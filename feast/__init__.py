@@ -1,5 +1,16 @@
 """FEAST: Finite Element Automatic Symbolic Tabulator."""
 from . import simplex, tp, references
+from .finite_element import FiniteElement
+
+_elementlist = {}
+
+for cell_class, module in [("simplex", simplex), ("tp", tp)]:
+    _elementlist[cell_class] = {}
+    for class_name in dir(module):
+        element = getattr(module, class_name)
+        if isinstance(element, type) and issubclass(element, FiniteElement) and element != FiniteElement:
+            for n in element.names:
+                _elementlist[cell_class][n] = element
 
 
 def feast_element(cell_type, element_type, order):
@@ -12,10 +23,6 @@ def feast_element(cell_type, element_type, order):
         Supported values: interval, triangle, quadrilateral, tetrahedron, hexahedron
     element_type: str
         The type of the element.
-        Supported values (simplex):
-            Lagrange, vector Lagrange, Nedelec, Raviart-Thomas
-        Supported values (tensor product):
-            Q, vector Q
     order: int
         The order of the element.
     """
@@ -33,19 +40,13 @@ def feast_element(cell_type, element_type, order):
         raise ValueError(f"Unknown cell type: {cell_type}")
 
     if reference.simplex:
-        if element_type == "Lagrange":
-            return simplex.Lagrange(reference, order)
-        if element_type == "vector Lagrange":
-            return simplex.VectorLagrange(reference, order)
-        if element_type == "Nedelec":
-            return simplex.NedelecFirstKind(reference, order)
-        if element_type == "Raviart-Thomas":
-            return simplex.RaviartThomas(reference, order)
+        print("simplex")
+        if element_type in _elementlist["simplex"]:
+            return _elementlist["simplex"][element_type](reference, order)
 
     if reference.tp:
-        if element_type == "Q":
-            return tp.Q(reference, order)
-        if element_type == "vector Q":
-            return tp.VectorQ(reference, order)
+        print("tp")
+        if element_type in _elementlist["tp"]:
+            return _elementlist["tp"][element_type](reference, order)
 
     raise ValueError(f"Unsupported element type: {element_type}")

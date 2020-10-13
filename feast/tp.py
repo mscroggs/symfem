@@ -26,6 +26,8 @@ class Q(FiniteElement):
             quolynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
 
+    names = ["Q"]
+
 
 class VectorQ(FiniteElement):
     """A vector Q element."""
@@ -50,3 +52,5 @@ class VectorQ(FiniteElement):
             reference.tdim,
             reference.tdim,
         )
+
+    names = ["vector Q", "vQ"]

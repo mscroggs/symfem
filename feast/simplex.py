@@ -38,6 +38,8 @@ class Lagrange(FiniteElement):
             polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
 
+    names = ["Lagrange", "P"]
+
 
 class VectorLagrange(FiniteElement):
     """Vector Lagrange finite element."""
@@ -63,6 +65,8 @@ class VectorLagrange(FiniteElement):
             reference.tdim,
         )
 
+    names = ["vector Lagrange", "vP"]
+
 
 class NedelecFirstKind(FiniteElement):
     """Nedelec first kind Hcurl finite element."""
@@ -80,6 +84,8 @@ class NedelecFirstKind(FiniteElement):
 
         super().__init__(poly, dofs, reference.tdim, reference.tdim)
 
+    names = ["Nedelec", "Nedelec1", "N1curl"]
+
 
 class RaviartThomas(FiniteElement):
     """Raviart-Thomas Hdiv finite element."""
@@ -95,3 +101,5 @@ class RaviartThomas(FiniteElement):
         )
 
         super().__init__(poly, dofs, reference.tdim, reference.tdim)
+
+    names = ["Raviart-Thomas", "RT", "N1div"]
