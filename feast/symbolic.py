@@ -17,4 +17,6 @@ def subs(f, vars, values):
     if len(values) == 2:
         return f.subs(vars[0], values[0]).subs(vars[1], values[1])
     if len(values) == 3:
-        return f.subs(vars[0], values[0]).subs(vars[1], values[1]).subs(vars[2], values[2])
+        return (
+            f.subs(vars[0], values[0]).subs(vars[1], values[1]).subs(vars[2], values[2])
+        )

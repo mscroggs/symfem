@@ -17,7 +17,7 @@ def vdiv(v, a):
 
 def vnorm(v):
     try:
-        return sympy.sqrt(sum(a**2 for a in v))
+        return sympy.sqrt(sum(a ** 2 for a in v))
     except TypeError:
         return abs(v)
 
@@ -39,9 +39,11 @@ def _vcross2d(v, w):
 
 
 def _vcross3d(v, w):
-    return (v[1] * w[2] - v[2] * w[1],
-            v[2] * w[0] - v[0] * w[2],
-            v[0] * w[1] - v[1] * w[0])
+    return (
+        v[1] * w[2] - v[2] * w[1],
+        v[2] * w[0] - v[0] * w[2],
+        v[0] * w[1] - v[1] * w[0],
+    )
 
 
 def vnormalise(v):

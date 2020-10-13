@@ -20,8 +20,9 @@ class DotPointEvaluation(BaseFunctional):
         self.vector = vector
 
     def eval(self, function):
-        return sum(subs(f_j * v_j, x, self.point)
-                   for f_j, v_j in zip(function, self.vector))
+        return sum(
+            subs(f_j * v_j, x, self.point) for f_j, v_j in zip(function, self.vector)
+        )
 
 
 class IntegralMoment(BaseFunctional):
@@ -29,9 +30,10 @@ class IntegralMoment(BaseFunctional):
         self.reference = reference
         self.f = subs(f, x, t)
         if isinstance(self.f, tuple):
-            self.f = tuple(o + sum(self.reference.axes[j][i] * c
-                                   for j, c in enumerate(self.f))
-                           for i, o in enumerate(self.reference.origin))
+            self.f = tuple(
+                o + sum(self.reference.axes[j][i] * c for j, c in enumerate(self.f))
+                for i, o in enumerate(self.reference.origin)
+            )
 
     def eval(self, function):
         point = [i for i in self.reference.origin]

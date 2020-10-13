@@ -24,7 +24,9 @@ def test_nedelec():
     ref = references.Triangle()
     space = NedelecFirstKind(ref, 1)
     values = space.tabulate_basis([[0, 0], [1, 0], [0, 1]], "xxyyzz")
-    assert all_equal(values, ((0, 0, 1, 0, 1, 0), (0, 0, 1, 1, 0, 1), (-1, 1, 0, 0, 1, 0)))
+    assert all_equal(
+        values, ((0, 0, 1, 0, 1, 0), (0, 0, 1, 1, 0, 1), (-1, 1, 0, 0, 1, 0))
+    )
 
 
 def test_Q():

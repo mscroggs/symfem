@@ -49,13 +49,13 @@ class Reference:
 
 
 class Interval(Reference):
-    def __init__(self, vertices=((0, ), (1, ))):
+    def __init__(self, vertices=((0,), (1,))):
         self.tdim = 1
         self.name = "interval"
         self.origin = vertices[0]
-        self.axes = (vsub(vertices[1], vertices[0]), )
+        self.axes = (vsub(vertices[1], vertices[0]),)
         self.vertices = vertices
-        self.edges = ((0, 1), )
+        self.edges = ((0, 1),)
         self.faces = tuple()
         self.volumes = tuple()
         self.sub_entity_types = ["point", Interval, None, None]
@@ -70,17 +70,18 @@ class Triangle(Reference):
         self.tdim = 2
         self.name = "triangle"
         self.origin = vertices[0]
-        self.axes = (vsub(vertices[1], vertices[0]),
-                     vsub(vertices[2], vertices[0]))
+        self.axes = (vsub(vertices[1], vertices[0]), vsub(vertices[2], vertices[0]))
         self.vertices = vertices
         self.edges = ((1, 2), (0, 2), (0, 1))
-        self.faces = ((0, 1, 2), )
+        self.faces = ((0, 1, 2),)
         self.volumes = tuple()
         self.sub_entity_types = ["point", Interval, Triangle, None]
         super().__init__(simplex=True)
 
     def integral(self, f):
-        return (f * self.jacobian()).integrate((t[1], 0, 1 - t[0])).integrate((t[0], 0, 1))
+        return (
+            (f * self.jacobian()).integrate((t[1], 0, 1 - t[0])).integrate((t[0], 0, 1))
+        )
 
 
 class Tetrahedron(Reference):
@@ -88,19 +89,25 @@ class Tetrahedron(Reference):
         self.tdim = 3
         self.name = "tetrahedron"
         self.origin = vertices[0]
-        self.axes = (vsub(vertices[1], vertices[0]),
-                     vsub(vertices[2], vertices[0]),
-                     vsub(vertices[3], vertices[0]))
+        self.axes = (
+            vsub(vertices[1], vertices[0]),
+            vsub(vertices[2], vertices[0]),
+            vsub(vertices[3], vertices[0]),
+        )
         self.vertices = vertices
         self.edges = ((2, 3), (1, 3), (1, 2), (0, 3), (0, 2), (0, 1))
         self.faces = ((1, 2, 3), (0, 2, 3), (0, 1, 3), (0, 1, 2))
-        self.volumes = ((0, 1, 2, 3), )
+        self.volumes = ((0, 1, 2, 3),)
         self.sub_entity_types = ["point", Interval, Triangle, Tetrahedron]
         super().__init__(simplex=True)
 
     def integral(self, f):
-        return (f * self.jacobian()).integrate((t[2], 0, 1 - t[0] - t[1])).integrate(
-            (t[1], 0, 1 - t[0])).integrate((t[0], 0, 1))
+        return (
+            (f * self.jacobian())
+            .integrate((t[2], 0, 1 - t[0] - t[1]))
+            .integrate((t[1], 0, 1 - t[0]))
+            .integrate((t[0], 0, 1))
+        )
 
 
 class Quadrilateral(Reference):
@@ -108,11 +115,10 @@ class Quadrilateral(Reference):
         self.tdim = 2
         self.name = "quadrilateral"
         self.origin = vertices[0]
-        self.axes = (vsub(vertices[1], vertices[0]),
-                     vsub(vertices[2], vertices[0]))
+        self.axes = (vsub(vertices[1], vertices[0]), vsub(vertices[2], vertices[0]))
         self.vertices = vertices
         self.edges = ((0, 1), (2, 3), (0, 2), (1, 3))
-        self.faces = ((0, 1, 2, 3), )
+        self.faces = ((0, 1, 2, 3),)
         self.volumes = tuple()
         self.sub_entity_types = ["point", Interval, Quadrilateral, None]
         super().__init__(tp=True)
@@ -122,20 +128,58 @@ class Quadrilateral(Reference):
 
 
 class Hexahedron(Reference):
-    def __init__(self, vertices=((0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0),
-                                 (0, 0, 1), (1, 0, 1), (0, 1, 1), (1, 1, 1))):
+    def __init__(
+        self,
+        vertices=(
+            (0, 0, 0),
+            (1, 0, 0),
+            (0, 1, 0),
+            (1, 1, 0),
+            (0, 0, 1),
+            (1, 0, 1),
+            (0, 1, 1),
+            (1, 1, 1),
+        ),
+    ):
         self.tdim = 3
         self.name = "hexahedron"
         self.origin = vertices[0]
-        self.axes = (vsub(vertices[1], vertices[0]),
-                     vsub(vertices[2], vertices[0]),
-                     vsub(vertices[4], vertices[0]))
+        self.axes = (
+            vsub(vertices[1], vertices[0]),
+            vsub(vertices[2], vertices[0]),
+            vsub(vertices[4], vertices[0]),
+        )
         self.vertices = vertices
-        self.edges = ((0, 1), (2, 3), (4, 5), (6, 7), (0, 2), (1, 3), (4, 6), (5, 7), (0, 4), (1, 5), (2, 6), (3, 7))
-        self.faces = ((0, 1, 2, 3), (4, 5, 6, 7), (0, 1, 4, 5), (2, 3, 6, 7), (0, 2, 4, 6), (1, 3, 5, 7))
-        self.volumes = ((0, 1, 2, 3), )
+        self.edges = (
+            (0, 1),
+            (2, 3),
+            (4, 5),
+            (6, 7),
+            (0, 2),
+            (1, 3),
+            (4, 6),
+            (5, 7),
+            (0, 4),
+            (1, 5),
+            (2, 6),
+            (3, 7),
+        )
+        self.faces = (
+            (0, 1, 2, 3),
+            (4, 5, 6, 7),
+            (0, 1, 4, 5),
+            (2, 3, 6, 7),
+            (0, 2, 4, 6),
+            (1, 3, 5, 7),
+        )
+        self.volumes = ((0, 1, 2, 3),)
         self.sub_entity_types = ["point", Interval, Quadrilateral, Hexahedron]
         super().__init__(tp=True)
 
     def integral(self, f):
-        return (f * self.jacobian()).integrate((t[2], 0, 1)).integrate((t[1], 0, 1)).integrate((t[0], 0, 1))
+        return (
+            (f * self.jacobian())
+            .integrate((t[2], 0, 1))
+            .integrate((t[1], 0, 1))
+            .integrate((t[0], 0, 1))
+        )

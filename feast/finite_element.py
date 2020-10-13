@@ -72,7 +72,9 @@ class FiniteElement:
         raise ValueError(f"Unknown order: {order}")
 
 
-def make_integral_moment_dofs(reference, vertices=None, edges=None, faces=None, volumes=None):
+def make_integral_moment_dofs(
+    reference, vertices=None, edges=None, faces=None, volumes=None
+):
     dofs = []
     if vertices is not None:
         if vertices[0] == PointEvaluation:

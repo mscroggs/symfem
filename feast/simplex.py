@@ -2,27 +2,42 @@ import sympy
 from itertools import product
 from .finite_element import FiniteElement, make_integral_moment_dofs
 from .polynomials import polynomial_set, Hcurl_polynomials
-from .functionals import PointEvaluation, DotPointEvaluation, TangentIntegralMoment, DotIntegralMoment
+from .functionals import (
+    PointEvaluation,
+    DotPointEvaluation,
+    TangentIntegralMoment,
+    DotIntegralMoment,
+)
 
 
 class Lagrange(FiniteElement):
     def __init__(self, reference, order):
         if order == 0:
-            dofs = [PointEvaluation(tuple(sympy.Rational(1, reference.tdim + 1)
-                                          for i in range(reference.tdim)))]
+            dofs = [
+                PointEvaluation(
+                    tuple(
+                        sympy.Rational(1, reference.tdim + 1)
+                        for i in range(reference.tdim)
+                    )
+                )
+            ]
         else:
             dofs = []
             for i in product(range(order + 1), repeat=reference.tdim):
                 if sum(i) <= order:
-                    dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i)))
+                    dofs.append(
+                        PointEvaluation(tuple(sympy.Rational(j, order) for j in i))
+                    )
 
-        super().__init__(polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1)
+        super().__init__(
+            polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
+        )
 
 
 class VectorLagrange(FiniteElement):
     def __init__(self, reference, order):
         if reference.name == "interval":
-            directions = [(1, )]
+            directions = [(1,)]
         elif reference.name == "triangle":
             directions = [(1, 0), (0, 1)]
         elif reference.name == "tetrahedron":
@@ -34,7 +49,12 @@ class VectorLagrange(FiniteElement):
             for d in directions:
                 dofs.append(DotPointEvaluation(p.point, d))
 
-        super().__init__(polynomial_set(reference.tdim, reference.tdim, order), dofs, reference.tdim, reference.tdim)
+        super().__init__(
+            polynomial_set(reference.tdim, reference.tdim, order),
+            dofs,
+            reference.tdim,
+            reference.tdim,
+        )
 
 
 class NedelecFirstKind(FiniteElement):
@@ -46,6 +66,7 @@ class NedelecFirstKind(FiniteElement):
             reference,
             edges=(TangentIntegralMoment, Lagrange, order - 1, 0),
             faces=(DotIntegralMoment, VectorLagrange, order - 2, 0),
-            volumes=(DotIntegralMoment, VectorLagrange, order - 3, 0))
+            volumes=(DotIntegralMoment, VectorLagrange, order - 3, 0),
+        )
 
         super().__init__(poly, dofs, reference.tdim, reference.tdim)
