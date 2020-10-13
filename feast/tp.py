@@ -2,8 +2,17 @@
 
 import sympy
 from itertools import product
+from .simplex import Lagrange, VectorLagrange
 from .finite_element import FiniteElement, make_integral_moment_dofs
-from .polynomials import quolynomial_set, Hdiv_quolynomials, Hcurl_quolynomials
+from .polynomials import (
+    quolynomial_set,
+    Hdiv_quolynomials,
+    Hcurl_quolynomials,
+    serendipity_set,
+    polynomial_set,
+    Hdiv_serendipity,
+    Hcurl_serendipity,
+)
 from .functionals import (
     PointEvaluation,
     DotPointEvaluation,
@@ -97,3 +106,64 @@ class RaviartThomas(FiniteElement):
         super().__init__(poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Raviart-Thomas", "NCF", "RTCF", "Qdiv"]
+
+
+class Serendipity(FiniteElement):
+    """A serendipity element."""
+
+    def __init__(self, reference, order):
+        poly = polynomial_set(reference.tdim, reference.tdim, order)
+        poly += serendipity_set(reference.tdim, reference.tdim, order)
+
+        dofs = []
+        for p in reference.vertices:
+            dofs.append(PointEvaluation(p))
+        dofs += make_integral_moment_dofs(
+            reference,
+            edges=(IntegralMoment, Lagrange, order - 2, 0),
+            faces=(IntegralMoment, Lagrange, order - 4, 0),
+            volumes=(IntegralMoment, Lagrange, order - 6, 0),
+        )
+
+        super().__init__(poly, dofs, reference.tdim, 1)
+
+    names = ["serendipity", "S"]
+
+
+class SerendipityCurl(FiniteElement):
+    """A serendipity Hcurl element."""
+
+    def __init__(self, reference, order):
+        poly = polynomial_set(reference.tdim, reference.tdim, order)
+        poly += Hcurl_serendipity(reference.tdim, reference.tdim, order)
+
+        dofs = []
+        dofs += make_integral_moment_dofs(
+            reference,
+            edges=(IntegralMoment, Lagrange, order, 0),
+            faces=(IntegralMoment, VectorLagrange, order - 2, 0),
+            volumes=(IntegralMoment, VectorLagrange, order - 4, 0),
+        )
+
+        super().__init__(poly, dofs, reference.tdim, 1)
+
+    names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
+
+
+class SerendipityDiv(FiniteElement):
+    """A serendipity Hdiv element."""
+
+    def __init__(self, reference, order):
+        poly = polynomial_set(reference.tdim, reference.tdim, order)
+        poly += Hdiv_serendipity(reference.tdim, reference.tdim, order)
+
+        dofs = []
+        dofs += make_integral_moment_dofs(
+            reference,
+            facets=(IntegralMoment, VectorLagrange, order, 0),
+            cells=(IntegralMoment, VectorLagrange, order - 2, 0),
+        )
+
+        super().__init__(poly, dofs, reference.tdim, 1)
+
+    names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
