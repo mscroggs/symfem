@@ -6,7 +6,7 @@ from .finite_element import FiniteElement, make_integral_moment_dofs
 from .polynomials import polynomial_set, Hcurl_polynomials
 from .functionals import (
     PointEvaluation,
-    PointEvaluation,
+    DotPointEvaluation,
     TangentIntegralMoment,
     IntegralMoment,
 )
