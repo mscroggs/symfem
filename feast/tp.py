@@ -2,9 +2,15 @@
 
 import sympy
 from itertools import product
-from .finite_element import FiniteElement
-from .polynomials import quolynomial_set
-from .functionals import PointEvaluation, DotPointEvaluation
+from .finite_element import FiniteElement, make_integral_moment_dofs
+from .polynomials import quolynomial_set, Hdiv_quolynomials, Hcurl_quolynomials
+from .functionals import (
+    PointEvaluation,
+    DotPointEvaluation,
+    IntegralMoment,
+    TangentIntegralMoment,
+    NormalIntegralMoment,
+)
 
 
 class Q(FiniteElement):
@@ -85,7 +91,7 @@ class RaviartThomas(FiniteElement):
         dofs = make_integral_moment_dofs(
             reference,
             facets=(NormalIntegralMoment, Q, order - 1, 0),
-            cells=(IntegralMoment, Nedelec, order - 1, 1)
+            cells=(IntegralMoment, Nedelec, order - 1, 1),
         )
 
         super().__init__(poly, dofs, reference.tdim, reference.tdim)

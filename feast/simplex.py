@@ -97,7 +97,7 @@ class RaviartThomas(FiniteElement):
         dofs = make_integral_moment_dofs(
             reference,
             facets=(NormalIntegralMoment, Lagrange, order - 1, 0),
-            cells=(IntegralMoment, VectorLagrange, order - 2, 0)
+            cells=(IntegralMoment, VectorLagrange, order - 2, 0),
         )
 
         super().__init__(poly, dofs, reference.tdim, reference.tdim)
@@ -132,7 +132,7 @@ class BDM(FiniteElement):
         dofs = make_integral_moment_dofs(
             reference,
             facets=(NormalIntegralMoment, Lagrange, order, 1),
-            cells=(IntegralMoment, NedelecFirstKind, order - 1, 1)
+            cells=(IntegralMoment, NedelecFirstKind, order - 1, 1),
         )
 
         super().__init__(poly, dofs, reference.tdim, reference.tdim)

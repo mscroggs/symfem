@@ -8,7 +8,11 @@ for cell_class, module in [("simplex", simplex), ("tp", tp)]:
     _elementlist[cell_class] = {}
     for class_name in dir(module):
         element = getattr(module, class_name)
-        if isinstance(element, type) and issubclass(element, FiniteElement) and element != FiniteElement:
+        if (
+            isinstance(element, type)
+            and issubclass(element, FiniteElement)
+            and element != FiniteElement
+        ):
             for n in element.names:
                 _elementlist[cell_class][n] = element
 
