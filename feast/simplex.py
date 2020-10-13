@@ -103,3 +103,38 @@ class RaviartThomas(FiniteElement):
         super().__init__(poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Raviart-Thomas", "RT", "N1div"]
+
+
+class NedelecSecondKind(FiniteElement):
+    """Nedelec second kind Hcurl finite element."""
+
+    def __init__(self, reference, order):
+        poly = polynomial_set(reference.tdim, reference.tdim, order)
+
+        dofs = make_integral_moment_dofs(
+            reference,
+            edges=(TangentIntegralMoment, Lagrange, order, 0),
+            faces=(IntegralMoment, RaviartThomas, order - 1, 1),
+            volumes=(IntegralMoment, RaviartThomas, order - 2, 1),
+        )
+
+        super().__init__(poly, dofs, reference.tdim, reference.tdim)
+
+    names = ["Nedelec2", "N2curl"]
+
+
+class BDM(FiniteElement):
+    """Brezzi-Douglas-Marini Hdiv finite element."""
+
+    def __init__(self, reference, order):
+        poly = polynomial_set(reference.tdim, reference.tdim, order)
+
+        dofs = make_integral_moment_dofs(
+            reference,
+            facets=(NormalIntegralMoment, Lagrange, order, 1),
+            cells=(IntegralMoment, NedelecFirstKind, order - 1, 1)
+        )
+
+        super().__init__(poly, dofs, reference.tdim, reference.tdim)
+
+    names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]
