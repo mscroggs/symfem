@@ -2,7 +2,6 @@
 
 import sympy
 from .symbolic import x, zero, subs
-from .functionals import PointEvaluation, DotPointEvaluation
 
 
 class FiniteElement:
