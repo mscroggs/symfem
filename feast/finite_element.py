@@ -79,23 +79,53 @@ class FiniteElement:
 
 
 def make_integral_moment_dofs(
-    reference, vertices=None, edges=None, faces=None, volumes=None
+    reference, vertices=None, edges=None, faces=None, volumes=None,
+    cells=None, facets=None, ridges=None, peaks=None
 ):
-    """Generate DOFs due to integral moments on sub entities."""
-    dofs = []
-    if vertices is not None:
-        if vertices[0] == PointEvaluation:
-            for vertex_i, v in enumerate(reference.vertices):
-                dofs.append(vertices[0](v))
-        elif vertices[0] == DotPointEvaluation:
-            for vertex_i, v in enumerate(reference.vertices):
-                for p in vertices[1]:
-                    dofs.append(vertices[0](v, p))
+    """Generate DOFs due to integral moments on sub entities.
 
-    for dim, moment_data in zip([1, 2, 3], [edges, faces, volumes]):
+    Parameters
+    ----------
+    reference: feast.references.Reference
+        The reference cell.
+    vertices: tuple
+        DOFs on dimension 0 entities.
+    edges: tuple
+        DOFs on dimension 1 entities.
+    faces: tuple
+        DOFs on dimension 2 entities.
+    volumes: tuple
+        DOFs on dimension 3 entities.
+    cells: tuple
+        DOFs on codimension 0 entities.
+    facets: tuple
+        DOFs on codimension 1 entities.
+    ridges: tuple
+        DOFs on codimension 2 entities.
+    peaks: tuple
+        DOFs on codimension 3 entities.
+    """
+    dofs = []
+
+    # DOFs per dimension
+    for dim, moment_data in enumerate([vertices, edges, faces, volumes]):
         if moment_data is not None and moment_data[2] >= moment_data[3]:
             sub_type = reference.sub_entity_types[dim]
             if sub_type is not None:
+                assert dim > 0
+                for i, vs in enumerate(reference.sub_entities(dim)):
+                    sub_ref = sub_type(vertices=[reference.vertices[v] for v in vs])
+                    sub_element = moment_data[1](sub_ref, moment_data[2])
+                    for d in sub_element.get_basis_functions():
+                        dofs.append(moment_data[0](sub_ref, d))
+
+    # DOFs per codimension
+    for codim, moment_data in enumerate([cells, facets, ridges, peaks]):
+        dim = reference.tdim - codim
+        if moment_data is not None and moment_data[2] >= moment_data[3]:
+            sub_type = reference.sub_entity_types[dim]
+            if sub_type is not None:
+                assert dim > 0
                 for i, vs in enumerate(reference.sub_entities(dim)):
                     sub_ref = sub_type(vertices=[reference.vertices[v] for v in vs])
                     sub_element = moment_data[1](sub_ref, moment_data[2])

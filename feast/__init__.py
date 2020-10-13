@@ -13,7 +13,7 @@ def feast_element(cell_type, element_type, order):
     element_type: str
         The type of the element.
         Supported values (simplex):
-            Lagrange, vector Lagrange, Nedelec
+            Lagrange, vector Lagrange, Nedelec, Raviart-Thomas
         Supported values (tensor product):
             Q, vector Q
     order: int
@@ -39,6 +39,8 @@ def feast_element(cell_type, element_type, order):
             return simplex.VectorLagrange(reference, order)
         if element_type == "Nedelec":
             return simplex.NedelecFirstKind(reference, order)
+        if element_type == "Raviart-Thomas":
+            return simplex.RaviartThomas(reference, order)
 
     if reference.tp:
         if element_type == "Q":

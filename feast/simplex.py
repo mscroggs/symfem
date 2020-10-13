@@ -3,11 +3,12 @@
 import sympy
 from itertools import product
 from .finite_element import FiniteElement, make_integral_moment_dofs
-from .polynomials import polynomial_set, Hcurl_polynomials
+from .polynomials import polynomial_set, Hcurl_polynomials, Hdiv_polynomials
 from .functionals import (
     PointEvaluation,
     DotPointEvaluation,
     TangentIntegralMoment,
+    NormalIntegralMoment,
     IntegralMoment,
 )
 
@@ -64,7 +65,7 @@ class VectorLagrange(FiniteElement):
 
 
 class NedelecFirstKind(FiniteElement):
-    """Nedelec first kind finite element."""
+    """Nedelec first kind Hcurl finite element."""
 
     def __init__(self, reference, order):
         poly = polynomial_set(reference.tdim, reference.tdim, order - 1)
@@ -75,6 +76,22 @@ class NedelecFirstKind(FiniteElement):
             edges=(TangentIntegralMoment, Lagrange, order - 1, 0),
             faces=(IntegralMoment, VectorLagrange, order - 2, 0),
             volumes=(IntegralMoment, VectorLagrange, order - 3, 0),
+        )
+
+        super().__init__(poly, dofs, reference.tdim, reference.tdim)
+
+
+class RaviartThomas(FiniteElement):
+    """Raviart-Thomas Hdiv finite element."""
+
+    def __init__(self, reference, order):
+        poly = polynomial_set(reference.tdim, reference.tdim, order - 1)
+        poly += Hdiv_polynomials(reference.tdim, reference.tdim, order)
+
+        dofs = make_integral_moment_dofs(
+            reference,
+            facets=(NormalIntegralMoment, Lagrange, order - 1, 0),
+            cells=(IntegralMoment, VectorLagrange, order - 2, 0)
         )
 
         super().__init__(poly, dofs, reference.tdim, reference.tdim)

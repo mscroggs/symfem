@@ -1,7 +1,7 @@
 """Reference elements."""
 import sympy
 from .symbolic import t
-from .vectors import vsub, vnorm, vdot, vcross
+from .vectors import vsub, vnorm, vdot, vcross, vnormalise
 
 
 class Reference:
@@ -30,7 +30,7 @@ class Reference:
         """Calculate the tangent to the element."""
         if self.tdim == 1:
             norm = sympy.sqrt(sum(i ** 2 for i in self.axes[0]))
-            return tuple(i / norm for i in self.axes[0])
+            return vnormalise(tuple(i / norm for i in self.axes[0]))
 
         raise RuntimeError
 
@@ -38,10 +38,10 @@ class Reference:
         """Calculate the normal to the element."""
         if self.tdim == 1:
             if self.gdim == 2:
-                return (self.axes[0][1], -self.axes[0][0])
+                return vnormalise((-self.axes[0][1], self.axes[0][0]))
         if self.tdim == 2:
             if self.gdim == 3:
-                return vcross(self.axes[0], self.axes[1])
+                return vnormalise(vcross(self.axes[0], self.axes[1]))
         raise RuntimeError
 
     def sub_entities(self, dim):
