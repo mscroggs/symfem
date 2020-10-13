@@ -161,7 +161,7 @@ class SerendipityDiv(FiniteElement):
         dofs = []
         dofs += make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, VectorLagrange, order, 0),
+            facets=(NormalIntegralMoment, Lagrange, order, 0),
             cells=(IntegralMoment, VectorLagrange, order - 2, 0),
         )
 
