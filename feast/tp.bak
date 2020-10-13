@@ -1,0 +1,141 @@
+import sympy
+from .finite_element import FiniteElement
+
+
+class Lagrange(FiniteElement):
+    def __init__(self, reference, order):
+        ref = references[cell_type]
+        if order == 0:
+            if ref["type"] == "interval":
+                dofs = [PointEvaluation((sympy.Rational(1, 2), ))]
+            elif ref["type"] == "triangle":
+                dofs = [PointEvaluation((sympy.Rational(1, 3), sympy.Rational(1, 3)))]
+            elif ref["type"] == fiatx.CellType.tetrahedron:
+                dofs = [PointEvaluation((sympy.Rational(1, 4), sympy.Rational(1, 4), sympy.Rational(1, 4)))]
+        else:
+            dofs = []
+            if ref["type"] == fiatx.CellType.interval:
+                for i in range(order + 1):
+                    dofs.append(PointEvaluation((sympy.Rational(i, order), )))
+            elif ref["type"] == fiatx.CellType.triangle:
+                for j in range(order + 1):
+                    for i in range(order + 1 - j):
+                        dofs.append(PointEvaluation((sympy.Rational(i, order), sympy.Rational(j, order))))
+            elif ref["type"] == fiatx.CellType.tetrahedron:
+                for k in range(order + 1):
+                    for j in range(order + 1 - k):
+                        for i in range(order + 1 - k - j):
+                            dofs.append(PointEvaluation((sympy.Rational(i, order), sympy.Rational(j, order), sympy.Rational(k, order))))
+
+        super()return FiniteElement(polynomial_set(ref["dim"], 1, order), dofs, ref["dim"], 1)
+
+
+def make_vector_lagrange_space(cell_type, order):
+    ref = references[cell_type]
+    if ref["type"] == fiatx.CellType.interval:
+        directions = [(1, )]
+    elif ref["type"] == fiatx.CellType.triangle:
+        directions = [(1, 0), (0, 1)]
+    elif ref["type"] == fiatx.CellType.tetrahedron:
+        directions = [(1, 0, 0), (0, 1, 0), (0, 1, 1)]
+
+    scalar_space = make_lagrange_space(cell_type, order)
+    dofs = []
+    for p in scalar_space.dofs:
+        for d in directions:
+            dofs.append(DotPointEvaluation(p.point, d))
+
+    return FiniteElement(polynomial_set(ref["dim"], ref["dim"], order), dofs, ref["dim"], ref["dim"])
+
+
+def make_Q_space(cell_type, order):
+    ref = references[cell_type]
+    if order == 0:
+        if ref["type"] == fiatx.CellType.interval:
+            dofs = [PointEvaluation((sympy.Rational(1, 2), ))]
+        elif ref["type"] == fiatx.CellType.quadrilateral:
+            dofs = [PointEvaluation((sympy.Rational(1, 2), sympy.Rational(1, 2)))]
+        elif ref["type"] == fiatx.CellType.hexahedron:
+            dofs = [PointEvaluation((sympy.Rational(1, 2), sympy.Rational(1, 2), sympy.Rational(1, 2)))]
+    else:
+        dofs = []
+        if ref["type"] == fiatx.CellType.interval:
+            for i in range(order + 1):
+                dofs.append(PointEvaluation((sympy.Rational(i, order), )))
+        elif ref["type"] == fiatx.CellType.quadrilateral:
+            for j in range(order + 1):
+                for i in range(order + 1):
+                    dofs.append(PointEvaluation((sympy.Rational(i, order), sympy.Rational(j, order))))
+        elif ref["type"] == fiatx.CellType.hexahedron:
+            for k in range(order + 1):
+                for j in range(order + 1):
+                    for i in range(order + 1):
+                        dofs.append(PointEvaluation((sympy.Rational(i, order), sympy.Rational(j, order), sympy.Rational(k, order))))
+
+    return FiniteElement(qolynomial_set(ref["dim"], 1, order), dofs, ref["dim"], 1)
+
+
+def make_vector_Q_space(cell_type, order):
+    ref = references[cell_type]
+    if ref["type"] == fiatx.CellType.interval:
+        directions = [(1, )]
+    elif ref["type"] == fiatx.CellType.quadrilateral:
+        directions = [(1, 0), (0, 1)]
+    elif ref["type"] == fiatx.CellType.hexahedron:
+        directions = [(1, 0, 0), (0, 1, 0), (0, 1, 1)]
+
+    scalar_space = make_Q_space(cell_type, order)
+    dofs = []
+    for p in scalar_space.dofs:
+        for d in directions:
+            dofs.append(DotPointEvaluation(p.point, d))
+
+    return FiniteElement(qolynomial_set(ref["dim"], ref["dim"], order), dofs, ref["dim"], ref["dim"])
+
+
+def make_integral_moment_dofs(ref, vertices=None, edges=None, faces=None, volumes=None):
+    dofs = []
+    if vertices is not None:
+        if vertices[0] == PointEvaluation:
+            for vertex_i, v in enumerate(ref["vertices"]):
+                dofs.append(vertices[0](v))
+        elif vertices[0] == DotPointEvaluation:
+            for vertex_i, v in enumerate(ref["vertices"]):
+                for p in vertices[1]:
+                    dofs.append(vertices[0](v, p))
+
+    for dim, moment_data, entity_type in zip([1, 2, 3], [edges, faces, volumes], ["edges", "faces", "volumes"]):
+        if moment_data is not None and moment_data[2] >= moment_data[3]:
+            sub_type = ref["sub_entity_types"][dim]
+            if sub_type is not None:
+                sub_ref = references[sub_type]
+                sub_element = symbolic_spaces[moment_data[1]](sub_type, moment_data[2])
+                for i, vs in enumerate(ref[entity_type]):
+                    vertices = [ref["vertices"][v] for v in vs]
+                    for d in sub_element.get_basis_functions():
+                        dofs.append(moment_data[0](sub_ref, d,
+                                                   origin=sub_ref["get_origin"](vertices),
+                                                   axes=sub_ref["get_axes"](vertices)))
+    return dofs
+
+
+def make_nedelec_first_space(cell_type, order):
+    ref = references[cell_type]
+    poly = polynomial_set(ref["dim"], ref["dim"], order - 1)
+    poly += Hcurl_polynomials(ref["dim"], ref["dim"], order)
+
+    dofs = make_integral_moment_dofs(
+        ref,
+        edges=(TangentIntegralMoment, "Lagrange", order - 1, 0),
+        faces=(DotIntegralMoment, "vector Lagrange", order - 2, 0),
+        volumes=(DotIntegralMoment, "vector Lagrange", order - 3, 0))
+
+    return FiniteElement(poly, dofs, ref["dim"], ref["dim"])
+
+
+symbolic_spaces["Lagrange"] = make_lagrange_space
+symbolic_spaces["vector Lagrange"] = make_vector_lagrange_space
+symbolic_spaces["Nedelec"] = make_nedelec_first_space
+
+symbolic_spaces["Q"] = make_Q_space
+symbolic_spaces["vector Q"] = make_vector_Q_space
