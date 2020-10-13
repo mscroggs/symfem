@@ -1,6 +1,4 @@
 from feast import feast_element
-from feast.simplex import NedelecFirstKind, Lagrange
-from feast.tp import Q
 
 
 def all_equal(a, b):
