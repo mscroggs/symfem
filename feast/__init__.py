@@ -40,12 +40,10 @@ def feast_element(cell_type, element_type, order):
         raise ValueError(f"Unknown cell type: {cell_type}")
 
     if reference.simplex:
-        print("simplex")
         if element_type in _elementlist["simplex"]:
             return _elementlist["simplex"][element_type](reference, order)
 
     if reference.tp:
-        print("tp")
         if element_type in _elementlist["tp"]:
             return _elementlist["tp"][element_type](reference, order)
 
