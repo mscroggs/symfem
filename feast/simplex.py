@@ -6,9 +6,9 @@ from .finite_element import FiniteElement, make_integral_moment_dofs
 from .polynomials import polynomial_set, Hcurl_polynomials
 from .functionals import (
     PointEvaluation,
-    DotPointEvaluation,
+    PointEvaluation,
     TangentIntegralMoment,
-    DotIntegralMoment,
+    IntegralMoment,
 )
 
 
@@ -73,8 +73,8 @@ class NedelecFirstKind(FiniteElement):
         dofs = make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, Lagrange, order - 1, 0),
-            faces=(DotIntegralMoment, VectorLagrange, order - 2, 0),
-            volumes=(DotIntegralMoment, VectorLagrange, order - 3, 0),
+            faces=(IntegralMoment, VectorLagrange, order - 2, 0),
+            volumes=(IntegralMoment, VectorLagrange, order - 3, 0),
         )
 
         super().__init__(poly, dofs, reference.tdim, reference.tdim)
