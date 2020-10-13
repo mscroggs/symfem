@@ -15,7 +15,7 @@ def test_lagrange():
     space = feast_element("triangle", "Lagrange", 1)
     assert all_equal(
         space.tabulate_basis([[0, 0], [0, 1], [1, 0]]),
-        ((1, 0, 0), (0, 1, 0), (0, 0, 1))
+        ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
     )
 
 
@@ -23,7 +23,7 @@ def test_nedelec():
     space = feast_element("triangle", "Nedelec", 1)
     assert all_equal(
         space.tabulate_basis([[0, 0], [1, 0], [0, 1]], "xxyyzz"),
-        ((0, 0, 1, 0, 1, 0), (0, 0, 1, 1, 0, 1), (-1, 1, 0, 0, 1, 0))
+        ((0, 0, 1, 0, 1, 0), (0, 0, 1, 1, 0, 1), (-1, 1, 0, 0, 1, 0)),
     )
 
 
@@ -31,5 +31,5 @@ def test_Q():
     space = feast_element("quadrilateral", "Q", 1)
     assert all_equal(
         space.tabulate_basis([[0, 0], [0, 1], [1, 0], [1, 1]]),
-        ((1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1))
+        ((1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1)),
     )
