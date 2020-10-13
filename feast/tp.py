@@ -2,6 +2,7 @@
 
 import sympy
 from itertools import product
+from .symbolic import one, zero
 from .simplex import Lagrange, VectorLagrange
 from .finite_element import FiniteElement, make_integral_moment_dofs
 from .polynomials import (
@@ -48,15 +49,12 @@ class VectorQ(FiniteElement):
     """A vector Q element."""
 
     def __init__(self, reference, order):
-        if reference.name == "interval":
-            directions = [(1,)]
-        elif reference.name == "quadrilateral":
-            directions = [(1, 0), (0, 1)]
-        elif reference.name == "hexahedron":
-            directions = [(1, 0, 0), (0, 1, 0), (0, 0, 1)]
-
         scalar_space = Q(reference, order)
         dofs = []
+        directions = [
+            tuple(one if i == j else zero for j in range(reference.tdim))
+            for i in range(reference.tdim)
+        ]
         for p in scalar_space.dofs:
             for d in directions:
                 dofs.append(DotPointEvaluation(p.point, d))
@@ -166,4 +164,4 @@ class SerendipityDiv(FiniteElement):
 
         super().__init__(poly, dofs, reference.tdim, 1)
 
-    names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
+    names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]

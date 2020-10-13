@@ -2,6 +2,7 @@
 
 import sympy
 from itertools import product
+from .symbolic import one, zero
 from .finite_element import FiniteElement, make_integral_moment_dofs
 from .polynomials import polynomial_set, Hcurl_polynomials, Hdiv_polynomials
 from .functionals import (
@@ -45,15 +46,12 @@ class VectorLagrange(FiniteElement):
     """Vector Lagrange finite element."""
 
     def __init__(self, reference, order):
-        if reference.name == "interval":
-            directions = [(1,)]
-        elif reference.name == "triangle":
-            directions = [(1, 0), (0, 1)]
-        elif reference.name == "tetrahedron":
-            directions = [(1, 0, 0), (0, 1, 0), (0, 0, 1)]
-
         scalar_space = Lagrange(reference, order)
         dofs = []
+        directions = [
+            tuple(one if i == j else zero for j in range(reference.tdim))
+            for i in range(reference.tdim)
+        ]
         for p in scalar_space.dofs:
             for d in directions:
                 dofs.append(DotPointEvaluation(p.point, d))
