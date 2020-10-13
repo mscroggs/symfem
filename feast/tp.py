@@ -54,3 +54,40 @@ class VectorQ(FiniteElement):
         )
 
     names = ["vector Q", "vQ"]
+
+
+class Nedelec(FiniteElement):
+    """Nedelec Hcurl finite element."""
+
+    def __init__(self, reference, order):
+        poly = quolynomial_set(reference.tdim, reference.tdim, order - 1)
+        poly += Hcurl_quolynomials(reference.tdim, reference.tdim, order)
+
+        dofs = make_integral_moment_dofs(
+            reference,
+            edges=(TangentIntegralMoment, Q, order - 1, 0),
+            faces=(IntegralMoment, RaviartThomas, order - 1, 1),
+            volumes=(IntegralMoment, RaviartThomas, order - 1, 1),
+        )
+
+        super().__init__(poly, dofs, reference.tdim, reference.tdim)
+
+    names = ["Nedelec", "NCE", "RTCE", "Qcurl"]
+
+
+class RaviartThomas(FiniteElement):
+    """Raviart-Thomas Hdiv finite element."""
+
+    def __init__(self, reference, order):
+        poly = quolynomial_set(reference.tdim, reference.tdim, order - 1)
+        poly += Hdiv_quolynomials(reference.tdim, reference.tdim, order)
+
+        dofs = make_integral_moment_dofs(
+            reference,
+            facets=(NormalIntegralMoment, Q, order - 1, 0),
+            cells=(IntegralMoment, Nedelec, order - 1, 1)
+        )
+
+        super().__init__(poly, dofs, reference.tdim, reference.tdim)
+
+    names = ["Raviart-Thomas", "NCF", "RTCF", "Qdiv"]
