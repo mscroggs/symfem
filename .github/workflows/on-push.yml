@@ -1,0 +1,31 @@
+on:
+  push
+
+jobs:
+  style-checks:
+    name: Run style checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt-get install -y python3-setuptools
+      - run: pip3 install black>=20.8
+      - run: pip3 install pydocstyle flake8
+      - run: |
+            python3 -m flake8 .
+        name: Run flake8 checks
+      - run: python3 -m pydocstyle feast
+        name: Run pydocstyle checks
+      - run: | 
+            python3 -m black --line-length 88 --check .
+        name: Run black checks
+
+  run-tests:
+    name: Build and run tests with ExaFMM
+    needs: build-and-publish-docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: pip3 install -r requirements.txt
+        name: Install requirements
+      - run: python3 -m pytest --durations=50 test
+        name: Run unit tests
