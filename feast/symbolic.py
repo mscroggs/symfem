@@ -1,3 +1,5 @@
+"""Symbolic tools."""
+
 import sympy
 
 t = [sympy.Symbol("t0"), sympy.Symbol("t1"), sympy.Symbol("t2")]

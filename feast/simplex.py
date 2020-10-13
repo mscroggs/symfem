@@ -1,3 +1,5 @@
+"""Finite elements on simplices."""
+
 import sympy
 from itertools import product
 from .finite_element import FiniteElement, make_integral_moment_dofs
@@ -11,6 +13,8 @@ from .functionals import (
 
 
 class Lagrange(FiniteElement):
+    """Lagrange finite element."""
+
     def __init__(self, reference, order):
         if order == 0:
             dofs = [
@@ -35,6 +39,8 @@ class Lagrange(FiniteElement):
 
 
 class VectorLagrange(FiniteElement):
+    """Vector Lagrange finite element."""
+
     def __init__(self, reference, order):
         if reference.name == "interval":
             directions = [(1,)]
@@ -58,6 +64,8 @@ class VectorLagrange(FiniteElement):
 
 
 class NedelecFirstKind(FiniteElement):
+    """Nedelec first kind finite element."""
+
     def __init__(self, reference, order):
         poly = polynomial_set(reference.tdim, reference.tdim, order - 1)
         poly += Hcurl_polynomials(reference.tdim, reference.tdim, order)

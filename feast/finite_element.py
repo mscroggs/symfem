@@ -1,9 +1,13 @@
+"""Abstract finite element classes and functions."""
+
 import sympy
 from .symbolic import x, zero, subs
 from .functionals import PointEvaluation, DotPointEvaluation
 
 
 class FiniteElement:
+    """Abstract finite element."""
+
     def __init__(self, basis, dofs, domain_dim, range_dim):
         assert len(basis) == len(dofs)
         self.basis = basis
@@ -14,6 +18,7 @@ class FiniteElement:
         self._basis_functions = None
 
     def get_basis_functions(self):
+        """Get the basis functions of the element."""
         if self._basis_functions is None:
             mat = []
             for b in self.basis:
@@ -42,6 +47,7 @@ class FiniteElement:
         return self._basis_functions
 
     def tabulate_basis(self, points, order="xyzxyz"):
+        """Evaluate the basis functions of the element at the given points."""
         if self.range_dim == 1:
             output = []
             for p in points:
@@ -75,6 +81,7 @@ class FiniteElement:
 def make_integral_moment_dofs(
     reference, vertices=None, edges=None, faces=None, volumes=None
 ):
+    """Generate DOFs due to integral moments on sub entities."""
     dofs = []
     if vertices is not None:
         if vertices[0] == PointEvaluation:

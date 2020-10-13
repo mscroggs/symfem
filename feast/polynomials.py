@@ -1,8 +1,10 @@
+"""Polynomial sets."""
 from .symbolic import x, zero, one
 from itertools import product
 
 
 def polynomial_set_1d(dim, order):
+    """One dimensional polynomial set."""
     if dim == 1:
         return [x[0] ** i for i in range(order + 1)]
     if dim == 2:
@@ -21,6 +23,7 @@ def polynomial_set_1d(dim, order):
 
 
 def polynomial_set(domain_dim, range_dim, order):
+    """Polynomial set."""
     if range_dim == 1:
         return polynomial_set_1d(domain_dim, order)
     set1d = polynomial_set_1d(domain_dim, order)
@@ -32,6 +35,7 @@ def polynomial_set(domain_dim, range_dim, order):
 
 
 def Hdiv_polynomials(domain_dim, range_dim, order):
+    """Hdiv conforming polynomial set."""
     assert domain_dim == range_dim
     if domain_dim == 2:
         return [
@@ -51,6 +55,7 @@ def Hdiv_polynomials(domain_dim, range_dim, order):
 
 
 def Hcurl_polynomials(domain_dim, range_dim, order):
+    """Hcurl conforming polynomial set."""
     assert domain_dim == range_dim
     if domain_dim == 2:
         return [
@@ -94,7 +99,8 @@ def Hcurl_polynomials(domain_dim, range_dim, order):
             ]
 
 
-def qolynomial_set_1d(dim, order):
+def quolynomial_set_1d(dim, order):
+    """One dimensional quolynomial set."""
     basis = []
     for j in product(range(order + 1), repeat=dim):
         poly = 1
@@ -104,10 +110,11 @@ def qolynomial_set_1d(dim, order):
     return basis
 
 
-def qolynomial_set(domain_dim, range_dim, order):
+def quolynomial_set(domain_dim, range_dim, order):
+    """Quolynomial set."""
     if range_dim == 1:
-        return qolynomial_set_1d(domain_dim, order)
-    set1d = qolynomial_set_1d(domain_dim, order)
+        return quolynomial_set_1d(domain_dim, order)
+    set1d = quolynomial_set_1d(domain_dim, order)
     return [
         tuple(p if i == j else zero for j in range(range_dim))
         for p in set1d
@@ -115,7 +122,8 @@ def qolynomial_set(domain_dim, range_dim, order):
     ]
 
 
-def Hdiv_qolynomials(domain_dim, range_dim, order):
+def Hdiv_quolynomials(domain_dim, range_dim, order):
+    """Hdiv conforming quolynomial set."""
     assert domain_dim == range_dim
     basis = []
     for d in range(domain_dim):
@@ -127,7 +135,8 @@ def Hdiv_qolynomials(domain_dim, range_dim, order):
     return basis
 
 
-def Hcurl_qolynomials(domain_dim, range_dim, order):
+def Hcurl_quolynomials(domain_dim, range_dim, order):
+    """Hcurl conforming quolynomial set."""
     assert domain_dim == range_dim
     basis = []
     for d in range(domain_dim):
@@ -144,6 +153,7 @@ def Hcurl_qolynomials(domain_dim, range_dim, order):
 
 
 def serendipity_indices(total, linear, dim, done=[]):
+    """Get the set indices for a serendipity polynomial set."""
     if len(done) == dim:
         if done.count(1) >= linear:
             return [done]
@@ -157,6 +167,7 @@ def serendipity_indices(total, linear, dim, done=[]):
 
 
 def serendipity_set_1d(dim, order):
+    """One dimensional serendipity set."""
     basis = []
     for s in range(order + 1, order + dim + 1):
         for i in serendipity_indices(s, s - order, dim):
@@ -168,6 +179,7 @@ def serendipity_set_1d(dim, order):
 
 
 def serendipity_set(domain_dim, range_dim, order):
+    """Serendipity set."""
     if range_dim == 1:
         return serendipity_set_1d(domain_dim, order)
     set1d = serendipity_set_1d(domain_dim, order)
@@ -179,6 +191,7 @@ def serendipity_set(domain_dim, range_dim, order):
 
 
 def Hdiv_serendipity(domain_dim, range_dim, order):
+    """Hdiv conforming serendipity set."""
     assert domain_dim == range_dim
     if domain_dim == 2:
         return [
@@ -225,6 +238,7 @@ def Hdiv_serendipity(domain_dim, range_dim, order):
 
 
 def Hcurl_serendipity(domain_dim, range_dim, order):
+    """Hcurl conforming serendipity set."""
     assert domain_dim == range_dim
     if domain_dim == 2:
         return [

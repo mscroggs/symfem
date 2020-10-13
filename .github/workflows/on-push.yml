@@ -13,11 +13,11 @@ jobs:
       - run: |
             python3 -m flake8 .
         name: Run flake8 checks
-      - run: python3 -m pydocstyle feast
-        name: Run pydocstyle checks
       - run: | 
             python3 -m black --line-length 88 --check .
         name: Run black checks
+      - run: python3 -m pydocstyle feast
+        name: Run pydocstyle checks
 
   run-tests:
     name: Run tests

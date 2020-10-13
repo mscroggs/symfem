@@ -1,18 +1,23 @@
+"""Reference elements."""
 import sympy
 from .symbolic import t
 from .vectors import vsub, vnorm, vdot, vcross
 
 
 class Reference:
+    """A reference element."""
+
     def __init__(self, simplex=False, tp=False):
         self.gdim = len(self.origin)
         self.simplex = simplex
         self.tp = tp
 
     def integral(self, f):
+        """Calculate the integral over the element."""
         raise NotImplementedError
 
     def jacobian(self):
+        """Calculate the jacobian."""
         assert len(self.axes) == self.tdim
         if self.tdim == 1:
             return vnorm(self.axes[0])
@@ -22,6 +27,7 @@ class Reference:
             return vnorm(vdot(vcross(self.axes[0], self.axes[1]), self.axes[2]))
 
     def tangent(self):
+        """Calculate the tangent to the element."""
         if self.tdim == 1:
             norm = sympy.sqrt(sum(i ** 2 for i in self.axes[0]))
             return tuple(i / norm for i in self.axes[0])
@@ -29,6 +35,7 @@ class Reference:
         raise RuntimeError
 
     def normal(self):
+        """Calculate the normal to the element."""
         if self.tdim == 1:
             if self.gdim == 2:
                 return (self.axes[0][1], -self.axes[0][0])
@@ -38,6 +45,7 @@ class Reference:
         raise RuntimeError
 
     def sub_entities(self, dim):
+        """Get the sub entities of a given dimension."""
         if dim == 0:
             return self.vertices
         if dim == 1:
@@ -49,6 +57,8 @@ class Reference:
 
 
 class Interval(Reference):
+    """An interval."""
+
     def __init__(self, vertices=((0,), (1,))):
         self.tdim = 1
         self.name = "interval"
@@ -62,10 +72,13 @@ class Interval(Reference):
         super().__init__(simplex=True, tp=True)
 
     def integral(self, f):
+        """Calculate the integral over the element."""
         return (f * self.jacobian()).integrate((t[0], 0, 1))
 
 
 class Triangle(Reference):
+    """A triangle."""
+
     def __init__(self, vertices=((0, 0), (1, 0), (0, 1))):
         self.tdim = 2
         self.name = "triangle"
@@ -79,12 +92,15 @@ class Triangle(Reference):
         super().__init__(simplex=True)
 
     def integral(self, f):
+        """Calculate the integral over the element."""
         return (
             (f * self.jacobian()).integrate((t[1], 0, 1 - t[0])).integrate((t[0], 0, 1))
         )
 
 
 class Tetrahedron(Reference):
+    """A tetrahedron."""
+
     def __init__(self, vertices=((0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1))):
         self.tdim = 3
         self.name = "tetrahedron"
@@ -102,6 +118,7 @@ class Tetrahedron(Reference):
         super().__init__(simplex=True)
 
     def integral(self, f):
+        """Calculate the integral over the element."""
         return (
             (f * self.jacobian())
             .integrate((t[2], 0, 1 - t[0] - t[1]))
@@ -111,6 +128,8 @@ class Tetrahedron(Reference):
 
 
 class Quadrilateral(Reference):
+    """A quadrilateral."""
+
     def __init__(self, vertices=((0, 0), (1, 0), (0, 1), (1, 1))):
         self.tdim = 2
         self.name = "quadrilateral"
@@ -124,10 +143,13 @@ class Quadrilateral(Reference):
         super().__init__(tp=True)
 
     def integral(self, f):
+        """Calculate the integral over the element."""
         return (f * self.jacobian()).integrate((t[1], 0, 1)).integrate((t[0], 0, 1))
 
 
 class Hexahedron(Reference):
+    """A hexahedron."""
+
     def __init__(
         self,
         vertices=(
@@ -177,6 +199,7 @@ class Hexahedron(Reference):
         super().__init__(tp=True)
 
     def integral(self, f):
+        """Calculate the integral over the element."""
         return (
             (f * self.jacobian())
             .integrate((t[2], 0, 1))

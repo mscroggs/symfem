@@ -1,11 +1,15 @@
+"""Elements on tensor product cells."""
+
 import sympy
 from itertools import product
 from .finite_element import FiniteElement
-from .polynomials import qolynomial_set
+from .polynomials import quolynomial_set
 from .functionals import PointEvaluation, DotPointEvaluation
 
 
 class Q(FiniteElement):
+    """A Q element."""
+
     def __init__(self, reference, order):
         if order == 0:
             dofs = [
@@ -19,11 +23,13 @@ class Q(FiniteElement):
                 dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i)))
 
         super().__init__(
-            qolynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
+            quolynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
 
 
 class VectorQ(FiniteElement):
+    """A vector Q element."""
+
     def __init__(self, reference, order):
         if reference.name == "interval":
             directions = [(1,)]
@@ -39,7 +45,7 @@ class VectorQ(FiniteElement):
                 dofs.append(DotPointEvaluation(p.point, d))
 
         super().__init__(
-            qolynomial_set(reference.tdim, reference.tdim, order),
+            quolynomial_set(reference.tdim, reference.tdim, order),
             dofs,
             reference.tdim,
             reference.tdim,

@@ -1,31 +1,44 @@
+"""Functionals used to define the dual sets."""
 from .symbolic import subs, x, t
+from .vectors import vdot
 
 
 class BaseFunctional:
+    """A functional."""
+
     def eval(self, fun):
+        """Apply to the functional to a function."""
         raise NotImplementedError
 
 
 class PointEvaluation(BaseFunctional):
+    """A point evaluation."""
+
     def __init__(self, point):
         self.point = point
 
     def eval(self, function):
+        """Apply to the functional to a function."""
         return subs(function, x, self.point)
 
 
 class DotPointEvaluation(BaseFunctional):
+    """A point evaluation in a given direction."""
+
     def __init__(self, point, vector):
         self.point = point
         self.vector = vector
 
     def eval(self, function):
+        """Apply to the functional to a function."""
         return sum(
             subs(f_j * v_j, x, self.point) for f_j, v_j in zip(function, self.vector)
         )
 
 
 class IntegralMoment(BaseFunctional):
+    """An integral moment."""
+
     def __init__(self, reference, f):
         self.reference = reference
         self.f = subs(f, x, t)
@@ -36,6 +49,7 @@ class IntegralMoment(BaseFunctional):
             )
 
     def eval(self, function):
+        """Apply to the functional to a function."""
         point = [i for i in self.reference.origin]
         for i, a in enumerate(zip(*self.reference.axes)):
             for j, k in zip(a, t):
@@ -44,31 +58,31 @@ class IntegralMoment(BaseFunctional):
         return self.reference.integral(integrand)
 
     def dot(self, function):
-        return function * self.f
-
-
-class DotIntegralMoment(IntegralMoment):
-    def __init__(self, reference, f):
-        super().__init__(reference, f)
-
-    def dot(self, function):
-        return sum(f_j * d_j for f_j, d_j in zip(function, self.f))
+        """Dot a function with the moment function."""
+        return vdot(function, self.f)
 
 
 class VecIntegralMoment(IntegralMoment):
+    """An integral moment applied to a component of a vector."""
+
     def __init__(self, reference, f, dot_with):
         super().__init__(reference, f)
         self.dot_with = dot_with
 
     def dot(self, function):
-        return sum(f_j * d_j for f_j, d_j in zip(function, self.dot_with)) * self.f
+        """Dot a function with the moment function."""
+        return vdot(function, self.dot_with) * self.f
 
 
 class TangentIntegralMoment(VecIntegralMoment):
+    """An integral moment in the tangential direction."""
+
     def __init__(self, reference, f):
         super().__init__(reference, f, reference.tangent())
 
 
 class NormalIntegralMoment(VecIntegralMoment):
-    def __init__(self, reference, f, origin=None, axes=None):
+    """An integral moment in the normal direction."""
+
+    def __init__(self, reference, f):
         super().__init__(reference, f, reference.normal())
