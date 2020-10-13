@@ -48,10 +48,13 @@ class VectorLagrange(FiniteElement):
     def __init__(self, reference, order):
         scalar_space = Lagrange(reference, order)
         dofs = []
-        directions = [
-            tuple(one if i == j else zero for j in range(reference.tdim))
-            for i in range(reference.tdim)
-        ]
+        if reference.tdim == 1:
+            directions = [1]
+        else:
+            directions = [
+                tuple(one if i == j else zero for j in range(reference.tdim))
+                for i in range(reference.tdim)
+            ]
         for p in scalar_space.dofs:
             for d in directions:
                 dofs.append(DotPointEvaluation(p.point, d))

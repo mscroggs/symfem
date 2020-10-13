@@ -31,9 +31,7 @@ class DotPointEvaluation(BaseFunctional):
 
     def eval(self, function):
         """Apply to the functional to a function."""
-        return sum(
-            subs(f_j * v_j, x, self.point) for f_j, v_j in zip(function, self.vector)
-        )
+        return subs(vdot(function, self.vector), x, self.point)
 
 
 class IntegralMoment(BaseFunctional):
