@@ -42,6 +42,9 @@ class Reference:
         if self.tdim == 2:
             if self.gdim == 3:
                 return vnormalise(vcross(self.axes[0], self.axes[1]))
+        from IPython import embed
+
+        embed()
         raise RuntimeError
 
     def sub_entities(self, dim):
@@ -64,6 +67,7 @@ class Interval(Reference):
         self.name = "interval"
         self.origin = vertices[0]
         self.axes = (vsub(vertices[1], vertices[0]),)
+        self.reference_vertices = ((0,), (1,))
         self.vertices = vertices
         self.edges = ((0, 1),)
         self.faces = tuple()
@@ -84,6 +88,7 @@ class Triangle(Reference):
         self.name = "triangle"
         self.origin = vertices[0]
         self.axes = (vsub(vertices[1], vertices[0]), vsub(vertices[2], vertices[0]))
+        self.reference_vertices = ((0, 0), (1, 0), (0, 1))
         self.vertices = vertices
         self.edges = ((1, 2), (0, 2), (0, 1))
         self.faces = ((0, 1, 2),)
@@ -110,6 +115,7 @@ class Tetrahedron(Reference):
             vsub(vertices[2], vertices[0]),
             vsub(vertices[3], vertices[0]),
         )
+        self.reference_vertices = ((0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1))
         self.vertices = vertices
         self.edges = ((2, 3), (1, 3), (1, 2), (0, 3), (0, 2), (0, 1))
         self.faces = ((1, 2, 3), (0, 2, 3), (0, 1, 3), (0, 1, 2))
@@ -135,6 +141,7 @@ class Quadrilateral(Reference):
         self.name = "quadrilateral"
         self.origin = vertices[0]
         self.axes = (vsub(vertices[1], vertices[0]), vsub(vertices[2], vertices[0]))
+        self.reference_vertices = ((0, 0), (1, 0), (0, 1), (1, 1))
         self.vertices = vertices
         self.edges = ((0, 1), (2, 3), (0, 2), (1, 3))
         self.faces = ((0, 1, 2, 3),)
@@ -171,6 +178,16 @@ class Hexahedron(Reference):
             vsub(vertices[2], vertices[0]),
             vsub(vertices[4], vertices[0]),
         )
+        self.reference_vertices = (
+            (0, 0, 0),
+            (1, 0, 0),
+            (0, 1, 0),
+            (1, 1, 0),
+            (0, 0, 1),
+            (1, 0, 1),
+            (0, 1, 1),
+            (1, 1, 1),
+        )
         self.vertices = vertices
         self.edges = (
             (0, 1),
@@ -194,7 +211,7 @@ class Hexahedron(Reference):
             (0, 2, 4, 6),
             (1, 3, 5, 7),
         )
-        self.volumes = ((0, 1, 2, 3),)
+        self.volumes = ((0, 1, 2, 3, 4, 5, 6, 7),)
         self.sub_entity_types = ["point", Interval, Quadrilateral, Hexahedron]
         super().__init__(tp=True)
 

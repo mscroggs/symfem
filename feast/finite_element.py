@@ -120,7 +120,9 @@ def make_integral_moment_dofs(
             if sub_type is not None:
                 assert dim > 0
                 for i, vs in enumerate(reference.sub_entities(dim)):
-                    sub_ref = sub_type(vertices=[reference.vertices[v] for v in vs])
+                    sub_ref = sub_type(
+                        vertices=[reference.reference_vertices[v] for v in vs]
+                    )
                     sub_element = moment_data[1](sub_ref, moment_data[2])
                     for d in sub_element.get_basis_functions():
                         dofs.append(moment_data[0](sub_ref, d))
@@ -133,7 +135,9 @@ def make_integral_moment_dofs(
             if sub_type is not None:
                 assert dim > 0
                 for i, vs in enumerate(reference.sub_entities(dim)):
-                    sub_ref = sub_type(vertices=[reference.vertices[v] for v in vs])
+                    sub_ref = sub_type(
+                        vertices=[reference.reference_vertices[v] for v in vs]
+                    )
                     sub_element = moment_data[1](sub_ref, moment_data[2])
                     for d in sub_element.get_basis_functions():
                         dofs.append(moment_data[0](sub_ref, d))
