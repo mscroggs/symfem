@@ -138,12 +138,12 @@ class SerendipityCurl(FiniteElement):
         dofs = []
         dofs += make_integral_moment_dofs(
             reference,
-            edges=(IntegralMoment, Lagrange, order, 0),
+            edges=(TangentIntegralMoment, Lagrange, order, 0),
             faces=(IntegralMoment, VectorLagrange, order - 2, 0),
             volumes=(IntegralMoment, VectorLagrange, order - 4, 0),
         )
 
-        super().__init__(poly, dofs, reference.tdim, 1)
+        super().__init__(poly, dofs, reference.tdim, reference.tdim)
 
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
 
@@ -158,10 +158,10 @@ class SerendipityDiv(FiniteElement):
         dofs = []
         dofs += make_integral_moment_dofs(
             reference,
-            facets=(IntegralMoment, VectorLagrange, order, 0),
+            facets=(NormalIntegralMoment, VectorLagrange, order, 0),
             cells=(IntegralMoment, VectorLagrange, order - 2, 0),
         )
 
-        super().__init__(poly, dofs, reference.tdim, 1)
+        super().__init__(poly, dofs, reference.tdim, reference.tdim)
 
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]
