@@ -110,8 +110,8 @@ class Serendipity(FiniteElement):
     """A serendipity element."""
 
     def __init__(self, reference, order):
-        poly = polynomial_set(reference.tdim, reference.tdim, order)
-        poly += serendipity_set(reference.tdim, reference.tdim, order)
+        poly = polynomial_set(reference.tdim, 1, order)
+        poly += serendipity_set(reference.tdim, 1, order)
 
         dofs = []
         for p in reference.vertices:
