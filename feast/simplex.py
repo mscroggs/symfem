@@ -32,9 +32,7 @@ class Lagrange(FiniteElement):
             for i in product(range(order + 1), repeat=reference.tdim):
                 if sum(i) <= order:
                     dofs.append(
-                        PointEvaluation(
-                            tuple(sympy.Rational(j, order) for j in i)
-                        )
+                        PointEvaluation(tuple(sympy.Rational(j, order) for j in i))
                     )
 
         super().__init__(

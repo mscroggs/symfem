@@ -70,9 +70,9 @@ class FiniteElement:
             output = []
             for p in points:
                 row = []
-                for d in range(self.range_dim):
-                    for b in self.get_basis_functions():
-                        row.append(subs(b[d], x, p))
+                for b in self.get_basis_functions():
+                    for i in subs(b, x, p):
+                        row.append(i)
                 output.append(row)
             return output
         raise ValueError(f"Unknown order: {order}")
