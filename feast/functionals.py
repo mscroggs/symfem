@@ -6,9 +6,6 @@ from .vectors import vdot
 class BaseFunctional:
     """A functional."""
 
-    def __init__(self, reference):
-        self.reference = reference
-
     def eval(self, fun):
         """Apply to the functional to a function."""
         raise NotImplementedError
@@ -27,8 +24,7 @@ class BaseFunctional:
 class PointEvaluation(BaseFunctional):
     """A point evaluation."""
 
-    def __init__(self, reference, point):
-        super().__init__(reference)
+    def __init__(self, point):
         self.point = point
 
     def eval(self, function):
@@ -45,8 +41,7 @@ class PointEvaluation(BaseFunctional):
 class DotPointEvaluation(BaseFunctional):
     """A point evaluation in a given direction."""
 
-    def __init__(self, reference, point, vector):
-        super().__init__(reference)
+    def __init__(self, point, vector):
         self.point = point
         self.vector = vector
 
@@ -69,7 +64,7 @@ class IntegralMoment(BaseFunctional):
     """An integral moment."""
 
     def __init__(self, reference, f, dof):
-        super().__init__(reference)
+        self.reference = reference
         self.dof = dof
         self.f = subs(f, x, t)
         if isinstance(self.f, tuple):

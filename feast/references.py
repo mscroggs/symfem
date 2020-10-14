@@ -58,6 +58,32 @@ class Reference:
         if dim == 3:
             return self.volumes
 
+    def at_vertex(self, point):
+        """Check if a point is a vertex of the reference."""
+        for v in self.vertices:
+            if v == tuple(point):
+                return True
+        return False
+
+    def on_edge(self, point):
+        """Check if a point is on an edge of the reference."""
+        for e in self.edges:
+            v0 = self.vertices[e[0]]
+            v1 = self.vertices[e[1]]
+            if vnorm(vcross(vsub(v0, point), vsub(v1, point))) == 0:
+                return True
+        return False
+
+    def on_face(self, point):
+        """Check if a point is on a face of the reference."""
+        for f in self.faces:
+            v0 = self.vertices[f[0]]
+            v1 = self.vertices[f[1]]
+            v2 = self.vertices[f[2]]
+            if vdot(vcross(vsub(v0, point), vsub(v1, point)), vsub(v2, point)):
+                return True
+        return False
+
 
 class Interval(Reference):
     """An interval."""
