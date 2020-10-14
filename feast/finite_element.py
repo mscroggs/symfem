@@ -7,8 +7,9 @@ from .symbolic import x, zero, subs
 class FiniteElement:
     """Abstract finite element."""
 
-    def __init__(self, basis, dofs, domain_dim, range_dim):
+    def __init__(self, reference, basis, dofs, domain_dim, range_dim):
         assert len(basis) == len(dofs)
+        self.reference = reference
         self.basis = basis
         self.dofs = dofs
         self.domain_dim = domain_dim
@@ -76,6 +77,13 @@ class FiniteElement:
             return output
         raise ValueError(f"Unknown order: {order}")
 
+    @property
+    def name(self):
+        """Get the name of the element."""
+        return self.names[0]
+
+    names = []
+
 
 def make_integral_moment_dofs(
     reference,
@@ -124,8 +132,10 @@ def make_integral_moment_dofs(
                         vertices=[reference.reference_vertices[v] for v in vs]
                     )
                     sub_element = moment_data[1](sub_ref, moment_data[2])
-                    for d in sub_element.get_basis_functions():
-                        dofs.append(moment_data[0](sub_ref, d))
+                    for f, d in zip(
+                        sub_element.get_basis_functions(), sub_element.dofs
+                    ):
+                        dofs.append(moment_data[0](sub_ref, f, d))
 
     # DOFs per codimension
     for codim, moment_data in enumerate([cells, facets, ridges, peaks]):
@@ -139,6 +149,8 @@ def make_integral_moment_dofs(
                         vertices=[reference.reference_vertices[v] for v in vs]
                     )
                     sub_element = moment_data[1](sub_ref, moment_data[2])
-                    for d in sub_element.get_basis_functions():
-                        dofs.append(moment_data[0](sub_ref, d))
+                    for f, d in zip(
+                        sub_element.get_basis_functions(), sub_element.dofs
+                    ):
+                        dofs.append(moment_data[0](sub_ref, f, d))
     return dofs

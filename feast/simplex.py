@@ -21,10 +21,11 @@ class Lagrange(FiniteElement):
         if order == 0:
             dofs = [
                 PointEvaluation(
+                    reference,
                     tuple(
                         sympy.Rational(1, reference.tdim + 1)
                         for i in range(reference.tdim)
-                    )
+                    ),
                 )
             ]
         else:
@@ -32,11 +33,13 @@ class Lagrange(FiniteElement):
             for i in product(range(order + 1), repeat=reference.tdim):
                 if sum(i) <= order:
                     dofs.append(
-                        PointEvaluation(tuple(sympy.Rational(j, order) for j in i))
+                        PointEvaluation(
+                            reference, tuple(sympy.Rational(j, order) for j in i)
+                        )
                     )
 
         super().__init__(
-            polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
+            reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
 
     names = ["Lagrange", "P"]
@@ -57,9 +60,10 @@ class VectorLagrange(FiniteElement):
             ]
         for p in scalar_space.dofs:
             for d in directions:
-                dofs.append(DotPointEvaluation(p.point, d))
+                dofs.append(DotPointEvaluation(reference, p.point, d))
 
         super().__init__(
+            reference,
             polynomial_set(reference.tdim, reference.tdim, order),
             dofs,
             reference.tdim,
@@ -83,7 +87,7 @@ class NedelecFirstKind(FiniteElement):
             volumes=(IntegralMoment, VectorLagrange, order - 3, 0),
         )
 
-        super().__init__(poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Nedelec", "Nedelec1", "N1curl"]
 
@@ -101,7 +105,7 @@ class RaviartThomas(FiniteElement):
             cells=(IntegralMoment, VectorLagrange, order - 2, 0),
         )
 
-        super().__init__(poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Raviart-Thomas", "RT", "N1div"]
 
@@ -119,7 +123,7 @@ class NedelecSecondKind(FiniteElement):
             volumes=(IntegralMoment, RaviartThomas, order - 2, 1),
         )
 
-        super().__init__(poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Nedelec2", "N2curl"]
 
@@ -136,6 +140,6 @@ class BDM(FiniteElement):
             cells=(IntegralMoment, NedelecFirstKind, order - 1, 1),
         )
 
-        super().__init__(poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]

@@ -30,16 +30,25 @@ class Q(FiniteElement):
         if order == 0:
             dofs = [
                 PointEvaluation(
-                    tuple(sympy.Rational(1, 2) for i in range(reference.tdim))
+                    reference,
+                    tuple(sympy.Rational(1, 2) for i in range(reference.tdim)),
                 )
             ]
         else:
             dofs = []
             for i in product(range(order + 1), repeat=reference.tdim):
-                dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i)))
+                dofs.append(
+                    PointEvaluation(
+                        reference, tuple(sympy.Rational(j, order) for j in i)
+                    )
+                )
 
         super().__init__(
-            quolynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
+            reference,
+            quolynomial_set(reference.tdim, 1, order),
+            dofs,
+            reference.tdim,
+            1,
         )
 
     names = ["Q"]
@@ -60,9 +69,10 @@ class VectorQ(FiniteElement):
             ]
         for p in scalar_space.dofs:
             for d in directions:
-                dofs.append(DotPointEvaluation(p.point, d))
+                dofs.append(DotPointEvaluation(reference, p.point, d))
 
         super().__init__(
+            reference,
             quolynomial_set(reference.tdim, reference.tdim, order),
             dofs,
             reference.tdim,
@@ -86,7 +96,7 @@ class Nedelec(FiniteElement):
             volumes=(IntegralMoment, RaviartThomas, order - 1, 1),
         )
 
-        super().__init__(poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Nedelec", "NCE", "RTCE", "Qcurl"]
 
@@ -104,7 +114,7 @@ class RaviartThomas(FiniteElement):
             cells=(IntegralMoment, Nedelec, order - 1, 1),
         )
 
-        super().__init__(poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Raviart-Thomas", "NCF", "RTCF", "Qdiv"]
 
@@ -118,7 +128,7 @@ class Serendipity(FiniteElement):
 
         dofs = []
         for p in reference.vertices:
-            dofs.append(PointEvaluation(p))
+            dofs.append(PointEvaluation(reference, p))
         dofs += make_integral_moment_dofs(
             reference,
             edges=(IntegralMoment, Lagrange, order - 2, 0),
@@ -126,7 +136,7 @@ class Serendipity(FiniteElement):
             volumes=(IntegralMoment, Lagrange, order - 6, 0),
         )
 
-        super().__init__(poly, dofs, reference.tdim, 1)
+        super().__init__(reference, poly, dofs, reference.tdim, 1)
 
     names = ["serendipity", "S"]
 
@@ -146,7 +156,7 @@ class SerendipityCurl(FiniteElement):
             volumes=(IntegralMoment, VectorLagrange, order - 4, 0),
         )
 
-        super().__init__(poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
 
@@ -165,6 +175,6 @@ class SerendipityDiv(FiniteElement):
             cells=(IntegralMoment, VectorLagrange, order - 2, 0),
         )
 
-        super().__init__(poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]
