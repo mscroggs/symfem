@@ -30,7 +30,6 @@ class Q(FiniteElement):
         if order == 0:
             dofs = [
                 PointEvaluation(
-                    reference,
                     tuple(sympy.Rational(1, 2) for i in range(reference.tdim)),
                 )
             ]
@@ -39,7 +38,7 @@ class Q(FiniteElement):
             for i in product(range(order + 1), repeat=reference.tdim):
                 dofs.append(
                     PointEvaluation(
-                        reference, tuple(sympy.Rational(j, order) for j in i)
+                        tuple(sympy.Rational(j, order) for j in i)
                     )
                 )
 
@@ -69,7 +68,7 @@ class VectorQ(FiniteElement):
             ]
         for p in scalar_space.dofs:
             for d in directions:
-                dofs.append(DotPointEvaluation(reference, p.point, d))
+                dofs.append(DotPointEvaluation(p.point, d))
 
         super().__init__(
             reference,
@@ -128,7 +127,7 @@ class Serendipity(FiniteElement):
 
         dofs = []
         for p in reference.vertices:
-            dofs.append(PointEvaluation(reference, p))
+            dofs.append(PointEvaluation(p))
         dofs += make_integral_moment_dofs(
             reference,
             edges=(IntegralMoment, Lagrange, order - 2, 0),

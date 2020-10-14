@@ -21,7 +21,6 @@ class Lagrange(FiniteElement):
         if order == 0:
             dofs = [
                 PointEvaluation(
-                    reference,
                     tuple(
                         sympy.Rational(1, reference.tdim + 1)
                         for i in range(reference.tdim)
@@ -34,7 +33,7 @@ class Lagrange(FiniteElement):
                 if sum(i) <= order:
                     dofs.append(
                         PointEvaluation(
-                            reference, tuple(sympy.Rational(j, order) for j in i)
+                            tuple(sympy.Rational(j, order) for j in i)
                         )
                     )
 
@@ -60,7 +59,7 @@ class VectorLagrange(FiniteElement):
             ]
         for p in scalar_space.dofs:
             for d in directions:
-                dofs.append(DotPointEvaluation(reference, p.point, d))
+                dofs.append(DotPointEvaluation(p.point, d))
 
         super().__init__(
             reference,
