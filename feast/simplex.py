@@ -27,6 +27,11 @@ class Lagrange(FiniteElement):
                     ),
                 )
             ]
+        elif reference.tp == 3:
+            dofs = []
+            for i in product(range(order + 1), repeat=reference.tdim):
+                if sum(i) <= order:
+                    dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i)))
         else:
             dofs = []
             for v in reference.reference_vertices:
