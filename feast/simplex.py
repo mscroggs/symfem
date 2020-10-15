@@ -40,16 +40,9 @@ class Lagrange(FiniteElement):
                         if sum(i) < order:
                             dofs.append(
                                 PointEvaluation(
-                                    tuple(
-                                        o
-                                        + sum(
-                                            a[j] * b / order
-                                            for a, b in zip(entity.axes, i)
-                                        )
-                                        for j, o in enumerate(entity.origin)
-                                    )
-                                )
-                            )
+                                    tuple(o + sum(a[j] * b / order
+                                                  for a, b in zip(entity.axes, i))
+                                          for j, o in enumerate(entity.origin))))
 
         super().__init__(
             reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
