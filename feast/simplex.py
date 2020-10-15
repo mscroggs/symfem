@@ -27,7 +27,7 @@ class Lagrange(FiniteElement):
                     ),
                 )
             ]
-        elif reference.tp == 3:
+        elif reference.tp:
             dofs = []
             for i in product(range(order + 1), repeat=reference.tdim):
                 if sum(i) <= order:
