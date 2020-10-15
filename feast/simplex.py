@@ -29,11 +29,27 @@ class Lagrange(FiniteElement):
             ]
         else:
             dofs = []
-            for i in product(range(order + 1), repeat=reference.tdim):
-                if sum(i) <= order:
-                    dofs.append(
-                        PointEvaluation(tuple(sympy.Rational(j, order) for j in i))
+            for v in reference.reference_vertices:
+                dofs.append(PointEvaluation(v))
+            for edim in range(1, 4):
+                for vs in reference.sub_entities(edim):
+                    entity = reference.sub_entity_types[edim](
+                        vertices=tuple(reference.reference_vertices[i] for i in vs)
                     )
+                    for i in product(range(1, order), repeat=edim):
+                        if sum(i) < order:
+                            dofs.append(
+                                PointEvaluation(
+                                    tuple(
+                                        o
+                                        + sum(
+                                            a[j] * b / order
+                                            for a, b in zip(entity.axes, i)
+                                        )
+                                        for j, o in enumerate(entity.origin)
+                                    )
+                                )
+                            )
 
         super().__init__(
             reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
