@@ -40,7 +40,7 @@ class Lagrange(FiniteElement):
                         if sum(i) < order:
                             dofs.append(
                                 PointEvaluation(
-                                    tuple(o + sum(a[j] * b / order
+                                    tuple(o + sum(sympy.Rational(a[j] * b, order)
                                                   for a, b in zip(entity.axes, i))
                                           for j, o in enumerate(entity.origin))))
 

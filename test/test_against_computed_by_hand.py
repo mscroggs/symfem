@@ -15,7 +15,7 @@ def test_lagrange():
     space = feast_element("triangle", "Lagrange", 1)
     assert all_equal(
         space.tabulate_basis([[0, 0], [0, 1], [1, 0]]),
-        ((1, 0, 0), (0, 1, 0), (0, 0, 1)),
+        ((1, 0, 0), (0, 0, 1), (0, 1, 0)),
     )
 
 
