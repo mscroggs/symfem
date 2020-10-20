@@ -56,6 +56,7 @@ class Lagrange(FiniteElement):
     names = ["Lagrange", "P"]
     min_order = 0
 
+
 class VectorLagrange(FiniteElement):
     """Vector Lagrange finite element."""
 
