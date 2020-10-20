@@ -54,7 +54,7 @@ class Lagrange(FiniteElement):
         )
 
     names = ["Lagrange", "P"]
-
+    min_order = 0
 
 class VectorLagrange(FiniteElement):
     """Vector Lagrange finite element."""
@@ -82,6 +82,7 @@ class VectorLagrange(FiniteElement):
         )
 
     names = ["vector Lagrange", "vP"]
+    min_order = 0
 
 
 class NedelecFirstKind(FiniteElement):
@@ -93,14 +94,15 @@ class NedelecFirstKind(FiniteElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, Lagrange, order - 1, 0),
-            faces=(IntegralMoment, VectorLagrange, order - 2, 0),
-            volumes=(IntegralMoment, VectorLagrange, order - 3, 0),
+            edges=(TangentIntegralMoment, Lagrange, order - 1),
+            faces=(IntegralMoment, VectorLagrange, order - 2),
+            volumes=(IntegralMoment, VectorLagrange, order - 3),
         )
 
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Nedelec", "Nedelec1", "N1curl"]
+    min_order = 1
 
 
 class RaviartThomas(FiniteElement):
@@ -112,13 +114,14 @@ class RaviartThomas(FiniteElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Lagrange, order - 1, 0),
-            cells=(IntegralMoment, VectorLagrange, order - 2, 0),
+            facets=(NormalIntegralMoment, Lagrange, order - 1),
+            cells=(IntegralMoment, VectorLagrange, order - 2),
         )
 
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Raviart-Thomas", "RT", "N1div"]
+    min_order = 1
 
 
 class NedelecSecondKind(FiniteElement):
@@ -129,14 +132,15 @@ class NedelecSecondKind(FiniteElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, Lagrange, order, 0),
-            faces=(IntegralMoment, RaviartThomas, order - 1, 1),
-            volumes=(IntegralMoment, RaviartThomas, order - 2, 1),
+            edges=(TangentIntegralMoment, Lagrange, order),
+            faces=(IntegralMoment, RaviartThomas, order - 1),
+            volumes=(IntegralMoment, RaviartThomas, order - 2),
         )
 
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Nedelec2", "N2curl"]
+    min_order = 1
 
 
 class BDM(FiniteElement):
@@ -147,10 +151,11 @@ class BDM(FiniteElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Lagrange, order, 1),
-            cells=(IntegralMoment, NedelecFirstKind, order - 1, 1),
+            facets=(NormalIntegralMoment, Lagrange, order),
+            cells=(IntegralMoment, NedelecFirstKind, order - 1),
         )
 
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]
+    min_order = 1

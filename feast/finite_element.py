@@ -123,34 +123,39 @@ def make_integral_moment_dofs(
 
     # DOFs per dimension
     for dim, moment_data in enumerate([vertices, edges, faces, volumes]):
-        if moment_data is not None and moment_data[2] >= moment_data[3]:
-            sub_type = reference.sub_entity_types[dim]
-            if sub_type is not None:
-                assert dim > 0
-                for i, vs in enumerate(reference.sub_entities(dim)):
-                    sub_ref = sub_type(
-                        vertices=[reference.reference_vertices[v] for v in vs]
-                    )
-                    sub_element = moment_data[1](sub_ref, moment_data[2])
-                    for f, d in zip(
-                        sub_element.get_basis_functions(), sub_element.dofs
-                    ):
-                        dofs.append(moment_data[0](sub_ref, f, d))
+        if moment_data is not None:
+            IntegralMoment, SubElement, order = moment_data
+            if order >= SubElement.min_order:
+                sub_type = reference.sub_entity_types[dim]
+                if sub_type is not None:
+                    assert dim > 0
+                    for i, vs in enumerate(reference.sub_entities(dim)):
+                        sub_ref = sub_type(
+                            vertices=[reference.reference_vertices[v] for v in vs]
+                        )
+                        sub_element = SubElement(sub_ref, order)
+                        for f, d in zip(
+                            sub_element.get_basis_functions(), sub_element.dofs
+                        ):
+                            dofs.append(IntegralMoment(sub_ref, f, d))
 
     # DOFs per codimension
     for codim, moment_data in enumerate([cells, facets, ridges, peaks]):
         dim = reference.tdim - codim
-        if moment_data is not None and moment_data[2] >= moment_data[3]:
-            sub_type = reference.sub_entity_types[dim]
-            if sub_type is not None:
-                assert dim > 0
-                for i, vs in enumerate(reference.sub_entities(dim)):
-                    sub_ref = sub_type(
-                        vertices=[reference.reference_vertices[v] for v in vs]
-                    )
-                    sub_element = moment_data[1](sub_ref, moment_data[2])
-                    for f, d in zip(
-                        sub_element.get_basis_functions(), sub_element.dofs
-                    ):
-                        dofs.append(moment_data[0](sub_ref, f, d))
+        if moment_data is not None:
+            IntegralMoment, SubElement, order = moment_data
+            if order >= SubElement.min_order:
+                sub_type = reference.sub_entity_types[dim]
+                if sub_type is not None:
+                    assert dim > 0
+                    for i, vs in enumerate(reference.sub_entities(dim)):
+                        sub_ref = sub_type(
+                            vertices=[reference.reference_vertices[v] for v in vs]
+                        )
+                        sub_element = SubElement(sub_ref, order)
+                        for f, d in zip(
+                            sub_element.get_basis_functions(), sub_element.dofs
+                        ):
+                            dofs.append(IntegralMoment(sub_ref, f, d))
+
     return dofs

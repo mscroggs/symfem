@@ -47,6 +47,7 @@ class Q(FiniteElement):
         )
 
     names = ["Q"]
+    min_order = 0
 
 
 class VectorQ(FiniteElement):
@@ -75,6 +76,7 @@ class VectorQ(FiniteElement):
         )
 
     names = ["vector Q", "vQ"]
+    min_order = 0
 
 
 class Nedelec(FiniteElement):
@@ -86,14 +88,15 @@ class Nedelec(FiniteElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, Q, order - 1, 0),
-            faces=(IntegralMoment, RaviartThomas, order - 1, 1),
-            volumes=(IntegralMoment, RaviartThomas, order - 1, 1),
+            edges=(TangentIntegralMoment, Q, order - 1),
+            faces=(IntegralMoment, RaviartThomas, order - 1),
+            volumes=(IntegralMoment, RaviartThomas, order - 1),
         )
 
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Nedelec", "NCE", "RTCE", "Qcurl"]
+    min_order = 1
 
 
 class RaviartThomas(FiniteElement):
@@ -105,13 +108,14 @@ class RaviartThomas(FiniteElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Q, order - 1, 0),
-            cells=(IntegralMoment, Nedelec, order - 1, 1),
+            facets=(NormalIntegralMoment, Q, order - 1),
+            cells=(IntegralMoment, Nedelec, order - 1),
         )
 
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Raviart-Thomas", "NCF", "RTCF", "Qdiv"]
+    min_order = 1
 
 
 class Serendipity(FiniteElement):
@@ -126,14 +130,15 @@ class Serendipity(FiniteElement):
             dofs.append(PointEvaluation(p))
         dofs += make_integral_moment_dofs(
             reference,
-            edges=(IntegralMoment, Lagrange, order - 2, 0),
-            faces=(IntegralMoment, Lagrange, order - 4, 0),
-            volumes=(IntegralMoment, Lagrange, order - 6, 0),
+            edges=(IntegralMoment, Lagrange, order - 2),
+            faces=(IntegralMoment, Lagrange, order - 4),
+            volumes=(IntegralMoment, Lagrange, order - 6),
         )
 
         super().__init__(reference, poly, dofs, reference.tdim, 1)
 
     names = ["serendipity", "S"]
+    min_order = 1
 
 
 class SerendipityCurl(FiniteElement):
@@ -146,14 +151,15 @@ class SerendipityCurl(FiniteElement):
         dofs = []
         dofs += make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, Lagrange, order, 0),
-            faces=(IntegralMoment, VectorLagrange, order - 2, 0),
-            volumes=(IntegralMoment, VectorLagrange, order - 4, 0),
+            edges=(TangentIntegralMoment, Lagrange, order),
+            faces=(IntegralMoment, VectorLagrange, order - 2),
+            volumes=(IntegralMoment, VectorLagrange, order - 4),
         )
 
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
+    min_order = 1
 
 
 class SerendipityDiv(FiniteElement):
@@ -166,10 +172,11 @@ class SerendipityDiv(FiniteElement):
         dofs = []
         dofs += make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Lagrange, order, 0),
-            cells=(IntegralMoment, VectorLagrange, order - 2, 0),
+            facets=(NormalIntegralMoment, Lagrange, order),
+            cells=(IntegralMoment, VectorLagrange, order - 2),
         )
 
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]
+    min_order = 1

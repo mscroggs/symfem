@@ -4,25 +4,55 @@ from feast.symbolic import x
 from feast.vectors import vdot
 
 
-def test_nedelec():
+def test_nedelec_2d():
     space = feast_element("triangle", "Nedelec", 1)
     k = sympy.Symbol("k")
-    dofs = [
-        lambda f: sympy.line_integrate(
-            vdot(f, (-1 / sympy.sqrt(2), 1 / sympy.sqrt(2))),
-            sympy.Curve([k, 1 - k], (k, 0, 1)),
-            x[:2],
-        ),
-        lambda f: sympy.line_integrate(
-            vdot(f, (0, 1)), sympy.Curve([0, k], (k, 0, 1)), x[:2]
-        ),
-        lambda f: sympy.line_integrate(
-            vdot(f, (1, 0)), sympy.Curve([k, 0], (k, 0, 1)), x[:2]
-        ),
-    ]
-    for i, dof in enumerate(dofs):
+
+    tdim = 2
+
+    for i, edge in enumerate([
+        ((1, 0), (0, 1)),
+        ((0, 0), (0, 1)),
+        ((0, 0), (1, 0))
+    ]):
         for j, f in enumerate(space.get_basis_functions()):
+            norm = sympy.sqrt(sum((edge[0][i] - edge[1][i]) ** 2 for i in range(tdim)))
+            tangent = tuple((edge[1][i] - edge[0][i]) / norm for i in range(tdim))
+            line = sympy.Curve([(1 - k) * edge[0][i] + k * edge[1][i] for i in range(tdim)], (k, 0, 1))
+
+            result = sympy.line_integrate(vdot(f, tangent), line, x[:tdim])
             if i == j:
-                assert dof(f) == 1
+                assert result == 1
             else:
-                assert dof(f) == 0
+                assert result == 0
+
+
+def test_nedelec_3d():
+    space = feast_element("tetrahedron", "Nedelec", 1)
+    k = sympy.Symbol("k")
+
+    tdim = 3
+
+    for i, edge in enumerate([
+        ((0, 1, 0), (0, 0, 1)),
+        ((1, 0, 0), (0, 0, 1)),
+        ((1, 0, 0), (0, 1, 0)),
+        ((0, 0, 0), (0, 0, 1)),
+        ((0, 0, 0), (0, 1, 0)),
+        ((0, 0, 0), (1, 0, 0))
+    ]):
+        for j, f in enumerate(space.get_basis_functions()):
+            norm = sympy.sqrt(sum((edge[0][i] - edge[1][i]) ** 2 for i in range(tdim)))
+            tangent = tuple((edge[1][i] - edge[0][i]) / norm for i in range(tdim))
+
+            integrand = sum(a * b for a, b in zip(f, tangent))
+            for d in range(tdim):
+                integrand = integrand.subs(x[d], (1 - k) * edge[0][d] + k * edge[1][d])
+
+            integrand *= norm
+
+            result = sympy.integrate(integrand, (k, 0, 1))
+            if i == j:
+                assert result == 1
+            else:
+                assert result == 0
