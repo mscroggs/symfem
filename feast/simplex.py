@@ -92,7 +92,6 @@ class NedelecFirstKind(FiniteElement):
     def __init__(self, reference, order):
         poly = polynomial_set(reference.tdim, reference.tdim, order - 1)
         poly += Hcurl_polynomials(reference.tdim, reference.tdim, order)
-
         dofs = make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, Lagrange, order - 1),
