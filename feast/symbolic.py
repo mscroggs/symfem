@@ -4,8 +4,8 @@ import sympy
 
 t = [sympy.Symbol("t0"), sympy.Symbol("t1"), sympy.Symbol("t2")]
 x = [sympy.Symbol("x"), sympy.Symbol("y"), sympy.Symbol("z")]
-zero = sympy.core.numbers.Zero()
-one = sympy.core.numbers.One()
+zero = sympy.Integer(0)
+one = sympy.Integer(1)
 
 
 def subs(f, vars, values):
