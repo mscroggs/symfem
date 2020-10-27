@@ -74,7 +74,7 @@ class DiscontinuousLagrange(FiniteElement):
             dofs = []
             for i in product(range(order + 1), repeat=reference.tdim):
                 if sum(i) <= order:
-                    dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i)))
+                    dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i[::-1])))
 
         super().__init__(
             reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
@@ -126,8 +126,8 @@ class VectorDiscontinuousLagrange(FiniteElement):
                 tuple(one if i == j else zero for j in range(reference.tdim))
                 for i in range(reference.tdim)
             ]
-        for d in directions:
-            for p in scalar_space.dofs:
+        for p in scalar_space.dofs:
+            for d in directions:
                 dofs.append(DotPointEvaluation(p.point, d))
 
         super().__init__(
