@@ -69,14 +69,14 @@ class IntegralMoment(BaseFunctional):
         self.f = subs(f, x, t)
         if isinstance(self.f, tuple):
             self.f = tuple(
-                sum(self.reference.axes[j][i] * c for j, c in enumerate(self.f))
+                sum(self.reference.scaled_axes()[j][i] * c for j, c in enumerate(self.f))
                 for i, o in enumerate(self.reference.origin)
             )
 
     def eval(self, function):
         """Apply to the functional to a function."""
         point = [i for i in self.reference.origin]
-        for i, a in enumerate(zip(*self.reference.scaled_axes())):
+        for i, a in enumerate(zip(*self.reference.axes)):
             for j, k in zip(a, t):
                 point[i] += j * k
         integrand = self.dot(subs(function, x, point))

@@ -26,6 +26,8 @@ class FiniteElement:
                 for d in self.dofs:
                     row.append(d.eval(b))
                 mat.append(row)
+                print(b)
+                print(row)
             minv = sympy.Matrix(mat).inv()
             self._basis_functions = []
             if self.range_dim == 1:
@@ -140,8 +142,8 @@ def make_integral_moment_dofs(
                             dofs.append(IntegralMoment(sub_ref, f, d))
 
     # DOFs per codimension
-    for codim, moment_data in enumerate([cells, facets, ridges, peaks]):
-        dim = reference.tdim - codim
+    for _dim, moment_data in enumerate([peaks, ridges, facets, cells]):
+        dim = reference.tdim - 3 + _dim
         if moment_data is not None:
             IntegralMoment, SubElement, order = moment_data
             if order >= SubElement.min_order:

@@ -3,7 +3,7 @@
 import sympy
 from itertools import product
 from .symbolic import one, zero
-from .simplex import Lagrange, VectorLagrange
+from .simplex import DiscontinuousLagrange, VectorDiscontinuousLagrange
 from .finite_element import FiniteElement, make_integral_moment_dofs
 from .polynomials import (
     quolynomial_set,
@@ -130,9 +130,9 @@ class Serendipity(FiniteElement):
             dofs.append(PointEvaluation(p))
         dofs += make_integral_moment_dofs(
             reference,
-            edges=(IntegralMoment, Lagrange, order - 2),
-            faces=(IntegralMoment, Lagrange, order - 4),
-            volumes=(IntegralMoment, Lagrange, order - 6),
+            edges=(IntegralMoment, DiscontinuousLagrange, order - 2),
+            faces=(IntegralMoment, DiscontinuousLagrange, order - 4),
+            volumes=(IntegralMoment, DiscontinuousLagrange, order - 6),
         )
 
         super().__init__(reference, poly, dofs, reference.tdim, 1)
@@ -151,9 +151,9 @@ class SerendipityCurl(FiniteElement):
         dofs = []
         dofs += make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, Lagrange, order),
-            faces=(IntegralMoment, VectorLagrange, order - 2),
-            volumes=(IntegralMoment, VectorLagrange, order - 4),
+            edges=(TangentIntegralMoment, DiscontinuousLagrange, order),
+            faces=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
+            volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 4),
         )
 
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
@@ -172,8 +172,8 @@ class SerendipityDiv(FiniteElement):
         dofs = []
         dofs += make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Lagrange, order),
-            cells=(IntegralMoment, VectorLagrange, order - 2),
+            facets=(NormalIntegralMoment, DiscontinuousLagrange, order),
+            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
         )
 
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
