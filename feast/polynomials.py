@@ -66,37 +66,20 @@ def Hcurl_polynomials(domain_dim, range_dim, order):
             for j in range(order)
         ]
     if domain_dim == 3:
-        if order == 1:
-            return [[x[1], -x[0], zero], [x[2], zero, -x[0]], [zero, x[2], -x[1]]]
-        elif order == 2:
-            return [
-                [x[1] ** 2, -x[0] * x[1], zero],
-                [x[0] * x[1], -x[0] ** 2, zero],
-                [x[2] * x[1], -x[2] * x[0], zero],
-                [zero, x[1] * x[2], -x[1] ** 2],
-                [zero, x[2] ** 2, -x[2] * x[1]],
-                [zero, x[0] * x[2], -x[0] * x[1]],
-                [x[0] * x[2], zero, -x[0] ** 2],
-                [x[2] ** 2, zero, -x[2] * x[0]],
-            ]
-        elif order == 3:
-            return [
-                [x[0] ** 2 * x[1], -x[0] ** 3, zero],
-                [x[0] ** 2 * x[2], zero, -x[0] ** 3],
-                [zero, x[0] ** 2 * x[2], -x[0] ** 2 * x[1]],
-                [x[0] * x[1] ** 2, -x[0] ** 2 * x[1], zero],
-                [2 * x[0] * x[1] * x[2], -x[0] ** 2 * x[2], -x[0] ** 2 * x[1]],
-                [zero, x[0] * x[1] * x[2], -x[0] * x[1] ** 2],
-                [x[0] * x[2] ** 2, zero, -x[0] ** 2 * x[2]],
-                [zero, x[0] * x[2] ** 2, -x[0] * x[1] * x[2]],
-                [x[1] ** 3, -x[0] * x[1] ** 2, zero],
-                [9 * x[1] ** 2 * x[2], -4 * x[0] * x[1] * x[2], -5 * x[0] * x[1] ** 2],
-                [zero, x[1] ** 2 * x[2], -x[1] ** 3],
-                [9 * x[1] * x[2] ** 2, -5 * x[0] * x[2] ** 2, -4 * x[0] * x[1] * x[2]],
-                [zero, x[1] * x[2] ** 2, -x[1] ** 2 * x[2]],
-                [x[2] ** 3, zero, -x[0] * x[2] ** 2],
-                [zero, x[2] ** 3, -x[1] * x[2] ** 2],
-            ]
+        poly = []
+        poly += [[x[0] ** (m - 1) * x[1] ** n * x[2] ** (order - m - n + 1),
+                  zero,
+                  -x[0] ** m * x[1] ** n * x[2] ** (order - m - n)]
+                 for n in range(order) for m in range(1, order + 1 - n)]
+        poly += [[zero,
+                  x[0] ** m * x[1] ** (n - 1) * x[2] ** (order - m - n + 1),
+                  -x[0] ** m * x[1] ** n * x[2] ** (order - m - n)]
+                 for m in range(order) for n in range(1, order + 1 - m)]
+        poly += [[x[0] ** (order - n) * x[1] ** n,
+                  -x[0] ** (order + 1 - n) * x[1] ** (n - 1),
+                  zero]
+                 for n in range(1, order + 1)]
+        return poly
 
 
 def quolynomial_set_1d(dim, order):
