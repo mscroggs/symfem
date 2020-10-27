@@ -60,8 +60,8 @@ def Hcurl_polynomials(domain_dim, range_dim, order):
     if domain_dim == 2:
         return [
             (
-                x[1] * x[0] ** (order - 1 - j) * x[1] ** j,
-                -x[0] * x[0] ** (order - 1 - j) * x[1] ** j,
+                x[0] ** (order - 1 - j) * x[1] ** (j + 1),
+                -x[0] ** (order - j) * x[1] ** j,
             )
             for j in range(order)
         ]
