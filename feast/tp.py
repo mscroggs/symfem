@@ -36,7 +36,7 @@ class Q(FiniteElement):
         else:
             dofs = []
             for i in product(range(order + 1), repeat=reference.tdim):
-                dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i[::-1])))
+                dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i)))
 
         super().__init__(
             reference,
