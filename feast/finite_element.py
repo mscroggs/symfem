@@ -26,8 +26,6 @@ class FiniteElement:
                 for d in self.dofs:
                     row.append(d.eval(b))
                 mat.append(row)
-                print(b)
-                print(row)
             minv = sympy.Matrix(mat).inv()
             self._basis_functions = []
             if self.range_dim == 1:
