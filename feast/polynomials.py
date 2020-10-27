@@ -10,15 +10,15 @@ def polynomial_set_1d(dim, order):
     if dim == 2:
         return [
             x[0] ** i * x[1] ** j
-            for i in range(order + 1)
-            for j in range(order + 1 - i)
+            for j in range(order + 1)
+            for i in range(order + 1 - j)
         ]
     if dim == 3:
         return [
             x[0] ** i * x[1] ** j * x[2] ** k
-            for i in range(order + 1)
-            for j in range(order + 1 - i)
-            for k in range(order + 1 - i - j)
+            for k in range(order + 1)
+            for j in range(order + 1 - k)
+            for i in range(order + 1 - k - j)
         ]
 
 

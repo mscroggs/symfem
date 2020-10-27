@@ -69,7 +69,7 @@ class IntegralMoment(BaseFunctional):
         self.f = subs(f, x, t)
         if isinstance(self.f, tuple):
             self.f = tuple(
-                o + sum(self.reference.axes[j][i] * c for j, c in enumerate(self.f))
+                sum(self.reference.scaled_axes()[j][i] * c for j, c in enumerate(self.f))
                 for i, o in enumerate(self.reference.origin)
             )
 

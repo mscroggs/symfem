@@ -26,6 +26,10 @@ class Reference:
         if self.tdim == 3:
             return vnorm(vdot(vcross(self.axes[0], self.axes[1]), self.axes[2]))
 
+    def scaled_axes(self):
+        """Returns the unit axes of the reference."""
+        return [vnormalise(a) for a in self.axes]
+
     def tangent(self):
         """Calculate the tangent to the element."""
         if self.tdim == 1:
