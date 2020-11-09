@@ -24,12 +24,12 @@ jobs:
       - run: pip3 install -r requirements.txt
         name: Install requirements
       - run: |
-            sudo apt-get install -y libeigen3-dev eigen3
+            sudo apt-get install -y libeigen3-dev
             git clone https://github.com/FEniCS/libtab.git
             cd libtab
             mkdir build
             cd build
-            cmake ../cpp
+            cmake -I /usr/include/eigen3 ../cpp
             make
             sudo make install
         name: Install libtab
