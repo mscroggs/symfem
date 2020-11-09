@@ -43,7 +43,7 @@ jobs:
             cmake ../cpp
             make
             sudo ln -sf libtab.so /usr/local/lib/
-            sudo ln -sf libtab.cpython-38-x86_64-linux-gnu.so /usr/lib/python3.8
+            sudo ln -sf libtab.cpython-38-x86_64-linux-gnu.so /usr/local/lib/python3.6/dist-packages
         name: Install libtab
       - run: python3 -m pytest --durations=50 test
         name: Run unit tests
