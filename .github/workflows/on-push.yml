@@ -41,8 +41,8 @@ jobs:
             cd build
             cmake ../cpp
             make
+            sudo ln -sf libtab.so /usr/local/lib/
+            sudo ln -sf libtab.cpython-38-x86_64-linux-gnu.so /usr/local/lib/python3.8/dist-packages/
         name: Install libtab
-      - run: |
-            export PYTHONPATH="/home/runner/work/feast/feast/libtab-src/build:$PYTHONPATH"
-            python3 -m pytest --durations=50 test
+      - run: python3 -m pytest --durations=50 test
         name: Run unit tests
