@@ -35,14 +35,14 @@ jobs:
             mkdir build && cd build
             cmake -DPYBIND11_TEST=off .. && sudo make install
             cd ../..
-            git clone https://github.com/FEniCS/libtab.git
-            cd libtab
+            git clone https://github.com/FEniCS/libtab.git libtab-src
+            cd libtab-src
             mkdir build
             cd build
             cmake ../cpp
             make
         name: Install libtab
       - run: |
-            export PYTHONPATH="/home/runner/work/feast/feast/libtab/build:$PYTHONPATH"
+            export PYTHONPATH="/home/runner/work/feast/feast/libtab-src/build:$PYTHONPATH"
             python3 -m pytest --durations=50 test
         name: Run unit tests
