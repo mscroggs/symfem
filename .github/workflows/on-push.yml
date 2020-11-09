@@ -41,9 +41,15 @@ jobs:
             cd build
             cmake ../cpp
             make
-            export PYTHONPATH="$(pwd):$PYTHONPATH"
         name: Install libtab
-      - run: pip3 install pytest
-        name: Install pytest
-      - run: python3 -m pytest --durations=50 test
+      - run: |
+            pwd
+            pwd
+            pwd
+            pwd
+            pwd
+            pwd
+            pwd
+            export PYTHONPATH=":$PYTHONPATH"
+            python3 -m pytest --durations=50 test
         name: Run unit tests
