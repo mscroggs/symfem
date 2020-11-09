@@ -43,13 +43,6 @@ jobs:
             make
         name: Install libtab
       - run: |
-            pwd
-            pwd
-            pwd
-            pwd
-            pwd
-            pwd
-            pwd
-            export PYTHONPATH=":$PYTHONPATH"
+            export PYTHONPATH="/home/runner/work/feast/feast/libtab/build:$PYTHONPATH"
             python3 -m pytest --durations=50 test
         name: Run unit tests
