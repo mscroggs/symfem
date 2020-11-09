@@ -26,6 +26,7 @@ jobs:
             sudo ln -sf eigen3/Eigen Eigen
         name: Fix eigen location
       - uses: actions/checkout@v2
+      - run: ls /usr/local/lib/python*
       - run: pip3 install -r requirements.txt
         name: Install requirements.txt
       - run: |
@@ -42,7 +43,6 @@ jobs:
             cmake ../cpp
             make
             sudo ln -sf libtab.so /usr/local/lib/
-            ls /usr/lib/python*
             sudo ln -sf libtab.cpython-38-x86_64-linux-gnu.so /usr/lib/python3.8
         name: Install libtab
       - run: python3 -m pytest --durations=50 test
