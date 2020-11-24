@@ -4,19 +4,6 @@ on:
     - cron: "0 7 * * 1"
 
 jobs:
-  style-checks:
-    name: Run style checks
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - run: sudo apt-get install -y python3-setuptools
-      - run: pip3 install pydocstyle flake8
-      - run: |
-            python3 -m flake8 .
-        name: Run flake8 checks
-      - run: python3 -m pydocstyle feast
-        name: Run pydocstyle checks
-
   run-tests:
     name: Run tests
     runs-on: ubuntu-latest
