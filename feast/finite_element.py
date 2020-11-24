@@ -75,6 +75,14 @@ class FiniteElement:
                         row.append(i)
                 output.append(row)
             return output
+        if order == "xyz,xyz":
+            output = []
+            for p in points:
+                row = []
+                for b in self.get_basis_functions():
+                    row.append(subs(b, x, p))
+                output.append(row)
+            return output
         raise ValueError(f"Unknown order: {order}")
 
     @property
