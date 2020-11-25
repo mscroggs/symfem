@@ -34,8 +34,20 @@ class Q(FiniteElement):
                     entity_dim=reference.tdim)]
         else:
             dofs = []
-            for i in product(range(order + 1), repeat=reference.tdim):
-                dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i)))
+            for v in reference.reference_vertices:
+                dofs.append(PointEvaluation(v, entity_dim=0))
+            for edim in range(1, 4):
+                for vs in reference.sub_entities(edim):
+                    entity = reference.sub_entity_types[edim](
+                        vertices=tuple(reference.reference_vertices[i] for i in vs)
+                    )
+                    for i in product(range(1, order), repeat=edim):
+                        dofs.append(
+                            PointEvaluation(
+                                tuple(o + sum(sympy.Rational(a[j] * b, order)
+                                              for a, b in zip(entity.axes, i))
+                                      for j, o in enumerate(entity.origin)),
+                                entity_dim=edim))
 
         super().__init__(
             reference,
@@ -45,6 +57,32 @@ class Q(FiniteElement):
             1)
 
     names = ["Q"]
+    min_order = 0
+
+
+class DiscontinuousQ(FiniteElement):
+    """A dQ element."""
+
+    def __init__(self, reference, order):
+        if order == 0:
+            dofs = [
+                PointEvaluation(
+                    tuple(sympy.Rational(1, 2) for i in range(reference.tdim)),
+                    entity_dim=reference.tdim)]
+        else:
+            dofs = []
+            for i in product(range(order + 1), repeat=reference.tdim):
+                dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i),
+                                            entity_dim=reference.tdim))
+
+        super().__init__(
+            reference,
+            quolynomial_set(reference.tdim, 1, order),
+            dofs,
+            reference.tdim,
+            1)
+
+    names = ["dQ"]
     min_order = 0
 
 
@@ -63,7 +101,7 @@ class VectorQ(FiniteElement):
             ]
         for p in scalar_space.dofs:
             for d in directions:
-                dofs.append(DotPointEvaluation(p.point, d))
+                dofs.append(DotPointEvaluation(p.point, d, entity_dim=p.entity_dim()))
 
         super().__init__(
             reference,
@@ -86,7 +124,7 @@ class Nedelec(FiniteElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, Q, order - 1),
+            edges=(TangentIntegralMoment, DiscontinuousQ, order - 1),
             faces=(IntegralMoment, RaviartThomas, order - 1),
             volumes=(IntegralMoment, RaviartThomas, order - 1),
         )
@@ -106,7 +144,7 @@ class RaviartThomas(FiniteElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Q, order - 1),
+            facets=(NormalIntegralMoment, DiscontinuousQ, order - 1),
             cells=(IntegralMoment, Nedelec, order - 1),
         )
 

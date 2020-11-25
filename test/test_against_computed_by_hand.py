@@ -38,6 +38,6 @@ def test_rt():
 def test_Q():
     space = feast_element("quadrilateral", "Q", 1)
     assert all_equal(
-        space.tabulate_basis([[0, 0], [0, 1], [1, 0], [1, 1]]),
+        space.tabulate_basis([[0, 0], [1, 0], [0, 1], [1, 1]]),
         ((1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1)),
     )
