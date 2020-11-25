@@ -22,8 +22,8 @@ def to_float(a):
                          [(cell, a, b, order) for cell, ls in elements.items() for a, b, c in ls for order in c])
 def test_against_libtab(cell, feast_type, libtab_type, order):
     element = feast_element(cell, feast_type, order)
-    points = libtab.create_lattice(getattr(libtab.CellType, cell), 3, True)
-    space = getattr(libtab, libtab_type)(getattr(libtab.CellType, cell), order)
+    points = libtab.create_lattice(getattr(libtab.CellType, cell), 3, libtab.LatticeType.equispaced, True)
+    space = getattr(libtab, libtab_type)(cell, order)
     result = space.tabulate(0, points)[0]
 
     if element.range_dim == 1:

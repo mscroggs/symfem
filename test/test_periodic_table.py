@@ -35,3 +35,4 @@ def test_elements(cell_type, element_type, order):
                 assert d.eval(f) == 1
             else:
                 assert d.eval(f) == 0
+            assert d.entity_dim() is not None

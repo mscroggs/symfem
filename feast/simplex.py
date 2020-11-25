@@ -31,7 +31,7 @@ class Lagrange(FiniteElement):
         else:
             dofs = []
             for v in reference.reference_vertices:
-                dofs.append(PointEvaluation(v))
+                dofs.append(PointEvaluation(v, entity_dim=0))
             for edim in range(1, 4):
                 for vs in reference.sub_entities(edim):
                     entity = reference.sub_entity_types[edim](
@@ -93,7 +93,7 @@ class VectorLagrange(FiniteElement):
             ]
         for p in scalar_space.dofs:
             for d in directions:
-                dofs.append(DotPointEvaluation(p.point, d))
+                dofs.append(DotPointEvaluation(p.point, d, entity_dim=p.entity_dim()))
 
         super().__init__(
             reference,
@@ -122,7 +122,7 @@ class VectorDiscontinuousLagrange(FiniteElement):
             ]
         for p in scalar_space.dofs:
             for d in directions:
-                dofs.append(DotPointEvaluation(p.point, d))
+                dofs.append(DotPointEvaluation(p.point, d, entity_dim=p.entity_dim()))
 
         super().__init__(
             reference,
