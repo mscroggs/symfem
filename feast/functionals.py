@@ -18,14 +18,19 @@ class BaseFunctional:
         """Get the direction of the DOF."""
         return None
 
+    def entity_dim(self):
+        """Get the dimension of the entitiy this DOF is associated with."""
+        return None
+
     name = None
 
 
 class PointEvaluation(BaseFunctional):
     """A point evaluation."""
 
-    def __init__(self, point):
+    def __init__(self, point, entity_dim=None):
         self.point = point
+        self._entity_dim = entity_dim
 
     def eval(self, function):
         """Apply to the functional to a function."""
@@ -35,15 +40,20 @@ class PointEvaluation(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return self.point
 
+    def entity_dim(self):
+        """Get the dimension of the entitiy this DOF is associated with."""
+        return self._entity_dim
+
     name = "Point evaluation"
 
 
 class DotPointEvaluation(BaseFunctional):
     """A point evaluation in a given direction."""
 
-    def __init__(self, point, vector):
+    def __init__(self, point, vector, entity_dim=None):
         self.point = point
         self.vector = vector
+        self._entity_dim = entity_dim
 
     def eval(self, function):
         """Apply to the functional to a function."""
@@ -56,6 +66,10 @@ class DotPointEvaluation(BaseFunctional):
     def dof_direction(self):
         """Get the direction of the DOF."""
         return self.vector
+
+    def entity_dim(self):
+        """Get the dimension of the entitiy this DOF is associated with."""
+        return self._entity_dim
 
     name = "Dot point evaluation"
 
@@ -103,6 +117,10 @@ class IntegralMoment(BaseFunctional):
             sum(self.reference.axes[j][i] * c for j, c in enumerate(p))
             for i in range(self.reference.gdim)
         )
+
+    def entity_dim(self):
+        """Get the dimension of the entitiy this DOF is associated with."""
+        return self.reference.tdim
 
     name = "Integral moment"
 

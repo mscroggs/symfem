@@ -31,8 +31,7 @@ class Q(FiniteElement):
             dofs = [
                 PointEvaluation(
                     tuple(sympy.Rational(1, 2) for i in range(reference.tdim)),
-                )
-            ]
+                    entity_dim=reference.tdim)]
         else:
             dofs = []
             for i in product(range(order + 1), repeat=reference.tdim):
@@ -43,8 +42,7 @@ class Q(FiniteElement):
             quolynomial_set(reference.tdim, 1, order),
             dofs,
             reference.tdim,
-            1,
-        )
+            1)
 
     names = ["Q"]
     min_order = 0

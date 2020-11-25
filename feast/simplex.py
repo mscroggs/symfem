@@ -25,13 +25,9 @@ class Lagrange(FiniteElement):
                         sympy.Rational(1, reference.tdim + 1)
                         for i in range(reference.tdim)
                     ),
+                    entity_dim=reference.tdim
                 )
             ]
-        elif reference.tp:
-            dofs = []
-            for i in product(range(order + 1), repeat=reference.tdim):
-                if sum(i) <= order:
-                    dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i)))
         else:
             dofs = []
             for v in reference.reference_vertices:
@@ -47,7 +43,8 @@ class Lagrange(FiniteElement):
                                 PointEvaluation(
                                     tuple(o + sum(sympy.Rational(a[j] * b, order)
                                                   for a, b in zip(entity.axes, i))
-                                          for j, o in enumerate(entity.origin))))
+                                          for j, o in enumerate(entity.origin)),
+                                    entity_dim=edim))
 
         super().__init__(
             reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
@@ -64,17 +61,14 @@ class DiscontinuousLagrange(FiniteElement):
         if order == 0:
             dofs = [
                 PointEvaluation(
-                    tuple(
-                        sympy.Rational(1, reference.tdim + 1)
-                        for i in range(reference.tdim)
-                    ),
-                )
-            ]
+                    tuple(sympy.Rational(1, reference.tdim + 1) for i in range(reference.tdim)),
+                    entity_dim=reference.tdim)]
         else:
             dofs = []
             for i in product(range(order + 1), repeat=reference.tdim):
                 if sum(i) <= order:
-                    dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i[::-1])))
+                    dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i[::-1]),
+                                                entity_dim=reference.tdim))
 
         super().__init__(
             reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
