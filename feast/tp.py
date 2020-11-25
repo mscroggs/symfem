@@ -163,7 +163,7 @@ class Serendipity(FiniteElement):
 
         dofs = []
         for p in reference.vertices:
-            dofs.append(PointEvaluation(p))
+            dofs.append(PointEvaluation(p, entity_dim=0))
         dofs += make_integral_moment_dofs(
             reference,
             edges=(IntegralMoment, DiscontinuousLagrange, order - 2),
