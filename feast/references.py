@@ -173,7 +173,7 @@ class Quadrilateral(Reference):
         self.axes = (vsub(vertices[1], vertices[0]), vsub(vertices[2], vertices[0]))
         self.reference_vertices = ((0, 0), (1, 0), (0, 1), (1, 1))
         self.vertices = vertices
-        self.edges = ((0, 1), (2, 3), (0, 2), (1, 3))
+        self.edges = ((0, 1), (0, 2), (1, 3), (2, 3))
         self.faces = ((0, 1, 2, 3),)
         self.volumes = tuple()
         self.sub_entity_types = ["point", Interval, Quadrilateral, None]
@@ -221,25 +221,25 @@ class Hexahedron(Reference):
         self.vertices = vertices
         self.edges = (
             (0, 1),
-            (2, 3),
-            (4, 5),
-            (6, 7),
             (0, 2),
-            (1, 3),
-            (4, 6),
-            (5, 7),
             (0, 4),
+            (1, 3),
             (1, 5),
+            (2, 3),
             (2, 6),
             (3, 7),
+            (4, 5),
+            (4, 6),
+            (5, 7),
+            (6, 7),
         )
         self.faces = (
             (0, 1, 2, 3),
-            (4, 5, 6, 7),
             (0, 1, 4, 5),
-            (2, 3, 6, 7),
             (0, 2, 4, 6),
             (1, 3, 5, 7),
+            (2, 3, 6, 7),
+            (4, 5, 6, 7),
         )
         self.volumes = ((0, 1, 2, 3, 4, 5, 6, 7),)
         self.sub_entity_types = ["point", Interval, Quadrilateral, Hexahedron]
