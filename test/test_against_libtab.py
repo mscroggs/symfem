@@ -25,12 +25,12 @@ def make_lattice(cell, N=3):
         return np.array([[i / N, j / N] for i in range(N + 1) for j in range(N + 1 - i)])
     if cell == "tetrahedron":
         return np.array([[i / N, j / N, k / N]
-                         for i in range(N + 1) for j in range(N + 1 - i) for k in range(N + 1 - i - j])
+                         for i in range(N + 1) for j in range(N + 1 - i) for k in range(N + 1 - i - j)])
     if cell == "quadrilateral":
         return np.array([[i / N, j / N] for i in range(N + 1) for j in range(N + 1)])
     if cell == "hexahedron":
         return np.array([[i / N, j / N, k / N]
-                         for i in range(N + 1) for j in range(N + 1) for k in range(N + 1])
+                         for i in range(N + 1) for j in range(N + 1) for k in range(N + 1)])
 
 
 @pytest.mark.parametrize(("cell", "feast_type", "libtab_type", "order"),
