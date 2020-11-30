@@ -7,8 +7,19 @@ jobs:
   run-tests:
     name: Run tests
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
     steps:
-      - run: sudo apt-get install -y libeigen3-dev python3-pytest python3-pip python3-setuptools ninja-build
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: |
+            sudo apt-get update
+            sudo apt-get install -y libeigen3-dev
+            pip install --upgrade pip
+            pip install scikit-build
         name: Install dependencies
       - uses: actions/checkout@v2
       - run: python3 -m pip install -r requirements.txt
@@ -16,8 +27,7 @@ jobs:
       - run: |
             git clone https://github.com/FEniCS/libtab.git libtab-src
             cd libtab-src
-            python3 -m pip install scikit-build
-            python3 -m pip install .
+            pip install .
         name: Install libtab
       - run: python3 -m pytest --durations=50 test
         name: Run unit tests
