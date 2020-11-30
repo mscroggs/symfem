@@ -5,9 +5,12 @@ import pytest
 import numpy as np
 
 elements = {
-    "triangle": [("P", "Lagrange", range(1, 4)), ("N1curl", "Nedelec", range(1, 4)),
-                 ("N1div", "RaviartThomas", range(1, 4))],
-    "tetrahedron": [("P", "Lagrange", range(1, 4)), ("N1curl", "Nedelec", range(1, 3))]
+    "triangle": [("P", "Lagrange", range(1, 4)), ("N1curl", "Nedelec 1st kind H(curl)", range(1, 4)),
+                 ("N2curl", "Nedelec 2nd kind H(curl)", range(1, 4)),
+                 ("N1div", "Raviart-Thomas", range(1, 4))],
+    "tetrahedron": [("P", "Lagrange", range(1, 4)), ("N1curl", "Nedelec 1st kind H(curl)", range(1, 3)),
+                    ("N2curl", "Nedelec 2nd kind H(curl)", range(1, 3)),
+                    ("N1div", "Raviart-Thomas", range(1, 3))]
 }
 
 
@@ -38,7 +41,7 @@ def make_lattice(cell, N=3):
 def test_against_libtab(cell, feast_type, libtab_type, order):
     element = feast_element(cell, feast_type, order)
     points = make_lattice(cell)
-    space = libtab.create_element(cell, libtab_type, order)
+    space = libtab.create_element(libtab_type, cell, order)
     result = space.tabulate(0, points)[0]
 
     if element.range_dim == 1:
