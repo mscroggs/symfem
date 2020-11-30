@@ -8,7 +8,7 @@ jobs:
     name: Run tests
     runs-on: ubuntu-latest
     steps:
-      - run: sudo apt-get install -y python3-setuptools libeigen3-dev python3-pytest python3-numpy python3-flake8 python3-sympy python3-pip
+      - run: sudo apt-get install -y python3-setuptools libeigen3-dev python3-pytest python3-numpy python3-flake8 python3-sympy python3-pip python3-six
         name: Install dependencies
       - run: |
             cd /usr/include
@@ -22,7 +22,7 @@ jobs:
             git clone https://github.com/FEniCS/libtab.git libtab-src
             cd libtab-src
             pip3 install --upgrade pip
-            pip3 install scikit-build six
+            pip3 install scikit-build
             pip3 install .
         name: Install libtab
       - run: python3 -m pytest --durations=50 test
