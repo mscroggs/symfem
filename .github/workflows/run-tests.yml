@@ -22,7 +22,7 @@ jobs:
             git clone https://github.com/FEniCS/libtab.git libtab-src
             cd libtab-src
             pip3 install --upgrade pip
-            pip3 install scikit-build
+            pip3 install scikit-build six
             pip3 install .
         name: Install libtab
       - run: python3 -m pytest --durations=50 test
