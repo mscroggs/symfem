@@ -8,12 +8,8 @@ jobs:
     name: Run tests
     runs-on: ubuntu-latest
     steps:
-      - run: sudo apt-get install -y python3-setuptools libeigen3-dev python3-pytest python3-numpy python3-flake8 python3-sympy python3-pip python3-six
+      - run: sudo apt-get install -y libeigen3-dev python3-pytest python3-pip
         name: Install dependencies
-      - run: |
-            cd /usr/include
-            sudo ln -sf eigen3/Eigen Eigen
-        name: Fix eigen location
       - uses: actions/checkout@v2
       - run: ls /usr/local/lib/python*
       - run: pip3 install -r requirements.txt
@@ -21,8 +17,6 @@ jobs:
       - run: |
             git clone https://github.com/FEniCS/libtab.git libtab-src
             cd libtab-src
-            pip3 install --upgrade pip
-            python3 -m pip install scikit-build
             python3 -m pip install .
         name: Install libtab
       - run: python3 -m pytest --durations=50 test
