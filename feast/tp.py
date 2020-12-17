@@ -45,7 +45,7 @@ class Q(FiniteElement):
                         dofs.append(
                             PointEvaluation(
                                 tuple(o + sum(sympy.Rational(a[j] * b, order)
-                                              for a, b in zip(entity.axes, i))
+                                              for a, b in zip(entity.axes, i[::-1]))
                                       for j, o in enumerate(entity.origin)),
                                 entity_dim=edim))
 
@@ -72,7 +72,7 @@ class DiscontinuousQ(FiniteElement):
         else:
             dofs = []
             for i in product(range(order + 1), repeat=reference.tdim):
-                dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i),
+                dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i[::-1]),
                                             entity_dim=reference.tdim))
 
         super().__init__(

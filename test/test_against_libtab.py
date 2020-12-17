@@ -5,12 +5,17 @@ import pytest
 import numpy as np
 
 elements = {
-    "triangle": [("P", "Lagrange", range(1, 4)), ("N1curl", "Nedelec 1st kind H(curl)", range(1, 4)),
+    "interval": [("P", "Lagrange", range(1, 4)), ("dP", "Discontinuous Lagrange", range(1, 4))],
+    "triangle": [("P", "Lagrange", range(1, 4)), ("dP", "Discontinuous Lagrange", range(1, 4)),
+                 ("N1curl", "Nedelec 1st kind H(curl)", range(1, 4)),
                  ("N2curl", "Nedelec 2nd kind H(curl)", range(1, 4)),
                  ("N1div", "Raviart-Thomas", range(1, 4))],
-    "tetrahedron": [("P", "Lagrange", range(1, 4)), ("N1curl", "Nedelec 1st kind H(curl)", range(1, 3)),
+    "tetrahedron": [("P", "Lagrange", range(1, 4)),("dP", "Discontinuous Lagrange", range(1, 4)),
+                    ("N1curl", "Nedelec 1st kind H(curl)", range(1, 3)),
                     ("N2curl", "Nedelec 2nd kind H(curl)", range(1, 3)),
-                    ("N1div", "Raviart-Thomas", range(1, 3))]
+                    ("N1div", "Raviart-Thomas", range(1, 3))],
+    "quadrilateral": [("Q", "Lagrange", range(1, 4))],
+    "hexahedron": [("Q", "Lagrange", range(1, 4))]
 }
 
 
