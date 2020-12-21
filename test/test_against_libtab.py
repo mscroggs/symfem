@@ -10,7 +10,9 @@ elements = {
                  ("N1div", "Raviart-Thomas", range(1, 4))],
     "tetrahedron": [("P", "Lagrange", range(1, 4)), ("N1curl", "Nedelec 1st kind H(curl)", range(1, 3)),
                     ("N2curl", "Nedelec 2nd kind H(curl)", range(1, 3)),
-                    ("N1div", "Raviart-Thomas", range(1, 3))]
+                    ("N1div", "Raviart-Thomas", range(1, 3))],
+    "quadrilateral": [("Q", "Lagrange", range(1, 4)), ("dQ", "Discontinuous Lagrange", range(1, 4))],
+    "hexahedron": [("Q", "Lagrange", range(1, 4)), ("dQ", "Discontinuous Lagrange", range(1, 4))]
 }
 
 
