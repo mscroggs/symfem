@@ -25,9 +25,9 @@ jobs:
       - run: python3 -m pip install -r requirements.txt
         name: Install requirements.txt
       - run: |
-            git clone https://github.com/FEniCS/libtab.git libtab-src
-            cd libtab-src
+            git clone https://github.com/FEniCS/basix.git basix-src
+            cd basix-src
             pip install .
-        name: Install libtab
+        name: Install basix
       - run: python3 -m pytest --durations=50 test
         name: Run unit tests
