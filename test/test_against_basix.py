@@ -1,16 +1,21 @@
 from feast import feast_element
 from feast.symbolic import subs, x
-import libtab
+import basix
 import pytest
 import numpy as np
 
 elements = {
-    "triangle": [("P", "Lagrange", range(1, 4)), ("N1curl", "Nedelec 1st kind H(curl)", range(1, 4)),
+    "interval": [("P", "Lagrange", range(1, 4)), ("dP", "Discontinuous Lagrange", range(1, 4))],
+    "triangle": [("P", "Lagrange", range(1, 4)), ("dP", "Discontinuous Lagrange", range(1, 4)),
+                 ("N1curl", "Nedelec 1st kind H(curl)", range(1, 4)),
                  ("N2curl", "Nedelec 2nd kind H(curl)", range(1, 4)),
                  ("N1div", "Raviart-Thomas", range(1, 4))],
-    "tetrahedron": [("P", "Lagrange", range(1, 4)), ("N1curl", "Nedelec 1st kind H(curl)", range(1, 3)),
+    "tetrahedron": [("P", "Lagrange", range(1, 4)), ("dP", "Discontinuous Lagrange", range(1, 4)),
+                    ("N1curl", "Nedelec 1st kind H(curl)", range(1, 3)),
                     ("N2curl", "Nedelec 2nd kind H(curl)", range(1, 3)),
-                    ("N1div", "Raviart-Thomas", range(1, 3))]
+                    ("N1div", "Raviart-Thomas", range(1, 3))],
+    "quadrilateral": [("Q", "Lagrange", range(1, 4)), ("dQ", "Discontinuous Lagrange", range(1, 4))],
+    "hexahedron": [("Q", "Lagrange", range(1, 4)), ("dQ", "Discontinuous Lagrange", range(1, 4))]
 }
 
 
@@ -36,12 +41,12 @@ def make_lattice(cell, N=3):
                          for i in range(N + 1) for j in range(N + 1) for k in range(N + 1)])
 
 
-@pytest.mark.parametrize(("cell", "feast_type", "libtab_type", "order"),
+@pytest.mark.parametrize(("cell", "feast_type", "basix_type", "order"),
                          [(cell, a, b, order) for cell, ls in elements.items() for a, b, c in ls for order in c])
-def test_against_libtab(cell, feast_type, libtab_type, order):
+def test_against_basix(cell, feast_type, basix_type, order):
     element = feast_element(cell, feast_type, order)
     points = make_lattice(cell)
-    space = libtab.create_element(libtab_type, cell, order)
+    space = basix.create_element(basix_type, cell, order)
     result = space.tabulate(0, points)[0]
 
     if element.range_dim == 1:
@@ -50,5 +55,4 @@ def test_against_libtab(cell, feast_type, libtab_type, order):
     else:
         basis = element.get_basis_functions()
         sym_result = [[float(subs(b, x, p)[j]) for j in range(element.range_dim) for b in basis] for p in points]
-
     assert np.allclose(result, sym_result)
