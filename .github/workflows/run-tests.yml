@@ -25,7 +25,7 @@ jobs:
       - run: python3 -m pip install -r requirements.txt
         name: Install requirements.txt
       - run: |
-            git clone https://github.com/FEniCS/libtab.git libtab-src
+            git clone https://github.com/FEniCS/libtab.git@mscroggs/dq libtab-src
             cd libtab-src
             pip install .
         name: Install libtab
