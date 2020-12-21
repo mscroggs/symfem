@@ -10,7 +10,7 @@ elements = {
                  ("N1curl", "Nedelec 1st kind H(curl)", range(1, 4)),
                  ("N2curl", "Nedelec 2nd kind H(curl)", range(1, 4)),
                  ("N1div", "Raviart-Thomas", range(1, 4))],
-    "tetrahedron": [("P", "Lagrange", range(1, 4)),("dP", "Discontinuous Lagrange", range(1, 4)),
+    "tetrahedron": [("P", "Lagrange", range(1, 4)), ("dP", "Discontinuous Lagrange", range(1, 4)),
                     ("N1curl", "Nedelec 1st kind H(curl)", range(1, 3)),
                     ("N2curl", "Nedelec 2nd kind H(curl)", range(1, 3)),
                     ("N1div", "Raviart-Thomas", range(1, 3))],
@@ -46,12 +46,6 @@ def make_lattice(cell, N=3):
 def test_against_basix(cell, feast_type, basix_type, order):
     element = feast_element(cell, feast_type, order)
     points = make_lattice(cell)
-    if cell == "interval":
-        points = np.array([[.5]])
-    elif cell in ["triangle", "quadrilateral"]:
-        points = np.array([[1/3, 1/4]])
-    else:
-        points = np.array([[1/3, 1/4, 1/5]])
     space = basix.create_element(basix_type, cell, order)
     result = space.tabulate(0, points)[0]
 
