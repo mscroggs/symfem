@@ -27,7 +27,7 @@ jobs:
       - run: |
             git clone https://github.com/FEniCS/basix.git basix-src
             cd basix-src
-            git checkout mscroggs/dq
+            git checkout mscroggs/bdm
             pip install .
         name: Install basix
       - run: python3 -m pytest --durations=50 test
