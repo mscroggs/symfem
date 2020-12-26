@@ -1,6 +1,21 @@
 """FEAST: Finite Element Automatic Symbolic Tabulator."""
 from . import simplex, tp, references
 from .finite_element import FiniteElement
+import os as _os
+
+_folder = _os.path.dirname(_os.path.realpath(__file__))
+
+if _os.path.isfile(_os.path.join(_folder, "../VERSION")):
+    # If running from folder
+    _v_folder = os.path.join(ave_folder, "..")
+else:
+    # If running from installation
+    _v_folder = _folder
+
+with open(os.path.join(_v_folder, "VERSION")) as f:
+    __version__ = f.read().strip()
+
+version_tuple = tuple(int(i) for i in version.split("."))
 
 _elementlist = {}
 
