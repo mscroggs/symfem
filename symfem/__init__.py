@@ -1,4 +1,4 @@
-"""symfem: Symbolic Finite Element Method Definitions"""
+"""symfem: Symbolic Finite Element Method Definitions."""
 import os as _os
 from . import simplex as _simplex
 from . import tp as _tp
