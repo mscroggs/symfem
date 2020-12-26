@@ -2,3 +2,7 @@
 symfem/VERSION
 
 .*.swp
+
+build/
+dist/
+feast.egg-info/
