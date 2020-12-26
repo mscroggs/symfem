@@ -25,6 +25,10 @@ jobs:
       - run: python3 -m pip install -r requirements.txt
         name: Install requirements.txt
       - run: |
+            python3 setup.py install
+            rm -rf feast
+        name: Install feast
+      - run: |
             git clone https://github.com/FEniCS/basix.git basix-src
             cd basix-src
             pip install .
