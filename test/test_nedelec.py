@@ -1,11 +1,11 @@
 import sympy
-from feast import feast_element
-from feast.symbolic import x
-from feast.vectors import vdot
+from symfem import create_element
+from symfem.symbolic import x
+from symfem.vectors import vdot
 
 
 def test_nedelec_2d():
-    space = feast_element("triangle", "Nedelec", 1)
+    space = create_element("triangle", "Nedelec", 1)
     k = sympy.Symbol("k")
 
     tdim = 2
@@ -28,7 +28,7 @@ def test_nedelec_2d():
 
 
 def test_nedelec_3d():
-    space = feast_element("tetrahedron", "Nedelec", 1)
+    space = create_element("tetrahedron", "Nedelec", 1)
     k = sympy.Symbol("k")
 
     tdim = 3

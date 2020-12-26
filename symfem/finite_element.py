@@ -108,7 +108,7 @@ def make_integral_moment_dofs(
 
     Parameters
     ----------
-    reference: feast.references.Reference
+    reference: symfem.references.Reference
         The reference cell.
     vertices: tuple
         DOFs on dimension 0 entities.

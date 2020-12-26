@@ -2,9 +2,7 @@ import sys
 import os
 import setuptools
 
-os.system("cp VERSION feast/")
-os.system("rm -rf ave/_games")
-os.system("cp -r games ave/_games")
+os.system("cp VERSION symfem/")
 
 if sys.version_info < (3, 6):
     print("Python 3.6 or higher required, please upgrade.")
@@ -14,20 +12,20 @@ with open("VERSION") as f:
     VERSION = f.read()
 
 data_files = [
-    ("feast", ["feast/VERSION"])]
+    ("symfem", ["symfem/VERSION"])]
 
 
 if __name__ == "__main__":
     setuptools.setup(
-        name="feast",
+        name="symfem",
         description="Finite Element Automated Symbolic Tabulator",
         version=VERSION,
         author="Matthew Scroggs",
         license="MIT",
-        author_email="feast@mscroggs.co.uk",
-        maintainer_email="feast@mscroggs.co.uk",
-        url="https://github.com/mscroggs/feast",
-        packages=["feast"],
+        author_email="symfem@mscroggs.co.uk",
+        maintainer_email="symfem@mscroggs.co.uk",
+        url="https://github.com/mscroggs/symfem",
+        packages=["symfem"],
         data_files=data_files,
         include_package_data=True
     )

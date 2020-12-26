@@ -26,8 +26,8 @@ jobs:
         name: Install requirements.txt
       - run: |
             python3 setup.py install
-            rm -rf feast
-        name: Install feast
+            rm -rf symfem
+        name: Install symfem
       - run: |
             git clone https://github.com/FEniCS/basix.git basix-src
             cd basix-src

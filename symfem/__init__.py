@@ -1,4 +1,4 @@
-"""FEAST: Finite Element Automatic Symbolic Tabulator."""
+"""symfem: Symbolic Finite Element Method Definitions."""
 import os as _os
 from . import simplex as _simplex
 from . import tp as _tp
@@ -32,7 +32,7 @@ for _cell_class, _module in [("simplex", _simplex), ("tp", _tp)]:
                 _elementlist[_cell_class][_n] = _element
 
 
-def feast_element(cell_type, element_type, order):
+def create_element(cell_type, element_type, order):
     """Make a finite element.
 
     Parameters

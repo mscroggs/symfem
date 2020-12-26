@@ -12,5 +12,5 @@ jobs:
       - run: |
             python3 -m flake8 .
         name: Run flake8 checks
-      - run: python3 -m pydocstyle feast
+      - run: python3 -m pydocstyle symfem
         name: Run pydocstyle checks

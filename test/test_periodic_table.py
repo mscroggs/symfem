@@ -1,5 +1,5 @@
 import pytest
-from feast import feast_element
+from symfem import create_element
 
 
 elements = []
@@ -28,7 +28,7 @@ elements += [
 
 @pytest.mark.parametrize(("cell_type", "element_type", "order"), elements)
 def test_elements(cell_type, element_type, order):
-    space = feast_element(cell_type, element_type, order)
+    space = create_element(cell_type, element_type, order)
     for i, f in enumerate(space.get_basis_functions()):
         for j, d in enumerate(space.dofs):
             if i == j:

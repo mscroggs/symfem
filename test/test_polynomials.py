@@ -1,8 +1,8 @@
 import pytest
-from feast.polynomials import Hdiv_polynomials, Hcurl_polynomials
-from feast.vectors import vdot
-from feast.symbolic import x
-from feast import references
+from symfem.polynomials import Hdiv_polynomials, Hcurl_polynomials
+from symfem.vectors import vdot
+from symfem.symbolic import x
+from symfem import references
 
 
 @pytest.mark.parametrize(

@@ -1,4 +1,4 @@
-from feast import references
+from symfem import references
 import pytest
 
 
