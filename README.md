@@ -1,4 +1,3 @@
-FEAST
------
-**F**inite **E**lement **A**utomatic **S**ymbolic **T**abulator
+Symfem: **Sym**bolic **F**inite **E**lement **M**ethod Definitions
+------------------------------------------------------------------
 

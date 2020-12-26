@@ -1,5 +1,5 @@
-from feast import feast_element
-from feast.symbolic import subs, x
+from symfem import create_element
+from symfem.symbolic import subs, x
 import basix
 import pytest
 import numpy as np
@@ -43,10 +43,10 @@ def make_lattice(cell, N=3):
                          for i in range(N + 1) for j in range(N + 1) for k in range(N + 1)])
 
 
-@pytest.mark.parametrize(("cell", "feast_type", "basix_type", "order"),
+@pytest.mark.parametrize(("cell", "symfem_type", "basix_type", "order"),
                          [(cell, a, b, order) for cell, ls in elements.items() for a, b, c in ls for order in c])
-def test_against_basix(cell, feast_type, basix_type, order):
-    element = feast_element(cell, feast_type, order)
+def test_against_basix(cell, symfem_type, basix_type, order):
+    element = create_element(cell, symfem_type, order)
     points = make_lattice(cell)
     space = basix.create_element(basix_type, cell, order)
     result = space.tabulate(0, points)[0]
