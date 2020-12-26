@@ -31,4 +31,3 @@ if __name__ == "__main__":
         data_files=data_files,
         include_package_data=True
     )
-
