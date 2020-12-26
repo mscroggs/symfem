@@ -14,7 +14,7 @@ with open("VERSION") as f:
     VERSION = f.read()
 
 data_files = [
-    ("feast", ["feast/VERSION", "feast/gamelist.json"])]
+    ("feast", ["feast/VERSION"])]
 
 
 if __name__ == "__main__":
