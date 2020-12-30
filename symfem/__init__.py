@@ -32,6 +32,29 @@ for _cell_class, _module in [("simplex", _simplex), ("tp", _tp)]:
                 _elementlist[_cell_class][_n] = _element
 
 
+def create_reference(cell_type):
+    """Make a reference cell.
+
+    Parameters
+    ----------
+    cell_type : str
+        The reference cell type.
+        Supported values: interval, triangle, quadrilateral, tetrahedron, hexahedron
+    """
+    if cell_type == "interval":
+        return _references.Interval()
+    elif cell_type == "triangle":
+        return _references.Triangle()
+    elif cell_type == "tetrahedron":
+        return _references.Tetrahedron()
+    elif cell_type == "quadrilateral":
+        return _references.Quadrilateral()
+    elif cell_type == "hexahedron":
+        return _references.Hexahedron()
+    else:
+        raise ValueError(f"Unknown cell type: {cell_type}")
+
+
 def create_element(cell_type, element_type, order):
     """Make a finite element.
 
@@ -45,18 +68,7 @@ def create_element(cell_type, element_type, order):
     order: int
         The order of the element.
     """
-    if cell_type == "interval":
-        reference = _references.Interval()
-    elif cell_type == "triangle":
-        reference = _references.Triangle()
-    elif cell_type == "tetrahedron":
-        reference = _references.Tetrahedron()
-    elif cell_type == "quadrilateral":
-        reference = _references.Quadrilateral()
-    elif cell_type == "hexahedron":
-        reference = _references.Hexahedron()
-    else:
-        raise ValueError(f"Unknown cell type: {cell_type}")
+    reference = create_reference(cell_type)
 
     if reference.simplex:
         if element_type in _elementlist["simplex"]:
