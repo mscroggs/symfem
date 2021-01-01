@@ -33,7 +33,6 @@ for _file in _os.listdir(_os.path.join(_folder, "elements")):
             ):
                 for _n in _element.names:
                     if _n in _elementlist:
-                        print(_n)
                         assert _element == _elementlist[_n]
                     _elementlist[_n] = _element
 
