@@ -261,7 +261,7 @@ class Regge(FiniteElement):
                                       for j, o in enumerate(entity.origin)),
                                 tangent, entity_dim=edim))
 
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim ** 2)
 
     names = ["Regge"]
     min_order = 0
