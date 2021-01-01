@@ -227,5 +227,5 @@ class CrouzeixRaviart(FiniteElement):
             reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
 
-    names = ["CrouzeixRaviart", "CR"]
+    names = ["Crouzeix-Raviart", "CR"]
     min_order = 1
