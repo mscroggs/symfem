@@ -1,17 +1,11 @@
-"""Finite elements on simplices."""
+"""Lagrange elements on simplices."""
 
 import sympy
 from itertools import product
-from .symbolic import one, zero
-from .finite_element import FiniteElement, make_integral_moment_dofs
-from .polynomials import polynomial_set, Hcurl_polynomials, Hdiv_polynomials
-from .functionals import (
-    PointEvaluation,
-    DotPointEvaluation,
-    TangentIntegralMoment,
-    NormalIntegralMoment,
-    IntegralMoment,
-)
+from ..core.symbolic import one, zero
+from ..core.finite_element import FiniteElement
+from ..core.polynomials import polynomial_set
+from ..core.functionals import PointEvaluation, DotPointEvaluation
 
 
 class Lagrange(FiniteElement):
@@ -134,98 +128,3 @@ class VectorDiscontinuousLagrange(FiniteElement):
 
     names = ["vector discontinuous Lagrange", "vdP", "vDP"]
     min_order = 0
-
-
-class NedelecFirstKind(FiniteElement):
-    """Nedelec first kind Hcurl finite element."""
-
-    def __init__(self, reference, order):
-        poly = polynomial_set(reference.tdim, reference.tdim, order - 1)
-        poly += Hcurl_polynomials(reference.tdim, reference.tdim, order)
-        dofs = make_integral_moment_dofs(
-            reference,
-            edges=(TangentIntegralMoment, DiscontinuousLagrange, order - 1),
-            faces=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
-            volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 3),
-        )
-
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
-
-    names = ["Nedelec", "Nedelec1", "N1curl"]
-    min_order = 1
-
-
-class RaviartThomas(FiniteElement):
-    """Raviart-Thomas Hdiv finite element."""
-
-    def __init__(self, reference, order):
-        poly = polynomial_set(reference.tdim, reference.tdim, order - 1)
-        poly += Hdiv_polynomials(reference.tdim, reference.tdim, order)
-
-        dofs = make_integral_moment_dofs(
-            reference,
-            facets=(NormalIntegralMoment, DiscontinuousLagrange, order - 1),
-            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
-        )
-
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
-
-    names = ["Raviart-Thomas", "RT", "N1div"]
-    min_order = 1
-
-
-class NedelecSecondKind(FiniteElement):
-    """Nedelec second kind Hcurl finite element."""
-
-    def __init__(self, reference, order):
-        poly = polynomial_set(reference.tdim, reference.tdim, order)
-
-        dofs = make_integral_moment_dofs(
-            reference,
-            edges=(TangentIntegralMoment, DiscontinuousLagrange, order),
-            faces=(IntegralMoment, RaviartThomas, order - 1),
-            volumes=(IntegralMoment, RaviartThomas, order - 2),
-        )
-
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
-
-    names = ["Nedelec2", "N2curl"]
-    min_order = 1
-
-
-class BDM(FiniteElement):
-    """Brezzi-Douglas-Marini Hdiv finite element."""
-
-    def __init__(self, reference, order):
-        poly = polynomial_set(reference.tdim, reference.tdim, order)
-
-        dofs = make_integral_moment_dofs(
-            reference,
-            facets=(NormalIntegralMoment, DiscontinuousLagrange, order),
-            cells=(IntegralMoment, NedelecFirstKind, order - 1),
-        )
-
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
-
-    names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]
-    min_order = 1
-
-
-class CrouzeixRaviart(FiniteElement):
-    """Crouzeix-Raviart finite element."""
-
-    def __init__(self, reference, order):
-        assert order == 1
-        dofs = []
-        for vs in reference.sub_entities(reference.tdim - 1):
-            midpoint = tuple(sum(i) / len(i)
-                             for i in zip(*[reference.vertices[i] for i in vs]))
-            dofs.append(
-                PointEvaluation(midpoint, entity_dim=reference.tdim - 1))
-
-        super().__init__(
-            reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
-        )
-
-    names = ["Crouzeix-Raviart", "CR"]
-    min_order = 1

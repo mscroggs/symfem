@@ -1,26 +1,12 @@
-"""Elements on tensor product cells."""
+"""Q elements on tensor product cells."""
 
 import sympy
 from itertools import product
-from .symbolic import one, zero
-from .simplex import DiscontinuousLagrange, VectorDiscontinuousLagrange
-from .finite_element import FiniteElement, make_integral_moment_dofs
-from .polynomials import (
-    quolynomial_set,
-    Hdiv_quolynomials,
-    Hcurl_quolynomials,
-    serendipity_set,
-    polynomial_set,
-    Hdiv_serendipity,
-    Hcurl_serendipity,
-)
-from .functionals import (
-    PointEvaluation,
-    DotPointEvaluation,
-    IntegralMoment,
-    TangentIntegralMoment,
-    NormalIntegralMoment,
-)
+from ..core.symbolic import one, zero
+from ..core.finite_element import FiniteElement, make_integral_moment_dofs
+from ..core.polynomials import quolynomial_set, Hdiv_quolynomials, Hcurl_quolynomials
+from ..core.functionals import (PointEvaluation, DotPointEvaluation, IntegralMoment,
+                                TangentIntegralMoment, NormalIntegralMoment)
 
 
 class Q(FiniteElement):
@@ -131,7 +117,7 @@ class Nedelec(FiniteElement):
 
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
-    names = ["Nedelec", "NCE", "RTCE", "Qcurl"]
+    names = ["NCE", "RTCE", "Qcurl"]
     min_order = 1
 
 
@@ -150,69 +136,5 @@ class RaviartThomas(FiniteElement):
 
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
-    names = ["Raviart-Thomas", "NCF", "RTCF", "Qdiv"]
-    min_order = 1
-
-
-class Serendipity(FiniteElement):
-    """A serendipity element."""
-
-    def __init__(self, reference, order):
-        poly = polynomial_set(reference.tdim, 1, order)
-        poly += serendipity_set(reference.tdim, 1, order)
-
-        dofs = []
-        for p in reference.vertices:
-            dofs.append(PointEvaluation(p, entity_dim=0))
-        dofs += make_integral_moment_dofs(
-            reference,
-            edges=(IntegralMoment, DiscontinuousLagrange, order - 2),
-            faces=(IntegralMoment, DiscontinuousLagrange, order - 4),
-            volumes=(IntegralMoment, DiscontinuousLagrange, order - 6),
-        )
-
-        super().__init__(reference, poly, dofs, reference.tdim, 1)
-
-    names = ["serendipity", "S"]
-    min_order = 1
-
-
-class SerendipityCurl(FiniteElement):
-    """A serendipity Hcurl element."""
-
-    def __init__(self, reference, order):
-        poly = polynomial_set(reference.tdim, reference.tdim, order)
-        poly += Hcurl_serendipity(reference.tdim, reference.tdim, order)
-
-        dofs = []
-        dofs += make_integral_moment_dofs(
-            reference,
-            edges=(TangentIntegralMoment, DiscontinuousLagrange, order),
-            faces=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
-            volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 4),
-        )
-
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
-
-    names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
-    min_order = 1
-
-
-class SerendipityDiv(FiniteElement):
-    """A serendipity Hdiv element."""
-
-    def __init__(self, reference, order):
-        poly = polynomial_set(reference.tdim, reference.tdim, order)
-        poly += Hdiv_serendipity(reference.tdim, reference.tdim, order)
-
-        dofs = []
-        dofs += make_integral_moment_dofs(
-            reference,
-            facets=(NormalIntegralMoment, DiscontinuousLagrange, order),
-            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
-        )
-
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
-
-    names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]
+    names = ["NCF", "RTCF", "Qdiv"]
     min_order = 1
