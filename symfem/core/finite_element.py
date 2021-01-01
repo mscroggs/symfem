@@ -7,13 +7,15 @@ from .symbolic import x, zero, subs
 class FiniteElement:
     """Abstract finite element."""
 
-    def __init__(self, reference, basis, dofs, domain_dim, range_dim):
+    def __init__(self, reference, basis, dofs, domain_dim, range_dim,
+                 range_shape=None):
         assert len(basis) == len(dofs)
         self.reference = reference
         self.basis = basis
         self.dofs = dofs
         self.domain_dim = domain_dim
         self.range_dim = range_dim
+        self.range_shape = range_shape
         self.space_dim = len(dofs)
         self._basis_functions = None
 
@@ -42,7 +44,15 @@ class FiniteElement:
                     for c, d in zip(minv.row(i), self.basis):
                         for j, d_j in enumerate(d):
                             b[j] += c * d_j
-                    self._basis_functions.append(b)
+                    if self.range_shape is None:
+                        self._basis_functions.append(b)
+                    else:
+                        if len(self.range_shape) != 2:
+                            raise NotImplementedError
+                        assert self.range_shape[0] * self.range_shape[1] == self.range_dim
+                        self._basis_functions.append(sympy.Matrix(
+                            [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
+                             for i in range(self.range_shape[0])]))
 
         return self._basis_functions
 
