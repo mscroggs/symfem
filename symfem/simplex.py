@@ -209,3 +209,23 @@ class BDM(FiniteElement):
 
     names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]
     min_order = 1
+
+
+class Regge(FiniteElement):
+    """A Regge element."""
+
+    def __init__(self, reference, order):
+        assert reference.name in ["triangle", "tetrahedron"]
+        poly = polynomial_set(reference.tdim, reference.tdim ** 2, order)
+
+        dofs = []
+        dofs += make_integral_moment_dofs(
+            reference,
+            facets=(NormalIntegralMoment, DiscontinuousLagrange, order),
+            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
+        )
+
+        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
+
+    names = ["Regge"]
+    min_order = 1
