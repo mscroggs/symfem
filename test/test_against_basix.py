@@ -50,7 +50,7 @@ def test_against_basix(cell, symfem_type, basix_type, order):
     try:
         import basix
     except ImportError:
-        pytest.skip()
+        pytest.skip("basix must be installed to run this test.")
 
     element = create_element(cell, symfem_type, order)
     points = make_lattice(cell)
