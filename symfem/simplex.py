@@ -209,3 +209,23 @@ class BDM(FiniteElement):
 
     names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]
     min_order = 1
+
+
+class CrouzeixRaviart(FiniteElement):
+    """Crouzeix-Raviart finite element."""
+
+    def __init__(self, reference, order):
+        assert order == 1
+        dofs = []
+        for vs in reference.sub_entities(reference.tdim - 1):
+            midpoint = tuple(sum(i) / len(i)
+                             for i in zip(*[reference.vertices[i] for i in vs]))
+            dofs.append(
+                PointEvaluation(midpoint, entity_dim=reference.tdim - 1))
+
+        super().__init__(
+            reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
+        )
+
+    names = ["CrouzeixRaviart", "CR"]
+    min_order = 1
