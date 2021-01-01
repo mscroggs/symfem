@@ -252,12 +252,12 @@ class Regge(FiniteElement):
                 )
                 for i in product(range(1, order + 2), repeat=edim):
                     if sum(i) < order + 2:
-                        for edge in entity.edges:
+                        for edge in entity.edges[::-1]:
                             tangent = [b - a for a, b in zip(entity.vertices[edge[0]],
                                                              entity.vertices[edge[1]])]
                             dofs.append(PointInnerProduct(
                                 tuple(o + sum(sympy.Rational(a[j] * b, order + 2)
-                                              for a, b in zip(entity.axes, i))
+                                              for a, b in zip(entity.axes, i[::-1]))
                                       for j, o in enumerate(entity.origin)),
                                 tangent, entity_dim=edim))
 
