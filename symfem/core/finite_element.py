@@ -20,6 +20,18 @@ class FiniteElement:
         self._basis_functions = None
         self._reshaped_basis_functions = None
 
+    def get_polynomial_basis(self, reshape=True):
+        """Get the polynomial basis for the element."""
+        if reshape and self.range_shape is not None:
+            if len(self.range_shape) != 2:
+                raise NotImplementedError
+            assert self.range_shape[0] * self.range_shape[1] == self.range_dim
+            return [sympy.Matrix(
+                [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
+                 for i in range(self.range_shape[0])]) for b in self.basis]
+
+        return self.basis
+
     def get_basis_functions(self, reshape=True):
         """Get the basis functions of the element."""
         if self._basis_functions is None:
