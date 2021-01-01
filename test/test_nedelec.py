@@ -1,7 +1,7 @@
 import sympy
 from symfem import create_element
-from symfem.symbolic import x
-from symfem.vectors import vdot
+from symfem.core.symbolic import x
+from symfem.core.vectors import vdot
 
 
 def test_nedelec_2d():
