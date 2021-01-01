@@ -1,8 +1,8 @@
 import pytest
-from symfem.polynomials import Hdiv_polynomials, Hcurl_polynomials
-from symfem.vectors import vdot
-from symfem.symbolic import x
-from symfem import references
+from symfem.core.polynomials import Hdiv_polynomials, Hcurl_polynomials
+from symfem.core.vectors import vdot
+from symfem.core.symbolic import x
+from symfem.core import references
 
 
 @pytest.mark.parametrize(

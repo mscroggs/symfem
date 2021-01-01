@@ -1,9 +1,8 @@
 """symfem: Symbolic Finite Element Method Definitions."""
 import os as _os
-from . import simplex as _simplex
-from . import tp as _tp
-from . import references as _references
-from .finite_element import FiniteElement as _FiniteElement
+import importlib as _il
+from .core import references as _references
+from .core.finite_element import FiniteElement as _FiniteElement
 
 _folder = _os.path.dirname(_os.path.realpath(__file__))
 
@@ -19,17 +18,23 @@ with open(_os.path.join(_v_folder, "VERSION")) as _f:
 
 _elementlist = {}
 
-for _cell_class, _module in [("simplex", _simplex), ("tp", _tp)]:
-    _elementlist[_cell_class] = {}
-    for _class_name in dir(_module):
-        _element = getattr(_module, _class_name)
-        if (
-            isinstance(_element, type)
-            and issubclass(_element, _FiniteElement)
-            and _element != _FiniteElement
-        ):
-            for _n in _element.names:
-                _elementlist[_cell_class][_n] = _element
+
+for _file in _os.listdir(_os.path.join(_folder, "elements")):
+    if _file.endswith(".py") and "__init__" not in _file:
+        _fname = _file[:-3]
+        _module = _il.import_module(f"symfem.elements.{_fname}")
+
+        for _class_name in dir(_module):
+            _element = getattr(_module, _class_name)
+            if (
+                isinstance(_element, type)
+                and issubclass(_element, _FiniteElement)
+                and _element != _FiniteElement
+            ):
+                for _n in _element.names:
+                    if _n in _elementlist:
+                        assert _element == _elementlist[_n]
+                    _elementlist[_n] = _element
 
 
 def create_reference(cell_type):
@@ -70,12 +75,7 @@ def create_element(cell_type, element_type, order):
     """
     reference = create_reference(cell_type)
 
-    if reference.simplex:
-        if element_type in _elementlist["simplex"]:
-            return _elementlist["simplex"][element_type](reference, order)
-
-    if reference.tp:
-        if element_type in _elementlist["tp"]:
-            return _elementlist["tp"][element_type](reference, order)
+    if element_type in _elementlist:
+        return _elementlist[element_type](reference, order)
 
     raise ValueError(f"Unsupported element type: {element_type}")
