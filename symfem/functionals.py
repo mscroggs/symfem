@@ -47,6 +47,37 @@ class PointEvaluation(BaseFunctional):
     name = "Point evaluation"
 
 
+class PointInnerProduct(BaseFunctional):
+    """An evaluation of an inner product at a point."""
+
+    def __init__(self, point, vec, entity_dim=None):
+        self.point = point
+        self.vec = vec
+        self._entity_dim = entity_dim
+
+    def eval(self, function):
+        """Apply to the functional to a function."""
+        v = subs(function, x, self.point)
+        tdim = len(self.vec)
+        return vdot(self.vec,
+                    tuple(vdot(v[tdim * i: tdim * (i + 1)], self.vec)
+                          for i in range(0, tdim)))
+
+    def dof_point(self):
+        """Get the location of the DOF in the cell."""
+        return self.point
+
+    def dof_direction(self):
+        """Get the location of the DOF in the cell."""
+        return self.vec
+
+    def entity_dim(self):
+        """Get the dimension of the entitiy this DOF is associated with."""
+        return self._entity_dim
+
+    name = "Point inner product"
+
+
 class DotPointEvaluation(BaseFunctional):
     """A point evaluation in a given direction."""
 
