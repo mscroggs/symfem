@@ -18,8 +18,9 @@ class FiniteElement:
         self.range_shape = range_shape
         self.space_dim = len(dofs)
         self._basis_functions = None
+        self._reshaped_basis_functions = None
 
-    def get_basis_functions(self):
+    def get_basis_functions(self, reshape=True):
         """Get the basis functions of the element."""
         if self._basis_functions is None:
             mat = []
@@ -44,15 +45,15 @@ class FiniteElement:
                     for c, d in zip(minv.row(i), self.basis):
                         for j, d_j in enumerate(d):
                             b[j] += c * d_j
-                    if self.range_shape is None:
-                        self._basis_functions.append(b)
-                    else:
-                        if len(self.range_shape) != 2:
-                            raise NotImplementedError
-                        assert self.range_shape[0] * self.range_shape[1] == self.range_dim
-                        self._basis_functions.append(sympy.Matrix(
-                            [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
-                             for i in range(self.range_shape[0])]))
+                    self._basis_functions.append(b)
+
+        if reshape and self.range_shape is not None:
+            if len(self.range_shape) != 2:
+                raise NotImplementedError
+            assert self.range_shape[0] * self.range_shape[1] == self.range_dim
+            return [sympy.Matrix(
+                [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
+                 for i in range(self.range_shape[0])]) for b in self._basis_functions]
 
         return self._basis_functions
 
@@ -62,7 +63,7 @@ class FiniteElement:
             output = []
             for p in points:
                 row = []
-                for b in self.get_basis_functions():
+                for b in self.get_basis_functions(False):
                     row.append(subs(b, x, p))
                 output.append(row)
             return output
@@ -72,7 +73,7 @@ class FiniteElement:
             for p in points:
                 row = []
                 for d in range(self.range_dim):
-                    for b in self.get_basis_functions():
+                    for b in self.get_basis_functions(False):
                         row.append(subs(b[d], x, p))
                 output.append(row)
             return output
@@ -80,7 +81,7 @@ class FiniteElement:
             output = []
             for p in points:
                 row = []
-                for b in self.get_basis_functions():
+                for b in self.get_basis_functions(False):
                     for i in subs(b, x, p):
                         row.append(i)
                 output.append(row)
@@ -89,7 +90,7 @@ class FiniteElement:
             output = []
             for p in points:
                 row = []
-                for b in self.get_basis_functions():
+                for b in self.get_basis_functions(False):
                     row.append(subs(b, x, p))
                 output.append(row)
             return output
