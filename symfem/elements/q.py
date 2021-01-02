@@ -13,7 +13,7 @@ class Q(FiniteElement):
     """A Q element."""
 
     def __init__(self, reference, order):
-        from sympy import create_reference
+        from symfem import create_reference
         if order == 0:
             dofs = [
                 PointEvaluation(
