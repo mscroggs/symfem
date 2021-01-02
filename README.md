@@ -137,7 +137,7 @@ print(triangle2.gdim)
 3
 ```
 
-The reference types of the subentities can be obtained. These can be used to crate reference
+The reference types of the subentities can be obtained. This can be used to create a reference
 representing a subentity:
 ```python
 import symfem
