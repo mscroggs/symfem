@@ -13,6 +13,7 @@ class Q(FiniteElement):
     """A Q element."""
 
     def __init__(self, reference, order):
+        from sympy import create_reference
         if order == 0:
             dofs = [
                 PointEvaluation(
@@ -24,9 +25,9 @@ class Q(FiniteElement):
                 dofs.append(PointEvaluation(v, entity_dim=0))
             for edim in range(1, 4):
                 for vs in reference.sub_entities(edim):
-                    entity = reference.sub_entity_types[edim](
-                        vertices=tuple(reference.reference_vertices[i] for i in vs)
-                    )
+                    entity = create_reference(
+                        reference.sub_entity_types[edim],
+                        vertices=tuple(reference.reference_vertices[i] for i in vs))
                     for i in product(range(1, order), repeat=edim):
                         dofs.append(
                             PointEvaluation(

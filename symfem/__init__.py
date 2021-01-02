@@ -37,7 +37,7 @@ for _file in _os.listdir(_os.path.join(_folder, "elements")):
                     _elementlist[_n] = _element
 
 
-def create_reference(cell_type):
+def create_reference(cell_type, vertices=None):
     """Make a reference cell.
 
     Parameters
@@ -45,16 +45,28 @@ def create_reference(cell_type):
     cell_type : str
         The reference cell type.
         Supported values: interval, triangle, quadrilateral, tetrahedron, hexahedron
+    vertices : list
+        The vertices of the reference.
     """
     if cell_type == "interval":
+        if vertices is not None:
+            return _references.Interval(vertices)
         return _references.Interval()
     elif cell_type == "triangle":
+        if vertices is not None:
+            return _references.Triangle(vertices)
         return _references.Triangle()
     elif cell_type == "tetrahedron":
+        if vertices is not None:
+            return _references.Tetrahedron(vertices)
         return _references.Tetrahedron()
     elif cell_type == "quadrilateral":
+        if vertices is not None:
+            return _references.Quadrilateral(vertices)
         return _references.Quadrilateral()
     elif cell_type == "hexahedron":
+        if vertices is not None:
+            return _references.Hexahedron(vertices)
         return _references.Hexahedron()
     else:
         raise ValueError(f"Unknown cell type: {cell_type}")

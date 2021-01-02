@@ -46,9 +46,6 @@ class Reference:
         if self.tdim == 2:
             if self.gdim == 3:
                 return vnormalise(vcross(self.axes[0], self.axes[1]))
-        from IPython import embed
-
-        embed()
         raise RuntimeError
 
     def sub_entities(self, dim):
@@ -102,7 +99,7 @@ class Interval(Reference):
         self.edges = ((0, 1),)
         self.faces = tuple()
         self.volumes = tuple()
-        self.sub_entity_types = ["point", Interval, None, None]
+        self.sub_entity_types = ["point", "interval", None, None]
         super().__init__(simplex=True, tp=True)
 
     def integral(self, f):
@@ -123,7 +120,7 @@ class Triangle(Reference):
         self.edges = ((1, 2), (0, 2), (0, 1))
         self.faces = ((0, 1, 2),)
         self.volumes = tuple()
-        self.sub_entity_types = ["point", Interval, Triangle, None]
+        self.sub_entity_types = ["point", "interval", "triangle", None]
         super().__init__(simplex=True)
 
     def integral(self, f):
@@ -150,7 +147,7 @@ class Tetrahedron(Reference):
         self.edges = ((2, 3), (1, 3), (1, 2), (0, 3), (0, 2), (0, 1))
         self.faces = ((1, 2, 3), (0, 2, 3), (0, 1, 3), (0, 1, 2))
         self.volumes = ((0, 1, 2, 3),)
-        self.sub_entity_types = ["point", Interval, Triangle, Tetrahedron]
+        self.sub_entity_types = ["point", "interval", "triangle", "tetrahedron"]
         super().__init__(simplex=True)
 
     def integral(self, f):
@@ -176,7 +173,7 @@ class Quadrilateral(Reference):
         self.edges = ((0, 1), (0, 2), (1, 3), (2, 3))
         self.faces = ((0, 1, 2, 3),)
         self.volumes = tuple()
-        self.sub_entity_types = ["point", Interval, Quadrilateral, None]
+        self.sub_entity_types = ["point", "interval", "quadrilateral", None]
         super().__init__(tp=True)
 
     def integral(self, f):
@@ -242,7 +239,7 @@ class Hexahedron(Reference):
             (4, 5, 6, 7),
         )
         self.volumes = ((0, 1, 2, 3, 4, 5, 6, 7),)
-        self.sub_entity_types = ["point", Interval, Quadrilateral, Hexahedron]
+        self.sub_entity_types = ["point", "interval", "quadrilateral", "hexahedron"]
         super().__init__(tp=True)
 
     def integral(self, f):
