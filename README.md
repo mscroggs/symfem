@@ -48,7 +48,7 @@ lagrange = symfem.create_element("triangle", "Lagrange", 1)
 print(lagrange.dofs)
 ```
 ```
-[<symfem.core.functionals.PointEvaluation object at 0x7fd6e5ad1970>, <symfem.core.functionals.PointEvaluation object at 0x7fd6e5ad1bb0>, <symfem.core.functionals.PointEvaluation object at 0x7fd6e5ad1850>]
+[<symfem.core.functionals.PointEvaluation object at 0x{ADDRESS}>, <symfem.core.functionals.PointEvaluation object at 0x{ADDRESS}>, <symfem.core.functionals.PointEvaluation object at 0x{ADDRESS}>]
 ```
 
 The basis functions spanning the finite element space can be obtained, or tabulated
@@ -153,5 +153,6 @@ edge0 = symfem.create_reference(
 print(edge0.vertices)
 ```
 ```
-['point', <class 'symfem.core.references.Interval'>, <class 'symfem.core.references.Triangle'>, None]
+['point', 'interval', 'triangle', None]
+[(1, 0), (0, 1)]
 ```
