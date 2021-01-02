@@ -60,9 +60,9 @@ def test_against_basix(cell, symfem_type, basix_type, order):
     result = space.tabulate(0, points)[0]
 
     if element.range_dim == 1:
-        basis = element.get_basis_functions()
+        basis = element.get_basis_functions(False)
         sym_result = [[float(subs(b, x, p)) for b in basis] for p in points]
     else:
-        basis = element.get_basis_functions()
+        basis = element.get_basis_functions(False)
         sym_result = [[float(subs(b, x, p)[j]) for j in range(element.range_dim) for b in basis] for p in points]
     assert np.allclose(result, sym_result)

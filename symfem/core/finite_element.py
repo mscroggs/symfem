@@ -7,17 +7,32 @@ from .symbolic import x, zero, subs
 class FiniteElement:
     """Abstract finite element."""
 
-    def __init__(self, reference, basis, dofs, domain_dim, range_dim):
+    def __init__(self, reference, basis, dofs, domain_dim, range_dim,
+                 range_shape=None):
         assert len(basis) == len(dofs)
         self.reference = reference
         self.basis = basis
         self.dofs = dofs
         self.domain_dim = domain_dim
         self.range_dim = range_dim
+        self.range_shape = range_shape
         self.space_dim = len(dofs)
         self._basis_functions = None
+        self._reshaped_basis_functions = None
 
-    def get_basis_functions(self):
+    def get_polynomial_basis(self, reshape=True):
+        """Get the polynomial basis for the element."""
+        if reshape and self.range_shape is not None:
+            if len(self.range_shape) != 2:
+                raise NotImplementedError
+            assert self.range_shape[0] * self.range_shape[1] == self.range_dim
+            return [sympy.Matrix(
+                [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
+                 for i in range(self.range_shape[0])]) for b in self.basis]
+
+        return self.basis
+
+    def get_basis_functions(self, reshape=True):
         """Get the basis functions of the element."""
         if self._basis_functions is None:
             mat = []
@@ -44,6 +59,14 @@ class FiniteElement:
                             b[j] += c * d_j
                     self._basis_functions.append(b)
 
+        if reshape and self.range_shape is not None:
+            if len(self.range_shape) != 2:
+                raise NotImplementedError
+            assert self.range_shape[0] * self.range_shape[1] == self.range_dim
+            return [sympy.Matrix(
+                [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
+                 for i in range(self.range_shape[0])]) for b in self._basis_functions]
+
         return self._basis_functions
 
     def tabulate_basis(self, points, order="xyzxyz"):
@@ -52,7 +75,7 @@ class FiniteElement:
             output = []
             for p in points:
                 row = []
-                for b in self.get_basis_functions():
+                for b in self.get_basis_functions(False):
                     row.append(subs(b, x, p))
                 output.append(row)
             return output
@@ -62,7 +85,7 @@ class FiniteElement:
             for p in points:
                 row = []
                 for d in range(self.range_dim):
-                    for b in self.get_basis_functions():
+                    for b in self.get_basis_functions(False):
                         row.append(subs(b[d], x, p))
                 output.append(row)
             return output
@@ -70,7 +93,7 @@ class FiniteElement:
             output = []
             for p in points:
                 row = []
-                for b in self.get_basis_functions():
+                for b in self.get_basis_functions(False):
                     for i in subs(b, x, p):
                         row.append(i)
                 output.append(row)
@@ -79,7 +102,7 @@ class FiniteElement:
             output = []
             for p in points:
                 row = []
-                for b in self.get_basis_functions():
+                for b in self.get_basis_functions(False):
                     row.append(subs(b, x, p))
                 output.append(row)
             return output
