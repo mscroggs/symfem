@@ -11,6 +11,7 @@ class Regge(FiniteElement):
     """A Regge element."""
 
     def __init__(self, reference, order):
+        from symfem import create_reference
         assert reference.name in ["triangle", "tetrahedron"]
         if reference.tdim == 2:
             poly = [(p[0], p[1], p[1], p[2])
@@ -22,9 +23,9 @@ class Regge(FiniteElement):
         dofs = []
         for edim in range(1, 4):
             for vs in reference.sub_entities(edim):
-                entity = reference.sub_entity_types[edim](
-                    vertices=tuple(reference.reference_vertices[i] for i in vs)
-                )
+                entity = create_reference(
+                    reference.sub_entity_types[edim],
+                    vertices=tuple(reference.reference_vertices[i] for i in vs))
                 for i in product(range(1, order + 2), repeat=edim):
                     if sum(i) < order + 2:
                         for edge in entity.edges[::-1]:

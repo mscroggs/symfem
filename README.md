@@ -48,7 +48,7 @@ lagrange = symfem.create_element("triangle", "Lagrange", 1)
 print(lagrange.dofs)
 ```
 ```
-[<symfem.core.functionals.PointEvaluation object at 0x7fd6e5ad1970>, <symfem.core.functionals.PointEvaluation object at 0x7fd6e5ad1bb0>, <symfem.core.functionals.PointEvaluation object at 0x7fd6e5ad1850>]
+[<symfem.core.functionals.PointEvaluation object at 0x{ADDRESS}>, <symfem.core.functionals.PointEvaluation object at 0x{ADDRESS}>, <symfem.core.functionals.PointEvaluation object at 0x{ADDRESS}>]
 ```
 
 The basis functions spanning the finite element space can be obtained, or tabulated
@@ -78,6 +78,7 @@ reference = lagrange.reference
 ```
 
 Alternatively, reference elements can be created using the `create_reference` function.
+Optionally, the vertices of the reference can be provided
 For example:
 
 ```python
@@ -86,9 +87,12 @@ import symfem
 triangle = symfem.create_reference("triangle")
 interval = symfem.create_reference("interval")
 tetrahedron = symfem.create_reference("tetrahedron")
+triangle2 = symfem.create_reference("triangle", ((0, 0, 0), (0, 1, 0), (1, 0, 1)))
+
 ```
 
-Various information about the reference can be accessed:
+Various information about the reference can be accessed. The reference element's subentities
+can be obtained:
 ```python
 import symfem
 
@@ -101,6 +105,7 @@ print(triangle.edges)
 ((1, 2), (0, 2), (0, 1))
 ```
 
+The origin and axes of the element can be obtained:
 ```python
 import symfem
 
@@ -113,24 +118,41 @@ print(triangle.axes)
 ((1, 0), (0, 1))
 ```
 
+The topological and geometric dimensions of the element can be obtained:
 ```python
 import symfem
 
 triangle = symfem.create_reference("triangle")
 print(triangle.tdim)
 print(triangle.gdim)
+
+triangle2 = symfem.create_reference("triangle", ((0, 0, 0), (0, 1, 0), (1, 0, 1)))
+print(triangle2.tdim)
+print(triangle2.gdim)
 ```
 ```
 2
 2
+2
+3
 ```
 
+The reference types of the subentities can be obtained. This can be used to create a reference
+representing a subentity:
 ```python
 import symfem
 
 triangle = symfem.create_reference("triangle")
 print(triangle.sub_entity_types)
+
+vertices = []
+for i in triangle.edges[0]:
+    vertices.append(triangle.vertices[i])
+edge0 = symfem.create_reference(
+    triangle.sub_entity_types[1], vertices)
+print(edge0.vertices)
 ```
 ```
-['point', <class 'symfem.core.references.Interval'>, <class 'symfem.core.references.Triangle'>, None]
+['point', 'interval', 'triangle', None]
+[(1, 0), (0, 1)]
 ```

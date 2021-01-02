@@ -150,6 +150,7 @@ def make_integral_moment_dofs(
     peaks: tuple
         DOFs on codimension 3 entities.
     """
+    from symfem import create_reference
     dofs = []
 
     # DOFs per dimension
@@ -161,9 +162,9 @@ def make_integral_moment_dofs(
                 if sub_type is not None:
                     assert dim > 0
                     for i, vs in enumerate(reference.sub_entities(dim)):
-                        sub_ref = sub_type(
-                            vertices=[reference.reference_vertices[v] for v in vs]
-                        )
+                        sub_ref = create_reference(
+                            sub_type,
+                            vertices=[reference.reference_vertices[v] for v in vs])
                         sub_element = SubElement(sub_ref, order)
                         for f, d in zip(
                             sub_element.get_basis_functions(), sub_element.dofs
@@ -180,9 +181,9 @@ def make_integral_moment_dofs(
                 if sub_type is not None:
                     assert dim > 0
                     for i, vs in enumerate(reference.sub_entities(dim)):
-                        sub_ref = sub_type(
-                            vertices=[reference.reference_vertices[v] for v in vs]
-                        )
+                        sub_ref = create_reference(
+                            sub_type,
+                            vertices=[reference.reference_vertices[v] for v in vs])
                         sub_element = SubElement(sub_ref, order)
                         for f, d in zip(
                             sub_element.get_basis_functions(), sub_element.dofs
