@@ -80,9 +80,17 @@ def create_element(cell_type, element_type, order):
     cell_type : str
         The reference cell type.
         Supported values: interval, triangle, quadrilateral, tetrahedron, hexahedron
-    element_type: str
+    element_type : str
         The type of the element.
-    order: int
+        Supported values: Crouzeix-Raviart, CR, discontinuous Lagrange, dP, DP,
+                          serendipity, S, serendipity Hcurl, Scurl, BDMCE, AAE,
+                          serendipity Hdiv, Sdiv, BDMCF, AAF,
+                          vector discontinuous Lagrange, vdP, vDP, Lagrange, P,
+                          vector Lagrange, vP, Regge, Nedelec, Nedelec1, N1curl,
+                          Nedelec2, N2curl, Raviart-Thomas, RT, N1div, dQ, NCE, RTCE,
+                          Qcurl, Q, NCF, RTCF, Qdiv, vector Q, vQ,
+                          Brezzi-Douglas-Marini, BDM, N2div
+    order : int
         The order of the element.
     """
     reference = create_reference(cell_type)
