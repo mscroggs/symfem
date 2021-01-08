@@ -41,7 +41,7 @@ class FiniteElement:
                 for d in self.dofs:
                     row.append(d.eval(b))
                 mat.append(row)
-            minv = sympy.Matrix(mat).inv()
+            minv = sympy.Matrix(mat).inv("LU")
             self._basis_functions = []
             if self.range_dim == 1:
                 # Scalar space
