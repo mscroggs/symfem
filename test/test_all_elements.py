@@ -14,7 +14,7 @@ def handler(signum, frame):
 elements = []
 for e in _elementlist:
     min_o = e.min_order if hasattr(e, "min_order") else 0
-    max_o = min(4, e.max_order) if hasattr(e, "max_order") else 4
+    max_o = min(5, e.max_order) if hasattr(e, "max_order") else 5
     for r in e.references:
         for order in range(min_o, max_o + 1):
             elements.append((r, e.names[0], order))

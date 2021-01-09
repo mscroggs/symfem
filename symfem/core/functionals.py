@@ -1,7 +1,7 @@
 """Functionals used to define the dual sets."""
 from .symbolic import subs, x, t
 from .vectors import vdot
-from .calculus import derivative
+from .calculus import derivative, jacobian_component
 
 
 class BaseFunctional:
@@ -83,6 +83,29 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
         self.reference = edge
 
     name = "Point evaluation of normal derivative"
+
+
+class PointComponentSecondDerivativeEvaluation(BaseFunctional):
+    """A point evaluation of a component of a second derivative."""
+
+    def __init__(self, point, component, entity_dim=None):
+        self.point = point
+        self.component = component
+        self._entity_dim = entity_dim
+
+    def eval(self, function):
+        """Apply to the functional to a function."""
+        return subs(jacobian_component(function, self.component), x, self.point)
+
+    def dof_point(self):
+        """Get the location of the DOF in the cell."""
+        return self.point
+
+    def entity_dim(self):
+        """Get the dimension of the entitiy this DOF is associated with."""
+        return self._entity_dim
+
+    name = "Point evaluation of Jacobian component"
 
 
 class PointInnerProduct(BaseFunctional):
