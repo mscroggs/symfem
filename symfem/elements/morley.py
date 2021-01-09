@@ -1,4 +1,4 @@
-"""Crouzeix-Raviart elements on simplices."""
+"""Morley elements on simplices."""
 
 from ..core.finite_element import FiniteElement
 from ..core.polynomials import polynomial_set
