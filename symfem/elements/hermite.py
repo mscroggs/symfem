@@ -10,7 +10,6 @@ class Hermite(FiniteElement):
     """Hermite finite element."""
 
     def __init__(self, reference, order):
-        from symfem import create_reference
         assert order == 3
         dofs = []
         for vs in reference.sub_entities(0):
@@ -21,7 +20,7 @@ class Hermite(FiniteElement):
         for vs in reference.sub_entities(2):
             midpoint = tuple(sym_sum(i) / len(i)
                              for i in zip(*[reference.vertices[i] for i in vs]))
-            dofs.append(PointEvaluation(midpoint, entity_dim = 2))
+            dofs.append(PointEvaluation(midpoint, entity_dim=2))
 
         super().__init__(
             reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
