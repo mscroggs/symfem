@@ -90,7 +90,7 @@ def create_element(cell_type, element_type, order):
                           vector Lagrange, vP, Regge, Nedelec, Nedelec1, N1curl,
                           Nedelec2, N2curl, Raviart-Thomas, RT, N1div, dQ, NCE, RTCE,
                           Qcurl, Q, NCF, RTCF, Qdiv, vector Q, vQ,
-                          Brezzi-Douglas-Marini, BDM, N2div
+                          Brezzi-Douglas-Marini, BDM, N2div, Morley
     order : int
         The order of the element.
     """
