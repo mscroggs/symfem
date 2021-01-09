@@ -1,6 +1,5 @@
 """Functions to handle derivatives."""
 
-import sympy
 from .vectors import vdot
 from .symbolic import x
 
