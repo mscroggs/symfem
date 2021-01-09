@@ -1,7 +1,7 @@
 """Functions to handle derivatives."""
 
 from .vectors import vdot
-from .symbolic import x
+from .symbolic import x, sym_sum
 
 
 def derivative(f, dir):
@@ -22,3 +22,7 @@ def jacobian_component(f, component):
 def jacobian(f, dim):
     """Find the Jacobian."""
     return [[f.diff(x[i]).diff(x[j]) for i in range(dim)] for j in range(dim)]
+
+
+def div(f):
+    return sym_sum(j.diff(x[i]) for i, j in enumerate(f))
