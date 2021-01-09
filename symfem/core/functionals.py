@@ -80,6 +80,7 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
 
     def __init__(self, point, edge):
         super().__init__(point, edge.normal(), entity_dim=edge.tdim)
+        self.reference = edge
 
     name = "Point evaluation of normal derivative"
 
