@@ -25,4 +25,5 @@ def jacobian(f, dim):
 
 
 def div(f):
+    """Find the divergence of a vector function."""
     return sym_sum(j.diff(x[i]) for i, j in enumerate(f))
