@@ -28,6 +28,7 @@ class Serendipity(FiniteElement):
         super().__init__(reference, poly, dofs, reference.tdim, 1)
 
     names = ["serendipity", "S"]
+    references = ["quadrilateral", "hexahedron"]
     min_order = 1
 
 
@@ -49,6 +50,7 @@ class SerendipityCurl(FiniteElement):
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
+    references = ["quadrilateral", "hexahedron"]
     min_order = 1
 
 
@@ -69,4 +71,5 @@ class SerendipityDiv(FiniteElement):
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]
+    references = ["quadrilateral", "hexahedron"]
     min_order = 1

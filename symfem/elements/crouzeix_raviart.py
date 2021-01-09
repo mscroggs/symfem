@@ -3,6 +3,7 @@
 from ..core.finite_element import FiniteElement
 from ..core.polynomials import polynomial_set
 from ..core.functionals import PointEvaluation
+from ..core.symbolic import sym_sum
 
 
 class CrouzeixRaviart(FiniteElement):
@@ -12,7 +13,7 @@ class CrouzeixRaviart(FiniteElement):
         assert order == 1
         dofs = []
         for vs in reference.sub_entities(reference.tdim - 1):
-            midpoint = tuple(sum(i) / len(i)
+            midpoint = tuple(sym_sum(i) / len(i)
                              for i in zip(*[reference.vertices[i] for i in vs]))
             dofs.append(
                 PointEvaluation(midpoint, entity_dim=reference.tdim - 1))
@@ -22,4 +23,6 @@ class CrouzeixRaviart(FiniteElement):
         )
 
     names = ["Crouzeix-Raviart", "CR"]
+    references = ["triangle", "tetrahedron"]
     min_order = 1
+    max_order = 1

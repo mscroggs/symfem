@@ -23,6 +23,7 @@ class NedelecFirstKind(FiniteElement):
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Nedelec", "Nedelec1", "N1curl"]
+    references = ["triangle", "tetrahedron"]
     min_order = 1
 
 
@@ -42,4 +43,5 @@ class NedelecSecondKind(FiniteElement):
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Nedelec2", "N2curl"]
+    references = ["triangle", "tetrahedron"]
     min_order = 1

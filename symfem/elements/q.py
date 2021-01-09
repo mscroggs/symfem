@@ -44,6 +44,7 @@ class Q(FiniteElement):
             1)
 
     names = ["Q"]
+    references = ["quadrilateral", "hexahedron"]
     min_order = 0
 
 
@@ -70,6 +71,7 @@ class DiscontinuousQ(FiniteElement):
             1)
 
     names = ["dQ"]
+    references = ["quadrilateral", "hexahedron"]
     min_order = 0
 
 
@@ -99,6 +101,7 @@ class VectorQ(FiniteElement):
         )
 
     names = ["vector Q", "vQ"]
+    references = ["quadrilateral", "hexahedron"]
     min_order = 0
 
 
@@ -119,6 +122,7 @@ class Nedelec(FiniteElement):
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["NCE", "RTCE", "Qcurl"]
+    references = ["quadrilateral", "hexahedron"]
     min_order = 1
 
 
@@ -138,4 +142,5 @@ class RaviartThomas(FiniteElement):
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["NCF", "RTCF", "Qdiv"]
+    references = ["quadrilateral", "hexahedron"]
     min_order = 1

@@ -22,4 +22,5 @@ class BDM(FiniteElement):
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]
+    references = ["triangle", "tetrahedron"]
     min_order = 1
