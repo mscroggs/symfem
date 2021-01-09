@@ -97,6 +97,7 @@ def create_element(cell_type, element_type, order):
     reference = create_reference(cell_type)
 
     if element_type in _elementmap:
+        assert cell_type in _elementmap[element_type].references
         return _elementmap[element_type](reference, order)
 
     raise ValueError(f"Unsupported element type: {element_type}")
