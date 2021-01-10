@@ -4,6 +4,7 @@ from ..core.finite_element import FiniteElement, make_integral_moment_dofs
 from ..core.polynomials import polynomial_set
 from ..core.symbolic import x, zero, one
 from ..core.calculus import curl
+from ..core.vectors import vsub, vadd, vcross, vdot
 from ..core.functionals import NormalIntegralMoment, TangentIntegralMoment, VecIntegralMoment
 from .lagrange import DiscontinuousLagrange
 
@@ -27,8 +28,7 @@ class MardalTaiWinther(FiniteElement):
                     (-x[1] * x[0] ** 2 / 2 - 9 * x[1] ** 2 * x[0] / 7 - 17 * x[0] ** 2 / (28 * 4),
                      3 * x[1] ** 3 / 7 + x[0] * x[1] ** 2 / 2 + 2 * 17 * x[0] * x[1] / (28 * 4))]
             dofs += make_integral_moment_dofs(
-                reference, facets=(TangentIntegralMoment, DiscontinuousLagrange, 0),
-                facet_tangents=3)
+                reference, facets=(TangentIntegralMoment, DiscontinuousLagrange, 0))
         else:
             assert reference.name == "tetrahedron"
 
@@ -45,9 +45,13 @@ class MardalTaiWinther(FiniteElement):
                 sub_element = DiscontinuousLagrange(sub_ref, 0)
                 for f, d in zip(sub_element.get_basis_functions(), sub_element.dofs):
                     for e in sub_ref.edges:
-                        edge_vec = tuple(j - k for j, k in zip(sub_ref.vertices[e[0]],
-                                                               sub_ref.vertices[e[1]]))
-                        dofs.append(VecIntegralMoment(sub_ref, f, edge_vec, d))
+                        rigid_m = vadd(
+                            vsub(sub_ref.vertices[e[1]], sub_ref.vertices[e[0]]),
+                            vcross(
+                                vsub(x, sub_ref.vertices[e[0]]),
+                                sub_ref.normal()))
+                        rigid_m = tuple(vdot(rigid_m, a) for a in sub_ref.axes)
+                        dofs.append(VecIntegralMoment(sub_ref, one, rigid_m, d))
 
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
