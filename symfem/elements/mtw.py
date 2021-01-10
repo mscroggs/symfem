@@ -1,7 +1,7 @@
 """Mardal-Tai-Winther elements on simplices."""
 
 from ..core.finite_element import FiniteElement, make_integral_moment_dofs
-from ..core.polynomials import polynomial_set, Hcurl_polynomials
+from ..core.polynomials import polynomial_set
 from ..core.symbolic import x, zero, one
 from ..core.calculus import curl
 from ..core.functionals import NormalIntegralMoment, TangentIntegralMoment, VecIntegralMoment
