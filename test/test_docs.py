@@ -24,4 +24,4 @@ def test_available_elements():
     supported = supported.split("Supported values:")[1]
     supported = set([i.strip() for i in supported.split(",")])
 
-    assert set(symfem._elementlist.keys()) == supported
+    assert set(symfem._elementmap.keys()) == supported

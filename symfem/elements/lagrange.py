@@ -46,6 +46,7 @@ class Lagrange(FiniteElement):
         )
 
     names = ["Lagrange", "P"]
+    references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
 
 
@@ -70,6 +71,7 @@ class DiscontinuousLagrange(FiniteElement):
         )
 
     names = ["discontinuous Lagrange", "dP", "DP"]
+    references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
     min_order = 0
 
 
@@ -99,6 +101,7 @@ class VectorLagrange(FiniteElement):
         )
 
     names = ["vector Lagrange", "vP"]
+    references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
 
 
@@ -128,4 +131,5 @@ class VectorDiscontinuousLagrange(FiniteElement):
         )
 
     names = ["vector discontinuous Lagrange", "vdP", "vDP"]
+    references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
     min_order = 0

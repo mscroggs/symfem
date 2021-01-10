@@ -41,4 +41,5 @@ class Regge(FiniteElement):
                          (reference.tdim, reference.tdim))
 
     names = ["Regge"]
+    references = ["triangle", "tetrahedron"]
     min_order = 0

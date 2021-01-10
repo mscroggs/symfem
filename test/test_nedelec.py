@@ -18,7 +18,8 @@ def test_nedelec_2d():
         for j, f in enumerate(space.get_basis_functions()):
             norm = sympy.sqrt(sum((edge[0][i] - edge[1][i]) ** 2 for i in range(tdim)))
             tangent = tuple((edge[1][i] - edge[0][i]) / norm for i in range(tdim))
-            line = sympy.Curve([(1 - k) * edge[0][i] + k * edge[1][i] for i in range(tdim)], (k, 0, 1))
+            line = sympy.Curve([(1 - k) * edge[0][i] + k * edge[1][i] for i in range(tdim)],
+                               (k, 0, 1))
 
             result = sympy.line_integrate(vdot(f, tangent), line, x[:tdim])
             if i == j:

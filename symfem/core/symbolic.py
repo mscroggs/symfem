@@ -22,3 +22,11 @@ def subs(f, vars, values):
         return (
             f.subs(vars[0], values[0]).subs(vars[1], values[1]).subs(vars[2], values[2])
         )
+
+
+def sym_sum(ls):
+    """Symbolically computes the sum of a list."""
+    out = zero
+    for i in ls:
+        out += i
+    return out
