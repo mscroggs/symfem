@@ -91,7 +91,7 @@ def create_element(cell_type, element_type, order):
                           Nedelec2, N2curl, Raviart-Thomas, RT, N1div, dQ, NCE, RTCE,
                           Qcurl, Q, NCF, RTCF, Qdiv, vector Q, vQ,
                           Brezzi-Douglas-Marini, BDM, N2div, Morley, Hermite,
-                          Mardal-Tai-Winther, MTW, Argyris
+                          Mardal-Tai-Winther, MTW, Argyris, bubble
     order : int
         The order of the element.
     """

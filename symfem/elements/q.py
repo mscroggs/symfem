@@ -44,7 +44,7 @@ class Q(FiniteElement):
             1)
 
     names = ["Q"]
-    references = ["quadrilateral", "hexahedron"]
+    references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 0
 
 
@@ -71,7 +71,7 @@ class DiscontinuousQ(FiniteElement):
             1)
 
     names = ["dQ"]
-    references = ["quadrilateral", "hexahedron"]
+    references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 0
 
 
