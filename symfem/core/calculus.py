@@ -27,3 +27,12 @@ def jacobian(f, dim):
 def div(f):
     """Find the divergence of a vector function."""
     return sym_sum(j.diff(x[i]) for i, j in enumerate(f))
+
+
+def curl(f):
+    """Find the curl of a 3D vector function."""
+    return (
+        f[2].diff(x[1]) - f[1].diff(x[2]),
+        f[0].diff(x[2]) - f[2].diff(x[0]),
+        f[1].diff(x[0]) - f[0].diff(x[1])
+    )

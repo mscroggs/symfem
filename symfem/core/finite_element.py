@@ -118,14 +118,8 @@ class FiniteElement:
 
 def make_integral_moment_dofs(
     reference,
-    vertices=None,
-    edges=None,
-    faces=None,
-    volumes=None,
-    cells=None,
-    facets=None,
-    ridges=None,
-    peaks=None,
+    vertices=None, edges=None, faces=None, volumes=None,
+    cells=None, facets=None, ridges=None, peaks=None
 ):
     """Generate DOFs due to integral moments on sub entities.
 

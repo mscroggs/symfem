@@ -26,10 +26,8 @@ def test_Hcurl_space(reference, order):
         assert vdot(p, x) == 0
 
 
-@pytest.mark.parametrize("reference", ["triangle", "tetrahedron"])
+@pytest.mark.parametrize("reference", ["triangle"])
 def test_MTW_space(reference):
-    if reference == "tetrahedron":
-        pytest.xfail()
     e = create_element(reference, "MTW", 3)
     polynomials = e.get_polynomial_basis()
     for p in polynomials:
