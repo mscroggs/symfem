@@ -4,7 +4,6 @@ from ..core.finite_element import FiniteElement, make_integral_moment_dofs
 from ..core.polynomials import polynomial_set
 from ..core.symbolic import x, zero, one
 from ..core.calculus import curl
-from ..core.vectors import vsub, vadd, vcross, vdot
 from ..core.functionals import NormalIntegralMoment, TangentIntegralMoment, IntegralMoment
 from .lagrange import DiscontinuousLagrange
 from .nedelec import NedelecFirstKind
@@ -14,7 +13,6 @@ class MardalTaiWinther(FiniteElement):
     """Mardal-Tai-Winther Hdiv finite element."""
 
     def __init__(self, reference, order):
-        from symfem import create_reference
         assert order == 3
 
         dofs = make_integral_moment_dofs(
