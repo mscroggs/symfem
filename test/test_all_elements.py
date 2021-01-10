@@ -13,10 +13,20 @@ def handler(signum, frame):
 
 elements = []
 for e in _elementlist:
-    min_o = e.min_order if hasattr(e, "min_order") else 0
-    max_o = min(5, e.max_order) if hasattr(e, "max_order") else 5
     for r in e.references:
-        for order in range(min_o, max_o + 1):
+        if hasattr(e, "min_order"):
+            min_o = e.min_order
+            if isinstance(min_o, dict):
+                min_o = min_o[r]
+        else:
+            min_o = 0
+        if hasattr(e, "max_order"):
+            max_o = e.max_order
+            if isinstance(max_o, dict):
+                max_o = max_o[r]
+        else:
+            max_o = 100
+        for order in range(min_o, min(5, max_o) + 1):
             elements.append((r, e.names[0], order))
 
 
