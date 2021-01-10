@@ -5,8 +5,9 @@ from ..core.polynomials import polynomial_set
 from ..core.symbolic import x, zero, one
 from ..core.calculus import curl
 from ..core.vectors import vsub, vadd, vcross, vdot
-from ..core.functionals import NormalIntegralMoment, TangentIntegralMoment, VecIntegralMoment
+from ..core.functionals import NormalIntegralMoment, TangentIntegralMoment, IntegralMoment
 from .lagrange import DiscontinuousLagrange
+from .nedelec import NedelecFirstKind
 
 
 class MardalTaiWinther(FiniteElement):
@@ -37,21 +38,8 @@ class MardalTaiWinther(FiniteElement):
                 poly.append(curl(tuple(i * x[0] * x[1] * x[2] * (1 - x[0] - x[1] - x[2])
                                        for i in p)))
 
-            sub_type = reference.sub_entity_types[2]
-            for i, vs in enumerate(reference.sub_entities(2)):
-                sub_ref = create_reference(
-                    sub_type,
-                    vertices=[reference.reference_vertices[v] for v in vs])
-                sub_element = DiscontinuousLagrange(sub_ref, 0)
-                for f, d in zip(sub_element.get_basis_functions(), sub_element.dofs):
-                    for e in sub_ref.edges:
-                        rigid_m = vadd(
-                            vsub(sub_ref.vertices[e[1]], sub_ref.vertices[e[0]]),
-                            vcross(
-                                vsub(x, sub_ref.vertices[e[0]]),
-                                sub_ref.normal()))
-                        rigid_m = tuple(vdot(rigid_m, a) for a in sub_ref.axes)
-                        dofs.append(VecIntegralMoment(sub_ref, one, rigid_m, d))
+            dofs += make_integral_moment_dofs(
+                reference, facets=(IntegralMoment, NedelecFirstKind, 1))
 
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
