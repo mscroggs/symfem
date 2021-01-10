@@ -11,6 +11,14 @@ def vsub(v, w):
         return v - w
 
 
+def vadd(v, w):
+    """Add two vectors."""
+    try:
+        return tuple(i + j for i, j in zip(v, w))
+    except TypeError:
+        return v + w
+
+
 def vdiv(v, a):
     """Divide a vector by a scalar."""
     try:
