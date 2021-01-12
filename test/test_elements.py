@@ -116,4 +116,3 @@ def test_element_continuity(cell_type, element_type, order):
 
     except TimeOutTheTest:
         pytest.skip(f"Testing {element_type} on {cell_type} timed out for order {order}.")
-

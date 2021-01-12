@@ -41,4 +41,3 @@ class Bubble(FiniteElement):
     min_order = {"interval": 2, "triangle": 3, "tetrahedron": 4}
     mapping = "default"
     continuity = "C0"
-

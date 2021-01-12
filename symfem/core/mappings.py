@@ -1,7 +1,7 @@
 """Functions to map functions between cells."""
 
 import sympy
-from .symbolic import subs, x, t
+from .symbolic import subs, x
 from .vectors import vdot
 
 
