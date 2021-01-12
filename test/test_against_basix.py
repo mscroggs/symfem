@@ -1,5 +1,5 @@
 from symfem import create_element
-from symfem.core.symbolic import subs, x
+from symfem.core.symbolic import subs, x, sym_sum, zero
 import pytest
 import numpy as np
 
@@ -13,11 +13,11 @@ elements = {
                  ("Regge", "Regge", range(0, 4)),
                  ("Crouzeix-Raviart", "Crouzeix-Raviart", [1])],
     "tetrahedron": [("P", "Lagrange", range(1, 4)), ("dP", "Discontinuous Lagrange", range(1, 4)),
-                    ("N1curl", "Nedelec 1st kind H(curl)", range(1, 3)),
-                    ("N2curl", "Nedelec 2nd kind H(curl)", range(1, 3)),
-                    ("N1div", "Raviart-Thomas", range(1, 3)),
-                    ("N2div", "Brezzi-Douglas-Marini", range(1, 3)),
-                    ("Regge", "Regge", range(0, 3)),
+                    ("N1curl", "Nedelec 1st kind H(curl)", range(1, 4)),
+                    ("N2curl", "Nedelec 2nd kind H(curl)", range(1, 4)),
+                    ("N1div", "Raviart-Thomas", range(1, 4)),
+                    ("N2div", "Brezzi-Douglas-Marini", range(1, 4)),
+                    ("Regge", "Regge", range(0, 4)),
                     ("Crouzeix-Raviart", "Crouzeix-Raviart", [1])],
     "quadrilateral": [("Q", "Lagrange", range(1, 4)),
                       ("dQ", "Discontinuous Lagrange", range(1, 4))],
@@ -62,11 +62,23 @@ def test_against_basix(cell, symfem_type, basix_type, order):
     space = basix.create_element(basix_type, cell, order)
     result = space.tabulate(0, points)[0]
 
+    mat = element.get_dual_matrix()
+    mat = np.array([[float(j) for j in mat.row(i)] for i in range(mat.rows)])
+    minv = np.linalg.inv(mat)
     if element.range_dim == 1:
-        basis = element.get_basis_functions(False)
+        basis = []
+        for i, dof in enumerate(element.dofs):
+            basis.append(sym_sum(b * c for b, c in zip(minv[i], element.basis)))
+
         sym_result = [[float(subs(b, x, p)) for b in basis] for p in points]
     else:
-        basis = element.get_basis_functions(False)
+        basis = []
+        for i, dof in enumerate(element.dofs):
+            b = [zero for i in element.basis[0]]
+            for c, d in zip(minv[i], element.basis):
+                for j, d_j in enumerate(d):
+                    b[j] += c * d_j
+            basis.append(b)
         sym_result = [[float(subs(b, x, p)[j]) for j in range(element.range_dim) for b in basis]
                       for p in points]
     assert np.allclose(result, sym_result)

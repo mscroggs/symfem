@@ -1,7 +1,7 @@
 """Abstract finite element classes and functions."""
 
 import sympy
-from .symbolic import x, zero, subs
+from .symbolic import x, zero, subs, sym_sum
 
 
 class FiniteElement:
@@ -50,10 +50,8 @@ class FiniteElement:
             if self.range_dim == 1:
                 # Scalar space
                 for i, dof in enumerate(self.dofs):
-                    b = zero
-                    for c, d in zip(minv.row(i), self.basis):
-                        b += c * d
-                    self._basis_functions.append(b)
+                    self._basis_functions.append(
+                        sym_sum(c * d for c, d in zip(minv.row(i), self.basis)))
             else:
                 # Vector space
                 for i, dof in enumerate(self.dofs):

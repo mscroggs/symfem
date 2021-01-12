@@ -13,12 +13,20 @@ class NedelecFirstKind(FiniteElement):
     def __init__(self, reference, order):
         poly = polynomial_set(reference.tdim, reference.tdim, order - 1)
         poly += Hcurl_polynomials(reference.tdim, reference.tdim, order)
-        dofs = make_integral_moment_dofs(
-            reference,
-            edges=(TangentIntegralMoment, DiscontinuousLagrange, order - 1),
-            faces=(TangentCrossIntegralMoment, VectorDiscontinuousLagrange, order - 2),
-            volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 3),
-        )
+        if reference.tdim == 3:
+            dofs = make_integral_moment_dofs(
+                reference,
+                edges=(TangentIntegralMoment, DiscontinuousLagrange, order - 1),
+                faces=(TangentCrossIntegralMoment, VectorDiscontinuousLagrange, order - 2),
+                volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 3),
+            )
+        else:
+            dofs = make_integral_moment_dofs(
+                reference,
+                edges=(TangentIntegralMoment, DiscontinuousLagrange, order - 1),
+                faces=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
+                volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 3),
+            )
 
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
 
@@ -36,7 +44,7 @@ class NedelecSecondKind(FiniteElement):
         dofs = make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, DiscontinuousLagrange, order),
-            faces=(TangentCrossIntegralMoment, RaviartThomas, order - 1),
+            faces=(IntegralMoment, RaviartThomas, order - 1),
             volumes=(IntegralMoment, RaviartThomas, order - 2),
         )
 
