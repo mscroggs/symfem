@@ -116,7 +116,7 @@ class FiniteElement:
         raise ValueError(f"Unknown order: {order}")
 
     def map_to_cell(self, f, vertices):
-        """Maps a function onto a cell using the appropriate mapping for the element."""
+        """Map a function onto a cell using the appropriate mapping for the element."""
         map = self.reference.get_map_to(vertices)
         inverse_map = self.reference.get_inverse_map_to(vertices)
         return getattr(mappings, self.mapping)(f, map, inverse_map, self.reference.tdim)
