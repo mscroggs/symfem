@@ -1,7 +1,8 @@
 """Reference elements."""
+
 import sympy
-from .symbolic import t
-from .vectors import vsub, vnorm, vdot, vcross, vnormalise
+from .symbolic import t, x
+from .vectors import vsub, vnorm, vdot, vcross, vnormalise, vadd
 
 
 class Reference:
@@ -14,6 +15,14 @@ class Reference:
 
     def integral(self, f):
         """Calculate the integral over the element."""
+        raise NotImplementedError
+
+    def get_map_to(self, vertices):
+        """Get the map from the reference to a cell."""
+        raise NotImplementedError
+
+    def get_inverse_map_to(self, vertices):
+        """Get the inverse map from a cell to the reference."""
         raise NotImplementedError
 
     def jacobian(self):
@@ -106,6 +115,18 @@ class Interval(Reference):
         """Calculate the integral over the element."""
         return (f * self.jacobian()).integrate((t[0], 0, 1))
 
+    def get_map_to(self, vertices):
+        """Get the map from the reference to a cell."""
+        assert self.vertices == self.reference_vertices
+        return tuple(v0 + (v1 - v0) * x[0] for v0, v1 in zip(*vertices))
+
+    def get_inverse_map_to(self, vertices):
+        """Get the inverse map from a cell to the reference."""
+        assert self.vertices == self.reference_vertices
+        p = vsub(x, vertices[0])
+        v = vsub(vertices[1], vertices[0])
+        return (vdot(p, v) / vdot(v, v), )
+
 
 class Triangle(Reference):
     """A triangle."""
@@ -128,6 +149,22 @@ class Triangle(Reference):
         return (
             (f * self.jacobian()).integrate((t[1], 0, 1 - t[0])).integrate((t[0], 0, 1))
         )
+
+    def get_map_to(self, vertices):
+        """Get the map from the reference to a cell."""
+        assert self.vertices == self.reference_vertices
+        return tuple(v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1] for v0, v1, v2 in zip(*vertices))
+
+    def get_inverse_map_to(self, vertices):
+        """Get the inverse map from a cell to the reference."""
+        assert self.vertices == self.reference_vertices
+        assert len(vertices[0]) == 2
+        p = vsub(x, vertices[0])
+        v1 = vsub(vertices[1], vertices[0])
+        v2 = vsub(vertices[2], vertices[0])
+        mat = sympy.Matrix([[v1[0], v2[0]],
+                            [v1[1], v2[1]]]).inv()
+        return (vdot(mat.row(0), p), vdot(mat.row(1), p))
 
 
 class Tetrahedron(Reference):
@@ -159,6 +196,25 @@ class Tetrahedron(Reference):
             .integrate((t[0], 0, 1))
         )
 
+    def get_map_to(self, vertices):
+        """Get the map from the reference to a cell."""
+        assert self.vertices == self.reference_vertices
+        return tuple(v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1] + (v3 - v0) * x[2]
+                     for v0, v1, v2, v3 in zip(*vertices))
+
+    def get_inverse_map_to(self, vertices):
+        """Get the inverse map from a cell to the reference."""
+        assert self.vertices == self.reference_vertices
+        assert len(vertices[0]) == 3
+        p = vsub(x, vertices[0])
+        v1 = vsub(vertices[1], vertices[0])
+        v2 = vsub(vertices[2], vertices[0])
+        v3 = vsub(vertices[3], vertices[0])
+        mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
+                            [v1[1], v2[1], v3[1]],
+                            [v1[2], v2[2], v3[2]]]).inv()
+        return (vdot(mat.row(0), p), vdot(mat.row(1), p), vdot(mat.row(2), p))
+
 
 class Quadrilateral(Reference):
     """A quadrilateral."""
@@ -179,6 +235,25 @@ class Quadrilateral(Reference):
     def integral(self, f):
         """Calculate the integral over the element."""
         return (f * self.jacobian()).integrate((t[1], 0, 1)).integrate((t[0], 0, 1))
+
+    def get_map_to(self, vertices):
+        """Get the map from the reference to a cell."""
+        assert self.vertices == self.reference_vertices
+        return tuple(
+            (1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1) + x[1] * ((1 - x[0]) * v2 + x[0] * v3)
+            for v0, v1, v2, v3 in zip(*vertices))
+
+    def get_inverse_map_to(self, vertices):
+        """Get the inverse map from a cell to the reference."""
+        assert self.vertices == self.reference_vertices
+        assert len(vertices[0]) == 2
+        assert vadd(vertices[0], vertices[3]) == vadd(vertices[1], vertices[2])
+        p = vsub(x, vertices[0])
+        v1 = vsub(vertices[1], vertices[0])
+        v2 = vsub(vertices[2], vertices[0])
+        mat = sympy.Matrix([[v1[0], v2[0]],
+                            [v1[1], v2[1]]]).inv()
+        return (vdot(mat.row(0), p), vdot(mat.row(1), p))
 
 
 class Hexahedron(Reference):
@@ -250,3 +325,28 @@ class Hexahedron(Reference):
             .integrate((t[1], 0, 1))
             .integrate((t[0], 0, 1))
         )
+
+    def get_map_to(self, vertices):
+        """Get the map from the reference to a cell."""
+        assert self.vertices == self.reference_vertices
+        return tuple(
+            (1 - x[2]) * ((1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1)
+                          + x[1] * ((1 - x[0]) * v2 + x[0] * v3))
+            + x[2] * ((1 - x[1]) * ((1 - x[0]) * v4 + x[0] * v5)
+                      + x[1] * ((1 - x[0]) * v6 + x[0] * v7))
+            for v0, v1, v2, v3, v4, v5, v6, v7 in zip(*vertices))
+
+    def get_inverse_map_to(self, vertices):
+        """Get the inverse map from a cell to the reference."""
+        assert self.vertices == self.reference_vertices
+        assert len(vertices[0]) == 3
+        for a, b, c, d in self.faces:
+            assert vadd(vertices[a], vertices[d]) == vadd(vertices[b], vertices[c])
+        p = vsub(x, vertices[0])
+        v1 = vsub(vertices[1], vertices[0])
+        v2 = vsub(vertices[2], vertices[0])
+        v3 = vsub(vertices[4], vertices[0])
+        mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
+                            [v1[1], v2[1], v3[1]],
+                            [v1[2], v2[2], v3[2]]]).inv()
+        return tuple(vdot(mat.row(i), p) for i in range(mat.rows))

@@ -22,7 +22,7 @@ class Regge(FiniteElement):
 
         dofs = []
         for edim in range(1, 4):
-            for vs in reference.sub_entities(edim):
+            for e_n, vs in enumerate(reference.sub_entities(edim)):
                 entity = create_reference(
                     reference.sub_entity_types[edim],
                     vertices=tuple(reference.reference_vertices[i] for i in vs))
@@ -35,7 +35,7 @@ class Regge(FiniteElement):
                                 tuple(o + sum(sympy.Rational(a[j] * b, order + 2)
                                               for a, b in zip(entity.axes, i[::-1]))
                                       for j, o in enumerate(entity.origin)),
-                                tangent, entity_dim=edim))
+                                tangent, entity=(edim, e_n)))
 
         super().__init__(reference, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))
@@ -43,3 +43,5 @@ class Regge(FiniteElement):
     names = ["Regge"]
     references = ["triangle", "tetrahedron"]
     min_order = 0
+    mapping = "double_covariant"
+    continuity = "C0"

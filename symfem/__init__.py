@@ -31,7 +31,8 @@ for _file in _os.listdir(_os.path.join(_folder, "elements")):
                 and issubclass(_element, _FiniteElement)
                 and _element != _FiniteElement
             ):
-                _elementlist.append(_element)
+                if _element not in _elementlist:
+                    _elementlist.append(_element)
                 for _n in _element.names:
                     if _n in _elementmap:
                         assert _element == _elementmap[_n]

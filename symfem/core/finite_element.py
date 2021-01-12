@@ -2,6 +2,7 @@
 
 import sympy
 from .symbolic import x, zero, subs, sym_sum
+from . import mappings
 
 
 class FiniteElement:
@@ -19,6 +20,10 @@ class FiniteElement:
         self.space_dim = len(dofs)
         self._basis_functions = None
         self._reshaped_basis_functions = None
+
+    def entity_dofs(self, entity_dim, entity_number):
+        """Get the numbers of the DOFs associated with the given entity."""
+        return [i for i, j in enumerate(self.dofs) if j.entity == (entity_dim, entity_number)]
 
     def get_polynomial_basis(self, reshape=True):
         """Get the polynomial basis for the element."""
@@ -110,80 +115,14 @@ class FiniteElement:
             return output
         raise ValueError(f"Unknown order: {order}")
 
+    def map_to_cell(self, f, vertices):
+        map = self.reference.get_map_to(vertices)
+        inverse_map = self.reference.get_inverse_map_to(vertices)
+        return getattr(mappings, self.mapping)(f, map, inverse_map, self.reference.tdim)
+
     @property
     def name(self):
         """Get the name of the element."""
         return self.names[0]
 
     names = []
-
-
-def make_integral_moment_dofs(
-    reference,
-    vertices=None, edges=None, faces=None, volumes=None,
-    cells=None, facets=None, ridges=None, peaks=None
-):
-    """Generate DOFs due to integral moments on sub entities.
-
-    Parameters
-    ----------
-    reference: symfem.references.Reference
-        The reference cell.
-    vertices: tuple
-        DOFs on dimension 0 entities.
-    edges: tuple
-        DOFs on dimension 1 entities.
-    faces: tuple
-        DOFs on dimension 2 entities.
-    volumes: tuple
-        DOFs on dimension 3 entities.
-    cells: tuple
-        DOFs on codimension 0 entities.
-    facets: tuple
-        DOFs on codimension 1 entities.
-    ridges: tuple
-        DOFs on codimension 2 entities.
-    peaks: tuple
-        DOFs on codimension 3 entities.
-    """
-    from symfem import create_reference
-    dofs = []
-
-    # DOFs per dimension
-    for dim, moment_data in enumerate([vertices, edges, faces, volumes]):
-        if moment_data is not None:
-            IntegralMoment, SubElement, order = moment_data
-            if order >= SubElement.min_order:
-                sub_type = reference.sub_entity_types[dim]
-                if sub_type is not None:
-                    assert dim > 0
-                    for i, vs in enumerate(reference.sub_entities(dim)):
-                        sub_ref = create_reference(
-                            sub_type,
-                            vertices=[reference.reference_vertices[v] for v in vs])
-                        sub_element = SubElement(sub_ref, order)
-                        for f, d in zip(
-                            sub_element.get_basis_functions(), sub_element.dofs
-                        ):
-                            dofs.append(IntegralMoment(sub_ref, f, d))
-
-    # DOFs per codimension
-    for _dim, moment_data in enumerate([peaks, ridges, facets, cells]):
-        dim = reference.tdim - 3 + _dim
-        if moment_data is not None:
-            IntegralMoment, SubElement, order = moment_data
-            if order >= SubElement.min_order:
-                sub_type = reference.sub_entity_types[dim]
-                if sub_type is not None:
-                    assert dim > 0
-                    for i, vs in enumerate(reference.sub_entities(dim)):
-                        sub_ref = create_reference(
-                            sub_type,
-                            vertices=[reference.reference_vertices[v] for v in vs])
-                        sub_element = SubElement(sub_ref, order)
-                        for f, d in zip(
-                            sub_element.get_basis_functions(), sub_element.dofs
-                        ):
-                            dofs.append(IntegralMoment(sub_ref, f, d))
-
-    return dofs

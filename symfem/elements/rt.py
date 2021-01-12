@@ -1,6 +1,7 @@
 """Raviart-Thomas elements on simplices."""
 
-from ..core.finite_element import FiniteElement, make_integral_moment_dofs
+from ..core.finite_element import FiniteElement
+from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import polynomial_set, Hdiv_polynomials
 from ..core.functionals import NormalIntegralMoment, IntegralMoment
 from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
@@ -24,3 +25,5 @@ class RaviartThomas(FiniteElement):
     names = ["Raviart-Thomas", "RT", "N1div"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
+    mapping = "contravariant"
+    continuity = "H(div)"

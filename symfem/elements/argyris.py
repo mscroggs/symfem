@@ -16,22 +16,22 @@ class Argyris(FiniteElement):
         assert order == 5
         assert reference.name == "triangle"
         dofs = []
-        for vs in reference.sub_entities(0):
-            dofs.append(PointEvaluation(vs, entity_dim=0))
+        for v_n, vs in enumerate(reference.sub_entities(0)):
+            dofs.append(PointEvaluation(vs, entity=(0, v_n)))
             for i in range(reference.tdim):
                 dir = tuple(1 if i == j else 0 for j in range(reference.tdim))
-                dofs.append(PointDirectionalDerivativeEvaluation(vs, dir, entity_dim=0))
+                dofs.append(PointDirectionalDerivativeEvaluation(vs, dir, entity=(0, v_n)))
             for i in range(reference.tdim):
                 for j in range(i + 1):
                     dofs.append(PointComponentSecondDerivativeEvaluation(
-                        vs, (i, j), entity_dim=0))
-        for vs in reference.sub_entities(1):
+                        vs, (i, j), entity=(0, v_n)))
+        for e_n, vs in enumerate(reference.sub_entities(1)):
             sub_ref = create_reference(
                 reference.sub_entity_types[1],
                 vertices=[reference.reference_vertices[v] for v in vs])
             midpoint = tuple(sym_sum(i) / len(i)
                              for i in zip(*[reference.vertices[i] for i in vs]))
-            dofs.append(PointNormalDerivativeEvaluation(midpoint, sub_ref))
+            dofs.append(PointNormalDerivativeEvaluation(midpoint, sub_ref, entity=(1, e_n)))
 
         super().__init__(
             reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
@@ -41,3 +41,5 @@ class Argyris(FiniteElement):
     references = ["triangle"]
     min_order = 5
     max_order = 5
+    mapping = "default"
+    continuity = "L2"

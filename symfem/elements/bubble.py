@@ -30,7 +30,7 @@ class Bubble(FiniteElement):
                         tuple(o + sum(sympy.Rational(a[j] * b, order)
                                       for a, b in zip(reference.axes, i))
                               for j, o in enumerate(reference.origin)),
-                        entity_dim=reference.tdim))
+                        entity=(reference.tdim, 0)))
 
         super().__init__(
             reference, poly, dofs, reference.tdim, 1
@@ -39,3 +39,6 @@ class Bubble(FiniteElement):
     names = ["bubble"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = {"interval": 2, "triangle": 3, "tetrahedron": 4}
+    mapping = "default"
+    continuity = "C0"
+

@@ -1,6 +1,7 @@
 """Brezzi-Douglas-Marini elements on simplices."""
 
-from ..core.finite_element import FiniteElement, make_integral_moment_dofs
+from ..core.finite_element import FiniteElement
+from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import polynomial_set
 from ..core.functionals import NormalIntegralMoment, IntegralMoment
 from .lagrange import DiscontinuousLagrange
@@ -24,3 +25,5 @@ class BDM(FiniteElement):
     names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
+    mapping = "contravariant"
+    continuity = "H(div)"

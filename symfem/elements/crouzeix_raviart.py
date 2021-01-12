@@ -12,11 +12,11 @@ class CrouzeixRaviart(FiniteElement):
     def __init__(self, reference, order):
         assert order == 1
         dofs = []
-        for vs in reference.sub_entities(reference.tdim - 1):
+        for e_n, vs in enumerate(reference.sub_entities(reference.tdim - 1)):
             midpoint = tuple(sym_sum(i) / len(i)
                              for i in zip(*[reference.vertices[i] for i in vs]))
             dofs.append(
-                PointEvaluation(midpoint, entity_dim=reference.tdim - 1))
+                PointEvaluation(midpoint, entity=(reference.tdim - 1, e_n)))
 
         super().__init__(
             reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
@@ -26,3 +26,5 @@ class CrouzeixRaviart(FiniteElement):
     references = ["triangle", "tetrahedron"]
     min_order = 1
     max_order = 1
+    mapping = "default"
+    continuity = "L2"

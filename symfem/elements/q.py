@@ -3,7 +3,8 @@
 import sympy
 from itertools import product
 from ..core.symbolic import one, zero
-from ..core.finite_element import FiniteElement, make_integral_moment_dofs
+from ..core.finite_element import FiniteElement
+from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import quolynomial_set, Hdiv_quolynomials, Hcurl_quolynomials
 from ..core.functionals import (PointEvaluation, DotPointEvaluation, IntegralMoment,
                                 TangentIntegralMoment, NormalIntegralMoment)
@@ -18,13 +19,13 @@ class Q(FiniteElement):
             dofs = [
                 PointEvaluation(
                     tuple(sympy.Rational(1, 2) for i in range(reference.tdim)),
-                    entity_dim=reference.tdim)]
+                    entity=(reference.tdim, 0))]
         else:
             dofs = []
-            for v in reference.reference_vertices:
-                dofs.append(PointEvaluation(v, entity_dim=0))
+            for v_n, v in enumerate(reference.reference_vertices):
+                dofs.append(PointEvaluation(v, entity=(0, v_n)))
             for edim in range(1, 4):
-                for vs in reference.sub_entities(edim):
+                for e_n, vs in enumerate(reference.sub_entities(edim)):
                     entity = create_reference(
                         reference.sub_entity_types[edim],
                         vertices=tuple(reference.reference_vertices[i] for i in vs))
@@ -34,7 +35,7 @@ class Q(FiniteElement):
                                 tuple(o + sum(sympy.Rational(a[j] * b, order)
                                               for a, b in zip(entity.axes, i[::-1]))
                                       for j, o in enumerate(entity.origin)),
-                                entity_dim=edim))
+                                entity=(edim, e_n)))
 
         super().__init__(
             reference,
@@ -46,6 +47,8 @@ class Q(FiniteElement):
     names = ["Q"]
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 0
+    mapping = "default"
+    continuity = "C0"
 
 
 class DiscontinuousQ(FiniteElement):
@@ -56,12 +59,12 @@ class DiscontinuousQ(FiniteElement):
             dofs = [
                 PointEvaluation(
                     tuple(sympy.Rational(1, 2) for i in range(reference.tdim)),
-                    entity_dim=reference.tdim)]
+                    entity=(reference.tdim, 0))]
         else:
             dofs = []
             for i in product(range(order + 1), repeat=reference.tdim):
                 dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i[::-1]),
-                                            entity_dim=reference.tdim))
+                                            entity=(reference.tdim, 0)))
 
         super().__init__(
             reference,
@@ -73,6 +76,8 @@ class DiscontinuousQ(FiniteElement):
     names = ["dQ"]
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 0
+    mapping = "default"
+    continuity = "L2"
 
 
 class VectorQ(FiniteElement):
@@ -90,7 +95,7 @@ class VectorQ(FiniteElement):
             ]
         for p in scalar_space.dofs:
             for d in directions:
-                dofs.append(DotPointEvaluation(p.point, d, entity_dim=p.entity_dim()))
+                dofs.append(DotPointEvaluation(p.point, d, entity=p.entity))
 
         super().__init__(
             reference,
@@ -103,6 +108,8 @@ class VectorQ(FiniteElement):
     names = ["vector Q", "vQ"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
+    mapping = "default"
+    continuity = "C0"
 
 
 class Nedelec(FiniteElement):
@@ -124,6 +131,8 @@ class Nedelec(FiniteElement):
     names = ["NCE", "RTCE", "Qcurl"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
+    mapping = "covariant"
+    continuity = "H(curl)"
 
 
 class RaviartThomas(FiniteElement):
@@ -144,3 +153,5 @@ class RaviartThomas(FiniteElement):
     names = ["NCF", "RTCF", "Qdiv"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
+    mapping = "contravariant"
+    continuity = "H(div)"
