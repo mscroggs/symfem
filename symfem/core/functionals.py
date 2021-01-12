@@ -239,10 +239,11 @@ class TangentCrossIntegralMoment(IntegralMoment):
     """An integral moment in the tangential direction."""
 
     def __init__(self, reference, f, dof):
-        f_3d = tuple(f[0] * a + f[1] * b for a, b in zip(*reference.axes))
-        f_3d = vcross(reference.normal(), f_3d)
-        f_new = tuple(vdot(f_3d, a) for a in reference.axes)
-        super().__init__(reference, f_new, dof)
+        super().__init__(reference, f, dof)
+
+    def dot(self, function):
+        """Dot a function with the moment function."""
+        return vdot(vcross(self.f, function), self.reference.normal())
 
     name = "Tangential integral moment"
 
