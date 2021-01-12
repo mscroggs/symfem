@@ -32,16 +32,20 @@ class FiniteElement:
 
         return self.basis
 
+    def get_dual_matrix(self):
+        """Get the dual matrix."""
+        mat = []
+        for b in self.basis:
+            row = []
+            for d in self.dofs:
+                row.append(d.eval(b))
+            mat.append(row)
+        return sympy.Matrix(mat)
+
     def get_basis_functions(self, reshape=True):
         """Get the basis functions of the element."""
         if self._basis_functions is None:
-            mat = []
-            for b in self.basis:
-                row = []
-                for d in self.dofs:
-                    row.append(d.eval(b))
-                mat.append(row)
-            minv = sympy.Matrix(mat).inv("LU")
+            minv = self.get_dual_matrix().inv("LU")
             self._basis_functions = []
             if self.range_dim == 1:
                 # Scalar space
