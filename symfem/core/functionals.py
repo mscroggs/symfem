@@ -1,6 +1,7 @@
 """Functionals used to define the dual sets."""
 from .symbolic import subs, x, t
 from .vectors import vdot, vcross
+from .calculus import derivative, jacobian_component
 
 
 class BaseFunctional:
@@ -45,6 +46,66 @@ class PointEvaluation(BaseFunctional):
         return self._entity_dim
 
     name = "Point evaluation"
+
+
+class PointDirectionalDerivativeEvaluation(BaseFunctional):
+    """A point evaluation of a derivative in a fixed direction."""
+
+    def __init__(self, point, direction, entity_dim=None):
+        self.point = point
+        self.dir = direction
+        self._entity_dim = entity_dim
+
+    def eval(self, function):
+        """Apply to the functional to a function."""
+        return subs(derivative(function, self.dir), x, self.point)
+
+    def dof_point(self):
+        """Get the location of the DOF in the cell."""
+        return self.point
+
+    def dof_direction(self):
+        """Get the direction of the DOF."""
+        return self.dir
+
+    def entity_dim(self):
+        """Get the dimension of the entitiy this DOF is associated with."""
+        return self._entity_dim
+
+    name = "Point evaluation of directional derivative"
+
+
+class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
+    """A point evaluation of a normal derivative."""
+
+    def __init__(self, point, edge):
+        super().__init__(point, edge.normal(), entity_dim=edge.tdim)
+        self.reference = edge
+
+    name = "Point evaluation of normal derivative"
+
+
+class PointComponentSecondDerivativeEvaluation(BaseFunctional):
+    """A point evaluation of a component of a second derivative."""
+
+    def __init__(self, point, component, entity_dim=None):
+        self.point = point
+        self.component = component
+        self._entity_dim = entity_dim
+
+    def eval(self, function):
+        """Apply to the functional to a function."""
+        return subs(jacobian_component(function, self.component), x, self.point)
+
+    def dof_point(self):
+        """Get the location of the DOF in the cell."""
+        return self.point
+
+    def entity_dim(self):
+        """Get the dimension of the entitiy this DOF is associated with."""
+        return self._entity_dim
+
+    name = "Point evaluation of Jacobian component"
 
 
 class PointInnerProduct(BaseFunctional):

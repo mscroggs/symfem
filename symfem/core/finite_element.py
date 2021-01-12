@@ -41,7 +41,7 @@ class FiniteElement:
                 for d in self.dofs:
                     row.append(d.eval(b))
                 mat.append(row)
-            minv = sympy.Matrix(mat).inv()
+            minv = sympy.Matrix(mat).inv("LU")
             self._basis_functions = []
             if self.range_dim == 1:
                 # Scalar space
@@ -118,14 +118,8 @@ class FiniteElement:
 
 def make_integral_moment_dofs(
     reference,
-    vertices=None,
-    edges=None,
-    faces=None,
-    volumes=None,
-    cells=None,
-    facets=None,
-    ridges=None,
-    peaks=None,
+    vertices=None, edges=None, faces=None, volumes=None,
+    cells=None, facets=None, ridges=None, peaks=None
 ):
     """Generate DOFs due to integral moments on sub entities.
 

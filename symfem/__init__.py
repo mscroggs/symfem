@@ -16,8 +16,8 @@ else:
 with open(_os.path.join(_v_folder, "VERSION")) as _f:
     __version__ = _f.read().strip()
 
-_elementlist = {}
-
+_elementmap = {}
+_elementlist = []
 
 for _file in _os.listdir(_os.path.join(_folder, "elements")):
     if _file.endswith(".py") and "__init__" not in _file:
@@ -31,10 +31,11 @@ for _file in _os.listdir(_os.path.join(_folder, "elements")):
                 and issubclass(_element, _FiniteElement)
                 and _element != _FiniteElement
             ):
+                _elementlist.append(_element)
                 for _n in _element.names:
-                    if _n in _elementlist:
-                        assert _element == _elementlist[_n]
-                    _elementlist[_n] = _element
+                    if _n in _elementmap:
+                        assert _element == _elementmap[_n]
+                    _elementmap[_n] = _element
 
 
 def create_reference(cell_type, vertices=None):
@@ -89,13 +90,15 @@ def create_element(cell_type, element_type, order):
                           vector Lagrange, vP, Regge, Nedelec, Nedelec1, N1curl,
                           Nedelec2, N2curl, Raviart-Thomas, RT, N1div, dQ, NCE, RTCE,
                           Qcurl, Q, NCF, RTCF, Qdiv, vector Q, vQ,
-                          Brezzi-Douglas-Marini, BDM, N2div
+                          Brezzi-Douglas-Marini, BDM, N2div, Morley, Hermite,
+                          Mardal-Tai-Winther, MTW, Argyris, bubble
     order : int
         The order of the element.
     """
     reference = create_reference(cell_type)
 
-    if element_type in _elementlist:
-        return _elementlist[element_type](reference, order)
+    if element_type in _elementmap:
+        assert cell_type in _elementmap[element_type].references
+        return _elementmap[element_type](reference, order)
 
     raise ValueError(f"Unsupported element type: {element_type}")

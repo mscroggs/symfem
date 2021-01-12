@@ -19,7 +19,8 @@ elements = {
                     ("N2div", "Brezzi-Douglas-Marini", range(1, 3)),
                     ("Regge", "Regge", range(0, 3)),
                     ("Crouzeix-Raviart", "Crouzeix-Raviart", [1])],
-    "quadrilateral": [("Q", "Lagrange", range(1, 4)), ("dQ", "Discontinuous Lagrange", range(1, 4))],
+    "quadrilateral": [("Q", "Lagrange", range(1, 4)),
+                      ("dQ", "Discontinuous Lagrange", range(1, 4))],
     "hexahedron": [("Q", "Lagrange", range(1, 4)), ("dQ", "Discontinuous Lagrange", range(1, 4))]
 }
 
@@ -38,7 +39,8 @@ def make_lattice(cell, N=3):
         return np.array([[i / N, j / N] for i in range(N + 1) for j in range(N + 1 - i)])
     if cell == "tetrahedron":
         return np.array([[i / N, j / N, k / N]
-                         for i in range(N + 1) for j in range(N + 1 - i) for k in range(N + 1 - i - j)])
+                         for i in range(N + 1) for j in range(N + 1 - i)
+                         for k in range(N + 1 - i - j)])
     if cell == "quadrilateral":
         return np.array([[i / N, j / N] for i in range(N + 1) for j in range(N + 1)])
     if cell == "hexahedron":
@@ -47,7 +49,8 @@ def make_lattice(cell, N=3):
 
 
 @pytest.mark.parametrize(("cell", "symfem_type", "basix_type", "order"),
-                         [(cell, a, b, order) for cell, ls in elements.items() for a, b, c in ls for order in c])
+                         [(cell, a, b, order) for cell, ls in elements.items()
+                          for a, b, c in ls for order in c])
 def test_against_basix(cell, symfem_type, basix_type, order):
     try:
         import basix
@@ -64,5 +67,6 @@ def test_against_basix(cell, symfem_type, basix_type, order):
         sym_result = [[float(subs(b, x, p)) for b in basis] for p in points]
     else:
         basis = element.get_basis_functions(False)
-        sym_result = [[float(subs(b, x, p)[j]) for j in range(element.range_dim) for b in basis] for p in points]
+        sym_result = [[float(subs(b, x, p)[j]) for j in range(element.range_dim) for b in basis]
+                      for p in points]
     assert np.allclose(result, sym_result)

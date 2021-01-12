@@ -1,3 +1,5 @@
+name: Run 🧪
+
 on:
   push:
   schedule:
