@@ -1,6 +1,6 @@
 """Functionals used to define the dual sets."""
 from .symbolic import subs, x, t
-from .vectors import vdot
+from .vectors import vdot, vcross
 
 
 class BaseFunctional:
@@ -172,6 +172,18 @@ class VecIntegralMoment(IntegralMoment):
         return self.dot_with
 
     name = "Vector integral moment"
+
+
+class TangentCrossIntegralMoment(IntegralMoment):
+    """An integral moment in the tangential direction."""
+
+    def __init__(self, reference, f, dof):
+        f_3d = tuple(f[0] * a + f[1] * b for a, b in zip(*reference.axes))
+        f_3d = vcross(reference.normal(), f_3d)
+        f_new = tuple(vdot(f_3d, a) for a in reference.axes)
+        super().__init__(reference, f_new, dof)
+
+    name = "Tangential integral moment"
 
 
 class TangentIntegralMoment(VecIntegralMoment):

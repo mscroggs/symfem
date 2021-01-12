@@ -2,7 +2,7 @@
 
 from ..core.finite_element import FiniteElement, make_integral_moment_dofs
 from ..core.polynomials import polynomial_set, Hcurl_polynomials
-from ..core.functionals import TangentIntegralMoment, IntegralMoment
+from ..core.functionals import TangentIntegralMoment, IntegralMoment, TangentCrossIntegralMoment
 from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
 from .rt import RaviartThomas
 
@@ -16,7 +16,7 @@ class NedelecFirstKind(FiniteElement):
         dofs = make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, DiscontinuousLagrange, order - 1),
-            faces=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
+            faces=(TangentCrossIntegralMoment, VectorDiscontinuousLagrange, order - 2),
             volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 3),
         )
 
@@ -35,7 +35,7 @@ class NedelecSecondKind(FiniteElement):
         dofs = make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, DiscontinuousLagrange, order),
-            faces=(IntegralMoment, RaviartThomas, order - 1),
+            faces=(TangentCrossIntegralMoment, RaviartThomas, order - 1),
             volumes=(IntegralMoment, RaviartThomas, order - 2),
         )
 
