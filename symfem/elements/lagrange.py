@@ -20,15 +20,15 @@ class Lagrange(FiniteElement):
                         sympy.Rational(1, reference.tdim + 1)
                         for i in range(reference.tdim)
                     ),
-                    entity_dim=reference.tdim
+                    entity=(reference.tdim, 0)
                 )
             ]
         else:
             dofs = []
-            for v in reference.reference_vertices:
-                dofs.append(PointEvaluation(v, entity_dim=0))
+            for v_n, v in enumerate(reference.reference_vertices):
+                dofs.append(PointEvaluation(v, entity=(0, v_n)))
             for edim in range(1, 4):
-                for vs in reference.sub_entities(edim):
+                for e_n, vs in enumerate(reference.sub_entities(edim)):
                     entity = create_reference(
                         reference.sub_entity_types[edim],
                         vertices=tuple(reference.reference_vertices[i] for i in vs))
@@ -39,7 +39,7 @@ class Lagrange(FiniteElement):
                                     tuple(o + sum(sympy.Rational(a[j] * b, order)
                                                   for a, b in zip(entity.axes, i))
                                           for j, o in enumerate(entity.origin)),
-                                    entity_dim=edim))
+                                    entity=(edim, e_n)))
 
         super().__init__(
             reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
@@ -48,6 +48,8 @@ class Lagrange(FiniteElement):
     names = ["Lagrange", "P"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
+    continuity = "C0"
+    mapping = "default"
 
 
 class DiscontinuousLagrange(FiniteElement):
@@ -58,13 +60,13 @@ class DiscontinuousLagrange(FiniteElement):
             dofs = [
                 PointEvaluation(
                     tuple(sympy.Rational(1, reference.tdim + 1) for i in range(reference.tdim)),
-                    entity_dim=reference.tdim)]
+                    entity=(reference.tdim, 0))]
         else:
             dofs = []
             for i in product(range(order + 1), repeat=reference.tdim):
                 if sum(i) <= order:
                     dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i[::-1]),
-                                                entity_dim=reference.tdim))
+                                                entity=(reference.tdim, 0)))
 
         super().__init__(
             reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
@@ -73,6 +75,8 @@ class DiscontinuousLagrange(FiniteElement):
     names = ["discontinuous Lagrange", "dP", "DP"]
     references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
     min_order = 0
+    continuity = "L2"
+    mapping = "default"
 
 
 class VectorLagrange(FiniteElement):
@@ -90,7 +94,7 @@ class VectorLagrange(FiniteElement):
             ]
         for p in scalar_space.dofs:
             for d in directions:
-                dofs.append(DotPointEvaluation(p.point, d, entity_dim=p.entity_dim()))
+                dofs.append(DotPointEvaluation(p.point, d, entity=p.entity))
 
         super().__init__(
             reference,
@@ -103,6 +107,8 @@ class VectorLagrange(FiniteElement):
     names = ["vector Lagrange", "vP"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
+    continuity = "C0"
+    mapping = "default"
 
 
 class VectorDiscontinuousLagrange(FiniteElement):
@@ -120,7 +126,7 @@ class VectorDiscontinuousLagrange(FiniteElement):
             ]
         for p in scalar_space.dofs:
             for d in directions:
-                dofs.append(DotPointEvaluation(p.point, d, entity_dim=p.entity_dim()))
+                dofs.append(DotPointEvaluation(p.point, d, entity=p.entity))
 
         super().__init__(
             reference,
@@ -133,3 +139,5 @@ class VectorDiscontinuousLagrange(FiniteElement):
     names = ["vector discontinuous Lagrange", "vdP", "vDP"]
     references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
     min_order = 0
+    continuity = "L2"
+    mapping = "default"

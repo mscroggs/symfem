@@ -7,6 +7,9 @@ from .calculus import derivative, jacobian_component
 class BaseFunctional:
     """A functional."""
 
+    def __init__(self, entity=(None, None)):
+        self.entity = entity
+
     def eval(self, fun):
         """Apply to the functional to a function."""
         raise NotImplementedError
@@ -21,7 +24,7 @@ class BaseFunctional:
 
     def entity_dim(self):
         """Get the dimension of the entitiy this DOF is associated with."""
-        return None
+        return self.entity[0]
 
     name = None
 
@@ -29,9 +32,9 @@ class BaseFunctional:
 class PointEvaluation(BaseFunctional):
     """A point evaluation."""
 
-    def __init__(self, point, entity_dim=None):
+    def __init__(self, point, entity=(None, None)):
+        super().__init__(entity)
         self.point = point
-        self._entity_dim = entity_dim
 
     def eval(self, function):
         """Apply to the functional to a function."""
@@ -41,20 +44,16 @@ class PointEvaluation(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return self.point
 
-    def entity_dim(self):
-        """Get the dimension of the entitiy this DOF is associated with."""
-        return self._entity_dim
-
     name = "Point evaluation"
 
 
 class PointDirectionalDerivativeEvaluation(BaseFunctional):
     """A point evaluation of a derivative in a fixed direction."""
 
-    def __init__(self, point, direction, entity_dim=None):
+    def __init__(self, point, direction, entity=(None, None)):
+        super().__init__(entity)
         self.point = point
         self.dir = direction
-        self._entity_dim = entity_dim
 
     def eval(self, function):
         """Apply to the functional to a function."""
@@ -68,18 +67,14 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
         """Get the direction of the DOF."""
         return self.dir
 
-    def entity_dim(self):
-        """Get the dimension of the entitiy this DOF is associated with."""
-        return self._entity_dim
-
     name = "Point evaluation of directional derivative"
 
 
 class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
     """A point evaluation of a normal derivative."""
 
-    def __init__(self, point, edge):
-        super().__init__(point, edge.normal(), entity_dim=edge.tdim)
+    def __init__(self, point, edge, entity=(None, None)):
+        super().__init__(point, edge.normal(), entity=entity)
         self.reference = edge
 
     name = "Point evaluation of normal derivative"
@@ -88,10 +83,10 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
 class PointComponentSecondDerivativeEvaluation(BaseFunctional):
     """A point evaluation of a component of a second derivative."""
 
-    def __init__(self, point, component, entity_dim=None):
+    def __init__(self, point, component, entity=(None, None)):
+        super().__init__(entity)
         self.point = point
         self.component = component
-        self._entity_dim = entity_dim
 
     def eval(self, function):
         """Apply to the functional to a function."""
@@ -101,20 +96,16 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return self.point
 
-    def entity_dim(self):
-        """Get the dimension of the entitiy this DOF is associated with."""
-        return self._entity_dim
-
     name = "Point evaluation of Jacobian component"
 
 
 class PointInnerProduct(BaseFunctional):
     """An evaluation of an inner product at a point."""
 
-    def __init__(self, point, vec, entity_dim=None):
+    def __init__(self, point, vec, entity=(None, None)):
+        super().__init__(entity)
         self.point = point
         self.vec = vec
-        self._entity_dim = entity_dim
 
     def eval(self, function):
         """Apply to the functional to a function."""
@@ -132,20 +123,16 @@ class PointInnerProduct(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return self.vec
 
-    def entity_dim(self):
-        """Get the dimension of the entitiy this DOF is associated with."""
-        return self._entity_dim
-
     name = "Point inner product"
 
 
 class DotPointEvaluation(BaseFunctional):
     """A point evaluation in a given direction."""
 
-    def __init__(self, point, vector, entity_dim=None):
+    def __init__(self, point, vector, entity=(None, None)):
+        super().__init__(entity)
         self.point = point
         self.vector = vector
-        self._entity_dim = entity_dim
 
     def eval(self, function):
         """Apply to the functional to a function."""
@@ -159,23 +146,22 @@ class DotPointEvaluation(BaseFunctional):
         """Get the direction of the DOF."""
         return self.vector
 
-    def entity_dim(self):
-        """Get the dimension of the entitiy this DOF is associated with."""
-        return self._entity_dim
-
     name = "Dot point evaluation"
 
 
 class IntegralMoment(BaseFunctional):
     """An integral moment."""
 
-    def __init__(self, reference, f, dof):
+    def __init__(self, reference, f, dof, entity=(None, None)):
+        super().__init__(entity)
         self.reference = reference
         self.dof = dof
         self.f = subs(f, x, t)
         if isinstance(self.f, tuple):
+            # TODO: is this one of the mappings?
             self.f = tuple(
-                sum(self.reference.scaled_axes()[j][i] * c for j, c in enumerate(self.f))
+                sum(self.reference.axes[j][i] * c / self.reference.jacobian()
+                    for j, c in enumerate(self.f))
                 for i, o in enumerate(self.reference.origin)
             )
 
@@ -210,18 +196,14 @@ class IntegralMoment(BaseFunctional):
             for i in range(self.reference.gdim)
         )
 
-    def entity_dim(self):
-        """Get the dimension of the entitiy this DOF is associated with."""
-        return self.reference.tdim
-
     name = "Integral moment"
 
 
 class VecIntegralMoment(IntegralMoment):
     """An integral moment applied to a component of a vector."""
 
-    def __init__(self, reference, f, dot_with, dof):
-        super().__init__(reference, f, dof)
+    def __init__(self, reference, f, dot_with, dof, entity=(None, None)):
+        super().__init__(reference, f, dof, entity=entity)
         self.dot_with = dot_with
 
     def dot(self, function):
@@ -238,8 +220,8 @@ class VecIntegralMoment(IntegralMoment):
 class TangentIntegralMoment(VecIntegralMoment):
     """An integral moment in the tangential direction."""
 
-    def __init__(self, reference, f, dof):
-        super().__init__(reference, f, reference.tangent(), dof)
+    def __init__(self, reference, f, dof, entity=(None, None)):
+        super().__init__(reference, f, reference.tangent(), dof, entity=entity)
 
     name = "Tangential integral moment"
 
@@ -247,7 +229,7 @@ class TangentIntegralMoment(VecIntegralMoment):
 class NormalIntegralMoment(VecIntegralMoment):
     """An integral moment in the normal direction."""
 
-    def __init__(self, reference, f, dof):
-        super().__init__(reference, f, reference.normal(), dof)
+    def __init__(self, reference, f, dof, entity=(None, None)):
+        super().__init__(reference, f, reference.normal(), dof, entity=entity)
 
     name = "Normal integral moment"

@@ -1,6 +1,7 @@
 """Nedelec elements on simplices."""
 
-from ..core.finite_element import FiniteElement, make_integral_moment_dofs
+from ..core.finite_element import FiniteElement
+from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import polynomial_set, Hcurl_polynomials
 from ..core.functionals import TangentIntegralMoment, IntegralMoment
 from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
@@ -25,6 +26,8 @@ class NedelecFirstKind(FiniteElement):
     names = ["Nedelec", "Nedelec1", "N1curl"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
+    mapping = "covariant"
+    continuity = "H(curl)"
 
 
 class NedelecSecondKind(FiniteElement):
@@ -45,3 +48,5 @@ class NedelecSecondKind(FiniteElement):
     names = ["Nedelec2", "N2curl"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
+    mapping = "covariant"
+    continuity = "H(curl)"

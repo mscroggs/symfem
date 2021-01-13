@@ -2,13 +2,12 @@ from symfem import create_element
 
 
 def all_equal(a, b):
-    try:
+    if isinstance(a, (list, tuple)):
         for i, j in zip(a, b):
             if not all_equal(i, j):
                 return False
         return True
-    except TypeError:
-        return a == b
+    return a == b
 
 
 def test_lagrange():

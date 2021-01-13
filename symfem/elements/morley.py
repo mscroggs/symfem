@@ -14,16 +14,16 @@ class Morley(FiniteElement):
         assert order == 2
         assert reference.name == "triangle"
         dofs = []
-        for vs in reference.sub_entities(0):
-            dofs.append(PointEvaluation(vs, entity_dim=0))
-        for vs in reference.sub_entities(1):
+        for v_n, vs in enumerate(reference.sub_entities(0)):
+            dofs.append(PointEvaluation(vs, entity=(0, v_n)))
+        for e_n, vs in enumerate(reference.sub_entities(1)):
             sub_ref = create_reference(
                 reference.sub_entity_types[1],
                 vertices=[reference.reference_vertices[v] for v in vs])
             midpoint = tuple(sym_sum(i) / len(i)
                              for i in zip(*[reference.vertices[i] for i in vs]))
             dofs.append(
-                PointNormalDerivativeEvaluation(midpoint, sub_ref))
+                PointNormalDerivativeEvaluation(midpoint, sub_ref, entity=(1, e_n)))
 
         super().__init__(
             reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
@@ -33,3 +33,5 @@ class Morley(FiniteElement):
     references = ["triangle"]
     min_order = 2
     max_order = 2
+    mapping = "default"
+    continuity = "L2"

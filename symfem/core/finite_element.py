@@ -1,7 +1,8 @@
 """Abstract finite element classes and functions."""
 
 import sympy
-from .symbolic import x, zero, subs
+from .symbolic import x, zero, subs, sym_sum
+from . import mappings
 
 
 class FiniteElement:
@@ -20,6 +21,10 @@ class FiniteElement:
         self._basis_functions = None
         self._reshaped_basis_functions = None
 
+    def entity_dofs(self, entity_dim, entity_number):
+        """Get the numbers of the DOFs associated with the given entity."""
+        return [i for i, j in enumerate(self.dofs) if j.entity == (entity_dim, entity_number)]
+
     def get_polynomial_basis(self, reshape=True):
         """Get the polynomial basis for the element."""
         if reshape and self.range_shape is not None:
@@ -32,24 +37,26 @@ class FiniteElement:
 
         return self.basis
 
+    def get_dual_matrix(self):
+        """Get the dual matrix."""
+        mat = []
+        for b in self.basis:
+            row = []
+            for d in self.dofs:
+                row.append(d.eval(b))
+            mat.append(row)
+        return sympy.Matrix(mat)
+
     def get_basis_functions(self, reshape=True):
         """Get the basis functions of the element."""
         if self._basis_functions is None:
-            mat = []
-            for b in self.basis:
-                row = []
-                for d in self.dofs:
-                    row.append(d.eval(b))
-                mat.append(row)
-            minv = sympy.Matrix(mat).inv("LU")
+            minv = self.get_dual_matrix().inv("LU")
             self._basis_functions = []
             if self.range_dim == 1:
                 # Scalar space
                 for i, dof in enumerate(self.dofs):
-                    b = zero
-                    for c, d in zip(minv.row(i), self.basis):
-                        b += c * d
-                    self._basis_functions.append(b)
+                    self._basis_functions.append(
+                        sym_sum(c * d for c, d in zip(minv.row(i), self.basis)))
             else:
                 # Vector space
                 for i, dof in enumerate(self.dofs):
@@ -108,80 +115,15 @@ class FiniteElement:
             return output
         raise ValueError(f"Unknown order: {order}")
 
+    def map_to_cell(self, f, vertices):
+        """Map a function onto a cell using the appropriate mapping for the element."""
+        map = self.reference.get_map_to(vertices)
+        inverse_map = self.reference.get_inverse_map_to(vertices)
+        return getattr(mappings, self.mapping)(f, map, inverse_map, self.reference.tdim)
+
     @property
     def name(self):
         """Get the name of the element."""
         return self.names[0]
 
     names = []
-
-
-def make_integral_moment_dofs(
-    reference,
-    vertices=None, edges=None, faces=None, volumes=None,
-    cells=None, facets=None, ridges=None, peaks=None
-):
-    """Generate DOFs due to integral moments on sub entities.
-
-    Parameters
-    ----------
-    reference: symfem.references.Reference
-        The reference cell.
-    vertices: tuple
-        DOFs on dimension 0 entities.
-    edges: tuple
-        DOFs on dimension 1 entities.
-    faces: tuple
-        DOFs on dimension 2 entities.
-    volumes: tuple
-        DOFs on dimension 3 entities.
-    cells: tuple
-        DOFs on codimension 0 entities.
-    facets: tuple
-        DOFs on codimension 1 entities.
-    ridges: tuple
-        DOFs on codimension 2 entities.
-    peaks: tuple
-        DOFs on codimension 3 entities.
-    """
-    from symfem import create_reference
-    dofs = []
-
-    # DOFs per dimension
-    for dim, moment_data in enumerate([vertices, edges, faces, volumes]):
-        if moment_data is not None:
-            IntegralMoment, SubElement, order = moment_data
-            if order >= SubElement.min_order:
-                sub_type = reference.sub_entity_types[dim]
-                if sub_type is not None:
-                    assert dim > 0
-                    for i, vs in enumerate(reference.sub_entities(dim)):
-                        sub_ref = create_reference(
-                            sub_type,
-                            vertices=[reference.reference_vertices[v] for v in vs])
-                        sub_element = SubElement(sub_ref, order)
-                        for f, d in zip(
-                            sub_element.get_basis_functions(), sub_element.dofs
-                        ):
-                            dofs.append(IntegralMoment(sub_ref, f, d))
-
-    # DOFs per codimension
-    for _dim, moment_data in enumerate([peaks, ridges, facets, cells]):
-        dim = reference.tdim - 3 + _dim
-        if moment_data is not None:
-            IntegralMoment, SubElement, order = moment_data
-            if order >= SubElement.min_order:
-                sub_type = reference.sub_entity_types[dim]
-                if sub_type is not None:
-                    assert dim > 0
-                    for i, vs in enumerate(reference.sub_entities(dim)):
-                        sub_ref = create_reference(
-                            sub_type,
-                            vertices=[reference.reference_vertices[v] for v in vs])
-                        sub_element = SubElement(sub_ref, order)
-                        for f, d in zip(
-                            sub_element.get_basis_functions(), sub_element.dofs
-                        ):
-                            dofs.append(IntegralMoment(sub_ref, f, d))
-
-    return dofs

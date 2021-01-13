@@ -1,6 +1,7 @@
 """Serendipity elements on tensor product cells."""
 
-from ..core.finite_element import FiniteElement, make_integral_moment_dofs
+from ..core.finite_element import FiniteElement
+from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import (serendipity_set, polynomial_set,
                                 Hdiv_serendipity, Hcurl_serendipity)
 from ..core.functionals import (
@@ -16,8 +17,8 @@ class Serendipity(FiniteElement):
         poly += serendipity_set(reference.tdim, 1, order)
 
         dofs = []
-        for p in reference.vertices:
-            dofs.append(PointEvaluation(p, entity_dim=0))
+        for v_n, p in enumerate(reference.vertices):
+            dofs.append(PointEvaluation(p, entity=(0, v_n)))
         dofs += make_integral_moment_dofs(
             reference,
             edges=(IntegralMoment, DiscontinuousLagrange, order - 2),
@@ -30,6 +31,8 @@ class Serendipity(FiniteElement):
     names = ["serendipity", "S"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
+    mapping = "default"
+    continuity = "C0"
 
 
 class SerendipityCurl(FiniteElement):
@@ -39,8 +42,7 @@ class SerendipityCurl(FiniteElement):
         poly = polynomial_set(reference.tdim, reference.tdim, order)
         poly += Hcurl_serendipity(reference.tdim, reference.tdim, order)
 
-        dofs = []
-        dofs += make_integral_moment_dofs(
+        dofs = make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, DiscontinuousLagrange, order),
             faces=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
@@ -53,6 +55,8 @@ class SerendipityCurl(FiniteElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     max_order = 3  # TODO: generalise polynomial set for hexahedra, then remove this
+    mapping = "covariant"
+    continuity = "H(curl)"
 
 
 class SerendipityDiv(FiniteElement):
@@ -62,8 +66,7 @@ class SerendipityDiv(FiniteElement):
         poly = polynomial_set(reference.tdim, reference.tdim, order)
         poly += Hdiv_serendipity(reference.tdim, reference.tdim, order)
 
-        dofs = []
-        dofs += make_integral_moment_dofs(
+        dofs = make_integral_moment_dofs(
             reference,
             facets=(NormalIntegralMoment, DiscontinuousLagrange, order),
             cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
@@ -75,3 +78,5 @@ class SerendipityDiv(FiniteElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     max_order = 3  # TODO: generalise polynomial set for hexahedra, then remove this
+    mapping = "contravariant"
+    continuity = "H(div)"

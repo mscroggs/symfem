@@ -1,6 +1,7 @@
 """Mardal-Tai-Winther elements on simplices."""
 
-from ..core.finite_element import FiniteElement, make_integral_moment_dofs
+from ..core.finite_element import FiniteElement
+from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import polynomial_set
 from ..core.symbolic import x, zero, one
 from ..core.calculus import curl
@@ -45,3 +46,5 @@ class MardalTaiWinther(FiniteElement):
     references = ["triangle", "tetrahedron"]
     min_order = 3
     max_order = 3
+    mapping = "contravariant"
+    continuity = "H(div)"
