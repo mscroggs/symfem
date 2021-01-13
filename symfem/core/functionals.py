@@ -160,7 +160,8 @@ class IntegralMoment(BaseFunctional):
         if isinstance(self.f, tuple):
             # TODO: is this one of the mappings?
             self.f = tuple(
-                sum(self.reference.axes[j][i] * c / self.reference.jacobian() for j, c in enumerate(self.f))
+                sum(self.reference.axes[j][i] * c / self.reference.jacobian()
+                    for j, c in enumerate(self.f))
                 for i, o in enumerate(self.reference.origin)
             )
 
