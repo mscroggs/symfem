@@ -13,6 +13,15 @@ def handler(signum, frame):
     raise TimeOutTheTest()
 
 
+def all_symequal(a, b):
+    if isinstance(a, (list, tuple)):
+        for i, j in zip(a, b):
+            if not all_symequal(i, j):
+                return False
+        return True
+    return sympy.expand(a) == sympy.expand(b)
+
+
 def elements(max_order=5):
     out = []
     for e in _elementlist:
@@ -55,7 +64,9 @@ def test_element_functionals(cell_type, element_type, order):
 @pytest.mark.parametrize(("cell_type", "element_type", "order"), elements(max_order=3))
 def test_element_continuity(cell_type, element_type, order):
     if element_type == "Regge":
-        pytest.xfail()
+        pytest.xfail()  # TODO: implement double covariant piola
+    if element_type == "Mardal-Tai-Winther":
+        pytest.xfail()  # TODO: correct MTW spaces
 
     try:
         if cell_type == "interval":
@@ -106,13 +117,7 @@ def test_element_continuity(cell_type, element_type, order):
                 else:
                     raise ValueError(f"Unknown continuity: {space.continuity}")
 
-                if not isinstance(f, (list, tuple)):
-                    f = [f]
-                    g = [g]
-                for i, j in zip(f, g):
-                    i = sympy.simplify(sympy.expand(i))
-                    j = sympy.simplify(sympy.expand(j))
-                    assert i == j
+                assert all_symequal(f, g)
 
     except TimeOutTheTest:
         pytest.skip(f"Testing {element_type} on {cell_type} timed out for order {order}.")

@@ -1,6 +1,6 @@
 """Functionals used to define the dual sets."""
 from .symbolic import subs, x, t
-from .vectors import vdot, vcross
+from .vectors import vdot
 from .calculus import derivative, jacobian_component
 
 
@@ -158,8 +158,9 @@ class IntegralMoment(BaseFunctional):
         self.dof = dof
         self.f = subs(f, x, t)
         if isinstance(self.f, tuple):
+            # TODO: is this one of the mappings?
             self.f = tuple(
-                sum(self.reference.scaled_axes()[j][i] * c for j, c in enumerate(self.f))
+                sum(self.reference.axes[j][i] * c / self.reference.jacobian() for j, c in enumerate(self.f))
                 for i, o in enumerate(self.reference.origin)
             )
 
@@ -213,19 +214,6 @@ class VecIntegralMoment(IntegralMoment):
         return self.dot_with
 
     name = "Vector integral moment"
-
-
-class TangentCrossIntegralMoment(IntegralMoment):
-    """An integral moment in the tangential direction."""
-
-    def __init__(self, reference, f, dof, entity=(None, None)):
-        super().__init__(reference, f, dof, entity=entity)
-
-    def dot(self, function):
-        """Dot a function with the moment function."""
-        return vdot(vcross(self.f, function), self.reference.normal())
-
-    name = "Tangential integral moment"
 
 
 class TangentIntegralMoment(VecIntegralMoment):
