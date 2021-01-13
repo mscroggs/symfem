@@ -1,6 +1,4 @@
-import sympy
 from symfem import create_element
-from symfem.core.symbolic import x
 
 
 def all_equal(a, b):
