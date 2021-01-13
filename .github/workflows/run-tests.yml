@@ -34,6 +34,7 @@ jobs:
       - run: |
             git clone https://github.com/FEniCS/basix.git basix-src
             cd basix-src
+            git checkout mscroggs/test_permutations
             pip install .
         name: Install basix
       - run: python3 -m pytest -n4 --durations=50 test
