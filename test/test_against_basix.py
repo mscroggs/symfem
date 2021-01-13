@@ -1,7 +1,6 @@
 from symfem import create_element
 from symfem.core.symbolic import subs, x, sym_sum, zero
 import pytest
-import numpy as np
 
 elements = {
     "interval": [("P", "Lagrange", range(1, 4)), ("dP", "Discontinuous Lagrange", range(1, 4))],
@@ -33,6 +32,7 @@ def to_float(a):
 
 
 def make_lattice(cell, N=3):
+    import numpy as np
     if cell == "interval":
         return np.array([[i / N] for i in range(N + 1)])
     if cell == "triangle":
@@ -54,8 +54,11 @@ def make_lattice(cell, N=3):
 def test_against_basix(cell, symfem_type, basix_type, order):
     try:
         import basix
+        from scipy.linalg import block_diag, solve
+        from scipy.linalg import block_diag, solve
+        import numpy as np
     except ImportError:
-        pytest.skip("basix must be installed to run this test.")
+        pytest.skip("basix, numpy and scipy must be installed to run this test.")
 
     element = create_element(cell, symfem_type, order)
     points = make_lattice(cell)
@@ -64,21 +67,14 @@ def test_against_basix(cell, symfem_type, basix_type, order):
 
     mat = element.get_dual_matrix()
     mat = np.array([[float(j) for j in mat.row(i)] for i in range(mat.rows)])
-    minv = np.linalg.inv(mat)
-    if element.range_dim == 1:
-        basis = []
-        for i, dof in enumerate(element.dofs):
-            basis.append(sym_sum(b * c for b, c in zip(minv[i], element.basis)))
 
-        sym_result = [[float(subs(b, x, p)) for b in basis] for p in points]
+
+    if element.range_dim == 1:
+        evaluated = np.array([[float(subs(b, x, p)) for p in points] for b in element.basis])
     else:
-        basis = []
-        for i, dof in enumerate(element.dofs):
-            b = [zero for i in element.basis[0]]
-            for c, d in zip(minv[i], element.basis):
-                for j, d_j in enumerate(d):
-                    b[j] += c * d_j
-            basis.append(b)
-        sym_result = [[float(subs(b, x, p)[j]) for j in range(element.range_dim) for b in basis]
-                      for p in points]
+        evaluated = np.array([[float(subs(b, x, p)[j]) for p in points] for j in range(element.range_dim) for b in element.basis])
+        mat = block_diag(*[mat for j in range(element.range_dim)])
+
+    sym_result = solve(mat, evaluated).transpose()
+
     assert np.allclose(result, sym_result)
