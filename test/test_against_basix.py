@@ -19,8 +19,10 @@ elements = {
                     ("Regge", "Regge", range(0, 3)),
                     ("Crouzeix-Raviart", "Crouzeix-Raviart", [1])],
     "quadrilateral": [("Q", "Lagrange", range(1, 4)),
-                      ("dQ", "Discontinuous Lagrange", range(1, 4))],
-    "hexahedron": [("Q", "Lagrange", range(1, 3)), ("dQ", "Discontinuous Lagrange", range(1, 3))]
+                      ("dQ", "Discontinuous Lagrange", range(1, 4)),
+                      ("Qdiv", "Qdiv", range(1, 4)), ("Qcurl", "Qcurl", range(1, 4))],
+    "hexahedron": [("Q", "Lagrange", range(1, 3)), ("dQ", "Discontinuous Lagrange", range(1, 3)),
+                   ("Qdiv", "Qdiv", range(1, 3)), ("Qcurl", "Qcurl", range(1, 3))]
 }
 
 
@@ -75,5 +77,4 @@ def test_against_basix(cell, symfem_type, basix_type, order):
         mat = block_diag(*[mat for j in range(element.range_dim)])
 
     sym_result = solve(mat, evaluated).transpose()
-
     assert np.allclose(result, sym_result)
