@@ -29,7 +29,7 @@ class Serendipity(FiniteElement):
         super().__init__(reference, poly, dofs, reference.tdim, 1)
 
     names = ["serendipity", "S"]
-    references = ["quadrilateral", "hexahedron"]
+    references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 1
     mapping = "default"
     continuity = "C0"
