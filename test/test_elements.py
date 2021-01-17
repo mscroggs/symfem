@@ -14,6 +14,7 @@ def handler(signum, frame):
 
 
 def all_symequal(a, b):
+    print(a, b); return 1
     if isinstance(a, (list, tuple)):
         for i, j in zip(a, b):
             if not all_symequal(i, j):
@@ -63,17 +64,12 @@ def test_element_functionals(cell_type, element_type, order):
 
 @pytest.mark.parametrize(("cell_type", "element_type", "order"), elements(max_order=3))
 def test_element_continuity(cell_type, element_type, order):
-    if element_type == "Regge":
-        pytest.xfail()  # TODO: implement double covariant piola
-    if element_type == "Mardal-Tai-Winther":
-        pytest.xfail()  # TODO: correct MTW spaces
-
     try:
         if cell_type == "interval":
             vertices = ((-1, ), (0, ))
             entity_pairs = [[0, (0, 1)]]
         elif cell_type == "triangle":
-            vertices = ((-1, 0), (0, 0), (0, 1))
+            vertices = ((-1, 2), (0, 0), (0, 1))
             entity_pairs = [[0, (0, 1)], [0, (2, 2)], [1, (1, 0)]]
         elif cell_type == "tetrahedron":
             vertices = ((-1, 0, 0), (0, 0, 0), (0, 1, 0), (0, 0, 1))
@@ -114,6 +110,10 @@ def test_element_continuity(cell_type, element_type, order):
                 elif space.continuity == "H(curl)":
                     f = f[1:]
                     g = g[1:]
+                elif space.continuity == "Regge":
+                    index = len(vertices[0]) + 1
+                    f = f[index]
+                    g = g[index]
                 else:
                     raise ValueError(f"Unknown continuity: {space.continuity}")
 

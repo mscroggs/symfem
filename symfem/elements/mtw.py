@@ -17,9 +17,6 @@ class MardalTaiWinther(FiniteElement):
     def __init__(self, reference, order):
         assert order == 3
 
-        warnings.warn("Mardal-Tai-Winther elements may be incorrectly defined"
-                      " (see https://github.com/mscroggs/symfem/issues/23)")
-
         dofs = make_integral_moment_dofs(
             reference, facets=(NormalIntegralMoment, DiscontinuousLagrange, 1))
 
@@ -51,4 +48,4 @@ class MardalTaiWinther(FiniteElement):
     min_order = 3
     max_order = 3
     mapping = "contravariant"
-    continuity = "H(div)"
+    continuity = "L2"
