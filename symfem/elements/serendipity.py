@@ -26,7 +26,7 @@ class Serendipity(FiniteElement):
             volumes=(IntegralMoment, DiscontinuousLagrange, order - 6),
         )
 
-        super().__init__(reference, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     names = ["serendipity", "S"]
     references = ["interval", "quadrilateral", "hexahedron"]
@@ -49,7 +49,7 @@ class SerendipityCurl(FiniteElement):
             volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 4),
         )
 
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
     references = ["quadrilateral", "hexahedron"]
@@ -72,7 +72,7 @@ class SerendipityDiv(FiniteElement):
             cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
         )
 
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]
     references = ["quadrilateral", "hexahedron"]

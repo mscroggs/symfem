@@ -26,7 +26,7 @@ class Morley(FiniteElement):
                 PointNormalDerivativeEvaluation(midpoint, sub_ref, entity=(1, e_n)))
 
         super().__init__(
-            reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
+            reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
 
     names = ["Morley"]

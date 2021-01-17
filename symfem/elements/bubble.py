@@ -33,7 +33,7 @@ class Bubble(FiniteElement):
                         entity=(reference.tdim, 0)))
 
         super().__init__(
-            reference, poly, dofs, reference.tdim, 1
+            reference, order, poly, dofs, reference.tdim, 1
         )
 
     names = ["bubble"]

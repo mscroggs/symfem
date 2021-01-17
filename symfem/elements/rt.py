@@ -20,7 +20,7 @@ class RaviartThomas(FiniteElement):
             cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
         )
 
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Raviart-Thomas", "RT", "N1div"]
     references = ["triangle", "tetrahedron"]
