@@ -8,7 +8,6 @@ from ..core.calculus import curl
 from ..core.functionals import NormalIntegralMoment, TangentIntegralMoment, IntegralMoment
 from .lagrange import DiscontinuousLagrange
 from .nedelec import NedelecFirstKind
-import warnings
 
 
 class MardalTaiWinther(FiniteElement):

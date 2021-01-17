@@ -14,7 +14,6 @@ def handler(signum, frame):
 
 
 def all_symequal(a, b):
-    print(a, b); return 1
     if isinstance(a, (list, tuple)):
         for i, j in zip(a, b):
             if not all_symequal(i, j):
@@ -110,7 +109,14 @@ def test_element_continuity(cell_type, element_type, order):
                 elif space.continuity == "H(curl)":
                     f = f[1:]
                     g = g[1:]
-                elif space.continuity == "Regge":
+                elif space.continuity == "inner H(curl)":
+                    if len(vertices[0]) == 2:
+                        f = f[3]
+                        g = g[3]
+                    if len(vertices[0]) == 3:
+                        f = f[3]
+                        g = g[3]
+                elif space.continuity == "inner H(div)":
                     index = len(vertices[0]) + 1
                     f = f[index]
                     g = g[index]

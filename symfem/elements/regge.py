@@ -44,4 +44,4 @@ class Regge(FiniteElement):
     references = ["triangle", "tetrahedron"]
     min_order = 0
     mapping = "double_covariant"
-    continuity = "Regge"  # TODO: give this a better name
+    continuity = "inner H(curl)"
