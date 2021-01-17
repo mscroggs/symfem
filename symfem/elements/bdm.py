@@ -20,7 +20,7 @@ class BDM(FiniteElement):
             cells=(IntegralMoment, NedelecFirstKind, order - 1),
         )
 
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]
     references = ["triangle", "tetrahedron"]

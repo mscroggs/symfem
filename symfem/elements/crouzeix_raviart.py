@@ -19,7 +19,7 @@ class CrouzeixRaviart(FiniteElement):
                 PointEvaluation(midpoint, entity=(reference.tdim - 1, e_n)))
 
         super().__init__(
-            reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
+            reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
 
     names = ["Crouzeix-Raviart", "CR"]

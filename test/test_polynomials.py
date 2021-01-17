@@ -38,5 +38,4 @@ def test_MTW_space(reference):
             p_edge = subs(p, x, [(1 - t[0]) * i + t[0] * j
                                  for i, j in zip(sub_ref.origin, sub_ref.axes[0])])
             poly = vdot(p_edge, sub_ref.normal())
-            print(p, vs, poly.expand())
             assert poly.is_real or sympy.Poly(poly).degree() <= 1

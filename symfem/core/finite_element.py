@@ -8,10 +8,11 @@ from . import mappings
 class FiniteElement:
     """Abstract finite element."""
 
-    def __init__(self, reference, basis, dofs, domain_dim, range_dim,
+    def __init__(self, reference, order, basis, dofs, domain_dim, range_dim,
                  range_shape=None):
         assert len(basis) == len(dofs)
         self.reference = reference
+        self.order = order
         self.basis = basis
         self.dofs = dofs
         self.domain_dim = domain_dim

@@ -8,7 +8,6 @@ from ..core.calculus import curl
 from ..core.functionals import NormalIntegralMoment, TangentIntegralMoment, IntegralMoment
 from .lagrange import DiscontinuousLagrange
 from .nedelec import NedelecFirstKind
-import warnings
 
 
 class MardalTaiWinther(FiniteElement):
@@ -16,9 +15,6 @@ class MardalTaiWinther(FiniteElement):
 
     def __init__(self, reference, order):
         assert order == 3
-
-        warnings.warn("Mardal-Tai-Winther elements may be incorrectly defined"
-                      " (see https://github.com/mscroggs/symfem/issues/23)")
 
         dofs = make_integral_moment_dofs(
             reference, facets=(NormalIntegralMoment, DiscontinuousLagrange, 1))
@@ -44,11 +40,11 @@ class MardalTaiWinther(FiniteElement):
             dofs += make_integral_moment_dofs(
                 reference, facets=(IntegralMoment, NedelecFirstKind, 1))
 
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Mardal-Tai-Winther", "MTW"]
     references = ["triangle", "tetrahedron"]
     min_order = 3
     max_order = 3
     mapping = "contravariant"
-    continuity = "H(div)"
+    continuity = "L2"

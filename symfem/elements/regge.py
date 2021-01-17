@@ -37,11 +37,11 @@ class Regge(FiniteElement):
                                       for j, o in enumerate(entity.origin)),
                                 tangent, entity=(edim, e_n)))
 
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim ** 2,
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))
 
     names = ["Regge"]
     references = ["triangle", "tetrahedron"]
     min_order = 0
     mapping = "double_covariant"
-    continuity = "C0"
+    continuity = "inner H(curl)"

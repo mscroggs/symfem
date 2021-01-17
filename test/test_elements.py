@@ -3,6 +3,7 @@ import signal
 import sympy
 from symfem import create_element, _elementlist
 from symfem.core.symbolic import subs, x
+from symfem.core.vectors import vsub
 
 
 class TimeOutTheTest(BaseException):
@@ -63,17 +64,12 @@ def test_element_functionals(cell_type, element_type, order):
 
 @pytest.mark.parametrize(("cell_type", "element_type", "order"), elements(max_order=3))
 def test_element_continuity(cell_type, element_type, order):
-    if element_type == "Regge":
-        pytest.xfail()  # TODO: implement double covariant piola
-    if element_type == "Mardal-Tai-Winther":
-        pytest.xfail()  # TODO: correct MTW spaces
-
     try:
         if cell_type == "interval":
             vertices = ((-1, ), (0, ))
             entity_pairs = [[0, (0, 1)]]
         elif cell_type == "triangle":
-            vertices = ((-1, 0), (0, 0), (0, 1))
+            vertices = ((-1, 2), (0, 0), (0, 1))
             entity_pairs = [[0, (0, 1)], [0, (2, 2)], [1, (1, 0)]]
         elif cell_type == "tetrahedron":
             vertices = ((-1, 0, 0), (0, 0, 0), (0, 1, 0), (0, 0, 1))
@@ -114,6 +110,26 @@ def test_element_continuity(cell_type, element_type, order):
                 elif space.continuity == "H(curl)":
                     f = f[1:]
                     g = g[1:]
+                elif space.continuity == "inner H(curl)":
+                    if len(vertices[0]) == 2:
+                        f = f[3]
+                        g = g[3]
+                    if len(vertices[0]) == 3:
+                        if dim == 1:
+                            vs = space.reference.sub_entities(1)[entities[0]]
+                            v0 = space.reference.vertices[vs[0]]
+                            v1 = space.reference.vertices[vs[1]]
+                            tangent = vsub(v1, v0)
+                            f = sum(i * f[ni * len(tangent) + nj] * j
+                                    for ni, i in enumerate(tangent)
+                                    for nj, j in enumerate(tangent))
+                            g = sum(i * g[ni * len(tangent) + nj] * j
+                                    for ni, i in enumerate(tangent)
+                                    for nj, j in enumerate(tangent))
+                        else:
+                            assert dim == 2
+                            f = [f[4], f[8]]
+                            g = [g[4], g[8]]
                 else:
                     raise ValueError(f"Unknown continuity: {space.continuity}")
 

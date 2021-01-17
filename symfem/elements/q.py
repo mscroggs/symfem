@@ -38,7 +38,7 @@ class Q(FiniteElement):
                                 entity=(edim, e_n)))
 
         super().__init__(
-            reference,
+            reference, order,
             quolynomial_set(reference.tdim, 1, order),
             dofs,
             reference.tdim,
@@ -67,7 +67,7 @@ class DiscontinuousQ(FiniteElement):
                                             entity=(reference.tdim, 0)))
 
         super().__init__(
-            reference,
+            reference, order,
             quolynomial_set(reference.tdim, 1, order),
             dofs,
             reference.tdim,
@@ -98,7 +98,7 @@ class VectorQ(FiniteElement):
                 dofs.append(DotPointEvaluation(p.point, d, entity=p.entity))
 
         super().__init__(
-            reference,
+            reference, order,
             quolynomial_set(reference.tdim, reference.tdim, order),
             dofs,
             reference.tdim,
@@ -126,7 +126,7 @@ class Nedelec(FiniteElement):
             volumes=(IntegralMoment, RaviartThomas, order - 1),
         )
 
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["NCE", "RTCE", "Qcurl"]
     references = ["quadrilateral", "hexahedron"]
@@ -148,7 +148,7 @@ class RaviartThomas(FiniteElement):
             cells=(IntegralMoment, Nedelec, order - 1),
         )
 
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["NCF", "RTCF", "Qdiv"]
     references = ["quadrilateral", "hexahedron"]

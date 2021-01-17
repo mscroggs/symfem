@@ -42,7 +42,7 @@ class Lagrange(FiniteElement):
                                     entity=(edim, e_n)))
 
         super().__init__(
-            reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
+            reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
 
     names = ["Lagrange", "P"]
@@ -69,7 +69,7 @@ class DiscontinuousLagrange(FiniteElement):
                                                 entity=(reference.tdim, 0)))
 
         super().__init__(
-            reference, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
+            reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
 
     names = ["discontinuous Lagrange", "dP", "DP"]
@@ -97,7 +97,7 @@ class VectorLagrange(FiniteElement):
                 dofs.append(DotPointEvaluation(p.point, d, entity=p.entity))
 
         super().__init__(
-            reference,
+            reference, order,
             polynomial_set(reference.tdim, reference.tdim, order),
             dofs,
             reference.tdim,
@@ -129,7 +129,7 @@ class VectorDiscontinuousLagrange(FiniteElement):
                 dofs.append(DotPointEvaluation(p.point, d, entity=p.entity))
 
         super().__init__(
-            reference,
+            reference, order,
             polynomial_set(reference.tdim, reference.tdim, order),
             dofs,
             reference.tdim,

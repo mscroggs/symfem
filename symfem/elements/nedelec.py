@@ -21,7 +21,7 @@ class NedelecFirstKind(FiniteElement):
             volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 3),
         )
 
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Nedelec", "Nedelec1", "N1curl"]
     references = ["triangle", "tetrahedron"]
@@ -43,7 +43,7 @@ class NedelecSecondKind(FiniteElement):
             volumes=(IntegralMoment, RaviartThomas, order - 2),
         )
 
-        super().__init__(reference, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
     names = ["Nedelec2", "N2curl"]
     references = ["triangle", "tetrahedron"]
