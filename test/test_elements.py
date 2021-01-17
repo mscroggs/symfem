@@ -114,8 +114,8 @@ def test_element_continuity(cell_type, element_type, order):
                         f = f[3]
                         g = g[3]
                     if len(vertices[0]) == 3:
-                        f = f[3]
-                        g = g[3]
+                        f = [f[4], f[8]]
+                        g = [g[4], g[8]]
                 elif space.continuity == "inner H(div)":
                     index = len(vertices[0]) + 1
                     f = f[index]
