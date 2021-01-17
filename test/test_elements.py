@@ -87,7 +87,7 @@ def test_element_continuity(cell_type, element_type, order):
                             [2, (0, 2)]]
 
         signal.signal(signal.SIGALRM, handler)
-#        signal.alarm(20)
+        signal.alarm(20)
 
         space = create_element(cell_type, element_type, order)
         if space.continuity == "L2":
