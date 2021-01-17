@@ -3,6 +3,7 @@ import signal
 import sympy
 from symfem import create_element, _elementlist
 from symfem.core.symbolic import subs, x
+from symfem.core.vectors import vsub
 
 
 class TimeOutTheTest(BaseException):
@@ -86,7 +87,7 @@ def test_element_continuity(cell_type, element_type, order):
                             [2, (0, 2)]]
 
         signal.signal(signal.SIGALRM, handler)
-        signal.alarm(20)
+#        signal.alarm(20)
 
         space = create_element(cell_type, element_type, order)
         if space.continuity == "L2":
@@ -114,12 +115,21 @@ def test_element_continuity(cell_type, element_type, order):
                         f = f[3]
                         g = g[3]
                     if len(vertices[0]) == 3:
-                        f = [f[4], f[8]]
-                        g = [g[4], g[8]]
-                elif space.continuity == "inner H(div)":
-                    index = len(vertices[0]) + 1
-                    f = f[index]
-                    g = g[index]
+                        if dim == 1:
+                            vs = space.reference.sub_entities(1)[entities[0]]
+                            v0 = space.reference.vertices[vs[0]]
+                            v1 = space.reference.vertices[vs[1]]
+                            tangent = vsub(v1, v0)
+                            f = sum(i * f[ni * len(tangent) + nj] * j
+                                    for ni, i in enumerate(tangent)
+                                    for nj, j in enumerate(tangent))
+                            g = sum(i * g[ni * len(tangent) + nj] * j
+                                    for ni, i in enumerate(tangent)
+                                    for nj, j in enumerate(tangent))
+                        else:
+                            assert dim == 2
+                            f = [f[4], f[8]]
+                            g = [g[4], g[8]]
                 else:
                     raise ValueError(f"Unknown continuity: {space.continuity}")
 
