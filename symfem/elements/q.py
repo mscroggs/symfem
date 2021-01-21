@@ -47,7 +47,7 @@ class Q(FiniteElement):
     names = ["Q"]
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 0
-    mapping = "default"
+    mapping = "identity"
     continuity = "C0"
 
 
@@ -76,7 +76,7 @@ class DiscontinuousQ(FiniteElement):
     names = ["dQ"]
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 0
-    mapping = "default"
+    mapping = "identity"
     continuity = "L2"
 
 
@@ -108,7 +108,7 @@ class VectorQ(FiniteElement):
     names = ["vector Q", "vQ"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
-    mapping = "default"
+    mapping = "identity"
     continuity = "C0"
 
 

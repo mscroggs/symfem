@@ -30,5 +30,5 @@ class Hermite(FiniteElement):
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 3
     max_order = 3
-    mapping = "default"
+    mapping = "identity"
     continuity = "L2"

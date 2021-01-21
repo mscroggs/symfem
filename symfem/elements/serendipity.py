@@ -31,7 +31,7 @@ class Serendipity(FiniteElement):
     names = ["serendipity", "S"]
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 1
-    mapping = "default"
+    mapping = "identity"
     continuity = "C0"
 
 

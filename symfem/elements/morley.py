@@ -33,5 +33,5 @@ class Morley(FiniteElement):
     references = ["triangle"]
     min_order = 2
     max_order = 2
-    mapping = "default"
+    mapping = "identity"
     continuity = "L2"

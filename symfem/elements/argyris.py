@@ -41,5 +41,5 @@ class Argyris(FiniteElement):
     references = ["triangle"]
     min_order = 5
     max_order = 5
-    mapping = "default"
+    mapping = "identity"
     continuity = "L2"

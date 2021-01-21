@@ -26,5 +26,5 @@ class CrouzeixRaviart(FiniteElement):
     references = ["triangle", "tetrahedron"]
     min_order = 1
     max_order = 1
-    mapping = "default"
+    mapping = "identity"
     continuity = "L2"

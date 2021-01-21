@@ -39,5 +39,5 @@ class Bubble(FiniteElement):
     names = ["bubble"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = {"interval": 2, "triangle": 3, "tetrahedron": 4}
-    mapping = "default"
+    mapping = "identity"
     continuity = "C0"

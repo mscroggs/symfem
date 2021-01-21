@@ -49,7 +49,7 @@ class Lagrange(FiniteElement):
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "C0"
-    mapping = "default"
+    mapping = "identity"
 
 
 class DiscontinuousLagrange(FiniteElement):
@@ -76,7 +76,7 @@ class DiscontinuousLagrange(FiniteElement):
     references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
-    mapping = "default"
+    mapping = "identity"
 
 
 class VectorLagrange(FiniteElement):
@@ -108,7 +108,7 @@ class VectorLagrange(FiniteElement):
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "C0"
-    mapping = "default"
+    mapping = "identity"
 
 
 class VectorDiscontinuousLagrange(FiniteElement):
@@ -140,4 +140,4 @@ class VectorDiscontinuousLagrange(FiniteElement):
     references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
-    mapping = "default"
+    mapping = "identity"

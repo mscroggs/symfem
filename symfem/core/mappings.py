@@ -5,7 +5,7 @@ from .symbolic import subs, x
 from .vectors import vdot
 
 
-def default(f, map, inverse_map, tdim):
+def identity(f, map, inverse_map, tdim):
     """Map functions."""
     g = subs(f, x, inverse_map)
     return g
