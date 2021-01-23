@@ -14,6 +14,9 @@ with open("VERSION") as f:
 with open("requirements.txt") as f:
     requirements = [line.strip() for line in f if line.strip() != ""]
 
+with open("README.md") as f:
+    long_description = fh
+
 data_files = [
     ("symfem", ["symfem/VERSION"])]
 
@@ -21,7 +24,9 @@ data_files = [
 if __name__ == "__main__":
     setuptools.setup(
         name="symfem",
-        description="Finite Element Automated Symbolic Tabulator",
+        description="a symbolic finite element definition library",
+        long_description=long_description,
+        long_description_content_type="text/markdown",
         version=VERSION,
         author="Matthew Scroggs",
         license="MIT",
