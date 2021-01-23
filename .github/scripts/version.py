@@ -8,6 +8,8 @@ failed = False
 access_key = sys.argv[-2]
 version = sys.argv[-1]
 
+assert "updated" not in version
+
 git = github.Github(access_key)
 
 symfem = git.get_repo("mscroggs/symfem")
