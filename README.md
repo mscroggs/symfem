@@ -13,6 +13,13 @@ Alternatively, the latest release can be installed by running:
 pip3 install symfem
 ```
 
+## Running tests
+To run the Symfem unit tests, clone the repository and run:
+
+```bash
+python3 -m pytest test/
+```
+
 ## Using Symfem
 
 ### Finite elements
