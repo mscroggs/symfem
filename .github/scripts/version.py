@@ -8,7 +8,6 @@ failed = False
 access_key = sys.argv[-2]
 version = sys.argv[-1]
 
-assert "updated" not in version
 assert version[0] == "v"
 version = version[1:]
 
@@ -40,6 +39,7 @@ if data["version"] != version:
 
 
 if failed:
+    assert "updated" not in version
     tree = symfem.create_git_tree(changed_list, base_tree)
     parent = symfem.get_git_commit(branch.commit.sha)
     commit = symfem.create_git_commit("Update version numbers", tree, [parent])
