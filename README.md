@@ -24,7 +24,8 @@ python3 -m pytest test/
 ```
 
 ## Using Symfem
-Documentation of Symfem can be found on [Read the Docs](https://symfem.readthedocs.io/en/stable/).
+Documentation of the latest release version of Symfem can be found on
+[Read the Docs](https://symfem.readthedocs.io/en/stable/).
 
 ## Contributing to Symfem
 You can find information about how to contribute to Symfem [here](CONTRIBUTING.md).
