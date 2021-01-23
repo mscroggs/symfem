@@ -1,10 +1,13 @@
+####################################################
 Symfem: a symbolic finite element definition library
-====================================================
+####################################################
 
 Welcome to the Symfem documention.
 
+*****************
 Installing Symfem
------------------
+*****************
+
 Symfem can be installed from `GitHub repo <https://github.com/mscroggs/symfem>`_ by running::
 
     git clone https://github.com/mscroggs/symfem.git
@@ -16,10 +19,10 @@ Alternatively, the latest release can be installed from PyPI by running::
     pip3 install symfem
 
 Using Symfem
-------------
+============
 
 Finite elements
-^^^^^^^^^^^^^^^
+---------------
 Finite elements can be created in symfem using the `create_element` function:
 
 .. autofunction:: symfem.create_element
@@ -87,7 +90,7 @@ at a set of points:
     [[1, 0, 0], [0.500000000000000, 0.500000000000000, 0], [0, 1, 0], [0.500000000000000, 0.250000000000000, 0.250000000000000]]
 
 Reference elements
-^^^^^^^^^^^^^^^^^^
+------------------
 Reference elements can be obtained from a :class:`symfem.core.finite_element.FiniteElement`:
 
 .. code-block:: python
@@ -191,7 +194,7 @@ representing a subentity:
     [(1, 0), (0, 1)]
 
 Documentation index
--------------------
+===================
 .. toctree::
    :titlesonly:
 
