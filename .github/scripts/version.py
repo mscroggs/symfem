@@ -12,8 +12,8 @@ git = github.Github(access_key)
 
 symfem = git.get_repo("mscroggs/symfem")
 branch = symfem.get_branch("main")
-ref = repo.get_git_ref("main")
-base_tree = repo.get_git_tree(branch.commit.sha)
+ref = symfem.get_git_ref("heads/main")
+base_tree = symfem.get_git_tree(branch.commit.sha)
 
 vfile1 = symfem.get_contents("VERSION", branch.commit.sha)
 v1 = vfile1.decoded_content.decode("utf8").strip()
@@ -36,10 +36,10 @@ if data["version"] != version:
 
 
 if failed:
-    tree = repo.create_git_tree(changed_list, base_tree)
-    parent = repo.get_git_commit(branch.commit.sha)
-    commit = repo.create_git_commit("Update version numbers", tree, [parent])
-    master_ref.edit(commit.sha)
+    tree = symfem.create_git_tree(changed_list, base_tree)
+    parent = symfem.get_git_commit(branch.commit.sha)
+    commit = symfem.create_git_commit("Update version numbers", tree, [parent])
+    ref.edit(commit.sha)
 
     try:
         rel = symfem.get_release(f"v{version}")
