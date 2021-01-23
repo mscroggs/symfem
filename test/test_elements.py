@@ -1,5 +1,4 @@
 import pytest
-import signal
 import sympy
 from symfem import create_element, _elementlist
 from symfem.core.symbolic import subs, x
