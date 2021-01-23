@@ -15,7 +15,7 @@ with open("requirements.txt") as f:
     requirements = [line.strip() for line in f if line.strip() != ""]
 
 with open("README.md") as f:
-    long_description = fh
+    long_description = f.read()
 
 data_files = [
     ("symfem", ["symfem/VERSION"])]
