@@ -1,32 +1,28 @@
 import json
 import sys
 from datetime import datetime
-from github import Github
+import github
 
 failed = False
 
 access_key = sys.argv[-2]
 version = sys.argv[-1]
 
-git = Github(access_key)
+git = github.Github(access_key)
 
 symfem = git.get_repo("mscroggs/symfem")
 branch = symfem.get_branch("main")
+ref = repo.get_git_ref("main")
+base_tree = repo.get_git_tree(branch.commit.sha)
 
 vfile1 = symfem.get_contents("VERSION", branch.commit.sha)
 v1 = vfile1.decoded_content.decode("utf8").strip()
 
-latest_sha = branch.commit.sha
+changed_list = []
 
 if v1 != version:
-    latest_sha = symfem.update_file(
-        "VERSION",
-        "Update version number",
-        version + "\n",
-        sha=vfile1.sha,
-        branch=branch.name,
-    )["commit"]
-
+    element = github.InputGitTreeElement("VERSION", '100644', 'blob', f"{version}\n")
+    changed_list.append(element)
     failed = True
 
 vfile2 = symfem.get_contents("codemeta.json", branch.commit.sha)
@@ -34,22 +30,28 @@ data = json.loads(vfile2.decoded_content)
 if data["version"] != version:
     data["version"] = version
     data["dateModified"] = datetime.now().strftime("%Y-%m-%d")
-    latest_sha = symfem.update_file(
-        "codemeta.json",
-        "Update version number",
-        json.dumps(data),
-        sha=vfile2.sha,
-        branch=branch.name,
-    )["commit"]
-
+    element = github.InputGitTreeElement("codemeta.json", '100644', 'blob', json.dumps(data))
+    changed_list.append(element)
     failed = True
 
+
 if failed:
-    rel = symfem.get_release(f"v{version}")
-    rel.delete_release()
+    tree = repo.create_git_tree(changed_list, base_tree)
+    parent = repo.get_git_commit(branch.commit.sha)
+    commit = repo.create_git_commit("Update version numbers", tree, [parent])
+    master_ref.edit(commit.sha)
+
+    try:
+        rel = symfem.get_release(f"v{version}")
+        rel.delete_release()
+        title = rel.title
+        body = rel.body
+    except:  # noqa: E722
+        print("No release found")
+        title = f"Version {version}"
+        body = ""
 
     symfem.create_git_tag_and_release(
-        f"v{version}updated", "Version {version}", rel.title, rel.body,
-        latest_sha, "commit")
+        f"v{version}updated", title, title, body, commit.sha, "commit")
 
     assert False
