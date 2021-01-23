@@ -21,7 +21,9 @@ python3 -m pytest test/
 ```
 
 ## Using Symfem
-Documentation of symfem can be found on Read the Docs...
+[![Documentation Status](https://readthedocs.org/projects/symfem/badge/?version=latest)](https://symfem.readthedocs.io/en/latest/?badge=latest)
+
+Documentation of symfem can be found on [Read the Docs](https://symfem.readthedocs.io/en/latest/)
 
 ## Contributing to Symfem
 You can find information about how to contribute to Symfem [here](CONTRIBUTING.md)
