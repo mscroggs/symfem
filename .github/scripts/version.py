@@ -9,6 +9,8 @@ access_key = sys.argv[-2]
 version = sys.argv[-1]
 
 assert "updated" not in version
+assert version[0] == "v"
+version = version[1:]
 
 git = github.Github(access_key)
 
@@ -54,6 +56,6 @@ if failed:
         body = ""
 
     symfem.create_git_tag_and_release(
-        f"v{version}updated", title, title, body, commit.sha, "commit")
+        f"v{version}", title, title, body, commit.sha, "commit")
 
     assert False
