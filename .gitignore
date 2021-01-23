@@ -6,3 +6,4 @@ symfem/VERSION
 build/
 dist/
 feast.egg-info/
+docs/_build
