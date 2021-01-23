@@ -10,6 +10,10 @@ version = sys.argv[-1]
 
 assert version[0] == "v"
 version = version[1:]
+is_update = False
+if version.endswith("updated"):
+    is_update = True
+    version = version[:-7]
 
 git = github.Github(access_key)
 
@@ -39,7 +43,7 @@ if data["version"] != version:
 
 
 if failed:
-    assert "updated" not in version
+    assert not is_update
     tree = symfem.create_git_tree(changed_list, base_tree)
     parent = symfem.get_git_commit(branch.commit.sha)
     commit = symfem.create_git_commit("Update version numbers", tree, [parent])
