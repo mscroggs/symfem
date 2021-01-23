@@ -1,4 +1,4 @@
-"""Symfem: a symbolic finite element definition library"""
+"""Symfem: a symbolic finite element definition library."""
 import os as _os
 import importlib as _il
 from .core import references as _references
