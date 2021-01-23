@@ -4,7 +4,8 @@
 ![Run tests](https://github.com/mscroggs/symfem/workflows/.github/workflows/run-tests.yml/badge.svg)
 
 ## Installing Symfem
-Symfem can be installed by downloading the repo and running:
+Symfem can be installed by downloading the [GitHub repo](https://github.com/mscroggs/symfem)
+and running:
 
 ```bash
 python3 setup.py install
