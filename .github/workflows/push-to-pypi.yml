@@ -7,8 +7,20 @@ on:
       - 'v*' 
 
 jobs:
+  check-and-correct-version:
+    name: 🔎 version number 🔍
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@master
+    - name: Get the version tag
+      id: get_version
+      run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+    - name: Check version number and update if necessary
+      run: python .github/scripts/version.py ${{ secrets.symfembot_github_token }} ${{ steps.get_version.outputs.VERSION }}
+
   build-n-publish:
     name: Build and publish 🐍 📦 to PyPI
+    needs: check-and-correct-version
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@master
