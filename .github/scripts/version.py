@@ -56,6 +56,6 @@ if failed:
         body = ""
 
     symfem.create_git_tag_and_release(
-        f"v{version}", title, title, body, commit.sha, "commit")
+        f"v{version}updated", title, title, body, commit.sha, "commit")
 
     assert False
