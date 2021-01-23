@@ -39,7 +39,7 @@ if data["version"] != version:
         "Update version number",
         json.dumps(data),
         sha=vfile2.sha,
-        branch=branch_name,
+        branch=branch.name,
     )["commit"]
 
     failed = True
