@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@master
+    - name: Install PyGitHub
+      run: pip3 install PyGitHub
     - name: Get the version tag
       id: get_version
       run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
