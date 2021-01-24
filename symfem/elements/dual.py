@@ -1,7 +1,7 @@
 """Lagrange elements on simplices."""
 
 import sympy
-from ..core.symbolic import subs, x, sym_sum, PiecewiseFunction
+from ..core.symbolic import sym_sum, PiecewiseFunction
 from ..core.finite_element import FiniteElement
 
 
