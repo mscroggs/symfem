@@ -346,7 +346,7 @@ class DualPolygon(Reference):
 
         self.edges = tuple((i, (i + 1) % (2 * number_of_triangles))
                            for i in range(2 * number_of_triangles))
-        self.faces = tuple(range(2 * number_of_triangles))
+        self.faces = (tuple(range(2 * number_of_triangles)), )
         self.volumes = tuple()
         self.sub_entity_types = ["point", "interval", f"dual polygon({number_of_triangles})", None]
 
