@@ -350,3 +350,7 @@ class Hexahedron(Reference):
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
         return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
+
+
+class Dual(Reference):
+    pass
