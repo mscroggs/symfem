@@ -72,7 +72,7 @@ def vnormalise(v):
 
 
 def point_in_triangle(point, triangle):
-    """Checks if a point is inside a triangle."""
+    """Check if a point is inside a triangle."""
     v0 = vsub(triangle[2], triangle[0])
     v1 = vsub(triangle[1], triangle[0])
     v2 = vsub(point, triangle[0])
