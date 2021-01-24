@@ -38,11 +38,15 @@ class DualFiniteElement(FiniteElement):
                 ):
                     sub_e = create_element("triangle", self.fine_space, self.order)
 
-                    sub_basis = subs(
-                        sub_e.get_basis_functions(),
-                        x,
-                        sub_e.reference.get_inverse_map_to([v0, v1, v2]))
-                    sub_fun = sym_sum(a * b for a, b in zip(coeffs, sub_basis))
+                    sub_basis = [
+                        sub_e.map_to_cell(f, [v0, v1, v2])
+                        for f in sub_e.get_basis_functions()]
+                    if self.range_dim == 1:
+                        sub_fun = sym_sum(a * b for a, b in zip(coeffs, sub_basis))
+                    else:
+                        sub_fun = tuple(
+                            sym_sum(a * b[i] for a, b in zip(coeffs, sub_basis))
+                            for i in range(self.range_dim))
                     pieces.append(((v0, v1, v2), sub_fun))
                 self._basis_functions.append(PiecewiseFunction(pieces))
         return self._basis_functions
@@ -92,3 +96,65 @@ class Dual(DualFiniteElement):
     max_order = 1
     continuity = "C0"
     mapping = "identity"
+
+
+class BuffaChristiansen(DualFiniteElement):
+    """Buffa-Christiansen barycentric dual finite element."""
+
+    def __init__(self, reference, order):
+        assert order == 1
+        dual_coefficients = [
+            [[0, 0, 0]
+             for i in range(2 * reference.number_of_triangles)]
+            for j in range(reference.number_of_triangles)
+        ]
+
+        for j in range(reference.number_of_triangles):
+            dual_coefficients[j][2 * j][0] = sympy.Rational(-1, 2)
+            dual_coefficients[j][2 * j - 1][0] = sympy.Rational(-1, 2)
+            N = 2 * reference.number_of_triangles
+            for i in range(N - 1):
+                dual_coefficients[j][(2 * j + i) % N][2] = sympy.Rational(i + 1 - N // 2, N)
+                dual_coefficients[j][(2 * j + i + 1) % N][1] = sympy.Rational(i + 1 - N // 2, N)
+
+        super().__init__(
+            dual_coefficients, "RT", reference, order, [], [], reference.tdim, 2
+        )
+
+    names = ["Buffa-Christiansen", "BC"]
+    references = ["dual polygon"]
+    min_order = 1
+    max_order = 1
+    continuity = "H(div)"
+    mapping = "contravariant"
+
+
+class RotatedBuffaChristiansen(DualFiniteElement):
+    """RotatedBuffa-Christiansen barycentric dual finite element."""
+
+    def __init__(self, reference, order):
+        assert order == 1
+        dual_coefficients = [
+            [[0, 0, 0]
+             for i in range(2 * reference.number_of_triangles)]
+            for j in range(reference.number_of_triangles)
+        ]
+
+        for j in range(reference.number_of_triangles):
+            dual_coefficients[j][2 * j][0] = sympy.Rational(-1, 2)
+            dual_coefficients[j][2 * j - 1][0] = sympy.Rational(-1, 2)
+            N = 2 * reference.number_of_triangles
+            for i in range(N - 1):
+                dual_coefficients[j][(2 * j + i) % N][2] = sympy.Rational(N // 2 - 1 - i, N)
+                dual_coefficients[j][(2 * j + i + 1) % N][1] = sympy.Rational(N // 2 - 1 - i, N)
+
+        super().__init__(
+            dual_coefficients, "N1curl", reference, order, [], [], reference.tdim, 2
+        )
+
+    names = ["rotated Buffa-Christiansen", "RBC"]
+    references = ["dual polygon"]
+    min_order = 1
+    max_order = 1
+    continuity = "H(div)"
+    mapping = "contravariant"
