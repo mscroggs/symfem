@@ -259,19 +259,8 @@ class Quadrilateral(Reference):
 class Hexahedron(Reference):
     """A hexahedron."""
 
-    def __init__(
-        self,
-        vertices=(
-            (0, 0, 0),
-            (1, 0, 0),
-            (0, 1, 0),
-            (1, 1, 0),
-            (0, 0, 1),
-            (1, 0, 1),
-            (0, 1, 1),
-            (1, 1, 1),
-        ),
-    ):
+    def __init__(self, vertices=((0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0),
+                                 (0, 0, 1), (1, 0, 1), (0, 1, 1), (1, 1, 1))):
         self.tdim = 3
         self.name = "hexahedron"
         self.origin = vertices[0]
@@ -281,38 +270,15 @@ class Hexahedron(Reference):
             vsub(vertices[4], vertices[0]),
         )
         self.reference_vertices = (
-            (0, 0, 0),
-            (1, 0, 0),
-            (0, 1, 0),
-            (1, 1, 0),
-            (0, 0, 1),
-            (1, 0, 1),
-            (0, 1, 1),
-            (1, 1, 1),
-        )
+            (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0),
+            (0, 0, 1), (1, 0, 1), (0, 1, 1), (1, 1, 1))
         self.vertices = vertices
         self.edges = (
-            (0, 1),
-            (0, 2),
-            (0, 4),
-            (1, 3),
-            (1, 5),
-            (2, 3),
-            (2, 6),
-            (3, 7),
-            (4, 5),
-            (4, 6),
-            (5, 7),
-            (6, 7),
-        )
+            (0, 1), (0, 2), (0, 4), (1, 3), (1, 5), (2, 3),
+            (2, 6), (3, 7), (4, 5), (4, 6), (5, 7), (6, 7))
         self.faces = (
-            (0, 1, 2, 3),
-            (0, 1, 4, 5),
-            (0, 2, 4, 6),
-            (1, 3, 5, 7),
-            (2, 3, 6, 7),
-            (4, 5, 6, 7),
-        )
+            (0, 1, 2, 3), (0, 1, 4, 5), (0, 2, 4, 6),
+            (1, 3, 5, 7), (2, 3, 6, 7), (4, 5, 6, 7))
         self.volumes = ((0, 1, 2, 3, 4, 5, 6, 7),)
         self.sub_entity_types = ["point", "interval", "quadrilateral", "hexahedron"]
         super().__init__(tp=True)
@@ -350,3 +316,38 @@ class Hexahedron(Reference):
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
         return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
+
+
+class DualPolygon(Reference):
+    """A polygon on a barycentric dual grid."""
+
+    def __init__(self, number_of_triangles, vertices=None):
+        self.tdim = 2
+        self.name = "dual polygon"
+        self.number_of_triangles = number_of_triangles
+        self.reference_origin = (0, 0)
+        self.reference_vertices = []
+        for tri in range(number_of_triangles):
+            angle = sympy.pi * 2 * tri / number_of_triangles
+            next_angle = sympy.pi * 2 * (tri + 1) / number_of_triangles
+
+            self.reference_vertices.append((sympy.cos(angle), sympy.sin(angle)))
+            self.reference_vertices.append(
+                ((sympy.cos(next_angle) + sympy.cos(angle)) / 2,
+                 (sympy.sin(next_angle) + sympy.sin(angle)) / 2))
+
+        if vertices is None:
+            self.origin = self.reference_origin
+            self.vertices = self.reference_vertices
+        else:
+            assert len(vertices) == 1 + len(self.reference_vertices)
+            self.origin = vertices[0]
+            self.vertices = vertices[1:]
+
+        self.edges = tuple((i, (i + 1) % (2 * number_of_triangles))
+                           for i in range(2 * number_of_triangles))
+        self.faces = (tuple(range(2 * number_of_triangles)), )
+        self.volumes = tuple()
+        self.sub_entity_types = ["point", "interval", f"dual polygon({number_of_triangles})", None]
+
+        super().__init__()

@@ -30,6 +30,7 @@ for _file in _os.listdir(_os.path.join(_folder, "elements")):
                 isinstance(_element, type)
                 and issubclass(_element, _FiniteElement)
                 and _element != _FiniteElement
+                and len(_element.names) > 0
             ):
                 if _element not in _elementlist:
                     _elementlist.append(_element)
@@ -46,7 +47,8 @@ def create_reference(cell_type, vertices=None):
     ----------
     cell_type : str
         The reference cell type.
-        Supported values: interval, triangle, quadrilateral, tetrahedron, hexahedron
+        Supported values: interval, triangle, quadrilateral, tetrahedron, hexahedron,
+        dual polygon(number_of_triangles)
     vertices : list
         The vertices of the reference.
     """
@@ -70,6 +72,11 @@ def create_reference(cell_type, vertices=None):
         if vertices is not None:
             return _references.Hexahedron(vertices)
         return _references.Hexahedron()
+    elif cell_type.startswith("dual polygon"):
+        n_tri = int(cell_type.split("(")[1].split(")")[0])
+        if vertices is not None:
+            return _references.DualPolygon(n_tri, vertices)
+        return _references.DualPolygon(n_tri)
     else:
         raise ValueError(f"Unknown cell type: {cell_type}")
 
@@ -81,7 +88,8 @@ def create_element(cell_type, element_type, order):
     ----------
     cell_type : str
         The reference cell type.
-        Supported values: interval, triangle, quadrilateral, tetrahedron, hexahedron
+        Supported values: interval, triangle, quadrilateral, tetrahedron, hexahedron,
+        dual polygon(number_of_triangles)
     element_type : str
         The type of the element.
         Supported values: Crouzeix-Raviart, CR, discontinuous Lagrange, dP, DP,
@@ -90,14 +98,15 @@ def create_element(cell_type, element_type, order):
         vector Lagrange, vP, Regge, Nedelec, Nedelec1, N1curl, Nedelec2, N2curl,
         Raviart-Thomas, RT, N1div, dQ, NCE, RTCE, Qcurl, Q, NCF, RTCF, Qdiv, vector Q,
         vQ, Brezzi-Douglas-Marini, BDM, N2div, Morley, Hermite, Mardal-Tai-Winther,
-        MTW, Argyris, bubble
+        MTW, Argyris, bubble, dual, Buffa-Christiansen, BC, rotated Buffa-Christiansen,
+        RBC
     order : int
         The order of the element.
     """
     reference = create_reference(cell_type)
 
     if element_type in _elementmap:
-        assert cell_type in _elementmap[element_type].references
+        assert cell_type.split("(")[0] in _elementmap[element_type].references
         return _elementmap[element_type](reference, order)
 
     raise ValueError(f"Unsupported element type: {element_type}")

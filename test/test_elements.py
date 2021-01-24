@@ -20,13 +20,17 @@ def all_symequal(a, b):
             if not all_symequal(i, j):
                 return False
         return True
-    return sympy.expand(a) == sympy.expand(b)
+    return sympy.expand(sympy.simplify(a)) == sympy.expand(sympy.simplify(b))
 
 
-def elements(max_order=5):
+def elements(max_order=5, include_dual=True, include_non_dual=True):
     out = []
     for e in _elementlist:
         for r in e.references:
+            if r == "dual polygon" and not include_dual:
+                continue
+            if r != "dual polygon" and not include_non_dual:
+                continue
             if hasattr(e, "min_order"):
                 min_o = e.min_order
                 if isinstance(min_o, dict):
@@ -40,12 +44,19 @@ def elements(max_order=5):
             else:
                 max_o = 100
             for order in range(min_o, min(max_order, max_o) + 1):
-                out.append((r, e.names[0], order))
+                if r == "dual polygon":
+                    for n_tri in range(3, 7):
+                        out.append((f"{r}({n_tri})", e.names[0], order))
+                else:
+                    out.append((r, e.names[0], order))
     return out
 
 
-@pytest.mark.parametrize(("cell_type", "element_type", "order"), elements(max_order=5))
+@pytest.mark.parametrize(("cell_type", "element_type", "order"),
+                         elements(max_order=5, include_dual=False))
 def test_element_functionals(cell_type, element_type, order):
+    if not cell_type.startswith("dual polygon"):
+        pytest.skip()
     try:
         signal.signal(signal.SIGALRM, handler)
         signal.alarm(20)
@@ -62,7 +73,8 @@ def test_element_functionals(cell_type, element_type, order):
         pytest.skip(f"Testing {element_type} on {cell_type} timed out for order {order}.")
 
 
-@pytest.mark.parametrize(("cell_type", "element_type", "order"), elements(max_order=3))
+@pytest.mark.parametrize(("cell_type", "element_type", "order"),
+                         elements(max_order=3, include_dual=False))
 def test_element_continuity(cell_type, element_type, order):
     try:
         if cell_type == "interval":
@@ -137,3 +149,17 @@ def test_element_continuity(cell_type, element_type, order):
 
     except TimeOutTheTest:
         pytest.skip(f"Testing {element_type} on {cell_type} timed out for order {order}.")
+
+
+@pytest.mark.parametrize("n_tri", [3, 4, 6, 8])
+@pytest.mark.parametrize("order", range(2))
+def test_dual_elements(n_tri, order):
+    space = create_element(f"dual polygon({n_tri})", "dual", order)
+
+    sub_e = create_element("triangle", space.fine_space, space.order)
+    for f, coeff_list in zip(space.get_basis_functions(), space.dual_coefficients):
+        for piece, coeffs in zip(f.pieces, coeff_list):
+            map = sub_e.reference.get_map_to(piece[0])
+            for dof, value in zip(sub_e.dofs, coeffs):
+                point = subs(map, x, dof.point)
+                assert all_symequal(value, subs(piece[1], x, point))

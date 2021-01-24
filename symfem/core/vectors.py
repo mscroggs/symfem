@@ -69,3 +69,22 @@ def _vcross3d(v, w):
 def vnormalise(v):
     """Normalise a vector."""
     return vdiv(v, vnorm(v))
+
+
+def point_in_triangle(point, triangle):
+    """Check if a point is inside a triangle."""
+    v0 = vsub(triangle[2], triangle[0])
+    v1 = vsub(triangle[1], triangle[0])
+    v2 = vsub(point, triangle[0])
+
+    dot00 = vdot(v0, v0)
+    dot01 = vdot(v0, v1)
+    dot02 = vdot(v0, v2)
+    dot11 = vdot(v1, v1)
+    dot12 = vdot(v1, v2)
+
+    det = (dot00 * dot11 - dot01 * dot01)
+    u = (dot11 * dot02 - dot01 * dot12) / det
+    v = (dot00 * dot12 - dot01 * dot02) / det
+
+    return u >= 0 and v >= 0 and u + v < 1

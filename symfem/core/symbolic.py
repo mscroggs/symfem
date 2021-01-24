@@ -13,6 +13,8 @@ _dummy = [sympy.Symbol("symbolicpyDUMMYx"), sympy.Symbol("symbolicpyDUMMYy"),
 
 def subs(f, vars, values):
     """Substitute values into a sympy expression."""
+    if isinstance(f, PiecewiseFunction):
+        return f.evaluate(values)
     try:
         return tuple(subs(f_j, vars, values) for f_j in f)
     except TypeError:
@@ -34,3 +36,20 @@ def sym_sum(ls):
     for i in ls:
         out += i
     return out
+
+
+class PiecewiseFunction:
+    """A function defined piecewise on a collection of triangles."""
+
+    def __init__(self, pieces):
+        self.pieces = pieces
+
+    def evaluate(self, values):
+        """Evaluate a function."""
+        from .vectors import point_in_triangle
+
+        for tri, value in self.pieces:
+            if point_in_triangle(values[:2], tri):
+                return subs(value, x, values)
+
+        raise NotImplementedError("Evaluation of piecewise functions outside domain not supported.")

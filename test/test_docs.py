@@ -72,11 +72,4 @@ def test_snippets(script, output):
 
     actual_output = redirected_output.getvalue().strip()
     actual_output = re.sub(r"at 0x[^\>]+\>", "at 0x{ADDRESS}>", actual_output)
-    print("------------------------------")
-    print(script)
-    print("------------------------------")
-    print(output)
-    print("------------------------------")
-    print(actual_output)
-    print("------------------------------")
     assert actual_output == output
