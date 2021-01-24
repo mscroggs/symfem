@@ -20,7 +20,7 @@ def all_symequal(a, b):
             if not all_symequal(i, j):
                 return False
         return True
-    return sympy.expand(a) == sympy.expand(b)
+    return sympy.expand(sympy.simplify(a)) == sympy.expand(sympy.simplify(b))
 
 
 def elements(max_order=5, include_dual=True, include_non_dual=True):
@@ -151,9 +151,15 @@ def test_element_continuity(cell_type, element_type, order):
         pytest.skip(f"Testing {element_type} on {cell_type} timed out for order {order}.")
 
 
-@pytest.mark.parametrize(("cell_type", "element_type", "order"),
-                         elements(max_order=3, include_dual=True, include_non_dual=False))
-def test_dual_elements(cell_type, element_type, order):
-    space = create_element(cell_type, element_type, order)
+@pytest.mark.parametrize("n_tri", [3, 4, 6, 8])
+@pytest.mark.parametrize("order", range(2))
+def test_dual_elements(n_tri, order):
+    space = create_element(f"dual polygon({n_tri})", "dual", order)
 
-    print(space.get_basis_functions())
+    sub_e = create_element("triangle", space.fine_space, space.order)
+    for f, coeff_list in zip(space.get_basis_functions(), space.dual_coefficients):
+        for piece, coeffs in zip(f.pieces, coeff_list):
+            map = sub_e.reference.get_map_to(piece[0])
+            for dof, value in zip(sub_e.dofs, coeffs):
+                point = subs(map, x, dof.point)
+                assert all_symequal(value, subs(piece[1], x, point))
