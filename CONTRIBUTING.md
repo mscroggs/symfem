@@ -15,3 +15,7 @@ If you want to contribute, but are unsure where to start, have a look at the
 
 On opening a pull request, unit tests and flake8 style checks will run. You can click on these in the pull request
 to see where (if anywhere) there are errors in your code.
+
+## Code of conduct
+We expect all our contributors to follow [the Contributor Covenant](CODE_OF_CONDUCT.md). Any unacceptable
+behaviour can be reported to Matthew (symfem@mscroggs.co.uk).
