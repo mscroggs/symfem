@@ -40,3 +40,13 @@ jobs:
       uses: pypa/gh-action-pypi-publish@master
       with:
         password: ${{ secrets.pypi_password }}
+
+  trigger-read-the-docs:
+    name: Trigger Read the Docs build
+    needs: check-and-correct-version
+    steps:
+    - uses: dfm/rtds-action@v1
+      with:
+        webhook_url: ${{ secrets.RTDS_WEBHOOK_URL }}
+        webhook_token: ${{ secrets.RTDS_WEBHOOK_TOKEN }}
+        commit_ref: ${{ github.ref }}
