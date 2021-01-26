@@ -48,4 +48,4 @@ jobs:
     steps:
     - name: Trigger Read the Docs build
       run: |
-        curl -X POST -H "Authorization: Token ${{ secrets.RTDS_WEBHOOK_TOKEN }}" https://readthedocs.org/api/v3/projects/symfem/versions/stable/builds/
+        curl -X POST -H "Authorization: Token ${{ secrets.RTDS_TOKEN }}" https://readthedocs.org/api/v3/projects/symfem/versions/stable/builds/
