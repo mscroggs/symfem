@@ -46,8 +46,4 @@ jobs:
     needs: check-and-correct-version
     runs-on: ubuntu-20.04
     steps:
-    - uses: dfm/rtds-action@v1
-      with:
-        webhook_url: ${{ secrets.RTDS_WEBHOOK_URL }}
-        webhook_token: ${{ secrets.RTDS_WEBHOOK_TOKEN }}
-        commit_ref: ${{ github.ref }}
+    - run: curl -X POST -H "Authorization: Token ${{ secrets.RTDS_WEBHOOK_TOKEN }}" https://readthedocs.org/api/v3/projects/symfem/versions/stable/builds/
