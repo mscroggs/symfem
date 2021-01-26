@@ -44,6 +44,7 @@ jobs:
   trigger-read-the-docs:
     name: Trigger Read the Docs build
     needs: check-and-correct-version
+    runs-on: ubuntu-20.04
     steps:
     - uses: dfm/rtds-action@v1
       with:
