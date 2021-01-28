@@ -23,11 +23,7 @@ Using Symfem
 
 Finite elements
 ---------------
-Finite elements can be created in symfem using the `create_element` function:
-
-.. autofunction:: symfem.create_element
-    :noindex:
-
+Finite elements can be created in symfem using the :function:`symfem.create_element` function.
 For example, some elements are created in the following snippet:
 
 .. code-block:: python
@@ -100,11 +96,7 @@ Reference elements can be obtained from a :class:`symfem.core.finite_element.Fin
     lagrange = symfem.create_element("triangle", "Lagrange", 1)
     reference = lagrange.reference
 
-Alternatively, reference elements can be created using the `create_reference` function.
-
-.. autofunction:: symfem.create_reference
-    :noindex:
-
+Alternatively, reference elements can be created using the :function:`symfem.create_reference` function.
 For example:
 
 .. code-block:: python
