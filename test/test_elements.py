@@ -54,8 +54,13 @@ def elements(max_order=5, include_dual=True, include_non_dual=True):
 
 @pytest.mark.parametrize(("cell_type", "element_type", "order"),
                          elements(max_order=5, include_dual=False))
-def test_element_functionals(cell_type, element_type, order):
-    if not cell_type.startswith("dual polygon"):
+def test_element_functionals(elements_to_test, cells_to_test, cell_type, element_type, order):
+    if elements_to_test != "ALL" and element_type not in elements_to_test:
+        pytest.skip()
+    if cells_to_test != "ALL" and cell_type not in cells_to_test:
+        pytest.skip()
+
+    if cell_type.startswith("dual polygon"):
         pytest.skip()
     try:
         signal.signal(signal.SIGALRM, handler)
@@ -75,7 +80,12 @@ def test_element_functionals(cell_type, element_type, order):
 
 @pytest.mark.parametrize(("cell_type", "element_type", "order"),
                          elements(max_order=3, include_dual=False))
-def test_element_continuity(cell_type, element_type, order):
+def test_element_continuity(elements_to_test, cells_to_test, cell_type, element_type, order):
+    if elements_to_test != "ALL" and element_type not in elements_to_test:
+        pytest.skip()
+    if cells_to_test != "ALL" and cell_type not in cells_to_test:
+        pytest.skip()
+
     try:
         if cell_type == "interval":
             vertices = ((-1, ), (0, ))
