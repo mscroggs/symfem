@@ -51,4 +51,4 @@ class MardalTaiWinther(FiniteElement):
     min_order = 3
     max_order = 3
     mapping = "contravariant"
-    continuity = "L2"
+    continuity = "H(div)"

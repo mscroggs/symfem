@@ -11,7 +11,6 @@ def pytest_addoption(parser):
 @pytest.fixture
 def elements_to_test(request):
     data = request.config.getoption("--elements-to-test")
-    print(data)
     if data == "ALL":
         return "ALL"
     return data.split(",")
@@ -20,7 +19,6 @@ def elements_to_test(request):
 @pytest.fixture
 def cells_to_test(request):
     data = request.config.getoption("--cells-to-test")
-    print(data)
     if data == "ALL":
         return "ALL"
     return data.split(",")
