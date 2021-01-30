@@ -45,7 +45,7 @@ def test_MTW_space(reference):
 @pytest.mark.parametrize("reference", ["triangle", "quadrilateral",
                                        "tetrahedron", "hexahedron"])
 @pytest.mark.parametrize("order", range(1, 5))
-def test_bdfm_space(reference, order):
+def test_BDFM_space(reference, order):
     e = create_element(reference, "BDFM", order)
     polynomials = e.get_polynomial_basis()
     tdim = e.reference.tdim
