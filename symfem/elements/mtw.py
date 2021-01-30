@@ -29,7 +29,7 @@ class MardalTaiWinther(FiniteElement):
                     (-x[0] ** 3 + 2 * x[0] ** 2 + 3 * x[0] * x[1] ** 2,
                      3 * x[0] ** 2 * x[1] - 4 * x[0] * x[1] - x[1] ** 3),
                     # (2*x**2*y + x**2 + 3*x*y**2, -2*x*y**2 - 2*x*y - y**3)
-                    (2 * x[0] ** 2 * x[1] + x[0] ** 2 + 3 * x[0] * x[1] **2,
+                    (2 * x[0] ** 2 * x[1] + x[0] ** 2 + 3 * x[0] * x[1] ** 2,
                      -2 * x[0] * x[1] ** 2 - 2 * x[0] * x[1] - x[1] ** 3)]
             dofs += make_integral_moment_dofs(
                 reference, facets=(TangentIntegralMoment, DiscontinuousLagrange, 0))
