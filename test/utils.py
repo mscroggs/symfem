@@ -4,7 +4,8 @@ from symfem import _elementlist
 # Set the max orders for elements that are slow to get basis functions for
 max_orders_getting_basis = {
     "triangle": {
-        "Brezzi-Douglas-Marini": 4,
+        "Brezzi-Douglas-Fortin-Marini": 3,
+        "Brezzi-Douglas-Marini": 3,
         "Nedelec": 3,
         "Nedelec2": 3,
         "Regge": 3,
@@ -13,13 +14,13 @@ max_orders_getting_basis = {
         "vector discontinuous Lagrange": 4,
     },
     "tetrahedron": {
-        "Brezzi-Douglas-Fortin-Marini": 3,
-        "Brezzi-Douglas-Marini": 3,
+        "Brezzi-Douglas-Fortin-Marini": 2,
+        "Brezzi-Douglas-Marini": 2,
         "Lagrange": 4,
-        "Nedelec": 3,
-        "Nedelec2": 3,
-        "Raviart-Thomas": 3,
-        "Regge": 3,
+        "Nedelec": 2,
+        "Nedelec2": 2,
+        "Raviart-Thomas": 2,
+        "Regge": 2,
         "vector Lagrange": 3,
         "vector discontinuous Lagrange": 3,
     },
@@ -32,9 +33,9 @@ max_orders_getting_basis = {
         "serendipity Hcurl": 3,
     },
     "hexahedron": {
-        "Brezzi-Douglas-Fortin-Marini": 3,
-        "NCE": 3,
-        "NCF": 3,
+        "Brezzi-Douglas-Fortin-Marini": 2,
+        "NCE": 2,
+        "NCF": 2,
         "Q": 3,
         "dQ": 3,
         "vector Q": 3,
