@@ -9,6 +9,7 @@ from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
 
 
 def bdfm_polyset(reference, order):
+    """Create the polynomial basis for a BDFM element."""
     dim = reference.tdim
     pset = []
     if reference.name == "quadrilateral":
