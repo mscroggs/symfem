@@ -33,6 +33,7 @@ max_orders_getting_basis = {
         "serendipity Hcurl": 3,
     },
     "hexahedron": {
+        "Brezzi-Douglas-Duran-Fortin": 2,
         "Brezzi-Douglas-Fortin-Marini": 2,
         "NCE": 2,
         "NCF": 2,
