@@ -77,7 +77,6 @@ def elements(max_order=5, include_dual=True, include_non_dual=True,
                     max_o = max_o[r]
             else:
                 max_o = 100
-            print(r, e.names[0])
             if r in max_orders_getting_basis and e.names[0] in max_orders_getting_basis[r]:
                 max_o = min(max_orders_getting_basis[r][e.names[0]], max_o)
 
