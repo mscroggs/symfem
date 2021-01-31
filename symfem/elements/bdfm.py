@@ -1,4 +1,4 @@
-"""Brezzi-Douglas-Fortin-Marini and Brezzi-Douglas-Duran-Fortin elements."""
+"""Brezzi-Douglas-Fortin-Marini elements."""
 
 from ..core.finite_element import FiniteElement
 from ..core.moments import make_integral_moment_dofs

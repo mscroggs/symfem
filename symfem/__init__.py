@@ -99,7 +99,7 @@ def create_element(cell_type, element_type, order):
         Raviart-Thomas, RT, N1div, dQ, NCE, RTCE, Qcurl, Q, NCF, RTCF, Qdiv, vector Q,
         vQ, Brezzi-Douglas-Marini, BDM, N2div, Morley, Hermite, Mardal-Tai-Winther,
         MTW, Argyris, bubble, dual, Buffa-Christiansen, BC, rotated Buffa-Christiansen,
-        RBC, Brezzi-Douglas-Fortin-Marini, BDFM
+        RBC, Brezzi-Douglas-Fortin-Marini, BDFM, Brezzi-Douglas-Duran-Fortin, BDDF
     order : int
         The order of the element.
     """
