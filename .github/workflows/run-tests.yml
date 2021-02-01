@@ -34,7 +34,6 @@ jobs:
       - run: |
             git clone https://github.com/FEniCS/basix.git basix-src
             cd basix-src
-            git checkout mscroggs/qdivcurl
             pip install .
         name: Install basix
       - run: python3 -m pytest -n=auto --durations=50 test
