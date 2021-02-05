@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - "**"
-  pull-request:
+  pull_request:
     branches:
       - master
   schedule:
