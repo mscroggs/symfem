@@ -20,9 +20,11 @@ elements = {
                     ("Crouzeix-Raviart", "Crouzeix-Raviart", [1])],
     "quadrilateral": [("Q", "Lagrange", range(1, 4)),
                       ("dQ", "Discontinuous Lagrange", range(1, 4)),
-                      ("Qdiv", "RTC", range(1, 4)), ("Qcurl", "NCE", range(1, 4))],
+                      ("Qdiv", "Raviart-Thomas", range(1, 4)),
+                      ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 4))],
     "hexahedron": [("Q", "Lagrange", range(1, 3)), ("dQ", "Discontinuous Lagrange", range(1, 3)),
-                   ("Qdiv", "RTC", range(1, 3)), ("Qcurl", "NCE", range(1, 3))]
+                   ("Qdiv", "Raviart-Thomas", range(1, 3)),
+                   ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 3))]
 }
 
 

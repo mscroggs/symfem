@@ -2,6 +2,7 @@
 [![Documentation status](https://readthedocs.org/projects/symfem/badge/?version=latest)](https://symfem.readthedocs.io/en/latest/?badge=latest)
 ![Style checks](https://github.com/mscroggs/symfem/workflows/.github/workflows/style-checks.yml/badge.svg)
 ![Run tests](https://github.com/mscroggs/symfem/workflows/.github/workflows/run-tests.yml/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/mscroggs/symfem/badge.svg?branch=main)](https://coveralls.io/github/mscroggs/symfem?branch=main)
 
 ## Installing Symfem
 Symfem can be installed by downloading the [GitHub repo](https://github.com/mscroggs/symfem)
