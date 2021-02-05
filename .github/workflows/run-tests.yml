@@ -43,6 +43,6 @@ jobs:
         name: Install basix
       - run: |
           export GITHUB_TOKEN=${{ secrets.coverall_token }}
-          coverage run --source symfem -m pytest -n=auto --durations=50 test
+          coverage run --source symfem -m pytest --durations=50 test
           coveralls
         name: Run unit tests
