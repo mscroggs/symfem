@@ -2,6 +2,7 @@ name: 🧪
 
 on:
   push:
+  pull-request:
   schedule:
     - cron: "0 7 * * 1"
 
@@ -37,6 +38,7 @@ jobs:
             pip install .
         name: Install basix
       - run: |
+          export GITHUB_TOKEN=${{ secrets.coverall_token }}
           coverage run --source symfem -m pytest -n=auto --durations=50 test
           coveralls
         name: Run unit tests
