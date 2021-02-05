@@ -21,7 +21,7 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y libeigen3-dev
             pip install --upgrade pip
-            pip install scikit-build pytest numpy scipy
+            pip install scikit-build pytest numpy scipy coverage coveralls
             pip install pytest-xdist
         name: Install dependencies
       - uses: actions/checkout@v2
@@ -36,5 +36,7 @@ jobs:
             cd basix-src
             pip install .
         name: Install basix
-      - run: python3 -m pytest -n=auto --durations=50 test
+      - run: |
+          coverage run --source symfem -m pytest -n=auto --durations=50 test
+          coveralls
         name: Run unit tests
