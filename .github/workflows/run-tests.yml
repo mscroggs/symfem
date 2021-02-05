@@ -43,7 +43,7 @@ jobs:
       - run: python3 -m pytest --cov=symfem/ --durations=50 test/
         name: Run unit tests
       - name: Upload to Coveralls
-        if: ${{ github.repository == 'mscroggs/symfem' && github.head_ref == '' && matrix.python-version == '3.8' }}
+        if: ${{ github.repository == 'mscroggs/symfem' && matrix.python-version == '3.8' }}
         env:
           GITHUB_TOKEN: ${{ secrets.coverall_token }}
         run: coveralls
