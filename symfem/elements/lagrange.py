@@ -153,7 +153,7 @@ class MatrixDiscontinuousLagrange(FiniteElement):
             directions = [1]
         else:
             directions = [
-                tuple(one if i == j else zero for j in range(reference.tdim))
+                tuple(one if i == j else zero for j in range(reference.tdim ** 2))
                 for i in range(reference.tdim ** 2)
             ]
         for p in scalar_space.dofs:
@@ -170,7 +170,7 @@ class MatrixDiscontinuousLagrange(FiniteElement):
         )
 
     names = ["matrix discontinuous Lagrange"]
-    references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
+    references = ["triangle", "tetrahedron", "quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
     mapping = "identity"
@@ -214,7 +214,7 @@ class SymmetricMatrixDiscontinuousLagrange(FiniteElement):
         )
 
     names = ["symmetric matrix discontinuous Lagrange"]
-    references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
+    references = ["triangle", "tetrahedron", "quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
     mapping = "identity"
