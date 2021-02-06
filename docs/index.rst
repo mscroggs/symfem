@@ -183,7 +183,7 @@ representing a subentity:
 ::
 
     ['point', 'interval', 'triangle', None]
-    [(1, 0), (0, 1)]
+    ((1, 0), (0, 1))
 
 Documentation index
 ===================

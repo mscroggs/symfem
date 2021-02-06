@@ -12,6 +12,9 @@ max_orders_getting_basis = {
         "Raviart-Thomas": 3,
         "vector Lagrange": 4,
         "vector discontinuous Lagrange": 4,
+        "matrix discontinuous Lagrange": 4,
+        "symmetric matrix discontinuous Lagrange": 4,
+        "Hellan-Herrmann-Johnson": 2,
     },
     "tetrahedron": {
         "Brezzi-Douglas-Fortin-Marini": 2,
@@ -23,6 +26,8 @@ max_orders_getting_basis = {
         "Regge": 2,
         "vector Lagrange": 3,
         "vector discontinuous Lagrange": 3,
+        "matrix discontinuous Lagrange": 2,
+        "symmetric matrix discontinuous Lagrange": 2,
     },
     "quadrilateral": {
         "Brezzi-Douglas-Fortin-Marini": 3,
@@ -31,6 +36,10 @@ max_orders_getting_basis = {
         "serendipity": 4,
         "serendipity Hdiv": 3,
         "serendipity Hcurl": 3,
+        "vector Lagrange": 3,
+        "vector discontinuous Lagrange": 3,
+        "matrix discontinuous Lagrange": 2,
+        "symmetric matrix discontinuous Lagrange": 2,
     },
     "hexahedron": {
         "Brezzi-Douglas-Duran-Fortin": 2,
@@ -44,6 +53,8 @@ max_orders_getting_basis = {
         "serendipity Hdiv": 2,
         "serendipity Hcurl": 2,
         "vector discontinuous Lagrange": 3,
+        "matrix discontinuous Lagrange": 2,
+        "symmetric matrix discontinuous Lagrange": 2,
     }
 }
 

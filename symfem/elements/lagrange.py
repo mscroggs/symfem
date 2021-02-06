@@ -141,3 +141,80 @@ class VectorDiscontinuousLagrange(FiniteElement):
     min_order = 0
     continuity = "L2"
     mapping = "identity"
+
+
+class MatrixDiscontinuousLagrange(FiniteElement):
+    """Matrix Lagrange finite element."""
+
+    def __init__(self, reference, order):
+        scalar_space = DiscontinuousLagrange(reference, order)
+        dofs = []
+        if reference.tdim == 1:
+            directions = [1]
+        else:
+            directions = [
+                tuple(one if i == j else zero for j in range(reference.tdim ** 2))
+                for i in range(reference.tdim ** 2)
+            ]
+        for p in scalar_space.dofs:
+            for d in directions:
+                dofs.append(DotPointEvaluation(p.point, d, entity=p.entity))
+
+        super().__init__(
+            reference, order,
+            polynomial_set(reference.tdim, reference.tdim ** 2, order),
+            dofs,
+            reference.tdim,
+            reference.tdim ** 2,
+            (reference.tdim, reference.tdim),
+        )
+
+    names = ["matrix discontinuous Lagrange"]
+    references = ["triangle", "tetrahedron", "quadrilateral", "hexahedron"]
+    min_order = 0
+    continuity = "L2"
+    mapping = "identity"
+
+
+class SymmetricMatrixDiscontinuousLagrange(FiniteElement):
+    """Symmetric matrix Lagrange finite element."""
+
+    def __init__(self, reference, order):
+        if reference.tdim == 1:
+            poly = polynomial_set(1, 1, order)
+            directions = [1]
+        elif reference.tdim == 2:
+            poly = [(a[0], a[1], a[1], a[2]) for a in polynomial_set(2, 3, order)]
+            directions = [(one, zero, zero, zero), (zero, one, zero, zero),
+                          (zero, zero, zero, one)]
+        else:
+            assert reference.tdim == 3
+            poly = [(a[0], a[1], a[2],
+                     a[1], a[3], a[4],
+                     a[2], a[4], a[5]) for a in polynomial_set(3, 6, order)]
+            directions = [(one, zero, zero, zero, zero, zero, zero, zero, zero),
+                          (zero, one, zero, zero, zero, zero, zero, zero, zero),
+                          (zero, zero, one, zero, zero, zero, zero, zero, zero),
+                          (zero, zero, zero, zero, one, zero, zero, zero, zero),
+                          (zero, zero, zero, zero, zero, one, zero, zero, zero),
+                          (zero, zero, zero, zero, zero, zero, zero, zero, one)]
+
+        scalar_space = DiscontinuousLagrange(reference, order)
+        dofs = []
+        for p in scalar_space.dofs:
+            for d in directions:
+                dofs.append(DotPointEvaluation(p.point, d, entity=p.entity))
+
+        super().__init__(
+            reference, order,
+            poly, dofs,
+            reference.tdim,
+            reference.tdim ** 2,
+            (reference.tdim, reference.tdim),
+        )
+
+    names = ["symmetric matrix discontinuous Lagrange"]
+    references = ["triangle", "tetrahedron", "quadrilateral", "hexahedron"]
+    min_order = 0
+    continuity = "L2"
+    mapping = "identity"
