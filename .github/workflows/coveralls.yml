@@ -2,11 +2,9 @@ name: 🥼
 
 on:
   pull_request:
-    branches:
-      - master
   push:
     branches:
-      - master
+      - main
 
 jobs:
   coveralls:
