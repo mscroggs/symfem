@@ -92,14 +92,16 @@ def create_element(cell_type, element_type, order):
         dual polygon(number_of_triangles)
     element_type : str
         The type of the element.
-        Supported values: Crouzeix-Raviart, CR, discontinuous Lagrange, dP, DP,
-        serendipity, S, serendipity Hcurl, Scurl, BDMCE, AAE, serendipity Hdiv, Sdiv,
-        BDMCF, AAF, vector discontinuous Lagrange, vdP, vDP, Lagrange, P,
-        vector Lagrange, vP, Regge, Nedelec, Nedelec1, N1curl, Nedelec2, N2curl,
-        Raviart-Thomas, RT, N1div, dQ, NCE, RTCE, Qcurl, Q, NCF, RTCF, Qdiv, vector Q,
-        vQ, Brezzi-Douglas-Marini, BDM, N2div, Morley, Hermite, Mardal-Tai-Winther,
-        MTW, Argyris, bubble, dual, Buffa-Christiansen, BC, rotated Buffa-Christiansen,
-        RBC, Brezzi-Douglas-Fortin-Marini, BDFM, Brezzi-Douglas-Duran-Fortin, BDDF
+        Supported values: Lagrange, P, discontinuous Lagrange, dP, DP,
+        vector Lagrange, vP, vector discontinuous Lagrange, vdP, vDP,
+        matrix discontinuous Lagrange, symmetric matrix discontinuous Lagrange,
+        Crouzeix-Raviart, CR, serendipity, S, serendipity Hcurl, Scurl, BDMCE, AAE,
+        serendipity Hdiv, Sdiv, BDMCF, AAF,  Regge, Nedelec, Nedelec1, N1curl, Nedelec2,
+        N2curl, Raviart-Thomas, RT, N1div, dQ, NCE, RTCE, Qcurl, Q, NCF, RTCF, Qdiv,
+        vector Q, vQ, Brezzi-Douglas-Marini, BDM, N2div, Morley, Hermite,
+        Mardal-Tai-Winther, MTW, Argyris, bubble, dual, Buffa-Christiansen, BC,
+        rotated Buffa-Christiansen, RBC, Brezzi-Douglas-Fortin-Marini, BDFM,
+        Brezzi-Douglas-Duran-Fortin, BDDF, Hellan-Herrmann-Johnson, HHJ
     order : int
         The order of the element.
     """
