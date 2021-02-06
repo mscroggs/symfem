@@ -1,44 +1,38 @@
-name: 🧪
+name: 🥼
 
 on:
+  pull_request:
   push:
     branches:
-      - "**"
-  pull_request:
-    branches:
       - master
-  schedule:
-    - cron: "0 7 * * 1"
 
 jobs:
-  run-tests:
-    name: Run tests
+  coveralls:
+    name: Run coverage checks
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.7, 3.8]
     steps:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.8
       - run: |
             sudo apt-get update
             sudo apt-get install -y libeigen3-dev
             pip install --upgrade pip
-            pip install scikit-build pytest numpy scipy pytest-xdist
+            pip install scikit-build pytest numpy scipy coverage coveralls pytest-cov pytest-xdist
         name: Install dependencies
       - uses: actions/checkout@v2
       - run: python3 -m pip install -r requirements.txt
         name: Install requirements.txt
       - run: |
-            python3 setup.py install
-            rm -rf symfem
-        name: Install symfem
-      - run: |
             git clone https://github.com/FEniCS/basix.git basix-src
             cd basix-src
             pip install .
         name: Install basix
-      - run: python3 -m pytest -n=auto --durations=50 test/
+      - run: python3 -m pytest -n=auto --cov=symfem --durations=50 test/
         name: Run unit tests
+      - name: Upload to Coveralls
+        if: ${{ github.repository == 'mscroggs/symfem' }}
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.coverall_token }}
+        run: coveralls
