@@ -89,6 +89,9 @@ def test_element_functionals_and_continuity(elements_to_test, cells_to_test,
                         assert dim == 2
                         f = [f[4], f[8]]
                         g = [g[4], g[8]]
+            elif space.continuity == "inner H(div)":
+                f = f[0]
+                g = g[0]
             else:
                 raise ValueError(f"Unknown continuity: {space.continuity}")
 

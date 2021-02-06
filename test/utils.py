@@ -12,6 +12,7 @@ max_orders_getting_basis = {
         "Raviart-Thomas": 3,
         "vector Lagrange": 4,
         "vector discontinuous Lagrange": 4,
+        "Hellan-Herrmann-Johnson": 2,
     },
     "tetrahedron": {
         "Brezzi-Douglas-Fortin-Marini": 2,

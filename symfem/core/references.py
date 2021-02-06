@@ -104,7 +104,7 @@ class Interval(Reference):
         self.origin = vertices[0]
         self.axes = (vsub(vertices[1], vertices[0]),)
         self.reference_vertices = ((0,), (1,))
-        self.vertices = vertices
+        self.vertices = tuple(vertices)
         self.edges = ((0, 1),)
         self.faces = tuple()
         self.volumes = tuple()
@@ -137,7 +137,7 @@ class Triangle(Reference):
         self.origin = vertices[0]
         self.axes = (vsub(vertices[1], vertices[0]), vsub(vertices[2], vertices[0]))
         self.reference_vertices = ((0, 0), (1, 0), (0, 1))
-        self.vertices = vertices
+        self.vertices = tuple(vertices)
         self.edges = ((1, 2), (0, 2), (0, 1))
         self.faces = ((0, 1, 2),)
         self.volumes = tuple()
@@ -180,7 +180,7 @@ class Tetrahedron(Reference):
             vsub(vertices[3], vertices[0]),
         )
         self.reference_vertices = ((0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1))
-        self.vertices = vertices
+        self.vertices = tuple(vertices)
         self.edges = ((2, 3), (1, 3), (1, 2), (0, 3), (0, 2), (0, 1))
         self.faces = ((1, 2, 3), (0, 2, 3), (0, 1, 3), (0, 1, 2))
         self.volumes = ((0, 1, 2, 3),)
@@ -225,7 +225,7 @@ class Quadrilateral(Reference):
         self.origin = vertices[0]
         self.axes = (vsub(vertices[1], vertices[0]), vsub(vertices[2], vertices[0]))
         self.reference_vertices = ((0, 0), (1, 0), (0, 1), (1, 1))
-        self.vertices = vertices
+        self.vertices = tuple(vertices)
         self.edges = ((0, 1), (0, 2), (1, 3), (2, 3))
         self.faces = ((0, 1, 2, 3),)
         self.volumes = tuple()
@@ -272,7 +272,7 @@ class Hexahedron(Reference):
         self.reference_vertices = (
             (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0),
             (0, 0, 1), (1, 0, 1), (0, 1, 1), (1, 1, 1))
-        self.vertices = vertices
+        self.vertices = tuple(vertices)
         self.edges = (
             (0, 1), (0, 2), (0, 4), (1, 3), (1, 5), (2, 3),
             (2, 6), (3, 7), (4, 5), (4, 6), (5, 7), (6, 7))
