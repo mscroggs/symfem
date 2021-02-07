@@ -102,18 +102,19 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
 class PointInnerProduct(BaseFunctional):
     """An evaluation of an inner product at a point."""
 
-    def __init__(self, point, vec, entity=(None, None)):
+    def __init__(self, point, lvec, rvec, entity=(None, None)):
         super().__init__(entity)
         self.point = point
-        self.vec = vec
+        self.lvec = lvec
+        self.rvec = rvec
 
     def eval(self, function):
         """Apply to the functional to a function."""
         v = subs(function, x, self.point)
-        tdim = len(self.vec)
+        tdim = len(self.lvec)
         assert len(function) == tdim ** 2
-        return vdot(self.vec,
-                    tuple(vdot(v[tdim * i: tdim * (i + 1)], self.vec)
+        return vdot(self.lvec,
+                    tuple(vdot(v[tdim * i: tdim * (i + 1)], self.rvec)
                           for i in range(0, tdim)))
 
     def dof_point(self):
@@ -243,16 +244,17 @@ class NormalIntegralMoment(VecIntegralMoment):
 class InnerProductIntegralMoment(IntegralMoment):
     """An integral moment of the inner product with a vector."""
 
-    def __init__(self, reference, f, inner_with, dof, entity=(None, None)):
+    def __init__(self, reference, f, inner_with_left, inner_with_right, dof, entity=(None, None)):
         super().__init__(reference, f, dof, entity=entity)
-        self.inner_with = inner_with
+        self.inner_with_left = inner_with_left
+        self.inner_with_right = inner_with_right
 
     def dot(self, function):
         """Take the inner product of a function with the moment direction."""
-        tdim = len(self.inner_with)
-        return vdot(self.inner_with,
-                    tuple(vdot(function[tdim * i: tdim * (i + 1)], self.inner_with)
-                          for i in range(0, tdim))) * self.reference.jacobian() * self.f
+        tdim = len(self.inner_with_left)
+        return vdot(self.inner_with_left,
+                    tuple(vdot(function[tdim * i: tdim * (i + 1)], self.inner_with_right)
+                          for i in range(0, tdim))) * self.f * self.reference.jacobian()
 
     def dof_direction(self):
         """Get the direction of the DOF."""
@@ -265,6 +267,6 @@ class NormalInnerProductIntegralMoment(InnerProductIntegralMoment):
     """An integral moment of the inner product with the normal direction."""
 
     def __init__(self, reference, f, dof, entity=(None, None)):
-        super().__init__(reference, f, reference.normal(), dof, entity=entity)
+        super().__init__(reference, f, reference.normal(), reference.normal(), dof, entity=entity)
 
     name = "Normal inner product integral moment"

@@ -92,6 +92,9 @@ def test_element_functionals_and_continuity(elements_to_test, cells_to_test,
             elif space.continuity == "inner H(div)":
                 f = f[0]
                 g = g[0]
+            elif space.continuity == "integral inner H(div)":
+                f = f[0].integrate((x[1], 0, 1))
+                g = g[0].integrate((x[1], 0, 1))
             else:
                 raise ValueError(f"Unknown continuity: {space.continuity}")
 
