@@ -1,7 +1,5 @@
 """Arnold-Winther elements on simplices."""
 
-import sympy
-from itertools import product
 from ..core.finite_element import FiniteElement
 from ..core.polynomials import polynomial_set
 from ..core.functionals import (PointInnerProduct, InnerProductIntegralMoment,
