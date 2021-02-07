@@ -1,4 +1,8 @@
-"""Hermite elements on simplices."""
+"""Hermite elements on simplices.
+
+This element's definition appears in https://doi.org/10.1016/0045-7825(72)90006-0
+(Ciarlet, Raviart, 1972)
+"""
 
 from ..core.finite_element import FiniteElement
 from ..core.polynomials import polynomial_set

@@ -1,4 +1,9 @@
-"""Mardal-Tai-Winther elements on simplices."""
+"""Mardal-Tai-Winther elements on simplices.
+
+This element's definition appears in https://doi.org/10.1137/S0036142901383910
+(Mardal, Tai, Winther, 2002)
+and https://doi.org/10.1007/s10092-006-0124-6 (Tail, Mardal, 2006)
+"""
 
 from ..core.finite_element import FiniteElement
 from ..core.moments import make_integral_moment_dofs

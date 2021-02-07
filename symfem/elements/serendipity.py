@@ -1,4 +1,8 @@
-"""Serendipity elements on tensor product cells."""
+"""Serendipity elements on tensor product cells.
+
+This element's definition appears in https://doi.org/10.1007/s10208-011-9087-3
+(Arnold, Awanou, 2011)
+"""
 
 from ..core.finite_element import FiniteElement
 from ..core.moments import make_integral_moment_dofs

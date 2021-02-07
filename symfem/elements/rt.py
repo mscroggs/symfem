@@ -1,4 +1,8 @@
-"""Raviart-Thomas elements on simplices."""
+"""Raviart-Thomas elements on simplices.
+
+This element's definition appears in https://doi.org/10.1007/BF01396415
+(Nedelec, 1980)
+"""
 
 from ..core.finite_element import FiniteElement
 from ..core.moments import make_integral_moment_dofs

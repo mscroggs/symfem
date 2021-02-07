@@ -1,4 +1,9 @@
-"""Regge elements on simplices."""
+"""Regge elements on simplices.
+
+This element's definition appears in https://doi.org/10.1007/BF02733251
+(Regge, 1961) and https://doi.org/10.1007/s00211-011-0394-z
+(Christiansen, 2011)
+"""
 
 import sympy
 from itertools import product

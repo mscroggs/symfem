@@ -102,7 +102,7 @@ def create_element(cell_type, element_type, order):
         Mardal-Tai-Winther, MTW, Argyris, bubble, dual, Buffa-Christiansen, BC,
         rotated Buffa-Christiansen, RBC, Brezzi-Douglas-Fortin-Marini, BDFM,
         Brezzi-Douglas-Duran-Fortin, BDDF, Hellan-Herrmann-Johnson, HHJ,
-        Arnold-Winther, AW
+        Arnold-Winther, AW, Bell
     order : int
         The order of the element.
     """

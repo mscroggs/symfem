@@ -1,4 +1,8 @@
-"""Brezzi-Douglas-Duran-Fortin elements."""
+"""Brezzi-Douglas-Duran-Fortin elements.
+
+This element's definition appears in https://doi.org/10.1007/BF01396752
+(Brezzi, Douglas, Duran, Fortin, 1987)
+"""
 
 from ..core.finite_element import FiniteElement
 from ..core.moments import make_integral_moment_dofs
