@@ -49,7 +49,7 @@ class ArnoldWinther(FiniteElement):
                 dofs.append(VecIntegralMoment(reference, p, component, dof, (2, 0)))
         sub_e = DiscontinuousLagrange(reference, order - 4)
         for p, dof in zip(sub_e.get_basis_functions(), sub_e.dofs):
-            f = p * x[0] * x[1] * (1 - x[0] - x[1])
+            f = p * x[0] ** 2 * x[1] ** 2 * (1 - x[0] - x[1]) ** 2
             J = tuple(f.diff(x[i]).diff(x[j]) for i in range(2) for j in range(2))
             dofs.append(IntegralMoment(reference, J, dof, (2, 0)))
 
