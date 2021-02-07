@@ -47,6 +47,28 @@ class PointEvaluation(BaseFunctional):
     name = "Point evaluation"
 
 
+class DerivativePointEvaluation(BaseFunctional):
+    """A point evaluation of a given derivative."""
+
+    def __init__(self, point, derivative, entity=(None, None)):
+        super().__init__(entity)
+        self.point = point
+        self.derivative = derivative
+
+    def eval(self, function):
+        """Apply to the functional to a function."""
+        for i, j in zip(x, self.derivative):
+            for k in range(j):
+                function = function.diff(i)
+        return subs(function, x, self.point)
+
+    def dof_point(self):
+        """Get the location of the DOF in the cell."""
+        return self.point
+
+    name = "Point derivative evaluation"
+
+
 class PointDirectionalDerivativeEvaluation(BaseFunctional):
     """A point evaluation of a derivative in a fixed direction."""
 

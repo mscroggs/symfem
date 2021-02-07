@@ -63,6 +63,9 @@ def test_element_functionals_and_continuity(elements_to_test, cells_to_test,
 
             if space.continuity == "C0":
                 pass
+            elif space.continuity == "C1":
+                f = [f] + [f.diff(i) for i in x[:space.reference.tdim]]
+                g = [g] + [g.diff(i) for i in x[:space.reference.tdim]]
             elif space.continuity == "H(div)":
                 f = f[0]
                 g = g[0]
