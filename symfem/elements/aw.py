@@ -1,4 +1,8 @@
-"""Arnold-Winther elements on simplices."""
+"""Arnold-Winther elements on simplices.
+
+This element's definition appears in https://doi.org/10.1007/s002110100348
+(Arnold, Winther, 2002)
+"""
 
 from ..core.finite_element import FiniteElement
 from ..core.polynomials import polynomial_set

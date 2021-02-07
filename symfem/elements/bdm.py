@@ -1,4 +1,8 @@
-"""Brezzi-Douglas-Marini elements on simplices."""
+"""Brezzi-Douglas-Marini elements on simplices.
+
+This element's definition appears in https://doi.org/10.1007/BF01389710
+(Brezzi, Douglas, Marini, 1985)
+"""
 
 from ..core.finite_element import FiniteElement
 from ..core.moments import make_integral_moment_dofs

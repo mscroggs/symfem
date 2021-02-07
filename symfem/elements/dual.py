@@ -1,4 +1,8 @@
-"""Lagrange elements on simplices."""
+"""Dual elements.
+
+These elements' definitions appear in https://doi.org/10.1016/j.crma.2004.12.022
+(Buffa, Christiansen, 2005)
+"""
 
 import sympy
 from ..core.symbolic import sym_sum, PiecewiseFunction

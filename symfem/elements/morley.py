@@ -1,4 +1,8 @@
-"""Morley elements on simplices."""
+"""Morley elements on simplices.
+
+This element's definition appears in https://doi.org/10.1017/S0001925900004546
+(Morley, 1968)
+"""
 
 from ..core.finite_element import FiniteElement
 from ..core.polynomials import polynomial_set

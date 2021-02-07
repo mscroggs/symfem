@@ -1,4 +1,8 @@
-"""Crouzeix-Raviart elements on simplices."""
+"""Crouzeix-Raviart elements on simplices.
+
+This element's definition appears in https://doi.org/10.1051/m2an/197307R300331
+(Crouzeix, Raviart, 1973)
+"""
 
 from ..core.finite_element import FiniteElement
 from ..core.polynomials import polynomial_set

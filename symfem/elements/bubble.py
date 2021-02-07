@@ -1,4 +1,8 @@
-"""Bubble elements on simplices."""
+"""Bubble elements on simplices.
+
+This element's definition appears in https://doi.org/10.1007/978-3-642-23099-8_3
+(Kirby, Logg, Rognes, Terrel, 2012)
+"""
 
 import sympy
 from itertools import product

@@ -1,4 +1,8 @@
-"""Argyris elements on simplices."""
+"""Argyris elements on simplices.
+
+This element's definition appears in https://doi.org/10.1017/S000192400008489X
+(Arygris, Fried, Scharpf, 1968)
+"""
 
 from ..core.finite_element import FiniteElement
 from ..core.polynomials import polynomial_set

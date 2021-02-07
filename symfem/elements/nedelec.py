@@ -1,4 +1,8 @@
-"""Nedelec elements on simplices."""
+"""Nedelec elements on simplices.
+
+These elements' definitions appear in https://doi.org/10.1007/BF01396415
+(Nedelec, 1980) and https://doi.org/10.1007/BF01389668 (Nedelec, 1986)
+"""
 
 from ..core.finite_element import FiniteElement
 from ..core.moments import make_integral_moment_dofs

@@ -1,4 +1,8 @@
-"""Hellan-Herrmann-Johnson elements on simplices."""
+"""Hellan-Herrmann-Johnson elements on simplices.
+
+This element's definition appears in https://arxiv.org/abs/1909.09687
+(Arnold, Walker, 2020)
+"""
 
 from ..core.finite_element import FiniteElement
 from ..core.moments import make_integral_moment_dofs
