@@ -121,7 +121,7 @@ def test_dual_elements(n_tri, order):
 @pytest.mark.parametrize("n_tri", [3, 4, 6, 8])
 @pytest.mark.parametrize("order", range(2))
 @pytest.mark.parametrize("element_type", ["BC", "RBC"])
-def test_bc_elements(n_tri, order):
+def test_bc_elements(n_tri, order, element_type):
     space = create_element(f"dual polygon({n_tri})", element_type, order)
 
     sub_e = create_element("triangle", space.fine_space, space.order)
