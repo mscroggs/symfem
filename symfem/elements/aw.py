@@ -4,6 +4,7 @@ This element's definition appears in https://doi.org/10.1007/s002110100348
 (Arnold, Winther, 2002)
 """
 
+import sympy
 from ..core.finite_element import FiniteElement
 from ..core.polynomials import polynomial_set
 from ..core.functionals import (PointInnerProduct, InnerProductIntegralMoment,
@@ -51,9 +52,13 @@ class ArnoldWinther(FiniteElement):
                 dofs.append(VecIntegralMoment(reference, p, component, dof, (2, 0)))
         sub_e = DiscontinuousLagrange(reference, order - 4)
         for p, dof in zip(sub_e.get_basis_functions(), sub_e.dofs):
+            if sympy.Poly(p, x[:2]).degree() != order - 4:
+                continue
             f = p * x[0] ** 2 * x[1] ** 2 * (1 - x[0] - x[1]) ** 2
             J = tuple(f.diff(x[i]).diff(x[j]) for i in range(2) for j in range(2))
             dofs.append(IntegralMoment(reference, J, dof, (2, 0)))
+
+        print(len(poly), len(dofs))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))
