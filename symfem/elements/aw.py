@@ -9,7 +9,7 @@ from .lagrange import DiscontinuousLagrange
 
 
 class ArnoldWinther(FiniteElement):
-    """A Arnold-Winther element."""
+    """An Arnold-Winther element."""
 
     def __init__(self, reference, order):
         from symfem import create_reference

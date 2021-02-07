@@ -123,7 +123,9 @@ class PointInnerProduct(BaseFunctional):
 
     def dof_direction(self):
         """Get the location of the DOF in the cell."""
-        return self.vec
+        if self.rvec != self.lvec:
+            return None
+        return self.lvec
 
     name = "Point inner product"
 
@@ -258,7 +260,9 @@ class InnerProductIntegralMoment(IntegralMoment):
 
     def dof_direction(self):
         """Get the direction of the DOF."""
-        return self.inner_with
+        if self.inner_with_left != self.inner_with_right:
+            return None
+        return self.inner_with_left
 
     name = "Inner product integral moment"
 
