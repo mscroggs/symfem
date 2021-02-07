@@ -101,7 +101,8 @@ def create_element(cell_type, element_type, order):
         vector Q, vQ, Brezzi-Douglas-Marini, BDM, N2div, Morley, Hermite,
         Mardal-Tai-Winther, MTW, Argyris, bubble, dual, Buffa-Christiansen, BC,
         rotated Buffa-Christiansen, RBC, Brezzi-Douglas-Fortin-Marini, BDFM,
-        Brezzi-Douglas-Duran-Fortin, BDDF, Hellan-Herrmann-Johnson, HHJ
+        Brezzi-Douglas-Duran-Fortin, BDDF, Hellan-Herrmann-Johnson, HHJ,
+        Arnold-Winther, AW
     order : int
         The order of the element.
     """

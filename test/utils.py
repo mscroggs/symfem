@@ -15,6 +15,7 @@ max_orders_getting_basis = {
         "matrix discontinuous Lagrange": 4,
         "symmetric matrix discontinuous Lagrange": 4,
         "Hellan-Herrmann-Johnson": 2,
+        "Arnold-Winther": 4
     },
     "tetrahedron": {
         "Brezzi-Douglas-Fortin-Marini": 2,
