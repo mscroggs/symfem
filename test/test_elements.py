@@ -118,7 +118,7 @@ def test_dual_elements(n_tri, order):
                 assert all_symequal(value, subs(piece[1], x, point))
 
 
-@pytest.mark.parametrize("n_tri", [3, 4, 6, 8])
+@pytest.mark.parametrize("n_tri", [3, 4])
 @pytest.mark.parametrize("order", range(2))
 @pytest.mark.parametrize("element_type", ["BC", "RBC"])
 def test_bc_elements(n_tri, order, element_type):
