@@ -47,6 +47,25 @@ class PointEvaluation(BaseFunctional):
     name = "Point evaluation"
 
 
+class WeightedPointEvaluation(BaseFunctional):
+    """A point evaluation."""
+
+    def __init__(self, point, weight, entity=(None, None)):
+        super().__init__(entity)
+        self.point = point
+        self.weight = weight
+
+    def eval(self, function):
+        """Apply to the functional to a function."""
+        return subs(function, x, self.point) * self.weight
+
+    def dof_point(self):
+        """Get the location of the DOF in the cell."""
+        return self.point
+
+    name = "Weighted point evaluation"
+
+
 class DerivativePointEvaluation(BaseFunctional):
     """A point evaluation of a given derivative."""
 
