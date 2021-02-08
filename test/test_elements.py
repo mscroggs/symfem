@@ -116,3 +116,9 @@ def test_dual_elements(n_tri, order):
             for dof, value in zip(sub_e.dofs, coeffs):
                 point = subs(map, x, dof.point)
                 assert all_symequal(value, subs(piece[1], x, point))
+
+
+@pytest.mark.parametrize("n_tri", [3, 4])
+@pytest.mark.parametrize("element_type", ["BC", "RBC"])
+def test_bc_elements(n_tri, element_type):
+    create_element(f"dual polygon({n_tri})", element_type, 1)
