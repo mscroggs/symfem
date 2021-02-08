@@ -1,4 +1,4 @@
-"Define fixtures and other test helpers."
+"""Define fixtures and other test helpers."""
 
 import pytest
 

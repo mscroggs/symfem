@@ -1,3 +1,5 @@
+"""Utility functions for testing."""
+
 import sympy
 from symfem import _elementlist
 
@@ -63,6 +65,7 @@ max_orders_getting_basis = {
 
 
 def all_symequal(a, b):
+    """Check if two symbolic numbers or vectors are equal."""
     if isinstance(a, (list, tuple)):
         for i, j in zip(a, b):
             if not all_symequal(i, j):
@@ -73,6 +76,7 @@ def all_symequal(a, b):
 
 def elements(max_order=5, include_dual=True, include_non_dual=True,
              getting_basis=False):
+    """Make a list of all elements up to a given order."""
     out = []
     for e in _elementlist:
         for r in e.references:
