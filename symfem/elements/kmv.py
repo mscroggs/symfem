@@ -12,6 +12,7 @@ from ..core.symbolic import x
 
 
 def kmv_tri_polyset(m, mf):
+    """Create the polynomial set for a KMV space on a triangle."""
     poly = polynomial_set(2, 1, m)
 
     b = x[0] * x[1] * (1 - x[0] - x[1])
@@ -22,6 +23,7 @@ def kmv_tri_polyset(m, mf):
 
 
 def kmv_tet_polyset(m, mf, mi):
+    """Create the polynomial set for a KMV space on a tetrahedron."""
     poly = polynomial_set(3, 1, m)
 
     # TODO: check this
