@@ -119,15 +119,6 @@ def test_dual_elements(n_tri, order):
 
 
 @pytest.mark.parametrize("n_tri", [3, 4])
-@pytest.mark.parametrize("order", range(2))
 @pytest.mark.parametrize("element_type", ["BC", "RBC"])
-def test_bc_elements(n_tri, order, element_type):
-    space = create_element(f"dual polygon({n_tri})", element_type, order)
-
-    sub_e = create_element("triangle", space.fine_space, space.order)
-    for f, coeff_list in zip(space.get_basis_functions(), space.dual_coefficients):
-        for piece, coeffs in zip(f.pieces, coeff_list):
-            map = sub_e.reference.get_map_to(piece[0])
-            for dof, value in zip(sub_e.dofs, coeffs):
-                point = subs(map, x, dof.point)
-                assert all_symequal(value, subs(piece[1], x, point))
+def test_bc_elements(n_tri, element_type):
+    create_element(f"dual polygon({n_tri})", element_type, 1)
