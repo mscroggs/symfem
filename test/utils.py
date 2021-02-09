@@ -5,6 +5,9 @@ from symfem import _elementlist
 
 # Set the max orders for elements that are slow to get basis functions for
 max_orders_getting_basis = {
+    "interval": {
+        "Gauss-Lobatto-Legendre": 3
+    },
     "triangle": {
         "Brezzi-Douglas-Fortin-Marini": 3,
         "Brezzi-Douglas-Marini": 3,
@@ -18,7 +21,7 @@ max_orders_getting_basis = {
         "symmetric matrix discontinuous Lagrange": 4,
         "Hellan-Herrmann-Johnson": 2,
         "Arnold-Winther": 4,
-        "Kong-Mulder-Veldhuizen": 3
+        "Kong-Mulder-Veldhuizen": 3,
     },
     "tetrahedron": {
         "Brezzi-Douglas-Fortin-Marini": 2,
@@ -32,7 +35,7 @@ max_orders_getting_basis = {
         "vector discontinuous Lagrange": 3,
         "matrix discontinuous Lagrange": 2,
         "symmetric matrix discontinuous Lagrange": 2,
-        "Kong-Mulder-Veldhuizen": 3
+        "Kong-Mulder-Veldhuizen": 3,
     },
     "quadrilateral": {
         "Brezzi-Douglas-Fortin-Marini": 3,
@@ -45,6 +48,7 @@ max_orders_getting_basis = {
         "vector discontinuous Lagrange": 3,
         "matrix discontinuous Lagrange": 2,
         "symmetric matrix discontinuous Lagrange": 2,
+        "Gauss-Lobatto-Legendre": 2
     },
     "hexahedron": {
         "Brezzi-Douglas-Duran-Fortin": 2,
@@ -60,6 +64,7 @@ max_orders_getting_basis = {
         "vector discontinuous Lagrange": 3,
         "matrix discontinuous Lagrange": 2,
         "symmetric matrix discontinuous Lagrange": 2,
+        "Gauss-Lobatto-Legendre": 2
     }
 }
 
