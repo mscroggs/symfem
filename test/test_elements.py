@@ -19,9 +19,9 @@ def test_element_functionals_and_continuity(elements_to_test, cells_to_test,
     for i, f in enumerate(space.get_basis_functions()):
         for j, d in enumerate(space.dofs):
             if i == j:
-                assert d.eval(f) == 1
+                assert d.eval(f).expand() == 1
             else:
-                assert d.eval(f) == 0
+                assert d.eval(f).expand() == 0
             assert d.entity_dim() is not None
 
     if order > 4:
