@@ -17,7 +17,8 @@ max_orders_getting_basis = {
         "matrix discontinuous Lagrange": 4,
         "symmetric matrix discontinuous Lagrange": 4,
         "Hellan-Herrmann-Johnson": 2,
-        "Arnold-Winther": 4
+        "Arnold-Winther": 4,
+        "Kong-Mulder-Veldhuizen": 3
     },
     "tetrahedron": {
         "Brezzi-Douglas-Fortin-Marini": 2,
@@ -31,6 +32,7 @@ max_orders_getting_basis = {
         "vector discontinuous Lagrange": 3,
         "matrix discontinuous Lagrange": 2,
         "symmetric matrix discontinuous Lagrange": 2,
+        "Kong-Mulder-Veldhuizen": 3
     },
     "quadrilateral": {
         "Brezzi-Douglas-Fortin-Marini": 3,
@@ -102,5 +104,10 @@ def elements(max_order=5, include_dual=True, include_non_dual=True,
                     for n_tri in range(3, 7):
                         out.append((f"{r}({n_tri})", e.names[0], order))
                 else:
+                    if e.names[0] == "Kong-Mulder-Veldhuizen":
+                        if r == "triangle" and order == 2:
+                            continue
+                        if r == "tetrahedron" and order in [2, 3]:
+                            continue
                     out.append((r, e.names[0], order))
     return out
