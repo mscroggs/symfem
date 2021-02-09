@@ -58,8 +58,6 @@ class ArnoldWinther(FiniteElement):
             J = tuple(f.diff(x[i]).diff(x[j]) for i in range(2) for j in range(2))
             dofs.append(IntegralMoment(reference, J, dof, (2, 0)))
 
-        print(len(poly), len(dofs))
-
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))
 
