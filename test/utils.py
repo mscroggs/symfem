@@ -1,7 +1,6 @@
 """Utility functions for testing."""
 
 import sympy
-from symfem import _elementlist
 
 test_elements = {
     "interval": {
@@ -33,7 +32,7 @@ test_elements = {
         "BDFM": {"equispaced": range(1, 4)},
         "Argyris": {"equispaced": [5]},
         "MTW": {"equispaced": [3]},
-        "KMV": {"equispaced": range(1, 4)},
+        "KMV": {"equispaced": [1, 3]},
         "Hermite": {"equispaced": [3]},
         "BDM": {"equispaced": range(1, 4)}
     },
@@ -51,7 +50,7 @@ test_elements = {
         "RT": {"equispaced": range(1, 3)},
         "BDFM": {"equispaced": range(1, 3)},
         "MTW": {"equispaced": [3]},
-        "KMV": {"equispaced": range(1, 3)},
+        "KMV": {"equispaced": [1]},
         "Hermite": {"equispaced": [3]},
         "BDM": {"equispaced": range(1, 3)}
     },
