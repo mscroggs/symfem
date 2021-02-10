@@ -4,7 +4,8 @@
 def make_integral_moment_dofs(
     reference,
     vertices=None, edges=None, faces=None, volumes=None,
-    cells=None, facets=None, ridges=None, peaks=None
+    cells=None, facets=None, ridges=None, peaks=None,
+    variant="equispaced"
 ):
     """Generate DOFs due to integral moments on sub entities.
 
@@ -44,7 +45,7 @@ def make_integral_moment_dofs(
                         sub_ref = create_reference(
                             sub_type,
                             vertices=[reference.reference_vertices[v] for v in vs])
-                        sub_element = SubElement(sub_ref, order)
+                        sub_element = SubElement(sub_ref, order, variant=variant)
                         for f, d in zip(
                             sub_element.get_basis_functions(), sub_element.dofs
                         ):
@@ -63,7 +64,7 @@ def make_integral_moment_dofs(
                         sub_ref = create_reference(
                             sub_type,
                             vertices=[reference.reference_vertices[v] for v in vs])
-                        sub_element = SubElement(sub_ref, order)
+                        sub_element = SubElement(sub_ref, order, variant=variant)
                         for f, d in zip(
                             sub_element.get_basis_functions(), sub_element.dofs
                         ):

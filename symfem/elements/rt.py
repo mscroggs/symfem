@@ -14,7 +14,7 @@ from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
 class RaviartThomas(FiniteElement):
     """Raviart-Thomas Hdiv finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         poly = polynomial_set(reference.tdim, reference.tdim, order - 1)
         poly += Hdiv_polynomials(reference.tdim, reference.tdim, order)
 
@@ -22,6 +22,7 @@ class RaviartThomas(FiniteElement):
             reference,
             facets=(NormalIntegralMoment, DiscontinuousLagrange, order - 1),
             cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
+            variant=variant
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

@@ -12,7 +12,7 @@ from ..core.functionals import (PointEvaluation, PointNormalDerivativeEvaluation
 class Bell(FiniteElement):
     """Bell finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         assert reference.name == "triangle"
         assert order == 5
         from symfem import create_reference

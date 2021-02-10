@@ -44,7 +44,7 @@ def kmv_tet_polyset(m, mf, mi):
 class KongMulderVeldhuizen(FiniteElement):
     """Kong-Mulder-Veldhuizen finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         dofs = []
         if reference.name == "triangle":
             if order == 1:

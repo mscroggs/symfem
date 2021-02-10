@@ -3,68 +3,81 @@
 import sympy
 from symfem import _elementlist
 
-# Set the max orders for elements that are slow to get basis functions for
-max_orders_getting_basis = {
+test_elements = {
     "interval": {
-        "Gauss-Lobatto-Legendre": 3
+        "P": {"equispaced": range(6), "gll": range(4)},
+        "dP": {"equispaced": range(6), "gll": range(4)},
+        "vdP": {"equispaced": range(6), "gll": range(3)},
+        "bubble": {"equispaced": range(2, 6), "gll": range(2, 3)},
+        "serendipity": {"equispaced": range(1, 6), "gll": range(1, 3)},
+        "Q": {"equispaced": range(3), "gll": range(3)},
+        "dQ": {"equispaced": range(3), "gll": range(3)},
+        "Hermite": {"equispaced": [3]},
     },
     "triangle": {
-        "Brezzi-Douglas-Fortin-Marini": 3,
-        "Brezzi-Douglas-Marini": 3,
-        "Nedelec": 3,
-        "Nedelec2": 3,
-        "Regge": 3,
-        "Raviart-Thomas": 3,
-        "vector Lagrange": 4,
-        "vector discontinuous Lagrange": 4,
-        "matrix discontinuous Lagrange": 4,
-        "symmetric matrix discontinuous Lagrange": 4,
-        "Hellan-Herrmann-Johnson": 2,
-        "Arnold-Winther": 4,
-        "Kong-Mulder-Veldhuizen": 3,
+        "P": {"equispaced": range(5), "gll": range(3)},
+        "dP": {"equispaced": range(5), "gll": range(3)},
+        "vdP": {"equispaced": range(5), "gll": range(3)},
+        "matrix discontinuous Lagrange": {"equispaced": range(3), "gll": range(3)},
+        "symmetric matrix discontinuous Lagrange": {"equispaced": range(3), "gll": range(3)},
+        "bubble": {"equispaced": range(2, 5), "gll": range(2, 3)},
+        "CR": {"equispaced": [1]},
+        "HHJ": {"equispaced": range(3)},
+        "Bell": {"equispaced": [5]},
+        "Morley": {"equispaced": [2]},
+        "Regge": {"equispaced": range(4)},
+        "AW": {"equispaced": range(3, 5)},
+        "Nedelec1": {"equispaced": range(1, 4)},
+        "Nedelec2": {"equispaced": range(1, 4)},
+        "RT": {"equispaced": range(1, 4)},
+        "BDFM": {"equispaced": range(1, 4)},
+        "Argyris": {"equispaced": [5]},
+        "MTW": {"equispaced": [3]},
+        "KMV": {"equispaced": range(1, 4)},
+        "Hermite": {"equispaced": [3]},
+        "BDM": {"equispaced": range(1, 4)}
     },
     "tetrahedron": {
-        "Brezzi-Douglas-Fortin-Marini": 2,
-        "Brezzi-Douglas-Marini": 2,
-        "Lagrange": 4,
-        "Nedelec": 2,
-        "Nedelec2": 2,
-        "Raviart-Thomas": 2,
-        "Regge": 2,
-        "vector Lagrange": 3,
-        "vector discontinuous Lagrange": 3,
-        "matrix discontinuous Lagrange": 2,
-        "symmetric matrix discontinuous Lagrange": 2,
-        "Kong-Mulder-Veldhuizen": 3,
+        "P": {"equispaced": range(3), "gll": range(3)},
+        "dP": {"equispaced": range(3), "gll": range(3)},
+        "vdP": {"equispaced": range(3), "gll": range(3)},
+        "matrix discontinuous Lagrange": {"equispaced": range(2), "gll": range(3)},
+        "symmetric matrix discontinuous Lagrange": {"equispaced": range(2), "gll": range(3)},
+        "bubble": {"equispaced": range(3), "gll": range(3)},
+        "CR": {"equispaced": [1]},
+        "Regge": {"equispaced": range(3)},
+        "Nedelec1": {"equispaced": range(1, 3)},
+        "Nedelec2": {"equispaced": range(1, 3)},
+        "RT": {"equispaced": range(1, 3)},
+        "BDFM": {"equispaced": range(1, 3)},
+        "MTW": {"equispaced": [3]},
+        "KMV": {"equispaced": range(1, 3)},
+        "Hermite": {"equispaced": [3]},
+        "BDM": {"equispaced": range(1, 3)}
     },
     "quadrilateral": {
-        "Brezzi-Douglas-Fortin-Marini": 3,
-        "NCE": 3,
-        "NCF": 3,
-        "serendipity": 4,
-        "serendipity Hdiv": 3,
-        "serendipity Hcurl": 3,
-        "vector Lagrange": 3,
-        "vector discontinuous Lagrange": 3,
-        "matrix discontinuous Lagrange": 2,
-        "symmetric matrix discontinuous Lagrange": 2,
-        "Gauss-Lobatto-Legendre": 2
+        "dP": {"equispaced": range(4), "gll": range(3)},
+        "vdP": {"equispaced": range(4), "gll": range(3)},
+        "Q": {"equispaced": range(4), "gll": range(3)},
+        "dQ": {"equispaced": range(4), "gll": range(3)},
+        "serendipity": {"equispaced": range(4), "gll": range(3)},
+        "Scurl": {"equispaced": range(4), "gll": range(3)},
+        "Sdiv": {"equispaced": range(4), "gll": range(3)},
+        "Qcurl": {"equispaced": range(4)},
+        "Qdiv": {"equispaced": range(4)},
+        "BDFM": {"equispaced": range(4)},
     },
     "hexahedron": {
-        "Brezzi-Douglas-Duran-Fortin": 2,
-        "Brezzi-Douglas-Fortin-Marini": 2,
-        "NCE": 2,
-        "NCF": 2,
-        "Q": 3,
-        "dQ": 3,
-        "vector Q": 3,
-        "serendipity": 3,
-        "serendipity Hdiv": 2,
-        "serendipity Hcurl": 2,
-        "vector discontinuous Lagrange": 3,
-        "matrix discontinuous Lagrange": 2,
-        "symmetric matrix discontinuous Lagrange": 2,
-        "Gauss-Lobatto-Legendre": 2
+        "dP": {"equispaced": range(3), "gll": range(3)},
+        "vdP": {"equispaced": range(3), "gll": range(3)},
+        "Q": {"equispaced": range(3), "gll": range(3)},
+        "dQ": {"equispaced": range(3), "gll": range(3)},
+        "serendipity": {"equispaced": range(3), "gll": range(3)},
+        "Scurl": {"equispaced": range(3), "gll": range(3)},
+        "Sdiv": {"equispaced": range(3), "gll": range(3)},
+        "Qcurl": {"equispaced": range(3)},
+        "Qdiv": {"equispaced": range(3)},
+        "BDFM": {"equispaced": range(3)},
     }
 }
 
@@ -77,42 +90,3 @@ def all_symequal(a, b):
                 return False
         return True
     return sympy.expand(sympy.simplify(a)) == sympy.expand(sympy.simplify(b))
-
-
-def elements(max_order=5, include_dual=True, include_non_dual=True,
-             getting_basis=False):
-    """Make a list of all elements up to a given order."""
-    out = []
-    for e in _elementlist:
-        for r in e.references:
-            if r == "dual polygon" and not include_dual:
-                continue
-            if r != "dual polygon" and not include_non_dual:
-                continue
-            if hasattr(e, "min_order"):
-                min_o = e.min_order
-                if isinstance(min_o, dict):
-                    min_o = min_o[r]
-            else:
-                min_o = 0
-            if hasattr(e, "max_order"):
-                max_o = e.max_order
-                if isinstance(max_o, dict):
-                    max_o = max_o[r]
-            else:
-                max_o = 100
-            if r in max_orders_getting_basis and e.names[0] in max_orders_getting_basis[r]:
-                max_o = min(max_orders_getting_basis[r][e.names[0]], max_o)
-
-            for order in range(min_o, min(max_order, max_o) + 1):
-                if r == "dual polygon":
-                    for n_tri in range(3, 7):
-                        out.append((f"{r}({n_tri})", e.names[0], order))
-                else:
-                    if e.names[0] == "Kong-Mulder-Veldhuizen":
-                        if r == "triangle" and order == 2:
-                            continue
-                        if r == "tetrahedron" and order in [2, 3]:
-                            continue
-                    out.append((r, e.names[0], order))
-    return out

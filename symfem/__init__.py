@@ -81,7 +81,7 @@ def create_reference(cell_type, vertices=None):
         raise ValueError(f"Unknown cell type: {cell_type}")
 
 
-def create_element(cell_type, element_type, order):
+def create_element(cell_type, element_type, order, variant="equispaced"):
     """Make a finite element.
 
     Parameters
@@ -106,11 +106,14 @@ def create_element(cell_type, element_type, order):
         Gauss-Lobatto-Legendre, GLL
     order : int
         The order of the element.
+    variant: str
+        The arrangement type of the points used the define the space.
+        Supported values: equispaced, gll
     """
     reference = create_reference(cell_type)
 
     if element_type in _elementmap:
         assert cell_type.split("(")[0] in _elementmap[element_type].references
-        return _elementmap[element_type](reference, order)
+        return _elementmap[element_type](reference, order, variant=variant)
 
     raise ValueError(f"Unsupported element type: {element_type}")

@@ -14,7 +14,7 @@ from .lagrange import DiscontinuousLagrange, SymmetricMatrixDiscontinuousLagrang
 class HellanHerrmannJohnson(FiniteElement):
     """A Hellan-Herrmann-Johnson element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         assert reference.name == "triangle"
         poly = [(p[0], p[1], p[1], p[2])
                 for p in polynomial_set(reference.tdim, 3, order)]
@@ -23,6 +23,7 @@ class HellanHerrmannJohnson(FiniteElement):
             reference,
             facets=(NormalInnerProductIntegralMoment, DiscontinuousLagrange, order),
             cells=(IntegralMoment, SymmetricMatrixDiscontinuousLagrange, order - 1),
+            variant=variant
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,

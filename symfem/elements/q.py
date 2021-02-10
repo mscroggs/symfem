@@ -6,6 +6,7 @@ from ..core.symbolic import one, zero
 from ..core.finite_element import FiniteElement
 from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import quolynomial_set, Hdiv_quolynomials, Hcurl_quolynomials
+from ..core import quadrature
 from ..core.functionals import (PointEvaluation, DotPointEvaluation, IntegralMoment,
                                 TangentIntegralMoment, NormalIntegralMoment)
 
@@ -13,14 +14,20 @@ from ..core.functionals import (PointEvaluation, DotPointEvaluation, IntegralMom
 class Q(FiniteElement):
     """A Q element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         from symfem import create_reference
+
         if order == 0:
             dofs = [
                 PointEvaluation(
                     tuple(sympy.Rational(1, 2) for i in range(reference.tdim)),
                     entity=(reference.tdim, 0))]
         else:
+            if variant == "equispaced":
+                points, _ = quadrature.equispaced(order + 1)
+            elif variant == "gll":
+                points, _ = quadrature.gll(order + 1)
+
             dofs = []
             for v_n, v in enumerate(reference.reference_vertices):
                 dofs.append(PointEvaluation(v, entity=(0, v_n)))
@@ -32,7 +39,7 @@ class Q(FiniteElement):
                     for i in product(range(1, order), repeat=edim):
                         dofs.append(
                             PointEvaluation(
-                                tuple(o + sum(sympy.Rational(a[j] * b, order)
+                                tuple(o + sum(a[j] * points[b]
                                               for a, b in zip(entity.axes, i[::-1]))
                                       for j, o in enumerate(entity.origin)),
                                 entity=(edim, e_n)))
@@ -54,16 +61,21 @@ class Q(FiniteElement):
 class DiscontinuousQ(FiniteElement):
     """A dQ element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         if order == 0:
             dofs = [
                 PointEvaluation(
                     tuple(sympy.Rational(1, 2) for i in range(reference.tdim)),
                     entity=(reference.tdim, 0))]
         else:
+            if variant == "equispaced":
+                points, _ = quadrature.equispaced(order + 1)
+            elif variant == "gll":
+                points, _ = quadrature.gll(order + 1)
+
             dofs = []
             for i in product(range(order + 1), repeat=reference.tdim):
-                dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i[::-1]),
+                dofs.append(PointEvaluation(tuple(points[j] for j in i[::-1]),
                                             entity=(reference.tdim, 0)))
 
         super().__init__(
@@ -83,8 +95,8 @@ class DiscontinuousQ(FiniteElement):
 class VectorQ(FiniteElement):
     """A vector Q element."""
 
-    def __init__(self, reference, order):
-        scalar_space = Q(reference, order)
+    def __init__(self, reference, order, variant):
+        scalar_space = Q(reference, order, variant)
         dofs = []
         if reference.tdim == 1:
             directions = [1]
@@ -115,7 +127,7 @@ class VectorQ(FiniteElement):
 class Nedelec(FiniteElement):
     """Nedelec Hcurl finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         poly = quolynomial_set(reference.tdim, reference.tdim, order - 1)
         poly += Hcurl_quolynomials(reference.tdim, reference.tdim, order)
 
@@ -124,6 +136,7 @@ class Nedelec(FiniteElement):
             edges=(TangentIntegralMoment, DiscontinuousQ, order - 1),
             faces=(IntegralMoment, RaviartThomas, order - 1),
             volumes=(IntegralMoment, RaviartThomas, order - 1),
+            variant=variant
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -138,7 +151,7 @@ class Nedelec(FiniteElement):
 class RaviartThomas(FiniteElement):
     """Raviart-Thomas Hdiv finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         poly = quolynomial_set(reference.tdim, reference.tdim, order - 1)
         poly += Hdiv_quolynomials(reference.tdim, reference.tdim, order)
 
@@ -146,6 +159,7 @@ class RaviartThomas(FiniteElement):
             reference,
             facets=(NormalIntegralMoment, DiscontinuousQ, order - 1),
             cells=(IntegralMoment, Nedelec, order - 1),
+            variant=variant
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

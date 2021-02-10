@@ -15,7 +15,7 @@ from .rt import RaviartThomas
 class NedelecFirstKind(FiniteElement):
     """Nedelec first kind Hcurl finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         poly = polynomial_set(reference.tdim, reference.tdim, order - 1)
         poly += Hcurl_polynomials(reference.tdim, reference.tdim, order)
         dofs = make_integral_moment_dofs(
@@ -23,6 +23,7 @@ class NedelecFirstKind(FiniteElement):
             edges=(TangentIntegralMoment, DiscontinuousLagrange, order - 1),
             faces=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
             volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 3),
+            variant=variant
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -37,7 +38,7 @@ class NedelecFirstKind(FiniteElement):
 class NedelecSecondKind(FiniteElement):
     """Nedelec second kind Hcurl finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         poly = polynomial_set(reference.tdim, reference.tdim, order)
 
         dofs = make_integral_moment_dofs(
@@ -45,6 +46,7 @@ class NedelecSecondKind(FiniteElement):
             edges=(TangentIntegralMoment, DiscontinuousLagrange, order),
             faces=(IntegralMoment, RaviartThomas, order - 1),
             volumes=(IntegralMoment, RaviartThomas, order - 2),
+            variant=variant
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

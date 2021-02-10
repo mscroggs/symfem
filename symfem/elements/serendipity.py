@@ -16,7 +16,7 @@ from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
 class Serendipity(FiniteElement):
     """A serendipity element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         poly = polynomial_set(reference.tdim, 1, order)
         poly += serendipity_set(reference.tdim, 1, order)
 
@@ -28,6 +28,7 @@ class Serendipity(FiniteElement):
             edges=(IntegralMoment, DiscontinuousLagrange, order - 2),
             faces=(IntegralMoment, DiscontinuousLagrange, order - 4),
             volumes=(IntegralMoment, DiscontinuousLagrange, order - 6),
+            variant=variant
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
@@ -42,7 +43,7 @@ class Serendipity(FiniteElement):
 class SerendipityCurl(FiniteElement):
     """A serendipity Hcurl element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         poly = polynomial_set(reference.tdim, reference.tdim, order)
         poly += Hcurl_serendipity(reference.tdim, reference.tdim, order)
 
@@ -51,6 +52,7 @@ class SerendipityCurl(FiniteElement):
             edges=(TangentIntegralMoment, DiscontinuousLagrange, order),
             faces=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
             volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 4),
+            variant=variant
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -66,7 +68,7 @@ class SerendipityCurl(FiniteElement):
 class SerendipityDiv(FiniteElement):
     """A serendipity Hdiv element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         poly = polynomial_set(reference.tdim, reference.tdim, order)
         poly += Hdiv_serendipity(reference.tdim, reference.tdim, order)
 
@@ -74,6 +76,7 @@ class SerendipityDiv(FiniteElement):
             reference,
             facets=(NormalIntegralMoment, DiscontinuousLagrange, order),
             cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
+            variant=variant
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
