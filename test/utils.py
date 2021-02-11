@@ -5,8 +5,8 @@ import sympy
 test_elements = {
     "interval": {
         "P": {"equispaced": range(6), "gll": range(4)},
-        "dP": {"equispaced": range(6), "gll": range(4)},
-        "vdP": {"equispaced": range(6), "gll": range(3)},
+        "dP": {"equispaced": range(6), "gll": range(4), "radau": range(3), "legendre": range(4)},
+        "vdP": {"equispaced": range(6), "gll": range(3), "radau": range(3), "legendre": range(3)},
         "bubble": {"equispaced": range(2, 6), "gll": range(2, 3)},
         "serendipity": {"equispaced": range(1, 6), "gll": range(1, 3)},
         "Q": {"equispaced": range(3), "gll": range(3)},
@@ -55,8 +55,8 @@ test_elements = {
         "BDM": {"equispaced": range(1, 3)}
     },
     "quadrilateral": {
-        "dP": {"equispaced": range(4), "gll": range(3)},
-        "vdP": {"equispaced": range(4), "gll": range(3)},
+        "dP": {"equispaced": range(4), "gll": range(3), "radau": range(3), "legendre": range(3)},
+        "vdP": {"equispaced": range(4), "gll": range(3), "radau": range(3), "legendre": range(3)},
         "Q": {"equispaced": range(4), "gll": range(3)},
         "dQ": {"equispaced": range(4), "gll": range(3)},
         "serendipity": {"equispaced": range(1, 4), "gll": range(1, 3)},
@@ -67,8 +67,8 @@ test_elements = {
         "BDFM": {"equispaced": range(1, 4)},
     },
     "hexahedron": {
-        "dP": {"equispaced": range(3), "gll": range(3)},
-        "vdP": {"equispaced": range(3), "gll": range(3)},
+        "dP": {"equispaced": range(3), "gll": range(3), "radau": range(3), "legendre": range(3)},
+        "vdP": {"equispaced": range(3), "gll": range(3), "radau": range(3), "legendre": range(3)},
         "Q": {"equispaced": range(3), "gll": range(3)},
         "dQ": {"equispaced": range(3), "gll": range(3)},
         "serendipity": {"equispaced": range(1, 3), "gll": range(1, 3)},
