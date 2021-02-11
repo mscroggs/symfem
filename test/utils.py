@@ -5,8 +5,10 @@ import sympy
 test_elements = {
     "interval": {
         "P": {"equispaced": range(6), "lobatto": range(4)},
-        "dP": {"equispaced": range(6), "lobatto": range(4), "radau": range(3), "legendre": range(4)},
-        "vdP": {"equispaced": range(6), "lobatto": range(3), "radau": range(3), "legendre": range(3)},
+        "dP": {"equispaced": range(6), "lobatto": range(4), "radau": range(3),
+               "legendre": range(4)},
+        "vdP": {"equispaced": range(6), "lobatto": range(3), "radau": range(3),
+                "legendre": range(3)},
         "bubble": {"equispaced": range(2, 6), "lobatto": range(2, 3)},
         "serendipity": {"equispaced": range(1, 6), "lobatto": range(1, 3)},
         "Q": {"equispaced": range(3), "lobatto": range(3)},
@@ -18,7 +20,8 @@ test_elements = {
         "dP": {"equispaced": range(5), "lobatto": range(3)},
         "vdP": {"equispaced": range(5), "lobatto": range(3)},
         "matrix discontinuous Lagrange": {"equispaced": range(3), "lobatto": range(3)},
-        "symmetric matrix discontinuous Lagrange": {"equispaced": range(3), "lobatto": range(3)},
+        "symmetric matrix discontinuous Lagrange": {
+            "equispaced": range(3), "lobatto": range(3)},
         "bubble": {"equispaced": range(2, 5), "lobatto": range(2, 3)},
         "CR": {"equispaced": [1]},
         "HHJ": {"equispaced": range(3)},
@@ -55,8 +58,10 @@ test_elements = {
         "BDM": {"equispaced": range(1, 3)}
     },
     "quadrilateral": {
-        "dP": {"equispaced": range(4), "lobatto": range(3), "radau": range(3), "legendre": range(3)},
-        "vdP": {"equispaced": range(4), "lobatto": range(3), "radau": range(3), "legendre": range(3)},
+        "dP": {"equispaced": range(4), "lobatto": range(3), "radau": range(3),
+               "legendre": range(3)},
+        "vdP": {"equispaced": range(4), "lobatto": range(3), "radau": range(3),
+                "legendre": range(3)},
         "Q": {"equispaced": range(4), "lobatto": range(3)},
         "dQ": {"equispaced": range(4), "lobatto": range(3)},
         "serendipity": {"equispaced": range(1, 4), "lobatto": range(1, 3)},
@@ -67,8 +72,10 @@ test_elements = {
         "BDFM": {"equispaced": range(1, 4)},
     },
     "hexahedron": {
-        "dP": {"equispaced": range(3), "lobatto": range(3), "radau": range(3), "legendre": range(3)},
-        "vdP": {"equispaced": range(3), "lobatto": range(3), "radau": range(3), "legendre": range(3)},
+        "dP": {"equispaced": range(3), "lobatto": range(3), "radau": range(3),
+               "legendre": range(3)},
+        "vdP": {"equispaced": range(3), "lobatto": range(3), "radau": range(3),
+                "legendre": range(3)},
         "Q": {"equispaced": range(3), "lobatto": range(3)},
         "dQ": {"equispaced": range(3), "lobatto": range(3)},
         "serendipity": {"equispaced": range(1, 3), "lobatto": range(1, 3)},
