@@ -194,6 +194,41 @@ class DotPointEvaluation(BaseFunctional):
     name = "Dot point evaluation"
 
 
+class IntegralAgainst(BaseFunctional):
+    """An integral against a function."""
+
+    def __init__(self, reference, f, entity=(None, None)):
+        super().__init__(entity)
+        self.reference = reference
+        self.f = subs(f, x, t)
+        if isinstance(self.f, tuple):
+            if len(self.f) == self.reference.tdim:
+                # TODO: is this one of the mappings?
+                self.f = tuple(
+                    sum(self.reference.axes[j][i] * c / self.reference.jacobian()
+                        for j, c in enumerate(self.f))
+                    for i, o in enumerate(self.reference.origin)
+                )
+            else:
+                assert len(self.f) == self.reference.tdim ** 2
+                assert self.reference.vertices == self.reference.reference_vertices
+
+    def eval(self, function):
+        """Apply to the functional to a function."""
+        point = [i for i in self.reference.origin]
+        for i, a in enumerate(zip(*self.reference.axes)):
+            for j, k in zip(a, t):
+                point[i] += j * k
+        integrand = self.dot(subs(function, x, point))
+        return self.reference.integral(integrand)
+
+    def dot(self, function):
+        """Dot a function with the moment function."""
+        return vdot(function, self.f)
+
+    name = "Integral against"
+
+
 class IntegralMoment(BaseFunctional):
     """An integral moment."""
 
