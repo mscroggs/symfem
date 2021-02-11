@@ -17,7 +17,7 @@ def equispaced(N):
              for i in range(N)])
 
 
-def gll(N):
+def lobatto(N):
     """Get Gauss-Lobatto-Legendre points and weights.
 
     Parameters
@@ -68,7 +68,7 @@ def gll(N):
 
 
 def radau(N):
-    """Get Gauss-Lobatto-Legendre points and weights.
+    """Get Radau points and weights.
 
     Parameters
     ----------
@@ -84,6 +84,25 @@ def radau(N):
     raise NotImplementedError()
 
 
+def legendre(N):
+    """Get Gauss-Legendre points and weights.
+
+    Parameters
+    ----------
+    N : int
+        Number of points
+    """
+    if N == 1:
+        return ([sympy.Rational(1, 2)], [one])
+    if N == 2:
+        return ([(3 - sympy.sqrt(3)) / 6, (3 + sympy.sqrt(3)) / 6],
+                [sympy.Rational(1, 2), sympy.Rational(1, 2)])
+    if N == 3:
+        return ([(5 - sympy.sqrt(15)) / 10, sympy.Rational(1, 2), (5 + sympy.sqrt(15)) / 10],
+                [sympy.Rational(5, 18), sympy.Rational(4, 9), sympy.Rational(5, 18)])
+    raise NotImplementedError()
+
+
 def get_quadrature(rule, N):
     """Get quadrature points and weights.
 
@@ -91,14 +110,16 @@ def get_quadrature(rule, N):
     ----------
     rule: str
         The quadrature rule.
-        Supported values: equispaced, gll, radau
+        Supported values: equispaced, lobatto, radau, legendre
     N : int
         Number of points
     """
     if rule == "equispaced":
         return equispaced(N)
-    if rule == "gll":
-        return gll(N)
+    if rule == "lobatto":
+        return lobatto(N)
     if rule == "radau":
         return radau(N)
+    if rule == "legendre":
+        return legendre(N)
     raise ValueError(f"Unknown quadrature rule: {rule}")
