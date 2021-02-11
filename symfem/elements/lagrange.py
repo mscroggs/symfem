@@ -6,7 +6,7 @@ from ..core.symbolic import one, zero
 from ..core.finite_element import FiniteElement
 from ..core.polynomials import polynomial_set
 from ..core.functionals import PointEvaluation, DotPointEvaluation
-from ..core import quadrature
+from ..core.quadrature import get_quadrature
 
 
 class Lagrange(FiniteElement):
@@ -25,10 +25,7 @@ class Lagrange(FiniteElement):
                 )
             ]
         else:
-            if variant == "equispaced":
-                points, _ = quadrature.equispaced(order + 1)
-            elif variant == "gll":
-                points, _ = quadrature.gll(order + 1)
+            points, _ = get_quadrature(variant, order + 1)
 
             dofs = []
             for v_n, v in enumerate(reference.reference_vertices):
@@ -68,10 +65,7 @@ class DiscontinuousLagrange(FiniteElement):
                     tuple(sympy.Rational(1, reference.tdim + 1) for i in range(reference.tdim)),
                     entity=(reference.tdim, 0))]
         else:
-            if variant == "equispaced":
-                points, _ = quadrature.equispaced(order + 1)
-            elif variant == "gll":
-                points, _ = quadrature.gll(order + 1)
+            points, _ = get_quadrature(variant, order + 1)
 
             dofs = []
             for i in product(range(order + 1), repeat=reference.tdim):

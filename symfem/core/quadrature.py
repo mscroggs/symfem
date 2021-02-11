@@ -65,3 +65,40 @@ def gll(N):
                  (124 - 7 * sympy.sqrt(15)) / 700,
                  sympy.Rational(1, 42)])
     raise NotImplementedError()
+
+
+def radau(N):
+    """Get Gauss-Lobatto-Legendre points and weights.
+
+    Parameters
+    ----------
+    N : int
+        Number of points
+    """
+    if N == 2:
+        return ([zero, sympy.Rational(2, 3)],
+                [sympy.Rational(1, 4), sympy.Rational(3, 4)])
+    if N == 3:
+        return ([zero, (6 - sympy.sqrt(6)) / 10, (6 + sympy.sqrt(6)) / 10],
+                [sympy.Rational(1, 9), (16 + sympy.sqrt(6)) / 36, (16 - sympy.sqrt(6)) / 36])
+    raise NotImplementedError()
+
+
+def get_quadrature(rule, N):
+    """Get quadrature points and weights.
+
+    Parameters
+    ----------
+    rule: str
+        The quadrature rule.
+        Supported values: equispaced, gll, radau
+    N : int
+        Number of points
+    """
+    if rule == "equispaced":
+        return equispaced(N)
+    if rule == "gll":
+        return gll(N)
+    if rule == "radau":
+        return radau(N)
+    raise ValueError(f"Unknown quadrature rule: {rule}")
