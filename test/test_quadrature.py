@@ -6,10 +6,10 @@ from utils import all_symequal
 
 @pytest.mark.parametrize("order", range(1, 7))
 def test_equispaced(order):
-    points, weights = quadrature.gll(order + 1)
+    points, weights = quadrature.equispaced(order + 1)
 
     x = sympy.Symbol("x")
-    poly = x ** (2 * order - 1)
+    poly = x
 
     assert all_symequal(
         poly.integrate((x, 0, 1)),
@@ -17,8 +17,8 @@ def test_equispaced(order):
 
 
 @pytest.mark.parametrize("order", range(1, 7))
-def test_gll(order):
-    points, weights = quadrature.gll(order + 1)
+def test_lobatto(order):
+    points, weights = quadrature.lobatto(order + 1)
 
     x = sympy.Symbol("x")
     poly = x ** (2 * order - 1)

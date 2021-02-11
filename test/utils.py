@@ -6,7 +6,7 @@ test_elements = {
     "interval": {
         "P": {"equispaced": range(6), "lobatto": range(4)},
         "dP": {"equispaced": range(6), "lobatto": range(4), "radau": range(3),
-               "legendre": range(4)},
+               "legendre": range(3)},
         "vdP": {"equispaced": range(6), "lobatto": range(3), "radau": range(3),
                 "legendre": range(3)},
         "bubble": {"equispaced": range(2, 6), "lobatto": range(2, 3)},

@@ -105,7 +105,7 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
         Arnold-Winther, AW, Bell, Kong-Mulder-Veldhuizen, KMV
     order : int
         The order of the element.
-    variant: str
+    variant : str
         The arrangement type of the points used the define the space.
         Supported values: equispaced, lobatto, radau, legendre
     """
