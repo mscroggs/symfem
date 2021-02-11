@@ -6,7 +6,7 @@ from ..core.symbolic import one, zero
 from ..core.finite_element import FiniteElement
 from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import quolynomial_set, Hdiv_quolynomials, Hcurl_quolynomials
-from ..core import quadrature
+from ..core.quadrature import get_quadrature
 from ..core.functionals import (PointEvaluation, DotPointEvaluation, IntegralMoment,
                                 TangentIntegralMoment, NormalIntegralMoment)
 
