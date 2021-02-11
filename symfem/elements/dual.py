@@ -63,7 +63,7 @@ class DualFiniteElement(FiniteElement):
 class Dual(DualFiniteElement):
     """Barycentric dual finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
 
         if order == 0:
             dual_coefficients = [
@@ -105,7 +105,7 @@ class Dual(DualFiniteElement):
 class BuffaChristiansen(DualFiniteElement):
     """Buffa-Christiansen barycentric dual finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         assert order == 1
         dual_coefficients = [
             [[0, 0, 0]
@@ -136,7 +136,7 @@ class BuffaChristiansen(DualFiniteElement):
 class RotatedBuffaChristiansen(DualFiniteElement):
     """RotatedBuffa-Christiansen barycentric dual finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         assert order == 1
         dual_coefficients = [
             [[0, 0, 0]

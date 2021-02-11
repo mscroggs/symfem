@@ -13,7 +13,7 @@ from ..core.symbolic import sym_sum
 class CrouzeixRaviart(FiniteElement):
     """Crouzeix-Raviart finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         assert order == 1
         dofs = []
         for e_n, vs in enumerate(reference.sub_entities(reference.tdim - 1)):

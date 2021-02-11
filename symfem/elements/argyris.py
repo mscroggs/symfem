@@ -15,7 +15,7 @@ from ..core.symbolic import sym_sum
 class Argyris(FiniteElement):
     """Argyris finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         from symfem import create_reference
         assert order == 5
         assert reference.name == "triangle"

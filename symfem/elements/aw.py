@@ -16,7 +16,7 @@ from .lagrange import DiscontinuousLagrange
 class ArnoldWinther(FiniteElement):
     """An Arnold-Winther element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         from symfem import create_reference
         assert reference.name == "triangle"
         poly = [(p[0], p[1], p[1], p[2])
@@ -39,18 +39,18 @@ class ArnoldWinther(FiniteElement):
             sub_ref = create_reference(
                 reference.sub_entity_types[1],
                 vertices=tuple(reference.vertices[i] for i in edge))
-            sub_e = DiscontinuousLagrange(sub_ref, order - 2)
+            sub_e = DiscontinuousLagrange(sub_ref, order - 2, variant)
             for p, dof in zip(sub_e.get_basis_functions(), sub_e.dofs):
                 for component in [sub_ref.normal(), sub_ref.tangent()]:
                     dofs.append(
                         InnerProductIntegralMoment(sub_ref, p, component, sub_ref.normal(), dof,
                                                    (1, e_n)))
-        sub_e = DiscontinuousLagrange(reference, order - 3)
+        sub_e = DiscontinuousLagrange(reference, order - 3, variant)
         for p, dof in zip(sub_e.get_basis_functions(), sub_e.dofs):
             for component in [(one, zero, zero, zero), (zero, one, zero, zero),
                               (zero, zero, zero, one)]:
                 dofs.append(VecIntegralMoment(reference, p, component, dof, (2, 0)))
-        sub_e = DiscontinuousLagrange(reference, order - 4)
+        sub_e = DiscontinuousLagrange(reference, order - 4, variant)
         for p, dof in zip(sub_e.get_basis_functions(), sub_e.dofs):
             if sympy.Poly(p, x[:2]).degree() != order - 4:
                 continue

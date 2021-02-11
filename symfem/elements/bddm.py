@@ -33,13 +33,14 @@ def bddf_polyset(reference, order):
 class BDDF(FiniteElement):
     """Brezzi-Douglas-Duran-Fortin Hdiv finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         poly = bddf_polyset(reference, order)
 
         dofs = make_integral_moment_dofs(
             reference,
             facets=(NormalIntegralMoment, DiscontinuousLagrange, order),
             cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
+            variant=variant
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

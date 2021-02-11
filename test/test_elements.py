@@ -2,30 +2,33 @@ import pytest
 from symfem import create_element
 from symfem.core.symbolic import subs, x
 from symfem.core.vectors import vsub
-from utils import elements, all_symequal
+from utils import test_elements, all_symequal
 
 
-@pytest.mark.parametrize(("cell_type", "element_type", "order"),
-                         elements(max_order=5, include_dual=False, getting_basis=True))
+@pytest.mark.parametrize(
+    ("cell_type", "element_type", "order", "variant"),
+    [[reference, element, order, variant]
+     for reference, i in test_elements.items() for element, j in i.items()
+     for variant, k in j.items() for order in k])
 def test_element_functionals_and_continuity(elements_to_test, cells_to_test,
-                                            cell_type, element_type, order):
+                                            cell_type, element_type, order, variant):
     if elements_to_test != "ALL" and element_type not in elements_to_test:
         pytest.skip()
     if cells_to_test != "ALL" and cell_type not in cells_to_test:
         pytest.skip()
 
     # Test functionals
-    space = create_element(cell_type, element_type, order)
+    space = create_element(cell_type, element_type, order, variant)
     for i, f in enumerate(space.get_basis_functions()):
         for j, d in enumerate(space.dofs):
             if i == j:
-                assert d.eval(f).expand() == 1
+                assert d.eval(f).expand().simplify() == 1
             else:
-                assert d.eval(f).expand() == 0
+                assert d.eval(f).expand().simplify() == 0
             assert d.entity_dim() is not None
 
     if order > 4:
-        return  # For high order, testinc continuity is slow
+        return  # For high order, testing continuity is slow
 
     # Test continuity
     if cell_type == "interval":

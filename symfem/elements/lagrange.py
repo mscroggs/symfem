@@ -6,12 +6,13 @@ from ..core.symbolic import one, zero
 from ..core.finite_element import FiniteElement
 from ..core.polynomials import polynomial_set
 from ..core.functionals import PointEvaluation, DotPointEvaluation
+from ..core.quadrature import get_quadrature
 
 
 class Lagrange(FiniteElement):
     """Lagrange finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         from symfem import create_reference
         if order == 0:
             dofs = [
@@ -24,6 +25,8 @@ class Lagrange(FiniteElement):
                 )
             ]
         else:
+            points, _ = get_quadrature(variant, order + 1)
+
             dofs = []
             for v_n, v in enumerate(reference.reference_vertices):
                 dofs.append(PointEvaluation(v, entity=(0, v_n)))
@@ -36,7 +39,7 @@ class Lagrange(FiniteElement):
                         if sum(i) < order:
                             dofs.append(
                                 PointEvaluation(
-                                    tuple(o + sum(sympy.Rational(a[j] * b, order)
+                                    tuple(o + sum(a[j] * points[b]
                                                   for a, b in zip(entity.axes, i))
                                           for j, o in enumerate(entity.origin)),
                                     entity=(edim, e_n)))
@@ -55,17 +58,19 @@ class Lagrange(FiniteElement):
 class DiscontinuousLagrange(FiniteElement):
     """Discontinuous Lagrange finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         if order == 0:
             dofs = [
                 PointEvaluation(
                     tuple(sympy.Rational(1, reference.tdim + 1) for i in range(reference.tdim)),
                     entity=(reference.tdim, 0))]
         else:
+            points, _ = get_quadrature(variant, order + 1)
+
             dofs = []
             for i in product(range(order + 1), repeat=reference.tdim):
                 if sum(i) <= order:
-                    dofs.append(PointEvaluation(tuple(sympy.Rational(j, order) for j in i[::-1]),
+                    dofs.append(PointEvaluation(tuple(points[j] for j in i[::-1]),
                                                 entity=(reference.tdim, 0)))
 
         super().__init__(
@@ -82,8 +87,8 @@ class DiscontinuousLagrange(FiniteElement):
 class VectorLagrange(FiniteElement):
     """Vector Lagrange finite element."""
 
-    def __init__(self, reference, order):
-        scalar_space = Lagrange(reference, order)
+    def __init__(self, reference, order, variant):
+        scalar_space = Lagrange(reference, order, variant)
         dofs = []
         if reference.tdim == 1:
             directions = [1]
@@ -114,8 +119,8 @@ class VectorLagrange(FiniteElement):
 class VectorDiscontinuousLagrange(FiniteElement):
     """Vector Lagrange finite element."""
 
-    def __init__(self, reference, order):
-        scalar_space = DiscontinuousLagrange(reference, order)
+    def __init__(self, reference, order, variant):
+        scalar_space = DiscontinuousLagrange(reference, order, variant)
         dofs = []
         if reference.tdim == 1:
             directions = [1]
@@ -146,8 +151,8 @@ class VectorDiscontinuousLagrange(FiniteElement):
 class MatrixDiscontinuousLagrange(FiniteElement):
     """Matrix Lagrange finite element."""
 
-    def __init__(self, reference, order):
-        scalar_space = DiscontinuousLagrange(reference, order)
+    def __init__(self, reference, order, variant):
+        scalar_space = DiscontinuousLagrange(reference, order, variant)
         dofs = []
         if reference.tdim == 1:
             directions = [1]
@@ -179,7 +184,7 @@ class MatrixDiscontinuousLagrange(FiniteElement):
 class SymmetricMatrixDiscontinuousLagrange(FiniteElement):
     """Symmetric matrix Lagrange finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant):
         if reference.tdim == 1:
             poly = polynomial_set(1, 1, order)
             directions = [1]
@@ -199,7 +204,7 @@ class SymmetricMatrixDiscontinuousLagrange(FiniteElement):
                           (zero, zero, zero, zero, zero, one, zero, zero, zero),
                           (zero, zero, zero, zero, zero, zero, zero, zero, one)]
 
-        scalar_space = DiscontinuousLagrange(reference, order)
+        scalar_space = DiscontinuousLagrange(reference, order, variant)
         dofs = []
         for p in scalar_space.dofs:
             for d in directions:
