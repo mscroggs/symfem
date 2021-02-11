@@ -107,7 +107,7 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
         The order of the element.
     variant: str
         The arrangement type of the points used the define the space.
-        Supported values: equispaced, gll
+        Supported values: equispaced, lobatto, radau, legendre
     """
     reference = create_reference(cell_type)
 

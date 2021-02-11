@@ -53,6 +53,21 @@ def test_available_references():
     assert r_supported == e_supported
 
 
+def test_available_variants():
+    r_supported = symfem.core.quadrature.get_quadrature.__doc__
+    r_supported = r_supported.split("rule : str\n")[1]
+    r_supported = r_supported.split("N : int\n")[0]
+    r_supported = r_supported.split("Supported values:")[1]
+    r_supported = set([i.strip() for i in r_supported.split(",")])
+
+    e_supported = symfem.create_element.__doc__
+    e_supported = e_supported.split("variant : str\n")[1]
+    e_supported = e_supported.split("Supported values:")[1]
+    e_supported = set([i.strip() for i in e_supported.split(",")])
+
+    assert r_supported == e_supported
+
+
 def test_available_elements():
     supported = symfem.create_element.__doc__
     supported = supported.split("element_type : str\n")[1]

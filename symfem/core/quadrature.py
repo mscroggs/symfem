@@ -108,7 +108,7 @@ def get_quadrature(rule, N):
 
     Parameters
     ----------
-    rule: str
+    rule : str
         The quadrature rule.
         Supported values: equispaced, lobatto, radau, legendre
     N : int
