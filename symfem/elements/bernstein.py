@@ -1,4 +1,8 @@
-"""Bernstein elements on simplices."""
+"""Bernstein elements on simplices.
+
+This element's definition appears in https://doi.org/10.1007/s00211-010-0327-2
+(Kirby, 2011)
+"""
 
 from ..core.symbolic import one, x
 from ..core.finite_element import FiniteElement
