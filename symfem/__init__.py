@@ -102,7 +102,8 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
         Mardal-Tai-Winther, MTW, Argyris, bubble, dual, Buffa-Christiansen, BC,
         rotated Buffa-Christiansen, RBC, Brezzi-Douglas-Fortin-Marini, BDFM,
         Brezzi-Douglas-Duran-Fortin, BDDF, Hellan-Herrmann-Johnson, HHJ,
-        Arnold-Winther, AW, Bell, Kong-Mulder-Veldhuizen, KMV
+        Arnold-Winther, AW, Bell, Kong-Mulder-Veldhuizen, KMV,
+        Bernstein, Bernstein-Bezier
     order : int
         The order of the element.
     variant : str

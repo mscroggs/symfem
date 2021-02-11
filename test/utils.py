@@ -14,6 +14,7 @@ test_elements = {
         "Q": {"equispaced": range(3), "lobatto": range(3)},
         "dQ": {"equispaced": range(3), "lobatto": range(3)},
         "Hermite": {"equispaced": [3]},
+        "Bernstein": {None: range(1, 4)},
     },
     "triangle": {
         "P": {"equispaced": range(5), "lobatto": range(3)},
@@ -37,7 +38,8 @@ test_elements = {
         "MTW": {"equispaced": [3]},
         "KMV": {"equispaced": [1, 3]},
         "Hermite": {"equispaced": [3]},
-        "BDM": {"equispaced": range(1, 4)}
+        "BDM": {"equispaced": range(1, 4)},
+        "Bernstein": {None: range(1, 4)},
     },
     "tetrahedron": {
         "P": {"equispaced": range(3), "lobatto": range(3)},
@@ -55,7 +57,8 @@ test_elements = {
         "MTW": {"equispaced": [3]},
         "KMV": {"equispaced": [1]},
         "Hermite": {"equispaced": [3]},
-        "BDM": {"equispaced": range(1, 3)}
+        "BDM": {"equispaced": range(1, 3)},
+        "Bernstein": {None: range(1, 3)},
     },
     "quadrilateral": {
         "dP": {"equispaced": range(4), "lobatto": range(3), "radau": range(3),
