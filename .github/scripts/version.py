@@ -19,29 +19,9 @@ vfile2 = symfem.get_contents("codemeta.json", branch.commit.sha)
 data = json.loads(vfile2.decoded_content)
 assert data["version"] == version
 
-print(symfem.get_tags()[0])
+release = symfem.get_releases()[0].tag_name
 
-
-failed = False
-
-
-if failed:
-    assert not is_update
-    tree = symfem.create_git_tree(changed_list, base_tree)
-    parent = symfem.get_git_commit(branch.commit.sha)
-    commit = symfem.create_git_commit("Update version numbers", tree, [parent])
-    ref.edit(commit.sha, force=True)
-
-    try:
-        rel = symfem.get_release(f"v{version}")
-        rel.delete_release()
-        title = rel.title
-        body = rel.body
-    except:  # noqa: E722
-        print("No release found")
-        title = f"Version {version}"
-        body = ""
-
+if release != f"v{version}":
     symfem.create_git_tag_and_release(
         f"v{version}", f"Version {version}", f"Version {version}", "Latest release",
         branch.commit.sha, "commit")
