@@ -47,7 +47,7 @@ if failed:
     tree = symfem.create_git_tree(changed_list, base_tree)
     parent = symfem.get_git_commit(branch.commit.sha)
     commit = symfem.create_git_commit("Update version numbers", tree, [parent])
-    ref.edit(commit.sha)
+    ref.edit(commit.sha, force=True)
 
     try:
         rel = symfem.get_release(f"v{version}")
