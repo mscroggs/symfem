@@ -1,6 +1,7 @@
 import pytest
+import sympy
 from symfem import create_element
-from symfem.core.symbolic import subs, x
+from symfem.core.symbolic import subs, x, PiecewiseFunction
 from symfem.core.vectors import vsub
 from utils import test_elements, all_symequal
 
@@ -58,8 +59,14 @@ def test_element_functionals_and_continuity(elements_to_test, cells_to_test,
     for dim, entities in entity_pairs:
         for fi, gi in zip(*[space.entity_dofs(dim, i) for i in entities]):
             basis = space.get_basis_functions()
+            basis2 = space.map_to_cell(vertices)
             f = basis[fi]
-            g = space.map_to_cell(basis[gi], vertices)
+            g = basis2[gi]
+
+            if isinstance(f, PiecewiseFunction):
+                assert space.reference.tdim == 2
+                f = f.get_piece((0, sympy.Rational(1, 2)))
+                g = g.get_piece((0, sympy.Rational(1, 2)))
 
             f = subs(f, [x[0]], [0])
             g = subs(g, [x[0]], [0])

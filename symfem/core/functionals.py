@@ -1,5 +1,5 @@
 """Functionals used to define the dual sets."""
-from .symbolic import subs, x, t
+from .symbolic import subs, x, t, PiecewiseFunction
 from .vectors import vdot
 from .calculus import derivative, jacobian_component
 
@@ -98,6 +98,8 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
 
     def eval(self, function):
         """Apply to the functional to a function."""
+        if isinstance(function, PiecewiseFunction):
+            function = function.get_piece(self.point)
         return subs(derivative(function, self.dir), x, self.point)
 
     def dof_point(self):

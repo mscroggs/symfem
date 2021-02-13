@@ -1,7 +1,7 @@
 """Abstract finite element classes and functions."""
 
 import sympy
-from .symbolic import x, zero, subs, sym_sum
+from .symbolic import x, zero, subs, sym_sum, PiecewiseFunction
 from . import mappings
 
 
@@ -116,11 +116,25 @@ class FiniteElement:
             return output
         raise ValueError(f"Unknown order: {order}")
 
-    def map_to_cell(self, f, vertices):
-        """Map a function onto a cell using the appropriate mapping for the element."""
+    def map_to_cell(self, vertices, basis=None):
+        """Map the basis onto a cell using the appropriate mapping for the element."""
+        if basis is None:
+            basis = self.get_basis_functions()
         map = self.reference.get_map_to(vertices)
+        if isinstance(basis[0], PiecewiseFunction):
+            pieces = [[] for i in basis]
+            for i, j in enumerate(basis[0].pieces):
+                new_i = [subs(map, x, k) for k in j[0]]
+                for k, f in enumerate(self.map_to_cell(vertices, [b.pieces[i][1] for b in basis])):
+                    pieces[k].append((new_i, f))
+            return [PiecewiseFunction(p) for p in pieces]
         inverse_map = self.reference.get_inverse_map_to(vertices)
-        return getattr(mappings, self.mapping)(f, map, inverse_map, self.reference.tdim)
+        return self.perform_mapping(basis, map, inverse_map)
+
+    def perform_mapping(self, basis, map, inverse_map):
+        """Map the basis onto a cell using the appropriate mapping for the element."""
+        return [getattr(mappings, self.mapping)(f, map, inverse_map, self.reference.tdim)
+                for f in basis]
 
     @property
     def name(self):
