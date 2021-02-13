@@ -105,6 +105,7 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
         Arnold-Winther, AW, Bell, Kong-Mulder-Veldhuizen, KMV,
         Bernstein, Bernstein-Bezier,
         Hsieh-Clough-Tocher, Clough-Tocher, HCT, CT
+        reduced Hsieh-Clough-Tocher, rHCT
     order : int
         The order of the element.
     variant : str
