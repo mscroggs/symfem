@@ -44,12 +44,36 @@ class PiecewiseFunction:
     def __init__(self, pieces):
         self.pieces = pieces
 
-    def evaluate(self, values):
-        """Evaluate a function."""
+    def get_piece(self, point):
         from .vectors import point_in_triangle
-
         for tri, value in self.pieces:
-            if point_in_triangle(values[:2], tri):
-                return subs(value, x, values)
+            if point_in_triangle(point[:2], tri):
+                return value
 
         raise NotImplementedError("Evaluation of piecewise functions outside domain not supported.")
+
+    def evaluate(self, values):
+        """Evaluate a function."""
+        return subs(self.get_piece(values), x, values)
+
+    def diff(self, variable):
+        """Differentiate the function."""
+        return PiecewiseFunction([(i, j.diff(variable)) for i, j in self.pieces])
+
+    def __rmul__(self, other):
+        """Multiply the function by a scalar."""
+        return PiecewiseFunction([(i, other * j) for i, j in self.pieces])
+
+    def __radd__(self, other):
+        """Add another piecewise function or a scalar."""
+        return self.__add__(other)
+
+    def __add__(self, other):
+        """Add another piecewise function or a scalar."""
+        if isinstance(other, PiecewiseFunction):
+            for i, j in zip(self.pieces, other.pieces):
+                assert i[0] == j[0]
+            return PiecewiseFunction(
+                [(i[0], i[1] + j[1]) for i, j in zip(self.pieces, other.pieces)])
+
+        return PiecewiseFunction([(i, other + j) for i, j in self.pieces])

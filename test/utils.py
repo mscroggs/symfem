@@ -40,6 +40,7 @@ test_elements = {
         "Hermite": {"equispaced": [3]},
         "BDM": {"equispaced": range(1, 4)},
         "Bernstein": {None: range(1, 4)},
+        "HCT": {None: [3]},
     },
     "tetrahedron": {
         "P": {"equispaced": range(3), "lobatto": range(3)},

@@ -4,10 +4,11 @@ This element's definition appears in https://doi.org/10.1016/0045-7825(72)90006-
 (Ciarlet, Raviart, 1972)
 """
 
+import sympy
 from ..core.finite_element import FiniteElement
 from ..core.polynomials import polynomial_set
-from ..core.functionals import PointEvaluation, PointDirectionalDerivativeEvaluation
-from ..core.symbolic import sym_sum
+from ..core.functionals import PointEvaluation, DerivativePointEvaluation
+from ..core.symbolic import sym_sum, x, subs
 
 
 class Hermite(FiniteElement):
@@ -19,8 +20,9 @@ class Hermite(FiniteElement):
         for v_n, vs in enumerate(reference.sub_entities(0)):
             dofs.append(PointEvaluation(vs, entity=(0, v_n)))
             for i in range(reference.tdim):
-                dir = tuple(1 if i == j else 0 for j in range(reference.tdim))
-                dofs.append(PointDirectionalDerivativeEvaluation(vs, dir, entity=(0, v_n)))
+                dofs.append(DerivativePointEvaluation(
+                    vs, tuple(1 if i == j else 0 for j in range(reference.tdim)),
+                    entity=(0, v_n)))
         for e_n, vs in enumerate(reference.sub_entities(2)):
             midpoint = tuple(sym_sum(i) / len(i)
                              for i in zip(*[reference.vertices[i] for i in vs]))
@@ -30,9 +32,30 @@ class Hermite(FiniteElement):
             reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
 
+    def map_to_cell(self, vertices, basis=None):
+        """Map the basis onto a cell using the appropriate mapping for the element."""
+        if basis is None:
+            basis = self.get_basis_functions()
+        map = self.reference.get_map_to(vertices)
+        inverse_map = self.reference.get_inverse_map_to(vertices)
+        out = []
+        tdim = self.reference.tdim
+        J = sympy.Matrix([[map[i].diff(x[j]) for j in range(tdim)] for i in range(tdim)])
+        for v in range(tdim + 1):
+            out.append(basis[(tdim + 1) * v])
+            for i in range(tdim):
+                out.append(sym_sum(a * b for a, b in
+                                   zip(basis[(tdim + 1) * v + 1: (tdim + 1) * (v + 1)],
+                                       J.row(i))))
+        if tdim == 2:
+            out.append(basis[-1])
+        if tdim == 3:
+            out += basis[-4:]
+        assert len(out) == len(basis)
+        return [subs(b, x, inverse_map) for b in out]
+
     names = ["Hermite"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 3
     max_order = 3
-    mapping = "identity"
-    continuity = "L2"
+    continuity = "C0"

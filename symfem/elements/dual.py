@@ -42,9 +42,8 @@ class DualFiniteElement(FiniteElement):
                 ):
                     sub_e = create_element("triangle", self.fine_space, self.order)
 
-                    sub_basis = [
-                        sub_e.map_to_cell(f, [v0, v1, v2])
-                        for f in sub_e.get_basis_functions()]
+                    sub_basis = sub_e.map_to_cell([v0, v1, v2])
+
                     if self.range_dim == 1:
                         sub_fun = sym_sum(a * b for a, b in zip(coeffs, sub_basis))
                     else:
