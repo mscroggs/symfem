@@ -8,7 +8,7 @@ import sympy
 from ..core.finite_element import FiniteElement
 from ..core.functionals import (PointEvaluation, PointNormalDerivativeEvaluation,
                                 DerivativePointEvaluation)
-from ..core.symbolic import sym_sum, PiecewiseFunction, zero
+from ..core.symbolic import sym_sum, PiecewiseFunction, zero, x, subs
 from .hermite import Hermite
 
 
@@ -66,6 +66,25 @@ class HsiehCloughTocher(FiniteElement):
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1
         )
+
+    def map_to_cell(self, vertices, basis=None):
+        """Map the basis onto a cell using the appropriate mapping for the element."""
+        if basis is None:
+            basis = self.get_basis_functions()
+        map = self.reference.get_map_to(vertices)
+        inverse_map = self.reference.get_inverse_map_to(vertices)
+        out = []
+        tdim = self.reference.tdim
+        J = sympy.Matrix([[map[i].diff(x[j]) for j in range(tdim)] for i in range(tdim)])
+        for v in range(tdim + 1):
+            out.append(basis[(tdim + 1) * v])
+            for i in range(tdim):
+                out.append(sym_sum(a * b for a, b in
+                                   zip(basis[(tdim + 1) * v + 1: (tdim + 1) * (v + 1)],
+                                       J.row(i))))
+        out += basis[-3:]
+        assert len(out) == len(basis)
+        return [subs(b, x, inverse_map) for b in out]
 
     names = ["Hsieh-Clough-Tocher", "Clough-Tocher", "HCT", "CT"]
     references = ["triangle"]

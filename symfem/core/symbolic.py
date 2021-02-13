@@ -54,7 +54,10 @@ class PiecewiseFunction:
 
     def evaluate(self, values):
         """Evaluate a function."""
-        return subs(self.get_piece(values), x, values)
+        try:
+            return subs(self.get_piece(values), x, values)
+        except TypeError:
+            return PiecewiseFunction([(i, subs(j, x, values)) for i, j in self.pieces])
 
     def diff(self, variable):
         """Differentiate the function."""
@@ -63,6 +66,10 @@ class PiecewiseFunction:
     def __rmul__(self, other):
         """Multiply the function by a scalar."""
         return PiecewiseFunction([(i, other * j) for i, j in self.pieces])
+
+    def __mul__(self, other):
+        """Multiply the function by a scalar."""
+        return self.__rmul__(other)
 
     def __radd__(self, other):
         """Add another piecewise function or a scalar."""
