@@ -3,17 +3,7 @@ import sys
 from datetime import datetime
 import github
 
-failed = False
-
-access_key = sys.argv[-2]
-version = sys.argv[-1]
-
-assert version[0] == "v"
-version = version[1:]
-is_update = False
-if version.endswith("updated"):
-    is_update = True
-    version = version[:-7]
+access_key = sys.argv[-1]
 
 git = github.Github(access_key)
 
@@ -23,23 +13,16 @@ ref = symfem.get_git_ref("heads/main")
 base_tree = symfem.get_git_tree(branch.commit.sha)
 
 vfile1 = symfem.get_contents("VERSION", branch.commit.sha)
-v1 = vfile1.decoded_content.decode("utf8").strip()
-
-changed_list = []
-
-if v1 != version:
-    element = github.InputGitTreeElement("VERSION", '100644', 'blob', f"{version}\n")
-    changed_list.append(element)
-    failed = True
+version = vfile1.decoded_content.decode("utf8").strip()
 
 vfile2 = symfem.get_contents("codemeta.json", branch.commit.sha)
 data = json.loads(vfile2.decoded_content)
-if data["version"] != version:
-    data["version"] = version
-    data["dateModified"] = datetime.now().strftime("%Y-%m-%d")
-    element = github.InputGitTreeElement("codemeta.json", '100644', 'blob', json.dumps(data))
-    changed_list.append(element)
-    failed = True
+assert data["version"] == version
+
+
+
+
+failed = False
 
 
 if failed:
@@ -60,6 +43,5 @@ if failed:
         body = ""
 
     symfem.create_git_tag_and_release(
-        f"v{version}updated", title, title, body, commit.sha, "commit")
-
-    assert False
+        f"v{version}", f"Version {version}", f"Version {version}", "Latest release",
+        branch.commit.sha, "commit")

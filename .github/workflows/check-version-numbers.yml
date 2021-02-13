@@ -1,0 +1,17 @@
+name: 🔢
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-version:
+    name: Check version number
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@master
+    - name: Install PyGitHub
+      run: pip3 install PyGitHub
+    - name: Check version number and make release if necessary
+      run: python .github/scripts/version.py ${{ secrets.symfembot_github_token }} ${{ steps.get_version.outputs.VERSION }}
