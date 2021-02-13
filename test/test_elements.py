@@ -1,6 +1,7 @@
 import pytest
+import sympy
 from symfem import create_element
-from symfem.core.symbolic import subs, x
+from symfem.core.symbolic import subs, x, PiecewiseFunction
 from symfem.core.vectors import vsub
 from utils import test_elements, all_symequal
 
@@ -62,9 +63,10 @@ def test_element_functionals_and_continuity(elements_to_test, cells_to_test,
             f = basis[fi]
             g = basis2[gi]
 
-            if element_type == "HCT":
-                f = f.pieces[2][1]
-                g = g.pieces[1][1]
+            if isinstance(f, PiecewiseFunction):
+                assert space.reference.tdim == 2
+                f = f.get_piece((0, sympy.Rational(1, 2)))
+                g = g.get_piece((0, sympy.Rational(1, 2)))
 
             f = subs(f, [x[0]], [0])
             g = subs(g, [x[0]], [0])
