@@ -27,7 +27,8 @@ class CrouzeixRaviart(FiniteElement):
 
             if order == 3:
                 dofs.append(
-                    PointEvaluation((sympy.Rational(1, 3), sympy.Rational(1, 3)), entity=(reference.tdim, 0)))
+                    PointEvaluation((sympy.Rational(1, 3), sympy.Rational(1, 3)),
+                                    entity=(reference.tdim, 0)))
         else:
             assert order == 1
             for e_n, vs in enumerate(reference.sub_entities(reference.tdim - 1)):
