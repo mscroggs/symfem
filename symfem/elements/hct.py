@@ -57,6 +57,10 @@ class HsiehCloughTocher(FiniteElement):
         piece_list.append((zero, bases[1][3], bases[2][0]))
         piece_list.append((zero, bases[1][4], bases[2][1]))
         piece_list.append((zero, bases[1][5], bases[2][2]))
+        # TODO: are these right to remove??
+        # piece_list.append((bases[0][9], zero, zero))
+        # piece_list.append((zero, bases[1][9], zero))
+        # piece_list.append((zero, zero, bases[2][9]))
 
         poly = [
             PiecewiseFunction(list(zip(subs, p)))
