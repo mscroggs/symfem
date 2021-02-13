@@ -18,9 +18,10 @@ vfile2 = symfem.get_contents("codemeta.json", branch.commit.sha)
 data = json.loads(vfile2.decoded_content)
 assert data["version"] == version
 
-release = symfem.get_releases()[0].tag_name
-
-if release != f"v{version}":
+for release in symfem.get_releases():
+    if release.tag_name == f"v{version}":
+        break
+else:
     symfem.create_git_tag_and_release(
         f"v{version}", f"Version {version}", f"Version {version}", "Latest release",
         branch.commit.sha, "commit")
