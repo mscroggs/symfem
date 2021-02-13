@@ -24,7 +24,7 @@ test_elements = {
         "symmetric matrix discontinuous Lagrange": {
             "equispaced": range(3), "lobatto": range(3)},
         "bubble": {"equispaced": range(2, 5), "lobatto": range(2, 3)},
-        "CR": {None: range(1, 5)},
+        "CR": {None: [1]},
         "HHJ": {"equispaced": range(3)},
         "Bell": {None: [5]},
         "Morley": {None: [2]},
