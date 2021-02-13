@@ -19,7 +19,7 @@ vfile2 = symfem.get_contents("codemeta.json", branch.commit.sha)
 data = json.loads(vfile2.decoded_content)
 assert data["version"] == version
 
-
+print(symfem.get_tags())
 
 
 failed = False
