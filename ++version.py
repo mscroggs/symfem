@@ -24,4 +24,3 @@ with open("codemeta.json", "w") as f:
     json.dump(data, f)
 
 print(f"Updated version to {new_version_str}")
-
