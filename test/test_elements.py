@@ -62,6 +62,10 @@ def test_element_functionals_and_continuity(elements_to_test, cells_to_test,
             f = basis[fi]
             g = basis2[gi]
 
+            if element_type == "HCT":
+                f = f.pieces[2][1]
+                g = g.pieces[1][1]
+
             f = subs(f, [x[0]], [0])
             g = subs(g, [x[0]], [0])
 

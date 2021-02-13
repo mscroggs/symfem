@@ -125,10 +125,14 @@ class FiniteElement:
             pieces = [[] for i in basis]
             for i, j in enumerate(basis[0].pieces):
                 new_i = [subs(map, x, k) for k in j[0]]
-                for k, f in enumerate(self.map_to_cell(new_i, [b.pieces[i][1] for b in basis])):
+                for k, f in enumerate(self.map_to_cell(vertices, [b.pieces[i][1] for b in basis])):
                     pieces[k].append((new_i, f))
             return [PiecewiseFunction(p) for p in pieces]
         inverse_map = self.reference.get_inverse_map_to(vertices)
+        return self.perform_mapping(basis, map, inverse_map)
+
+    def perform_mapping(self, basis, map, inverse_map):
+        """Map the basis onto a cell using the appropriate mapping for the element."""
         return [getattr(mappings, self.mapping)(f, map, inverse_map, self.reference.tdim)
                 for f in basis]
 

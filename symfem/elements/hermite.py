@@ -32,12 +32,8 @@ class Hermite(FiniteElement):
             reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
 
-    def map_to_cell(self, vertices, basis=None):
+    def perform_mapping(self, basis, map, inverse_map):
         """Map the basis onto a cell using the appropriate mapping for the element."""
-        if basis is None:
-            basis = self.get_basis_functions()
-        map = self.reference.get_map_to(vertices)
-        inverse_map = self.reference.get_inverse_map_to(vertices)
         out = []
         tdim = self.reference.tdim
         J = sympy.Matrix([[map[i].diff(x[j]) for j in range(tdim)] for i in range(tdim)])
