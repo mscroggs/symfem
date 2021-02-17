@@ -26,7 +26,7 @@ test_elements = {
         "bubble": {"equispaced": range(2, 5), "lobatto": range(2, 3)},
         "CR": {None: [1, 3]},
         "HHJ": {"equispaced": range(3)},
-        "Bell": {None: [5]},
+        "Bell": {"equispaced": [5]},
         "Morley": {None: [2]},
         "Regge": {None: range(4)},
         "AW": {"equispaced": range(3, 5)},

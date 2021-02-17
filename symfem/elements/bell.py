@@ -4,9 +4,11 @@ This element's definition is given in https://doi.org/10.1002/nme.1620010108 (Be
 """
 
 from ..core.finite_element import FiniteElement
+from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import polynomial_set
-from ..core.functionals import (PointEvaluation, PointNormalDerivativeEvaluation,
+from ..core.functionals import (PointEvaluation, NormalDerivativeIntegralMoment,
                                 DerivativePointEvaluation)
+from .lagrange import DiscontinuousLagrange
 
 
 class Bell(FiniteElement):
@@ -15,7 +17,6 @@ class Bell(FiniteElement):
     def __init__(self, reference, order, variant):
         assert reference.name == "triangle"
         assert order == 5
-        from symfem import create_reference
         dofs = []
         for v_n, v in enumerate(reference.vertices):
             dofs.append(PointEvaluation(v, entity=(0, v_n)))
@@ -24,14 +25,11 @@ class Bell(FiniteElement):
             dofs.append(DerivativePointEvaluation(v, (2, 0), entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(v, (1, 1), entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(v, (0, 2), entity=(0, v_n)))
-        for e_n, e in enumerate(reference.edges):
-            sub_ref = create_reference(
-                reference.sub_entity_types[1],
-                vertices=tuple(reference.vertices[i] for i in e))
-            dofs.append(PointNormalDerivativeEvaluation(
-                tuple((i + j) / 2 for i, j in zip(reference.vertices[e[0]],
-                                                  reference.vertices[e[1]])),
-                sub_ref, (1, e_n)))
+        dofs += make_integral_moment_dofs(
+            reference,
+            edges=(NormalDerivativeIntegralMoment, DiscontinuousLagrange, 0),
+            variant=variant
+        )
 
         super().__init__(
             reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
