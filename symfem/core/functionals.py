@@ -304,6 +304,8 @@ class VecIntegralMoment(IntegralMoment):
 
 
 class DerivativeIntegralMoment(IntegralMoment):
+    """An integral moment of the derivative of a scalar function."""
+
     def __init__(self, reference, f, dot_with, dof, entity=(None, None)):
         super().__init__(reference, f, dof, entity=entity)
         self.dot_with = dot_with
