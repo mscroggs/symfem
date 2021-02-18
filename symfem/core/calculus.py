@@ -9,9 +9,9 @@ def derivative(f, dir):
     return vdot(grad(f, len(dir)), dir)
 
 
-def grad(f, dim):
+def grad(f, dim, variables=x):
     """Find the gradient of a scalar function."""
-    return tuple(f.diff(x[i]) for i in range(dim))
+    return tuple(f.diff(variables[i]) for i in range(dim))
 
 
 def jacobian_component(f, component):

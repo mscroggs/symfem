@@ -1,7 +1,7 @@
 """Functionals used to define the dual sets."""
 from .symbolic import subs, x, t, PiecewiseFunction
 from .vectors import vdot
-from .calculus import derivative, jacobian_component
+from .calculus import derivative, jacobian_component, grad
 
 
 class BaseFunctional:
@@ -303,6 +303,33 @@ class VecIntegralMoment(IntegralMoment):
     name = "Vector integral moment"
 
 
+class DerivativeIntegralMoment(IntegralMoment):
+    """An integral moment of the derivative of a scalar function."""
+
+    def __init__(self, reference, f, dot_with, dof, entity=(None, None)):
+        super().__init__(reference, f, dof, entity=entity)
+        self.dot_with = dot_with
+
+    def dot(self, function):
+        """Dot a function with the moment function."""
+        return vdot(function, self.dot_with) * self.f
+
+    def dof_direction(self):
+        """Get the direction of the DOF."""
+        return self.dot_with
+
+    def eval(self, function):
+        """Apply to the functional to a function."""
+        point = [i for i in self.reference.origin]
+        for i, a in enumerate(zip(*self.reference.axes)):
+            for j, k in zip(a, t):
+                point[i] += j * k
+        integrand = self.dot(subs(grad(function, self.reference.gdim), x, point))
+        return self.reference.integral(integrand)
+
+    name = "Derivative integral moment"
+
+
 class TangentIntegralMoment(VecIntegralMoment):
     """An integral moment in the tangential direction."""
 
@@ -319,6 +346,15 @@ class NormalIntegralMoment(VecIntegralMoment):
         super().__init__(reference, f, reference.normal(), dof, entity=entity)
 
     name = "Normal integral moment"
+
+
+class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
+    """An integral moment in the normal direction."""
+
+    def __init__(self, reference, f, dof, entity=(None, None)):
+        super().__init__(reference, f, reference.normal(), dof, entity=entity)
+
+    name = "Normal derivative integral moment"
 
 
 class InnerProductIntegralMoment(IntegralMoment):
