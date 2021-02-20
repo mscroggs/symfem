@@ -215,7 +215,10 @@ class IntegralAgainst(BaseFunctional):
             else:
                 assert len(self.f) == self.reference.tdim ** 2
                 assert self.reference.vertices == self.reference.reference_vertices
-        self.point = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
+
+    def dof_point(self):
+        """Get the location of the DOF in the cell."""
+        return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.reference.vertices))
 
     def eval(self, function):
         """Apply to the functional to a function."""
