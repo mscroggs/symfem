@@ -27,7 +27,7 @@ class Bell(FiniteElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
-    names = ["Taylor"]
+    names = ["Taylor", "discontinuous Taylor"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "L2"
