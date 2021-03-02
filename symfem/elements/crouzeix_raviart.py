@@ -4,46 +4,56 @@ This element's definition appears in https://doi.org/10.1051/m2an/197307R300331
 (Crouzeix, Raviart, 1973)
 """
 
-import sympy
+from itertools import product
 from ..core.finite_element import FiniteElement
 from ..core.polynomials import polynomial_set
 from ..core.functionals import PointEvaluation
-from ..core.symbolic import sym_sum
+from ..core.quadrature import get_quadrature
 
 
 class CrouzeixRaviart(FiniteElement):
     """Crouzeix-Raviart finite element."""
 
     def __init__(self, reference, order, variant):
+        from symfem import create_reference
+        assert reference.name in ["triangle", "tetrahedron"]
+
+        if order > 1:
+            assert reference.name == "triangle"
+
+        points, _ = get_quadrature(variant, order + reference.tdim)
+
         dofs = []
-        if reference.name == "triangle":
-            assert order in [1, 3]
-            for e_n, vs in enumerate(reference.sub_entities(reference.tdim - 1)):
-                for a in range(1, order + 1):
-                    midpoint = tuple(i + a * sympy.Rational(j - i, order + 1)
-                                     for i, j in zip(*[reference.vertices[i] for i in vs]))
+
+        for e_n, vs in enumerate(reference.sub_entities(reference.tdim - 1)):
+            entity = create_reference(
+                reference.sub_entity_types[reference.tdim - 1],
+                vertices=tuple(reference.reference_vertices[i] for i in vs))
+            for i in product(range(1, order + 1), repeat=reference.tdim - 1):
+                if sum(i) < order + reference.tdim - 1:
                     dofs.append(
-                        PointEvaluation(midpoint, entity=(reference.tdim - 1, e_n)))
+                        PointEvaluation(
+                            tuple(o + sum(a[j] * points[b]
+                                          for a, b in zip(entity.axes, i))
+                                  for j, o in enumerate(entity.origin)),
+                            entity=(reference.tdim - 1, e_n)))
 
-            if order == 3:
+        points, _ = get_quadrature(variant, order + reference.tdim - 1)
+        for i in product(range(1, order), repeat=reference.tdim):
+            if sum(i) < order:
                 dofs.append(
-                    PointEvaluation((sympy.Rational(1, 3), sympy.Rational(1, 3)),
-                                    entity=(reference.tdim, 0)))
-        else:
-            assert order == 1
-            for e_n, vs in enumerate(reference.sub_entities(reference.tdim - 1)):
-                midpoint = tuple(sym_sum(i) / len(i)
-                                 for i in zip(*[reference.vertices[i] for i in vs]))
-                dofs.append(
-                    PointEvaluation(midpoint, entity=(reference.tdim - 1, e_n)))
+                    PointEvaluation(
+                        tuple(o + sum(a[j] * points[b]
+                                      for a, b in zip(reference.axes, i))
+                              for j, o in enumerate(reference.origin)),
+                        entity=(reference.tdim, 0)))
 
-        super().__init__(
-            reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
-        )
+        poly = polynomial_set(reference.tdim, 1, order)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     names = ["Crouzeix-Raviart", "CR"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
-    max_order = 3
+    max_order = {"tetrahedron": 1}
     mapping = "identity"
     continuity = "L2"
