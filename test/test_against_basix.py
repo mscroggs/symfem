@@ -14,7 +14,7 @@ elements = {
                  ("Regge", "Regge", range(0, 4)),
                  ("Crouzeix-Raviart", "Crouzeix-Raviart", [1])],
     "tetrahedron": [("P", "Lagrange", range(1, 4)), ("dP", "Discontinuous Lagrange", range(1, 4)),
-                    ("bubble", "Bubble", range(4, 5)),
+                    ("bubble", "Bubble", range(4, 6)),
                     ("N1curl", "Nedelec 1st kind H(curl)", range(1, 4)),
                     ("N2curl", "Nedelec 2nd kind H(curl)", range(1, 3)),
                     ("N1div", "Raviart-Thomas", range(1, 3)),
@@ -58,7 +58,11 @@ def make_lattice(cell, N=3):
 @pytest.mark.parametrize(("cell", "symfem_type", "basix_type", "order"),
                          [(cell, a, b, order) for cell, ls in elements.items()
                           for a, b, c in ls for order in c])
-def test_against_basix(cell, symfem_type, basix_type, order):
+def test_against_basix(elements_to_test, cells_to_test, cell, symfem_type, basix_type, order):
+    if elements_to_test != "ALL" and symfem_type not in elements_to_test:
+        pytest.skip()
+    if cells_to_test != "ALL" and cell not in cells_to_test:
+        pytest.skip()
     try:
         import basix
         from scipy.linalg import block_diag, solve
