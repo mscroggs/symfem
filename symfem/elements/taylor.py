@@ -9,8 +9,8 @@ from .lagrange import DiscontinuousLagrange
 from itertools import product
 
 
-class Bell(FiniteElement):
-    """Bell finite element."""
+class Taylor(FiniteElement):
+    """Taylor finite element."""
 
     def __init__(self, reference, order, variant):
         dofs = make_integral_moment_dofs(

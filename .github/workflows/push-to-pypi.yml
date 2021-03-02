@@ -34,5 +34,3 @@ jobs:
     - uses: actions/checkout@master
     - name: Trigger Read the Docs build
       run: python .github/scripts/trigger_rtd_build.py ${{ secrets.RTDS_TOKEN }}
-    needs:
-    - build-n-publish
