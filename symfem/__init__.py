@@ -96,7 +96,7 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
         vector Lagrange, vP, vector discontinuous Lagrange, vdP, vDP,
         matrix discontinuous Lagrange, symmetric matrix discontinuous Lagrange,
         Crouzeix-Raviart, CR, serendipity, S, serendipity Hcurl, Scurl, BDMCE, AAE,
-        serendipity Hdiv, Sdiv, BDMCF, AAF,  Regge, Nedelec, Nedelec1, N1curl, Nedelec2,
+        serendipity Hdiv, Sdiv, BDMCF, AAF, Regge, Nedelec, Nedelec1, N1curl, Nedelec2,
         N2curl, Raviart-Thomas, RT, N1div, dQ, NCE, RTCE, Qcurl, Q, NCF, RTCF, Qdiv,
         vector Q, vQ, Brezzi-Douglas-Marini, BDM, N2div, Morley, Hermite,
         Mardal-Tai-Winther, MTW, Argyris, bubble, dual, Buffa-Christiansen, BC,
@@ -105,7 +105,8 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
         Arnold-Winther, AW, Bell, Kong-Mulder-Veldhuizen, KMV,
         Bernstein, Bernstein-Bezier,
         Hsieh-Clough-Tocher, Clough-Tocher, HCT, CT,
-        reduced Hsieh-Clough-Tocher, rHCT, Taylor, discontinuous Taylor
+        reduced Hsieh-Clough-Tocher, rHCT, Taylor, discontinuous Taylor,
+        bubble enriched Lagrange, bubble enriched vector Lagrange
     order : int
         The order of the element.
     variant : str
