@@ -62,7 +62,8 @@ def make_lattice(cell, N=3):
 @pytest.mark.parametrize(("cell", "symfem_type", "basix_type", "order"),
                          [(cell, a, b, order) for cell, ls in elements.items()
                           for a, b, c in ls for order in c])
-def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_type, basix_type, order):
+def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_type,
+                       basix_type, order):
     if elements_to_test != "ALL" and symfem_type not in elements_to_test:
         pytest.skip()
     if cells_to_test != "ALL" and cell not in cells_to_test:

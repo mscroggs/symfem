@@ -38,7 +38,7 @@ jobs:
       - run: |
             git clone https://github.com/FEniCS/basix.git basix-src
             cd basix-src
-            got checkout serendipity
+            git checkout serendipity
             pip install .
         name: Install basix
       - run: python3 -m pytest -n=auto --durations=50 test/ --has-basix 1
