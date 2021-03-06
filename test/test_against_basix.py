@@ -4,6 +4,7 @@ import pytest
 
 elements = {
     "interval": [("P", "Lagrange", range(1, 4)), ("dP", "Discontinuous Lagrange", range(1, 4)),
+                 ("serendipity", "Serendipity", range(1, 5)),
                  ("bubble", "Bubble", range(2, 5))],
     "triangle": [("P", "Lagrange", range(1, 4)), ("dP", "Discontinuous Lagrange", range(1, 4)),
                  ("bubble", "Bubble", range(3, 5)),
@@ -23,9 +24,12 @@ elements = {
                     ("Crouzeix-Raviart", "Crouzeix-Raviart", [1])],
     "quadrilateral": [("Q", "Lagrange", range(1, 4)),
                       ("dQ", "Discontinuous Lagrange", range(1, 4)),
+                      ("dP", "DPC", range(0, 4)),
+                      ("serendipity", "Serendipity", range(1, 5)),
                       ("Qdiv", "Raviart-Thomas", range(1, 4)),
                       ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 4))],
     "hexahedron": [("Q", "Lagrange", range(1, 3)), ("dQ", "Discontinuous Lagrange", range(1, 3)),
+                   ("serendipity", "Serendipity", range(1, 5)),
                    ("Qdiv", "Raviart-Thomas", range(1, 3)),
                    ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 3))]
 }
@@ -58,17 +62,23 @@ def make_lattice(cell, N=3):
 @pytest.mark.parametrize(("cell", "symfem_type", "basix_type", "order"),
                          [(cell, a, b, order) for cell, ls in elements.items()
                           for a, b, c in ls for order in c])
-def test_against_basix(elements_to_test, cells_to_test, cell, symfem_type, basix_type, order):
+def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_type,
+                       basix_type, order):
     if elements_to_test != "ALL" and symfem_type not in elements_to_test:
         pytest.skip()
     if cells_to_test != "ALL" and cell not in cells_to_test:
         pytest.skip()
-    try:
+    if has_basix:
         import basix
         from scipy.linalg import block_diag, solve
         import numpy as np
-    except ImportError:
-        pytest.skip("basix, numpy and scipy must be installed to run this test.")
+    else:
+        try:
+            import basix
+            from scipy.linalg import block_diag, solve
+            import numpy as np
+        except ImportError:
+            pytest.skip("basix, numpy and scipy must be installed to run this test.")
 
     element = create_element(cell, symfem_type, order)
     points = make_lattice(cell)

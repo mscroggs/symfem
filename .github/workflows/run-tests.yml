@@ -40,5 +40,5 @@ jobs:
             cd basix-src
             pip install .
         name: Install basix
-      - run: python3 -m pytest -n=auto --durations=50 test/
+      - run: python3 -m pytest -n=auto --durations=50 test/ --has-basix 1
         name: Run unit tests
