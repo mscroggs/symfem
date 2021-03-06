@@ -46,6 +46,7 @@ test_elements = {
         "Bernstein": {None: range(1, 4)},
         "HCT": {None: [3]},
         "rHCT": {None: [3]},
+        "FS": {None: [2]},
         "Taylor": {None: range(0, 5)},
     },
     "tetrahedron": {

@@ -27,7 +27,6 @@ class BognerFoxSchmit(FiniteElement):
             if reference.tdim == 2:
                 dofs.append(DerivativePointEvaluation(vs, (1, 1), entity=(0, v_n)))
 
-        print(len(dofs), len( quolynomial_set(reference.tdim, 1, order)))
         super().__init__(
             reference, order, quolynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
@@ -49,7 +48,6 @@ class BognerFoxSchmit(FiniteElement):
                 out.append(basis[dof])
                 dof += 1
 
-        print(tdim, len(out), len(basis))
         assert len(out) == len(basis)
         return [subs(b, x, inverse_map) for b in out]
 
