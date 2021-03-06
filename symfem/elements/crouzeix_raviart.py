@@ -51,7 +51,7 @@ class CrouzeixRaviart(FiniteElement):
         poly = polynomial_set(reference.tdim, 1, order)
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
-    names = ["Crouzeix-Raviart", "CR"]
+    names = ["Crouzeix-Raviart", "CR", "Crouzeix-Falk", "CF"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
     max_order = {"tetrahedron": 1}

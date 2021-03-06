@@ -46,6 +46,7 @@ test_elements = {
         "Bernstein": {None: range(1, 4)},
         "HCT": {None: [3]},
         "rHCT": {None: [3]},
+        "FS": {None: [2]},
         "Taylor": {None: range(0, 5)},
     },
     "tetrahedron": {
@@ -81,6 +82,7 @@ test_elements = {
         "Sdiv": {"equispaced": range(1, 4), "lobatto": range(1, 3)},
         "Qcurl": {"equispaced": range(1, 4)},
         "Qdiv": {"equispaced": range(1, 4)},
+        "BFS": {None: [3]},
         "BDFM": {"equispaced": range(1, 4)},
     },
     "hexahedron": {
