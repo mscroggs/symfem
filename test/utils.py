@@ -81,6 +81,7 @@ test_elements = {
         "Sdiv": {"equispaced": range(1, 4), "lobatto": range(1, 3)},
         "Qcurl": {"equispaced": range(1, 4)},
         "Qdiv": {"equispaced": range(1, 4)},
+        "BFS": {None: [3]},
         "BDFM": {"equispaced": range(1, 4)},
     },
     "hexahedron": {

@@ -1,18 +1,18 @@
-"""Hermite elements on simplices.
+"""Bogner-Fox-Schmit elements on tensor products.
 
-This element's definition appears in https://doi.org/10.1016/0045-7825(72)90006-0
-(Ciarlet, Raviart, 1972)
+This element's definition appears in http://contrails.iit.edu/reports/8569
+(Bogner, Fox, Schmit, 1966)
 """
 
 import sympy
 from ..core.finite_element import FiniteElement
-from ..core.polynomials import polynomial_set
+from ..core.polynomials import quolynomial_set
 from ..core.functionals import PointEvaluation, DerivativePointEvaluation
 from ..core.symbolic import sym_sum, x, subs
 
 
-class Hermite(FiniteElement):
-    """Hermite finite element."""
+class BognerFoxSchmit(FiniteElement):
+    """Bogner-Fox-Schmit finite element."""
 
     def __init__(self, reference, order, variant):
         assert order == 3
@@ -23,13 +23,13 @@ class Hermite(FiniteElement):
                 dofs.append(DerivativePointEvaluation(
                     vs, tuple(1 if i == j else 0 for j in range(reference.tdim)),
                     entity=(0, v_n)))
-        for e_n, vs in enumerate(reference.sub_entities(2)):
-            midpoint = tuple(sym_sum(i) / len(i)
-                             for i in zip(*[reference.vertices[i] for i in vs]))
-            dofs.append(PointEvaluation(midpoint, entity=(2, e_n)))
 
+            if reference.tdim == 2:
+                dofs.append(DerivativePointEvaluation(vs, (1, 1), entity=(0, v_n)))
+
+        print(len(dofs), len( quolynomial_set(reference.tdim, 1, order)))
         super().__init__(
-            reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
+            reference, order, quolynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
 
     def perform_mapping(self, basis, map, inverse_map):
@@ -37,21 +37,24 @@ class Hermite(FiniteElement):
         out = []
         tdim = self.reference.tdim
         J = sympy.Matrix([[map[i].diff(x[j]) for j in range(tdim)] for i in range(tdim)])
-        for v in range(tdim + 1):
-            out.append(basis[(tdim + 1) * v])
+        dof = 0
+        for v in range(2 ** tdim):
+            out.append(basis[dof])
+            dof += 1
             for i in range(tdim):
                 out.append(sym_sum(a * b for a, b in
-                                   zip(basis[(tdim + 1) * v + 1: (tdim + 1) * (v + 1)],
-                                       J.row(i))))
-        if tdim == 2:
-            out.append(basis[-1])
-        if tdim == 3:
-            out += basis[-4:]
+                                   zip(basis[dof: dof + tdim], J.row(i))))
+            dof += tdim
+            if tdim == 2:
+                out.append(basis[dof])
+                dof += 1
+
+        print(tdim, len(out), len(basis))
         assert len(out) == len(basis)
         return [subs(b, x, inverse_map) for b in out]
 
-    names = ["Hermite"]
-    references = ["interval", "triangle", "tetrahedron"]
+    names = ["Bogner-Fox-Schmit", "BFS"]
+    references = ["quadrilateral"]
     min_order = 3
     max_order = 3
     continuity = "C1"

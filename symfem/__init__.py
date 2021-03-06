@@ -106,7 +106,8 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
         Bernstein, Bernstein-Bezier,
         Hsieh-Clough-Tocher, Clough-Tocher, HCT, CT,
         reduced Hsieh-Clough-Tocher, rHCT, Taylor, discontinuous Taylor,
-        bubble enriched Lagrange, bubble enriched vector Lagrange
+        bubble enriched Lagrange, bubble enriched vector Lagrange,
+        Bogner-Fox-Schmitt, BFS
     order : int
         The order of the element.
     variant : str
