@@ -17,22 +17,21 @@ jobs:
           python-version: 3.8
       - run: |
             sudo apt-get update
-            sudo apt-get install -y libeigen3-dev libopenblas-dev liblapack-dev
             pip install --upgrade pip
-            pip install scikit-build pytest numpy scipy coverage coveralls pytest-cov pytest-xdist pybind11
+            pip install pytest numpy scipy coverage coveralls pytest-cov pytest-xdist
         name: Install dependencies
       - uses: actions/checkout@v2
       - run: python3 -m pip install -r requirements.txt
         name: Install requirements.txt
       - run: |
+            sudo apt-get install -y libeigen3-dev libopenblas-dev liblapack-dev ninja-build
+            pip install pybind11
             git clone https://github.com/FEniCS/basix.git basix-src
             cd basix-src
-            mkdir build
-            cd build
-            cmake ..
-            sudo make install
-            cd ../python
-            pip install .
+            cmake -G Ninja -B build-dir -S .
+            cmake --build build-dir
+            sudo cmake --install build-dir
+            pip install ./python/
         name: Install basix
       - run: python3 -m pytest -n=auto --cov=symfem --durations=50 test/
         name: Run unit tests
