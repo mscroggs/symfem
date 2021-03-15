@@ -40,7 +40,7 @@ jobs:
             cd basix-src
             cmake -B build -S .
             cmake --build build
-            cmake --install build
+            sudo cmake --install build
             cd python
             pip install .
         name: Install basix
