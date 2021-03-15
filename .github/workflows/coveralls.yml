@@ -32,7 +32,7 @@ jobs:
       - run: |
             git clone https://github.com/FEniCS/basix.git basix-src
             cd basix-src
-            cmake -G Ninja -B build-dir -S .
+            cmake -G Ninja -DCMAKE_BUILD_TYPE=Developer -DXTENSOR_ENABLE_ASSERT=ON -B build-dir -S .
             cmake --build build-dir
             sudo cmake --install build-dir
             pip install ./python/
