@@ -18,14 +18,18 @@ jobs:
       - run: |
             sudo apt-get update
             pip install --upgrade pip
+        name: Update apt and pip
+      - run: |
+            sudo apt-get install -y libeigen3-dev libopenblas-dev liblapack-dev ninja-build
+            pip install pybind11
+        name: Install Basix dependencies
+      - run: |
             pip install pytest numpy scipy coverage coveralls pytest-cov pytest-xdist
-        name: Install dependencies
+        name: Install test dependencies
       - uses: actions/checkout@v2
       - run: python3 -m pip install -r requirements.txt
         name: Install requirements.txt
       - run: |
-            sudo apt-get install -y libeigen3-dev libopenblas-dev liblapack-dev ninja-build
-            pip install pybind11
             git clone https://github.com/FEniCS/basix.git basix-src
             cd basix-src
             cmake -G Ninja -B build-dir -S .
