@@ -38,11 +38,11 @@ jobs:
       - run: |
             git clone https://github.com/FEniCS/basix.git basix-src
             cd basix-src
-            cmake -B build -S .
-            cmake --build build
-            sudo cmake --install build
-            cd python
+            mkdir build
+            cd build
+            cmake ..
+            sudo make install
+            cd ../python
             pip install .
-        name: Install basix
-      - run: python3 -m pytest -n=auto --durations=50 test/ --has-basix 1
+        name: Install basix - run: python3 -m pytest -n=auto --durations=50 test/ --has-basix 1
         name: Run unit tests
