@@ -101,7 +101,7 @@ test_elements = {
         "BDFM": {"equispaced": range(1, 3)},
     },
     "prism": {
-        "prism Lagrange": {"equispaced": range(4)}
+        "Lagrange": {"equispaced": range(4)}
     }
 }
 

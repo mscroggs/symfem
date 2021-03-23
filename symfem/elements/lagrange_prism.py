@@ -71,8 +71,7 @@ class Lagrange(FiniteElement):
             reference.tdim, 1
         )
 
-    names = ["prism Lagrange"]
-    # names = ["Lagrange", "P"]
+    names = ["Lagrange", "P"]
     references = ["prism"]
     min_order = 0
     continuity = "C0"
