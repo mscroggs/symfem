@@ -100,8 +100,9 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
     ----------
     cell_type : str
         The reference cell type.
-        Supported values: interval, triangle, quadrilateral, tetrahedron, hexahedron,
-        dual polygon(number_of_triangles)
+        Supported values:
+          interval, triangle, quadrilateral, tetrahedron, hexahedron,
+          prism, pyramid, dual polygon(number_of_triangles)
     element_type : str
         The type of the element.
         Supported values:
