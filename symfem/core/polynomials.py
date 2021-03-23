@@ -255,4 +255,27 @@ def Hcurl_serendipity(domain_dim, range_dim, order):
             out.append(tuple(p.diff(i) for i in x))
         return out
 
-    raise NotImplementedError
+    raise NotImplementedError()
+
+
+def prism_polynomial_set_1d(dim, order):
+    """One dimensional polynomial set."""
+    assert dim == 3
+    return [
+        x[0] ** i * x[1] ** j * x[2] ** k
+        for k in range(order + 1)
+        for j in range(order + 1)
+        for i in range(order + 1 - j)
+    ]
+
+
+def prism_polynomial_set(domain_dim, range_dim, order):
+    """Polynomial set for a prism."""
+    if range_dim == 1:
+        return prism_polynomial_set_1d(domain_dim, order)
+    set1d = polynomial_set_1d(domain_dim, order)
+    return [
+        tuple(p if i == j else zero for j in range(range_dim))
+        for p in set1d
+        for i in range(range_dim)
+    ]

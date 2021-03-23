@@ -47,8 +47,9 @@ def create_reference(cell_type, vertices=None):
     ----------
     cell_type : str
         The reference cell type.
-        Supported values: interval, triangle, quadrilateral, tetrahedron, hexahedron,
-        dual polygon(number_of_triangles)
+        Supported values:
+          interval, triangle, quadrilateral, tetrahedron, hexahedron,
+          prism, pyramid, dual polygon(number_of_triangles)
     vertices : list
         The vertices of the reference.
     """
@@ -72,6 +73,14 @@ def create_reference(cell_type, vertices=None):
         if vertices is not None:
             return _references.Hexahedron(vertices)
         return _references.Hexahedron()
+    elif cell_type == "prism":
+        if vertices is not None:
+            return _references.Prism(vertices)
+        return _references.Prism()
+    elif cell_type == "pyramid":
+        if vertices is not None:
+            return _references.Pyramid(vertices)
+        return _references.Pyramid()
     elif cell_type.startswith("dual polygon"):
         n_tri = int(cell_type.split("(")[1].split(")")[0])
         if vertices is not None:

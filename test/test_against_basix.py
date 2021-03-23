@@ -31,7 +31,8 @@ elements = {
     "hexahedron": [("Q", "Lagrange", range(1, 3)), ("dQ", "Discontinuous Lagrange", range(1, 3)),
                    ("serendipity", "Serendipity", range(1, 5)),
                    ("Qdiv", "Raviart-Thomas", range(1, 3)),
-                   ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 3))]
+                   ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 3))],
+    "prism": [("Lagrange", "Lagrange", range(1, 4))]
 }
 
 

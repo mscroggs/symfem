@@ -99,6 +99,9 @@ test_elements = {
         "Qcurl": {"equispaced": range(1, 3)},
         "Qdiv": {"equispaced": range(1, 3)},
         "BDFM": {"equispaced": range(1, 3)},
+    },
+    "prism": {
+        "prism Lagrange": {"equispaced": range(4)}
     }
 }
 
