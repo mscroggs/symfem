@@ -68,6 +68,21 @@ class Reference:
         if dim == 3:
             return self.volumes
 
+    def sub_entity_count(self, dim):
+        """Get the number of sub entities of a given dimension."""
+        return len(self.sub_entities(dim))
+
+    def sub_entity(self, dim, n):
+        """Get the sub entity of a given dimension and number."""
+        from symfem import create_reference
+
+        entity_type = self.sub_entity_types[dim]
+        if not isinstance(entity_type, str):
+            entity_type = entity_type[n]
+
+        return create_reference(
+            entity_type, [self.vertices[i] for i in self.sub_entities(dim)[n]])
+
     def at_vertex(self, point):
         """Check if a point is a vertex of the reference."""
         for v in self.vertices:
