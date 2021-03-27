@@ -35,9 +35,12 @@ for _file in _os.listdir(_os.path.join(_folder, "elements")):
                 if _element not in _elementlist:
                     _elementlist.append(_element)
                 for _n in _element.names:
-                    if _n in _elementmap:
-                        assert _element == _elementmap[_n]
-                    _elementmap[_n] = _element
+                    for _r in _element.references:
+                        if _n not in _elementmap:
+                            _elementmap[_n] = {}
+                        if _r in _elementmap[_n]:
+                            assert _element == _elementmap[_n][_r]
+                        _elementmap[_n][_r] = _element
 
 
 def create_reference(cell_type, vertices=None):
@@ -47,8 +50,9 @@ def create_reference(cell_type, vertices=None):
     ----------
     cell_type : str
         The reference cell type.
-        Supported values: interval, triangle, quadrilateral, tetrahedron, hexahedron,
-        dual polygon(number_of_triangles)
+        Supported values:
+          interval, triangle, quadrilateral, tetrahedron, hexahedron,
+          prism, pyramid, dual polygon(number_of_triangles)
     vertices : list
         The vertices of the reference.
     """
@@ -72,6 +76,14 @@ def create_reference(cell_type, vertices=None):
         if vertices is not None:
             return _references.Hexahedron(vertices)
         return _references.Hexahedron()
+    elif cell_type == "prism":
+        if vertices is not None:
+            return _references.Prism(vertices)
+        return _references.Prism()
+    elif cell_type == "pyramid":
+        if vertices is not None:
+            return _references.Pyramid(vertices)
+        return _references.Pyramid()
     elif cell_type.startswith("dual polygon"):
         n_tri = int(cell_type.split("(")[1].split(")")[0])
         if vertices is not None:
@@ -88,8 +100,9 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
     ----------
     cell_type : str
         The reference cell type.
-        Supported values: interval, triangle, quadrilateral, tetrahedron, hexahedron,
-        dual polygon(number_of_triangles)
+        Supported values:
+          interval, triangle, quadrilateral, tetrahedron, hexahedron,
+          prism, pyramid, dual polygon(number_of_triangles)
     element_type : str
         The type of the element.
         Supported values:
@@ -144,7 +157,7 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
     reference = create_reference(cell_type)
 
     if element_type in _elementmap:
-        assert cell_type.split("(")[0] in _elementmap[element_type].references
-        return _elementmap[element_type](reference, order, variant=variant)
+        assert reference.name in _elementmap[element_type]
+        return _elementmap[element_type][reference.name](reference, order, variant=variant)
 
     raise ValueError(f"Unsupported element type: {element_type}")

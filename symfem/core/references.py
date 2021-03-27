@@ -318,6 +318,134 @@ class Hexahedron(Reference):
         return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
 
 
+class Prism(Reference):
+    """A (triangular) prism."""
+
+    def __init__(self, vertices=((0, 0, 0), (1, 0, 0), (0, 1, 0),
+                                 (0, 0, 1), (1, 0, 1), (0, 1, 1))):
+        self.tdim = 3
+        self.name = "prism"
+        self.origin = vertices[0]
+        self.axes = (
+            vsub(vertices[1], vertices[0]),
+            vsub(vertices[2], vertices[0]),
+            vsub(vertices[3], vertices[0]),
+        )
+        self.reference_vertices = (
+            (0, 0, 0), (1, 0, 0), (0, 1, 0),
+            (0, 0, 1), (1, 0, 1), (0, 1, 1))
+        self.vertices = tuple(vertices)
+        self.edges = (
+            (0, 1), (0, 2), (0, 3), (1, 2), (1, 4),
+            (2, 5), (3, 4), (3, 5), (4, 5))
+        self.faces = (
+            (0, 1, 2), (0, 1, 3, 4), (0, 2, 3, 5),
+            (1, 2, 4, 5), (3, 4, 5))
+        self.volumes = ((0, 1, 2, 3, 4, 5),)
+        self.sub_entity_types = [
+            "point", "interval",
+            ["triangle", "quadrilateral", "quadrilateral", "quadrilateral", "triangle"],
+            "prism"]
+        super().__init__(tp=True)
+
+    def integral(self, f):
+        """Calculate the integral over the element."""
+        return (
+            (f * self.jacobian())
+            .integrate((t[2], 0, 1))
+            .integrate((t[1], 0, 1 - t[0]))
+            .integrate((t[0], 0, 1))
+        )
+
+    def get_map_to(self, vertices):
+        """Get the map from the reference to a cell."""
+        assert self.vertices == self.reference_vertices
+        return tuple(
+            (1 - x[2]) * (v0 + x[0] * (v1 - v0) + x[1] * (v2 - v0))
+            + x[2] * (v3 + x[0] * (v4 - v3) + x[1] * (v5 - v3))
+            for v0, v1, v2, v3, v4, v5 in zip(*vertices))
+
+    def get_inverse_map_to(self, vertices):
+        """Get the inverse map from a cell to the reference."""
+        assert self.vertices == self.reference_vertices
+        assert len(vertices[0]) == 3
+        for a, b, c, d in self.faces[1:4]:
+            assert vadd(vertices[a], vertices[d]) == vadd(vertices[b], vertices[c])
+        p = vsub(x, vertices[0])
+        v1 = vsub(vertices[1], vertices[0])
+        v2 = vsub(vertices[2], vertices[0])
+        v3 = vsub(vertices[3], vertices[0])
+        mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
+                            [v1[1], v2[1], v3[1]],
+                            [v1[2], v2[2], v3[2]]]).inv()
+        return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
+
+
+class Pyramid(Reference):
+    """A (square-based) pyramid."""
+
+    def __init__(self, vertices=((0, 0, 0), (1, 0, 0), (0, 1, 0),
+                                 (1, 1, 0), (0, 0, 1))):
+        self.tdim = 3
+        self.name = "pyramid"
+        self.origin = vertices[0]
+        self.axes = (
+            vsub(vertices[1], vertices[0]),
+            vsub(vertices[2], vertices[0]),
+            vsub(vertices[4], vertices[0]),
+        )
+        self.reference_vertices = (
+            (0, 0, 0), (1, 0, 0), (0, 1, 0),
+            (1, 1, 0), (0, 0, 1))
+        self.vertices = tuple(vertices)
+        self.edges = (
+            (0, 1), (0, 2), (0, 4), (1, 3),
+            (1, 4), (2, 3), (2, 4), (3, 4))
+        self.faces = (
+            (0, 1, 2, 3), (0, 1, 4), (0, 2, 4),
+            (1, 3, 4), (2, 3, 4))
+        self.volumes = ((0, 1, 2, 3, 4),)
+        self.sub_entity_types = [
+            "point", "interval",
+            ["quadrilateral", "triangle", "triangle", "triangle", "triangle"],
+            "pyramid"]
+        super().__init__(tp=True)
+
+    def integral(self, f):
+        """Calculate the integral over the element."""
+        return (
+            (f * self.jacobian())
+            .integrate((t[2], 0, 1))
+            .integrate((t[1], 0, 1 - t[0]))
+            .integrate((t[0], 0, 1))
+        )
+
+    def get_map_to(self, vertices):
+        """Get the map from the reference to a cell."""
+        assert self.vertices == self.reference_vertices
+        return tuple(
+            (1 - x[2]) * (
+                (1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1)
+                + x[1] * ((1 - x[0]) * v2 + x[0] * v3)
+            ) + x[2] * v4
+            for v0, v1, v2, v3, v4 in zip(*vertices))
+
+    def get_inverse_map_to(self, vertices):
+        """Get the inverse map from a cell to the reference."""
+        assert self.vertices == self.reference_vertices
+        assert len(vertices[0]) == 3
+        for a, b, c, d in self.faces[:1]:
+            assert vadd(vertices[a], vertices[d]) == vadd(vertices[b], vertices[c])
+        p = vsub(x, vertices[0])
+        v1 = vsub(vertices[1], vertices[0])
+        v2 = vsub(vertices[2], vertices[0])
+        v3 = vsub(vertices[4], vertices[0])
+        mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
+                            [v1[1], v2[1], v3[1]],
+                            [v1[2], v2[2], v3[2]]]).inv()
+        return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
+
+
 class DualPolygon(Reference):
     """A polygon on a barycentric dual grid."""
 
