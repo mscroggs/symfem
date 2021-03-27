@@ -1,4 +1,4 @@
-"""Lagrange elements on simplices."""
+"""Lagrange elements on a prism and pyramid."""
 
 import sympy
 from itertools import product
