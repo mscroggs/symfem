@@ -43,7 +43,7 @@ class Lagrange(FiniteElement):
             for e_n in range(reference.sub_entity_count(2)):
                 entity = reference.sub_entity(2, e_n)
                 for i in product(range(1, order), repeat=2):
-                    if len(vs) == 4 or sum(i) < order:
+                    if len(entity.vertices) == 4 or sum(i) < order:
                         dofs.append(
                             PointEvaluation(
                                 tuple(o + sum(a[j] * points[b]
