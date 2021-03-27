@@ -102,6 +102,9 @@ test_elements = {
     },
     "prism": {
         "Lagrange": {"equispaced": range(4)}
+    },
+    "pyramid": {
+        "Lagrange": {"equispaced": range(3)}
     }
 }
 

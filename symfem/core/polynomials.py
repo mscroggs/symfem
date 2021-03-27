@@ -3,19 +3,19 @@ from .symbolic import x, zero, one
 from itertools import product
 
 
-def polynomial_set_1d(dim, order):
+def polynomial_set_1d(dim, order, vars=x):
     """One dimensional polynomial set."""
     if dim == 1:
-        return [x[0] ** i for i in range(order + 1)]
+        return [vars[0] ** i for i in range(order + 1)]
     if dim == 2:
         return [
-            x[0] ** i * x[1] ** j
+            vars[0] ** i * vars[1] ** j
             for j in range(order + 1)
             for i in range(order + 1 - j)
         ]
     if dim == 3:
         return [
-            x[0] ** i * x[1] ** j * x[2] ** k
+            vars[0] ** i * vars[1] ** j * vars[2] ** k
             for k in range(order + 1)
             for j in range(order + 1 - k)
             for i in range(order + 1 - k - j)
@@ -208,7 +208,7 @@ def Hdiv_serendipity(domain_dim, range_dim, order):
             for p in [x[0] ** 3, x[0] ** 2 * x[1], x[0] * x[1] ** 2, x[1] ** 3]:
                 a.append((x[1] * x[2] * p, -x[0] * x[2] * p, zero))
         else:
-            raise NotImplementedError
+            raise NotImplementedError()
         return [
             (
                 r.diff(x[1]) - q.diff(x[2]),
@@ -217,7 +217,7 @@ def Hdiv_serendipity(domain_dim, range_dim, order):
             )
             for p, q, r in a
         ]
-    raise NotImplementedError
+    raise NotImplementedError()
 
 
 def Hcurl_serendipity(domain_dim, range_dim, order):
@@ -250,7 +250,7 @@ def Hcurl_serendipity(domain_dim, range_dim, order):
             for p in [x[0] ** 2, x[0] * x[1], x[1] ** 2]:
                 out.append((x[1] * x[2] * p, -x[0] * x[2] * p, zero))
         else:
-            raise NotImplementedError
+            raise NotImplementedError()
         for p in serendipity_set(domain_dim, 1, order + 1):
             out.append(tuple(p.diff(i) for i in x))
         return out
@@ -273,7 +273,41 @@ def prism_polynomial_set(domain_dim, range_dim, order):
     """Polynomial set for a prism."""
     if range_dim == 1:
         return prism_polynomial_set_1d(domain_dim, order)
-    set1d = polynomial_set_1d(domain_dim, order)
+    set1d = prism_polynomial_set_1d(domain_dim, order)
+    return [
+        tuple(p if i == j else zero for j in range(range_dim))
+        for p in set1d
+        for i in range(range_dim)
+    ]
+
+
+def pyramid_polynomial_set_1d(dim, order):
+    """One dimensional polynomial set."""
+    assert dim == 3
+    if order == 0:
+        return [one]
+    if order >= 3:
+       raise NotImplementedError()
+
+    poly = []
+    for r in range(order + 1):
+        for p in range(order - r + 1):
+            for q in range(order - r + 1):
+                if r == 0 and p + q < order:
+                    poly.append(x[0] ** p * x[1] ** q)
+                else:
+                    new_p = (2 * x[0] + x[2]) ** p
+                    new_p *= (2 * x[1] + x[2]) ** q
+                    new_p *= x[2] ** r
+                    poly.append(new_p)
+    return poly
+
+
+def pyramid_polynomial_set(domain_dim, range_dim, order):
+    """Polynomial set for a pyramid."""
+    if range_dim == 1:
+        return pyramid_polynomial_set_1d(domain_dim, order)
+    set1d = pyramid_polynomial_set_1d(domain_dim, order)
     return [
         tuple(p if i == j else zero for j in range(range_dim))
         for p in set1d

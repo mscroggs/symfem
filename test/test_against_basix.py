@@ -32,7 +32,8 @@ elements = {
                    ("serendipity", "Serendipity", range(1, 5)),
                    ("Qdiv", "Raviart-Thomas", range(1, 3)),
                    ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 3))],
-    "prism": [("Lagrange", "Lagrange", range(1, 4))]
+    "prism": [("Lagrange", "Lagrange", range(1, 4))],
+    "pyramid": [("Lagrange", "Lagrange", range(1, 3))]
 }
 
 
@@ -58,6 +59,13 @@ def make_lattice(cell, N=3):
     if cell == "hexahedron":
         return np.array([[i / N, j / N, k / N]
                          for i in range(N + 1) for j in range(N + 1) for k in range(N + 1)])
+    if cell == "prism":
+        return np.array([[i / N, j / N, k / N]
+                         for i in range(N + 1) for j in range(N + 1 - i) for k in range(N + 1)])
+    if cell == "pyramid":
+        return np.array([[i / N, j / N, k / N]
+                         for i in range(N + 1) for j in range(N + 1)
+                         for k in range(N + 1 - max(i, j))])
 
 
 @pytest.mark.parametrize(("cell", "symfem_type", "basix_type", "order"),
@@ -82,7 +90,7 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
             pytest.skip("basix, numpy and scipy must be installed to run this test.")
 
     element = create_element(cell, symfem_type, order)
-    points = make_lattice(cell)
+    points = make_lattice(cell, 2)
     space = basix.create_element(basix_type, cell, order)
     result = space.tabulate(0, points)[0]
 

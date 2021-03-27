@@ -58,6 +58,12 @@ def test_element_functionals_and_continuity(elements_to_test, cells_to_test,
         entity_pairs = [[0, (0, 1)], [0, (2, 2)], [0, (3, 4)], [0, (5, 5)],
                         [1, (1, 3)], [1, (2, 4)], [1, (6, 6)], [1, (7, 8)],
                         [2, (2, 3)]]
+    elif cell_type == "pyramid":
+        vertices = ((-1, 0, 0), (0, 0, 0), (-1, 1, 0),
+                    (0, 1, 0), (0, 0, 1))
+        entity_pairs = [[0, (0, 1)], [0, (2, 3)], [0, (4, 4)],
+                        [1, (1, 3)], [1, (2, 4)], [1, (6, 7)],
+                        [2, (2, 4)]]
 
     if space.continuity == "L2":
         return
