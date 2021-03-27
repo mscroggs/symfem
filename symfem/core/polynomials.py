@@ -287,7 +287,7 @@ def pyramid_polynomial_set_1d(dim, order):
     if order == 0:
         return [one]
     if order >= 3:
-       raise NotImplementedError()
+        raise NotImplementedError()
 
     poly = []
     for r in range(order + 1):

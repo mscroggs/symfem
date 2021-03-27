@@ -77,7 +77,6 @@ class Lagrange(FiniteElement):
                                       for j, o in enumerate(reference.origin)),
                                 entity=(3, e_n)))
 
-
         if reference.name == "prism":
             poly = prism_polynomial_set(reference.tdim, 1, order)
         elif reference.name == "pyramid":
