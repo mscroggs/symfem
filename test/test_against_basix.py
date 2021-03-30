@@ -5,7 +5,8 @@ import pytest
 elements = {
     "interval": [("P", "Lagrange", range(1, 4)), ("dP", "Discontinuous Lagrange", range(1, 4)),
                  ("serendipity", "Serendipity", range(1, 5)),
-                 ("bubble", "Bubble", range(2, 5))],
+                 ("bubble", "Bubble", range(2, 5)),
+                 ("dP", "DPC", range(0, 5))],
     "triangle": [("P", "Lagrange", range(1, 4)), ("dP", "Discontinuous Lagrange", range(1, 4)),
                  ("bubble", "Bubble", range(3, 5)),
                  ("N1curl", "Nedelec 1st kind H(curl)", range(1, 4)),
@@ -27,11 +28,15 @@ elements = {
                       ("dP", "DPC", range(0, 4)),
                       ("serendipity", "Serendipity", range(1, 5)),
                       ("Qdiv", "Raviart-Thomas", range(1, 4)),
-                      ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 4))],
+                      ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 4)),
+                      ("Sdiv", "Brezzi-Douglas-Marini", range(1, 4)),
+                      ("Scurl", "Nedelec 2nd kind H(curl)", range(1, 4))],
     "hexahedron": [("Q", "Lagrange", range(1, 3)), ("dQ", "Discontinuous Lagrange", range(1, 3)),
                    ("serendipity", "Serendipity", range(1, 5)),
                    ("Qdiv", "Raviart-Thomas", range(1, 3)),
-                   ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 3))],
+                   ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 3)),
+                   ("Sdiv", "Brezzi-Douglas-Marini", range(1, 3)),
+                   ("Scurl", "Nedelec 2nd kind H(curl)", range(1, 3))],
     "prism": [("Lagrange", "Lagrange", range(1, 4))],
     "pyramid": [("Lagrange", "Lagrange", range(1, 3))]
 }
