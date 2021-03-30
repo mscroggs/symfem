@@ -13,7 +13,6 @@ class Lagrange(FiniteElement):
     """Lagrange finite element."""
 
     def __init__(self, reference, order, variant):
-        from symfem import create_reference
         if order == 0:
             dofs = [
                 PointEvaluation(
@@ -31,10 +30,8 @@ class Lagrange(FiniteElement):
             for v_n, v in enumerate(reference.reference_vertices):
                 dofs.append(PointEvaluation(v, entity=(0, v_n)))
             for edim in range(1, 4):
-                for e_n, vs in enumerate(reference.sub_entities(edim)):
-                    entity = create_reference(
-                        reference.sub_entity_types[edim],
-                        vertices=tuple(reference.reference_vertices[i] for i in vs))
+                for e_n in range(reference.sub_entity_count(edim)):
+                    entity = reference.sub_entity(edim, e_n)
                     for i in product(range(1, order), repeat=edim):
                         if sum(i) < order:
                             dofs.append(
