@@ -73,7 +73,7 @@ jobs:
         with:
           path: ./basix-src
           repository: FEniCS/basix
-          ref: serendipity-divcurl
+          ref: main
       - run: |
             cd basix-src
             cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DXTENSOR_ENABLE_ASSERT=ON -B build-dir -S .
