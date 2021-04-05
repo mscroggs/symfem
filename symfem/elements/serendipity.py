@@ -60,7 +60,6 @@ class SerendipityCurl(FiniteElement):
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
-    max_order = 3  # TODO: generalise polynomial set for hexahedra, then remove this
     mapping = "covariant"
     continuity = "H(curl)"
 
@@ -84,6 +83,5 @@ class SerendipityDiv(FiniteElement):
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
-    max_order = 3  # TODO: generalise polynomial set for hexahedra, then remove this
     mapping = "contravariant"
     continuity = "H(div)"

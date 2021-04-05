@@ -186,29 +186,17 @@ def Hdiv_serendipity(domain_dim, range_dim, order):
         if order == 0:
             a.append((zero, x[0] * x[2], -x[0] * x[1]))
             a.append((x[1] * x[2], zero, -x[0] * x[1]))
-        elif order == 1:
-            for p in [x[1], x[2]]:
-                a.append((zero, x[0] * x[2] * p, -x[0] * x[1] * p))
-            for p in [x[0], x[2]]:
-                a.append((x[1] * x[2] * p, zero, -x[0] * x[1] * p))
-            for p in [x[0], x[1]]:
-                a.append((x[1] * x[2] * p, -x[0] * x[2] * p, zero))
-        elif order == 2:
-            for p in [x[0] ** 2, x[0] * x[2], x[2] ** 2]:
-                a.append((x[1] * x[2] * p, zero, -x[0] * x[1] * p))
-            for p in [x[1] ** 2, x[1] * x[2], x[2] ** 2]:
-                a.append((zero, x[0] * x[2] * p, -x[0] * x[1] * p))
-            for p in [x[0] ** 2, x[0] * x[1], x[1] ** 2]:
-                a.append((x[1] * x[2] * p, -x[0] * x[2] * p, zero))
-        elif order == 3:
-            for p in [x[0] ** 3, x[0] ** 2 * x[2], x[0] * x[2] ** 2, x[2] ** 3]:
-                a.append((x[1] * x[2] * p, zero, -x[0] * x[1] * p))
-            for p in [x[1] ** 3, x[1] ** 2 * x[2], x[1] * x[2] ** 2, x[1] ** 3]:
-                a.append((zero, x[0] * x[2] * p, -x[0] * x[1] * p))
-            for p in [x[0] ** 3, x[0] ** 2 * x[1], x[0] * x[1] ** 2, x[1] ** 3]:
-                a.append((x[1] * x[2] * p, -x[0] * x[2] * p, zero))
         else:
-            raise NotImplementedError()
+            for i in range(order + 1):
+                p = x[1] ** i * x[2] ** (order - i)
+                a.append((zero, x[0] * x[2] * p, -x[0] * x[1] * p))
+
+                p = x[0] ** i * x[2] ** (order - i)
+                a.append((x[1] * x[2] * p, zero, -x[0] * x[1] * p))
+
+                p = x[0] ** i * x[1] ** (order - i)
+                a.append((x[1] * x[2] * p, -x[0] * x[2] * p, zero))
+
         return [
             (
                 r.diff(x[1]) - q.diff(x[2]),
@@ -217,6 +205,7 @@ def Hdiv_serendipity(domain_dim, range_dim, order):
             )
             for p, q, r in a
         ]
+
     raise NotImplementedError()
 
 
@@ -235,22 +224,17 @@ def Hcurl_serendipity(domain_dim, range_dim, order):
                 (zero, x[0] * x[2], -x[0] * x[1]),
                 (x[1] * x[2], zero, -x[0] * x[1]),
             ]
-        elif order == 2:
-            for p in [x[0], x[2]]:
-                out.append((x[1] * x[2] * p, zero, -x[0] * x[1] * p))
-            for p in [x[1], x[2]]:
-                out.append((zero, x[0] * x[2] * p, -x[0] * x[1] * p))
-            for p in [x[0], x[1]]:
-                out.append((x[1] * x[2] * p, -x[0] * x[2] * p, zero))
-        elif order == 3:
-            for p in [x[0] ** 2, x[0] * x[2], x[2] ** 2]:
-                out.append((x[1] * x[2] * p, zero, -x[0] * x[1] * p))
-            for p in [x[1] ** 2, x[1] * x[2], x[2] ** 2]:
-                out.append((zero, x[0] * x[2] * p, -x[0] * x[1] * p))
-            for p in [x[0] ** 2, x[0] * x[1], x[1] ** 2]:
-                out.append((x[1] * x[2] * p, -x[0] * x[2] * p, zero))
         else:
-            raise NotImplementedError()
+            for i in range(order):
+                p = x[0] ** i * x[2] ** (order - 1 - i)
+                out.append((x[1] * x[2] * p, zero, -x[0] * x[1] * p))
+
+                p = x[1] ** i * x[2] ** (order - 1 - i)
+                out.append((zero, x[0] * x[2] * p, -x[0] * x[1] * p))
+
+                p = x[0] ** i * x[1] ** (order - 1 - i)
+                out.append((x[1] * x[2] * p, -x[0] * x[2] * p, zero))
+
         for p in serendipity_set(domain_dim, 1, order + 1):
             out.append(tuple(p.diff(i) for i in x))
         return out
