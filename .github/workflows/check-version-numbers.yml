@@ -1,4 +1,4 @@
-name: 🔢
+name: 🔢 Version numbering
 
 on:
   push:

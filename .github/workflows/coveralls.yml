@@ -1,4 +1,4 @@
-name: 🥼
+name: 🥼 Coveralls
 
 on:
   pull_request:
