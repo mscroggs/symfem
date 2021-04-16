@@ -147,7 +147,8 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
           bubble enriched Lagrange,
           bubble enriched vector Lagrange,
           Bogner-Fox-Schmit, BFS,
-          Fortin-Soulie, FS
+          Fortin-Soulie, FS,
+          Bernardi-Raugel
     order : int
         The order of the element.
     variant : str
