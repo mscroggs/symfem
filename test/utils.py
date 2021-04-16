@@ -48,6 +48,7 @@ test_elements = {
         "rHCT": {None: [3]},
         "FS": {None: [2]},
         "Taylor": {None: range(0, 5)},
+        "Bernardi-Raugel": {None: [1]},
     },
     "tetrahedron": {
         "P": {"equispaced": range(3), "lobatto": range(3)},
@@ -68,6 +69,7 @@ test_elements = {
         "BDM": {"equispaced": range(1, 3)},
         "Bernstein": {None: range(1, 3)},
         "Taylor": {None: range(0, 5)},
+        "Bernardi-Raugel": {None: [1]},
     },
     "quadrilateral": {
         "dP": {"equispaced": range(4), "lobatto": range(3), "radau": range(3),
