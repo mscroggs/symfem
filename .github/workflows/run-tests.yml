@@ -1,4 +1,4 @@
-name: 🧪
+name: 🧪 Tests
 
 on:
   push:
@@ -68,8 +68,13 @@ jobs:
             python3 setup.py install
             rm -rf symfem
         name: Install symfem
+      - name: Clone Basix
+        uses: actions/checkout@v2
+        with:
+          path: ./basix-src
+          repository: FEniCS/basix
+          ref: main
       - run: |
-            git clone https://github.com/FEniCS/basix.git basix-src
             cd basix-src
             cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DXTENSOR_ENABLE_ASSERT=ON -B build-dir -S .
             cmake --build build-dir
