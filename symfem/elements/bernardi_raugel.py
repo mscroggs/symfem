@@ -6,7 +6,6 @@ This element's definition appears in https://doi.org/10.2307/2007793
 
 from ..core import mappings
 from ..core.finite_element import FiniteElement
-from ..core.vectors import vsub
 from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import polynomial_set
 from ..core.functionals import NormalIntegralMoment, DotPointEvaluation
