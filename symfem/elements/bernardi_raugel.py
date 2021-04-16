@@ -6,6 +6,7 @@ This element's definition appears in https://doi.org/10.2307/2007793
 
 from ..core import mappings
 from ..core.finite_element import FiniteElement
+from ..core.vectors import vsub
 from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import polynomial_set
 from ..core.functionals import NormalIntegralMoment, DotPointEvaluation
@@ -30,9 +31,11 @@ class BernardiRaugel(FiniteElement):
 
         dofs = []
         for v_n, vertex in enumerate(reference.vertices):
-            for d in [tuple(1 if i == j else 0 for j in range(reference.tdim))
-                      for i in range(reference.tdim)]:
-                dofs.append(DotPointEvaluation(vertex, d, entity=(0, v_n)))
+            for f_n, facet in enumerate(reference.sub_entities(codim=1)):
+                if v_n in facet:
+                    sub_e = reference.sub_entity(reference.tdim - 1, f_n)
+                    d = [i * sub_e.jacobian() for i in sub_e.normal()]
+                    dofs.append(DotPointEvaluation(vertex, d, entity=(0, v_n)))
 
         dofs += make_integral_moment_dofs(
             reference,
@@ -46,12 +49,15 @@ class BernardiRaugel(FiniteElement):
         """Map the basis onto a cell using the appropriate mapping for the element."""
         out = []
         tdim = self.reference.tdim
-        for d, b in zip(self.dofs, basis):
-            if isinstance(d, DotPointEvaluation):
-                out.append(mappings.identity(b, map, inverse_map, tdim))
-            else:
-                out.append(mappings.contravariant(b, map, inverse_map, tdim))
+        out = [mappings.contravariant(b, map, inverse_map, tdim)
+               for b in basis]
         assert len(out) == len(basis)
+        # TODO: improve this hack
+        if self.reference.name == "triangle":
+            out[4], out[5] = out[5], out[4]
+        if self.reference.name == "tetrahedron":
+            out[6], out[7] = out[7], out[6]
+            out[9], out[10] = out[10], out[9]
         return out
 
     names = ["Bernardi-Raugel"]

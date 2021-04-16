@@ -57,8 +57,10 @@ class Reference:
                 return vnormalise(vcross(self.axes[0], self.axes[1]))
         raise RuntimeError
 
-    def sub_entities(self, dim):
+    def sub_entities(self, dim=None, codim=None):
         """Get the sub entities of a given dimension."""
+        if dim is None:
+            dim = self.tdim - codim
         if dim == 0:
             return self.vertices
         if dim == 1:
