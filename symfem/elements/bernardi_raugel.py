@@ -4,9 +4,7 @@ This element's definition appears in https://doi.org/10.2307/2007793
 (Bernardi and Raugel, 1985)
 """
 
-import sympy
 from ..core import mappings
-from ..core.symbolic import x, sym_sum, subs
 from ..core.finite_element import FiniteElement
 from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import polynomial_set
