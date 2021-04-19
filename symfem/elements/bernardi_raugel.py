@@ -33,7 +33,7 @@ class BernardiRaugel(FiniteElement):
             for f_n, facet in enumerate(reference.sub_entities(codim=1)):
                 if v_n in facet:
                     sub_e = reference.sub_entity(reference.tdim - 1, f_n)
-                    d = [i * sub_e.jacobian() for i in sub_e.normal()]
+                    d = tuple(i * sub_e.jacobian() for i in sub_e.normal())
                     dofs.append(DotPointEvaluation(vertex, d, entity=(0, v_n)))
 
         dofs += make_integral_moment_dofs(
