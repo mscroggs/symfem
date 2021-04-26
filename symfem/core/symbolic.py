@@ -19,6 +19,9 @@ def subs(f, vars, values):
         return tuple(subs(f_j, vars, values) for f_j in f)
     except TypeError:
         pass
+    if isinstance(vars, sympy.Symbol):
+        return (zero + f).subs(vars, values)
+
     if len(values) == 1:
         return f.subs(vars[0], values[0])
     if len(values) == 2:

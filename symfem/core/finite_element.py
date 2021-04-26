@@ -3,6 +3,7 @@
 import sympy
 from .symbolic import x, zero, subs, sym_sum, PiecewiseFunction
 from . import mappings
+from .basis_function import ElementBasisFunction
 
 
 class FiniteElement:
@@ -76,6 +77,10 @@ class FiniteElement:
                  for i in range(self.range_shape[0])]) for b in self._basis_functions]
 
         return self._basis_functions
+
+    def get_basis_function(self, n):
+        """Get a single basis function of the element."""
+        return ElementBasisFunction(self, n)
 
     def tabulate_basis(self, points, order="xyzxyz"):
         """Evaluate the basis functions of the element at the given points."""
