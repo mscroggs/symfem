@@ -84,10 +84,10 @@ class ReducedHsiehCloughTocher(FiniteElement):
                     x[0] ** 3 - x[1] ** 3, x[0] ** 3 + 3 * x[0] * x[1] ** 2]
         polys[2].remove(x[0] * x[1] ** 2)
 
-        bases = [
-            P1Hermite(r, 3, variant, p).get_basis_functions()
-            for r, p in zip(refs, polys)
-        ]
+        bases = []
+        for r, p in zip(refs, polys):
+            space = P1Hermite(r, 3, variant, p)
+            bases.append([space.get_basis_function(i) for i in range(space.space_dim)])
 
         piece_list = []
         piece_list.append((bases[0][0], zero, bases[2][3]))

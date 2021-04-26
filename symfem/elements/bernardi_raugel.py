@@ -25,7 +25,7 @@ class BernardiRaugel(FiniteElement):
             sub_e = reference.sub_entity(reference.tdim - 1, i)
             bubble = 1
             for j in reference.sub_entities(reference.tdim - 1)[i]:
-                bubble *= p.get_basis_functions()[j]
+                bubble *= p.get_basis_function(j)
             poly.append(tuple(bubble * j for j in sub_e.normal()))
 
         dofs = []
