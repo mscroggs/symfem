@@ -14,6 +14,10 @@ class BasisFunction:
         """Substitute a value into the function."""
         return SubbedBasisFunction(self, pre, post)
 
+    def __getattr__(self, attr):
+        """Forward all other function calls to symbolic function."""
+        return self.get_function().__getattr__(attr)
+
     def __rmul__(self, other):
         """Multiply."""
         return self.get_function() * other
