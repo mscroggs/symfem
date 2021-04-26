@@ -16,7 +16,7 @@ class BasisFunction:
 
     def __getattr__(self, attr):
         """Forward all other function calls to symbolic function."""
-        return self.get_function().__getattr__(attr)
+        return getattr(self.get_function(), attr)
 
     def __rmul__(self, other):
         """Multiply."""
