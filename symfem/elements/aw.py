@@ -40,13 +40,15 @@ class ArnoldWinther(FiniteElement):
                 reference.sub_entity_types[1],
                 vertices=tuple(reference.vertices[i] for i in edge))
             sub_e = DiscontinuousLagrange(sub_ref, order - 2, variant)
-            for p, dof in zip(sub_e.get_basis_functions(), sub_e.dofs):
+            for dof_n, dof in enumerate(sub_e.dofs):
+                p = sub_e.get_basis_function(dof_n)
                 for component in [sub_ref.normal(), sub_ref.tangent()]:
                     dofs.append(
                         InnerProductIntegralMoment(sub_ref, p, component, sub_ref.normal(), dof,
                                                    (1, e_n)))
         sub_e = DiscontinuousLagrange(reference, order - 3, variant)
-        for p, dof in zip(sub_e.get_basis_functions(), sub_e.dofs):
+        for dof_n, dof in enumerate(sub_e.dofs):
+            p = sub_e.get_basis_function(dof_n)
             for component in [(one, zero, zero, zero), (zero, one, zero, zero),
                               (zero, zero, zero, one)]:
                 dofs.append(VecIntegralMoment(reference, p, component, dof, (2, 0)))

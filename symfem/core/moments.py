@@ -46,9 +46,8 @@ def make_integral_moment_dofs(
                             sub_type,
                             vertices=[reference.reference_vertices[v] for v in vs])
                         sub_element = SubElement(sub_ref, order, variant=variant)
-                        for f, d in zip(
-                            sub_element.get_basis_functions(), sub_element.dofs
-                        ):
+                        for dn, d in enumerate(sub_element.dofs):
+                            f = sub_element.get_basis_function(dn)
                             dofs.append(IntegralMoment(sub_ref, f, d, entity=(dim, i)))
 
     # DOFs per codimension
@@ -65,9 +64,8 @@ def make_integral_moment_dofs(
                             sub_type,
                             vertices=[reference.reference_vertices[v] for v in vs])
                         sub_element = SubElement(sub_ref, order, variant=variant)
-                        for f, d in zip(
-                            sub_element.get_basis_functions(), sub_element.dofs
-                        ):
+                        for dn, d in enumerate(sub_element.dofs):
+                            f = sub_element.get_basis_function(dn)
                             dofs.append(IntegralMoment(sub_ref, f, d, entity=(dim, i)))
 
     return dofs
