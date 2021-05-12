@@ -21,6 +21,13 @@ _elementlist = []
 
 
 def add_element(ElementClass):
+    """Add an element to Symfem.
+
+    Parameters
+    ----------
+    ElementClass : type
+        The class defining the element.
+    """
     global _elementlist
     global _elementmap
     if not isinstance(ElementClass, type):
