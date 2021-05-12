@@ -19,6 +19,30 @@ with open(_os.path.join(_v_folder, "VERSION")) as _f:
 _elementmap = {}
 _elementlist = []
 
+
+def add_element(ElementClass):
+    global _elementlist
+    global _elementmap
+    if not isinstance(ElementClass, type):
+        raise TypeError("Element must be defined by a class.")
+    if not issubclass(ElementClass, _FiniteElement):
+        raise TypeError("Element must inherit from the FiniteElement class.")
+    if ElementClass == _FiniteElement:
+        raise TypeError("Cannot add the FiniteElement class itself.")
+    if len(ElementClass.names) == 0:
+        raise TypeError("An element with no names cannot be added")
+
+    if ElementClass not in _elementlist:
+        _elementlist.append(ElementClass)
+    for _n in ElementClass.names:
+        for _r in ElementClass.references:
+            if _n not in _elementmap:
+                _elementmap[_n] = {}
+            if _r in _elementmap[_n]:
+                assert ElementClass == _elementmap[_n][_r]
+            _elementmap[_n][_r] = ElementClass
+
+
 for _file in _os.listdir(_os.path.join(_folder, "elements")):
     if _file.endswith(".py") and "__init__" not in _file:
         _fname = _file[:-3]
@@ -32,15 +56,7 @@ for _file in _os.listdir(_os.path.join(_folder, "elements")):
                 and _element != _FiniteElement
                 and len(_element.names) > 0
             ):
-                if _element not in _elementlist:
-                    _elementlist.append(_element)
-                for _n in _element.names:
-                    for _r in _element.references:
-                        if _n not in _elementmap:
-                            _elementmap[_n] = {}
-                        if _r in _elementmap[_n]:
-                            assert _element == _elementmap[_n][_r]
-                        _elementmap[_n][_r] = _element
+                add_element(_element)
 
 
 def create_reference(cell_type, vertices=None):
