@@ -8,6 +8,7 @@ from .basis_function import ElementBasisFunction
 
 class FiniteElement:
     """Abstract finite element."""
+
     def __init__(self, reference, order, space_dim, domain_dim, range_dim,
                  range_shape=None):
         self.reference = reference
