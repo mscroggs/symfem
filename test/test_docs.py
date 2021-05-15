@@ -75,7 +75,7 @@ def test_available_elements():
     supported = supported.split("Supported values:")[1]
     supported = set([i.strip() for i in supported.split(",")])
 
-    assert set(symfem._elementmap.keys()) == supported
+    assert set(symfem.create._elementmap.keys()) == supported
 
 
 @pytest.mark.parametrize("script, output", doc_data)
