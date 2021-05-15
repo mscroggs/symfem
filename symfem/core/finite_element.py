@@ -28,7 +28,7 @@ class FiniteElement:
 
     def get_basis_function(self, n):
         """Get a single basis function of the element."""
-        raise NotImplementedError()
+        return ElementBasisFunction(self, n)
 
     def tabulate_basis(self, points, order="xyzxyz"):
         """Evaluate the basis functions of the element at the given points."""
@@ -164,6 +164,34 @@ class CiarletElement(FiniteElement):
 
         return self._basis_functions
 
-    def get_basis_function(self, n):
-        """Get a single basis function of the element."""
-        return ElementBasisFunction(self, n)
+    names = []
+
+
+class DirectElement(FiniteElement):
+    """Finite element defined directly."""
+
+    def __init__(self, reference, order, basis_functions, basis_entities, domain_dim, range_dim,
+                 range_shape=None):
+        super().__init__(reference, order, len(basis_functions), domain_dim, range_dim,
+                         range_shape)
+        self._basis_entities = basis_entities
+        self._basis_functions = basis_functions
+        self._reshaped_basis_functions = None
+
+    def entity_dofs(self, entity_dim, entity_number):
+        """Get the numbers of the DOFs associated with the given entity."""
+        return [i for i, j in enumerate(self._basis_entities) if j == (entity_dim, entity_number)]
+
+    def get_basis_functions(self, reshape=True):
+        """Get the basis functions of the element."""
+        if reshape and self.range_shape is not None:
+            if len(self.range_shape) != 2:
+                raise NotImplementedError
+            assert self.range_shape[0] * self.range_shape[1] == self.range_dim
+            return [sympy.Matrix(
+                [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
+                 for i in range(self.range_shape[0])]) for b in self._basis_functions]
+
+        return self._basis_functions
+
+    names = []
