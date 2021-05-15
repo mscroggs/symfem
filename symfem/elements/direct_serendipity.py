@@ -57,7 +57,7 @@ class DirectSerendipity(DirectElement):
             for j in range(order - 2):
                 basis_functions.append((1 - x[0]) * x[0] * lambda_34 * lambda_v ** j)
                 basis_entities.append((1, 3))
-            basis_functions.append((1 - x[0]) * x[0] * R_v * lambda_v ** (order - 2))
+            basis_functions.append((1 - x[0]) * x[0] * R_h * lambda_v ** (order - 2))
             basis_entities.append((1, 3))
 
         # Functions in interior
@@ -74,5 +74,3 @@ class DirectSerendipity(DirectElement):
     min_order = 1
     mapping = "identity"
     continuity = "C0"
-
-
