@@ -5,13 +5,13 @@ This element's definition appears in https://doi.org/10.1051/m2an/197307R300331
 """
 
 from itertools import product
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.polynomials import polynomial_set
 from ..core.functionals import PointEvaluation
 from ..core.quadrature import get_quadrature
 
 
-class CrouzeixRaviart(FiniteElement):
+class CrouzeixRaviart(CiarletElement):
     """Crouzeix-Raviart finite element."""
 
     def __init__(self, reference, order, variant):

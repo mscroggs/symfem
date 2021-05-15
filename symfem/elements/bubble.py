@@ -7,13 +7,13 @@ This element's definition appears in https://doi.org/10.1007/978-3-642-23099-8_3
 import sympy
 from itertools import product
 from ..core.symbolic import x, zero, one
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.polynomials import polynomial_set, quolynomial_set
 from ..core.functionals import PointEvaluation, DotPointEvaluation
 from .lagrange import Lagrange
 
 
-class Bubble(FiniteElement):
+class Bubble(CiarletElement):
     """Bubble finite element."""
 
     def __init__(self, reference, order, variant):
@@ -59,7 +59,7 @@ class Bubble(FiniteElement):
     continuity = "C0"
 
 
-class BubbleEnrichedLagrange(FiniteElement):
+class BubbleEnrichedLagrange(CiarletElement):
     """Bubble enriched Lagrange element."""
 
     def __init__(self, reference, order, variant):
@@ -78,7 +78,7 @@ class BubbleEnrichedLagrange(FiniteElement):
     continuity = "C0"
 
 
-class BubbleEnrichedVectorLagrange(FiniteElement):
+class BubbleEnrichedVectorLagrange(CiarletElement):
     """Bubble enriched Lagrange element."""
 
     def __init__(self, reference, order, variant):

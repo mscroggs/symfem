@@ -3,7 +3,7 @@
 This element's definition is given in https://doi.org/10.1002/nme.1620010108 (Bell, 1969)
 """
 
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import polynomial_set
 from ..core.functionals import (PointEvaluation, NormalDerivativeIntegralMoment,
@@ -11,7 +11,7 @@ from ..core.functionals import (PointEvaluation, NormalDerivativeIntegralMoment,
 from .lagrange import DiscontinuousLagrange
 
 
-class Bell(FiniteElement):
+class Bell(CiarletElement):
     """Bell finite element."""
 
     def __init__(self, reference, order, variant):

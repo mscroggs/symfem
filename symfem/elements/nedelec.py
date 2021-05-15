@@ -4,7 +4,7 @@ These elements' definitions appear in https://doi.org/10.1007/BF01396415
 (Nedelec, 1980) and https://doi.org/10.1007/BF01389668 (Nedelec, 1986)
 """
 
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import polynomial_set, Hcurl_polynomials
 from ..core.functionals import TangentIntegralMoment, IntegralMoment
@@ -12,7 +12,7 @@ from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
 from .rt import RaviartThomas
 
 
-class NedelecFirstKind(FiniteElement):
+class NedelecFirstKind(CiarletElement):
     """Nedelec first kind Hcurl finite element."""
 
     def __init__(self, reference, order, variant):
@@ -35,7 +35,7 @@ class NedelecFirstKind(FiniteElement):
     continuity = "H(curl)"
 
 
-class NedelecSecondKind(FiniteElement):
+class NedelecSecondKind(CiarletElement):
     """Nedelec second kind Hcurl finite element."""
 
     def __init__(self, reference, order, variant):

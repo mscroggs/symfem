@@ -4,14 +4,14 @@ This element's definition appears in https://arxiv.org/abs/1909.09687
 (Arnold, Walker, 2020)
 """
 
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import polynomial_set
 from ..core.functionals import NormalInnerProductIntegralMoment, IntegralMoment
 from .lagrange import DiscontinuousLagrange, SymmetricMatrixDiscontinuousLagrange
 
 
-class HellanHerrmannJohnson(FiniteElement):
+class HellanHerrmannJohnson(CiarletElement):
     """A Hellan-Herrmann-Johnson element."""
 
     def __init__(self, reference, order, variant):

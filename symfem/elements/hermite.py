@@ -5,13 +5,13 @@ This element's definition appears in https://doi.org/10.1016/0045-7825(72)90006-
 """
 
 import sympy
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.polynomials import polynomial_set
 from ..core.functionals import PointEvaluation, DerivativePointEvaluation
 from ..core.symbolic import sym_sum, x, subs
 
 
-class Hermite(FiniteElement):
+class Hermite(CiarletElement):
     """Hermite finite element."""
 
     def __init__(self, reference, order, variant):

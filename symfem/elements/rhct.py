@@ -5,13 +5,13 @@ This element's definition appears in https://doi.org/10.2307/2006147
 """
 
 import sympy
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.functionals import PointEvaluation, DerivativePointEvaluation
 from ..core.polynomials import polynomial_set
 from ..core.symbolic import sym_sum, PiecewiseFunction, zero, x, subs, one
 
 
-class P1Hermite(FiniteElement):
+class P1Hermite(CiarletElement):
     """P1Hermite finite element."""
 
     def __init__(self, reference, order, variant, poly):
@@ -51,7 +51,7 @@ class P1Hermite(FiniteElement):
     continuity = "C0"
 
 
-class ReducedHsiehCloughTocher(FiniteElement):
+class ReducedHsiehCloughTocher(CiarletElement):
     """Reduced Hsieh-Clough-Tocher finite element."""
 
     def __init__(self, reference, order, variant):

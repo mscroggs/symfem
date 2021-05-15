@@ -1,11 +1,11 @@
 import symfem
 import sympy
-from symfem.core.finite_element import FiniteElement
+from symfem.core.finite_element import CiarletElement
 from symfem.core.symbolic import x
 from symfem.core.functionals import PointEvaluation
 
 
-class CustomElement(FiniteElement):
+class CustomElement(CiarletElement):
     """Custom element on a quadrilateral."""
 
     def __init__(self, reference, order, variant):

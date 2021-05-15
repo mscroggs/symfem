@@ -4,7 +4,7 @@ This element's definition appears in https://doi.org/10.1017/S000192400008489X
 (Arygris, Fried, Scharpf, 1968)
 """
 
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.polynomials import polynomial_set
 from ..core.functionals import (PointEvaluation, PointDirectionalDerivativeEvaluation,
                                 PointNormalDerivativeEvaluation,
@@ -12,7 +12,7 @@ from ..core.functionals import (PointEvaluation, PointDirectionalDerivativeEvalu
 from ..core.symbolic import sym_sum
 
 
-class Argyris(FiniteElement):
+class Argyris(CiarletElement):
     """Argyris finite element."""
 
     def __init__(self, reference, order, variant):

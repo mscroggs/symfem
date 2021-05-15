@@ -4,7 +4,7 @@ This element's definition appears in https://doi.org/10.1007/BF01396752
 (Brezzi, Douglas, Duran, Fortin, 1987)
 """
 
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import polynomial_set
 from ..core.symbolic import x, zero
@@ -30,7 +30,7 @@ def bddf_polyset(reference, order):
     return pset
 
 
-class BDDF(FiniteElement):
+class BDDF(CiarletElement):
     """Brezzi-Douglas-Duran-Fortin Hdiv finite element."""
 
     def __init__(self, reference, order, variant):

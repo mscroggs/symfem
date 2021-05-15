@@ -4,7 +4,7 @@ This element's definition appears in https://doi.org/10.1007/s10208-011-9087-3
 (Arnold, Awanou, 2011)
 """
 
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import (serendipity_set, polynomial_set,
                                 Hdiv_serendipity, Hcurl_serendipity)
@@ -13,7 +13,7 @@ from ..core.functionals import (
 from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
 
 
-class Serendipity(FiniteElement):
+class Serendipity(CiarletElement):
     """A serendipity element."""
 
     def __init__(self, reference, order, variant):
@@ -40,7 +40,7 @@ class Serendipity(FiniteElement):
     continuity = "C0"
 
 
-class SerendipityCurl(FiniteElement):
+class SerendipityCurl(CiarletElement):
     """A serendipity Hcurl element."""
 
     def __init__(self, reference, order, variant):
@@ -64,7 +64,7 @@ class SerendipityCurl(FiniteElement):
     continuity = "H(curl)"
 
 
-class SerendipityDiv(FiniteElement):
+class SerendipityDiv(CiarletElement):
     """A serendipity Hdiv element."""
 
     def __init__(self, reference, order, variant):

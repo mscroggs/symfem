@@ -5,7 +5,7 @@ This element's definition is given in https://doi.org/10.1023/A:1004420829610
 """
 
 import sympy
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.polynomials import polynomial_set
 from ..core.functionals import WeightedPointEvaluation
 from ..core.symbolic import x
@@ -41,7 +41,7 @@ def kmv_tet_polyset(m, mf, mi):
     return poly
 
 
-class KongMulderVeldhuizen(FiniteElement):
+class KongMulderVeldhuizen(CiarletElement):
     """Kong-Mulder-Veldhuizen finite element."""
 
     def __init__(self, reference, order, variant):

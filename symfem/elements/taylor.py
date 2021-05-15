@@ -1,6 +1,6 @@
 """Taylor element on an interval, triangle or tetrahedron."""
 
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import polynomial_set
 from ..core.functionals import IntegralMoment, DerivativePointEvaluation
@@ -9,7 +9,7 @@ from .lagrange import DiscontinuousLagrange
 from itertools import product
 
 
-class Taylor(FiniteElement):
+class Taylor(CiarletElement):
     """Taylor finite element."""
 
     def __init__(self, reference, order, variant):
