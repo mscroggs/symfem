@@ -5,13 +5,13 @@ This element's definition appears in http://contrails.iit.edu/reports/8569
 """
 
 import sympy
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.polynomials import quolynomial_set
 from ..core.functionals import PointEvaluation, DerivativePointEvaluation
 from ..core.symbolic import sym_sum, x, subs
 
 
-class BognerFoxSchmit(FiniteElement):
+class BognerFoxSchmit(CiarletElement):
     """Bogner-Fox-Schmit finite element."""
 
     def __init__(self, reference, order, variant):

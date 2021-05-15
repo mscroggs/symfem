@@ -9,74 +9,22 @@ from .basis_function import ElementBasisFunction
 class FiniteElement:
     """Abstract finite element."""
 
-    def __init__(self, reference, order, basis, dofs, domain_dim, range_dim,
+    def __init__(self, reference, order, space_dim, domain_dim, range_dim,
                  range_shape=None):
-        assert len(basis) == len(dofs)
         self.reference = reference
         self.order = order
-        self.basis = basis
-        self.dofs = dofs
+        self.space_dim = space_dim
         self.domain_dim = domain_dim
         self.range_dim = range_dim
         self.range_shape = range_shape
-        self.space_dim = len(dofs)
-        self._basis_functions = None
-        self._reshaped_basis_functions = None
 
     def entity_dofs(self, entity_dim, entity_number):
         """Get the numbers of the DOFs associated with the given entity."""
-        return [i for i, j in enumerate(self.dofs) if j.entity == (entity_dim, entity_number)]
-
-    def get_polynomial_basis(self, reshape=True):
-        """Get the polynomial basis for the element."""
-        if reshape and self.range_shape is not None:
-            if len(self.range_shape) != 2:
-                raise NotImplementedError
-            assert self.range_shape[0] * self.range_shape[1] == self.range_dim
-            return [sympy.Matrix(
-                [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
-                 for i in range(self.range_shape[0])]) for b in self.basis]
-
-        return self.basis
-
-    def get_dual_matrix(self):
-        """Get the dual matrix."""
-        mat = []
-        for b in self.basis:
-            row = []
-            for d in self.dofs:
-                row.append(d.eval(b))
-            mat.append(row)
-        return sympy.Matrix(mat)
+        raise NotImplementedError()
 
     def get_basis_functions(self, reshape=True):
         """Get the basis functions of the element."""
-        if self._basis_functions is None:
-            minv = self.get_dual_matrix().inv("LU")
-            self._basis_functions = []
-            if self.range_dim == 1:
-                # Scalar space
-                for i, dof in enumerate(self.dofs):
-                    self._basis_functions.append(
-                        sym_sum(c * d for c, d in zip(minv.row(i), self.basis)))
-            else:
-                # Vector space
-                for i, dof in enumerate(self.dofs):
-                    b = [zero for i in self.basis[0]]
-                    for c, d in zip(minv.row(i), self.basis):
-                        for j, d_j in enumerate(d):
-                            b[j] += c * d_j
-                    self._basis_functions.append(b)
-
-        if reshape and self.range_shape is not None:
-            if len(self.range_shape) != 2:
-                raise NotImplementedError
-            assert self.range_shape[0] * self.range_shape[1] == self.range_dim
-            return [sympy.Matrix(
-                [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
-                 for i in range(self.range_shape[0])]) for b in self._basis_functions]
-
-        return self._basis_functions
+        raise NotImplementedError()
 
     def get_basis_function(self, n):
         """Get a single basis function of the element."""
@@ -145,5 +93,105 @@ class FiniteElement:
     def name(self):
         """Get the name of the element."""
         return self.names[0]
+
+    names = []
+
+
+class CiarletElement(FiniteElement):
+    """Finite element defined using the Ciarlet definition."""
+
+    def __init__(self, reference, order, basis, dofs, domain_dim, range_dim,
+                 range_shape=None):
+        super().__init__(reference, order, len(dofs), domain_dim, range_dim, range_shape)
+        assert len(basis) == len(dofs)
+        self.basis = basis
+        self.dofs = dofs
+        self._basis_functions = None
+        self._reshaped_basis_functions = None
+
+    def entity_dofs(self, entity_dim, entity_number):
+        """Get the numbers of the DOFs associated with the given entity."""
+        return [i for i, j in enumerate(self.dofs) if j.entity == (entity_dim, entity_number)]
+
+    def get_polynomial_basis(self, reshape=True):
+        """Get the polynomial basis for the element."""
+        if reshape and self.range_shape is not None:
+            if len(self.range_shape) != 2:
+                raise NotImplementedError
+            assert self.range_shape[0] * self.range_shape[1] == self.range_dim
+            return [sympy.Matrix(
+                [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
+                 for i in range(self.range_shape[0])]) for b in self.basis]
+
+        return self.basis
+
+    def get_dual_matrix(self):
+        """Get the dual matrix."""
+        mat = []
+        for b in self.basis:
+            row = []
+            for d in self.dofs:
+                row.append(d.eval(b))
+            mat.append(row)
+        return sympy.Matrix(mat)
+
+    def get_basis_functions(self, reshape=True):
+        """Get the basis functions of the element."""
+        if self._basis_functions is None:
+            minv = self.get_dual_matrix().inv("LU")
+            self._basis_functions = []
+            if self.range_dim == 1:
+                # Scalar space
+                for i, dof in enumerate(self.dofs):
+                    self._basis_functions.append(
+                        sym_sum(c * d for c, d in zip(minv.row(i), self.basis)))
+            else:
+                # Vector space
+                for i, dof in enumerate(self.dofs):
+                    b = [zero for i in self.basis[0]]
+                    for c, d in zip(minv.row(i), self.basis):
+                        for j, d_j in enumerate(d):
+                            b[j] += c * d_j
+                    self._basis_functions.append(b)
+
+        if reshape and self.range_shape is not None:
+            if len(self.range_shape) != 2:
+                raise NotImplementedError
+            assert self.range_shape[0] * self.range_shape[1] == self.range_dim
+            return [sympy.Matrix(
+                [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
+                 for i in range(self.range_shape[0])]) for b in self._basis_functions]
+
+        return self._basis_functions
+
+    names = []
+
+
+class DirectElement(FiniteElement):
+    """Finite element defined directly."""
+
+    def __init__(self, reference, order, basis_functions, basis_entities, domain_dim, range_dim,
+                 range_shape=None):
+        super().__init__(reference, order, len(basis_functions), domain_dim, range_dim,
+                         range_shape)
+        self._basis_entities = basis_entities
+        self._basis_functions = basis_functions
+        self._reshaped_basis_functions = None
+
+    def entity_dofs(self, entity_dim, entity_number):
+        """Get the numbers of the DOFs associated with the given entity."""
+        return [i for i, j in enumerate(self._basis_entities) if j == (entity_dim, entity_number)]
+
+    def get_basis_functions(self, reshape=True):
+        """Get the basis functions of the element."""
+        if reshape and self.range_shape is not None:
+            if len(self.range_shape) != 2:
+                raise NotImplementedError
+            assert self.range_shape[0] * self.range_shape[1] == self.range_dim
+            return [sympy.Matrix(
+                [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
+                 for i in range(self.range_shape[0])]) for b in self._basis_functions]
+
+        return self._basis_functions
 
     names = []

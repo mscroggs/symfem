@@ -5,14 +5,14 @@ This element's definition appears in https://doi.org/10.2307/2007793
 """
 
 from ..core import mappings
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import polynomial_set
 from ..core.functionals import NormalIntegralMoment, DotPointEvaluation
 from .lagrange import Lagrange, DiscontinuousLagrange
 
 
-class BernardiRaugel(FiniteElement):
+class BernardiRaugel(CiarletElement):
     """Bernardi-Raugel Hdiv finite element."""
 
     def __init__(self, reference, order, variant):

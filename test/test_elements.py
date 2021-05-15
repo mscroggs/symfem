@@ -1,9 +1,23 @@
 import pytest
 import sympy
+import symfem
 from symfem import create_element
+from symfem.core.finite_element import CiarletElement
 from symfem.core.symbolic import subs, x, PiecewiseFunction
 from symfem.core.vectors import vsub
 from utils import test_elements, all_symequal
+
+
+def test_all_tested():
+    for e in symfem.create._elementlist:
+        for r in e.references:
+            if r == "dual polygon":
+                continue
+            for n in e.names:
+                if n in test_elements[r]:
+                    break
+            else:
+                raise ValueError(f"{e.names[0]} on a {r} is not tested")
 
 
 @pytest.mark.parametrize(
@@ -27,13 +41,16 @@ def test_element_functionals_and_continuity(
 
     # Test functionals
     space = create_element(cell_type, element_type, order, variant)
-    for i, f in enumerate(space.get_basis_functions()):
-        for j, d in enumerate(space.dofs):
-            if i == j:
-                assert d.eval(f).expand().simplify() == 1
-            else:
-                assert d.eval(f).expand().simplify() == 0
-            assert d.entity_dim() is not None
+    if isinstance(space, CiarletElement):
+        for i, f in enumerate(space.get_basis_functions()):
+            for j, d in enumerate(space.dofs):
+                if i == j:
+                    assert d.eval(f).expand().simplify() == 1
+                else:
+                    assert d.eval(f).expand().simplify() == 0
+                assert d.entity_dim() is not None
+    else:
+        space.get_basis_functions()
 
     if order > 4:
         return  # For high order, testing continuity is slow

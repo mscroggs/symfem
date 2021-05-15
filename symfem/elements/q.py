@@ -3,7 +3,7 @@
 import sympy
 from itertools import product
 from ..core.symbolic import one, zero
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import quolynomial_set, Hdiv_quolynomials, Hcurl_quolynomials
 from ..core.quadrature import get_quadrature
@@ -11,7 +11,7 @@ from ..core.functionals import (PointEvaluation, DotPointEvaluation, IntegralMom
                                 TangentIntegralMoment, NormalIntegralMoment)
 
 
-class Q(FiniteElement):
+class Q(CiarletElement):
     """A Q element."""
 
     def __init__(self, reference, order, variant):
@@ -55,7 +55,7 @@ class Q(FiniteElement):
     continuity = "C0"
 
 
-class DiscontinuousQ(FiniteElement):
+class DiscontinuousQ(CiarletElement):
     """A dQ element."""
 
     def __init__(self, reference, order, variant):
@@ -86,7 +86,7 @@ class DiscontinuousQ(FiniteElement):
     continuity = "L2"
 
 
-class VectorQ(FiniteElement):
+class VectorQ(CiarletElement):
     """A vector Q element."""
 
     def __init__(self, reference, order, variant):
@@ -118,7 +118,7 @@ class VectorQ(FiniteElement):
     continuity = "C0"
 
 
-class Nedelec(FiniteElement):
+class Nedelec(CiarletElement):
     """Nedelec Hcurl finite element."""
 
     def __init__(self, reference, order, variant):
@@ -142,7 +142,7 @@ class Nedelec(FiniteElement):
     continuity = "H(curl)"
 
 
-class RaviartThomas(FiniteElement):
+class RaviartThomas(CiarletElement):
     """Raviart-Thomas Hdiv finite element."""
 
     def __init__(self, reference, order, variant):

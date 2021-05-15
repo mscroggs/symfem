@@ -5,7 +5,7 @@ This element's definition appears in https://doi.org/10.1007/s00211-010-0327-2
 """
 
 from ..core.symbolic import one, x
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.polynomials import polynomial_set
 from ..core.functionals import IntegralAgainst
 
@@ -65,7 +65,7 @@ def bernstein_polynomials(n, d):
     return poly
 
 
-class Bernstein(FiniteElement):
+class Bernstein(CiarletElement):
     """Bernstein finite element."""
 
     def __init__(self, reference, order, variant):

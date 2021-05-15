@@ -4,14 +4,14 @@ This element's definition appears in https://doi.org/10.1007/BF01396415
 (Nedelec, 1980)
 """
 
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import polynomial_set, Hdiv_polynomials
 from ..core.functionals import NormalIntegralMoment, IntegralMoment
 from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
 
 
-class RaviartThomas(FiniteElement):
+class RaviartThomas(CiarletElement):
     """Raviart-Thomas Hdiv finite element."""
 
     def __init__(self, reference, order, variant):

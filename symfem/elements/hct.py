@@ -5,14 +5,14 @@ This element's definition appears in https://doi.org/10.2307/2006147
 """
 
 import sympy
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.functionals import (PointEvaluation, PointNormalDerivativeEvaluation,
                                 DerivativePointEvaluation)
 from ..core.symbolic import sym_sum, PiecewiseFunction, zero, x, subs
 from .hermite import Hermite
 
 
-class HsiehCloughTocher(FiniteElement):
+class HsiehCloughTocher(CiarletElement):
     """Hsieh-Clough-Tocher finite element."""
 
     def __init__(self, reference, order, variant):

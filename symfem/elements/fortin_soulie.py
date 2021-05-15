@@ -5,14 +5,14 @@ This element's definition appears in https://doi.org/10.1002/nme.1620190405
 """
 
 import sympy
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.polynomials import polynomial_set
 from ..core.functionals import PointEvaluation, IntegralMoment
 from ..core.moments import make_integral_moment_dofs
 from .lagrange import DiscontinuousLagrange
 
 
-class FortinSoulie(FiniteElement):
+class FortinSoulie(CiarletElement):
     """Fortin-Soulie finite element."""
 
     def __init__(self, reference, order, variant):

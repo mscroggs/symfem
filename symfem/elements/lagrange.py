@@ -3,13 +3,13 @@
 import sympy
 from itertools import product
 from ..core.symbolic import one, zero
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.polynomials import polynomial_set
 from ..core.functionals import PointEvaluation, DotPointEvaluation
 from ..core.quadrature import get_quadrature
 
 
-class Lagrange(FiniteElement):
+class Lagrange(CiarletElement):
     """Lagrange finite element."""
 
     def __init__(self, reference, order, variant):
@@ -52,7 +52,7 @@ class Lagrange(FiniteElement):
     mapping = "identity"
 
 
-class DiscontinuousLagrange(FiniteElement):
+class DiscontinuousLagrange(CiarletElement):
     """Discontinuous Lagrange finite element."""
 
     def __init__(self, reference, order, variant):
@@ -81,7 +81,7 @@ class DiscontinuousLagrange(FiniteElement):
     mapping = "identity"
 
 
-class VectorLagrange(FiniteElement):
+class VectorLagrange(CiarletElement):
     """Vector Lagrange finite element."""
 
     def __init__(self, reference, order, variant):
@@ -113,7 +113,7 @@ class VectorLagrange(FiniteElement):
     mapping = "identity"
 
 
-class VectorDiscontinuousLagrange(FiniteElement):
+class VectorDiscontinuousLagrange(CiarletElement):
     """Vector Lagrange finite element."""
 
     def __init__(self, reference, order, variant):
@@ -145,7 +145,7 @@ class VectorDiscontinuousLagrange(FiniteElement):
     mapping = "identity"
 
 
-class MatrixDiscontinuousLagrange(FiniteElement):
+class MatrixDiscontinuousLagrange(CiarletElement):
     """Matrix Lagrange finite element."""
 
     def __init__(self, reference, order, variant):
@@ -178,7 +178,7 @@ class MatrixDiscontinuousLagrange(FiniteElement):
     mapping = "identity"
 
 
-class SymmetricMatrixDiscontinuousLagrange(FiniteElement):
+class SymmetricMatrixDiscontinuousLagrange(CiarletElement):
     """Symmetric matrix Lagrange finite element."""
 
     def __init__(self, reference, order, variant):

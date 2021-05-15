@@ -9,6 +9,8 @@ test_elements = {
                "legendre": range(3)},
         "vdP": {"equispaced": range(6), "lobatto": range(3), "radau": range(3),
                 "legendre": range(3)},
+        "vP": {"equispaced": range(6), "lobatto": range(3), "radau": range(3),
+               "legendre": range(3)},
         "bubble": {"equispaced": range(2, 6), "lobatto": range(2, 3)},
         "serendipity": {"equispaced": range(1, 6), "lobatto": range(1, 3)},
         "Q": {"equispaced": range(3), "lobatto": range(3)},
@@ -21,6 +23,7 @@ test_elements = {
         "P": {"equispaced": range(5), "lobatto": range(3)},
         "dP": {"equispaced": range(5), "lobatto": range(3)},
         "vdP": {"equispaced": range(5), "lobatto": range(3)},
+        "vP": {"equispaced": range(5), "lobatto": range(3)},
         "matrix discontinuous Lagrange": {"equispaced": range(3), "lobatto": range(3)},
         "symmetric matrix discontinuous Lagrange": {
             "equispaced": range(3), "lobatto": range(3)},
@@ -54,6 +57,7 @@ test_elements = {
         "P": {"equispaced": range(3), "lobatto": range(3)},
         "dP": {"equispaced": range(3), "lobatto": range(3)},
         "vdP": {"equispaced": range(3), "lobatto": range(3)},
+        "vP": {"equispaced": range(3), "lobatto": range(3)},
         "matrix discontinuous Lagrange": {"equispaced": range(2), "lobatto": range(3)},
         "symmetric matrix discontinuous Lagrange": {"equispaced": range(2), "lobatto": range(3)},
         "bubble": {"equispaced": [3], "lobatto": [3]},
@@ -76,10 +80,16 @@ test_elements = {
                "legendre": range(3)},
         "vdP": {"equispaced": range(4), "lobatto": range(3), "radau": range(3),
                 "legendre": range(3)},
+        "symmetric matrix discontinuous Lagrange": {
+            "equispaced": range(2)},
+        "matrix discontinuous Lagrange": {
+            "equispaced": range(2)},
         "bubble": {"equispaced": range(2, 4), "lobatto": range(2, 4)},
         "Q": {"equispaced": range(4), "lobatto": range(3)},
         "dQ": {"equispaced": range(4), "lobatto": range(3)},
+        "vQ": {"equispaced": range(4), "lobatto": range(3)},
         "serendipity": {"equispaced": range(1, 4), "lobatto": range(1, 3)},
+        "direct serendipity": {None: range(1, 7)},
         "Scurl": {"equispaced": range(1, 4), "lobatto": range(1, 3)},
         "Sdiv": {"equispaced": range(1, 4), "lobatto": range(1, 3)},
         "Qcurl": {"equispaced": range(1, 4)},
@@ -93,14 +103,20 @@ test_elements = {
         "vdP": {"equispaced": range(3), "lobatto": range(3), "radau": range(3),
                 "legendre": range(3)},
         "bubble": {"equispaced": range(2, 4), "lobatto": range(2, 4)},
+        "symmetric matrix discontinuous Lagrange": {
+            "equispaced": range(2)},
+        "matrix discontinuous Lagrange": {
+            "equispaced": range(2)},
         "Q": {"equispaced": range(3), "lobatto": range(3)},
         "dQ": {"equispaced": range(3), "lobatto": range(3)},
+        "vQ": {"equispaced": range(3), "lobatto": range(3)},
         "serendipity": {"equispaced": range(1, 3), "lobatto": range(1, 3)},
         "Scurl": {"equispaced": range(1, 3), "lobatto": range(1, 3)},
         "Sdiv": {"equispaced": range(1, 3), "lobatto": range(1, 3)},
         "Qcurl": {"equispaced": range(1, 3)},
         "Qdiv": {"equispaced": range(1, 3)},
         "BDFM": {"equispaced": range(1, 3)},
+        "BDDF": {"equispaced": range(1, 3)},
     },
     "prism": {
         "Lagrange": {"equispaced": range(4)}

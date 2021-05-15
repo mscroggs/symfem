@@ -5,7 +5,7 @@ This element's definition appears in https://doi.org/10.1137/S0036142901383910
 and https://doi.org/10.1007/s10092-006-0124-6 (Tail, Mardal, 2006)
 """
 
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.moments import make_integral_moment_dofs
 from ..core.polynomials import polynomial_set
 from ..core.symbolic import x, zero, one
@@ -15,7 +15,7 @@ from .lagrange import DiscontinuousLagrange
 from .nedelec import NedelecFirstKind
 
 
-class MardalTaiWinther(FiniteElement):
+class MardalTaiWinther(CiarletElement):
     """Mardal-Tai-Winther Hdiv finite element."""
 
     def __init__(self, reference, order, variant):

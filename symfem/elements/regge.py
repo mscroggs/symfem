@@ -7,12 +7,12 @@ This element's definition appears in https://doi.org/10.1007/BF02733251
 
 import sympy
 from itertools import product
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 from ..core.polynomials import polynomial_set
 from ..core.functionals import PointInnerProduct
 
 
-class Regge(FiniteElement):
+class Regge(CiarletElement):
     """A Regge element."""
 
     def __init__(self, reference, order, variant):

@@ -6,10 +6,10 @@ These elements' definitions appear in https://doi.org/10.1016/j.crma.2004.12.022
 
 import sympy
 from ..core.symbolic import sym_sum, PiecewiseFunction
-from ..core.finite_element import FiniteElement
+from ..core.finite_element import CiarletElement
 
 
-class DualFiniteElement(FiniteElement):
+class DualCiarletElement(CiarletElement):
     """Abstract barycentric finite element."""
 
     def __init__(self, dual_coefficients, fine_space, reference, order, basis,
@@ -59,7 +59,7 @@ class DualFiniteElement(FiniteElement):
         raise NotImplementedError()
 
 
-class Dual(DualFiniteElement):
+class Dual(DualCiarletElement):
     """Barycentric dual finite element."""
 
     def __init__(self, reference, order, variant):
@@ -101,7 +101,7 @@ class Dual(DualFiniteElement):
     mapping = "identity"
 
 
-class BuffaChristiansen(DualFiniteElement):
+class BuffaChristiansen(DualCiarletElement):
     """Buffa-Christiansen barycentric dual finite element."""
 
     def __init__(self, reference, order, variant):
@@ -132,7 +132,7 @@ class BuffaChristiansen(DualFiniteElement):
     mapping = "contravariant"
 
 
-class RotatedBuffaChristiansen(DualFiniteElement):
+class RotatedBuffaChristiansen(DualCiarletElement):
     """RotatedBuffa-Christiansen barycentric dual finite element."""
 
     def __init__(self, reference, order, variant):
