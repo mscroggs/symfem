@@ -25,6 +25,61 @@ def test_all_tested():
     [[reference, element, order, variant]
      for reference, i in test_elements.items() for element, j in i.items()
      for variant, k in j.items() for order in k])
+def test_independence(
+    elements_to_test, cells_to_test, cell_type, element_type, order, variant,
+    speed
+):
+    if elements_to_test != "ALL" and element_type not in elements_to_test:
+        pytest.skip()
+    if cells_to_test != "ALL" and cell_type not in cells_to_test:
+        pytest.skip()
+    if speed == "fast":
+        if order > 2:
+            pytest.skip()
+        if order == 2 and cell_type in ["tetrahedron", "hexahedron", "prism", "pyramid"]:
+            pytest.skip()
+
+    space = create_element(cell_type, element_type, order, variant)
+    basis = space.get_basis_functions()
+    all_terms = set()
+
+    try:
+        basis[0].as_coefficients_dict()
+        scalar = True
+    except AttributeError:
+        scalar = False
+
+    if scalar:
+        for f in basis:
+            for term in f.as_coefficients_dict():
+                all_terms.add(term)
+        mat = [[0 for i in all_terms] for j in basis]
+        for i, t in enumerate(all_terms):
+            for j, f in enumerate(basis):
+                fd = f.as_coefficients_dict()
+                if t in fd:
+                    mat[j][i] = fd[t]
+    else:
+        for f in basis:
+            for fi, fpart in enumerate(f):
+                for term in fpart.as_coefficients_dict():
+                    all_terms.add((fi, term))
+        mat = [[0 for i in all_terms] for j in basis]
+        for i, (fi, t) in enumerate(all_terms):
+            for j, f in enumerate(basis):
+                fd = f[fi].as_coefficients_dict()
+                if t in fd:
+                    mat[j][i] = fd[t]
+    mat = sympy.Matrix(mat)
+
+    assert mat.rank() == mat.rows
+
+
+@pytest.mark.parametrize(
+    ("cell_type", "element_type", "order", "variant"),
+    [[reference, element, order, variant]
+     for reference, i in test_elements.items() for element, j in i.items()
+     for variant, k in j.items() for order in k])
 def test_element_functionals_and_continuity(
     elements_to_test, cells_to_test, cell_type, element_type, order, variant,
     speed
