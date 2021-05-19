@@ -2,7 +2,7 @@ import pytest
 import sympy
 import symfem
 from symfem import create_element
-from symfem.core.finite_element import CiarletElement
+from symfem.core.finite_element import CiarletElement, DirectElement
 from symfem.core.symbolic import subs, x, PiecewiseFunction
 from symfem.core.vectors import vsub
 from utils import test_elements, all_symequal
@@ -29,6 +29,7 @@ def test_independence(
     elements_to_test, cells_to_test, cell_type, element_type, order, variant,
     speed
 ):
+    """Test that DirectElements have independent basis functions."""
     if elements_to_test != "ALL" and element_type not in elements_to_test:
         pytest.skip()
     if cells_to_test != "ALL" and cell_type not in cells_to_test:
@@ -40,6 +41,11 @@ def test_independence(
             pytest.skip()
 
     space = create_element(cell_type, element_type, order, variant)
+
+    # Only run this test for DirectElements
+    if not isinstance(space, DirectElement):
+        pytest.skip()
+
     basis = space.get_basis_functions()
     all_terms = set()
 
