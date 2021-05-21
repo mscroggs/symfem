@@ -27,7 +27,7 @@ test_elements = {
         "matrix discontinuous Lagrange": {"equispaced": range(3), "lobatto": range(3)},
         "symmetric matrix discontinuous Lagrange": {
             "equispaced": range(3), "lobatto": range(3)},
-        "bubble": {"equispaced": range(2, 5), "lobatto": range(2, 3)},
+        "bubble": {"equispaced": range(3, 5), "lobatto": range(3, 3)},
         "bubble enriched Lagrange": {"equispaced": range(1, 3), "lobatto": range(1, 3)},
         "bubble enriched vector Lagrange":
             {"equispaced": range(1, 3), "lobatto": range(1, 3)},
@@ -60,7 +60,7 @@ test_elements = {
         "vP": {"equispaced": range(3), "lobatto": range(3)},
         "matrix discontinuous Lagrange": {"equispaced": range(2), "lobatto": range(3)},
         "symmetric matrix discontinuous Lagrange": {"equispaced": range(2), "lobatto": range(3)},
-        "bubble": {"equispaced": [3], "lobatto": [3]},
+        "bubble": {"equispaced": [4], "lobatto": [4]},
         "CR": {"equispaced": [1]},
         "Regge": {None: range(3)},
         "Nedelec1": {"equispaced": range(1, 3)},

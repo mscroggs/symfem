@@ -23,15 +23,15 @@ class DirectSerendipity(DirectElement):
         # Functions on edges
         if order >= 2:
             alpha_h = 1
-            beta_h = 1
+            beta_h = 2
             gamma_h = 1
-            xi_h = 1
+            xi_h = 2
             eta_h = 1
 
             alpha_v = 1
-            beta_v = 1
+            beta_v = 2
             gamma_v = 1
-            xi_v = 1
+            xi_v = 2
             eta_v = 1
 
             lambda_h = alpha_h * (1 - x[1]) + beta_h * x[1] + gamma_h
