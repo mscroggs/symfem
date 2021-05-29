@@ -119,7 +119,6 @@ def test_element_functionals_and_continuity(
     if "{order}" in space.continuity:
         space.continuity = space.continuity.replace("{order}", f"{order}")
 
-
     # Test continuity
     if cell_type == "interval":
         vertices = ((-1, ), (0, ))
