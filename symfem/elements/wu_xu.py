@@ -13,6 +13,7 @@ from ..core.symbolic import sym_sum, x, subs
 
 
 def derivatives(dim, order):
+    """Return all the orders of a multidimensional derivative."""
     if dim == 1:
         return [(order, )]
 
