@@ -7,8 +7,19 @@ This element's definition appears in https://doi.org/10.1090/mcom/3361
 import sympy
 from ..core.finite_element import CiarletElement
 from ..core.polynomials import polynomial_set
-from ..core.functionals import PointEvaluation, DerivativePointEvaluation
+from ..core.functionals import (PointEvaluation, DerivativePointEvaluation,
+                                IntegralOfDirectionalMultiderivative)
 from ..core.symbolic import sym_sum, x, subs
+
+
+def derivatives(dim, order):
+    if dim == 1:
+        return [(order, )]
+
+    out = []
+    for i in range(order + 1):
+        out += [(i, ) + j for j in derivatives(dim - 1, order - i)]
+    return out
 
 
 class WuXu(CiarletElement):
@@ -25,7 +36,7 @@ class WuXu(CiarletElement):
         elif reference.name == "tetrahedron":
             bubble = x[0] * x[1] * x[2] * (1 - x[0] - x[1] - x[2])
 
-        poly += [bubble * i for i in polynomial_set(reference.tdim, 1, 1)]
+        poly += [bubble * i for i in polynomial_set(reference.tdim, 1, 1)[1:]]
 
         dofs = []
 
@@ -35,17 +46,31 @@ class WuXu(CiarletElement):
                 dofs.append(DerivativePointEvaluation(
                     vs, tuple(1 if i == j else 0 for j in range(reference.tdim)),
                     entity=(0, v_n)))
-        for e_n, vs in enumerate(reference.sub_entities(2)):
-            midpoint = tuple(sym_sum(i) / len(i)
-                             for i in zip(*[reference.vertices[i] for i in vs]))
-            dofs.append(PointEvaluation(midpoint, entity=(2, e_n)))
+        for codim in range(1, reference.tdim):
+            dim = reference.tdim - codim
+            for e_n, vs in enumerate(reference.sub_entities(codim=codim)):
+                subentity = reference.sub_entity(dim, e_n)
+                volume = subentity.jacobian()
+                if codim == 1:
+                    normals = [subentity.normal()]
+                elif codim == 2 and reference.tdim == 3:
+                    normals = []
+                    for f_n, f_vs in enumerate(reference.sub_entities(2)):
+                        if vs[0] in f_vs and vs[1] in f_vs:
+                            face = reference.sub_entity(2, f_n)
+                            normals.append(face.normal())
+                else:
+                    raise NotImplementedError
+                for orders in derivatives(len(normals), len(normals)):
+                    dofs.append(IntegralOfDirectionalMultiderivative(
+                        subentity, normals, orders, scale=1 / volume,
+                        entity=(dim, e_n)))
 
-        super().__init__(
-            reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
-        )
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     def perform_mapping(self, basis, map, inverse_map):
         """Map the basis onto a cell using the appropriate mapping for the element."""
+        # TODO
         out = []
         tdim = self.reference.tdim
         J = sympy.Matrix([[map[i].diff(x[j]) for j in range(tdim)] for i in range(tdim)])

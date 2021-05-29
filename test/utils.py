@@ -18,6 +18,7 @@ test_elements = {
         "Hermite": {None: [3]},
         "Bernstein": {None: range(1, 4)},
         "Taylor": {None: range(0, 5)},
+        "Wu-Xu": {None: [2]},
     },
     "triangle": {
         "P": {"equispaced": range(5), "lobatto": range(3)},
@@ -52,6 +53,7 @@ test_elements = {
         "FS": {None: [2]},
         "Taylor": {None: range(0, 5)},
         "Bernardi-Raugel": {None: [1]},
+        "Wu-Xu": {None: [3]},
     },
     "tetrahedron": {
         "P": {"equispaced": range(3), "lobatto": range(3)},
@@ -74,6 +76,7 @@ test_elements = {
         "Bernstein": {None: range(1, 3)},
         "Taylor": {None: range(0, 5)},
         "Bernardi-Raugel": {None: [1]},
+        "Wu-Xu": {None: [4]},
     },
     "quadrilateral": {
         "dP": {"equispaced": range(4), "lobatto": range(3), "radau": range(3),

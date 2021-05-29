@@ -116,6 +116,10 @@ def test_element_functionals_and_continuity(
     if order > 4:
         return  # For high order, testing continuity is slow
 
+    if "{order}" in space.continuity:
+        space.continuity = space.continuity.replace("{order}", f"{order}")
+
+
     # Test continuity
     if cell_type == "interval":
         vertices = ((-1, ), (0, ))
@@ -173,6 +177,19 @@ def test_element_functionals_and_continuity(
             elif space.continuity == "C1":
                 f = [f] + [f.diff(i) for i in x[:space.reference.tdim]]
                 g = [g] + [g.diff(i) for i in x[:space.reference.tdim]]
+            elif space.continuity == "C2":
+                f = [f] + [
+                    f.diff(i)for i in x[:space.reference.tdim]
+                ] + [
+                    f.diff(i).diff(j) for i in x[:space.reference.tdim]
+                    for j in x[:space.reference.tdim]
+                ]
+                g = [g] + [
+                    g.diff(i)for i in x[:space.reference.tdim]
+                ] + [
+                    g.diff(i).diff(j) for i in x[:space.reference.tdim]
+                    for j in x[:space.reference.tdim]
+                ]
             elif space.continuity == "H(div)":
                 f = f[0]
                 g = g[0]
