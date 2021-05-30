@@ -236,34 +236,6 @@ class IntegralAgainst(BaseFunctional):
     name = "Integral against"
 
 
-class IntegralOfDerivative(BaseFunctional):
-    """An integral of a derivative of a scalar function."""
-
-    def __init__(self, reference, derivative, scale=one, entity=(None, None)):
-        super().__init__(entity)
-        self.reference = reference
-        self.derivative = derivative
-        self.scale = scale
-
-    def dof_point(self):
-        """Get the location of the DOF in the cell."""
-        return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.reference.vertices))
-
-    def eval(self, function):
-        """Apply to the functional to a function."""
-        for i, j in zip(x, self.derivative):
-            for k in range(j):
-                function = function.diff(i)
-        point = [i for i in self.reference.origin]
-        for i, a in enumerate(zip(*self.reference.axes)):
-            for j, k in zip(a, t):
-                point[i] += j * k
-        integrand = self.scale * self.dot(subs(grad(function, self.reference.gdim), x, point))
-        return self.reference.integral(integrand)
-
-    name = "Integral of a derivative"
-
-
 class IntegralOfDirectionalMultiderivative(BaseFunctional):
     """An integral of a directional derivative of a scalar function."""
 
