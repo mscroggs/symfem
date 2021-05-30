@@ -1,4 +1,3 @@
-from random import choice, seed
 from math import sqrt
 import svgwrite
 
@@ -66,7 +65,6 @@ def zvalue(x, y, z):
 
 
 def in_letter(a, b, c):
-    print(a)
     if a == (5, 2) or a == (9, 0) or a == (13, 0) or a == (14, 1) or a == (18, 1) or a == (21, 0):
         return False
     for u in ups:
@@ -75,7 +73,6 @@ def in_letter(a, b, c):
     return False
 
 
-seed(101)
 svg = svgwrite.Drawing("logo.svg", size=(800, 200))
 
 for n, letter in enumerate(letters):
@@ -94,7 +91,24 @@ for x in range(-4, 26):
                 color = "#FFA366"
                 strokecolor = "#999999"
             else:
-                color = "#" + choice("9ABC") * 6
+                edge1 = (p2[0] - p1[0], p2[1] - p1[1], z2 - z1)
+                edge2 = (p3[0] - p1[0], p3[1] - p1[1], z3 - z1)
+                normal = (edge1[1] * edge2[2] - edge1[2] * edge2[1],
+                          edge1[2] * edge2[0] - edge1[0] * edge2[2],
+                          edge1[0] * edge2[1] - edge1[1] * edge2[0])
+                if p2[0] == x:
+                    normal = tuple(-i for i in normal)
+                size = sqrt(sum(i**2 for i in normal))
+                normal = tuple(i / size for i in normal)
+                dot = normal[0] + normal[1] / 2 - normal[2] / 5
+                if dot < -0.5:
+                    color = "#999999"
+                elif dot < 0:
+                    color = "#CCCCCC"
+                elif dot < 0.5:
+                    color = "#AAAAAA"
+                else:
+                    color = "#BBBBBB"
                 strokecolor = "black"
 
             mid = ((p1[0] + p2[0] + p3[0]) / 3,
