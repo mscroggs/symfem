@@ -3,6 +3,7 @@ import os
 import setuptools
 
 os.system("cp VERSION symfem/")
+os.system("cp logo/logo.png symfem/")
 
 if sys.version_info < (3, 6):
     print("Python 3.6 or higher required, please upgrade.")
@@ -17,7 +18,7 @@ with open("requirements.txt") as f:
 with open("README.md") as f:
     long_description = f.read().replace(
         "(logo/logo.png)",
-        "(https://raw.githubusercontent.com/mscroggs/symfem/logo/logo/logo.png)")
+        "(logo.png)")
 
 data_files = [
     ("symfem", ["symfem/VERSION"])]
