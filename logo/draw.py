@@ -58,7 +58,7 @@ for n, up in enumerate(ups):
 
 
 def to_2d(x, y, z):
-    return (80 + (x + (-z+y/2-3)/2) * 30, 58 + (3-y - z) * sqrt(3)/2 * 30)
+    return (90 + (x + (-z+y/2-3)/2) * 30, 68 + (3-y - z) * sqrt(3)/2 * 30)
 
 
 def zvalue(x, y, z):
@@ -76,14 +76,14 @@ def in_letter(a, b, c):
 
 
 seed(101)
-svg = svgwrite.Drawing("logo.svg", size=(780, 200))
+svg = svgwrite.Drawing("logo.svg", size=(800, 200))
 
 for n, letter in enumerate(letters):
     svg.add(svg.polygon([to_2d(*i, 1) for i in letter[0]], fill="white"))
 
 polys = []
-for x in range(-3, 26):
-    for y in range(-3, 6):
+for x in range(-4, 26):
+    for y in range(-3, 7):
         p1 = (x, y)
         p3 = (x+1, y+1)
         for p2 in [(x+1, y), (x, y+1)]:
