@@ -3,7 +3,6 @@ import os
 import setuptools
 
 os.system("cp VERSION symfem/")
-os.system("cp logo/logo.png symfem/")
 
 if sys.version_info < (3, 6):
     print("Python 3.6 or higher required, please upgrade.")
