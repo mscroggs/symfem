@@ -75,9 +75,6 @@ def in_letter(a, b, c):
 
 svg = svgwrite.Drawing("logo.svg", size=(800, 200))
 
-for n, letter in enumerate(letters):
-    svg.add(svg.polygon([to_2d(*i, 1) for i in letter[0]], fill="white"))
-
 polys = []
 for x in range(-4, 26):
     for y in range(-3, 7):
@@ -118,7 +115,8 @@ for x in range(-4, 26):
                 zvalue(*mid),
                 [to_2d(*p1, z1), to_2d(*p2, z2), to_2d(*p3, z3)],
                 color,
-                strokecolor
+                strokecolor,
+                in_letter(p1, p2, p3) and p1[0] < 4
             ))
 
 polys.sort(key=lambda p: p[0])
@@ -128,11 +126,34 @@ for p in polys:
         p[1],
         stroke=p[3], stroke_width=1, fill=p[2]))
 
-for n, letter in enumerate(letters):
+for letter in letters:
     for line_group in letter:
         for i, j in zip(line_group[:-1], line_group[1:]):
             svg.add(svg.line(
                 to_2d(*i, 1.3), to_2d(*j, 1.3),
-                stroke="black", stroke_width=3))
+                stroke="black", stroke_width=3, stroke_linecap="round"))
+
+svg.save()
+
+
+def fav_move(p):
+    print(p)
+    return p[0] - 22, p[1] - 15
+
+
+svg = svgwrite.Drawing("favicon.svg", size=(120, 120))
+
+for p in polys:
+    if p[4]:
+        svg.add(svg.polygon(
+            [fav_move(i) for i in p[1]],
+            stroke=p[3], stroke_width=1, fill=p[2]))
+
+for line_group in letters[0]:
+    for i, j in zip(line_group[:-1], line_group[1:]):
+        svg.add(svg.line(
+            fav_move(to_2d(*i, 1.3)),
+            fav_move(to_2d(*j, 1.3)),
+            stroke="black", stroke_width=3, stroke_linecap="round"))
 
 svg.save()
