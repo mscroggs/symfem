@@ -2,6 +2,10 @@
   :width: 800
   :alt: Symfem
 
+======
+Symfem
+======
+
 Welcome to the documention of Symfem: a symbolic finite element definition library
 
 *****************
