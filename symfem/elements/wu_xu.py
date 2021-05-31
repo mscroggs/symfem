@@ -4,12 +4,11 @@ This element's definition appears in https://doi.org/10.1090/mcom/3361
 (Wu, Xu, 2019)
 """
 
-import sympy
 from ..core.finite_element import CiarletElement
 from ..core.polynomials import polynomial_set
 from ..core.functionals import (PointEvaluation, DerivativePointEvaluation,
                                 IntegralOfDirectionalMultiderivative)
-from ..core.symbolic import sym_sum, x, subs
+from ..core.symbolic import x
 
 
 def derivatives(dim, order):
