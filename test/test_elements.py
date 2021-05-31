@@ -116,6 +116,9 @@ def test_element_functionals_and_continuity(
     if order > 4:
         return  # For high order, testing continuity is slow
 
+    if "{order}" in space.continuity:
+        space.continuity = space.continuity.replace("{order}", f"{order}")
+
     # Test continuity
     if cell_type == "interval":
         vertices = ((-1, ), (0, ))
@@ -156,7 +159,10 @@ def test_element_functionals_and_continuity(
     for dim, entities in entity_pairs:
         for fi, gi in zip(*[space.entity_dofs(dim, i) for i in entities]):
             basis = space.get_basis_functions()
-            basis2 = space.map_to_cell(vertices)
+            try:
+                basis2 = space.map_to_cell(vertices)
+            except NotImplementedError:
+                pytest.xfail("Mapping for this element not implemented yet.")
             f = basis[fi]
             g = basis2[gi]
 
@@ -168,11 +174,17 @@ def test_element_functionals_and_continuity(
             f = subs(f, [x[0]], [0])
             g = subs(g, [x[0]], [0])
 
-            if space.continuity == "C0":
-                pass
-            elif space.continuity == "C1":
-                f = [f] + [f.diff(i) for i in x[:space.reference.tdim]]
-                g = [g] + [g.diff(i) for i in x[:space.reference.tdim]]
+            if space.continuity[0] == "C":
+                order = int(space.continuity[1:])
+                deriv_f = [f]
+                deriv_g = [g]
+                f = [f]
+                g = [g]
+                for _ in range(order):
+                    deriv_f = [d.diff(i) for d in deriv_f for i in x[:space.reference.tdim]]
+                    f += deriv_f
+                    deriv_g = [d.diff(i) for d in deriv_g for i in x[:space.reference.tdim]]
+                    g += deriv_g
             elif space.continuity == "H(div)":
                 f = f[0]
                 g = g[0]

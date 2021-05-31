@@ -48,7 +48,7 @@ From this object, the polynomial basis of the element can be obtained:
 ::
 
     [1, x, y]
--
+
 Each item in the polynomial basis will be a `Sympy <https://www.sympy.org>`_ symbolic expression.
 
 The functionals that define the DOFs of the finite element space can be obtained with the following
