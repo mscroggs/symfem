@@ -15,7 +15,9 @@ with open("requirements.txt") as f:
     requirements = [line.strip() for line in f if line.strip() != ""]
 
 with open("README.md") as f:
-    long_description = f.read()
+    long_description = f.read().replace(
+        "(logo/logo.png)",
+        "(https://raw.githubusercontent.com/mscroggs/symfem/main/logo/logo.png)")
 
 data_files = [
     ("symfem", ["symfem/VERSION"])]

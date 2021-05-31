@@ -1,8 +1,8 @@
-####################################################
-Symfem: a symbolic finite element definition library
-####################################################
+.. image:: ../logo/logo.png
+  :width: 800
+  :alt: Symfem
 
-Welcome to the Symfem documention.
+Welcome to the documention of Symfem: a symbolic finite element definition library
 
 *****************
 Installing Symfem
