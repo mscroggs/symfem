@@ -284,7 +284,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         """Map functions to a cell."""
         if sum(self.orders) > 1:
             raise NotImplementedError("Mapping high order derivatives not implemented")
-        super().perform_mapping(fs, map, inverse_map, tdim)
+        return super().perform_mapping(fs, map, inverse_map, tdim)
 
     name = "Integral of a directional derivative"
 

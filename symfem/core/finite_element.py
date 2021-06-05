@@ -176,6 +176,8 @@ class CiarletElement(FiniteElement):
                     mapped_dofs = self.dofs[ds[0]].perform_mapping(
                         [basis[d] for d in ds],
                         map, inverse_map, self.reference.tdim)
+                    if mapped_dofs is None:
+                        from IPython import embed; embed()
                     for d_n, d in zip(ds, mapped_dofs):
                         out[d_n] = d
 
