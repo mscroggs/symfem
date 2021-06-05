@@ -171,9 +171,6 @@ def test_element_functionals_and_continuity(
                     basis2[6], basis2[7] = basis2[7], basis2[6]
                     basis2[9], basis2[10] = basis2[10], basis2[9]
 
-            print(basis)
-            print(basis2)
-
             f = basis[fi]
             g = basis2[gi]
 
