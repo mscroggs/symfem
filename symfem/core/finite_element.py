@@ -162,7 +162,7 @@ class CiarletElement(FiniteElement):
         inverse_map = self.reference.get_inverse_map_to(vertices)
 
         out = [None for f in basis]
-        for dim in range(self.reference.tdim):
+        for dim in range(self.reference.tdim + 1):
             for e in range(self.reference.sub_entity_count(dim)):
                 entity_dofs = self.entity_dofs(dim, e)
                 dofs_by_type = {}
@@ -179,6 +179,8 @@ class CiarletElement(FiniteElement):
                     for d_n, d in zip(ds, mapped_dofs):
                         out[d_n] = d
 
+        for i in out:
+            assert i is not None
         return out
 
     names = []
