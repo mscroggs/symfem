@@ -32,5 +32,4 @@ class HellanHerrmannJohnson(CiarletElement):
     names = ["Hellan-Herrmann-Johnson", "HHJ"]
     references = ["triangle"]
     min_order = 0
-    mapping = "double_contravariant"
     continuity = "inner H(div)"

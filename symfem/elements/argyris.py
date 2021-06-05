@@ -45,5 +45,4 @@ class Argyris(CiarletElement):
     references = ["triangle"]
     min_order = 5
     max_order = 5
-    mapping = "identity"
     continuity = "L2"

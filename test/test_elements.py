@@ -162,7 +162,15 @@ def test_element_functionals_and_continuity(
             try:
                 basis2 = space.map_to_cell(vertices)
             except NotImplementedError:
-                pytest.xfail("Mapping for this element not implemented yet.")
+                pytest.xfail("Mapping not implemented for this element yet")
+            if space.names[0] == "Bernardi-Raugel":
+                # TODO: remove this hack
+                if space.reference.name == "triangle":
+                    basis2[4], basis2[5] = basis2[5], basis2[4]
+                if space.reference.name == "tetrahedron":
+                    basis2[6], basis2[7] = basis2[7], basis2[6]
+                    basis2[9], basis2[10] = basis2[10], basis2[9]
+
             f = basis[fi]
             g = basis2[gi]
 
@@ -225,9 +233,13 @@ def test_element_functionals_and_continuity(
 
 @pytest.mark.parametrize("n_tri", [3, 4, 6, 8])
 @pytest.mark.parametrize("order", range(2))
-def test_dual_elements(n_tri, order):
-    space = create_element(f"dual polygon({n_tri})", "dual", order)
+def test_dual_elements(elements_to_test, cells_to_test, n_tri, order):
+    if elements_to_test != "ALL" and "dual" not in elements_to_test:
+        pytest.skip()
+    if cells_to_test != "ALL" and "dual polygon" not in cells_to_test:
+        pytest.skip()
 
+    space = create_element(f"dual polygon({n_tri})", "dual", order)
     sub_e = create_element("triangle", space.fine_space, space.order)
     for f, coeff_list in zip(space.get_basis_functions(), space.dual_coefficients):
         for piece, coeffs in zip(f.pieces, coeff_list):
@@ -239,5 +251,10 @@ def test_dual_elements(n_tri, order):
 
 @pytest.mark.parametrize("n_tri", [3, 4])
 @pytest.mark.parametrize("element_type", ["BC", "RBC"])
-def test_bc_elements(n_tri, element_type):
+def test_bc_elements(elements_to_test, cells_to_test, n_tri, element_type):
+    if elements_to_test != "ALL" and element_type not in elements_to_test:
+        pytest.skip()
+    if cells_to_test != "ALL" and "dual polygon" not in cells_to_test:
+        pytest.skip()
+
     create_element(f"dual polygon({n_tri})", element_type, 1)

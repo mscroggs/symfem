@@ -60,7 +60,7 @@ class Lagrange(CiarletElement):
                                 tuple(o + sum(a[j] * points[b]
                                               for a, b in zip(reference.axes, i))
                                       for j, o in enumerate(reference.origin)),
-                                entity=(3, e_n)))
+                                entity=(3, 0)))
             elif reference.name == "pyramid":
                 # Interior
                 for i in product(range(1, order), repeat=3):
@@ -70,7 +70,7 @@ class Lagrange(CiarletElement):
                                 tuple(o + sum(a[j] * points[b]
                                               for a, b in zip(reference.axes, i))
                                       for j, o in enumerate(reference.origin)),
-                                entity=(3, e_n)))
+                                entity=(3, 0)))
 
         if reference.name == "prism":
             poly = prism_polynomial_set(reference.tdim, 1, order)
@@ -82,7 +82,6 @@ class Lagrange(CiarletElement):
     references = ["prism", "pyramid"]
     min_order = 0
     continuity = "C0"
-    mapping = "identity"
 
 
 class DiscontinuousLagrange(CiarletElement):
@@ -113,7 +112,6 @@ class DiscontinuousLagrange(CiarletElement):
     references = ["prism"]
     min_order = 0
     continuity = "L2"
-    mapping = "identity"
 
 
 class VectorLagrange(CiarletElement):
@@ -146,7 +144,6 @@ class VectorLagrange(CiarletElement):
     references = ["prism"]
     min_order = 0
     continuity = "C0"
-    mapping = "identity"
 
 
 class VectorDiscontinuousLagrange(CiarletElement):
@@ -179,4 +176,3 @@ class VectorDiscontinuousLagrange(CiarletElement):
     references = ["prism"]
     min_order = 0
     continuity = "L2"
-    mapping = "identity"

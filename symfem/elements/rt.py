@@ -21,7 +21,7 @@ class RaviartThomas(CiarletElement):
         dofs = make_integral_moment_dofs(
             reference,
             facets=(NormalIntegralMoment, DiscontinuousLagrange, order - 1),
-            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
+            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, "contravariant"),
             variant=variant
         )
 
@@ -30,5 +30,4 @@ class RaviartThomas(CiarletElement):
     names = ["Raviart-Thomas", "RT", "N1div"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
-    mapping = "contravariant"
     continuity = "H(div)"

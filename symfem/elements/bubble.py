@@ -55,7 +55,6 @@ class Bubble(CiarletElement):
     references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
     min_order = {"interval": 2, "triangle": 3, "tetrahedron": 4,
                  "quadrilateral": 2, "hexahedron": 2}
-    mapping = "identity"
     continuity = "C0"
 
 
@@ -74,7 +73,6 @@ class BubbleEnrichedLagrange(CiarletElement):
     names = ["bubble enriched Lagrange"]
     references = ["triangle"]
     min_order = 1
-    mapping = "identity"
     continuity = "C0"
 
 
@@ -97,5 +95,4 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
     names = ["bubble enriched vector Lagrange"]
     references = ["triangle"]
     min_order = 1
-    mapping = "identity"
     continuity = "C0"

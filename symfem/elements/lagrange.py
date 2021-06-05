@@ -49,7 +49,6 @@ class Lagrange(CiarletElement):
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "C0"
-    mapping = "identity"
 
 
 class DiscontinuousLagrange(CiarletElement):
@@ -78,7 +77,6 @@ class DiscontinuousLagrange(CiarletElement):
     references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
-    mapping = "identity"
 
 
 class VectorLagrange(CiarletElement):
@@ -110,7 +108,6 @@ class VectorLagrange(CiarletElement):
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "C0"
-    mapping = "identity"
 
 
 class VectorDiscontinuousLagrange(CiarletElement):
@@ -142,7 +139,6 @@ class VectorDiscontinuousLagrange(CiarletElement):
     references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
-    mapping = "identity"
 
 
 class MatrixDiscontinuousLagrange(CiarletElement):
@@ -175,7 +171,6 @@ class MatrixDiscontinuousLagrange(CiarletElement):
     references = ["triangle", "tetrahedron", "quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
-    mapping = "identity"
 
 
 class SymmetricMatrixDiscontinuousLagrange(CiarletElement):
@@ -219,4 +214,3 @@ class SymmetricMatrixDiscontinuousLagrange(CiarletElement):
     references = ["triangle", "tetrahedron", "quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
-    mapping = "identity"

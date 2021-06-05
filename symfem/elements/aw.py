@@ -34,7 +34,8 @@ class ArnoldWinther(CiarletElement):
             for d in [[(one, zero), (one, zero)],
                       [(one, zero), (zero, one)],
                       [(zero, one), (zero, one)]]:
-                dofs.append(PointInnerProduct(v, d[0], d[1], (0, v_n)))
+                dofs.append(PointInnerProduct(v, d[0], d[1], entity=(0, v_n),
+                                              mapping="double_contravariant"))
         for e_n, edge in enumerate(reference.edges):
             sub_ref = create_reference(
                 reference.sub_entity_types[1],
@@ -45,20 +46,20 @@ class ArnoldWinther(CiarletElement):
                 for component in [sub_ref.normal(), sub_ref.tangent()]:
                     dofs.append(
                         InnerProductIntegralMoment(sub_ref, p, component, sub_ref.normal(), dof,
-                                                   (1, e_n)))
+                                                   entity=(1, e_n), mapping="double_contravariant"))
         sub_e = DiscontinuousLagrange(reference, order - 3, variant)
         for dof_n, dof in enumerate(sub_e.dofs):
             p = sub_e.get_basis_function(dof_n)
             for component in [(one, zero, zero, zero), (zero, one, zero, zero),
                               (zero, zero, zero, one)]:
-                dofs.append(VecIntegralMoment(reference, p, component, dof, (2, 0)))
+                dofs.append(VecIntegralMoment(reference, p, component, dof, entity=(2, 0)))
         sub_e = DiscontinuousLagrange(reference, order - 4, variant)
         for p, dof in zip(sub_e.get_basis_functions(), sub_e.dofs):
             if sympy.Poly(p, x[:2]).degree() != order - 4:
                 continue
             f = p * x[0] ** 2 * x[1] ** 2 * (1 - x[0] - x[1]) ** 2
             J = tuple(f.diff(x[i]).diff(x[j]) for i in range(2) for j in range(2))
-            dofs.append(IntegralMoment(reference, J, dof, (2, 0)))
+            dofs.append(IntegralMoment(reference, J, dof, entity=(2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))
@@ -66,5 +67,4 @@ class ArnoldWinther(CiarletElement):
     names = ["Arnold-Winther", "AW"]
     references = ["triangle"]
     min_order = 3
-    mapping = "double_contravariant"
     continuity = "integral inner H(div)"

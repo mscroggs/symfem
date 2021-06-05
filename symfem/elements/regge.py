@@ -40,7 +40,7 @@ class Regge(CiarletElement):
                                 tuple(o + sum(sympy.Rational(a[j] * b, order + 2)
                                               for a, b in zip(entity.axes, i[::-1]))
                                       for j, o in enumerate(entity.origin)),
-                                tangent, tangent, entity=(edim, e_n)))
+                                tangent, tangent, entity=(edim, e_n), mapping="double_covariant"))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))
@@ -48,5 +48,4 @@ class Regge(CiarletElement):
     names = ["Regge"]
     references = ["triangle", "tetrahedron"]
     min_order = 0
-    mapping = "double_covariant"
     continuity = "inner H(curl)"

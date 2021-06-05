@@ -21,8 +21,8 @@ class NedelecFirstKind(CiarletElement):
         dofs = make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, DiscontinuousLagrange, order - 1),
-            faces=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
-            volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 3),
+            faces=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, "covariant"),
+            volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 3, "covariant"),
             variant=variant
         )
 
@@ -31,7 +31,6 @@ class NedelecFirstKind(CiarletElement):
     names = ["Nedelec", "Nedelec1", "N1curl"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
-    mapping = "covariant"
     continuity = "H(curl)"
 
 
@@ -44,8 +43,8 @@ class NedelecSecondKind(CiarletElement):
         dofs = make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, DiscontinuousLagrange, order),
-            faces=(IntegralMoment, RaviartThomas, order - 1),
-            volumes=(IntegralMoment, RaviartThomas, order - 2),
+            faces=(IntegralMoment, RaviartThomas, order - 1, "covariant"),
+            volumes=(IntegralMoment, RaviartThomas, order - 2, "covariant"),
             variant=variant
         )
 
@@ -54,5 +53,4 @@ class NedelecSecondKind(CiarletElement):
     names = ["Nedelec2", "N2curl"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
-    mapping = "covariant"
     continuity = "H(curl)"

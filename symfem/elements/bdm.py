@@ -30,5 +30,4 @@ class BDM(CiarletElement):
     names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
-    mapping = "contravariant"
     continuity = "H(div)"

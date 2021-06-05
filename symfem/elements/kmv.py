@@ -133,4 +133,3 @@ class KongMulderVeldhuizen(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 1
     continuity = "C0"
-    mapping = "identity"

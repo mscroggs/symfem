@@ -48,5 +48,4 @@ class BDDF(CiarletElement):
     names = ["Brezzi-Douglas-Duran-Fortin", "BDDF"]
     references = ["hexahedron"]
     min_order = 1
-    mapping = "contravariant"
     continuity = "H(div)"

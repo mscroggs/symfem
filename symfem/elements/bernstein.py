@@ -81,4 +81,3 @@ class Bernstein(CiarletElement):
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "C0"
-    mapping = "identity"
