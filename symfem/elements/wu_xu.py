@@ -68,10 +68,6 @@ class WuXu(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
-    def perform_mapping(self, basis, map, inverse_map):
-        """Map the basis onto a cell using the appropriate mapping for the element."""
-        raise NotImplementedError()
-
     names = ["Wu-Xu"]
     references = ["interval", "triangle", "tetrahedron"]
     max_order = {"interval": 2, "triangle": 3, "tetrahedron": 4}

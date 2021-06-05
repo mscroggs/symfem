@@ -33,5 +33,4 @@ class FortinSoulie(CiarletElement):
     references = ["triangle"]
     min_order = 2
     max_order = 2
-    mapping = "identity"
     continuity = "L2"

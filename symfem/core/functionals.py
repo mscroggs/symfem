@@ -1,15 +1,17 @@
 """Functionals used to define the dual sets."""
 import sympy
-from .symbolic import subs, x, t, PiecewiseFunction, one
+from .symbolic import subs, x, t, PiecewiseFunction, one, sym_sum
 from .vectors import vdot
 from .calculus import derivative, jacobian_component, grad
+from . import mappings
 
 
 class BaseFunctional:
     """A functional."""
 
-    def __init__(self, entity=(None, None)):
+    def __init__(self, entity=(None, None), mapping="identity"):
         self.entity = entity
+        self.mapping = mapping
 
     def eval(self, fun):
         """Apply to the functional to a function."""
@@ -27,14 +29,18 @@ class BaseFunctional:
         """Get the dimension of the entitiy this DOF is associated with."""
         return self.entity[0]
 
+    def perform_mapping(self, fs, map, inverse_map, tdim):
+        """Map functions to a cell."""
+        return [getattr(mappings, self.mapping)(f, map, inverse_map, tdim) for f in fs]
+
     name = None
 
 
 class PointEvaluation(BaseFunctional):
     """A point evaluation."""
 
-    def __init__(self, point, entity=(None, None)):
-        super().__init__(entity)
+    def __init__(self, point, entity=(None, None), mapping="identity"):
+        super().__init__(entity, mapping)
         self.point = point
 
     def eval(self, function):
@@ -51,8 +57,8 @@ class PointEvaluation(BaseFunctional):
 class WeightedPointEvaluation(BaseFunctional):
     """A point evaluation."""
 
-    def __init__(self, point, weight, entity=(None, None)):
-        super().__init__(entity)
+    def __init__(self, point, weight, entity=(None, None), mapping="identity"):
+        super().__init__(entity, mapping)
         self.point = point
         self.weight = weight
 
@@ -70,8 +76,8 @@ class WeightedPointEvaluation(BaseFunctional):
 class DerivativePointEvaluation(BaseFunctional):
     """A point evaluation of a given derivative."""
 
-    def __init__(self, point, derivative, entity=(None, None)):
-        super().__init__(entity)
+    def __init__(self, point, derivative, entity=(None, None), mapping=None):
+        super().__init__(entity, mapping)
         self.point = point
         self.derivative = derivative
 
@@ -86,14 +92,25 @@ class DerivativePointEvaluation(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return self.point
 
+    def perform_mapping(self, fs, map, inverse_map, tdim):
+        """Map functions to a cell."""
+        if self.mapping is not None:
+            return super().perform_mapping(fs, map, inverse_map, tdim)
+        out = []
+        J = sympy.Matrix([[map[i].diff(x[j]) for j in range(tdim)] for i in range(tdim)])
+        for dofs in zip(*[fs[i::tdim] for i in range(tdim)]):
+            for i in range(tdim):
+                out.append(sym_sum(a * b for a, b in zip(dofs, J.row(i))))
+        return [subs(b, x, inverse_map) for b in out]
+
     name = "Point derivative evaluation"
 
 
 class PointDirectionalDerivativeEvaluation(BaseFunctional):
     """A point evaluation of a derivative in a fixed direction."""
 
-    def __init__(self, point, direction, entity=(None, None)):
-        super().__init__(entity)
+    def __init__(self, point, direction, entity=(None, None), mapping="identity"):
+        super().__init__(entity, mapping)
         self.point = point
         self.dir = direction
 
@@ -117,8 +134,8 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
 class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
     """A point evaluation of a normal derivative."""
 
-    def __init__(self, point, edge, entity=(None, None)):
-        super().__init__(point, edge.normal(), entity=entity)
+    def __init__(self, point, edge, entity=(None, None), mapping="identity"):
+        super().__init__(point, edge.normal(), entity=entity, mapping=mapping)
         self.reference = edge
 
     name = "Point evaluation of normal derivative"
@@ -127,8 +144,8 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
 class PointComponentSecondDerivativeEvaluation(BaseFunctional):
     """A point evaluation of a component of a second derivative."""
 
-    def __init__(self, point, component, entity=(None, None)):
-        super().__init__(entity)
+    def __init__(self, point, component, entity=(None, None), mapping="identity"):
+        super().__init__(entity, mapping)
         self.point = point
         self.component = component
 
@@ -146,8 +163,8 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
 class PointInnerProduct(BaseFunctional):
     """An evaluation of an inner product at a point."""
 
-    def __init__(self, point, lvec, rvec, entity=(None, None)):
-        super().__init__(entity)
+    def __init__(self, point, lvec, rvec, entity=(None, None), mapping="identity"):
+        super().__init__(entity, mapping)
         self.point = point
         self.lvec = lvec
         self.rvec = rvec
@@ -177,8 +194,8 @@ class PointInnerProduct(BaseFunctional):
 class DotPointEvaluation(BaseFunctional):
     """A point evaluation in a given direction."""
 
-    def __init__(self, point, vector, entity=(None, None)):
-        super().__init__(entity)
+    def __init__(self, point, vector, entity=(None, None), mapping="identity"):
+        super().__init__(entity, mapping)
         self.point = point
         self.vector = vector
 
@@ -200,8 +217,8 @@ class DotPointEvaluation(BaseFunctional):
 class IntegralAgainst(BaseFunctional):
     """An integral against a function."""
 
-    def __init__(self, reference, f, entity=(None, None)):
-        super().__init__(entity)
+    def __init__(self, reference, f, entity=(None, None), mapping="identity"):
+        super().__init__(entity, mapping)
         self.reference = reference
         self.f = subs(f, x, t)
         if isinstance(self.f, tuple):
@@ -239,8 +256,9 @@ class IntegralAgainst(BaseFunctional):
 class IntegralOfDirectionalMultiderivative(BaseFunctional):
     """An integral of a directional derivative of a scalar function."""
 
-    def __init__(self, reference, directions, orders, scale=one, entity=(None, None)):
-        super().__init__(entity)
+    def __init__(self, reference, directions, orders, scale=one, entity=(None, None),
+                 mapping="identity"):
+        super().__init__(entity, mapping)
         self.reference = reference
         self.directions = directions
         self.orders = orders
@@ -262,14 +280,20 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         integrand = self.scale * subs(function, x, point)
         return self.reference.integral(integrand)
 
+    def perform_mapping(self, fs, map, inverse_map, tdim):
+        """Map functions to a cell."""
+        if sum(self.orders) > 1:
+            raise NotImplementedError("Mapping high order derivatives not implemented")
+        super().perform_mapping(fs, map, inverse_map, tdim)
+
     name = "Integral of a directional derivative"
 
 
 class IntegralMoment(BaseFunctional):
     """An integral moment."""
 
-    def __init__(self, reference, f, dof, entity=(None, None)):
-        super().__init__(entity)
+    def __init__(self, reference, f, dof, entity=(None, None), mapping="identity"):
+        super().__init__(entity, mapping)
         self.reference = reference
         self.dof = dof
         self.f = subs(f, x, t)
@@ -322,8 +346,8 @@ class IntegralMoment(BaseFunctional):
 class VecIntegralMoment(IntegralMoment):
     """An integral moment applied to a component of a vector."""
 
-    def __init__(self, reference, f, dot_with, dof, entity=(None, None)):
-        super().__init__(reference, f, dof, entity=entity)
+    def __init__(self, reference, f, dot_with, dof, entity=(None, None), mapping="identity"):
+        super().__init__(reference, f, dof, entity=entity, mapping=mapping)
         self.dot_with = dot_with
 
     def dot(self, function):
@@ -340,8 +364,8 @@ class VecIntegralMoment(IntegralMoment):
 class DerivativeIntegralMoment(IntegralMoment):
     """An integral moment of the derivative of a scalar function."""
 
-    def __init__(self, reference, f, dot_with, dof, entity=(None, None)):
-        super().__init__(reference, f, dof, entity=entity)
+    def __init__(self, reference, f, dot_with, dof, entity=(None, None), mapping="identity"):
+        super().__init__(reference, f, dof, entity=entity, mapping=mapping)
         self.dot_with = dot_with
 
     def dot(self, function):
@@ -367,8 +391,8 @@ class DerivativeIntegralMoment(IntegralMoment):
 class TangentIntegralMoment(VecIntegralMoment):
     """An integral moment in the tangential direction."""
 
-    def __init__(self, reference, f, dof, entity=(None, None)):
-        super().__init__(reference, f, reference.tangent(), dof, entity=entity)
+    def __init__(self, reference, f, dof, entity=(None, None), mapping="covariant"):
+        super().__init__(reference, f, reference.tangent(), dof, entity=entity, mapping=mapping)
 
     name = "Tangential integral moment"
 
@@ -376,8 +400,8 @@ class TangentIntegralMoment(VecIntegralMoment):
 class NormalIntegralMoment(VecIntegralMoment):
     """An integral moment in the normal direction."""
 
-    def __init__(self, reference, f, dof, entity=(None, None)):
-        super().__init__(reference, f, reference.normal(), dof, entity=entity)
+    def __init__(self, reference, f, dof, entity=(None, None), mapping="contravariant"):
+        super().__init__(reference, f, reference.normal(), dof, entity=entity, mapping=mapping)
 
     name = "Normal integral moment"
 
@@ -385,8 +409,8 @@ class NormalIntegralMoment(VecIntegralMoment):
 class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
     """An integral moment in the normal direction."""
 
-    def __init__(self, reference, f, dof, entity=(None, None)):
-        super().__init__(reference, f, reference.normal(), dof, entity=entity)
+    def __init__(self, reference, f, dof, entity=(None, None), mapping="identity"):
+        super().__init__(reference, f, reference.normal(), dof, entity=entity, mapping=mapping)
 
     name = "Normal derivative integral moment"
 
@@ -394,8 +418,9 @@ class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
 class InnerProductIntegralMoment(IntegralMoment):
     """An integral moment of the inner product with a vector."""
 
-    def __init__(self, reference, f, inner_with_left, inner_with_right, dof, entity=(None, None)):
-        super().__init__(reference, f, dof, entity=entity)
+    def __init__(self, reference, f, inner_with_left, inner_with_right, dof,
+                 entity=(None, None), mapping="identity"):
+        super().__init__(reference, f, dof, entity=entity, mapping=mapping)
         self.inner_with_left = inner_with_left
         self.inner_with_right = inner_with_right
 
@@ -418,7 +443,8 @@ class InnerProductIntegralMoment(IntegralMoment):
 class NormalInnerProductIntegralMoment(InnerProductIntegralMoment):
     """An integral moment of the inner product with the normal direction."""
 
-    def __init__(self, reference, f, dof, entity=(None, None)):
-        super().__init__(reference, f, reference.normal(), reference.normal(), dof, entity=entity)
+    def __init__(self, reference, f, dof, entity=(None, None), mapping="double_contravariant"):
+        super().__init__(reference, f, reference.normal(), reference.normal(), dof, entity=entity,
+                         mapping=mapping)
 
     name = "Normal inner product integral moment"

@@ -22,7 +22,8 @@ class MardalTaiWinther(CiarletElement):
         assert order == 3
 
         dofs = make_integral_moment_dofs(
-            reference, facets=(NormalIntegralMoment, DiscontinuousLagrange, 1),
+            reference, facets=(NormalIntegralMoment, DiscontinuousLagrange, 1,
+                               "contravariant"),
             variant=variant)
 
         if reference.name == "triangle":
@@ -38,7 +39,8 @@ class MardalTaiWinther(CiarletElement):
                     (2 * x[0] ** 2 * x[1] + x[0] ** 2 + 3 * x[0] * x[1] ** 2,
                      -2 * x[0] * x[1] ** 2 - 2 * x[0] * x[1] - x[1] ** 3)]
             dofs += make_integral_moment_dofs(
-                reference, facets=(TangentIntegralMoment, DiscontinuousLagrange, 0),
+                reference, facets=(TangentIntegralMoment, DiscontinuousLagrange, 0,
+                                   "contravariant"),
                 variant=variant)
         else:
             assert reference.name == "tetrahedron"
@@ -49,7 +51,7 @@ class MardalTaiWinther(CiarletElement):
                                        for i in p)))
 
             dofs += make_integral_moment_dofs(
-                reference, facets=(IntegralMoment, NedelecFirstKind, 1),
+                reference, facets=(IntegralMoment, NedelecFirstKind, 1, "contravariant"),
                 variant=variant)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -58,5 +60,4 @@ class MardalTaiWinther(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 3
     max_order = 3
-    mapping = "contravariant"
     continuity = "H(div)"

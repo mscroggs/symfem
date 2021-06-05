@@ -2,7 +2,6 @@
 
 import sympy
 from .symbolic import x, zero, subs, sym_sum, PiecewiseFunction
-from . import mappings
 from .basis_function import ElementBasisFunction
 
 
@@ -71,23 +70,7 @@ class FiniteElement:
 
     def map_to_cell(self, vertices, basis=None):
         """Map the basis onto a cell using the appropriate mapping for the element."""
-        if basis is None:
-            basis = self.get_basis_functions()
-        map = self.reference.get_map_to(vertices)
-        if isinstance(basis[0], PiecewiseFunction):
-            pieces = [[] for i in basis]
-            for i, j in enumerate(basis[0].pieces):
-                new_i = [subs(map, x, k) for k in j[0]]
-                for k, f in enumerate(self.map_to_cell(vertices, [b.pieces[i][1] for b in basis])):
-                    pieces[k].append((new_i, f))
-            return [PiecewiseFunction(p) for p in pieces]
-        inverse_map = self.reference.get_inverse_map_to(vertices)
-        return self.perform_mapping(basis, map, inverse_map)
-
-    def perform_mapping(self, basis, map, inverse_map):
-        """Map the basis onto a cell using the appropriate mapping for the element."""
-        return [getattr(mappings, self.mapping)(f, map, inverse_map, self.reference.tdim)
-                for f in basis]
+        raise NotImplementedError()
 
     @property
     def name(self):
@@ -163,6 +146,40 @@ class CiarletElement(FiniteElement):
                  for i in range(self.range_shape[0])]) for b in self._basis_functions]
 
         return self._basis_functions
+
+    def map_to_cell(self, vertices, basis=None):
+        """Map the basis onto a cell using the appropriate mapping for the element."""
+        if basis is None:
+            basis = self.get_basis_functions()
+        map = self.reference.get_map_to(vertices)
+        if isinstance(basis[0], PiecewiseFunction):
+            pieces = [[] for i in basis]
+            for i, j in enumerate(basis[0].pieces):
+                new_i = [subs(map, x, k) for k in j[0]]
+                for k, f in enumerate(self.map_to_cell(vertices, [b.pieces[i][1] for b in basis])):
+                    pieces[k].append((new_i, f))
+            return [PiecewiseFunction(p) for p in pieces]
+        inverse_map = self.reference.get_inverse_map_to(vertices)
+
+        out = [None for f in basis]
+        for dim in range(self.reference.tdim):
+            for e in range(self.reference.sub_entity_count(dim)):
+                entity_dofs = self.entity_dofs(dim, e)
+                dofs_by_type = {}
+                for d in entity_dofs:
+                    dof = self.dofs[d]
+                    t = (type(dof), dof.mapping)
+                    if t not in dofs_by_type:
+                        dofs_by_type[t] = []
+                    dofs_by_type[t].append(d)
+                for ds in dofs_by_type.values():
+                    mapped_dofs = self.dofs[ds[0]].perform_mapping(
+                        [basis[d] for d in ds],
+                        map, inverse_map, self.reference.tdim)
+                    for d_n, d in zip(ds, mapped_dofs):
+                        out[d_n] = d
+
+        return out
 
     names = []
 

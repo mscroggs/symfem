@@ -54,10 +54,6 @@ class DualCiarletElement(CiarletElement):
                 self._basis_functions.append(PiecewiseFunction(pieces))
         return self._basis_functions
 
-    def map_to_cell(self, f, vertices):
-        """Map a function onto a cell using the appropriate mapping for the element."""
-        raise NotImplementedError()
-
 
 class Dual(DualCiarletElement):
     """Barycentric dual finite element."""
@@ -98,7 +94,6 @@ class Dual(DualCiarletElement):
     min_order = 0
     max_order = 1
     continuity = "C0"
-    mapping = "identity"
 
 
 class BuffaChristiansen(DualCiarletElement):
@@ -129,7 +124,6 @@ class BuffaChristiansen(DualCiarletElement):
     min_order = 1
     max_order = 1
     continuity = "H(div)"
-    mapping = "contravariant"
 
 
 class RotatedBuffaChristiansen(DualCiarletElement):
@@ -160,4 +154,3 @@ class RotatedBuffaChristiansen(DualCiarletElement):
     min_order = 1
     max_order = 1
     continuity = "H(div)"
-    mapping = "contravariant"

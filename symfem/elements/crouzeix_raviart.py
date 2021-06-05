@@ -55,5 +55,4 @@ class CrouzeixRaviart(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 1
     max_order = {"tetrahedron": 1}
-    mapping = "identity"
     continuity = "L2"

@@ -36,7 +36,6 @@ class Serendipity(CiarletElement):
     names = ["serendipity", "S"]
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 1
-    mapping = "identity"
     continuity = "C0"
 
 
@@ -50,8 +49,8 @@ class SerendipityCurl(CiarletElement):
         dofs = make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, DiscontinuousLagrange, order),
-            faces=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
-            volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 4),
+            faces=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, "covariant"),
+            volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 4, "covariant"),
             variant=variant
         )
 
@@ -60,7 +59,6 @@ class SerendipityCurl(CiarletElement):
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
-    mapping = "covariant"
     continuity = "H(curl)"
 
 
@@ -74,7 +72,7 @@ class SerendipityDiv(CiarletElement):
         dofs = make_integral_moment_dofs(
             reference,
             facets=(NormalIntegralMoment, DiscontinuousLagrange, order),
-            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
+            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, "contravariant"),
             variant=variant
         )
 
@@ -83,5 +81,4 @@ class SerendipityDiv(CiarletElement):
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
-    mapping = "contravariant"
     continuity = "H(div)"

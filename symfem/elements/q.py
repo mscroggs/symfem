@@ -51,7 +51,6 @@ class Q(CiarletElement):
     names = ["Q"]
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 0
-    mapping = "identity"
     continuity = "C0"
 
 
@@ -82,7 +81,6 @@ class DiscontinuousQ(CiarletElement):
     names = ["dQ"]
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 0
-    mapping = "identity"
     continuity = "L2"
 
 
@@ -114,7 +112,6 @@ class VectorQ(CiarletElement):
     names = ["vector Q", "vQ"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
-    mapping = "identity"
     continuity = "C0"
 
 
@@ -128,8 +125,8 @@ class Nedelec(CiarletElement):
         dofs = make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, DiscontinuousQ, order - 1),
-            faces=(IntegralMoment, RaviartThomas, order - 1),
-            volumes=(IntegralMoment, RaviartThomas, order - 1),
+            faces=(IntegralMoment, RaviartThomas, order - 1, "covariant"),
+            volumes=(IntegralMoment, RaviartThomas, order - 1, "covariant"),
             variant=variant
         )
 
@@ -138,7 +135,6 @@ class Nedelec(CiarletElement):
     names = ["NCE", "RTCE", "Qcurl"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
-    mapping = "covariant"
     continuity = "H(curl)"
 
 
@@ -152,7 +148,7 @@ class RaviartThomas(CiarletElement):
         dofs = make_integral_moment_dofs(
             reference,
             facets=(NormalIntegralMoment, DiscontinuousQ, order - 1),
-            cells=(IntegralMoment, Nedelec, order - 1),
+            cells=(IntegralMoment, Nedelec, order - 1, "contravariant"),
             variant=variant
         )
 
@@ -161,5 +157,4 @@ class RaviartThomas(CiarletElement):
     names = ["NCF", "RTCF", "Qdiv"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
-    mapping = "contravariant"
     continuity = "H(div)"

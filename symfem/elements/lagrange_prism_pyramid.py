@@ -82,7 +82,6 @@ class Lagrange(CiarletElement):
     references = ["prism", "pyramid"]
     min_order = 0
     continuity = "C0"
-    mapping = "identity"
 
 
 class DiscontinuousLagrange(CiarletElement):
@@ -113,7 +112,6 @@ class DiscontinuousLagrange(CiarletElement):
     references = ["prism"]
     min_order = 0
     continuity = "L2"
-    mapping = "identity"
 
 
 class VectorLagrange(CiarletElement):
@@ -146,7 +144,6 @@ class VectorLagrange(CiarletElement):
     references = ["prism"]
     min_order = 0
     continuity = "C0"
-    mapping = "identity"
 
 
 class VectorDiscontinuousLagrange(CiarletElement):
@@ -179,4 +176,3 @@ class VectorDiscontinuousLagrange(CiarletElement):
     references = ["prism"]
     min_order = 0
     continuity = "L2"
-    mapping = "identity"

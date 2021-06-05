@@ -72,5 +72,4 @@ class DirectSerendipity(DirectElement):
     names = ["direct serendipity"]
     references = ["quadrilateral"]
     min_order = 1
-    mapping = "identity"
     continuity = "C0"

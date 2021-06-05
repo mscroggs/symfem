@@ -23,7 +23,6 @@ class Taylor(CiarletElement):
                 dofs.append(DerivativePointEvaluation(midpoint, i, entity=(reference.tdim, 0)))
 
         poly = polynomial_set(reference.tdim, 1, order)
-        print(len(dofs), len(poly))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
@@ -31,4 +30,3 @@ class Taylor(CiarletElement):
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "L2"
-    mapping = "identity"
