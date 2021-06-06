@@ -154,6 +154,7 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
         NCE, RTCE, Qcurl,
         NCF, RTCF, Qdiv,
         Morley,
+        Morley-Wang-Xu, MWX,
         Hermite,
         Mardal-Tai-Winther, MTW,
         Argyris,

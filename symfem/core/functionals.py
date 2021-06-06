@@ -282,7 +282,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
 
     def perform_mapping(self, fs, map, inverse_map, tdim):
         """Map functions to a cell."""
-        if sum(self.orders) > 1:
+        if sum(self.orders) > 0:
             raise NotImplementedError("Mapping high order derivatives not implemented")
         return super().perform_mapping(fs, map, inverse_map, tdim)
 
