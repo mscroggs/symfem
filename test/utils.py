@@ -19,6 +19,7 @@ test_elements = {
         "Bernstein": {None: range(1, 4)},
         "Taylor": {None: range(0, 5)},
         "Wu-Xu": {None: [2]},
+        "MWX": {None: [1]},
     },
     "triangle": {
         "P": {"equispaced": range(5), "lobatto": range(3)},
@@ -36,6 +37,7 @@ test_elements = {
         "HHJ": {"equispaced": range(3)},
         "Bell": {"equispaced": [5]},
         "Morley": {None: [2]},
+        "MWX": {None: [1, 2]},
         "Regge": {None: range(4)},
         "AW": {"equispaced": range(3, 5)},
         "Nedelec1": {"equispaced": range(1, 4)},
@@ -70,6 +72,7 @@ test_elements = {
         "RT": {"equispaced": range(1, 3)},
         "BDFM": {"equispaced": range(1, 3)},
         "MTW": {"equispaced": [3]},
+        "MWX": {None: [1, 2, 3]},
         "KMV": {"equispaced": [1]},
         "Hermite": {None: [3]},
         "BDM": {"equispaced": range(1, 3)},
