@@ -6,23 +6,8 @@ This element's definition appears in https://doi.org/10.1090/S0025-5718-2012-026
 
 from ..core.finite_element import CiarletElement
 from ..core.polynomials import polynomial_set
-from ..core.moments import make_integral_moment_dofs
-from ..core.functionals import (PointEvaluation, DerivativePointEvaluation,
-                                IntegralOfDirectionalMultiderivative,
-                                IntegralMoment, NormalIntegralMoment, IntegralAgainst)
-from .lagrange import DiscontinuousLagrange
-from ..core.symbolic import x
-
-
-def derivatives(dim, order):
-    """Return all the orders of a multidimensional derivative."""
-    if dim == 1:
-        return [(order, )]
-
-    out = []
-    for i in range(order + 1):
-        out += [(i, ) + j for j in derivatives(dim - 1, order - i)]
-    return out
+from ..core.functionals import (PointEvaluation, IntegralOfDirectionalMultiderivative,
+                                IntegralAgainst)
 
 
 class MorleyWangXu(CiarletElement):
