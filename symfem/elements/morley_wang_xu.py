@@ -44,7 +44,7 @@ class MorleyWangXu(CiarletElement):
                 facet = reference.sub_entity(dim, facet_n)
                 dofs.append(IntegralOfDirectionalMultiderivative(
                     facet, (facet.normal(), ), (1, ), scale=1 / facet.jacobian(),
-                    entity=(1, facet_n)))
+                    entity=(dim, facet_n)))
         else:
             assert order == reference.tdim == 3
             for v_n, v in enumerate(reference.sub_entities(0)):
