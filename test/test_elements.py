@@ -86,6 +86,31 @@ def test_independence(
     [[reference, element, order, variant]
      for reference, i in test_elements.items() for element, j in i.items()
      for variant, k in j.items() for order in k])
+def test_functional_entities(
+    elements_to_test, cells_to_test, cell_type, element_type, order, variant,
+    speed
+):
+    if elements_to_test != "ALL" and element_type not in elements_to_test:
+        pytest.skip()
+    if cells_to_test != "ALL" and cell_type not in cells_to_test:
+        pytest.skip()
+
+    # Test functionals
+    space = create_element(cell_type, element_type, order, variant)
+    if not isinstance(space, CiarletElement):
+        pytest.skip()
+    for dof in space.dofs:
+        dim, entity = dof.entity
+        assert entity < space.reference.sub_entity_count(dim)
+        if hasattr(dof, "reference"):
+            assert dim == dof.reference.tdim
+
+
+@pytest.mark.parametrize(
+    ("cell_type", "element_type", "order", "variant"),
+    [[reference, element, order, variant]
+     for reference, i in test_elements.items() for element, j in i.items()
+     for variant, k in j.items() for order in k])
 def test_element_functionals_and_continuity(
     elements_to_test, cells_to_test, cell_type, element_type, order, variant,
     speed
