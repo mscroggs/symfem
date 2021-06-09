@@ -10,7 +10,6 @@ def test_stiffness_matrix():
 
     matrix = [[0 for i in vertices] for j in vertices]
 
-
     element = symfem.create_element("triangle", "Lagrange", 1)
     for triangle in triangles:
         vs = [vertices[i] for i in triangle]
