@@ -128,7 +128,7 @@ test_elements = {
         "Lagrange": {"equispaced": range(4)}
     },
     "pyramid": {
-        "Lagrange": {"equispaced": range(3)}
+        "Lagrange": {"equispaced": range(4)}
     }
 }
 
