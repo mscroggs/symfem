@@ -6,10 +6,9 @@ This element's definition appears in https://doi.org/10.1007/s10915-009-9334-9
 
 import sympy
 from itertools import product
-from ..core.symbolic import one, zero
 from ..core.finite_element import CiarletElement
 from ..core.polynomials import pyramid_polynomial_set
-from ..core.functionals import PointEvaluation, DotPointEvaluation
+from ..core.functionals import PointEvaluation
 from ..core.quadrature import get_quadrature
 
 
