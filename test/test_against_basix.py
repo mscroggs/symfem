@@ -37,8 +37,7 @@ elements = {
                    ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 3)),
                    ("Sdiv", "Brezzi-Douglas-Marini", range(1, 3)),
                    ("Scurl", "Nedelec 2nd kind H(curl)", range(1, 3))],
-    "prism": [("Lagrange", "Lagrange", range(1, 4))],
-    "pyramid": [("Lagrange", "Lagrange", range(1, 3))]
+    "prism": [("Lagrange", "Lagrange", range(1, 4))]
 }
 
 

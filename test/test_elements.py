@@ -176,7 +176,7 @@ def test_element_functionals_and_continuity(
                     (0, 1, 0), (0, 0, 1))
         entity_pairs = [[0, (0, 1)], [0, (2, 3)], [0, (4, 4)],
                         [1, (1, 3)], [1, (2, 4)], [1, (6, 7)],
-                        [2, (2, 4)]]
+                        [2, (2, 3)]]
 
     if space.continuity == "L2":
         return

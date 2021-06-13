@@ -1,10 +1,10 @@
-"""Lagrange elements on a prism and pyramid."""
+"""Lagrange elements on a prism."""
 
 import sympy
 from itertools import product
 from ..core.symbolic import one, zero
 from ..core.finite_element import CiarletElement
-from ..core.polynomials import prism_polynomial_set, pyramid_polynomial_set
+from ..core.polynomials import prism_polynomial_set
 from ..core.functionals import PointEvaluation, DotPointEvaluation
 from ..core.quadrature import get_quadrature
 
@@ -51,35 +51,21 @@ class Lagrange(CiarletElement):
                                       for j, o in enumerate(entity.origin)),
                                 entity=(2, e_n)))
 
-            if reference.name == "prism":
-                # Interior
-                for i in product(range(1, order), repeat=3):
-                    if i[0] + i[1] < order:
-                        dofs.append(
-                            PointEvaluation(
-                                tuple(o + sum(a[j] * points[b]
-                                              for a, b in zip(reference.axes, i))
-                                      for j, o in enumerate(reference.origin)),
-                                entity=(3, 0)))
-            elif reference.name == "pyramid":
-                # Interior
-                for i in product(range(1, order), repeat=3):
-                    if max(i[0], i[1]) + i[2] < order:
-                        dofs.append(
-                            PointEvaluation(
-                                tuple(o + sum(a[j] * points[b]
-                                              for a, b in zip(reference.axes, i))
-                                      for j, o in enumerate(reference.origin)),
-                                entity=(3, 0)))
+            # Interior
+            for i in product(range(1, order), repeat=3):
+                if i[0] + i[1] < order:
+                    dofs.append(
+                        PointEvaluation(
+                            tuple(o + sum(a[j] * points[b]
+                                          for a, b in zip(reference.axes, i))
+                                  for j, o in enumerate(reference.origin)),
+                            entity=(3, 0)))
 
-        if reference.name == "prism":
-            poly = prism_polynomial_set(reference.tdim, 1, order)
-        elif reference.name == "pyramid":
-            poly = pyramid_polynomial_set(reference.tdim, 1, order)
+        poly = prism_polynomial_set(reference.tdim, 1, order)
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     names = ["Lagrange", "P"]
-    references = ["prism", "pyramid"]
+    references = ["prism"]
     min_order = 0
     continuity = "C0"
 

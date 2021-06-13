@@ -270,20 +270,14 @@ def pyramid_polynomial_set_1d(dim, order):
     assert dim == 3
     if order == 0:
         return [one]
-    if order >= 3:
-        raise NotImplementedError()
 
-    poly = []
-    for r in range(order + 1):
-        for p in range(order - r + 1):
-            for q in range(order - r + 1):
-                if r == 0 and p + q < order:
-                    poly.append(x[0] ** p * x[1] ** q)
-                else:
-                    new_p = (2 * x[0] + x[2]) ** p
-                    new_p *= (2 * x[1] + x[2]) ** q
-                    new_p *= x[2] ** r
-                    poly.append(new_p)
+    poly = polynomial_set_1d(3, order)
+
+    poly = [x[0] ** a * x[1] ** b * x[2] ** c / (1 - x[2]) ** (a + b + c - order)
+            for c in range(order)
+            for a in range(order + 1 - c) for b in range(order + 1 - c)]
+    poly.append(x[2] ** order)
+
     return poly
 
 
