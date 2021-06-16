@@ -1,8 +1,8 @@
 """Create elements and references."""
 import os as _os
 import importlib as _il
-from .core import references as _references
-from .core.finite_element import FiniteElement as _FiniteElement
+from . import references as _references
+from .finite_element import FiniteElement as _FiniteElement
 
 _folder = _os.path.dirname(_os.path.realpath(__file__))
 

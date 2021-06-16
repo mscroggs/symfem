@@ -5,12 +5,12 @@ This element's definition appears in https://doi.org/10.1137/S0036142901383910
 and https://doi.org/10.1007/s10092-006-0124-6 (Tail, Mardal, 2006)
 """
 
-from ..core.finite_element import CiarletElement
-from ..core.moments import make_integral_moment_dofs
-from ..core.polynomials import polynomial_set
-from ..core.symbolic import x, zero, one
-from ..core.calculus import curl
-from ..core.functionals import NormalIntegralMoment, TangentIntegralMoment, IntegralMoment
+from ..finite_element import CiarletElement
+from ..moments import make_integral_moment_dofs
+from ..polynomials import polynomial_set
+from ..symbolic import x, zero, one
+from ..calculus import curl
+from ..functionals import NormalIntegralMoment, TangentIntegralMoment, IntegralMoment
 from .lagrange import DiscontinuousLagrange
 from .nedelec import NedelecFirstKind
 

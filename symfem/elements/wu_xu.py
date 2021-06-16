@@ -4,11 +4,11 @@ This element's definition appears in https://doi.org/10.1090/mcom/3361
 (Wu, Xu, 2019)
 """
 
-from ..core.finite_element import CiarletElement
-from ..core.polynomials import polynomial_set
-from ..core.functionals import (PointEvaluation, DerivativePointEvaluation,
-                                IntegralOfDirectionalMultiderivative)
-from ..core.symbolic import x
+from ..finite_element import CiarletElement
+from ..polynomials import polynomial_set
+from ..functionals import (PointEvaluation, DerivativePointEvaluation,
+                           IntegralOfDirectionalMultiderivative)
+from ..symbolic import x
 
 
 def derivatives(dim, order):

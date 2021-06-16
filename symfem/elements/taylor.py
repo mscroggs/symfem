@@ -1,10 +1,10 @@
 """Taylor element on an interval, triangle or tetrahedron."""
 
-from ..core.finite_element import CiarletElement
-from ..core.moments import make_integral_moment_dofs
-from ..core.polynomials import polynomial_set
-from ..core.functionals import IntegralMoment, DerivativePointEvaluation
-from ..core.symbolic import sym_sum
+from ..finite_element import CiarletElement
+from ..moments import make_integral_moment_dofs
+from ..polynomials import polynomial_set
+from ..functionals import IntegralMoment, DerivativePointEvaluation
+from ..symbolic import sym_sum
 from .lagrange import DiscontinuousLagrange
 from itertools import product
 

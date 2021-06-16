@@ -4,12 +4,12 @@ This element's definition appears in https://doi.org/10.1007/BF01396752
 (Brezzi, Douglas, Duran, Fortin, 1987)
 """
 
-from ..core.finite_element import CiarletElement
-from ..core.moments import make_integral_moment_dofs
-from ..core.polynomials import polynomial_set
-from ..core.symbolic import x, zero
-from ..core.calculus import curl
-from ..core.functionals import NormalIntegralMoment, IntegralMoment
+from ..finite_element import CiarletElement
+from ..moments import make_integral_moment_dofs
+from ..polynomials import polynomial_set
+from ..symbolic import x, zero
+from ..calculus import curl
+from ..functionals import NormalIntegralMoment, IntegralMoment
 from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
 
 

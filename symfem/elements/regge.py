@@ -7,9 +7,9 @@ This element's definition appears in https://doi.org/10.1007/BF02733251
 
 import sympy
 from itertools import product
-from ..core.finite_element import CiarletElement
-from ..core.polynomials import polynomial_set
-from ..core.functionals import PointInnerProduct
+from ..finite_element import CiarletElement
+from ..polynomials import polynomial_set
+from ..functionals import PointInnerProduct
 
 
 class Regge(CiarletElement):

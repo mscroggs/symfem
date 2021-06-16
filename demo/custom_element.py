@@ -1,8 +1,8 @@
 import symfem
 import sympy
-from symfem.core.finite_element import CiarletElement
-from symfem.core.symbolic import x
-from symfem.core.functionals import PointEvaluation
+from symfem.finite_element import CiarletElement
+from symfem.symbolic import x
+from symfem.functionals import PointEvaluation
 
 
 class CustomElement(CiarletElement):

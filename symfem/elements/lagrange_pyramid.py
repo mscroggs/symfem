@@ -6,10 +6,10 @@ This element's definition appears in https://doi.org/10.1007/s10915-009-9334-9
 
 import sympy
 from itertools import product
-from ..core.finite_element import CiarletElement
-from ..core.polynomials import pyramid_polynomial_set
-from ..core.functionals import PointEvaluation
-from ..core.quadrature import get_quadrature
+from ..finite_element import CiarletElement
+from ..polynomials import pyramid_polynomial_set
+from ..functionals import PointEvaluation
+from ..quadrature import get_quadrature
 
 
 class Lagrange(CiarletElement):

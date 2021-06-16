@@ -4,10 +4,10 @@ This element's definition appears in https://doi.org/10.1016/0045-7825(72)90006-
 (Ciarlet, Raviart, 1972)
 """
 
-from ..core.finite_element import CiarletElement
-from ..core.polynomials import polynomial_set
-from ..core.functionals import PointEvaluation, DerivativePointEvaluation
-from ..core.symbolic import sym_sum
+from ..finite_element import CiarletElement
+from ..polynomials import polynomial_set
+from ..functionals import PointEvaluation, DerivativePointEvaluation
+from ..symbolic import sym_sum
 
 
 class Hermite(CiarletElement):

@@ -4,12 +4,12 @@ This element's definition appears in https://doi.org/10.1017/S000192400008489X
 (Arygris, Fried, Scharpf, 1968)
 """
 
-from ..core.finite_element import CiarletElement
-from ..core.polynomials import polynomial_set
-from ..core.functionals import (PointEvaluation, PointDirectionalDerivativeEvaluation,
-                                PointNormalDerivativeEvaluation,
-                                PointComponentSecondDerivativeEvaluation)
-from ..core.symbolic import sym_sum
+from ..finite_element import CiarletElement
+from ..polynomials import polynomial_set
+from ..functionals import (PointEvaluation, PointDirectionalDerivativeEvaluation,
+                           PointNormalDerivativeEvaluation,
+                           PointComponentSecondDerivativeEvaluation)
+from ..symbolic import sym_sum
 
 
 class Argyris(CiarletElement):

@@ -1,7 +1,7 @@
 import sympy
 from utils import all_symequal
 from symfem import create_element
-from symfem.core.symbolic import x
+from symfem.symbolic import x
 
 
 def test_lagrange():

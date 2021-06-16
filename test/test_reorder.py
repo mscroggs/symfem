@@ -1,6 +1,6 @@
 import symfem
 import sympy
-from symfem.core.symbolic import zero, one
+from symfem.symbolic import zero, one
 half = sympy.Rational(1, 2)
 
 

@@ -74,7 +74,7 @@ class Reference:
         """Get the number of sub entities of a given dimension."""
         return len(self.sub_entities(dim))
 
-    def sub_entity(self, dim, n):
+    def sub_entity(self, dim, n, reference_vertices=False):
         """Get the sub entity of a given dimension and number."""
         from symfem import create_reference
 
@@ -82,8 +82,12 @@ class Reference:
         if not isinstance(entity_type, str):
             entity_type = entity_type[n]
 
-        return create_reference(
-            entity_type, [self.vertices[i] for i in self.sub_entities(dim)[n]])
+        if reference_vertices:
+            return create_reference(
+                entity_type, [self.reference_vertices[i] for i in self.sub_entities(dim)[n]])
+        else:
+            return create_reference(
+                entity_type, [self.vertices[i] for i in self.sub_entities(dim)[n]])
 
     def at_vertex(self, point):
         """Check if a point is a vertex of the reference."""

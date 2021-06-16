@@ -5,10 +5,10 @@ This element's definition appears in https://doi.org/10.2307/2006147
 """
 
 import sympy
-from ..core.finite_element import CiarletElement
-from ..core.functionals import (PointEvaluation, PointNormalDerivativeEvaluation,
-                                DerivativePointEvaluation)
-from ..core.symbolic import sym_sum, PiecewiseFunction, zero
+from ..finite_element import CiarletElement
+from ..functionals import (PointEvaluation, PointNormalDerivativeEvaluation,
+                           DerivativePointEvaluation)
+from ..symbolic import sym_sum, PiecewiseFunction, zero
 from .hermite import Hermite
 
 

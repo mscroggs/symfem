@@ -1,5 +1,5 @@
 from symfem import create_element
-from symfem.core.symbolic import subs, x
+from symfem.symbolic import subs, x
 import pytest
 
 elements = {

@@ -5,8 +5,8 @@ These elements' definitions appear in https://doi.org/10.1016/j.crma.2004.12.022
 """
 
 import sympy
-from ..core.symbolic import sym_sum, PiecewiseFunction
-from ..core.finite_element import CiarletElement
+from ..symbolic import sym_sum, PiecewiseFunction
+from ..finite_element import CiarletElement
 
 
 class DualCiarletElement(CiarletElement):

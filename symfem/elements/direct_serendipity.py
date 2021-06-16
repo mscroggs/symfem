@@ -4,8 +4,8 @@ This element's definition appears in https://arxiv.org/abs/1809.02192
 (Arbogast, Tao, 2018)
 """
 
-from ..core.finite_element import DirectElement
-from ..core.symbolic import x
+from ..finite_element import DirectElement
+from ..symbolic import x
 from .lagrange import DiscontinuousLagrange
 
 

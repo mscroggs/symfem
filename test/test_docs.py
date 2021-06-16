@@ -54,7 +54,7 @@ def test_available_references():
 
 
 def test_available_variants():
-    r_supported = symfem.core.quadrature.get_quadrature.__doc__
+    r_supported = symfem.quadrature.get_quadrature.__doc__
     r_supported = r_supported.split("rule : str\n")[1]
     r_supported = r_supported.split("N : int\n")[0]
     r_supported = r_supported.split("Supported values:")[1]

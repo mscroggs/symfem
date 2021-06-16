@@ -4,10 +4,10 @@ This element's definition appears in https://doi.org/10.1090/S0025-5718-2012-026
 (Wang, Xu, 2013)
 """
 
-from ..core.finite_element import CiarletElement
-from ..core.polynomials import polynomial_set
-from ..core.functionals import (PointEvaluation, IntegralOfDirectionalMultiderivative,
-                                IntegralAgainst)
+from ..finite_element import CiarletElement
+from ..polynomials import polynomial_set
+from ..functionals import (PointEvaluation, IntegralOfDirectionalMultiderivative,
+                           IntegralAgainst)
 
 
 class MorleyWangXu(CiarletElement):

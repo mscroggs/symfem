@@ -5,11 +5,11 @@ This element's definition appears in https://doi.org/10.1007/s002110100348
 """
 
 import sympy
-from ..core.finite_element import CiarletElement
-from ..core.polynomials import polynomial_set
-from ..core.functionals import (PointInnerProduct, InnerProductIntegralMoment,
-                                VecIntegralMoment, IntegralMoment)
-from ..core.symbolic import zero, one, x
+from ..finite_element import CiarletElement
+from ..polynomials import polynomial_set
+from ..functionals import (PointInnerProduct, InnerProductIntegralMoment,
+                           VecIntegralMoment, IntegralMoment)
+from ..symbolic import zero, one, x
 from .lagrange import DiscontinuousLagrange
 
 
