@@ -2,9 +2,9 @@ import pytest
 import sympy
 import symfem
 from symfem import create_element
-from symfem.core.finite_element import CiarletElement, DirectElement
-from symfem.core.symbolic import subs, x, PiecewiseFunction
-from symfem.core.vectors import vsub
+from symfem.finite_element import CiarletElement, DirectElement
+from symfem.symbolic import subs, x, PiecewiseFunction
+from symfem.vectors import vsub
 from utils import test_elements, all_symequal
 
 

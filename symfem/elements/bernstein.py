@@ -4,10 +4,10 @@ This element's definition appears in https://doi.org/10.1007/s00211-010-0327-2
 (Kirby, 2011)
 """
 
-from ..core.symbolic import one, x
-from ..core.finite_element import CiarletElement
-from ..core.polynomials import polynomial_set
-from ..core.functionals import IntegralAgainst
+from ..symbolic import one, x
+from ..finite_element import CiarletElement
+from ..polynomials import polynomial_set
+from ..functionals import IntegralAgainst
 
 
 def single_choose(n, k):

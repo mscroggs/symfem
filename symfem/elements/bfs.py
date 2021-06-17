@@ -4,9 +4,9 @@ This element's definition appears in http://contrails.iit.edu/reports/8569
 (Bogner, Fox, Schmit, 1966)
 """
 
-from ..core.finite_element import CiarletElement
-from ..core.polynomials import quolynomial_set
-from ..core.functionals import PointEvaluation, DerivativePointEvaluation
+from ..finite_element import CiarletElement
+from ..polynomials import quolynomial_set
+from ..functionals import PointEvaluation, DerivativePointEvaluation
 
 
 class BognerFoxSchmit(CiarletElement):

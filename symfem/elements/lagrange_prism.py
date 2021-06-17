@@ -2,11 +2,11 @@
 
 import sympy
 from itertools import product
-from ..core.symbolic import one, zero
-from ..core.finite_element import CiarletElement
-from ..core.polynomials import prism_polynomial_set
-from ..core.functionals import PointEvaluation, DotPointEvaluation
-from ..core.quadrature import get_quadrature
+from ..symbolic import one, zero
+from ..finite_element import CiarletElement
+from ..polynomials import prism_polynomial_set
+from ..functionals import PointEvaluation, DotPointEvaluation
+from ..quadrature import get_quadrature
 
 
 class Lagrange(CiarletElement):

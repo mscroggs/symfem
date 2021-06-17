@@ -125,7 +125,8 @@ test_elements = {
         "BDDF": {"equispaced": range(1, 3)},
     },
     "prism": {
-        "Lagrange": {"equispaced": range(4)}
+        "Lagrange": {"equispaced": range(4)},
+        "Nedelec": {"equispaced": range(1, 3)}
     },
     "pyramid": {
         "Lagrange": {"equispaced": range(4)}

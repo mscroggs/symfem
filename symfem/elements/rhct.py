@@ -5,10 +5,10 @@ This element's definition appears in https://doi.org/10.2307/2006147
 """
 
 import sympy
-from ..core.finite_element import CiarletElement
-from ..core.functionals import PointEvaluation, DerivativePointEvaluation
-from ..core.polynomials import polynomial_set
-from ..core.symbolic import PiecewiseFunction, zero, x, one
+from ..finite_element import CiarletElement
+from ..functionals import PointEvaluation, DerivativePointEvaluation
+from ..polynomials import polynomial_set
+from ..symbolic import PiecewiseFunction, zero, x, one
 
 
 class P1Hermite(CiarletElement):

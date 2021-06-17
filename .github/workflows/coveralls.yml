@@ -16,10 +16,6 @@ jobs:
         with:
           python-version: 3.8
       - run: |
-            sudo apt-get update
-            pip install --upgrade pip
-        name: Update apt and pip
-      - run: |
             sudo apt-get install -y libeigen3-dev libopenblas-dev liblapack-dev ninja-build
             pip install pybind11
         name: Install Basix dependencies

@@ -1,7 +1,7 @@
 import symfem
 import sympy
-from symfem.core.vectors import vdot
-from symfem.core.calculus import grad
+from symfem.vectors import vdot
+from symfem.calculus import grad
 
 
 def test_stiffness_matrix():

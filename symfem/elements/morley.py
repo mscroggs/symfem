@@ -4,10 +4,10 @@ This element's definition appears in https://doi.org/10.1017/S0001925900004546
 (Morley, 1968)
 """
 
-from ..core.finite_element import CiarletElement
-from ..core.polynomials import polynomial_set
-from ..core.functionals import PointEvaluation, PointNormalDerivativeEvaluation
-from ..core.symbolic import sym_sum
+from ..finite_element import CiarletElement
+from ..polynomials import polynomial_set
+from ..functionals import PointEvaluation, PointNormalDerivativeEvaluation
+from ..symbolic import sym_sum
 
 
 class Morley(CiarletElement):

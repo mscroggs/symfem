@@ -4,10 +4,10 @@ These elements' definitions appear in https://doi.org/10.1007/BF01396415
 (Nedelec, 1980) and https://doi.org/10.1007/BF01389668 (Nedelec, 1986)
 """
 
-from ..core.finite_element import CiarletElement
-from ..core.moments import make_integral_moment_dofs
-from ..core.polynomials import polynomial_set, Hcurl_polynomials
-from ..core.functionals import TangentIntegralMoment, IntegralMoment
+from ..finite_element import CiarletElement
+from ..moments import make_integral_moment_dofs
+from ..polynomials import polynomial_set, Hcurl_polynomials
+from ..functionals import TangentIntegralMoment, IntegralMoment
 from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
 from .rt import RaviartThomas
 

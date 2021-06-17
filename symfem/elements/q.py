@@ -2,13 +2,13 @@
 
 import sympy
 from itertools import product
-from ..core.symbolic import one, zero
-from ..core.finite_element import CiarletElement
-from ..core.moments import make_integral_moment_dofs
-from ..core.polynomials import quolynomial_set, Hdiv_quolynomials, Hcurl_quolynomials
-from ..core.quadrature import get_quadrature
-from ..core.functionals import (PointEvaluation, DotPointEvaluation, IntegralMoment,
-                                TangentIntegralMoment, NormalIntegralMoment)
+from ..symbolic import one, zero
+from ..finite_element import CiarletElement
+from ..moments import make_integral_moment_dofs
+from ..polynomials import quolynomial_set, Hdiv_quolynomials, Hcurl_quolynomials
+from ..quadrature import get_quadrature
+from ..functionals import (PointEvaluation, DotPointEvaluation, IntegralMoment,
+                           TangentIntegralMoment, NormalIntegralMoment)
 
 
 class Q(CiarletElement):
@@ -132,7 +132,7 @@ class Nedelec(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
-    names = ["NCE", "RTCE", "Qcurl"]
+    names = ["NCE", "RTCE", "Qcurl", "Nedelec", "Ncurl"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(curl)"

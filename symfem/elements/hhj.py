@@ -4,10 +4,10 @@ This element's definition appears in https://arxiv.org/abs/1909.09687
 (Arnold, Walker, 2020)
 """
 
-from ..core.finite_element import CiarletElement
-from ..core.moments import make_integral_moment_dofs
-from ..core.polynomials import polynomial_set
-from ..core.functionals import NormalInnerProductIntegralMoment, IntegralMoment
+from ..finite_element import CiarletElement
+from ..moments import make_integral_moment_dofs
+from ..polynomials import polynomial_set
+from ..functionals import NormalInnerProductIntegralMoment, IntegralMoment
 from .lagrange import DiscontinuousLagrange, SymmetricMatrixDiscontinuousLagrange
 
 

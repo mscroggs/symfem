@@ -1,9 +1,9 @@
 import pytest
 import sympy
-from symfem.core.polynomials import Hdiv_polynomials, Hcurl_polynomials
-from symfem.core.vectors import vdot
-from symfem.core.symbolic import x, t, subs
-from symfem.core.calculus import div
+from symfem.polynomials import Hdiv_polynomials, Hcurl_polynomials
+from symfem.vectors import vdot
+from symfem.symbolic import x, t, subs
+from symfem.calculus import div
 from symfem import create_reference, create_element
 
 

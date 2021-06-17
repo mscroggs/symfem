@@ -6,10 +6,10 @@ This element's definition appears in https://doi.org/10.1007/978-3-642-23099-8_3
 
 import sympy
 from itertools import product
-from ..core.symbolic import x, zero, one
-from ..core.finite_element import CiarletElement
-from ..core.polynomials import polynomial_set, quolynomial_set
-from ..core.functionals import PointEvaluation, DotPointEvaluation
+from ..symbolic import x, zero, one
+from ..finite_element import CiarletElement
+from ..polynomials import polynomial_set, quolynomial_set
+from ..functionals import PointEvaluation, DotPointEvaluation
 from .lagrange import Lagrange
 
 

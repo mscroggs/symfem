@@ -1,6 +1,17 @@
 """Functions to create integral moments."""
 
 
+def extract_moment_data(moment_data, sub_type):
+    """Get the information for a moment."""
+    if isinstance(moment_data, dict):
+        return extract_moment_data(moment_data[sub_type], sub_type)
+
+    if len(moment_data) == 3:
+        return moment_data + (None, )
+    else:
+        return moment_data
+
+
 def make_integral_moment_dofs(
     reference,
     vertices=None, edges=None, faces=None, volumes=None,
@@ -30,25 +41,19 @@ def make_integral_moment_dofs(
     peaks: tuple
         DOFs on codimension 3 entities.
     """
-    from symfem import create_reference
     dofs = []
 
     # DOFs per dimension
     for dim, moment_data in enumerate([vertices, edges, faces, volumes]):
         if moment_data is not None:
-            if len(moment_data) == 3:
-                IntegralMoment, SubElement, order = moment_data
-                mapping = None
-            else:
-                IntegralMoment, SubElement, order, mapping = moment_data
-            if order >= SubElement.min_order:
-                sub_type = reference.sub_entity_types[dim]
-                if sub_type is not None:
-                    assert dim > 0
-                    for i, vs in enumerate(reference.sub_entities(dim)):
-                        sub_ref = create_reference(
-                            sub_type,
-                            vertices=[reference.reference_vertices[v] for v in vs])
+            sub_type = reference.sub_entity_types[dim]
+            if sub_type is not None:
+                assert dim > 0
+                for i, vs in enumerate(reference.sub_entities(dim)):
+                    sub_ref = reference.sub_entity(dim, i, True)
+                    IntegralMoment, SubElement, order, mapping = extract_moment_data(
+                        moment_data, sub_ref.name)
+                    if order >= SubElement.min_order:
                         sub_element = SubElement(sub_ref, order, variant=variant)
                         for dn, d in enumerate(sub_element.dofs):
                             f = sub_element.get_basis_function(dn)
@@ -62,19 +67,14 @@ def make_integral_moment_dofs(
     for _dim, moment_data in enumerate([peaks, ridges, facets, cells]):
         dim = reference.tdim - 3 + _dim
         if moment_data is not None:
-            if len(moment_data) == 3:
-                IntegralMoment, SubElement, order = moment_data
-                mapping = None
-            else:
-                IntegralMoment, SubElement, order, mapping = moment_data
-            if order >= SubElement.min_order:
-                sub_type = reference.sub_entity_types[dim]
-                if sub_type is not None:
-                    assert dim > 0
-                    for i, vs in enumerate(reference.sub_entities(dim)):
-                        sub_ref = create_reference(
-                            sub_type,
-                            vertices=[reference.reference_vertices[v] for v in vs])
+            sub_type = reference.sub_entity_types[dim]
+            if sub_type is not None:
+                assert dim > 0
+                for i, vs in enumerate(reference.sub_entities(dim)):
+                    sub_ref = reference.sub_entity(dim, i, True)
+                    IntegralMoment, SubElement, order, mapping = extract_moment_data(
+                        moment_data, sub_ref.name)
+                    if order >= SubElement.min_order:
                         sub_element = SubElement(sub_ref, order, variant=variant)
                         for dn, d in enumerate(sub_element.dofs):
                             f = sub_element.get_basis_function(dn)

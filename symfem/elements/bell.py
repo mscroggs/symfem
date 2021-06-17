@@ -3,11 +3,11 @@
 This element's definition is given in https://doi.org/10.1002/nme.1620010108 (Bell, 1969)
 """
 
-from ..core.finite_element import CiarletElement
-from ..core.moments import make_integral_moment_dofs
-from ..core.polynomials import polynomial_set
-from ..core.functionals import (PointEvaluation, NormalDerivativeIntegralMoment,
-                                DerivativePointEvaluation)
+from ..finite_element import CiarletElement
+from ..moments import make_integral_moment_dofs
+from ..polynomials import polynomial_set
+from ..functionals import (PointEvaluation, NormalDerivativeIntegralMoment,
+                           DerivativePointEvaluation)
 from .lagrange import DiscontinuousLagrange
 
 

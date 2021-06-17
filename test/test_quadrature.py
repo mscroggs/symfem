@@ -1,6 +1,6 @@
 import pytest
 import sympy
-from symfem.core import quadrature
+from symfem import quadrature
 from utils import all_symequal
 
 

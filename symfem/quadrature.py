@@ -1,7 +1,7 @@
 """Quadrature definitions."""
 
 import sympy
-from ..core.symbolic import one, zero
+from .symbolic import one, zero
 
 
 def equispaced(N):

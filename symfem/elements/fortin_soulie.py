@@ -5,10 +5,10 @@ This element's definition appears in https://doi.org/10.1002/nme.1620190405
 """
 
 import sympy
-from ..core.finite_element import CiarletElement
-from ..core.polynomials import polynomial_set
-from ..core.functionals import PointEvaluation, IntegralMoment
-from ..core.moments import make_integral_moment_dofs
+from ..finite_element import CiarletElement
+from ..polynomials import polynomial_set
+from ..functionals import PointEvaluation, IntegralMoment
+from ..moments import make_integral_moment_dofs
 from .lagrange import DiscontinuousLagrange
 
 

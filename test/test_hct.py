@@ -1,8 +1,8 @@
 import symfem
 import sympy
 from utils import all_symequal
-from symfem.core.symbolic import zero, x, t, subs
-from symfem.core.calculus import grad
+from symfem.symbolic import zero, x, t, subs
+from symfem.calculus import grad
 half = sympy.Rational(1, 2)
 
 
