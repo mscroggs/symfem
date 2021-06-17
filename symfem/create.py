@@ -144,7 +144,7 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
         serendipity Hdiv, Sdiv, BDMCF, AAF,
         direct serendipity,
         Regge,
-        Nedelec, Nedelec1, N1curl,
+        Nedelec, Nedelec1, N1curl, Ncurl,
         Nedelec2, N2curl,
         Raviart-Thomas, RT, N1div,
         Brezzi-Douglas-Marini, BDM, N2div,

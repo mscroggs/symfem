@@ -39,7 +39,7 @@ For example, some elements are created in the following snippet:
     nedelec = symfem.create_element("triangle", "N2curl", 1)
     qcurl = symfem.create_element("quadrilateral", "Qcurl", 2)
 
-`create_element` will create a :class:`symfem.core.finite_element.FiniteElement` object.
+`create_element` will create a :class:`symfem.finite_element.FiniteElement` object.
 From this object, the polynomial basis of the element can be obtained:
 
 .. code-block:: python
@@ -67,9 +67,9 @@ snippet.
 
 ::
 
-    [<symfem.core.functionals.PointEvaluation object at 0x{ADDRESS}>, <symfem.core.functionals.PointEvaluation object at 0x{ADDRESS}>, <symfem.core.functionals.PointEvaluation object at 0x{ADDRESS}>]
+    [<symfem.functionals.PointEvaluation object at 0x{ADDRESS}>, <symfem.functionals.PointEvaluation object at 0x{ADDRESS}>, <symfem.functionals.PointEvaluation object at 0x{ADDRESS}>]
 
-Each functional will be a functional defined in :mod:`symfem.core.functionals`.
+Each functional will be a functional defined in :mod:`symfem.functionals`.
 
 The basis functions spanning the finite element space can be obtained, or tabulated
 at a set of points:
@@ -91,7 +91,7 @@ at a set of points:
 
 Reference elements
 ------------------
-Reference elements can be obtained from a :class:`symfem.core.finite_element.FiniteElement`:
+Reference elements can be obtained from a :class:`symfem.finite_element.FiniteElement`:
 
 .. code-block:: python
 

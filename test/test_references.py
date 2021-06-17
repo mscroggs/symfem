@@ -1,4 +1,4 @@
-from symfem.core import references
+from symfem import references
 import pytest
 
 
