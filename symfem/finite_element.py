@@ -116,7 +116,6 @@ class CiarletElement(FiniteElement):
             for d in self.dofs:
                 row.append(d.eval(b))
             mat.append(row)
-            print(b, "\n", row, "\n")
         return sympy.Matrix(mat)
 
     def get_basis_functions(self, reshape=True):

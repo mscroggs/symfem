@@ -4,7 +4,7 @@ from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..polynomials import (Hcurl_polynomials, polynomial_set_1d,
                            polynomial_set)
-from ..functionals import TangentIntegralMoment, IntegralMoment
+from ..functionals import TangentIntegralMoment, IntegralMoment, IntegralAgainst
 from ..symbolic import x, zero
 from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
 from .q import RaviartThomas as QRT
@@ -14,6 +14,8 @@ class Nedelec(CiarletElement):
     """Nedelec Hcurl finite element."""
 
     def __init__(self, reference, order, variant):
+        from .. import create_reference
+
         poly = [(i[0] * j, i[1] * j, zero)
                 for i in polynomial_set(2, 2, order - 1) + Hcurl_polynomials(2, 2, order)
                 for j in polynomial_set_1d(1, order, x[2:])]
@@ -30,10 +32,18 @@ class Nedelec(CiarletElement):
             variant=variant
         )
 
-        # TODO: volume DOFs
+        triangle = create_reference("triangle")
+        interval = create_reference("interval")
 
-        print(poly)
-        print(len(dofs), len(poly))
+        space1 = VectorDiscontinuousLagrange(triangle, order - 2, variant)
+        space2 = DiscontinuousLagrange(interval, order - 2, variant)
+
+        for i in range(space1.space_dim):
+            for j in range(space2.space_dim):
+                f = (space2.get_basis_function(j) * space1.get_basis_function(i)[0],
+                     space2.get_basis_function(j) * space1.get_basis_function(i)[1],
+                     zero)
+                dofs.append(IntegralAgainst(reference, f, entity=(3, 0), mapping="covariant"))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 

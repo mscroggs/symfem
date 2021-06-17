@@ -18,13 +18,17 @@ class BasisFunction:
         """Forward all other function calls to symbolic function."""
         return getattr(self.get_function(), attr)
 
-    def __rmul__(self, other):
+    def __getitem__(self, key):
+        """Forward all other function calls to symbolic function."""
+        return self.get_function()[key]
+
+    def __mul__(self, other):
         """Multiply."""
         return self.get_function() * other
 
-    def __lmul__(self, other):
+    def __rmul__(self, other):
         """Multiply."""
-        return self.__rmul__(other)
+        return self.__mul__(other)
 
     def __truediv__(self, other):
         """Divide."""

@@ -78,7 +78,6 @@ def make_integral_moment_dofs(
                         for dn, d in enumerate(sub_element.dofs):
                             f = sub_element.get_basis_function(dn)
                             if mapping is None:
-                                print(sub_ref.name)
                                 dofs.append(IntegralMoment(sub_ref, f, d, entity=(dim, i)))
                             else:
                                 dofs.append(IntegralMoment(sub_ref, f, d, entity=(dim, i),
