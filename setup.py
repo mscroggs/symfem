@@ -35,7 +35,7 @@ if __name__ == "__main__":
         author_email="symfem@mscroggs.co.uk",
         maintainer_email="symfem@mscroggs.co.uk",
         url="https://github.com/mscroggs/symfem",
-        packages=["symfem", "symfem.core", "symfem.elements"],
+        packages=["symfem", "symfem.elements"],
         data_files=data_files,
         include_package_data=True,
         install_requires=requirements

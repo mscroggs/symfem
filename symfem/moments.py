@@ -2,6 +2,7 @@
 
 
 def extract_moment_data(moment_data, sub_type):
+    """Get the information for a moment."""
     if isinstance(moment_data, dict):
         return extract_moment_data(moment_data[sub_type], sub_type)
 
