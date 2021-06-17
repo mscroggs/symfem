@@ -38,6 +38,9 @@ class Nedelec(CiarletElement):
         space1 = VectorDiscontinuousLagrange(triangle, order - 2, variant)
         space2 = DiscontinuousLagrange(interval, order - 2, variant)
 
+        if order > 2:
+            raise NotImplementedError()
+        # TODO: correct these for order > 2
         for i in range(space1.space_dim):
             for j in range(space2.space_dim):
                 f = (space2.get_basis_function(j) * space1.get_basis_function(i)[0],
@@ -50,4 +53,5 @@ class Nedelec(CiarletElement):
     names = ["Nedelec", "Ncurl"]
     references = ["prism"]
     min_order = 1
+    max_order = 2
     continuity = "H(curl)"
