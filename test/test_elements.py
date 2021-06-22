@@ -5,7 +5,7 @@ from symfem import create_element
 from symfem.finite_element import CiarletElement, DirectElement
 from symfem.symbolic import subs, x, PiecewiseFunction
 from symfem.vectors import vsub
-from utils import test_elements, all_symequal
+from .utils import test_elements, all_symequal
 
 
 def test_all_tested():
