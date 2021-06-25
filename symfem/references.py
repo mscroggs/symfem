@@ -116,6 +116,37 @@ class Reference:
         return False
 
 
+class Point(Reference):
+    """A point."""
+
+    def __init__(self, vertices=(tuple())):
+        self.tdim = 0
+        self.name = "point"
+        self.origin = vertices[0]
+        self.axes = tuple()
+        self.reference_vertices = (tuple())
+        self.vertices = tuple(vertices)
+        self.edges = tuple()
+        self.faces = tuple()
+        self.volumes = tuple()
+        self.sub_entity_types = ["point", None, None, None]
+        super().__init__(simplex=True, tp=True)
+
+    def integral(self, f):
+        """Calculate the integral over the element."""
+        return subs(f, t, vertices)
+
+    def get_map_to(self, vertices):
+        """Get the map from the reference to a cell."""
+        assert self.vertices == self.reference_vertices
+        return vertices
+
+    def get_inverse_map_to(self, vertices):
+        """Get the inverse map from a cell to the reference."""
+        assert self.vertices == self.reference_vertices
+        return self.vertices
+
+
 class Interval(Reference):
     """An interval."""
 

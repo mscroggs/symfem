@@ -75,11 +75,15 @@ def create_reference(cell_type, vertices=None):
         The reference cell type.
 
         Supported values:
-        interval, triangle, quadrilateral, tetrahedron, hexahedron,
+        point, interval, triangle, quadrilateral, tetrahedron, hexahedron,
         prism, pyramid, dual polygon(number_of_triangles)
     vertices : list
         The vertices of the reference.
     """
+    if cell_type == "point":
+        if vertices is not None:
+            return _references.Point(vertices)
+        return _references.Point()
     if cell_type == "interval":
         if vertices is not None:
             return _references.Interval(vertices)
@@ -126,7 +130,7 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
         The reference cell type.
 
         Supported values:
-        interval, triangle, quadrilateral, tetrahedron, hexahedron,
+        point, interval, triangle, quadrilateral, tetrahedron, hexahedron,
         prism, pyramid, dual polygon(number_of_triangles)
     element_type : str
         The type of the element.
