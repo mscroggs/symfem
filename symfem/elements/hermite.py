@@ -16,7 +16,7 @@ class Hermite(CiarletElement):
     def __init__(self, reference, order, variant):
         assert order == 3
         dofs = []
-        for v_n, vs in enumerate(reference.sub_entities(0)):
+        for v_n, vs in enumerate(reference.vertices):
             dofs.append(PointEvaluation(vs, entity=(0, v_n)))
             for i in range(reference.tdim):
                 dofs.append(DerivativePointEvaluation(

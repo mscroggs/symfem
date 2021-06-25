@@ -13,8 +13,6 @@ test_elements = {
                "legendre": range(3)},
         "bubble": {"equispaced": range(2, 6), "lobatto": range(2, 3)},
         "serendipity": {"equispaced": range(1, 6), "lobatto": range(1, 3)},
-        "Q": {"equispaced": range(3), "lobatto": range(3)},
-        "dQ": {"equispaced": range(3), "lobatto": range(3)},
         "Hermite": {None: [3]},
         "Bernstein": {None: range(1, 4)},
         "Taylor": {None: range(0, 5)},

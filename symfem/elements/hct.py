@@ -20,7 +20,7 @@ class HsiehCloughTocher(CiarletElement):
         assert order == 3
         assert reference.name == "triangle"
         dofs = []
-        for v_n, vs in enumerate(reference.sub_entities(0)):
+        for v_n, vs in enumerate(reference.vertices):
             dofs.append(PointEvaluation(vs, entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(vs, (1, 0), entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(vs, (0, 1), entity=(0, v_n)))
@@ -42,25 +42,40 @@ class HsiehCloughTocher(CiarletElement):
 
         refs = [create_reference("triangle", vs) for vs in subs]
 
-        bases = [Hermite(ref, 3, variant).get_basis_functions() for ref in refs]
+        hermite_spaces = [Hermite(ref, 3, variant) for ref in refs]
 
         piece_list = []
-        piece_list.append((bases[0][0], zero, bases[2][3]))
-        piece_list.append((bases[0][1], zero, bases[2][4]))
-        piece_list.append((bases[0][2], zero, bases[2][5]))
-        piece_list.append((bases[0][3], bases[1][0], zero))
-        piece_list.append((bases[0][4], bases[1][1], zero))
-        piece_list.append((bases[0][5], bases[1][2], zero))
-        piece_list.append((bases[0][6], bases[1][6], bases[2][6]))
-        piece_list.append((bases[0][7], bases[1][7], bases[2][7]))
-        piece_list.append((bases[0][8], bases[1][8], bases[2][8]))
-        piece_list.append((zero, bases[1][3], bases[2][0]))
-        piece_list.append((zero, bases[1][4], bases[2][1]))
-        piece_list.append((zero, bases[1][5], bases[2][2]))
+        piece_list.append((hermite_spaces[0].get_basis_function(0), zero,
+                           hermite_spaces[2].get_basis_function(3)))
+        piece_list.append((hermite_spaces[0].get_basis_function(1), zero,
+                           hermite_spaces[2].get_basis_function(4)))
+        piece_list.append((hermite_spaces[0].get_basis_function(2), zero,
+                           hermite_spaces[2].get_basis_function(5)))
+        piece_list.append((hermite_spaces[0].get_basis_function(3),
+                           hermite_spaces[1].get_basis_function(0), zero))
+        piece_list.append((hermite_spaces[0].get_basis_function(4),
+                           hermite_spaces[1].get_basis_function(1), zero))
+        piece_list.append((hermite_spaces[0].get_basis_function(5),
+                           hermite_spaces[1].get_basis_function(2), zero))
+        piece_list.append((hermite_spaces[0].get_basis_function(6),
+                           hermite_spaces[1].get_basis_function(6),
+                           hermite_spaces[2].get_basis_function(6)))
+        piece_list.append((hermite_spaces[0].get_basis_function(7),
+                           hermite_spaces[1].get_basis_function(7),
+                           hermite_spaces[2].get_basis_function(7)))
+        piece_list.append((hermite_spaces[0].get_basis_function(8),
+                           hermite_spaces[1].get_basis_function(8),
+                           hermite_spaces[2].get_basis_function(8)))
+        piece_list.append((zero, hermite_spaces[1].get_basis_function(3),
+                           hermite_spaces[2].get_basis_function(0)))
+        piece_list.append((zero, hermite_spaces[1].get_basis_function(4),
+                           hermite_spaces[2].get_basis_function(1)))
+        piece_list.append((zero, hermite_spaces[1].get_basis_function(5),
+                           hermite_spaces[2].get_basis_function(2)))
         # TODO: are these right to remove??
-        # piece_list.append((bases[0][9], zero, zero))
-        # piece_list.append((zero, bases[1][9], zero))
-        # piece_list.append((zero, zero, bases[2][9]))
+        # piece_list.append((hermite_spaces[0].get_basis_function(9), zero, zero))
+        # piece_list.append((zero, hermite_spaces[1].get_basis_function(9), zero))
+        # piece_list.append((zero, zero, hermite_spaces[2].get_basis_function(9)))
 
         poly = [
             PiecewiseFunction(list(zip(subs, p)))

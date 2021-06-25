@@ -34,6 +34,10 @@ class BasisFunction:
         """Divide."""
         return self.get_function() / other
 
+    def __rtruediv__(self, other):
+        """Divide."""
+        return other / self.get_function()
+
     def __add__(self, other):
         """Add."""
         return self.get_function() + other

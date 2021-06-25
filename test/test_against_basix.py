@@ -1,5 +1,5 @@
 from symfem import create_element
-from symfem.symbolic import subs, x
+import numpy as np
 import pytest
 
 elements = {
@@ -86,30 +86,17 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
 
     if has_basix:
         import basix
-        from scipy.linalg import block_diag, solve
-        import numpy as np
     else:
         try:
             import basix
-            from scipy.linalg import block_diag, solve
-            import numpy as np
         except ImportError:
-            pytest.skip("Basix, numpy and scipy must be installed to run this test.")
+            pytest.skip("Basix must be installed to run this test.")
 
-    element = create_element(cell, symfem_type, order)
     points = make_lattice(cell, 2)
     space = basix.create_element(basix_type, cell, order)
     result = space.tabulate(0, points)[0]
 
-    mat = element.get_dual_matrix()
-    mat = np.array([[float(j) for j in mat.row(i)] for i in range(mat.rows)])
+    element = create_element(cell, symfem_type, order)
+    sym_result = element.tabulate_basis(points, "xxyyzz", symbolic=False)
 
-    if element.range_dim == 1:
-        evaluated = np.array([[float(subs(b, x, p)) for p in points] for b in element.basis])
-    else:
-        evaluated = np.array([[float(subs(b, x, p)[j]) for p in points]
-                              for j in range(element.range_dim) for b in element.basis])
-        mat = block_diag(*[mat for j in range(element.range_dim)])
-
-    sym_result = solve(mat, evaluated).transpose()
     assert np.allclose(result, sym_result)

@@ -48,8 +48,8 @@ class Q(CiarletElement):
             reference.tdim,
             1)
 
-    names = ["Q"]
-    references = ["interval", "quadrilateral", "hexahedron"]
+    names = ["Q", "Lagrange", "P"]
+    references = ["quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "C0"
 
@@ -79,7 +79,7 @@ class DiscontinuousQ(CiarletElement):
             1)
 
     names = ["dQ"]
-    references = ["interval", "quadrilateral", "hexahedron"]
+    references = ["quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
 

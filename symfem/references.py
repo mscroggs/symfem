@@ -1,7 +1,7 @@
 """Reference elements."""
 
 import sympy
-from .symbolic import t, x
+from .symbolic import t, x, subs
 from .vectors import vsub, vnorm, vdot, vcross, vnormalise, vadd
 
 
@@ -62,7 +62,7 @@ class Reference:
         if dim is None:
             dim = self.tdim - codim
         if dim == 0:
-            return self.vertices
+            return tuple((i, ) for i, _ in enumerate(self.vertices))
         if dim == 1:
             return self.edges
         if dim == 2:
@@ -114,6 +114,37 @@ class Reference:
             if vdot(vcross(vsub(v0, point), vsub(v1, point)), vsub(v2, point)):
                 return True
         return False
+
+
+class Point(Reference):
+    """A point."""
+
+    def __init__(self, vertices=(tuple())):
+        self.tdim = 0
+        self.name = "point"
+        self.origin = vertices[0]
+        self.axes = tuple()
+        self.reference_vertices = (tuple())
+        self.vertices = tuple(vertices)
+        self.edges = tuple()
+        self.faces = tuple()
+        self.volumes = tuple()
+        self.sub_entity_types = ["point", None, None, None]
+        super().__init__(simplex=True, tp=True)
+
+    def integral(self, f):
+        """Calculate the integral over the element."""
+        return subs(f, t, self.vertices[0])
+
+    def get_map_to(self, vertices):
+        """Get the map from the reference to a cell."""
+        assert self.vertices == self.reference_vertices
+        return vertices
+
+    def get_inverse_map_to(self, vertices):
+        """Get the inverse map from a cell to the reference."""
+        assert self.vertices == self.reference_vertices
+        return self.vertices
 
 
 class Interval(Reference):

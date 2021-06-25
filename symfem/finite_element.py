@@ -1,6 +1,7 @@
 """Abstract finite element classes and functions."""
 
 import sympy
+import numpy
 from .symbolic import x, zero, subs, sym_sum, PiecewiseFunction
 from .basis_function import ElementBasisFunction
 
@@ -21,7 +22,7 @@ class FiniteElement:
         """Get the numbers of the DOFs associated with the given entity."""
         raise NotImplementedError()
 
-    def get_basis_functions(self, reshape=True):
+    def get_basis_functions(self, reshape=True, symbolic=True):
         """Get the basis functions of the element."""
         raise NotImplementedError()
 
@@ -29,8 +30,10 @@ class FiniteElement:
         """Get a single basis function of the element."""
         return ElementBasisFunction(self, n)
 
-    def tabulate_basis(self, points, order="xyzxyz"):
+    def tabulate_basis(self, points, order="xyzxyz", symbolic=True):
         """Evaluate the basis functions of the element at the given points."""
+        assert symbolic
+
         if self.range_dim == 1:
             output = []
             for p in points:
@@ -91,6 +94,7 @@ class CiarletElement(FiniteElement):
         self.dofs = dofs
         self._basis_functions = None
         self._reshaped_basis_functions = None
+        self._dual_inv = None
 
     def entity_dofs(self, entity_dim, entity_number):
         """Get the numbers of the DOFs associated with the given entity."""
@@ -108,7 +112,54 @@ class CiarletElement(FiniteElement):
 
         return self.basis
 
-    def get_dual_matrix(self):
+    def tabulate_basis(self, points, order="xyzxyz", symbolic=True):
+        """Evaluate the basis functions of the element at the given points."""
+        if symbolic:
+            return super().tabulate_basis(points, order, symbolic)
+
+        assert not symbolic
+
+        if self._dual_inv is None:
+            dual_mat = self.get_dual_matrix(symbolic=False)
+            self._dual_inv = numpy.linalg.inv(dual_mat)
+
+        if self.range_dim == 1:
+            tabulated_polyset = numpy.array([
+                [float(subs(f, x, p)) for f in self.basis]
+                for p in points])
+            return numpy.dot(tabulated_polyset, self._dual_inv.transpose())
+
+        tabulated_polyset = numpy.array([
+            [tuple(float(i) for i in subs(f, x, p)) for f in self.basis]
+            for p in points])
+
+        results = numpy.array([
+            numpy.dot(tabulated_polyset[:, :, i], self._dual_inv.transpose())
+            for i in range(tabulated_polyset.shape[2])
+        ])
+        # results[xyz][point][function]
+
+        if order == "xxyyzz":
+            return numpy.array([
+                [results[xyz, point, function] for xyz in range(results.shape[0])
+                 for function in range(results.shape[2])]
+                for point in range(results.shape[1])
+            ])
+        if order == "xyzxyz":
+            return numpy.array([
+                [results[xyz, point, function] for function in range(results.shape[2])
+                 for xyz in range(results.shape[0])]
+                for point in range(results.shape[1])
+            ])
+        if order == "xyz,xyz":
+            return numpy.array([
+                [[results[xyz, point, function] for xyz in range(results.shape[0])]
+                 for function in range(results.shape[2])]
+                for point in range(results.shape[1])
+            ])
+        raise ValueError(f"Unknown order: {order}")
+
+    def get_dual_matrix(self, symbolic=True):
         """Get the dual matrix."""
         mat = []
         for b in self.basis:
@@ -116,7 +167,10 @@ class CiarletElement(FiniteElement):
             for d in self.dofs:
                 row.append(d.eval(b))
             mat.append(row)
-        return sympy.Matrix(mat)
+        if symbolic:
+            return sympy.Matrix(mat)
+        else:
+            return numpy.array([[float(j) for j in i] for i in mat])
 
     def get_basis_functions(self, reshape=True):
         """Get the basis functions of the element."""
