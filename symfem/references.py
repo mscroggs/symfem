@@ -1,7 +1,7 @@
 """Reference elements."""
 
 import sympy
-from .symbolic import t, x
+from .symbolic import t, x, subs
 from .vectors import vsub, vnorm, vdot, vcross, vnormalise, vadd
 
 
@@ -134,7 +134,7 @@ class Point(Reference):
 
     def integral(self, f):
         """Calculate the integral over the element."""
-        return subs(f, t, vertices)
+        return subs(f, t, self.vertices[0])
 
     def get_map_to(self, vertices):
         """Get the map from the reference to a cell."""
