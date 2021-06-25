@@ -141,24 +141,17 @@ class CiarletElement(FiniteElement):
 
         if order == "xxyyzz":
             return numpy.array([
-                [results[xyz, point, function]
-                 for xyz in range(results.shape[0])
-                 for function in range(results.shape[2])
-                ]
+                [results[xyz, point, function] for xyz in range(results.shape[0]) for function in range(results.shape[2])]
                 for point in range(results.shape[1])
             ])
         if order == "xyzxyz":
             return numpy.array([
-                [results[xyz, point, function]
-                 for function in range(results.shape[2])
-                 for xyz in range(results.shape[0])
-                ]
+                [results[xyz, point, function] for function in range(results.shape[2]) for xyz in range(results.shape[0])]
                 for point in range(results.shape[1])
             ])
         if order == "xyz,xyz":
             return numpy.array([
-                [[results[xyz, point, function] for xyz in range(results.shape[0])]
-                 for function in range(results.shape[2])]
+                [[results[xyz, point, function] for xyz in range(results.shape[0])] for function in range(results.shape[2])]
                 for point in range(results.shape[1])
             ])
         raise ValueError(f"Unknown order: {order}")
