@@ -20,7 +20,7 @@ class Argyris(CiarletElement):
         assert order == 5
         assert reference.name == "triangle"
         dofs = []
-        for v_n, vs in enumerate(reference.sub_entities(0)):
+        for v_n, vs in enumerate(reference.vertices):
             dofs.append(PointEvaluation(vs, entity=(0, v_n)))
             for i in range(reference.tdim):
                 dir = tuple(1 if i == j else 0 for j in range(reference.tdim))

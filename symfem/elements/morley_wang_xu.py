@@ -21,7 +21,7 @@ class MorleyWangXu(CiarletElement):
 
         if order == 1:
             if reference.tdim == 1:
-                for v_n, v in enumerate(reference.sub_entities(0)):
+                for v_n, v in enumerate(reference.vertices):
                     dofs.append(PointEvaluation(v, entity=(0, v_n)))
             else:
                 dim = reference.tdim - 1
@@ -31,7 +31,7 @@ class MorleyWangXu(CiarletElement):
                                                 entity=(dim, facet_n)))
         elif order == 2:
             if reference.tdim == 2:
-                for v_n, v in enumerate(reference.sub_entities(0)):
+                for v_n, v in enumerate(reference.vertices):
                     dofs.append(PointEvaluation(v, entity=(0, v_n)))
             else:
                 dim = reference.tdim - 2
@@ -47,7 +47,7 @@ class MorleyWangXu(CiarletElement):
                     entity=(dim, facet_n)))
         else:
             assert order == reference.tdim == 3
-            for v_n, v in enumerate(reference.sub_entities(0)):
+            for v_n, v in enumerate(reference.vertices):
                 dofs.append(PointEvaluation(v, entity=(0, v_n)))
             for e_n, vs in enumerate(reference.sub_entities(1)):
                 subentity = reference.sub_entity(1, e_n)

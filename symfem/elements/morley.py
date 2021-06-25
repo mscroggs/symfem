@@ -18,7 +18,7 @@ class Morley(CiarletElement):
         assert order == 2
         assert reference.name == "triangle"
         dofs = []
-        for v_n, vs in enumerate(reference.sub_entities(0)):
+        for v_n, vs in enumerate(reference.vertices):
             dofs.append(PointEvaluation(vs, entity=(0, v_n)))
         for e_n, vs in enumerate(reference.sub_entities(1)):
             sub_ref = create_reference(

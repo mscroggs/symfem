@@ -20,7 +20,7 @@ class HsiehCloughTocher(CiarletElement):
         assert order == 3
         assert reference.name == "triangle"
         dofs = []
-        for v_n, vs in enumerate(reference.sub_entities(0)):
+        for v_n, vs in enumerate(reference.vertices):
             dofs.append(PointEvaluation(vs, entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(vs, (1, 0), entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(vs, (0, 1), entity=(0, v_n)))
