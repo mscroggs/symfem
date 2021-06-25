@@ -46,7 +46,6 @@ def test_independence(
     if not isinstance(space, DirectElement):
         pytest.skip()
 
-
     basis = space.get_basis_functions()
     all_terms = set()
 
