@@ -62,7 +62,7 @@ class Reference:
         if dim is None:
             dim = self.tdim - codim
         if dim == 0:
-            return self.vertices
+            return tuple(i for i, _ in enumerate(self.vertices))
         if dim == 1:
             return self.edges
         if dim == 2:
