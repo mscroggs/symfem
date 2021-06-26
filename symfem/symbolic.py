@@ -139,13 +139,13 @@ def subs(f, vars, values):
         return subs(f.to_sympy(), vars, values)
     if isinstance(vars, Monomial):
         return subs(f, vars.to_sympy(), values)
-    elif not isinstance(vars, sympy.Symbol):
+    elif isinstance(vars, (list, tuple)):
         for i, j in enumerate(vars):
             if isinstance(j, Monomial):
                 return subs(f, vars[:i] + [j.to_sympy()] + vars[i + 1:], values)
     if isinstance(values, Monomial):
         return subs(f, vars, values.to_sympy())
-    elif not isinstance(values, sympy.Symbol):
+    elif isinstance(values, (list, tuple)):
         for i, j in enumerate(values):
             if isinstance(j, Monomial):
                 return subs(f, vars, values[:i] + [j.to_sympy()] + values[i + 1:])

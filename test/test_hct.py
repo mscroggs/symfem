@@ -1,14 +1,15 @@
 import symfem
 import sympy
 from .utils import all_symequal
-from symfem.symbolic import x, t, subs
+from symfem.symbolic import x, t, subs, to_sympy
 from symfem.calculus import grad, diff
 half = sympy.Rational(1, 2)
+x = [to_sympy(i) for i in x]
 
 
 def test_hct():
     e = symfem.create_element("triangle", "HCT", 3)
-    for f in e.basis:
+    for f in e.get_polynomial_basis():
         # edge from (1,0) to (1/3,1/3)
         f1 = f.get_piece((half, 0))
         f2 = f.get_piece((half, half))
@@ -39,7 +40,7 @@ def test_hct():
 
 def test_rhct():
     e = symfem.create_element("triangle", "rHCT", 3)
-    for f in e.basis:
+    for f in e.get_polynomial_basis():
         # edge from (1,0) to (1/3,1/3)
         f1 = f.get_piece((half, 0))
         f2 = f.get_piece((half, half))
