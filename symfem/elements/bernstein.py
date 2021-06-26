@@ -4,7 +4,7 @@ This element's definition appears in https://doi.org/10.1007/s00211-010-0327-2
 (Kirby, 2011)
 """
 
-from ..symbolic import one, x
+from ..symbolic import x, to_sympy
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set
 from ..functionals import IntegralAgainst
@@ -12,7 +12,7 @@ from ..functionals import IntegralAgainst
 
 def single_choose(n, k):
     """Calculate choose function of a set of powers."""
-    out = one
+    out = to_sympy(1)
     for i in range(k + 1, n + 1):
         out *= i
     for i in range(1, n - k + 1):
@@ -22,7 +22,7 @@ def single_choose(n, k):
 
 def choose(n, powers):
     """Calculate choose function of a set of powers."""
-    out = one
+    out = to_sympy(1)
     for p in powers:
         out *= single_choose(n, p)
         n -= p

@@ -2,7 +2,6 @@
 
 import sympy
 from itertools import product
-from ..symbolic import one, zero
 from ..finite_element import CiarletElement
 from ..polynomials import prism_polynomial_set
 from ..functionals import PointEvaluation, DotPointEvaluation
@@ -110,7 +109,7 @@ class VectorLagrange(CiarletElement):
             directions = [1]
         else:
             directions = [
-                tuple(one if i == j else zero for j in range(reference.tdim))
+                tuple(1 if i == j else 0 for j in range(reference.tdim))
                 for i in range(reference.tdim)
             ]
         for p in scalar_space.dofs:
@@ -142,7 +141,7 @@ class VectorDiscontinuousLagrange(CiarletElement):
             directions = [1]
         else:
             directions = [
-                tuple(one if i == j else zero for j in range(reference.tdim))
+                tuple(1 if i == j else 0 for j in range(reference.tdim))
                 for i in range(reference.tdim)
             ]
         for p in scalar_space.dofs:

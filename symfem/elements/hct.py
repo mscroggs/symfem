@@ -8,7 +8,7 @@ import sympy
 from ..finite_element import CiarletElement
 from ..functionals import (PointEvaluation, PointNormalDerivativeEvaluation,
                            DerivativePointEvaluation)
-from ..symbolic import sym_sum, PiecewiseFunction, zero
+from ..symbolic import sym_sum, PiecewiseFunction
 from .hermite import Hermite
 
 
@@ -45,18 +45,18 @@ class HsiehCloughTocher(CiarletElement):
         hermite_spaces = [Hermite(ref, 3, variant) for ref in refs]
 
         piece_list = []
-        piece_list.append((hermite_spaces[0].get_basis_function(0), zero,
+        piece_list.append((hermite_spaces[0].get_basis_function(0), 0,
                            hermite_spaces[2].get_basis_function(3)))
-        piece_list.append((hermite_spaces[0].get_basis_function(1), zero,
+        piece_list.append((hermite_spaces[0].get_basis_function(1), 0,
                            hermite_spaces[2].get_basis_function(4)))
-        piece_list.append((hermite_spaces[0].get_basis_function(2), zero,
+        piece_list.append((hermite_spaces[0].get_basis_function(2), 0,
                            hermite_spaces[2].get_basis_function(5)))
         piece_list.append((hermite_spaces[0].get_basis_function(3),
-                           hermite_spaces[1].get_basis_function(0), zero))
+                           hermite_spaces[1].get_basis_function(0), 0))
         piece_list.append((hermite_spaces[0].get_basis_function(4),
-                           hermite_spaces[1].get_basis_function(1), zero))
+                           hermite_spaces[1].get_basis_function(1), 0))
         piece_list.append((hermite_spaces[0].get_basis_function(5),
-                           hermite_spaces[1].get_basis_function(2), zero))
+                           hermite_spaces[1].get_basis_function(2), 0))
         piece_list.append((hermite_spaces[0].get_basis_function(6),
                            hermite_spaces[1].get_basis_function(6),
                            hermite_spaces[2].get_basis_function(6)))
@@ -66,16 +66,16 @@ class HsiehCloughTocher(CiarletElement):
         piece_list.append((hermite_spaces[0].get_basis_function(8),
                            hermite_spaces[1].get_basis_function(8),
                            hermite_spaces[2].get_basis_function(8)))
-        piece_list.append((zero, hermite_spaces[1].get_basis_function(3),
+        piece_list.append((0, hermite_spaces[1].get_basis_function(3),
                            hermite_spaces[2].get_basis_function(0)))
-        piece_list.append((zero, hermite_spaces[1].get_basis_function(4),
+        piece_list.append((0, hermite_spaces[1].get_basis_function(4),
                            hermite_spaces[2].get_basis_function(1)))
-        piece_list.append((zero, hermite_spaces[1].get_basis_function(5),
+        piece_list.append((0, hermite_spaces[1].get_basis_function(5),
                            hermite_spaces[2].get_basis_function(2)))
         # TODO: are these right to remove??
-        # piece_list.append((hermite_spaces[0].get_basis_function(9), zero, zero))
-        # piece_list.append((zero, hermite_spaces[1].get_basis_function(9), zero))
-        # piece_list.append((zero, zero, hermite_spaces[2].get_basis_function(9)))
+        # piece_list.append((hermite_spaces[0].get_basis_function(9), 0, 0))
+        # piece_list.append((0, hermite_spaces[1].get_basis_function(9), 0))
+        # piece_list.append((0, 0, hermite_spaces[2].get_basis_function(9)))
 
         poly = [
             PiecewiseFunction(list(zip(subs, p)))

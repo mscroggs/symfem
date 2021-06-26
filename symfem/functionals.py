@@ -1,8 +1,8 @@
 """Functionals used to define the dual sets."""
 import sympy
-from .symbolic import subs, x, t, PiecewiseFunction, one, sym_sum
+from .symbolic import subs, x, t, PiecewiseFunction, sym_sum
 from .vectors import vdot
-from .calculus import derivative, jacobian_component, grad
+from .calculus import derivative, jacobian_component, grad, diff
 from . import mappings
 
 
@@ -85,7 +85,7 @@ class DerivativePointEvaluation(BaseFunctional):
         """Apply to the functional to a function."""
         for i, j in zip(x, self.derivative):
             for k in range(j):
-                function = function.diff(i)
+                function = diff(function, i)
         return subs(function, x, self.point)
 
     def dof_point(self):
@@ -97,7 +97,7 @@ class DerivativePointEvaluation(BaseFunctional):
         if self.mapping is not None:
             return super().perform_mapping(fs, map, inverse_map, tdim)
         out = []
-        J = sympy.Matrix([[map[i].diff(x[j]) for j in range(tdim)] for i in range(tdim)])
+        J = sympy.Matrix([[diff(map[i], x[j]) for j in range(tdim)] for i in range(tdim)])
         for dofs in zip(*[fs[i::tdim] for i in range(tdim)]):
             for i in range(tdim):
                 out.append(sym_sum(a * b for a, b in zip(dofs, J.row(i))))
@@ -256,7 +256,7 @@ class IntegralAgainst(BaseFunctional):
 class IntegralOfDirectionalMultiderivative(BaseFunctional):
     """An integral of a directional derivative of a scalar function."""
 
-    def __init__(self, reference, directions, orders, scale=one, entity=(None, None),
+    def __init__(self, reference, directions, orders, scale=1, entity=(None, None),
                  mapping="identity"):
         super().__init__(entity, mapping)
         self.reference = reference
@@ -272,7 +272,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         """Apply to the functional to a function."""
         for dir, o in zip(self.directions, self.orders):
             for i in range(o):
-                function = sum(d * function.diff(x[j]) for j, d in enumerate(dir))
+                function = sum(d * diff(function, x[j]) for j, d in enumerate(dir))
         point = [i for i in self.reference.origin]
         for i, a in enumerate(zip(*self.reference.axes)):
             for j, k in zip(a, t):

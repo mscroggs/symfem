@@ -3,45 +3,90 @@
 import sympy
 
 
-class Polynomial:
+def to_sympy(i):
+    """Convert to a sympy expression."""
+    if isinstance(i, list):
+        return [to_sympy(j) for j in i]
+    if isinstance(i, tuple):
+        return tuple(to_sympy(j) for j in i)
+
+    if isinstance(i, int):
+        return sympy.Integer(i)
+    if isinstance(i, Monomial):
+        return i.to_sympy()
+
+    return i
+
+
+class Monomial:
+    """A monomial."""
+
     def __init__(self, xpow=0, ypow=0, zpow=0, negative=False):
         self._x = xpow
         self._y = ypow
         self._z = zpow
         self._negative = negative
 
+    def diff(self, variable):
+        return self.to_sympy().diff(to_sympy(variable))
+
     def to_sympy(self):
         _x = [sympy.Symbol("x"), sympy.Symbol("y"), sympy.Symbol("z")]
+
+        if self._x + self._y + self._z == 1 and not self._negative:
+            if self._x == 1:
+                return _x[0]
+            if self._y == 1:
+                return _x[1]
+            if self._z == 1:
+                return _x[2]
+
         if self._negative:
-            return _x[0] ** self._x * _x[1] ** self._y * _x[2] ** self._z
-        else:
             return -_x[0] ** self._x * _x[1] ** self._y * _x[2] ** self._z
+        else:
+            return _x[0] ** self._x * _x[1] ** self._y * _x[2] ** self._z
+
+    def __hash__(self):
+        return hash(self.to_sympy())
+
+    def __unicode__(self):
+        return str(self.to_sympy())
+
+    def __str__(self):
+        return self.__unicode__()
+
+    def __repr__(self):
+        return self.__unicode__()
 
     def __eq__(self, other):
-        if isinstance(other, Polynomial):
-            return self._x == other._x and self._y == other._y and self._z == other._z and self._negative == other._negative
+        if isinstance(other, Monomial):
+            return (self._x == other._x and self._y == other._y
+                    and self._z == other._z and self._negative == other._negative)
         return self.to_sympy() == other
 
     def __mul__(self, other):
-        if isinstance(other, Polynomial):
-            return Polynomial(self._x + other._x, self._y + other._y, self._z + other._z, self._negative)
+        if isinstance(other, Monomial):
+            return Monomial(self._x + other._x, self._y + other._y,
+                            self._z + other._z, self._negative)
         return self.to_sympy() * other
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
-        if isinstance(other, Polynomial):
-            return Polynomial(self._x - other._x, self._y - other._y, self._z - other._z, self._negative)
-        return self.to_sympy() / other
+        if isinstance(other, Monomial):
+            return Monomial(self._x - other._x, self._y - other._y,
+                            self._z - other._z, self._negative)
+        return self.to_sympy() / to_sympy(other)
 
     def __rtruediv__(self, other):
-        if isinstance(other, Polynomial):
-            return Polynomial(other._x - self._x, other._y - self._y, other._z - self._z, self._negative)
+        if isinstance(other, Monomial):
+            return Monomial(other._x - self._x, other._y - self._y,
+                            other._z - self._z, self._negative)
         return other / self.to_sympy()
 
     def __pow__(self, power):
-        return Polynomial(self._x * power, self._y * power, self._z * power, self._negative)
+        return Monomial(self._x * power, self._y * power, self._z * power, self._negative)
 
     def __add__(self, other):
         return self.to_sympy() + other
@@ -56,17 +101,18 @@ class Polynomial:
         return other - self.to_sympy()
 
     def __neg__(self):
-        return Polynomial(self._x, self._y, self._z, not self._negative)
+        return Monomial(self._x, self._y, self._z, not self._negative)
+
+    def __sympy__(self):
+        return self.to_sympy()
 
     def __getattr__(self, attr):
         return getattr(self.to_sympy(), attr)
 
-x = [Polynomial(xpow=1), Polynomial(ypow=1), Polynomial(zpow=1)]
+
+x = [Monomial(xpow=1), Monomial(ypow=1), Monomial(zpow=1)]
 
 t = [sympy.Symbol("t0"), sympy.Symbol("t1"), sympy.Symbol("t2")]
-
-zero = 0
-one = 1
 
 _dummy = [sympy.Symbol("symbolicpyDUMMYx"), sympy.Symbol("symbolicpyDUMMYy"),
           sympy.Symbol("symbolicpyDUMMYz")]
@@ -75,14 +121,20 @@ _dummy = [sympy.Symbol("symbolicpyDUMMYx"), sympy.Symbol("symbolicpyDUMMYy"),
 def subs(f, vars, values):
     """Substitute values into a sympy expression."""
 
-    if isinstance(f, Polynomial):
+    if isinstance(f, Monomial):
         return subs(f.to_sympy(), vars, values)
-    for i, j in enumerate(vars):
-        if isinstance(j, Polynomial):
-            return subs(f, vars[:i] + [j.to_sympy()] + vars[i + 1: ], values)
-    for i, j in enumerate(values):
-        if isinstance(j, Polynomial):
-            return subs(f, vars, values[:i] + [j.to_sympy()] + values[i + 1: ])
+    if isinstance(vars, Monomial):
+        return subs(f, vars.to_sympy(), values)
+    elif not isinstance(vars, sympy.Symbol):
+        for i, j in enumerate(vars):
+            if isinstance(j, Monomial):
+                return subs(f, vars[:i] + [j.to_sympy()] + vars[i + 1:], values)
+    if isinstance(values, Monomial):
+        return subs(f, vars, values.to_sympy())
+    elif not isinstance(values, sympy.Symbol):
+        for i, j in enumerate(values):
+            if isinstance(j, Monomial):
+                return subs(f, vars, values[:i] + [j.to_sympy()] + values[i + 1:])
 
     if isinstance(f, PiecewiseFunction):
         return f.evaluate(values)
@@ -91,7 +143,7 @@ def subs(f, vars, values):
     except TypeError:
         pass
     if isinstance(vars, sympy.Symbol):
-        return (zero + f).subs(vars, values)
+        return to_sympy(f).subs(vars, values)
 
     if isinstance(f, int):
         return f
@@ -109,7 +161,7 @@ def subs(f, vars, values):
 
 def sym_sum(ls):
     """Symbolically computes the sum of a list."""
-    out = zero
+    out = to_sympy(0)
     for i in ls:
         out += i
     return out
@@ -139,7 +191,8 @@ class PiecewiseFunction:
 
     def diff(self, variable):
         """Differentiate the function."""
-        return PiecewiseFunction([(i, j.diff(variable)) for i, j in self.pieces])
+        from .calculus import diff
+        return PiecewiseFunction([(i, diff(j, variable)) for i, j in self.pieces])
 
     def __rmul__(self, other):
         """Multiply the function by a scalar."""

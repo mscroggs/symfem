@@ -1,5 +1,6 @@
 """Polynomial sets."""
-from .symbolic import x, zero, one
+from .symbolic import x
+from .calculus import curl, diff
 from itertools import product
 
 
@@ -28,7 +29,7 @@ def polynomial_set(domain_dim, range_dim, order):
         return polynomial_set_1d(domain_dim, order)
     set1d = polynomial_set_1d(domain_dim, order)
     return [
-        tuple(p if i == j else zero for j in range(range_dim))
+        tuple(p if i == j else 0 for j in range(range_dim))
         for p in set1d
         for i in range(range_dim)
     ]
@@ -68,16 +69,16 @@ def Hcurl_polynomials(domain_dim, range_dim, order):
     if domain_dim == 3:
         poly = []
         poly += [[x[0] ** (m - 1) * x[1] ** n * x[2] ** (order - m - n + 1),
-                  zero,
+                  0,
                   -x[0] ** m * x[1] ** n * x[2] ** (order - m - n)]
                  for n in range(order) for m in range(1, order + 1 - n)]
-        poly += [[zero,
+        poly += [[0,
                   x[0] ** m * x[1] ** (n - 1) * x[2] ** (order - m - n + 1),
                   -x[0] ** m * x[1] ** n * x[2] ** (order - m - n)]
                  for m in range(order) for n in range(1, order + 1 - m)]
         poly += [[x[0] ** (order - n) * x[1] ** n,
                   -x[0] ** (order + 1 - n) * x[1] ** (n - 1),
-                  zero]
+                  0]
                  for n in range(1, order + 1)]
         return poly
 
@@ -99,7 +100,7 @@ def quolynomial_set(domain_dim, range_dim, order):
         return quolynomial_set_1d(domain_dim, order)
     set1d = quolynomial_set_1d(domain_dim, order)
     return [
-        tuple(p if i == j else zero for j in range(range_dim))
+        tuple(p if i == j else 0 for j in range(range_dim))
         for p in set1d
         for i in range(range_dim)
     ]
@@ -111,10 +112,10 @@ def Hdiv_quolynomials(domain_dim, range_dim, order):
     basis = []
     for d in range(domain_dim):
         for j in product(range(order), repeat=domain_dim - 1):
-            poly = one
+            poly = 1
             for a, b in zip(x, j[:d] + (order,) + j[d:]):
                 poly *= a ** b
-            basis.append(tuple(poly if i == d else zero for i in range(domain_dim)))
+            basis.append(tuple(poly if i == d else 0 for i in range(domain_dim)))
     return basis
 
 
@@ -128,10 +129,10 @@ def Hcurl_quolynomials(domain_dim, range_dim, order):
         ):
             if order not in j:
                 continue
-            poly = one
+            poly = 1
             for a, b in zip(x, j):
                 poly *= a ** b
-            basis.append(tuple(poly if i == d else zero for i in range(domain_dim)))
+            basis.append(tuple(poly if i == d else 0 for i in range(domain_dim)))
     return basis
 
 
@@ -154,7 +155,7 @@ def serendipity_set_1d(dim, order):
     basis = []
     for s in range(order + 1, order + dim + 1):
         for i in serendipity_indices(s, s - order, dim):
-            p = one
+            p = 1
             for j, k in zip(x, i):
                 p *= j ** k
             basis.append(p)
@@ -167,7 +168,7 @@ def serendipity_set(domain_dim, range_dim, order):
         return serendipity_set_1d(domain_dim, order)
     set1d = serendipity_set_1d(domain_dim, order)
     return [
-        tuple(p if i == j else zero for j in range(range_dim))
+        tuple(p if i == j else 0 for j in range(range_dim))
         for p in set1d
         for i in range(range_dim)
     ]
@@ -184,27 +185,20 @@ def Hdiv_serendipity(domain_dim, range_dim, order):
     if domain_dim == 3:
         a = []
         if order == 0:
-            a.append((zero, x[0] * x[2], -x[0] * x[1]))
-            a.append((x[1] * x[2], zero, -x[0] * x[1]))
+            a.append((0, x[0] * x[2], -x[0] * x[1]))
+            a.append((x[1] * x[2], 0, -x[0] * x[1]))
         else:
             for i in range(order + 1):
                 p = x[1] ** i * x[2] ** (order - i)
-                a.append((zero, x[0] * x[2] * p, -x[0] * x[1] * p))
+                a.append((0, x[0] * x[2] * p, -x[0] * x[1] * p))
 
                 p = x[0] ** i * x[2] ** (order - i)
-                a.append((x[1] * x[2] * p, zero, -x[0] * x[1] * p))
+                a.append((x[1] * x[2] * p, 0, -x[0] * x[1] * p))
 
                 p = x[0] ** i * x[1] ** (order - i)
-                a.append((x[1] * x[2] * p, -x[0] * x[2] * p, zero))
+                a.append((x[1] * x[2] * p, -x[0] * x[2] * p, 0))
 
-        return [
-            (
-                r.diff(x[1]) - q.diff(x[2]),
-                p.diff(x[2]) - r.diff(x[0]),
-                q.diff(x[0]) - p.diff(x[1]),
-            )
-            for p, q, r in a
-        ]
+        return [curl(i) for i in a]
 
     raise NotImplementedError()
 
@@ -221,22 +215,22 @@ def Hcurl_serendipity(domain_dim, range_dim, order):
         out = []
         if order == 1:
             out += [
-                (zero, x[0] * x[2], -x[0] * x[1]),
-                (x[1] * x[2], zero, -x[0] * x[1]),
+                (0, x[0] * x[2], -x[0] * x[1]),
+                (x[1] * x[2], 0, -x[0] * x[1]),
             ]
         else:
             for i in range(order):
                 p = x[0] ** i * x[2] ** (order - 1 - i)
-                out.append((x[1] * x[2] * p, zero, -x[0] * x[1] * p))
+                out.append((x[1] * x[2] * p, 0, -x[0] * x[1] * p))
 
                 p = x[1] ** i * x[2] ** (order - 1 - i)
-                out.append((zero, x[0] * x[2] * p, -x[0] * x[1] * p))
+                out.append((0, x[0] * x[2] * p, -x[0] * x[1] * p))
 
                 p = x[0] ** i * x[1] ** (order - 1 - i)
-                out.append((x[1] * x[2] * p, -x[0] * x[2] * p, zero))
+                out.append((x[1] * x[2] * p, -x[0] * x[2] * p, 0))
 
         for p in serendipity_set(domain_dim, 1, order + 1):
-            out.append(tuple(p.diff(i) for i in x))
+            out.append(tuple(diff(p, i) for i in x))
         return out
 
     raise NotImplementedError()
@@ -259,7 +253,7 @@ def prism_polynomial_set(domain_dim, range_dim, order):
         return prism_polynomial_set_1d(domain_dim, order)
     set1d = prism_polynomial_set_1d(domain_dim, order)
     return [
-        tuple(p if i == j else zero for j in range(range_dim))
+        tuple(p if i == j else 0 for j in range(range_dim))
         for p in set1d
         for i in range(range_dim)
     ]
@@ -269,7 +263,7 @@ def pyramid_polynomial_set_1d(dim, order):
     """One dimensional polynomial set."""
     assert dim == 3
     if order == 0:
-        return [one]
+        return [1]
 
     poly = polynomial_set_1d(3, order)
 
@@ -287,7 +281,7 @@ def pyramid_polynomial_set(domain_dim, range_dim, order):
         return pyramid_polynomial_set_1d(domain_dim, order)
     set1d = pyramid_polynomial_set_1d(domain_dim, order)
     return [
-        tuple(p if i == j else zero for j in range(range_dim))
+        tuple(p if i == j else 0 for j in range(range_dim))
         for p in set1d
         for i in range(range_dim)
     ]

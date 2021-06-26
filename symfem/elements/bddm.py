@@ -7,7 +7,7 @@ This element's definition appears in https://doi.org/10.1007/BF01396752
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set
-from ..symbolic import x, zero
+from ..symbolic import x
 from ..calculus import curl
 from ..functionals import NormalIntegralMoment, IntegralMoment
 from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
@@ -19,13 +19,13 @@ def bddf_polyset(reference, order):
     pset = []
     assert reference.name == "hexahedron"
     pset = polynomial_set(dim, dim, order)
-    pset.append(curl((zero, zero, x[0] ** (order + 1) * x[1])))
-    pset.append(curl((zero, x[0] * x[2] ** (order + 1), zero)))
-    pset.append(curl((x[1] ** (order + 1) * x[2], zero, zero)))
+    pset.append(curl((0, 0, x[0] ** (order + 1) * x[1])))
+    pset.append(curl((0, x[0] * x[2] ** (order + 1), 0)))
+    pset.append(curl((x[1] ** (order + 1) * x[2], 0, 0)))
     for i in range(1, order + 1):
-        pset.append(curl((zero, zero, x[0] * x[1] ** (i + 1) * x[2] ** (order - i))))
-        pset.append(curl((zero, x[0] ** (i + 1) * x[1] ** (order - i) * x[2], zero)))
-        pset.append(curl((x[0] ** (order - i) * x[1] * x[2] ** (i + 1), zero, zero)))
+        pset.append(curl((0, 0, x[0] * x[1] ** (i + 1) * x[2] ** (order - i))))
+        pset.append(curl((0, x[0] ** (i + 1) * x[1] ** (order - i) * x[2], 0)))
+        pset.append(curl((x[0] ** (order - i) * x[1] * x[2] ** (i + 1), 0, 0)))
 
     return pset
 

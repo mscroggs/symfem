@@ -8,7 +8,7 @@ import sympy
 from ..finite_element import CiarletElement
 from ..functionals import PointEvaluation, DerivativePointEvaluation
 from ..polynomials import polynomial_set
-from ..symbolic import PiecewiseFunction, zero, x, one
+from ..symbolic import PiecewiseFunction, x
 
 
 class P1Hermite(CiarletElement):
@@ -61,7 +61,7 @@ class ReducedHsiehCloughTocher(CiarletElement):
             polynomial_set(reference.tdim, 1, order),
         ]
         polys[0].remove(x[0] ** 2 * x[1])
-        polys[1] = [one, x[0], x[0] ** 2, x[1], x[0] * x[1], x[1] ** 2,
+        polys[1] = [1, x[0], x[0] ** 2, x[1], x[0] * x[1], x[1] ** 2,
                     x[0] * x[1] ** 2 - x[0] ** 2 * x[1],
                     x[0] ** 3 - x[1] ** 3, x[0] ** 3 + 3 * x[0] * x[1] ** 2]
         polys[2].remove(x[0] * x[1] ** 2)
@@ -70,19 +70,19 @@ class ReducedHsiehCloughTocher(CiarletElement):
                  for r, p in zip(refs, polys)]
 
         piece_list = []
-        piece_list.append((bases[0][0], zero, bases[2][3]))
-        piece_list.append((bases[0][1], zero, bases[2][4]))
-        piece_list.append((bases[0][2], zero, bases[2][5]))
-        piece_list.append((bases[0][3], bases[1][0], zero))
-        piece_list.append((bases[0][4], bases[1][1], zero))
-        piece_list.append((bases[0][5], bases[1][2], zero))
+        piece_list.append((bases[0][0], 0, bases[2][3]))
+        piece_list.append((bases[0][1], 0, bases[2][4]))
+        piece_list.append((bases[0][2], 0, bases[2][5]))
+        piece_list.append((bases[0][3], bases[1][0], 0))
+        piece_list.append((bases[0][4], bases[1][1], 0))
+        piece_list.append((bases[0][5], bases[1][2], 0))
         # TODO: are these right to remove??
         # piece_list.append((bases[0][6], bases[1][6], bases[2][6]))
         # piece_list.append((bases[0][7], bases[1][7], bases[2][7]))
         # piece_list.append((bases[0][8], bases[1][8], bases[2][8]))
-        piece_list.append((zero, bases[1][3], bases[2][0]))
-        piece_list.append((zero, bases[1][4], bases[2][1]))
-        piece_list.append((zero, bases[1][5], bases[2][2]))
+        piece_list.append((0, bases[1][3], bases[2][0]))
+        piece_list.append((0, bases[1][4], bases[2][1]))
+        piece_list.append((0, bases[1][5], bases[2][2]))
 
         poly = [
             PiecewiseFunction(list(zip(subs, p)))
