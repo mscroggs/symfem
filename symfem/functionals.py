@@ -1,6 +1,6 @@
 """Functionals used to define the dual sets."""
 import sympy
-from .symbolic import subs, x, t, PiecewiseFunction, sym_sum
+from .symbolic import subs, x, t, PiecewiseFunction, sym_sum, to_sympy
 from .vectors import vdot
 from .calculus import derivative, jacobian_component, grad, diff
 from . import mappings
@@ -225,7 +225,7 @@ class IntegralAgainst(BaseFunctional):
             if len(self.f) == self.reference.tdim:
                 # TODO: is this one of the mappings?
                 self.f = tuple(
-                    sum(self.reference.axes[j][i] * c / self.reference.jacobian()
+                    sum(self.reference.axes[j][i] * c / to_sympy(self.reference.jacobian())
                         for j, c in enumerate(self.f))
                     for i, o in enumerate(self.reference.origin)
                 )
@@ -301,7 +301,7 @@ class IntegralMoment(BaseFunctional):
             if len(self.f) == self.reference.tdim:
                 # TODO: is this one of the mappings?
                 self.f = tuple(
-                    sum(self.reference.axes[j][i] * c / self.reference.jacobian()
+                    sum(self.reference.axes[j][i] * c / to_sympy(self.reference.jacobian())
                         for j, c in enumerate(self.f))
                     for i, o in enumerate(self.reference.origin)
                 )
