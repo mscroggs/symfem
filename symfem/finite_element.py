@@ -170,7 +170,6 @@ class CiarletElement(FiniteElement):
             row = []
             for d in self.dofs:
                 row.append(to_sympy(d).eval(to_sympy(b)))
-            print(row)
             mat.append(row)
         if symbolic:
             return sympy.Matrix(mat)
@@ -242,7 +241,6 @@ class CiarletElement(FiniteElement):
 
         for i in out:
             assert i is not None
-        print(out)
         return out
 
     names = []
