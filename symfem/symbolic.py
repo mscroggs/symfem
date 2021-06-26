@@ -28,9 +28,11 @@ class Monomial:
         self._negative = negative
 
     def diff(self, variable):
+        """Differentiate the monomial."""
         return self.to_sympy().diff(to_sympy(variable))
 
     def to_sympy(self):
+        """Convert to a sympy expression."""
         _x = [sympy.Symbol("x"), sympy.Symbol("y"), sympy.Symbol("z")]
 
         if self._x + self._y + self._z == 1 and not self._negative:
@@ -47,66 +49,79 @@ class Monomial:
             return _x[0] ** self._x * _x[1] ** self._y * _x[2] ** self._z
 
     def __hash__(self):
+        """Return hash."""
         return hash(self.to_sympy())
 
     def __unicode__(self):
+        """Return unicode."""
         return str(self.to_sympy())
 
     def __str__(self):
+        """Return string."""
         return self.__unicode__()
 
     def __repr__(self):
+        """Return representation."""
         return self.__unicode__()
 
     def __eq__(self, other):
+        """Check if monomials are equal."""
         if isinstance(other, Monomial):
             return (self._x == other._x and self._y == other._y
                     and self._z == other._z and self._negative == other._negative)
         return self.to_sympy() == other
 
     def __mul__(self, other):
+        """Multiply."""
         if isinstance(other, Monomial):
             return Monomial(self._x + other._x, self._y + other._y,
                             self._z + other._z, self._negative)
         return self.to_sympy() * other
 
     def __rmul__(self, other):
+        """Multiply."""
         return self.__mul__(other)
 
     def __truediv__(self, other):
+        """Divide."""
         if isinstance(other, Monomial):
             return Monomial(self._x - other._x, self._y - other._y,
                             self._z - other._z, self._negative)
         return self.to_sympy() / to_sympy(other)
 
     def __rtruediv__(self, other):
+        """Divide."""
         if isinstance(other, Monomial):
             return Monomial(other._x - self._x, other._y - self._y,
                             other._z - self._z, self._negative)
         return other / self.to_sympy()
 
     def __pow__(self, power):
+        """Exponentiate."""
         return Monomial(self._x * power, self._y * power, self._z * power, self._negative)
 
+    def __neg__(self):
+        """Negate."""
+        return Monomial(self._x, self._y, self._z, not self._negative)
+
     def __add__(self, other):
+        """Add."""
         return self.to_sympy() + other
 
     def __radd__(self, other):
+        """Add."""
         return self.__add__(other)
 
     def __sub__(self, other):
+        """Subtract."""
         return self.to_sympy() - other
 
     def __rsub__(self, other):
+        """Subtract."""
         return other - self.to_sympy()
 
-    def __neg__(self):
-        return Monomial(self._x, self._y, self._z, not self._negative)
-
-    def __sympy__(self):
-        return self.to_sympy()
-
     def __getattr__(self, attr):
+        """Forward all other calls to sympy."""
         return getattr(self.to_sympy(), attr)
 
 
@@ -120,7 +135,6 @@ _dummy = [sympy.Symbol("symbolicpyDUMMYx"), sympy.Symbol("symbolicpyDUMMYy"),
 
 def subs(f, vars, values):
     """Substitute values into a sympy expression."""
-
     if isinstance(f, Monomial):
         return subs(f.to_sympy(), vars, values)
     if isinstance(vars, Monomial):

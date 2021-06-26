@@ -100,7 +100,7 @@ class CiarletElement(FiniteElement):
         """Get the numbers of the DOFs associated with the given entity."""
         return [i for i, j in enumerate(self.dofs) if j.entity == (entity_dim, entity_number)]
 
-    def get_symbolic_polynomial_basis(self, reshape=True):
+    def get_polynomial_basis(self, reshape=True):
         """Get the symbolic polynomial basis for the element."""
         basis = [to_sympy(i) for i in self._basis]
 
@@ -114,8 +114,10 @@ class CiarletElement(FiniteElement):
         return basis
 
     def get_tabulated_polynomial_basis(self, points, symbolic=True):
+        """Get the value of the polynomial basis at the given points."""
+        # TODO
         return numpy.array([
-            [tuple(float(i) for i in subs(f, x, p)) for f in self.get_symbolic_polynomial_basis()]
+            [tuple(float(i) for i in subs(f, x, p)) for f in self.get_polynomial_basis()]
             for p in points])
 
     def tabulate_basis(self, points, order="xyzxyz", symbolic=True):
@@ -131,7 +133,7 @@ class CiarletElement(FiniteElement):
 
         if self.range_dim == 1:
             tabulated_polyset = numpy.array([
-                [float(subs(f, x, p)) for f in self.get_symbolic_polynomial_basis()]
+                [float(subs(f, x, p)) for f in self.get_polynomial_basis()]
                 for p in points])
             return numpy.dot(tabulated_polyset, self._dual_inv.transpose())
 
@@ -166,7 +168,7 @@ class CiarletElement(FiniteElement):
     def get_dual_matrix(self, symbolic=True):
         """Get the dual matrix."""
         mat = []
-        for b in self.get_symbolic_polynomial_basis():
+        for b in self.get_polynomial_basis():
             row = []
             for d in self.dofs:
                 row.append(to_sympy(d).eval(to_sympy(b)))
@@ -187,12 +189,12 @@ class CiarletElement(FiniteElement):
                     self._basis_functions.append(
                         sym_sum(c * d for c, d in zip(
                             minv.row(i),
-                            self.get_symbolic_polynomial_basis())))
+                            self.get_polynomial_basis())))
             else:
                 # Vector space
                 for i, dof in enumerate(self.dofs):
-                    b = [0 for i in self.get_symbolic_polynomial_basis()[0]]
-                    for c, d in zip(minv.row(i), self.get_symbolic_polynomial_basis()):
+                    b = [0 for i in self.get_polynomial_basis()[0]]
+                    for c, d in zip(minv.row(i), self.get_polynomial_basis()):
                         for j, d_j in enumerate(d):
                             b[j] += c * d_j
                     self._basis_functions.append(b)

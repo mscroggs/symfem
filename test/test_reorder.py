@@ -1,13 +1,12 @@
 import symfem
 import sympy
-from symfem.symbolic import zero, one
 half = sympy.Rational(1, 2)
 
 
 def test_xxyyzz():
     element = symfem.create_element("triangle", "RT", 1)
 
-    points = [(zero, one), (one, zero), (zero, zero), (half, half)]
+    points = [(0, 1), (1, 0), (0, 0), (half, half)]
     r1 = element.tabulate_basis(points, "xyzxyz")
     r2 = element.tabulate_basis(points, "xxyyzz")
     for i, j in zip(r1, r2):
@@ -22,7 +21,7 @@ def test_xxyyzz():
 def test_vector():
     element = symfem.create_element("triangle", "RT", 1)
 
-    points = [(zero, one), (one, zero), (zero, zero), (half, half)]
+    points = [(0, 1), (1, 0), (0, 0), (half, half)]
     r1 = element.tabulate_basis(points, "xyzxyz")
     r2 = element.tabulate_basis(points, "xyz,xyz")
     for i, j in zip(r1, r2):
