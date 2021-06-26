@@ -1,9 +1,11 @@
 """Abstract finite element classes and functions."""
 
 import sympy
+import warnings
 import numpy
-from .symbolic import x, subs, sym_sum, PiecewiseFunction, to_sympy
+from .symbolic import x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float
 from .basis_function import ElementBasisFunction
+from .polynomials import evaluate_legendre_basis
 
 
 class FiniteElement:
@@ -95,6 +97,8 @@ class CiarletElement(FiniteElement):
         self._basis_functions = None
         self._reshaped_basis_functions = None
         self._dual_inv = None
+        self._dual_inv_legendre = None
+        self._can_use_legendre = None
 
     def entity_dofs(self, entity_dim, entity_number):
         """Get the numbers of the DOFs associated with the given entity."""
@@ -113,34 +117,57 @@ class CiarletElement(FiniteElement):
                  for i in range(self.range_shape[0])]) for b in basis]
         return basis
 
-    def get_tabulated_polynomial_basis(self, points, symbolic=True):
+    def get_tabulated_polynomial_basis(self, points, symbolic=True, use_legendre=False):
         """Get the value of the polynomial basis at the given points."""
-        # TODO
-        return numpy.array([
-            [tuple(float(i) for i in subs(f, x, p)) for f in self.get_polynomial_basis()]
-            for p in points])
+        if symbolic:
+            if use_legendre:
+                warnings.warn("Symbolic Legendre bases are not implemented. Using standard "
+                              "basis instead.")
+            return [
+                [subs(f, x, p) for f in self.get_polynomial_basis()]
+                for p in points]
+        else:
+            if use_legendre:
+                l_basis = evaluate_legendre_basis(points, self._basis, self.reference)
+                if l_basis is None:
+                    self._can_use_legendre = False
+                    warnings.warn("Cannot calculate Legendre basis for this element. "
+                                  "Using standard basis instead.")
+                else:
+                    self._can_use_legendre = True
+                    return l_basis
+            return numpy.array([
+                [to_float(subs(f, x, p)) for f in self.get_polynomial_basis()]
+                for p in points])
 
-    def tabulate_basis(self, points, order="xyzxyz", symbolic=True):
+    def tabulate_basis(self, points, order="xyzxyz", symbolic=True, use_legendre=False):
         """Evaluate the basis functions of the element at the given points."""
         if symbolic:
+            if use_legendre:
+                warnings.warn("Symbolic Legendre bases are not implemented. Using standard "
+                              "basis instead.")
             return super().tabulate_basis(points, order, symbolic)
 
         assert not symbolic
 
-        if self._dual_inv is None:
-            dual_mat = self.get_dual_matrix(symbolic=False)
-            self._dual_inv = numpy.linalg.inv(dual_mat)
+        tabulated_polyset = self.get_tabulated_polynomial_basis(points, symbolic=False,
+                                                                use_legendre=use_legendre)
+        if self._can_use_legendre:
+            if self._dual_inv_legendre is None:
+                dual_mat = self.get_dual_matrix(symbolic=False, use_legendre=True)
+                self._dual_inv_legendre = numpy.linalg.inv(dual_mat)
+            dual_inv = self._dual_inv_legendre
+        else:
+            if self._dual_inv is None:
+                dual_mat = self.get_dual_matrix(symbolic=False, use_legendre=False)
+                self._dual_inv = numpy.linalg.inv(dual_mat)
+            dual_inv = self._dual_inv
 
         if self.range_dim == 1:
-            tabulated_polyset = numpy.array([
-                [float(subs(f, x, p)) for f in self.get_polynomial_basis()]
-                for p in points])
-            return numpy.dot(tabulated_polyset, self._dual_inv.transpose())
-
-        tabulated_polyset = self.get_tabulated_polynomial_basis(points)
+            return numpy.dot(tabulated_polyset, dual_inv.transpose())
 
         results = numpy.array([
-            numpy.dot(tabulated_polyset[:, :, i], self._dual_inv.transpose())
+            numpy.dot(tabulated_polyset[:, :, i], dual_inv.transpose())
             for i in range(tabulated_polyset.shape[2])
         ])
         # results[xyz][point][function]
@@ -165,18 +192,27 @@ class CiarletElement(FiniteElement):
             ])
         raise ValueError(f"Unknown order: {order}")
 
-    def get_dual_matrix(self, symbolic=True):
+    def get_dual_matrix(self, symbolic=True, use_legendre=False):
         """Get the dual matrix."""
-        mat = []
-        for b in self.get_polynomial_basis():
-            row = []
-            for d in self.dofs:
-                row.append(to_sympy(d).eval(to_sympy(b)))
-            mat.append(row)
         if symbolic:
+            if use_legendre:
+                warnings.warn("Symbolic Legendre bases are not implemented. Using standard "
+                              "basis instead.")
+            mat = []
+            for b in self.get_polynomial_basis():
+                row = []
+                for d in self.dofs:
+                    row.append(to_sympy(d).eval(to_sympy(b), symbolic=symbolic))
+                mat.append(row)
             return sympy.Matrix(mat)
+
         else:
-            return numpy.array([[float(j) for j in i] for i in mat])
+            mat = numpy.empty((len(self.dofs), len(self.dofs)))
+            for i, d in enumerate(self.dofs):
+                p, w = d.get_points_and_weights()
+                mat[:, i] = numpy.dot(w, self.get_tabulated_polynomial_basis(
+                    p, symbolic=False, use_legendre=use_legendre))
+            return mat
 
     def get_basis_functions(self, reshape=True):
         """Get the basis functions of the element."""

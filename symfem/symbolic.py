@@ -18,6 +18,16 @@ def to_sympy(i):
     return i
 
 
+def to_float(i):
+    """Convert to a float."""
+    if isinstance(i, list):
+        return [to_float(j) for j in i]
+    if isinstance(i, tuple):
+        return tuple(to_float(j) for j in i)
+
+    return float(i)
+
+
 class Monomial:
     """A monomial."""
 
@@ -26,6 +36,11 @@ class Monomial:
         self._y = ypow
         self._z = zpow
         self._negative = negative
+
+    @property
+    def order(self):
+        """Get the order of the monomial."""
+        return self._x + self._y + self._z
 
     def diff(self, variable):
         """Differentiate the monomial."""

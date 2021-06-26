@@ -97,6 +97,6 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
     result = space.tabulate(0, points)[0]
 
     element = create_element(cell, symfem_type, order)
-    sym_result = element.tabulate_basis(points, "xxyyzz", symbolic=False)
+    sym_result = element.tabulate_basis(points, "xxyyzz", symbolic=False, use_legendre=True)
 
     assert np.allclose(result, sym_result)

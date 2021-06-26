@@ -1,6 +1,7 @@
 """Functionals used to define the dual sets."""
 import sympy
-from .symbolic import subs, x, t, PiecewiseFunction, sym_sum, to_sympy
+import numpy
+from .symbolic import subs, x, t, PiecewiseFunction, sym_sum, to_sympy, to_float
 from .vectors import vdot
 from .calculus import derivative, jacobian_component, grad, diff
 from . import mappings
@@ -13,7 +14,7 @@ class BaseFunctional:
         self.entity = entity
         self.mapping = mapping
 
-    def eval(self, fun):
+    def eval(self, fun, symbolic=True):
         """Apply to the functional to a function."""
         raise NotImplementedError
 
@@ -33,6 +34,11 @@ class BaseFunctional:
         """Map functions to a cell."""
         return [getattr(mappings, self.mapping)(f, map, inverse_map, tdim) for f in fs]
 
+    def get_points_and_weights(self, max_order=None):
+        """Get points and weights that can be used to numerically evaluate functional."""
+        # TODO: quadrature
+        raise NotImplementedError
+
     name = None
 
 
@@ -43,13 +49,21 @@ class PointEvaluation(BaseFunctional):
         super().__init__(entity, mapping)
         self.point = point
 
-    def eval(self, function):
+    def eval(self, function, symbolic=True):
         """Apply to the functional to a function."""
-        return subs(function, x, self.point)
+        value = subs(function, x, self.point)
+        if symbolic:
+            return value
+        else:
+            return to_float(value)
 
     def dof_point(self):
         """Get the location of the DOF in the cell."""
         return self.point
+
+    def get_points_and_weights(self, max_order=None):
+        """Get points and weights that can be used to numerically evaluate functional."""
+        return numpy.array([self.point]), numpy.array([1])
 
     name = "Point evaluation"
 
@@ -62,13 +76,21 @@ class WeightedPointEvaluation(BaseFunctional):
         self.point = point
         self.weight = weight
 
-    def eval(self, function):
+    def eval(self, function, symbolic=True):
         """Apply to the functional to a function."""
-        return subs(function, x, self.point) * self.weight
+        value = subs(function, x, self.point) * self.weight
+        if symbolic:
+            return value
+        else:
+            return to_float(value)
 
     def dof_point(self):
         """Get the location of the DOF in the cell."""
         return self.point
+
+    def get_points_and_weights(self, max_order=None):
+        """Get points and weights that can be used to numerically evaluate functional."""
+        return numpy.array([self.point]), numpy.array([self.weight])
 
     name = "Weighted point evaluation"
 
@@ -81,12 +103,16 @@ class DerivativePointEvaluation(BaseFunctional):
         self.point = point
         self.derivative = derivative
 
-    def eval(self, function):
+    def eval(self, function, symbolic=True):
         """Apply to the functional to a function."""
         for i, j in zip(x, self.derivative):
             for k in range(j):
                 function = diff(function, i)
-        return subs(function, x, self.point)
+        value = subs(function, x, self.point)
+        if symbolic:
+            return value
+        else:
+            return to_float(value)
 
     def dof_point(self):
         """Get the location of the DOF in the cell."""
@@ -114,11 +140,15 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
         self.point = point
         self.dir = direction
 
-    def eval(self, function):
+    def eval(self, function, symbolic=True):
         """Apply to the functional to a function."""
         if isinstance(function, PiecewiseFunction):
             function = function.get_piece(self.point)
-        return subs(derivative(function, self.dir), x, self.point)
+        value = subs(derivative(function, self.dir), x, self.point)
+        if symbolic:
+            return value
+        else:
+            return to_float(value)
 
     def dof_point(self):
         """Get the location of the DOF in the cell."""
@@ -149,9 +179,13 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
         self.point = point
         self.component = component
 
-    def eval(self, function):
+    def eval(self, function, symbolic=True):
         """Apply to the functional to a function."""
-        return subs(jacobian_component(function, self.component), x, self.point)
+        value = subs(jacobian_component(function, self.component), x, self.point)
+        if symbolic:
+            return value
+        else:
+            return to_float(value)
 
     def dof_point(self):
         """Get the location of the DOF in the cell."""
@@ -169,14 +203,18 @@ class PointInnerProduct(BaseFunctional):
         self.lvec = lvec
         self.rvec = rvec
 
-    def eval(self, function):
+    def eval(self, function, symbolic=True):
         """Apply to the functional to a function."""
         v = subs(function, x, self.point)
         tdim = len(self.lvec)
         assert len(function) == tdim ** 2
-        return vdot(self.lvec,
-                    tuple(vdot(v[tdim * i: tdim * (i + 1)], self.rvec)
-                          for i in range(0, tdim)))
+        value = vdot(self.lvec,
+                     tuple(vdot(v[tdim * i: tdim * (i + 1)], self.rvec)
+                           for i in range(0, tdim)))
+        if symbolic:
+            return value
+        else:
+            return to_float(value)
 
     def dof_point(self):
         """Get the location of the DOF in the cell."""
@@ -199,9 +237,13 @@ class DotPointEvaluation(BaseFunctional):
         self.point = point
         self.vector = vector
 
-    def eval(self, function):
+    def eval(self, function, symbolic=True):
         """Apply to the functional to a function."""
-        return subs(vdot(function, self.vector), x, self.point)
+        value = subs(vdot(function, self.vector), x, self.point)
+        if symbolic:
+            return value
+        else:
+            return to_float(value)
 
     def dof_point(self):
         """Get the location of the DOF in the cell."""
@@ -237,14 +279,18 @@ class IntegralAgainst(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.reference.vertices))
 
-    def eval(self, function):
+    def eval(self, function, symbolic=True):
         """Apply to the functional to a function."""
         point = [i for i in self.reference.origin]
         for i, a in enumerate(zip(*self.reference.axes)):
             for j, k in zip(a, t):
                 point[i] += j * k
         integrand = self.dot(subs(function, x, point))
-        return self.reference.integral(integrand)
+        value = self.reference.integral(integrand, symbolic=symbolic)
+        if symbolic:
+            return value
+        else:
+            return to_float(value)
 
     def dot(self, function):
         """Dot a function with the moment function."""
@@ -268,7 +314,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.reference.vertices))
 
-    def eval(self, function):
+    def eval(self, function, symbolic=True):
         """Apply to the functional to a function."""
         for dir, o in zip(self.directions, self.orders):
             for i in range(o):
@@ -278,7 +324,11 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
             for j, k in zip(a, t):
                 point[i] += j * k
         integrand = self.scale * subs(function, x, point)
-        return self.reference.integral(integrand)
+        value = self.reference.integral(integrand)
+        if symbolic:
+            return value
+        else:
+            return to_float(value)
 
     def perform_mapping(self, fs, map, inverse_map, tdim):
         """Map functions to a cell."""
@@ -309,14 +359,18 @@ class IntegralMoment(BaseFunctional):
                 assert len(self.f) == self.reference.tdim ** 2
                 assert self.reference.vertices == self.reference.reference_vertices
 
-    def eval(self, function):
+    def eval(self, function, symbolic=True):
         """Apply to the functional to a function."""
         point = [i for i in self.reference.origin]
         for i, a in enumerate(zip(*self.reference.axes)):
             for j, k in zip(a, t):
                 point[i] += j * k
         integrand = self.dot(subs(function, x, point))
-        return self.reference.integral(integrand)
+        value = self.reference.integral(integrand)
+        if symbolic:
+            return value
+        else:
+            return to_float(value)
 
     def dot(self, function):
         """Dot a function with the moment function."""
@@ -376,14 +430,18 @@ class DerivativeIntegralMoment(IntegralMoment):
         """Get the direction of the DOF."""
         return self.dot_with
 
-    def eval(self, function):
+    def eval(self, function, symbolic=True):
         """Apply to the functional to a function."""
         point = [i for i in self.reference.origin]
         for i, a in enumerate(zip(*self.reference.axes)):
             for j, k in zip(a, t):
                 point[i] += j * k
         integrand = self.dot(subs(grad(function, self.reference.gdim), x, point))
-        return self.reference.integral(integrand)
+        value = self.reference.integral(integrand)
+        if symbolic:
+            return value
+        else:
+            return to_float(value)
 
     name = "Derivative integral moment"
 
