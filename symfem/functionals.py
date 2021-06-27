@@ -34,11 +34,7 @@ class BaseFunctional:
         """Map functions to a cell."""
         return [getattr(mappings, self.mapping)(f, map, inverse_map, tdim) for f in fs]
 
-    def get_points_and_weights(self, max_order=None):
-        """Get points and weights that can be used to numerically evaluate functional."""
-        # TODO: quadrature
-        raise NotImplementedError
-
+    get_points_and_weights = None
     name = None
 
 
@@ -286,7 +282,7 @@ class IntegralAgainst(BaseFunctional):
             for j, k in zip(a, t):
                 point[i] += j * k
         integrand = self.dot(subs(function, x, point))
-        value = self.reference.integral(integrand, symbolic=symbolic)
+        value = self.reference.integral(integrand)
         if symbolic:
             return value
         else:

@@ -5,7 +5,7 @@ import warnings
 import numpy
 from .symbolic import x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float
 from .basis_function import ElementBasisFunction
-from .polynomials import evaluate_legendre_basis
+from .legendre import evaluate_legendre_basis, get_legendre_basis
 
 
 class FiniteElement:
@@ -34,7 +34,10 @@ class FiniteElement:
 
     def tabulate_basis(self, points, order="xyzxyz", symbolic=True):
         """Evaluate the basis functions of the element at the given points."""
-        assert symbolic
+        if not symbolic:
+            warnings.warn("Converting from symbolic to float. This may be slow.")
+            return numpy.array([to_float(self.tabulate_basis(points, order=order,
+                                                             symbolic=True))])
 
         if self.range_dim == 1:
             output = []
@@ -98,15 +101,26 @@ class CiarletElement(FiniteElement):
         self._reshaped_basis_functions = None
         self._dual_inv = None
         self._dual_inv_legendre = None
-        self._can_use_legendre = None
+
+    @property
+    def _can_use_legendre(self):
+        return evaluate_legendre_basis(numpy.array(self.reference.vertices), self._basis,
+                                       self.reference) is not None
 
     def entity_dofs(self, entity_dim, entity_number):
         """Get the numbers of the DOFs associated with the given entity."""
         return [i for i, j in enumerate(self.dofs) if j.entity == (entity_dim, entity_number)]
 
-    def get_polynomial_basis(self, reshape=True):
+    def get_polynomial_basis(self, reshape=True, use_legendre=False):
         """Get the symbolic polynomial basis for the element."""
-        basis = [to_sympy(i) for i in self._basis]
+        if use_legendre and not self._can_use_legendre:
+            use_legendre = False
+            warnings.warn("Cannot calculate Legendre basis for this element. "
+                          "Using standard basis instead.")
+        if use_legendre:
+            basis = [to_sympy(i) for i in get_legendre_basis(self._basis, self.reference)]
+        else:
+            basis = [to_sympy(i) for i in self._basis]
 
         if reshape and self.range_shape is not None:
             if len(self.range_shape) != 2:
@@ -119,40 +133,40 @@ class CiarletElement(FiniteElement):
 
     def get_tabulated_polynomial_basis(self, points, symbolic=True, use_legendre=False):
         """Get the value of the polynomial basis at the given points."""
+        if use_legendre and not self._can_use_legendre:
+            use_legendre = False
+            warnings.warn("Cannot calculate Legendre basis for this element. "
+                          "Using standard basis instead.")
         if symbolic:
-            if use_legendre:
-                warnings.warn("Symbolic Legendre bases are not implemented. Using standard "
-                              "basis instead.")
             return [
-                [subs(f, x, p) for f in self.get_polynomial_basis()]
+                [subs(f, x, p) for f in self.get_polynomial_basis(
+                    use_legendre=use_legendre)]
                 for p in points]
         else:
             if use_legendre:
-                l_basis = evaluate_legendre_basis(points, self._basis, self.reference)
-                if l_basis is None:
-                    self._can_use_legendre = False
-                    warnings.warn("Cannot calculate Legendre basis for this element. "
-                                  "Using standard basis instead.")
-                else:
-                    self._can_use_legendre = True
-                    return l_basis
-            return numpy.array([
-                [to_float(subs(f, x, p)) for f in self.get_polynomial_basis()]
-                for p in points])
+                return evaluate_legendre_basis(points, self._basis, self.reference)
+            else:
+                return numpy.array([
+                    [to_float(subs(f, x, p)) for f in self.get_polynomial_basis(
+                        use_legendre=use_legendre)]
+                    for p in points])
 
     def tabulate_basis(self, points, order="xyzxyz", symbolic=True, use_legendre=False):
         """Evaluate the basis functions of the element at the given points."""
+        if use_legendre and not self._can_use_legendre:
+            use_legendre = False
+            warnings.warn("Cannot calculate Legendre basis for this element. "
+                          "Using standard basis instead.")
+
         if symbolic:
-            if use_legendre:
-                warnings.warn("Symbolic Legendre bases are not implemented. Using standard "
-                              "basis instead.")
-            return super().tabulate_basis(points, order, symbolic)
+            return super().tabulate_basis(points, order, symbolic=True)
 
         assert not symbolic
 
-        tabulated_polyset = self.get_tabulated_polynomial_basis(points, symbolic=False,
-                                                                use_legendre=use_legendre)
-        if self._can_use_legendre:
+        tabulated_polyset = self.get_tabulated_polynomial_basis(
+            points, symbolic=False, use_legendre=use_legendre)
+
+        if use_legendre:
             if self._dual_inv_legendre is None:
                 dual_mat = self.get_dual_matrix(symbolic=False, use_legendre=True)
                 self._dual_inv_legendre = numpy.linalg.inv(dual_mat)
@@ -195,11 +209,8 @@ class CiarletElement(FiniteElement):
     def get_dual_matrix(self, symbolic=True, use_legendre=False):
         """Get the dual matrix."""
         if symbolic:
-            if use_legendre:
-                warnings.warn("Symbolic Legendre bases are not implemented. Using standard "
-                              "basis instead.")
             mat = []
-            for b in self.get_polynomial_basis():
+            for b in self.get_polynomial_basis(use_legendre=use_legendre):
                 row = []
                 for d in self.dofs:
                     row.append(to_sympy(d).eval(to_sympy(b), symbolic=symbolic))
@@ -207,6 +218,14 @@ class CiarletElement(FiniteElement):
             return sympy.Matrix(mat)
 
         else:
+            for d in self.dofs:
+                if d.get_points_and_weights is None:
+                    warnings.warn("Cannot numerically evaluate all the DOFs in this element. "
+                                  "Converting symbolic evaluations instead (this may be slow).")
+                    mat = self.get_dual_matrix(symbolic=True, use_legendre=use_legendre)
+                    return numpy.array(
+                        [[float(j) for j in mat.row(i)] for i in range(mat.rows)]
+                    )
             mat = numpy.empty((len(self.dofs), len(self.dofs)))
             for i, d in enumerate(self.dofs):
                 p, w = d.get_points_and_weights()

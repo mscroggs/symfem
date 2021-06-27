@@ -1,27 +1,7 @@
 """Polynomial sets."""
-from .symbolic import x, Monomial
+from .symbolic import x
 from .calculus import curl, diff
 from itertools import product
-import numpy
-
-
-def evaluate_legendre_basis(points, basis, reference):
-    """Evaluate the Legendre basis spanning the same set as the given basis."""
-    for i in basis:
-        if not isinstance(i, Monomial):
-            return None
-    max_order = max(i.order for i in basis)
-
-    if reference.name == "interval":
-        polys = numpy.empty((len(points), max_order + 1))
-        polys[:, 0] = 1
-        polys[:, 1] = 2 * points[:, 0] - 1
-        for n in range(1, max_order):
-            polys[:, n + 1] = (2 * n + 1) * polys[:, 1] * polys[:, n]
-            polys[:, n + 1] -= n * polys[:, n - 1]
-            polys[:, n + 1] /= n + 1
-
-        return polys
 
 
 def polynomial_set_1d(dim, order, vars=x):

@@ -42,6 +42,11 @@ class Monomial:
         """Get the order of the monomial."""
         return self._x + self._y + self._z
 
+    @property
+    def indices(self):
+        """Get the indices of the monomial."""
+        return (self._x, self._y, self._z)
+
     def diff(self, variable):
         """Differentiate the monomial."""
         return self.to_sympy().diff(to_sympy(variable))
