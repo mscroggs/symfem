@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 from symfem import legendre, create_element
-from symfem.symbolic import x, subs, to_float
+from symfem.symbolic import x, t, subs, to_float
 
 
 def make_lattice(cell, N=3):
@@ -44,4 +44,27 @@ def test_legendre(cell, order):
 
     values2 = np.array([[to_float(subs(b, x, p)) for b in basis] for p in points])
 
+    print(values)
+    print(basis)
+    print(values2)
     assert np.allclose(values, values2)
+
+
+@pytest.mark.parametrize("cell", ["interval", "triangle", "tetrahedron", "quadrilateral",
+                                  "hexahedron", "prism", "pyramid"])
+def test_orthogonal(cell):
+    if cell not in ["interval", "quadrilateral", "hexahedron"]:
+        pytest.xfail()
+
+    if cell == "interval":
+        e = create_element(cell, "Lagrange", 5)
+    else:
+        e = create_element(cell, "Lagrange", 2)
+    basis = legendre.get_legendre_basis(e._basis, e.reference)
+
+    if basis is None:
+        pytest.skip()
+
+    for i, f in enumerate(basis):
+        for g in basis[:i]:
+            assert e.reference.integral(subs(f * g, x, t)) == 0

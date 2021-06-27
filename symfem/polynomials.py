@@ -1,5 +1,5 @@
 """Polynomial sets."""
-from .symbolic import x
+from .symbolic import x, Monomial
 from .calculus import curl, diff
 from itertools import product
 
@@ -87,7 +87,7 @@ def quolynomial_set_1d(dim, order):
     """One dimensional quolynomial set."""
     basis = []
     for j in product(range(order + 1), repeat=dim):
-        poly = 1
+        poly = Monomial()
         for a, b in zip(x, j):
             poly *= a ** b
         basis.append(poly)
@@ -263,7 +263,7 @@ def pyramid_polynomial_set_1d(dim, order):
     """One dimensional polynomial set."""
     assert dim == 3
     if order == 0:
-        return [1]
+        return [Monomial()]
 
     poly = polynomial_set_1d(3, order)
 

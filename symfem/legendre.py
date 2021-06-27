@@ -3,16 +3,23 @@ from .symbolic import x, Monomial
 import numpy
 
 
-def get_index(reference, indices):
+def get_index(tdim, indices):
     """Get the index of a monomial."""
-    if reference.name == "interval":
+    if tdim == 1:
         return indices[0]
+    if tdim == 2:
+        return sum(indices[:2]) * (sum(indices[:2]) + 1) // 2 + indices[0]
+    if tdim == 3:
+        return (sum(indices) * (sum(indices) + 1) * (sum(indices) + 2) // 6
+                + sum(indices[:2]) * (sum(indices[:2]) + 1) // 2 + indices[0])
 
 
-def num_polynomials(reference, max_order):
-    """Get the number of polynomials for a reference."""
-    if reference.name == "interval":
+def num_polynomials(tdim, max_order):
+    """Get the number of polynomials."""
+    if tdim == 1:
         return max_order + 1
+    if tdim == 2:
+        return (max_order + 1) * (max_order + 2) // 2
 
 
 def evaluate_legendre_basis(points, basis, reference):
@@ -21,37 +28,80 @@ def evaluate_legendre_basis(points, basis, reference):
         if not isinstance(i, Monomial):
             return None
     max_order = max(i.order for i in basis)
+    min_order = min(i.order for i in basis)
 
-    if reference.name == "interval":
-        legendre = numpy.empty((len(points), num_polynomials(reference, max_order)))
-        legendre[:, 0] = 1
+    if min_order < 0:
+        return None
+
+    num_p = num_polynomials(reference.tdim, max_order)
+    if num_p is None:
+        return None
+
+    ldims = [numpy.empty((len(points), num_polynomials(1, max_order)))
+             for i in range(reference.tdim)]
+    for i in range(reference.tdim):
+        ldims[i][:, 0] = 1
         if max_order > 0:
-            legendre[:, 1] = 2 * points[:, 0] - 1
+            ldims[i][:, 1] = 2 * points[:, i] - 1
         for n in range(1, max_order):
-            legendre[:, n + 1] = (2 * n + 1) * legendre[:, 1] * legendre[:, n]
-            legendre[:, n + 1] -= n * legendre[:, n - 1]
-            legendre[:, n + 1] /= n + 1
+            ldims[i][:, n + 1] = (2 * n + 1) * ldims[i][:, 1] * ldims[i][:, n]
+            ldims[i][:, n + 1] -= n * ldims[i][:, n - 1]
+            ldims[i][:, n + 1] /= n + 1
 
-        polys = numpy.empty((len(points), len(basis)))
-        for i, b in enumerate(basis):
-            polys[:, i] = legendre[:, get_index(reference, b.indices)]
+    if reference.tdim == 1:
+        legendre = ldims[0]
+    if reference.tdim == 2:
+        legendre = numpy.empty((len(points), num_p))
+        for o in range(max_order + 1):
+            for i in range(o + 1):
+                index = get_index(reference.tdim, (i, o - i, 0))
+                legendre[:, index] = ldims[0][:, i] * ldims[1][:, o - i]
 
-        return polys
+    polys = numpy.empty((len(points), len(basis)))
+    for i, b in enumerate(basis):
+        polys[:, i] = legendre[:, get_index(reference.tdim, b.indices)]
+
+    return polys
 
 
 def get_legendre_basis(basis, reference):
     """Get the symbolic Legendre basis spanning the same set as the given basis."""
-    for i in basis:
-        if not isinstance(i, Monomial):
+    for i, j in enumerate(basis):
+        if isinstance(j, int):
+            basis[i] = Monomial()
+        elif not isinstance(j, Monomial):
+            print("-->", j, type(j))
             return None
+
     max_order = max(i.order for i in basis)
+    min_order = min(i.order for i in basis)
 
-    if reference.name == "interval":
-        polys = []
-        polys.append(1)
+    if min_order < 0:
+        return None
+
+    num_p = num_polynomials(reference.tdim, max_order)
+    if num_p is None:
+        return None
+
+    ldims = [[] for i in range(reference.tdim)]
+    for i in range(reference.tdim):
+        ldims[i].append(1)
         if max_order > 0:
-            polys.append(2 * x[0] - 1)
+            ldims[i].append(2 * x[i] - 1)
         for n in range(1, max_order):
-            polys.append(((2 * n + 1) * polys[1] * polys[-1] - n * polys[-2]) / (n + 1))
+            f = ((2 * n + 1) * ldims[i][1] * ldims[i][-1] - n * ldims[i][-2]) / (n + 1)
+            ldims[i].append(f.expand())
 
-        return polys
+    if reference.tdim == 1:
+        legendre = ldims[0]
+    if reference.tdim == 2:
+        legendre = []
+        for o in range(max_order + 1):
+            for i in range(o + 1):
+                legendre.append(ldims[0][i] * ldims[1][o - i])
+
+    polys = []
+    for i, b in enumerate(basis):
+        polys.append(legendre[get_index(reference.tdim, b.indices)])
+
+    return polys
