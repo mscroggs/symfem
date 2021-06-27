@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from symfem import legendre, create_element, polynomials
+from symfem import legendre, create_element
 from symfem.symbolic import x, subs, to_float
 
 
