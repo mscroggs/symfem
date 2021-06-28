@@ -34,6 +34,7 @@ def num_polynomials(refname, max_order):
 
 
 def get_max_order(basis, refname):
+    """Get the maximum order of a basis."""
     if refname in ["interval", "triangle", "tetrahedron"]:
         return max(sum(i.indices) for i in basis)
     if refname in ["quadrilateral", "hexahedron"]:
@@ -41,48 +42,92 @@ def get_max_order(basis, refname):
 
 
 def get_min_order(basis, refname):
+    """Get the minimum order of a basis."""
     if refname in ["interval", "triangle", "tetrahedron"]:
         return min(sum(i.indices) for i in basis)
     if refname in ["quadrilateral", "hexahedron"]:
         return min(max(i.indices) for i in basis)
 
 
-def _evaluate_legendre_interval(points, max_order):
-    legendre = numpy.empty((len(points), num_polynomials("interval", max_order)))
-    legendre[:, 0] = 1
+def _legendre_interval(max_order, pts, leg, set_leg, divide):
+    """Compute Legendre polynomials on an interval."""
+    set_leg(0, 1)
     if max_order > 0:
-        legendre[:, 1] = 2 * points[:, 0] - 1
+        set_leg(1, 2 * pts(0) - 1)
     for n in range(1, max_order):
-        legendre[:, n + 1] = (2 * n + 1) * legendre[:, 1] * legendre[:, n]
-        legendre[:, n + 1] -= n * legendre[:, n - 1]
-        legendre[:, n + 1] /= n + 1
-    return legendre
+        set_leg(n + 1, ((2 * n + 1) * leg(1) * leg(n) - n * leg(n - 1)) / (n + 1))
 
 
-def _evaluate_legendre_triangle(points, max_order):
-    legendre = numpy.empty((len(points), num_polynomials("triangle", max_order)))
-    legendre[:, 0] = 1
+def _legendre_triangle(max_order, pts, leg, set_leg, divide):
+    """Compute Legendre polynomials on a triangle."""
 
     def ind(a, b):
         return get_index("triangle", (a, b), max_order)
 
-    for p in range(1, max_order + 1):
-        a = (2 * p - 1) / p
-        legendre[:, ind(p, 0)] = (points[:, 0] * 2 + points[:, 1] - 1) * legendre[:, ind(p - 1, 0)] * a
+    set_leg(0, 1)
 
+    for p in range(1, max_order + 1):
+        a = divide(2 * p - 1, p)
         if p > 1:
-            # y^2 terms
-            legendre[:, ind(p, 0)] -= (1 - points[:, 1]) ** 2 * legendre[:, ind(p - 2, 0)] * (a - 1)
+            set_leg(ind(p, 0),
+                    (pts(0) * 2 + pts(1) - 1) * leg(ind(p - 1, 0)) * a
+                    - (1 - pts(1)) ** 2 * leg(ind(p - 2, 0)) * (a - 1))
+        else:
+            set_leg(ind(p, 0), (pts(0) * 2 + pts(1) - 1) * leg(ind(p - 1, 0)) * a)
 
     for p in range(max_order):
-        legendre[:, ind(p, 1)] = legendre[:, ind(p, 0)] * ((points[:, 1] * 2 - 1) * (1.5 + p) + 0.5 + p)
+        set_leg(ind(p, 1),
+                leg(ind(p, 0)) * ((pts(1) * 2 - 1) * (divide(3, 2) + p) + divide(1, 2) + p))
         for q in range(1, max_order - p):
-            a1 = (p + q + 1) * (2 * p + 2 * q + 3) / (q + 1) / (2 * p + q + 2)
-            a2 = (2 * p + 1) ** 2 * (p + q + 1) / (q + 1) / (2 * p + q + 2) / (2 * p + 2 * q + 1)
-            a3 = q * (2 * p + q + 1) * (2 * p + 2 * q + 3) / (q + 1) / (2 * p + q + 2) / (2 * p + 2 * q + 1)
+            a1 = divide((p + q + 1) * (2 * p + 2 * q + 3),
+                        (q + 1) * (2 * p + q + 2))
+            a2 = divide((2 * p + 1) ** 2 * (p + q + 1),
+                        (q + 1) * (2 * p + q + 2) * (2 * p + 2 * q + 1))
+            a3 = divide(q * (2 * p + q + 1) * (2 * p + 2 * q + 3),
+                        (q + 1) * (2 * p + q + 2) * (2 * p + 2 * q + 1))
 
-            legendre[:, ind(p, q + 1)] = legendre[:, ind(p, q)] * ((points[:, 1] * 2 - 1) * a1 + a2)
-            legendre[:, ind(p, q + 1)] -= legendre[:, ind(p, q - 1)] * a3
+            set_leg(ind(p, q + 1),
+                    leg(ind(p, q)) * ((pts(1) * 2 - 1) * a1 + a2)
+                    - leg(ind(p, q - 1)) * a3)
+
+
+def _evaluate_legendre_interval(points, max_order):
+    """Evaluate the Legendre polynomials (non-symbolically) at the given points in an interval."""
+    legendre = numpy.empty((len(points), num_polynomials("interval", max_order)))
+
+    def pts(i):
+        return points[:, i]
+
+    def leg(i):
+        return legendre[:, i]
+
+    def set_leg(i, value):
+        legendre[:, i] = value
+
+    def divide(a, b):
+        return a / b
+
+    _legendre_interval(max_order, pts, leg, set_leg, divide)
+    return legendre
+
+
+def _evaluate_legendre_triangle(points, max_order):
+    """Evaluate the Legendre polynomials (non-symbolically) at the given points in a triangle."""
+    legendre = numpy.empty((len(points), num_polynomials("triangle", max_order)))
+
+    def pts(i):
+        return points[:, i]
+
+    def leg(i):
+        return legendre[:, i]
+
+    def set_leg(i, value):
+        legendre[:, i] = value
+
+    def divide(a, b):
+        return a / b
+
+    _legendre_triangle(max_order, pts, leg, set_leg, divide)
 
     return legendre
 
@@ -96,7 +141,7 @@ def evaluate_legendre_basis(points, basis, reference):
     min_order = get_min_order(basis, reference.name)
 
     if min_order is None or max_order is None or min_order < 0:
-            return None
+        return None
 
     num_p = num_polynomials(reference.name, max_order)
     if num_p is None:
@@ -154,40 +199,44 @@ def evaluate_legendre_basis(points, basis, reference):
 
 
 def _get_legendre_interval(variable, max_order):
-    legendre = [1]
-    if max_order > 0:
-        legendre.append(2 * variable - 1)
-    for n in range(1, max_order):
-        f = ((2 * n + 1) * legendre[1] * legendre[-1] - n * legendre[-2]) / (n + 1)
-        legendre.append(f.expand())
+    """Get the Legendre polynomials for an interval."""
+    legendre = [0 for i in range(num_polynomials("interval", max_order))]
+
+    def pts(i):
+        assert i == 0
+        return variable
+
+    def leg(i):
+        return legendre[i]
+
+    def set_leg(i, value):
+        legendre[i] = value
+
+    def divide(a, b):
+        return sympy.Rational(a, b)
+
+    _legendre_interval(max_order, pts, leg, set_leg, divide)
+
     return legendre
 
 
 def _get_legendre_triangle(variables, max_order):
+    """Get the Legendre polynomials for a triangle."""
     legendre = [0 for i in range(num_polynomials("triangle", max_order))]
-    legendre[0] = 1
-    ind = lambda a, b: get_index("triangle", (a, b), max_order)
 
-    for p in range(1, max_order + 1):
-        a = sympy.Rational(2 * p - 1, p)
-        legendre[ind(p, 0)] = (variables[0] * 2 + variables[1] - 1) * legendre[ind(p - 1, 0)] * a
+    def pts(i):
+        return variables[i]
 
-        if p > 1:
-            # y^2 terms
-            legendre[ind(p, 0)] -= (1 - variables[1]) ** 2 * legendre[ind(p - 2, 0)] * (a - 1)
-        legendre[ind(p, 0)] = legendre[ind(p, 0)].expand()
+    def leg(i):
+        return legendre[i]
 
-    for p in range(max_order):
-        legendre[ind(p, 1)] = legendre[ind(p, 0)] * ((variables[1] * 2 - 1) * (3 + 2 * p) / 2 + sympy.Rational(1, 2) + p)
-        legendre[ind(p, 1)] = legendre[ind(p, 1)].expand()
-        for q in range(1, max_order - p):
-            a1 = sympy.Rational((p + q + 1) * (2 * p + 2 * q + 3), (q + 1) * (2 * p + q + 2))
-            a2 = sympy.Rational((2 * p + 1) ** 2 * (p + q + 1), (q + 1) * (2 * p + q + 2) * (2 * p + 2 * q + 1))
-            a3 = sympy.Rational(q * (2 * p + q + 1) * (2 * p + 2 * q + 3), (q + 1) * (2 * p + q + 2) * (2 * p + 2 * q + 1))
+    def set_leg(i, value):
+        legendre[i] = value
 
-            legendre[ind(p, q + 1)] = legendre[ind(p, q)] * ((variables[1] * 2 - 1) * a1 + a2)
-            legendre[ind(p, q + 1)] -= legendre[ind(p, q - 1)] * a3
-            legendre[ind(p, q + 1)] = legendre[ind(p, q + 1)].expand()
+    def divide(a, b):
+        return sympy.Rational(a, b)
+
+    _legendre_triangle(max_order, pts, leg, set_leg, divide)
 
     return legendre
 
