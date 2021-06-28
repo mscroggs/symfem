@@ -2,7 +2,6 @@
 
 import sympy
 from itertools import product
-from ..symbolic import one, zero
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..polynomials import quolynomial_set, Hdiv_quolynomials, Hcurl_quolynomials
@@ -94,7 +93,7 @@ class VectorQ(CiarletElement):
             directions = [1]
         else:
             directions = [
-                tuple(one if i == j else zero for j in range(reference.tdim))
+                tuple(1 if i == j else 0 for j in range(reference.tdim))
                 for i in range(reference.tdim)
             ]
         for p in scalar_space.dofs:

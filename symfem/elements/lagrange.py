@@ -2,7 +2,6 @@
 
 import sympy
 from itertools import product
-from ..symbolic import one, zero
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set
 from ..functionals import PointEvaluation, DotPointEvaluation
@@ -89,7 +88,7 @@ class VectorLagrange(CiarletElement):
             directions = [1]
         else:
             directions = [
-                tuple(one if i == j else zero for j in range(reference.tdim))
+                tuple(1 if i == j else 0 for j in range(reference.tdim))
                 for i in range(reference.tdim)
             ]
         for p in scalar_space.dofs:
@@ -120,7 +119,7 @@ class VectorDiscontinuousLagrange(CiarletElement):
             directions = [1]
         else:
             directions = [
-                tuple(one if i == j else zero for j in range(reference.tdim))
+                tuple(1 if i == j else 0 for j in range(reference.tdim))
                 for i in range(reference.tdim)
             ]
         for p in scalar_space.dofs:
@@ -151,7 +150,7 @@ class MatrixDiscontinuousLagrange(CiarletElement):
             directions = [1]
         else:
             directions = [
-                tuple(one if i == j else zero for j in range(reference.tdim ** 2))
+                tuple(1 if i == j else 0 for j in range(reference.tdim ** 2))
                 for i in range(reference.tdim ** 2)
             ]
         for p in scalar_space.dofs:
@@ -182,19 +181,19 @@ class SymmetricMatrixDiscontinuousLagrange(CiarletElement):
             directions = [1]
         elif reference.tdim == 2:
             poly = [(a[0], a[1], a[1], a[2]) for a in polynomial_set(2, 3, order)]
-            directions = [(one, zero, zero, zero), (zero, one, zero, zero),
-                          (zero, zero, zero, one)]
+            directions = [(1, 0, 0, 0), (0, 1, 0, 0),
+                          (0, 0, 0, 1)]
         else:
             assert reference.tdim == 3
             poly = [(a[0], a[1], a[2],
                      a[1], a[3], a[4],
                      a[2], a[4], a[5]) for a in polynomial_set(3, 6, order)]
-            directions = [(one, zero, zero, zero, zero, zero, zero, zero, zero),
-                          (zero, one, zero, zero, zero, zero, zero, zero, zero),
-                          (zero, zero, one, zero, zero, zero, zero, zero, zero),
-                          (zero, zero, zero, zero, one, zero, zero, zero, zero),
-                          (zero, zero, zero, zero, zero, one, zero, zero, zero),
-                          (zero, zero, zero, zero, zero, zero, zero, zero, one)]
+            directions = [(1, 0, 0, 0, 0, 0, 0, 0, 0),
+                          (0, 1, 0, 0, 0, 0, 0, 0, 0),
+                          (0, 0, 1, 0, 0, 0, 0, 0, 0),
+                          (0, 0, 0, 0, 1, 0, 0, 0, 0),
+                          (0, 0, 0, 0, 0, 1, 0, 0, 0),
+                          (0, 0, 0, 0, 0, 0, 0, 0, 1)]
 
         scalar_space = DiscontinuousLagrange(reference, order, variant)
         dofs = []

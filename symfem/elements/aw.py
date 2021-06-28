@@ -9,7 +9,8 @@ from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set
 from ..functionals import (PointInnerProduct, InnerProductIntegralMoment,
                            VecIntegralMoment, IntegralMoment)
-from ..symbolic import zero, one, x
+from ..symbolic import x
+from ..calculus import diff
 from .lagrange import DiscontinuousLagrange
 
 
@@ -26,14 +27,14 @@ class ArnoldWinther(CiarletElement):
                   -k * (order - k + 2) * x[0] ** (k - 1) * x[1] ** (order - k + 1),
                   -k * (k - 1) * x[0] ** (k - 2) * x[1] ** (order - k + 2))
                  for k in range(order + 1)]
-        poly += [(zero, x[0] ** order, x[0] ** order, -order * x[0] ** (order - 1) * x[1]),
-                 (zero, zero, zero, x[0] ** order)]
+        poly += [(0, x[0] ** order, x[0] ** order, -order * x[0] ** (order - 1) * x[1]),
+                 (0, 0, 0, x[0] ** order)]
 
         dofs = []
         for v_n, v in enumerate(reference.vertices):
-            for d in [[(one, zero), (one, zero)],
-                      [(one, zero), (zero, one)],
-                      [(zero, one), (zero, one)]]:
+            for d in [[(1, 0), (1, 0)],
+                      [(1, 0), (0, 1)],
+                      [(0, 1), (0, 1)]]:
                 dofs.append(PointInnerProduct(v, d[0], d[1], entity=(0, v_n),
                                               mapping="double_contravariant"))
         for e_n, edge in enumerate(reference.edges):
@@ -50,15 +51,15 @@ class ArnoldWinther(CiarletElement):
         sub_e = DiscontinuousLagrange(reference, order - 3, variant)
         for dof_n, dof in enumerate(sub_e.dofs):
             p = sub_e.get_basis_function(dof_n)
-            for component in [(one, zero, zero, zero), (zero, one, zero, zero),
-                              (zero, zero, zero, one)]:
+            for component in [(1, 0, 0, 0), (0, 1, 0, 0),
+                              (0, 0, 0, 1)]:
                 dofs.append(VecIntegralMoment(reference, p, component, dof, entity=(2, 0)))
         sub_e = DiscontinuousLagrange(reference, order - 4, variant)
         for p, dof in zip(sub_e.get_basis_functions(), sub_e.dofs):
             if sympy.Poly(p, x[:2]).degree() != order - 4:
                 continue
             f = p * x[0] ** 2 * x[1] ** 2 * (1 - x[0] - x[1]) ** 2
-            J = tuple(f.diff(x[i]).diff(x[j]) for i in range(2) for j in range(2))
+            J = tuple(diff(f, x[i], x[j]) for i in range(2) for j in range(2))
             dofs.append(IntegralMoment(reference, J, dof, entity=(2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,

@@ -5,6 +5,8 @@ from symfem import create_element
 from symfem.finite_element import CiarletElement, DirectElement
 from symfem.symbolic import subs, x, PiecewiseFunction
 from symfem.vectors import vsub
+from symfem.symbolic import to_sympy
+from symfem.calculus import diff
 from .utils import test_elements, all_symequal
 
 
@@ -214,9 +216,9 @@ def test_element_functionals_and_continuity(
                 f = [f]
                 g = [g]
                 for _ in range(order):
-                    deriv_f = [d.diff(i) for d in deriv_f for i in x[:space.reference.tdim]]
+                    deriv_f = [diff(d, i) for d in deriv_f for i in x[:space.reference.tdim]]
                     f += deriv_f
-                    deriv_g = [d.diff(i) for d in deriv_g for i in x[:space.reference.tdim]]
+                    deriv_g = [diff(d, i) for d in deriv_g for i in x[:space.reference.tdim]]
                     g += deriv_g
             elif space.continuity == "H(div)":
                 f = f[0]
@@ -248,8 +250,8 @@ def test_element_functionals_and_continuity(
                 f = f[0]
                 g = g[0]
             elif space.continuity == "integral inner H(div)":
-                f = f[0].integrate((x[1], 0, 1))
-                g = g[0].integrate((x[1], 0, 1))
+                f = f[0].integrate((to_sympy(x[1]), 0, 1))
+                g = g[0].integrate((to_sympy(x[1]), 0, 1))
             else:
                 raise ValueError(f"Unknown continuity: {space.continuity}")
 

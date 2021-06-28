@@ -1,7 +1,7 @@
 """Functions to handle derivatives."""
 
 from .vectors import vdot
-from .symbolic import x, sym_sum
+from .symbolic import x, sym_sum, to_sympy
 
 
 def derivative(f, dir):
@@ -11,28 +11,41 @@ def derivative(f, dir):
 
 def grad(f, dim, variables=x):
     """Find the gradient of a scalar function."""
-    return tuple(f.diff(variables[i]) for i in range(dim))
+    return tuple(diff(f, variables[i]) for i in range(dim))
 
 
 def jacobian_component(f, component):
     """Find a component of the Jacobian."""
-    return f.diff(x[component[0]]).diff(x[component[1]])
+    return diff(f, x[component[0]], x[component[1]])
 
 
 def jacobian(f, dim):
     """Find the Jacobian."""
-    return [[f.diff(x[i]).diff(x[j]) for i in range(dim)] for j in range(dim)]
+    return [[diff(f, x[i], x[j]) for i in range(dim)] for j in range(dim)]
 
 
 def div(f):
     """Find the divergence of a vector function."""
-    return sym_sum(j.diff(x[i]) for i, j in enumerate(f))
+    return sym_sum(diff(j, x[i]) for i, j in enumerate(f))
 
 
 def curl(f):
     """Find the curl of a 3D vector function."""
     return (
-        f[2].diff(x[1]) - f[1].diff(x[2]),
-        f[0].diff(x[2]) - f[2].diff(x[0]),
-        f[1].diff(x[0]) - f[0].diff(x[1])
+        diff(f[2], x[1]) - diff(f[1], x[2]),
+        diff(f[0], x[2]) - diff(f[2], x[0]),
+        diff(f[1], x[0]) - diff(f[0], x[1])
     )
+
+
+def diff(f, *vars):
+    """Calculate the derivative of a function."""
+    if isinstance(f, list):
+        return [diff(i, *vars) for i in f]
+    if isinstance(f, tuple):
+        return tuple(diff(i, *vars) for i in f)
+
+    out = to_sympy(f)
+    for i in vars:
+        out = out.diff(to_sympy(i))
+    return out

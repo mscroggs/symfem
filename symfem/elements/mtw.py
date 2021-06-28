@@ -8,7 +8,7 @@ and https://doi.org/10.1007/s10092-006-0124-6 (Tail, Mardal, 2006)
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set
-from ..symbolic import x, zero, one
+from ..symbolic import x
 from ..calculus import curl
 from ..functionals import NormalIntegralMoment, TangentIntegralMoment, IntegralMoment
 from .lagrange import DiscontinuousLagrange
@@ -27,8 +27,8 @@ class MardalTaiWinther(CiarletElement):
             variant=variant)
 
         if reference.name == "triangle":
-            poly = [(one, zero), (x[0], zero), (x[1], zero),
-                    (zero, one), (zero, x[0]), (zero, x[1]),
+            poly = [(1, 0), (x[0], 0), (x[1], 0),
+                    (0, 1), (0, x[0]), (0, x[1]),
                     # (x**2 + 2*x*y, -2*x*y - y**2)
                     (x[0] ** 2 + 2 * x[0] * x[1],
                      -2 * x[0] * x[1] - x[1] ** 2),

@@ -6,7 +6,7 @@ This element's definition appears in https://doi.org/10.1007/978-3-642-23099-8_3
 
 import sympy
 from itertools import product
-from ..symbolic import x, zero, one
+from ..symbolic import x
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set, quolynomial_set
 from ..functionals import PointEvaluation, DotPointEvaluation
@@ -66,7 +66,7 @@ class BubbleEnrichedLagrange(CiarletElement):
         bubble = Bubble(reference, order + 2, variant)
 
         super().__init__(
-            reference, order, lagrange.basis + bubble.basis,
+            reference, order, lagrange._basis + bubble._basis,
             lagrange.dofs + bubble.dofs, reference.tdim, 1
         )
 
@@ -83,12 +83,12 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
         lagrange = Lagrange(reference, order, variant)
         bubble = Bubble(reference, order + 2, variant)
 
-        basis = [(i, zero) for i in lagrange.basis + bubble.basis]
-        basis += [(zero, i) for i in lagrange.basis + bubble.basis]
+        basis = [(i, 0) for i in lagrange._basis + bubble._basis]
+        basis += [(0, i) for i in lagrange._basis + bubble._basis]
 
         dofs = [DotPointEvaluation(d.point, v, entity=d.entity)
                 for d in lagrange.dofs + bubble.dofs
-                for v in [(one, zero), (zero, one)]]
+                for v in [(1, 0), (0, 1)]]
 
         super().__init__(reference, order, basis, dofs, reference.tdim, 2)
 

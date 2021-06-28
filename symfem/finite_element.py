@@ -1,9 +1,11 @@
 """Abstract finite element classes and functions."""
 
 import sympy
+import warnings
 import numpy
-from .symbolic import x, zero, subs, sym_sum, PiecewiseFunction
+from .symbolic import x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float
 from .basis_function import ElementBasisFunction
+from .legendre import evaluate_legendre_basis, get_legendre_basis
 
 
 class FiniteElement:
@@ -32,7 +34,10 @@ class FiniteElement:
 
     def tabulate_basis(self, points, order="xyzxyz", symbolic=True):
         """Evaluate the basis functions of the element at the given points."""
-        assert symbolic
+        if not symbolic:
+            warnings.warn("Converting from symbolic to float. This may be slow.")
+            return numpy.array([to_float(self.tabulate_basis(points, order=order,
+                                                             symbolic=True))])
 
         if self.range_dim == 1:
             output = []
@@ -90,51 +95,93 @@ class CiarletElement(FiniteElement):
                  range_shape=None):
         super().__init__(reference, order, len(dofs), domain_dim, range_dim, range_shape)
         assert len(basis) == len(dofs)
-        self.basis = basis
+        self._basis = basis
         self.dofs = dofs
         self._basis_functions = None
         self._reshaped_basis_functions = None
         self._dual_inv = None
+        self._dual_inv_legendre = None
+
+    @property
+    def _can_use_legendre(self):
+        return evaluate_legendre_basis(numpy.array(self.reference.vertices), self._basis,
+                                       self.reference) is not None
 
     def entity_dofs(self, entity_dim, entity_number):
         """Get the numbers of the DOFs associated with the given entity."""
         return [i for i, j in enumerate(self.dofs) if j.entity == (entity_dim, entity_number)]
 
-    def get_polynomial_basis(self, reshape=True):
-        """Get the polynomial basis for the element."""
+    def get_polynomial_basis(self, reshape=True, use_legendre=False):
+        """Get the symbolic polynomial basis for the element."""
+        if use_legendre and not self._can_use_legendre:
+            use_legendre = False
+            warnings.warn("Cannot calculate Legendre basis for this element. "
+                          "Using standard basis instead.")
+        if use_legendre:
+            basis = [to_sympy(i) for i in get_legendre_basis(self._basis, self.reference)]
+        else:
+            basis = [to_sympy(i) for i in self._basis]
+
         if reshape and self.range_shape is not None:
             if len(self.range_shape) != 2:
                 raise NotImplementedError
             assert self.range_shape[0] * self.range_shape[1] == self.range_dim
             return [sympy.Matrix(
                 [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
-                 for i in range(self.range_shape[0])]) for b in self.basis]
+                 for i in range(self.range_shape[0])]) for b in basis]
+        return basis
 
-        return self.basis
-
-    def tabulate_basis(self, points, order="xyzxyz", symbolic=True):
-        """Evaluate the basis functions of the element at the given points."""
+    def get_tabulated_polynomial_basis(self, points, symbolic=True, use_legendre=False):
+        """Get the value of the polynomial basis at the given points."""
+        if use_legendre and not self._can_use_legendre:
+            use_legendre = False
+            warnings.warn("Cannot calculate Legendre basis for this element. "
+                          "Using standard basis instead.")
         if symbolic:
-            return super().tabulate_basis(points, order, symbolic)
+            return [
+                [subs(f, x, p) for f in self.get_polynomial_basis(
+                    use_legendre=use_legendre)]
+                for p in points]
+        else:
+            if use_legendre:
+                return evaluate_legendre_basis(points, self._basis, self.reference)
+            else:
+                return numpy.array([
+                    [to_float(subs(f, x, p)) for f in self.get_polynomial_basis(
+                        use_legendre=use_legendre)]
+                    for p in points])
+
+    def tabulate_basis(self, points, order="xyzxyz", symbolic=True, use_legendre=False):
+        """Evaluate the basis functions of the element at the given points."""
+        if use_legendre and not self._can_use_legendre:
+            use_legendre = False
+            warnings.warn("Cannot calculate Legendre basis for this element. "
+                          "Using standard basis instead.")
+
+        if symbolic:
+            return super().tabulate_basis(points, order, symbolic=True)
 
         assert not symbolic
 
-        if self._dual_inv is None:
-            dual_mat = self.get_dual_matrix(symbolic=False)
-            self._dual_inv = numpy.linalg.inv(dual_mat)
+        tabulated_polyset = self.get_tabulated_polynomial_basis(
+            points, symbolic=False, use_legendre=use_legendre)
+
+        if use_legendre:
+            if self._dual_inv_legendre is None:
+                dual_mat = self.get_dual_matrix(symbolic=False, use_legendre=True)
+                self._dual_inv_legendre = numpy.linalg.inv(dual_mat)
+            dual_inv = self._dual_inv_legendre
+        else:
+            if self._dual_inv is None:
+                dual_mat = self.get_dual_matrix(symbolic=False, use_legendre=False)
+                self._dual_inv = numpy.linalg.inv(dual_mat)
+            dual_inv = self._dual_inv
 
         if self.range_dim == 1:
-            tabulated_polyset = numpy.array([
-                [float(subs(f, x, p)) for f in self.basis]
-                for p in points])
-            return numpy.dot(tabulated_polyset, self._dual_inv.transpose())
-
-        tabulated_polyset = numpy.array([
-            [tuple(float(i) for i in subs(f, x, p)) for f in self.basis]
-            for p in points])
+            return numpy.dot(tabulated_polyset, dual_inv.transpose())
 
         results = numpy.array([
-            numpy.dot(tabulated_polyset[:, :, i], self._dual_inv.transpose())
+            numpy.dot(tabulated_polyset[:, :, i], dual_inv.transpose())
             for i in range(tabulated_polyset.shape[2])
         ])
         # results[xyz][point][function]
@@ -159,18 +206,32 @@ class CiarletElement(FiniteElement):
             ])
         raise ValueError(f"Unknown order: {order}")
 
-    def get_dual_matrix(self, symbolic=True):
+    def get_dual_matrix(self, symbolic=True, use_legendre=False):
         """Get the dual matrix."""
-        mat = []
-        for b in self.basis:
-            row = []
-            for d in self.dofs:
-                row.append(d.eval(b))
-            mat.append(row)
         if symbolic:
+            mat = []
+            for b in self.get_polynomial_basis(use_legendre=use_legendre):
+                row = []
+                for d in self.dofs:
+                    row.append(to_sympy(d).eval(to_sympy(b), symbolic=symbolic))
+                mat.append(row)
             return sympy.Matrix(mat)
+
         else:
-            return numpy.array([[float(j) for j in i] for i in mat])
+            for d in self.dofs:
+                if d.get_points_and_weights is None:
+                    warnings.warn("Cannot numerically evaluate all the DOFs in this element. "
+                                  "Converting symbolic evaluations instead (this may be slow).")
+                    mat = self.get_dual_matrix(symbolic=True, use_legendre=use_legendre)
+                    return numpy.array(
+                        [[float(j) for j in mat.row(i)] for i in range(mat.rows)]
+                    )
+            mat = numpy.empty((len(self.dofs), len(self.dofs)))
+            for i, d in enumerate(self.dofs):
+                p, w = d.get_points_and_weights()
+                mat[:, i] = numpy.dot(w, self.get_tabulated_polynomial_basis(
+                    p, symbolic=False, use_legendre=use_legendre))
+            return mat
 
     def get_basis_functions(self, reshape=True):
         """Get the basis functions of the element."""
@@ -181,12 +242,14 @@ class CiarletElement(FiniteElement):
                 # Scalar space
                 for i, dof in enumerate(self.dofs):
                     self._basis_functions.append(
-                        sym_sum(c * d for c, d in zip(minv.row(i), self.basis)))
+                        sym_sum(c * d for c, d in zip(
+                            minv.row(i),
+                            self.get_polynomial_basis())))
             else:
                 # Vector space
                 for i, dof in enumerate(self.dofs):
-                    b = [zero for i in self.basis[0]]
-                    for c, d in zip(minv.row(i), self.basis):
+                    b = [0 for i in self.get_polynomial_basis()[0]]
+                    for c, d in zip(minv.row(i), self.get_polynomial_basis()):
                         for j, d_j in enumerate(d):
                             b[j] += c * d_j
                     self._basis_functions.append(b)
