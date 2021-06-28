@@ -293,6 +293,9 @@ def get_legendre_basis(basis, reference):
     elif reference.name == "hexahedron":
         _legendre_hexahedron(max_order, pts, leg, set_leg, divide)
 
+    if len(basis) == len(legendre):
+        return legendre
+
     polys = []
     for i, b in enumerate(basis):
         polys.append(legendre[get_index(reference.name, b.indices, max_order)])
