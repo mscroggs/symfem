@@ -28,9 +28,14 @@ def make_lattice(cell, N=3):
                          for k in range(N + 1 - max(i, j))])
 
 
-@pytest.mark.parametrize("order", range(1, 10))
-@pytest.mark.parametrize("cell", ["interval", "triangle", "tetrahedron", "quadrilateral",
-                                  "hexahedron", "prism", "pyramid"])
+max_orders = {"interval": 10, "triangle": 8, "tetrahedron": 5, "quadrilateral": 8, "hexahedron": 5,
+               "prism": 5, "pyramid": 5}
+
+
+@pytest.mark.parametrize(
+    ("cell", "order"),
+    [(c, o) for c in ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron",
+                      "prism", "pyramid"] for o in range(1, max_orders[c])])
 def test_legendre(cell, order):
     e = create_element(cell, "Lagrange", order)
     points = make_lattice(cell)
@@ -44,18 +49,12 @@ def test_legendre(cell, order):
 
     values2 = np.array([[to_float(subs(b, x, p)) for b in basis] for p in points])
 
-    print(values)
-    print(basis)
-    print(values2)
     assert np.allclose(values, values2)
 
 
 @pytest.mark.parametrize("cell", ["interval", "triangle", "tetrahedron", "quadrilateral",
                                   "hexahedron", "prism", "pyramid"])
 def test_orthogonal(cell):
-    if cell not in ["interval", "quadrilateral", "hexahedron"]:
-        pytest.xfail()
-
     if cell == "interval":
         e = create_element(cell, "Lagrange", 5)
     else:
