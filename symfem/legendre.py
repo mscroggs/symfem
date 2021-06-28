@@ -50,7 +50,7 @@ def get_min_order(basis, refname):
 
 
 def _jrc(a, n, divide):
-    """Coefficients in Jacobi polynomial recurrence relation"""
+    """Coefficients in Jacobi polynomial recurrence relation."""
     return (
         divide((a + 2 * n + 1) * (a + 2 * n + 2), 2 * (n + 1) * (a + n + 1)),
         divide(a * a * (a + 2 * n + 1), 2 * (n + 1) * (a + n + 1) * (a + 2 * n)),
