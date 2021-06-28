@@ -29,7 +29,7 @@ def make_lattice(cell, N=3):
 
 
 max_orders = {"interval": 10, "triangle": 8, "tetrahedron": 5, "quadrilateral": 8, "hexahedron": 5,
-               "prism": 5, "pyramid": 5}
+              "prism": 5, "pyramid": 5}
 
 
 @pytest.mark.parametrize(
