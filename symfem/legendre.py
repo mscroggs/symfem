@@ -236,26 +236,8 @@ def evaluate_legendre_basis(points, basis, reference):
     elif reference.name == "hexahedron":
         _legendre_hexahedron(max_order, pts, leg, set_leg, divide)
 
-    else:
-        ldims = [numpy.empty((len(points), num_polynomials("interval", max_order)))
-                 for i in range(reference.tdim)]
-        for i in range(reference.tdim):
-            ldims[i][:, 0] = 1
-            if max_order > 0:
-                ldims[i][:, 1] = 2 * points[:, i] - 1
-            for n in range(1, max_order):
-                ldims[i][:, n + 1] = (2 * n + 1) * ldims[i][:, 1] * ldims[i][:, n]
-                ldims[i][:, n + 1] -= n * ldims[i][:, n - 1]
-                ldims[i][:, n + 1] /= n + 1
-
-        if reference.tdim == 1:
-            legendre = ldims[0]
-        if reference.tdim == 2:
-            legendre = numpy.empty((len(points), num_p))
-            for o in range(max_order + 1):
-                for i in range(o + 1):
-                    index = get_index(reference.name, (i, o - i, 0), max_order)
-                    legendre[:, index] = ldims[0][:, i] * ldims[1][:, o - i]
+    if len(basis) == legendre.shape[1]:
+        return legendre
 
     polys = numpy.empty((len(points), len(basis)))
     for i, b in enumerate(basis):
