@@ -9,12 +9,12 @@ def get_index(refname, indices, max_order):
     if refname == "interval":
         return indices[0]
     if refname == "triangle":
-        return sum(indices[:2]) * (sum(indices[:2]) + 1) // 2 + indices[0]
+        return sum(indices) * (sum(indices) + 1) // 2 + indices[1]
     if refname == "quadrilateral":
         return indices[1] * (max_order + 1) + indices[0]
-#    if refname == "tetrahedron":
-#        return (sum(indices) * (sum(indices) + 1) * (sum(indices) + 2) // 6
-#                + sum(indices[:2]) * (sum(indices[:2]) + 1) // 2 + indices[0])
+    if refname == "tetrahedron":
+        return (sum(indices) * (sum(indices) + 1) * (sum(indices) + 2) // 6
+                + sum(indices[1:]) * (sum(indices[1:]) + 1) // 2 + indices[2])
     if refname == "hexahedron":
         return indices[2] * (max_order + 1) ** 2 + indices[1] * (max_order + 1) + indices[0]
 
@@ -27,8 +27,8 @@ def num_polynomials(refname, max_order):
         return (max_order + 1) * (max_order + 2) // 2
     if refname == "quadrilateral":
         return (max_order + 1) ** 2
-#    if refname == "tetrahedron":
-#        return (max_order + 1) * (max_order + 2) * (max_order + 3) // 6
+    if refname == "tetrahedron":
+        return (max_order + 1) * (max_order + 2) * (max_order + 3) // 6
     if refname == "hexahedron":
         return (max_order + 1) ** 3
 
@@ -49,6 +49,15 @@ def get_min_order(basis, refname):
         return min(max(i.indices) for i in basis)
 
 
+def _jrc(a, n, divide):
+    """Coefficients in Jacobi polynomial recurrence relation"""
+    return (
+        divide((a + 2 * n + 1) * (a + 2 * n + 2), 2 * (n + 1) * (a + n + 1)),
+        divide(a * a * (a + 2 * n + 1), 2 * (n + 1) * (a + n + 1) * (a + 2 * n)),
+        divide(n * (a + n) * (a + 2 * n + 2), (n + 1) * (a + n + 1) * (a + 2 * n))
+    )
+
+
 def _legendre_interval(max_order, pts, leg, set_leg, divide):
     """Compute Legendre polynomials on an interval."""
     set_leg(0, 1)
@@ -56,6 +65,63 @@ def _legendre_interval(max_order, pts, leg, set_leg, divide):
         set_leg(1, 2 * pts(0) - 1)
     for n in range(1, max_order):
         set_leg(n + 1, ((2 * n + 1) * leg(1) * leg(n) - n * leg(n - 1)) / (n + 1))
+
+
+def _legendre_quadrilateral(max_order, pts, leg, set_leg, divide):
+    """Compute Legendre polynomials on a quadrilateral."""
+
+    def ind(a, b):
+        return get_index("quadrilateral", (a, b), max_order)
+
+    def pts1(i):
+        return pts(1 + i)
+
+    def leg1(i):
+        return leg(ind(0, i))
+
+    def set_leg1(i, value):
+        set_leg(ind(0, i), value)
+
+    _legendre_interval(max_order, pts, leg, set_leg, divide)
+    _legendre_interval(max_order, pts1, leg1, set_leg1, divide)
+
+    for i in range(1, max_order + 1):
+        for j in range(1, max_order + 1):
+            set_leg(ind(i, j), leg(ind(i, 0)) * leg(ind(0, j)))
+
+
+def _legendre_hexahedron(max_order, pts, leg, set_leg, divide):
+    """Compute Legendre polynomials on a hexahedron."""
+
+    def ind(a, b, c):
+        return get_index("hexahedron", (a, b, c), max_order)
+
+    def pts1(i):
+        return pts(1 + i)
+
+    def leg1(i):
+        return leg(ind(0, i, 0))
+
+    def set_leg1(i, value):
+        set_leg(ind(0, i, 0), value)
+
+    def pts2(i):
+        return pts(2 + i)
+
+    def leg2(i):
+        return leg(ind(0, 0, i))
+
+    def set_leg2(i, value):
+        set_leg(ind(0, 0, i), value)
+
+    _legendre_interval(max_order, pts, leg, set_leg, divide)
+    _legendre_interval(max_order, pts1, leg1, set_leg1, divide)
+    _legendre_interval(max_order, pts2, leg2, set_leg2, divide)
+
+    for i in range(max_order + 1):
+        for j in range(max_order + 1):
+            for k in range(max_order + 1):
+                set_leg(ind(i, j, k), leg(ind(i, 0, 0)) * leg(ind(0, j, 0)) * leg(ind(0, 0, k)))
 
 
 def _legendre_triangle(max_order, pts, leg, set_leg, divide):
@@ -79,57 +145,51 @@ def _legendre_triangle(max_order, pts, leg, set_leg, divide):
         set_leg(ind(p, 1),
                 leg(ind(p, 0)) * ((pts(1) * 2 - 1) * (divide(3, 2) + p) + divide(1, 2) + p))
         for q in range(1, max_order - p):
-            a1 = divide((p + q + 1) * (2 * p + 2 * q + 3),
-                        (q + 1) * (2 * p + q + 2))
-            a2 = divide((2 * p + 1) ** 2 * (p + q + 1),
-                        (q + 1) * (2 * p + q + 2) * (2 * p + 2 * q + 1))
-            a3 = divide(q * (2 * p + q + 1) * (2 * p + 2 * q + 3),
-                        (q + 1) * (2 * p + q + 2) * (2 * p + 2 * q + 1))
-
+            a1, a2, a3 = _jrc(2 * p + 1, q, divide)
             set_leg(ind(p, q + 1),
-                    leg(ind(p, q)) * ((pts(1) * 2 - 1) * a1 + a2)
-                    - leg(ind(p, q - 1)) * a3)
+                    leg(ind(p, q)) * ((pts(1) * 2 - 1) * a1 + a2) - leg(ind(p, q - 1)) * a3)
 
 
-def _evaluate_legendre_interval(points, max_order):
-    """Evaluate the Legendre polynomials (non-symbolically) at the given points in an interval."""
-    legendre = numpy.empty((len(points), num_polynomials("interval", max_order)))
+def _legendre_tetrahedron(max_order, pts, leg, set_leg, divide):
+    """Compute Legendre polynomials on a tetrahedron."""
 
-    def pts(i):
-        return points[:, i]
+    def ind(a, b, c):
+        return get_index("tetrahedron", (a, b, c), max_order)
 
-    def leg(i):
-        return legendre[:, i]
+    set_leg(0, 1)
 
-    def set_leg(i, value):
-        legendre[:, i] = value
+    for p in range(1, max_order + 1):
+        a = divide(2 * p - 1, p)
+        if p > 1:
+            set_leg(ind(p, 0, 0),
+                    (pts(0) * 2 + pts(1) + pts(2) - 1) * leg(ind(p - 1, 0, 0)) * a
+                    - (pts(1) + pts(2) - 1) ** 2 * leg(ind(p - 2, 0, 0)) * (a - 1))
+        else:
+            set_leg(ind(p, 0, 0),
+                    (pts(0) * 2 + pts(1) + pts(2) - 1) * leg(ind(p - 1, 0, 0)) * a)
 
-    def divide(a, b):
-        return a / b
+    for p in range(max_order):
+        set_leg(ind(p, 1, 0),
+                leg(ind(p, 0, 0)) * (pts(1) * (3 + 2 * p) + pts(2) - 1))
 
-    _legendre_interval(max_order, pts, leg, set_leg, divide)
-    return legendre
+        for q in range(1, max_order - p):
+            a1, a2, a3 = _jrc(2 * p + 1, q, divide)
+            set_leg(ind(p, q + 1, 0),
+                    leg(ind(p, q, 0)) * (pts(1) * 2 * a1 + (pts(2) - 1) * (a1 - a2))
+                    - leg(ind(p, q - 1, 0)) * (1 - pts(2)) ** 2 * a3)
 
+    for p in range(max_order):
+        for q in range(max_order - p):
+            set_leg(ind(p, q, 1),
+                    leg(ind(p, q, 0)) * ((1 + p + q) + (pts(2) * 2 - 1) * (2 + p + q)))
 
-def _evaluate_legendre_triangle(points, max_order):
-    """Evaluate the Legendre polynomials (non-symbolically) at the given points in a triangle."""
-    legendre = numpy.empty((len(points), num_polynomials("triangle", max_order)))
-
-    def pts(i):
-        return points[:, i]
-
-    def leg(i):
-        return legendre[:, i]
-
-    def set_leg(i, value):
-        legendre[:, i] = value
-
-    def divide(a, b):
-        return a / b
-
-    _legendre_triangle(max_order, pts, leg, set_leg, divide)
-
-    return legendre
+    for p in range(max_order - 1):
+        for q in range(max_order - p - 1):
+            for r in range(1, max_order - p - q):
+                a1, a2, a3 = _jrc(2 * p + 2 * q + 2, r, divide)
+                set_leg(ind(p, q, r + 1),
+                        leg(ind(p, q, r)) * ((pts(2) * 2 - 1) * a1 + a2)
+                        - leg(ind(p, q, r - 1)) * a3)
 
 
 def evaluate_legendre_basis(points, basis, reference):
@@ -147,28 +207,34 @@ def evaluate_legendre_basis(points, basis, reference):
     if num_p is None:
         return None
 
+    legendre = numpy.empty((len(points), num_polynomials(reference.name, max_order)))
+
+    def pts(i):
+        return points[:, i]
+
+    def leg(i):
+        return legendre[:, i]
+
+    def set_leg(i, value):
+        legendre[:, i] = value
+
+    def divide(a, b):
+        return a / b
+
     if reference.name == "interval":
-        legendre = _evaluate_legendre_interval(points, max_order)
-
-    elif reference.name == "quadrilateral":
-        ldims = [_evaluate_legendre_interval(points[:, i:i+1], max_order) for i in range(2)]
-        legendre = numpy.empty((len(points), num_p))
-        for i in range(max_order + 1):
-            for j in range(max_order + 1):
-                index = get_index(reference.name, (i, j, 0), max_order)
-                legendre[:, index] = ldims[0][:, i] * ldims[1][:, j]
-
-    elif reference.name == "hexahedron":
-        ldims = [_evaluate_legendre_interval(points[:, i:i+1], max_order) for i in range(3)]
-        legendre = numpy.empty((len(points), num_p))
-        for i in range(max_order + 1):
-            for j in range(max_order + 1):
-                for k in range(max_order + 1):
-                    index = get_index(reference.name, (i, j, k), max_order)
-                    legendre[:, index] = ldims[0][:, i] * ldims[1][:, j] * ldims[2][:, k]
+        _legendre_interval(max_order, pts, leg, set_leg, divide)
 
     elif reference.name == "triangle":
-        legendre = _evaluate_legendre_triangle(points, max_order)
+        _legendre_triangle(max_order, pts, leg, set_leg, divide)
+
+    elif reference.name == "tetrahedron":
+        _legendre_tetrahedron(max_order, pts, leg, set_leg, divide)
+
+    elif reference.name == "quadrilateral":
+        _legendre_quadrilateral(max_order, pts, leg, set_leg, divide)
+
+    elif reference.name == "hexahedron":
+        _legendre_hexahedron(max_order, pts, leg, set_leg, divide)
 
     else:
         ldims = [numpy.empty((len(points), num_polynomials("interval", max_order)))
@@ -198,49 +264,6 @@ def evaluate_legendre_basis(points, basis, reference):
     return polys
 
 
-def _get_legendre_interval(variable, max_order):
-    """Get the Legendre polynomials for an interval."""
-    legendre = [0 for i in range(num_polynomials("interval", max_order))]
-
-    def pts(i):
-        assert i == 0
-        return variable
-
-    def leg(i):
-        return legendre[i]
-
-    def set_leg(i, value):
-        legendre[i] = value
-
-    def divide(a, b):
-        return sympy.Rational(a, b)
-
-    _legendre_interval(max_order, pts, leg, set_leg, divide)
-
-    return legendre
-
-
-def _get_legendre_triangle(variables, max_order):
-    """Get the Legendre polynomials for a triangle."""
-    legendre = [0 for i in range(num_polynomials("triangle", max_order))]
-
-    def pts(i):
-        return variables[i]
-
-    def leg(i):
-        return legendre[i]
-
-    def set_leg(i, value):
-        legendre[i] = value
-
-    def divide(a, b):
-        return sympy.Rational(a, b)
-
-    _legendre_triangle(max_order, pts, leg, set_leg, divide)
-
-    return legendre
-
-
 def get_legendre_basis(basis, reference):
     """Get the symbolic Legendre basis spanning the same set as the given basis."""
     for i, j in enumerate(basis):
@@ -259,46 +282,34 @@ def get_legendre_basis(basis, reference):
     if num_p is None:
         return None
 
+    legendre = [0 for i in range(num_polynomials(reference.name, max_order))]
+
+    def pts(i):
+        return x[i]
+
+    def leg(i):
+        return legendre[i]
+
+    def set_leg(i, value):
+        legendre[i] = value
+
+    def divide(a, b):
+        return sympy.Rational(a, b)
+
     if reference.name == "interval":
-        legendre = _get_legendre_interval(x[0], max_order)
-
-    elif reference.name == "quadrilateral":
-        ldims = [_get_legendre_interval(x[i], max_order) for i in range(2)]
-        legendre = []
-        for j in range(max_order + 1):
-            for i in range(max_order + 1):
-                assert len(legendre) == get_index(reference.name, (i, j, 0), max_order)
-                legendre.append(ldims[0][i] * ldims[1][j])
-
-    elif reference.name == "hexahedron":
-        ldims = [_get_legendre_interval(x[i], max_order) for i in range(3)]
-        legendre = []
-        for k in range(max_order + 1):
-            for j in range(max_order + 1):
-                for i in range(max_order + 1):
-                    assert len(legendre) == get_index(reference.name, (i, j, k), max_order)
-                    legendre.append(ldims[0][i] * ldims[1][j] * ldims[2][k])
+        _legendre_interval(max_order, pts, leg, set_leg, divide)
 
     elif reference.name == "triangle":
-        legendre = _get_legendre_triangle(x, max_order)
+        _legendre_triangle(max_order, pts, leg, set_leg, divide)
 
-    else:
-        ldims = [[] for i in range(reference.tdim)]
-        for i in range(reference.tdim):
-            ldims[i].append(1)
-            if max_order > 0:
-                ldims[i].append(2 * x[i] - 1)
-            for n in range(1, max_order):
-                f = ((2 * n + 1) * ldims[i][1] * ldims[i][-1] - n * ldims[i][-2]) / (n + 1)
-                ldims[i].append(f.expand())
+    elif reference.name == "tetrahedron":
+        _legendre_tetrahedron(max_order, pts, leg, set_leg, divide)
 
-        if reference.tdim == 1:
-            legendre = ldims[0]
-        if reference.tdim == 2:
-            legendre = []
-            for o in range(max_order + 1):
-                for i in range(o + 1):
-                    legendre.append(ldims[0][i] * ldims[1][o - i])
+    elif reference.name == "quadrilateral":
+        _legendre_quadrilateral(max_order, pts, leg, set_leg, divide)
+
+    elif reference.name == "hexahedron":
+        _legendre_hexahedron(max_order, pts, leg, set_leg, divide)
 
     polys = []
     for i, b in enumerate(basis):
