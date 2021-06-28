@@ -47,6 +47,9 @@ def test_legendre(cell, order):
         assert values is None
         pytest.skip()
 
+    for b in basis:
+        assert b != 0
+
     values2 = np.array([[to_float(subs(b, x, p)) for b in basis] for p in points])
 
     assert np.allclose(values, values2)

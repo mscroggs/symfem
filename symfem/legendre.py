@@ -17,6 +17,9 @@ def get_index(refname, indices, max_order):
                 + sum(indices[1:]) * (sum(indices[1:]) + 1) // 2 + indices[2])
     if refname == "hexahedron":
         return indices[2] * (max_order + 1) ** 2 + indices[1] * (max_order + 1) + indices[0]
+    if refname == "prism":
+        return ((max_order + 2) * (max_order + 1) * indices[2] // 2
+                + sum(indices[:2]) * (sum(indices[:2]) + 1) // 2 + indices[1])
 
 
 def num_polynomials(refname, max_order):
@@ -31,6 +34,8 @@ def num_polynomials(refname, max_order):
         return (max_order + 1) * (max_order + 2) * (max_order + 3) // 6
     if refname == "hexahedron":
         return (max_order + 1) ** 3
+    if refname == "prism":
+        return (max_order + 1) ** 2 * (max_order + 2) // 2
 
 
 def get_max_order(basis, refname):
@@ -39,6 +44,8 @@ def get_max_order(basis, refname):
         return max(sum(i.indices) for i in basis)
     if refname in ["quadrilateral", "hexahedron"]:
         return max(max(i.indices) for i in basis)
+    if refname == "prism":
+        return max(max(sum(i.indices[:2]), i.indices[2]) for i in basis)
 
 
 def get_min_order(basis, refname):
@@ -47,6 +54,8 @@ def get_min_order(basis, refname):
         return min(sum(i.indices) for i in basis)
     if refname in ["quadrilateral", "hexahedron"]:
         return min(max(i.indices) for i in basis)
+    if refname == "prism":
+        return min(max(sum(i.indices[:2]), i.indices[2]) for i in basis)
 
 
 def _jrc(a, n, divide):
@@ -122,6 +131,30 @@ def _legendre_hexahedron(max_order, pts, leg, set_leg, divide):
         for j in range(max_order + 1):
             for k in range(max_order + 1):
                 set_leg(ind(i, j, k), leg(ind(i, 0, 0)) * leg(ind(0, j, 0)) * leg(ind(0, 0, k)))
+
+
+def _legendre_prism(max_order, pts, leg, set_leg, divide):
+    """Compute Legendre polynomials on a prism."""
+
+    def ind(a, b, c):
+        return get_index("prism", (a, b, c), max_order)
+
+    def pts2(i):
+        return pts(2 + i)
+
+    def leg2(i):
+        return leg(ind(0, 0, i))
+
+    def set_leg2(i, value):
+        set_leg(ind(0, 0, i), value)
+
+    _legendre_triangle(max_order, pts, leg, set_leg, divide)
+    _legendre_interval(max_order, pts2, leg2, set_leg2, divide)
+
+    for i in range(max_order + 1):
+        for j in range(max_order - i + 1):
+            for k in range(max_order + 1):
+                set_leg(ind(i, j, k), leg(ind(i, j, 0)) * leg(ind(0, 0, k)))
 
 
 def _legendre_triangle(max_order, pts, leg, set_leg, divide):
@@ -223,18 +256,16 @@ def evaluate_legendre_basis(points, basis, reference):
 
     if reference.name == "interval":
         _legendre_interval(max_order, pts, leg, set_leg, divide)
-
     elif reference.name == "triangle":
         _legendre_triangle(max_order, pts, leg, set_leg, divide)
-
     elif reference.name == "tetrahedron":
         _legendre_tetrahedron(max_order, pts, leg, set_leg, divide)
-
     elif reference.name == "quadrilateral":
         _legendre_quadrilateral(max_order, pts, leg, set_leg, divide)
-
     elif reference.name == "hexahedron":
         _legendre_hexahedron(max_order, pts, leg, set_leg, divide)
+    elif reference.name == "prism":
+        _legendre_prism(max_order, pts, leg, set_leg, divide)
 
     if len(basis) == legendre.shape[1]:
         return legendre
@@ -280,18 +311,16 @@ def get_legendre_basis(basis, reference):
 
     if reference.name == "interval":
         _legendre_interval(max_order, pts, leg, set_leg, divide)
-
     elif reference.name == "triangle":
         _legendre_triangle(max_order, pts, leg, set_leg, divide)
-
     elif reference.name == "tetrahedron":
         _legendre_tetrahedron(max_order, pts, leg, set_leg, divide)
-
     elif reference.name == "quadrilateral":
         _legendre_quadrilateral(max_order, pts, leg, set_leg, divide)
-
     elif reference.name == "hexahedron":
         _legendre_hexahedron(max_order, pts, leg, set_leg, divide)
+    elif reference.name == "prism":
+        _legendre_prism(max_order, pts, leg, set_leg, divide)
 
     if len(basis) == len(legendre):
         return legendre
