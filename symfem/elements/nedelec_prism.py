@@ -23,8 +23,6 @@ class Nedelec(CiarletElement):
                  for i in polynomial_set_1d(2, order, x[:2])
                  for j in polynomial_set_1d(1, order - 1, x[2:])]
 
-        print(poly)
-
         dofs = make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, DiscontinuousLagrange, order - 1),
