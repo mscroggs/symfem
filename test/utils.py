@@ -32,6 +32,7 @@ test_elements = {
         "bubble enriched vector Lagrange":
             {"equispaced": range(1, 3), "lobatto": range(1, 3)},
         "CR": {"equispaced": [1, 3, 5]},
+        "conforming CR": {"equispaced": range(1, 6)},
         "HHJ": {"equispaced": range(3)},
         "Bell": {"equispaced": [5]},
         "Morley": {None: [2]},

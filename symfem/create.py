@@ -143,6 +143,7 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
         matrix discontinuous Lagrange,
         symmetric matrix discontinuous Lagrange,
         Crouzeix-Raviart, CR, Crouzeix-Falk, CF,
+        conforming Crouzeix-Raviart, conforming CR,
         serendipity, S,
         serendipity Hcurl, Scurl, BDMCE, AAE,
         serendipity Hdiv, Sdiv, BDMCF, AAF,
