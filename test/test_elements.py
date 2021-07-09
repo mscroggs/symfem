@@ -151,7 +151,7 @@ def test_element_functionals_and_continuity(
         vertices = ((-1, ), (0, ))
         entity_pairs = [[0, (0, 1)]]
     elif cell_type == "triangle":
-        vertices = ((-1, 2), (0, 0), (0, 1))
+        vertices = ((-1, 0), (0, 0), (0, 1))
         entity_pairs = [[0, (0, 1)], [0, (2, 2)], [1, (1, 0)]]
     elif cell_type == "tetrahedron":
         vertices = ((-1, 0, 0), (0, 0, 0), (0, 1, 0), (0, 0, 1))
@@ -190,13 +190,6 @@ def test_element_functionals_and_continuity(
                 basis2 = space.map_to_cell(vertices)
             except NotImplementedError:
                 pytest.xfail("Mapping not implemented for this element yet")
-            if space.names[0] == "Bernardi-Raugel":
-                # TODO: remove this hack
-                if space.reference.name == "triangle":
-                    basis2[4], basis2[5] = basis2[5], basis2[4]
-                if space.reference.name == "tetrahedron":
-                    basis2[6], basis2[7] = basis2[7], basis2[6]
-                    basis2[9], basis2[10] = basis2[10], basis2[9]
 
             f = basis[fi]
             g = basis2[gi]

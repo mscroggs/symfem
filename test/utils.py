@@ -77,7 +77,7 @@ test_elements = {
         "BDM": {"equispaced": range(1, 3)},
         "Bernstein": {None: range(1, 3)},
         "Taylor": {None: range(0, 5)},
-        "Bernardi-Raugel": {None: [1]},
+        "Bernardi-Raugel": {None: [1, 2]},
         "Wu-Xu": {None: [4]},
     },
     "quadrilateral": {

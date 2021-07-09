@@ -3,7 +3,7 @@ import sympy
 import numpy
 from .symbolic import subs, x, t, PiecewiseFunction, sym_sum, to_sympy, to_float
 from .vectors import vdot
-from .calculus import derivative, jacobian_component, grad, diff
+from .calculus import derivative, jacobian_component, grad, diff, div
 from . import mappings
 
 
@@ -440,6 +440,28 @@ class DerivativeIntegralMoment(IntegralMoment):
             return to_float(value)
 
     name = "Derivative integral moment"
+
+
+class DivergenceIntegralMoment(IntegralMoment):
+    """An integral moment of the divergence of a vector function."""
+
+    def __init__(self, reference, f, dof, entity=(None, None), mapping="identity"):
+        super().__init__(reference, f, dof, entity=entity, mapping=mapping)
+
+    def eval(self, function, symbolic=True):
+        """Apply to the functional to a function."""
+        point = [i for i in self.reference.origin]
+        for i, a in enumerate(zip(*self.reference.axes)):
+            for j, k in zip(a, t):
+                point[i] += j * k
+        integrand = self.dot(subs(div(function), x, point))
+        value = self.reference.integral(integrand)
+        if symbolic:
+            return value
+        else:
+            return to_float(value)
+
+    name = "Integral moment of divergence"
 
 
 class TangentIntegralMoment(VecIntegralMoment):
