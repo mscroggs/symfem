@@ -6,16 +6,6 @@ from .finite_element import FiniteElement as _FiniteElement
 
 _folder = _os.path.dirname(_os.path.realpath(__file__))
 
-if _os.path.isfile(_os.path.join(_folder, "../VERSION")):
-    # If running from folder
-    _v_folder = _os.path.join(_folder, "..")
-else:
-    # If running from installation
-    _v_folder = _folder
-
-with open(_os.path.join(_v_folder, "VERSION")) as _f:
-    version = _f.read().strip()
-
 _elementmap = {}
 _elementlist = []
 

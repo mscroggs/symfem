@@ -1,5 +1,6 @@
 import symfem
 from io import StringIO
+import json
 import sys
 import os
 import re
@@ -88,3 +89,51 @@ def test_snippets(script, output):
     actual_output = redirected_output.getvalue().strip()
     actual_output = re.sub(r"at 0x[^\>]+\>", "at 0x{ADDRESS}>", actual_output)
     assert actual_output == output
+
+
+def test_version_numbers():
+    root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+    with open(os.path.join(root, "VERSION")) as f:
+        version = f.read()
+    assert version == version.strip()
+
+    # codemeta.json
+    with open(os.path.join(root, "codemeta.json")) as f:
+        data = json.load(f)
+    assert data["version"] == version
+
+    # setup.py
+    with open(os.path.join(root, "setup.py")) as f:
+        for line in f:
+            if 'version="' in line:
+                assert line.split('version="')[1].split('"')[0] == version
+
+    # symfem/version.py
+    with open(os.path.join(root, "symfem/version.py")) as f:
+        assert f.read().split('version = "')[1].split('"')[0] == version
+
+
+def test_requirements():
+    root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+    with open(os.path.join(root, "setup.py")) as f:
+        for line in f:
+            if 'install_requires=' in line:
+                in_setup = [
+                    i.strip()[1:-1]
+                    for i in line.split('install_requires=[')[1].split(']')[0].split(",")]
+    with open(os.path.join(root, "requirements.txt")) as f:
+        in_requirements = [i.strip() for i in f]
+    assert set(in_requirements) == set(in_setup)
+
+
+def test_long_description():
+    root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+    with open(os.path.join(root, "README.md")) as f:
+        in_readme = f.read().replace(
+            "(logo/logo.png)",
+            "(https://raw.githubusercontent.com/mscroggs/symfem/main/logo/logo.png)")
+
+    with open(os.path.join(root, "setup.py")) as f:
+        in_setup = f.read().split('long_description = """')[1].split('"""')[0]
+
+    assert in_readme.strip() == in_setup.strip()
