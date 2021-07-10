@@ -13,7 +13,7 @@ from ..functionals import (PointEvaluation, DotPointEvaluation, IntegralMoment,
 class Q(CiarletElement):
     """A Q element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         from symfem import create_reference
 
         if order == 0:
@@ -56,7 +56,7 @@ class Q(CiarletElement):
 class DiscontinuousQ(CiarletElement):
     """A dQ element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         if order == 0:
             dofs = [
                 PointEvaluation(
@@ -86,7 +86,7 @@ class DiscontinuousQ(CiarletElement):
 class VectorQ(CiarletElement):
     """A vector Q element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         scalar_space = Q(reference, order, variant)
         dofs = []
         if reference.tdim == 1:
@@ -117,7 +117,7 @@ class VectorQ(CiarletElement):
 class Nedelec(CiarletElement):
     """Nedelec Hcurl finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         poly = quolynomial_set(reference.tdim, reference.tdim, order - 1)
         poly += Hcurl_quolynomials(reference.tdim, reference.tdim, order)
 
@@ -139,7 +139,7 @@ class Nedelec(CiarletElement):
 class RaviartThomas(CiarletElement):
     """Raviart-Thomas Hdiv finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         poly = quolynomial_set(reference.tdim, reference.tdim, order - 1)
         poly += Hdiv_quolynomials(reference.tdim, reference.tdim, order)
 

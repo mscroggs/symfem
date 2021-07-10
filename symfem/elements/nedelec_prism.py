@@ -13,7 +13,7 @@ from .q import RaviartThomas as QRT
 class Nedelec(CiarletElement):
     """Nedelec Hcurl finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         from .. import create_reference
 
         poly = [(i[0] * j, i[1] * j, 0)

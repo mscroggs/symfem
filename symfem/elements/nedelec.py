@@ -15,7 +15,7 @@ from .rt import RaviartThomas
 class NedelecFirstKind(CiarletElement):
     """Nedelec first kind Hcurl finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         poly = polynomial_set(reference.tdim, reference.tdim, order - 1)
         poly += Hcurl_polynomials(reference.tdim, reference.tdim, order)
         dofs = make_integral_moment_dofs(
@@ -39,7 +39,7 @@ class NedelecFirstKind(CiarletElement):
 class NedelecSecondKind(CiarletElement):
     """Nedelec second kind Hcurl finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         poly = polynomial_set(reference.tdim, reference.tdim, order)
 
         dofs = make_integral_moment_dofs(

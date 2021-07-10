@@ -18,7 +18,7 @@ from .nedelec import NedelecFirstKind
 class MardalTaiWinther(CiarletElement):
     """Mardal-Tai-Winther Hdiv finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         assert order == 3
 
         dofs = make_integral_moment_dofs(

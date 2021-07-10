@@ -15,7 +15,7 @@ from .nedelec import NedelecFirstKind
 class BDM(CiarletElement):
     """Brezzi-Douglas-Marini Hdiv finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         poly = polynomial_set(reference.tdim, reference.tdim, order)
 
         dofs = make_integral_moment_dofs(

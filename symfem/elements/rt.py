@@ -14,7 +14,7 @@ from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
 class RaviartThomas(CiarletElement):
     """Raviart-Thomas Hdiv finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         poly = polynomial_set(reference.tdim, reference.tdim, order - 1)
         poly += Hdiv_polynomials(reference.tdim, reference.tdim, order)
 

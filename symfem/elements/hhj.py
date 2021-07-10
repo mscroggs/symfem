@@ -14,7 +14,7 @@ from .lagrange import DiscontinuousLagrange, SymmetricMatrixDiscontinuousLagrang
 class HellanHerrmannJohnson(CiarletElement):
     """A Hellan-Herrmann-Johnson element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         assert reference.name == "triangle"
         poly = [(p[0], p[1], p[1], p[2])
                 for p in polynomial_set(reference.tdim, 3, order)]

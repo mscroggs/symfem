@@ -16,7 +16,7 @@ from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
 class Serendipity(CiarletElement):
     """A serendipity element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         poly = polynomial_set(reference.tdim, 1, order)
         poly += serendipity_set(reference.tdim, 1, order)
 
@@ -41,7 +41,7 @@ class Serendipity(CiarletElement):
 class SerendipityCurl(CiarletElement):
     """A serendipity Hcurl element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         poly = polynomial_set(reference.tdim, reference.tdim, order)
         poly += Hcurl_serendipity(reference.tdim, reference.tdim, order)
 
@@ -65,7 +65,7 @@ class SerendipityCurl(CiarletElement):
 class SerendipityDiv(CiarletElement):
     """A serendipity Hdiv element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         poly = polynomial_set(reference.tdim, reference.tdim, order)
         poly += Hdiv_serendipity(reference.tdim, reference.tdim, order)
 

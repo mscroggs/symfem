@@ -141,6 +141,7 @@ test_elements = {
     }
 }
 
+
 def all_symequal(a, b):
     """Check if two symbolic numbers or vectors are equal."""
     if isinstance(a, (list, tuple)):

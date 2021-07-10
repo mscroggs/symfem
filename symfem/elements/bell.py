@@ -14,7 +14,7 @@ from .lagrange import DiscontinuousLagrange
 class Bell(CiarletElement):
     """Bell finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         assert reference.name == "triangle"
         assert order == 5
         dofs = []
