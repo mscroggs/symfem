@@ -55,16 +55,26 @@ class BernardiRaugel(CiarletElement):
                     if j == i else 0 for j in range(reference.tdim)))
 
             for e_n, edge in enumerate(reference.edges):
-                midpoint = tuple(sympy.Rational(i + j, 2) for i, j in zip(
-                    reference.vertices[edge[0]], reference.vertices[edge[1]]))
-                for i in range(reference.tdim):
-                    d = tuple(1 if j == i else 0 for j in range(reference.tdim))
-                    dofs.append(DotPointEvaluation(midpoint, d, entity=(1, e_n)))
+                v1 = reference.vertices[edge[0]]
+                v2 = reference.vertices[edge[1]]
+                midpoint = tuple(sympy.Rational(i + j, 2) for i, j in zip(v1, v2))
+                d = tuple(j - i for i, j in zip(v1, v2))
+                dofs.append(DotPointEvaluation(midpoint, d, entity=(1, e_n),
+                                               mapping="contravariant"))
+            for f_n in range(reference.sub_entity_count(2)):
+                face = reference.sub_entity(2, f_n)
+                normal = [i * face.jacobian() for i in face.normal()]
+                for e_n in range(3):
+                    edge = face.sub_entity(1, e_n)
+                    midpoint = tuple(sympy.Rational(i + j, 2) for i, j in zip(*edge.vertices))
+                    dofs.append(DotPointEvaluation(midpoint, normal, entity=(2, f_n),
+                                                   mapping="contravariant"))
 
             for i in range(3):
                 d = tuple(1 if j == i else 0 for j in range(reference.tdim))
                 dofs.append(DivergenceIntegralMoment(
-                    reference, x[i], BaseFunctional(), entity=(3, 0)
+                    reference, x[i], BaseFunctional(), entity=(3, 0),
+                    mapping="contravariant"
                 ))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
