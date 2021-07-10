@@ -17,6 +17,7 @@ class Bubble(CiarletElement):
     """Bubble finite element."""
 
     def __init__(self, reference, order, variant):
+        # TODO: variants
         if reference.name == "interval":
             poly = [x[0] * (1 - x[0]) * p for p in polynomial_set(reference.tdim, 1, order - 2)]
         elif reference.name == "triangle":

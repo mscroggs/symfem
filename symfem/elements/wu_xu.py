@@ -25,7 +25,7 @@ def derivatives(dim, order):
 class WuXu(CiarletElement):
     """Wu-Xu finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order):
         assert order == reference.tdim + 1
         poly = polynomial_set(reference.tdim, 1, order)
 

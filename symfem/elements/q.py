@@ -123,10 +123,9 @@ class Nedelec(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, DiscontinuousQ, order - 1),
-            faces=(IntegralMoment, RaviartThomas, order - 1, "covariant"),
-            volumes=(IntegralMoment, RaviartThomas, order - 1, "covariant"),
-            variant=variant
+            edges=(TangentIntegralMoment, DiscontinuousQ, order - 1, {"variant": variant}),
+            faces=(IntegralMoment, RaviartThomas, order - 1, "covariant", {"variant": variant}),
+            volumes=(IntegralMoment, RaviartThomas, order - 1, "covariant", {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -146,9 +145,8 @@ class RaviartThomas(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, DiscontinuousQ, order - 1),
-            cells=(IntegralMoment, Nedelec, order - 1, "contravariant"),
-            variant=variant
+            facets=(NormalIntegralMoment, DiscontinuousQ, order - 1, {"variant": variant}),
+            cells=(IntegralMoment, Nedelec, order - 1, "contravariant", {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

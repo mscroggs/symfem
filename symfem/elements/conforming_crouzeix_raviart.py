@@ -14,7 +14,7 @@ from ..symbolic import x
 class ConformingCrouzeixRaviart(CiarletElement):
     """Conforming Crouzeix-Raviart finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order):
         assert reference.name == "triangle"
 
         poly = polynomial_set(reference.tdim, 1, order)

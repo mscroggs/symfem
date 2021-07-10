@@ -25,11 +25,12 @@ class Nedelec(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, DiscontinuousLagrange, order - 1),
+            edges=(TangentIntegralMoment, DiscontinuousLagrange, order - 1,
+                   {"variant": variant}),
             faces={"triangle": (IntegralMoment, VectorDiscontinuousLagrange, order - 2,
-                                "covariant"),
-                   "quadrilateral": (IntegralMoment, QRT, order - 1, "covariant")},
-            variant=variant
+                                "covariant", {"variant": variant}),
+                   "quadrilateral": (IntegralMoment, QRT, order - 1, "covariant",
+                                     {"variant": variant})},
         )
 
         triangle = create_reference("triangle")

@@ -17,7 +17,7 @@ from .lagrange import Lagrange, DiscontinuousLagrange
 class BernardiRaugel(CiarletElement):
     """Bernardi-Raugel Hdiv finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order):
         poly = polynomial_set(reference.tdim, reference.tdim, order)
 
         p = Lagrange(reference, 1, variant="equispaced")
@@ -41,8 +41,8 @@ class BernardiRaugel(CiarletElement):
 
         dofs += make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, DiscontinuousLagrange, 0, "contravariant"),
-            variant=variant
+            facets=(NormalIntegralMoment, DiscontinuousLagrange, 0, "contravariant",
+                    {"variant": "equispaced"}),
         )
 
         if order > 1:

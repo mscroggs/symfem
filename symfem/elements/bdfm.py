@@ -52,9 +52,8 @@ class BDFM(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, DiscontinuousLagrange, order - 1),
-            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
-            variant=variant
+            facets=(NormalIntegralMoment, DiscontinuousLagrange, order - 1, {"variant": variant}),
+            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

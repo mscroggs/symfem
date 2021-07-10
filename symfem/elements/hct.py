@@ -15,7 +15,7 @@ from .hermite import Hermite
 class HsiehCloughTocher(CiarletElement):
     """Hsieh-Clough-Tocher finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order):
         from symfem import create_reference
         assert order == 3
         assert reference.name == "triangle"
@@ -42,7 +42,7 @@ class HsiehCloughTocher(CiarletElement):
 
         refs = [create_reference("triangle", vs) for vs in subs]
 
-        hermite_spaces = [Hermite(ref, 3, variant) for ref in refs]
+        hermite_spaces = [Hermite(ref, 3) for ref in refs]
 
         piece_list = []
         piece_list.append((hermite_spaces[0].get_basis_function(0), 0,

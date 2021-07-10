@@ -111,7 +111,7 @@ def create_reference(cell_type, vertices=None):
         raise ValueError(f"Unknown cell type: {cell_type}")
 
 
-def create_element(cell_type, element_type, order, variant="equispaced"):
+def create_element(cell_type, element_type, order, **kwargs):
     """Make a finite element.
 
     Parameters
@@ -175,11 +175,6 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
         Wu-Xu
     order : int
         The order of the element.
-    variant : str
-        The arrangement type of the points used the define the space.
-
-        Supported values:
-        equispaced, lobatto, radau, legendre
     """
     reference = create_reference(cell_type)
 
@@ -189,7 +184,7 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
         element_class = _elementmap[element_type][reference.name]
         if not _order_is_allowed(element_class, reference.name, order):
             raise ValueError(f"Order {order} {element_type} element cannot be created.")
-        return element_class(reference, order, variant=variant)
+        return element_class(reference, order, **kwargs)
 
     raise ValueError(f"Unsupported element type: {element_type}")
 

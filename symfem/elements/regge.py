@@ -15,7 +15,7 @@ from ..functionals import PointInnerProduct
 class Regge(CiarletElement):
     """A Regge element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order):
         from symfem import create_reference
         assert reference.name in ["triangle", "tetrahedron"]
         if reference.tdim == 2:

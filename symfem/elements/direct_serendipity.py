@@ -12,7 +12,7 @@ from .lagrange import DiscontinuousLagrange
 class DirectSerendipity(DirectElement):
     """A direct serendipity element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order):
         basis_functions = []
         basis_entities = []
 

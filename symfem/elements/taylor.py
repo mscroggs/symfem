@@ -12,10 +12,10 @@ from itertools import product
 class Taylor(CiarletElement):
     """Taylor finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order):
         dofs = make_integral_moment_dofs(
             reference,
-            cells=(IntegralMoment, DiscontinuousLagrange, 0),
+            cells=(IntegralMoment, DiscontinuousLagrange, 0, {"variant": "equispaced"}),
         )
         midpoint = tuple(sym_sum(i) / len(i) for i in zip(*reference.vertices))
         for i in product(range(order + 1), repeat=reference.tdim):

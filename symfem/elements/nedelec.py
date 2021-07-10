@@ -20,10 +20,12 @@ class NedelecFirstKind(CiarletElement):
         poly += Hcurl_polynomials(reference.tdim, reference.tdim, order)
         dofs = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, DiscontinuousLagrange, order - 1),
-            faces=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, "covariant"),
-            volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 3, "covariant"),
-            variant=variant
+            edges=(TangentIntegralMoment, DiscontinuousLagrange, order - 1,
+                   {"variant": variant}),
+            faces=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, "covariant",
+                   {"variant": variant}),
+            volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 3, "covariant",
+                     {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -42,10 +44,9 @@ class NedelecSecondKind(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, DiscontinuousLagrange, order),
-            faces=(IntegralMoment, RaviartThomas, order - 1, "covariant"),
-            volumes=(IntegralMoment, RaviartThomas, order - 2, "covariant"),
-            variant=variant
+            edges=(TangentIntegralMoment, DiscontinuousLagrange, order, {"variant": variant}),
+            faces=(IntegralMoment, RaviartThomas, order - 1, "covariant", {"variant": variant}),
+            volumes=(IntegralMoment, RaviartThomas, order - 2, "covariant", {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

@@ -21,9 +21,10 @@ class HellanHerrmannJohnson(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalInnerProductIntegralMoment, DiscontinuousLagrange, order),
-            cells=(IntegralMoment, SymmetricMatrixDiscontinuousLagrange, order - 1),
-            variant=variant
+            facets=(NormalInnerProductIntegralMoment, DiscontinuousLagrange, order,
+                    {"variant": variant}),
+            cells=(IntegralMoment, SymmetricMatrixDiscontinuousLagrange, order - 1,
+                   {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,

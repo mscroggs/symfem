@@ -20,9 +20,8 @@ class BDM(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, DiscontinuousLagrange, order),
-            cells=(IntegralMoment, NedelecFirstKind, order - 1),
-            variant=variant
+            facets=(NormalIntegralMoment, DiscontinuousLagrange, order, {"variant": variant}),
+            cells=(IntegralMoment, NedelecFirstKind, order - 1, {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
