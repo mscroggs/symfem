@@ -46,6 +46,8 @@ Documentation of the latest release version of Symfem can be found on
 You can find information about how to contribute to Symfem [here](CONTRIBUTING.md).
 """
 
+data_files = ["LICENSE"]
+
 if __name__ == "__main__":
     setuptools.setup(
         name="symfem",
@@ -60,5 +62,6 @@ if __name__ == "__main__":
         url="https://github.com/mscroggs/symfem",
         packages=["symfem", "symfem.elements"],
         include_package_data=True,
+        data_files=data_files,
         install_requires=["sympy", "numpy"]
     )

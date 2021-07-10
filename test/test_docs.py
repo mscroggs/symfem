@@ -13,29 +13,32 @@ doc_data = []
 outputlines = []
 codelines = []
 
-with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../docs/index.rst")) as f:
-    for line in f:
-        if line.strip() == ".. code-block:: python":
-            code = True
-            output = False
-            codelines = []
-            outputlines = []
-        elif code and line.strip() == "::":
-            output = True
-            code = False
-        elif code or output:
-            if line.strip() != "":
-                if line.startswith("    "):
-                    if code:
-                        assert not output
-                        codelines.append(line.strip("\n")[4:])
+if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                  "../docs/index.rst")):
+    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+              "../docs/index.rst")) as f:
+        for line in f:
+            if line.strip() == ".. code-block:: python":
+                code = True
+                output = False
+                codelines = []
+                outputlines = []
+            elif code and line.strip() == "::":
+                output = True
+                code = False
+            elif code or output:
+                if line.strip() != "":
+                    if line.startswith("    "):
+                        if code:
+                            assert not output
+                            codelines.append(line.strip("\n")[4:])
+                        else:
+                            assert output
+                            outputlines.append(line.strip("\n")[4:])
                     else:
-                        assert output
-                        outputlines.append(line.strip("\n")[4:])
-                else:
-                    output = False
-                    code = False
-                    doc_data.append(("\n".join(codelines), "\n".join(outputlines)))
+                        output = False
+                        code = False
+                        doc_data.append(("\n".join(codelines), "\n".join(outputlines)))
 
 
 def test_available_references():
@@ -81,6 +84,11 @@ def test_available_elements():
 
 @pytest.mark.parametrize("script, output", doc_data)
 def test_snippets(script, output):
+    root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+    if not os.path.isfile(os.path.join(root, "VERSION")):
+        # Skip test if running in tarball source
+        pytest.skip()
+
     old_stdout = sys.stdout
     redirected_output = sys.stdout = StringIO()
     exec(script)
@@ -93,6 +101,10 @@ def test_snippets(script, output):
 
 def test_version_numbers():
     root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+    if not os.path.isfile(os.path.join(root, "VERSION")):
+        # Skip test if running in tarball source
+        pytest.skip()
+
     with open(os.path.join(root, "VERSION")) as f:
         version = f.read()
     assert version == version.strip()
@@ -115,6 +127,10 @@ def test_version_numbers():
 
 def test_requirements():
     root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+    if not os.path.isfile(os.path.join(root, "VERSION")):
+        # Skip test if running in tarball source
+        pytest.skip()
+
     with open(os.path.join(root, "setup.py")) as f:
         for line in f:
             if 'install_requires=' in line:
@@ -128,6 +144,10 @@ def test_requirements():
 
 def test_long_description():
     root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+    if not os.path.isfile(os.path.join(root, "VERSION")):
+        # Skip test if running in tarball source
+        pytest.skip()
+
     with open(os.path.join(root, "README.md")) as f:
         in_readme = f.read().replace(
             "(logo/logo.png)",
