@@ -9,7 +9,7 @@ from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set
 from ..functionals import (NormalIntegralMoment, DotPointEvaluation,
-                           DivergenceIntegralMoment, BaseFunctional)
+                           DivergenceIntegralMoment)
 from ..symbolic import x
 from .lagrange import Lagrange, DiscontinuousLagrange
 
