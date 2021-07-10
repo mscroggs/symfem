@@ -28,7 +28,7 @@ with open("codemeta.json", "w") as f:
 new_setup = ""
 with open("setup.py") as f:
     for line in f:
-        if "version=" in line:
+        if 'version="' in line:
             a, b = line.split('version="')
             b = b.split('"', 1)[1]
             new_setup += f'{a}version="{new_version_str}"{b}'
@@ -39,6 +39,6 @@ with open("setup.py", "w") as f:
 
 # symfem/version.py
 with open("symfem/version.py", "w") as f:
-    f.write(f'version="{new_version_str}"')
+    f.write(f'version = "{new_version_str}"')
 
 print(f"Updated version to {new_version_str}")
