@@ -70,10 +70,12 @@ class BernardiRaugel(CiarletElement):
                     dofs.append(DotPointEvaluation(midpoint, normal, entity=(2, f_n),
                                                    mapping="contravariant"))
 
+            p = DiscontinuousLagrange(reference, 0, variant="equispaced")
+
             for i in range(3):
                 d = tuple(1 if j == i else 0 for j in range(reference.tdim))
                 dofs.append(DivergenceIntegralMoment(
-                    reference, x[i], BaseFunctional(), entity=(3, 0),
+                    reference, x[i], p.dofs[0], entity=(3, 0),
                     mapping="contravariant"
                 ))
 
