@@ -1,5 +1,4 @@
 import sys
-import os
 import setuptools
 
 if sys.version_info < (3, 6):
@@ -60,7 +59,6 @@ if __name__ == "__main__":
         maintainer_email="symfem@mscroggs.co.uk",
         url="https://github.com/mscroggs/symfem",
         packages=["symfem", "symfem.elements"],
-        data_files=data_files,
         include_package_data=True,
         install_requires=["sympy", "numpy"]
     )

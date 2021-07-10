@@ -39,6 +39,6 @@ with open("setup.py", "w") as f:
 
 # symfem/version.py
 with open("symfem/version.py", "w") as f:
-    f.write(f'version = "{new_version_str}"')
+    f.write(f'version = "{new_version_str}"\n')
 
 print(f"Updated version to {new_version_str}")
