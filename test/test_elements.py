@@ -22,6 +22,24 @@ def test_all_tested():
                 raise ValueError(f"{e.names[0]} on a {r} is not tested")
 
 
+@pytest.mark.parametrize("ref, element, order", [
+    ("triangle", "Hermite", 4),
+    ("tetrahedron", "Crouzeix-Raviart", 2)
+])
+def test_too_high_order(ref, element, order):
+    with pytest.raises(ValueError):
+        symfem.create_element(ref, element, order)
+
+
+@pytest.mark.parametrize("ref, element, order", [
+    ("triangle", "Hermite", 2),
+    ("tetrahedron", "bubble", 3)
+])
+def test_too_low_order(ref, element, order):
+    with pytest.raises(ValueError):
+        symfem.create_element(ref, element, order)
+
+
 @pytest.mark.parametrize(
     ("cell_type", "element_type", "order", "variant"),
     [[reference, element, order, variant]
