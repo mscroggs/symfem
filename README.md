@@ -6,7 +6,8 @@
 [![Coverage Status](https://coveralls.io/repos/github/mscroggs/symfem/badge.svg?branch=main)](https://coveralls.io/github/mscroggs/symfem?branch=main)
 [![PyPI](https://img.shields.io/pypi/v/symfem?color=blue&label=PyPI&logo=pypi&logoColor=white)](https://pypi.org/project/symfem/)
 
-Symfem is a symbolic finite element definition library.
+Symfem is a symbolic finite element definition library, that can be used to
+symbolically evaluate the basis functions of a finite element space.
 
 ## Installing Symfem
 Symfem can be installed by downloading the [GitHub repo](https://github.com/mscroggs/symfem)
