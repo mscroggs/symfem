@@ -30,7 +30,6 @@ jobs:
         name: Install requirements.txt
       - run: |
             python3 setup.py install
-            rm -rf symfem
         name: Install symfem
       - run: python3 -m pytest -n=auto --durations=50 test/ -x
         name: Run unit tests
@@ -60,7 +59,6 @@ jobs:
         name: Install requirements.txt
       - run: |
             python3 setup.py install
-            rm -rf symfem
         name: Install symfem
       - name: Clone Basix
         uses: actions/checkout@v2
