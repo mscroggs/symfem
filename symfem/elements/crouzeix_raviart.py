@@ -14,7 +14,7 @@ from ..quadrature import get_quadrature
 class CrouzeixRaviart(CiarletElement):
     """Crouzeix-Raviart finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         from symfem import create_reference
         assert reference.name in ["triangle", "tetrahedron"]
 

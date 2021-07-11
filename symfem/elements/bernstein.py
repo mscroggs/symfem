@@ -68,7 +68,7 @@ def bernstein_polynomials(n, d):
 class Bernstein(CiarletElement):
     """Bernstein finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order):
 
         dofs = [
             IntegralAgainst(reference, p, entity=(reference.tdim, 0))

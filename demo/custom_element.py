@@ -8,7 +8,7 @@ from symfem.functionals import PointEvaluation
 class CustomElement(CiarletElement):
     """Custom element on a quadrilateral."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order):
         zero = sympy.Integer(0)
         one = sympy.Integer(1)
         half = sympy.Rational(1, 2)

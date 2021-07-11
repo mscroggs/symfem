@@ -47,14 +47,13 @@ def bdfm_polyset(reference, order):
 class BDFM(CiarletElement):
     """Brezzi-Douglas-Fortin-Marini Hdiv finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         poly = bdfm_polyset(reference, order)
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, DiscontinuousLagrange, order - 1),
-            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2),
-            variant=variant
+            facets=(NormalIntegralMoment, DiscontinuousLagrange, order - 1, {"variant": variant}),
+            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

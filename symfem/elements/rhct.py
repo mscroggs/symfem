@@ -14,7 +14,7 @@ from ..symbolic import PiecewiseFunction, x
 class P1Hermite(CiarletElement):
     """P1Hermite finite element."""
 
-    def __init__(self, reference, order, variant, poly):
+    def __init__(self, reference, order, poly):
         assert order == 3
         dofs = []
         for v_n, vs in enumerate(reference.vertices):
@@ -36,7 +36,7 @@ class P1Hermite(CiarletElement):
 class ReducedHsiehCloughTocher(CiarletElement):
     """Reduced Hsieh-Clough-Tocher finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order):
         from symfem import create_reference
         assert order == 3
         assert reference.name == "triangle"
@@ -66,7 +66,7 @@ class ReducedHsiehCloughTocher(CiarletElement):
                     x[0] ** 3 - x[1] ** 3, x[0] ** 3 + 3 * x[0] * x[1] ** 2]
         polys[2].remove(x[0] * x[1] ** 2)
 
-        bases = [P1Hermite(r, 3, variant, p).get_basis_functions()
+        bases = [P1Hermite(r, 3, p).get_basis_functions()
                  for r, p in zip(refs, polys)]
 
         piece_list = []

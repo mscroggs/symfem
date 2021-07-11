@@ -13,7 +13,7 @@ from ..symbolic import sym_sum
 class Morley(CiarletElement):
     """Morley finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order):
         from symfem import create_reference
         assert order == 2
         assert reference.name == "triangle"

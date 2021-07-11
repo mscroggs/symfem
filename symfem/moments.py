@@ -6,17 +6,22 @@ def extract_moment_data(moment_data, sub_type):
     if isinstance(moment_data, dict):
         return extract_moment_data(moment_data[sub_type], sub_type)
 
-    if len(moment_data) == 3:
-        return moment_data + (None, )
+    if isinstance(moment_data[-1], dict):
+        kwargs = moment_data[-1]
+        moment_data = moment_data[:-1]
     else:
-        return moment_data
+        kwargs = {}
+
+    if len(moment_data) == 3:
+        return moment_data + (None, kwargs)
+    else:
+        return moment_data + (kwargs, )
 
 
 def make_integral_moment_dofs(
     reference,
     vertices=None, edges=None, faces=None, volumes=None,
-    cells=None, facets=None, ridges=None, peaks=None,
-    variant="equispaced"
+    cells=None, facets=None, ridges=None, peaks=None
 ):
     """Generate DOFs due to integral moments on sub entities.
 
@@ -51,10 +56,10 @@ def make_integral_moment_dofs(
                 assert dim > 0
                 for i, vs in enumerate(reference.sub_entities(dim)):
                     sub_ref = reference.sub_entity(dim, i, True)
-                    IntegralMoment, SubElement, order, mapping = extract_moment_data(
+                    IntegralMoment, SubElement, order, mapping, kwargs = extract_moment_data(
                         moment_data, sub_ref.name)
                     if order >= SubElement.min_order:
-                        sub_element = SubElement(sub_ref, order, variant=variant)
+                        sub_element = SubElement(sub_ref, order, **kwargs)
                         for dn, d in enumerate(sub_element.dofs):
                             f = sub_element.get_basis_function(dn)
                             if mapping is None:
@@ -72,10 +77,10 @@ def make_integral_moment_dofs(
                 assert dim > 0
                 for i, vs in enumerate(reference.sub_entities(dim)):
                     sub_ref = reference.sub_entity(dim, i, True)
-                    IntegralMoment, SubElement, order, mapping = extract_moment_data(
+                    IntegralMoment, SubElement, order, mapping, kwargs = extract_moment_data(
                         moment_data, sub_ref.name)
                     if order >= SubElement.min_order:
-                        sub_element = SubElement(sub_ref, order, variant=variant)
+                        sub_element = SubElement(sub_ref, order, **kwargs)
                         for dn, d in enumerate(sub_element.dofs):
                             f = sub_element.get_basis_function(dn)
                             if mapping is None:

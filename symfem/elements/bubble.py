@@ -16,7 +16,8 @@ from .lagrange import Lagrange
 class Bubble(CiarletElement):
     """Bubble finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
+        # TODO: variants
         if reference.name == "interval":
             poly = [x[0] * (1 - x[0]) * p for p in polynomial_set(reference.tdim, 1, order - 2)]
         elif reference.name == "triangle":
@@ -61,7 +62,7 @@ class Bubble(CiarletElement):
 class BubbleEnrichedLagrange(CiarletElement):
     """Bubble enriched Lagrange element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         lagrange = Lagrange(reference, order, variant)
         bubble = Bubble(reference, order + 2, variant)
 
@@ -79,7 +80,7 @@ class BubbleEnrichedLagrange(CiarletElement):
 class BubbleEnrichedVectorLagrange(CiarletElement):
     """Bubble enriched Lagrange element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         lagrange = Lagrange(reference, order, variant)
         bubble = Bubble(reference, order + 2, variant)
 

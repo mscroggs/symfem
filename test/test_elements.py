@@ -22,13 +22,31 @@ def test_all_tested():
                 raise ValueError(f"{e.names[0]} on a {r} is not tested")
 
 
+@pytest.mark.parametrize("ref, element, order", [
+    ("triangle", "Hermite", 4),
+    ("tetrahedron", "Crouzeix-Raviart", 2)
+])
+def test_too_high_order(ref, element, order):
+    with pytest.raises(ValueError):
+        symfem.create_element(ref, element, order)
+
+
+@pytest.mark.parametrize("ref, element, order", [
+    ("triangle", "Hermite", 2),
+    ("tetrahedron", "bubble", 3)
+])
+def test_too_low_order(ref, element, order):
+    with pytest.raises(ValueError):
+        symfem.create_element(ref, element, order)
+
+
 @pytest.mark.parametrize(
-    ("cell_type", "element_type", "order", "variant"),
-    [[reference, element, order, variant]
+    ("cell_type", "element_type", "order", "kwargs"),
+    [[reference, element, order, kwargs]
      for reference, i in test_elements.items() for element, j in i.items()
-     for variant, k in j.items() for order in k])
+     for kwargs, k in j for order in k])
 def test_independence(
-    elements_to_test, cells_to_test, cell_type, element_type, order, variant,
+    elements_to_test, cells_to_test, cell_type, element_type, order, kwargs,
     speed
 ):
     """Test that DirectElements have independent basis functions."""
@@ -42,7 +60,7 @@ def test_independence(
         if order == 2 and cell_type in ["tetrahedron", "hexahedron", "prism", "pyramid"]:
             pytest.skip()
 
-    space = create_element(cell_type, element_type, order, variant)
+    space = create_element(cell_type, element_type, order, **kwargs)
 
     # Only run this test for DirectElements
     if not isinstance(space, DirectElement):
@@ -84,12 +102,12 @@ def test_independence(
 
 
 @pytest.mark.parametrize(
-    ("cell_type", "element_type", "order", "variant"),
-    [[reference, element, order, variant]
+    ("cell_type", "element_type", "order", "kwargs"),
+    [[reference, element, order, kwargs]
      for reference, i in test_elements.items() for element, j in i.items()
-     for variant, k in j.items() for order in k])
+     for kwargs, k in j for order in k])
 def test_functional_entities(
-    elements_to_test, cells_to_test, cell_type, element_type, order, variant,
+    elements_to_test, cells_to_test, cell_type, element_type, order, kwargs,
     speed
 ):
     if elements_to_test != "ALL" and element_type not in elements_to_test:
@@ -98,7 +116,7 @@ def test_functional_entities(
         pytest.skip()
 
     # Test functionals
-    space = create_element(cell_type, element_type, order, variant)
+    space = create_element(cell_type, element_type, order, **kwargs)
     if not isinstance(space, CiarletElement):
         pytest.skip()
     for dof in space.dofs:
@@ -109,12 +127,12 @@ def test_functional_entities(
 
 
 @pytest.mark.parametrize(
-    ("cell_type", "element_type", "order", "variant"),
-    [[reference, element, order, variant]
+    ("cell_type", "element_type", "order", "kwargs"),
+    [[reference, element, order, kwargs]
      for reference, i in test_elements.items() for element, j in i.items()
-     for variant, k in j.items() for order in k])
+     for kwargs, k in j for order in k])
 def test_element_functionals_and_continuity(
-    elements_to_test, cells_to_test, cell_type, element_type, order, variant,
+    elements_to_test, cells_to_test, cell_type, element_type, order, kwargs,
     speed
 ):
     if elements_to_test != "ALL" and element_type not in elements_to_test:
@@ -128,7 +146,7 @@ def test_element_functionals_and_continuity(
             pytest.skip()
 
     # Test functionals
-    space = create_element(cell_type, element_type, order, variant)
+    space = create_element(cell_type, element_type, order, **kwargs)
     if isinstance(space, CiarletElement):
         for i, f in enumerate(space.get_basis_functions()):
             for j, d in enumerate(space.dofs):

@@ -16,7 +16,7 @@ from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
 class Serendipity(CiarletElement):
     """A serendipity element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         poly = polynomial_set(reference.tdim, 1, order)
         poly += serendipity_set(reference.tdim, 1, order)
 
@@ -25,10 +25,9 @@ class Serendipity(CiarletElement):
             dofs.append(PointEvaluation(p, entity=(0, v_n)))
         dofs += make_integral_moment_dofs(
             reference,
-            edges=(IntegralMoment, DiscontinuousLagrange, order - 2),
-            faces=(IntegralMoment, DiscontinuousLagrange, order - 4),
-            volumes=(IntegralMoment, DiscontinuousLagrange, order - 6),
-            variant=variant
+            edges=(IntegralMoment, DiscontinuousLagrange, order - 2, {"variant": variant}),
+            faces=(IntegralMoment, DiscontinuousLagrange, order - 4, {"variant": variant}),
+            volumes=(IntegralMoment, DiscontinuousLagrange, order - 6, {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
@@ -42,16 +41,17 @@ class Serendipity(CiarletElement):
 class SerendipityCurl(CiarletElement):
     """A serendipity Hcurl element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         poly = polynomial_set(reference.tdim, reference.tdim, order)
         poly += Hcurl_serendipity(reference.tdim, reference.tdim, order)
 
         dofs = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, DiscontinuousLagrange, order),
-            faces=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, "covariant"),
-            volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 4, "covariant"),
-            variant=variant
+            edges=(TangentIntegralMoment, DiscontinuousLagrange, order, {"variant": variant}),
+            faces=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, "covariant",
+                   {"variant": variant}),
+            volumes=(IntegralMoment, VectorDiscontinuousLagrange, order - 4, "covariant",
+                     {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -65,15 +65,15 @@ class SerendipityCurl(CiarletElement):
 class SerendipityDiv(CiarletElement):
     """A serendipity Hdiv element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         poly = polynomial_set(reference.tdim, reference.tdim, order)
         poly += Hdiv_serendipity(reference.tdim, reference.tdim, order)
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, DiscontinuousLagrange, order),
-            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, "contravariant"),
-            variant=variant
+            facets=(NormalIntegralMoment, DiscontinuousLagrange, order, {"variant": variant}),
+            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, "contravariant",
+                   {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

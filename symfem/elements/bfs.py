@@ -12,7 +12,7 @@ from ..functionals import PointEvaluation, DerivativePointEvaluation
 class BognerFoxSchmit(CiarletElement):
     """Bogner-Fox-Schmit finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order):
         assert order == 3
         dofs = []
         for v_n, vs in enumerate(reference.vertices):

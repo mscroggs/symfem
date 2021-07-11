@@ -13,7 +13,7 @@ from ..symbolic import sym_sum
 class Hermite(CiarletElement):
     """Hermite finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order):
         assert order == 3
         dofs = []
         for v_n, vs in enumerate(reference.vertices):

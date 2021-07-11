@@ -11,7 +11,7 @@ from ..quadrature import get_quadrature
 class Lagrange(CiarletElement):
     """Lagrange finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         if order == 0:
             dofs = [
                 PointEvaluation(
@@ -53,7 +53,7 @@ class Lagrange(CiarletElement):
 class DiscontinuousLagrange(CiarletElement):
     """Discontinuous Lagrange finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         if order == 0:
             dofs = [
                 PointEvaluation(
@@ -81,7 +81,7 @@ class DiscontinuousLagrange(CiarletElement):
 class VectorLagrange(CiarletElement):
     """Vector Lagrange finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         scalar_space = Lagrange(reference, order, variant)
         dofs = []
         if reference.tdim == 1:
@@ -112,7 +112,7 @@ class VectorLagrange(CiarletElement):
 class VectorDiscontinuousLagrange(CiarletElement):
     """Vector Lagrange finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         scalar_space = DiscontinuousLagrange(reference, order, variant)
         dofs = []
         if reference.tdim == 1:
@@ -143,7 +143,7 @@ class VectorDiscontinuousLagrange(CiarletElement):
 class MatrixDiscontinuousLagrange(CiarletElement):
     """Matrix Lagrange finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         scalar_space = DiscontinuousLagrange(reference, order, variant)
         dofs = []
         if reference.tdim == 1:
@@ -175,7 +175,7 @@ class MatrixDiscontinuousLagrange(CiarletElement):
 class SymmetricMatrixDiscontinuousLagrange(CiarletElement):
     """Symmetric matrix Lagrange finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         if reference.tdim == 1:
             poly = polynomial_set(1, 1, order)
             directions = [1]
