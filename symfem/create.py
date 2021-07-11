@@ -172,7 +172,8 @@ def create_element(cell_type, element_type, order, **kwargs):
         Bogner-Fox-Schmit, BFS,
         Fortin-Soulie, FS,
         Bernardi-Raugel,
-        Wu-Xu
+        Wu-Xu,
+        transition
     order : int
         The order of the element.
     """
