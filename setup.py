@@ -55,7 +55,8 @@ Documentation of the latest release version of Symfem can be found on
 You can find information about how to contribute to Symfem [here](CONTRIBUTING.md).
 """
 
-data_files = ["LICENSE", ("test", ["test/__init__.py", "test/utils.py", "test/conftest.py"])]
+data_files = ["LICENSE", "requirements.txt",
+              ("test", ["test/__init__.py", "test/utils.py", "test/conftest.py"])]
 
 if __name__ == "__main__":
     setuptools.setup(

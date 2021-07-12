@@ -52,6 +52,9 @@ with open(".github/workflows/test-packages.yml") as f:
         elif url in line:
             new_test += line.split(url)[0]
             new_test += f"{url}{new_version_str}.tar.gz\n"
+        elif "cd symfem-" in line:
+            new_test += line.split("cd symfem-")[0]
+            new_test += f"cd symfem-{new_version_str}\n"
         else:
             new_test += line
 
