@@ -57,6 +57,6 @@ jobs:
           conda config --set channel_priority strict
           conda install symfem
           conda install pytest
-          python -m pytest test/
-          python -m pytest demo/test_demos.py
+          pytest test/
+          pytest demo/test_demos.py
         name: Install Symfem and run tests
