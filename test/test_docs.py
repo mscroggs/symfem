@@ -113,7 +113,7 @@ def test_version_numbers():
     with open(os.path.join(root, ".github/workflows/test-packages.yml")) as f:
         for line in f:
             if "ref:" in line:
-                assert line.split("ref:")[1].strip() == version
+                assert line.split("ref:")[1].strip() == "v" + version
 
 
 def test_requirements():

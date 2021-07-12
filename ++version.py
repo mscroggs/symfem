@@ -47,7 +47,7 @@ with open(os.path.join(root, ".github/workflows/test-packages.yml")) as f:
     for line in f:
         if "ref:" in line:
             new_test += line.split("ref:")[0]
-            new_test += f"ref: {new_version_str}\n"
+            new_test += f"ref: v{new_version_str}\n"
         else:
             new_test += line
 

@@ -23,7 +23,7 @@ jobs:
         name: Install test dependencies
       - uses: actions/checkout@v2
         with:
-          ref: 2021.7.5
+          ref: v2021.7.5
         name: Get latest Symfem version
       - run: python3 -m pip install symfem
         name: Install Symfem
@@ -45,7 +45,7 @@ jobs:
         name: Install test dependencies
       - uses: actions/checkout@v2
         with:
-          ref: 2021.7.5
+          ref: v2021.7.5
         name: Get latest Symfem version
       - run: conda install symfem
         name: Install Symfem
