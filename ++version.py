@@ -41,4 +41,14 @@ with open("setup.py", "w") as f:
 with open("symfem/version.py", "w") as f:
     f.write(f'"""Version number."""\n\nversion = "{new_version_str}"\n')
 
+# .github/workflows/test-packages.yml
+new_test = ""
+with open(os.path.join(root, ".github/workflows/test-packages.yml")) as f:
+    for line in f:
+        if "ref:" in line:
+            new_test += line.split("ref:")[0]
+            new_test += f"ref: {new_version_str}\n"
+        else:
+            new_test += line
+
 print(f"Updated version to {new_version_str}")
