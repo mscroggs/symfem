@@ -22,6 +22,9 @@ jobs:
       - run: pip install pytest pytest-xdist
         name: Install test dependencies
       - uses: actions/checkout@v2
+        with:
+          ref: 2021.7.5
+        name: Get latest Symfem version
       - run: python3 -m pip install symfem
         name: Install Symfem
       - run: rm -rf symfem VERSION
@@ -40,6 +43,10 @@ jobs:
           activate-environment: symfem
       - run: conda install pytest pytest-xdist
         name: Install test dependencies
+      - uses: actions/checkout@v2
+        with:
+          ref: 2021.7.5
+        name: Get latest Symfem version
       - run: conda install symfem
         name: Install Symfem
       - run: rm -rf symfem VERSION
