@@ -43,5 +43,5 @@ jobs:
     - uses: actions/checkout@master
     - name: Install PyGitHub
       run: pip3 install PyGitHub requests
-    - name: Check version number and make release if necessary
-      run: python .github/scripts/version.py ${{ secrets.symfembot_github_token }}
+    - name: Open PR to update conda package
+      run: python .github/scripts/conda.py ${{ secrets.conda_github_token }}

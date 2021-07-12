@@ -12,7 +12,6 @@ branch = symfem.get_branch("main")
 
 version = symfem.get_contents("VERSION", branch.commit.sha).decoded_content.decode()
 
-print(f"https://pypi.org/pypi/symfem/{version}/json")
 with urllib.request.urlopen(f"https://pypi.org/pypi/symfem/{version}/json") as f:
     data = json.load(f)
 
@@ -21,3 +20,38 @@ for file in data["releases"][version]:
         hash = file["digests"]["sha256"]
 
 print(hash)
+
+upstream_feedstock = git.get_repo("conda-forge/symfem-feedstock")
+upstream_branch = upstream_feedstock.get_branch("master")
+
+fork = git.get_user().create_fork(upstream_feedstock)
+
+u = git.get_user()
+
+for repo in u.get_repos():
+    if repo.full_name.startswith("symfembot/symfem-feedstock"):
+        repo.delete()
+
+fork = git.get_user().create_fork(upstream_feedstock)
+branch = fork.get_branch("master")
+
+old_meta = fork.get_contents("recipe/meta.yaml", branch.commit.sha)
+
+old_meta_lines = old_meta.decoded_content.decode().split("\n")
+new_meta_lines = []
+for line in old_meta_lines:
+    if line.startswith("{% version"):
+        new_meta_lines.append(f"{{% set version = \"{version}\" %}}")
+    elif "sha256" in line:
+        newline = line.split("sha256")[0]
+        newline += f"sha256: {hash}"
+        new_meta_lines.append(newline)
+    else:
+        new_meta_lines.append(line)
+
+new_meta_lines += ["TEST", ""]
+
+fork.update_file("recipe/meta.yaml", "Update version", "\n".join(new_meta_lines), sha=old_meta.sha)
+
+upstream_feedstock.create_pull(title=f"Update version to {version}",
+                               body="", base="master", head="symfembot:master")
