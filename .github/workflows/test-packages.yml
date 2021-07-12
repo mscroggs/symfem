@@ -53,13 +53,18 @@ jobs:
       - run: rm -rf symfem VERSION
         name: Remove downloaded symfem
       - run: |
+          conda activate symfem
           conda config --add channels conda-forge
           conda config --set channel_priority strict
           conda install symfem
         name: Install Symfem
-      - run: conda install pytest
+      - run: |
+          conda activate symfem
+          conda install pytest
         name: Install pytest
-      - run: python -m pytest test/
+      - run: |
+          conda activate symfem
+          python -m pytest test/
         name: Run unit tests
       - run: python -m pytest demo/test_demos.py
         name: Run demos
