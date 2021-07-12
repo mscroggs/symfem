@@ -80,7 +80,7 @@ jobs:
       - run: pip install pytest
         name: Install pytest
       - run: |
-          cd symfem
+          cd symfem-2021.7.5
           python3 -m pytest test/
         name: Run unit tests
       - run: |
