@@ -15,7 +15,7 @@ from ..quadrature import get_quadrature
 class Lagrange(CiarletElement):
     """Lagrange finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         if order == 0:
             dofs = [
                 PointEvaluation(

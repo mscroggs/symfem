@@ -14,15 +14,16 @@ from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
 class RaviartThomas(CiarletElement):
     """Raviart-Thomas Hdiv finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         poly = polynomial_set(reference.tdim, reference.tdim, order - 1)
         poly += Hdiv_polynomials(reference.tdim, reference.tdim, order)
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, DiscontinuousLagrange, order - 1),
-            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, "contravariant"),
-            variant=variant
+            facets=(NormalIntegralMoment, DiscontinuousLagrange, order - 1,
+                    {"variant": variant}),
+            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, "contravariant",
+                   {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

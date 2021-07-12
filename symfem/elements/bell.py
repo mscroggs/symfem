@@ -14,7 +14,7 @@ from .lagrange import DiscontinuousLagrange
 class Bell(CiarletElement):
     """Bell finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         assert reference.name == "triangle"
         assert order == 5
         dofs = []
@@ -27,8 +27,7 @@ class Bell(CiarletElement):
             dofs.append(DerivativePointEvaluation(v, (0, 2), entity=(0, v_n)))
         dofs += make_integral_moment_dofs(
             reference,
-            edges=(NormalDerivativeIntegralMoment, DiscontinuousLagrange, 0),
-            variant=variant
+            edges=(NormalDerivativeIntegralMoment, DiscontinuousLagrange, 0, {"variant": variant}),
         )
 
         super().__init__(

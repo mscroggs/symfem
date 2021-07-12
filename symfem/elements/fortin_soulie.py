@@ -15,14 +15,14 @@ from .lagrange import DiscontinuousLagrange
 class FortinSoulie(CiarletElement):
     """Fortin-Soulie finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order):
         assert reference.name == "triangle"
 
         assert order == 2
 
         dofs = make_integral_moment_dofs(
             reference,
-            edges=(IntegralMoment, DiscontinuousLagrange, order - 1),
+            edges=(IntegralMoment, DiscontinuousLagrange, order - 1, {"variant": "equispaced"}),
         )
         dofs[-1] = PointEvaluation((sympy.Rational(1, 3), sympy.Rational(1, 3)), entity=(2, 0))
 

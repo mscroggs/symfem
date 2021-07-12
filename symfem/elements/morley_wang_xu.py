@@ -13,7 +13,7 @@ from ..functionals import (PointEvaluation, IntegralOfDirectionalMultiderivative
 class MorleyWangXu(CiarletElement):
     """Morley-Wang-Xu finite element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order):
         assert order <= reference.tdim
         poly = polynomial_set(reference.tdim, 1, order)
 

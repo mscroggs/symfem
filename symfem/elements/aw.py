@@ -17,7 +17,7 @@ from .lagrange import DiscontinuousLagrange
 class ArnoldWinther(CiarletElement):
     """An Arnold-Winther element."""
 
-    def __init__(self, reference, order, variant):
+    def __init__(self, reference, order, variant="equispaced"):
         from symfem import create_reference
         assert reference.name == "triangle"
         poly = [(p[0], p[1], p[1], p[2])

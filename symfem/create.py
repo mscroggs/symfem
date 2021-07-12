@@ -111,7 +111,7 @@ def create_reference(cell_type, vertices=None):
         raise ValueError(f"Unknown cell type: {cell_type}")
 
 
-def create_element(cell_type, element_type, order, variant="equispaced"):
+def create_element(cell_type, element_type, order, **kwargs):
     """Make a finite element.
 
     Parameters
@@ -172,19 +172,37 @@ def create_element(cell_type, element_type, order, variant="equispaced"):
         Bogner-Fox-Schmit, BFS,
         Fortin-Soulie, FS,
         Bernardi-Raugel,
-        Wu-Xu
+        Wu-Xu,
+        transition
     order : int
         The order of the element.
-    variant : str
-        The arrangement type of the points used the define the space.
-
-        Supported values:
-        equispaced, lobatto, radau, legendre
     """
     reference = create_reference(cell_type)
 
     if element_type in _elementmap:
-        assert reference.name in _elementmap[element_type]
-        return _elementmap[element_type][reference.name](reference, order, variant=variant)
+        if reference.name not in _elementmap[element_type]:
+            raise ValueError(f"{element_type} element cannot be created on a {reference.name}.")
+        element_class = _elementmap[element_type][reference.name]
+        if not _order_is_allowed(element_class, reference.name, order):
+            raise ValueError(f"Order {order} {element_type} element cannot be created.")
+        return element_class(reference, order, **kwargs)
 
     raise ValueError(f"Unsupported element type: {element_type}")
+
+
+def _order_is_allowed(element_class, ref, order):
+    if hasattr(element_class, "min_order"):
+        if isinstance(element_class.min_order, dict):
+            if ref in element_class.min_order:
+                if order < element_class.min_order[ref]:
+                    return False
+        elif order < element_class.min_order:
+            return False
+    if hasattr(element_class, "max_order"):
+        if isinstance(element_class.max_order, dict):
+            if ref in element_class.max_order:
+                if order > element_class.max_order[ref]:
+                    return False
+        elif order > element_class.max_order:
+            return False
+    return True
