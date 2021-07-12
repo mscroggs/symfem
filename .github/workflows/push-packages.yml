@@ -7,7 +7,7 @@ on:
       - 'v*' 
 
 jobs:
-  build-n-publish:
+  pypi:
     name: Build and publish to PyPI
     runs-on: ubuntu-20.04
     steps:
@@ -27,10 +27,21 @@ jobs:
       with:
         password: ${{ secrets.pypi_password }}
 
-  trigger-read-the-docs:
+  read-the-docs:
     name: Trigger Read the Docs build
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@master
     - name: Trigger Read the Docs build
       run: python .github/scripts/trigger_rtd_build.py ${{ secrets.RTDS_TOKEN }}
+
+  conda:
+    name: Open conda-forge PR
+    needs: pypi
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@master
+    - name: Install PyGitHub
+      run: pip3 install PyGitHub requests
+    - name: Check version number and make release if necessary
+      run: python .github/scripts/version.py ${{ secrets.symfembot_github_token }}
