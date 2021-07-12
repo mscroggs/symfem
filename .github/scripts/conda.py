@@ -19,8 +19,6 @@ for file in data["releases"][version]:
     if file["packagetype"] == "sdist":
         hash = file["digests"]["sha256"]
 
-print(hash)
-
 upstream_feedstock = git.get_repo("conda-forge/symfem-feedstock")
 upstream_branch = upstream_feedstock.get_branch("master")
 
