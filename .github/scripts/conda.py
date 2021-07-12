@@ -47,8 +47,6 @@ for line in old_meta_lines:
     else:
         new_meta_lines.append(line)
 
-new_meta_lines += ["TEST", ""]
-
 fork.update_file("recipe/meta.yaml", "Update version", "\n".join(new_meta_lines), sha=old_meta.sha)
 
 upstream_feedstock.create_pull(title=f"Update version to {version}",
