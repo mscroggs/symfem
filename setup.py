@@ -6,11 +6,11 @@ if sys.version_info < (3, 6):
     print("Python 3.6 or higher required, please upgrade.")
     sys.exit(1)
 
-with open(os.path.join(os.path.dirname(os.path.realpath(__file__), "README.md")) as f:
+with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "README.md")) as f:
     long_description = f.read().replace(
         "(logo/logo.png)",
         "(https://raw.githubusercontent.com/mscroggs/symfem/main/logo/logo.png)")
-with open(os.path.join(os.path.dirname(os.path.realpath(__file__), "README.md"), "w") as f:
+with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "README.md"), "w") as f:
     f.write(long_description)
 
 data_files = ["LICENSE", "requirements.txt",
