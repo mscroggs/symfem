@@ -38,7 +38,7 @@ old_meta = fork.get_contents("recipe/meta.yaml", branch.commit.sha)
 old_meta_lines = old_meta.decoded_content.decode().split("\n")
 new_meta_lines = []
 for line in old_meta_lines:
-    if line.startswith("{% version"):
+    if line.startswith("{% set version"):
         new_meta_lines.append(f"{{% set version = \"{version}\" %}}")
     elif "sha256" in line:
         newline = line.split("sha256")[0]
