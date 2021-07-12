@@ -79,8 +79,5 @@ jobs:
       - run: |
           cd symfem-2021.7.5
           python3 -m pytest test/
-        name: Run unit tests
-      - run: |
-          cd symfem
           python3 -m pytest demo/test_demos.py
-        name: Run demos
+        name: Run tests and demos
