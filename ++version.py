@@ -57,5 +57,7 @@ with open(".github/workflows/test-packages.yml") as f:
             new_test += f"cd symfem-{new_version_str}\n"
         else:
             new_test += line
+with open(".github/workflows/test-packages.yml", "w") as f:
+    f.write(new_test)
 
 print(f"Updated version to {new_version_str}")

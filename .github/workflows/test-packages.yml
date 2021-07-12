@@ -18,7 +18,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: actions/checkout@v2
         with:
-          ref: v2021.7.5
+          ref: v2021.7.6
         name: Get latest Symfem version
       - run: rm -rf symfem VERSION
         name: Remove downloaded symfem
@@ -45,7 +45,7 @@ jobs:
           activate-environment: symfem
       - uses: actions/checkout@v2
         with:
-          ref: v2021.7.5
+          ref: v2021.7.6
         name: Get latest Symfem version
       - run: rm -rf symfem VERSION
         name: Remove downloaded symfem
@@ -71,13 +71,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: |
-          wget -O symfem.tar.gz https://pypi.io/packages/source/s/symfem/symfem-2021.7.5.tar.gz
+          wget -O symfem.tar.gz https://pypi.io/packages/source/s/symfem/symfem-2021.7.6.tar.gz
           tar -xvzf symfem.tar.gz
         name: Download and unpack latest version of Symfem
       - run: pip install pytest
         name: Install pytest
       - run: |
-          cd symfem-2021.7.5
+          cd symfem-2021.7.6
           pip install -r requirements.txt
           python3 -m pytest test/
           python3 -m pytest demo/test_demos.py
