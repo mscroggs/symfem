@@ -1,0 +1,49 @@
+name: 🧪📦 Test packages
+
+on:
+  push
+  schedule:
+    - cron: "0 7 * * 1"
+
+jobs:
+  run-tests-with-pip:
+    name: Run tests with Symfem installed from pip
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: |
+            pip install pytest pytest-xdist
+        name: Install test dependencies
+      - uses: actions/checkout@v2
+      - run: python3 -m pip install symfem
+        name: Install Symfem
+      - run: rm -rf symfem
+        name: Remove downloaded symfem
+      - run: python3 -m pytest -n=auto --durations=50 test/ -x
+        name: Run unit tests
+      - run: python3 -m pytest demo/test_demos.py
+        name: Run demos
+
+  run-tests-with-conda:
+    name: Run tests with Symfem installed from conda-forge
+    runs-on: ubuntu-latest
+    steps:
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: symfem
+      - run: |
+            const install pytest pytest-xdist
+      - run: conda install symfem
+        name: Install Symfem
+      - run: rm -rf symfem
+        name: Remove downloaded symfem
+      - run: python3 -m pytest -n=auto --durations=50 test/ -x
+        name: Run unit tests
+      - run: python3 -m pytest demo/test_demos.py
+        name: Run demos
