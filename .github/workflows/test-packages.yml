@@ -1,9 +1,6 @@
 name: 🧪📦 Test packages
 
 on:
-  push:
-    branches:
-      - "**"
   schedule:
     - cron: "0 7 * * 1"
 
