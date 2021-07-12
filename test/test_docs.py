@@ -136,20 +136,3 @@ def test_requirements():
     with open(os.path.join(root, "requirements.txt")) as f:
         in_requirements = [i.strip() for i in f]
     assert set(in_requirements) == set(in_setup)
-
-
-def test_long_description():
-    root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
-    if not os.path.isfile(os.path.join(root, "VERSION")):
-        # Skip test if running in tarball source
-        pytest.skip()
-
-    with open(os.path.join(root, "README.md")) as f:
-        in_readme = f.read().replace(
-            "(logo/logo.png)",
-            "(https://raw.githubusercontent.com/mscroggs/symfem/main/logo/logo.png)")
-
-    with open(os.path.join(root, "setup.py")) as f:
-        in_setup = f.read().split('long_description = """')[1].split('"""')[0]
-
-    assert in_readme.strip() == in_setup.strip()

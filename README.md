@@ -5,6 +5,7 @@
 [![Run tests](https://github.com/mscroggs/symfem/actions/workflows/run-tests.yml/badge.svg)](https://github.com/mscroggs/symfem/actions)
 [![Coverage Status](https://coveralls.io/repos/github/mscroggs/symfem/badge.svg?branch=main)](https://coveralls.io/github/mscroggs/symfem?branch=main)
 [![PyPI](https://img.shields.io/pypi/v/symfem?color=blue&label=PyPI&logo=pypi&logoColor=white)](https://pypi.org/project/symfem/)
+[![conda](https://img.shields.io/badge/Anaconda.org-2021.7.6-blue.svg?style=flat-square&label=conda&logo=anaconda)](https://anaconda.org/conda-forge/symfem)
 
 Symfem is a symbolic finite element definition library, that can be used to
 symbolically evaluate the basis functions of a finite element space.
