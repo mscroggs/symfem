@@ -59,4 +59,5 @@ jobs:
           conda install pytest
           pytest test/
           pytest demo/test_demos.py
+        shell: bash -l {0}
         name: Install Symfem and run tests
