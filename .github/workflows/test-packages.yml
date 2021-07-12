@@ -61,3 +61,30 @@ jobs:
           pytest demo/test_demos.py
         shell: bash -l {0}
         name: Install Symfem and run tests
+
+  run-test-with-pypi-zip:
+    name: Run tests with Symfem downloaded from PyPI
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: |
+          wget https://pypi.io/packages/source/s/symfem/symfem-2021.7.5.tar.gz symfem.tar.gz
+          tar -xvzf symfem.tar.gz
+        name: Download and unpack latest version of Symfem
+      - run: pip install pytest
+        name: Install pytest
+      - run: |
+          cd symfem
+          python3 -m pytest test/
+        name: Run unit tests
+      - run: |
+          cd symfem
+          python3 -m pytest demo/test_demos.py
+        name: Run demos
+
