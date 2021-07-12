@@ -74,7 +74,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: |
-          wget https://pypi.io/packages/source/s/symfem/symfem-2021.7.5.tar.gz symfem.tar.gz
+          wget -O symfem.tar.gz https://pypi.io/packages/source/s/symfem/symfem-2021.7.5.tar.gz
           tar -xvzf symfem.tar.gz
         name: Download and unpack latest version of Symfem
       - run: pip install pytest

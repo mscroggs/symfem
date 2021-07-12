@@ -110,10 +110,13 @@ def test_version_numbers():
         assert f.read().split('version = "')[1].split('"')[0] == version
 
     # .github/workflows/test-packages.yml
+    url = "https://pypi.io/packages/source/s/symfem/symfem-"
     with open(os.path.join(root, ".github/workflows/test-packages.yml")) as f:
         for line in f:
             if "ref:" in line:
                 assert line.split("ref:")[1].strip() == "v" + version
+            elif url in line:
+                assert line.split(url)[1].split(" ")[0] == version
 
 
 def test_requirements():
