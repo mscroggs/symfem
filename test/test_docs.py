@@ -109,6 +109,17 @@ def test_version_numbers():
     with open(os.path.join(root, "symfem/version.py")) as f:
         assert f.read().split('version = "')[1].split('"')[0] == version
 
+    # .github/workflows/test-packages.yml
+    url = "https://pypi.io/packages/source/s/symfem/symfem-"
+    with open(os.path.join(root, ".github/workflows/test-packages.yml")) as f:
+        for line in f:
+            if "ref:" in line:
+                assert line.split("ref:")[1].strip() == "v" + version
+            elif url in line:
+                assert line.split(url)[1].split(".tar.gz")[0] == version
+            elif "cd symfem-" in line:
+                assert line.split("cd symfem-")[1].strip() == version
+
 
 def test_requirements():
     root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")

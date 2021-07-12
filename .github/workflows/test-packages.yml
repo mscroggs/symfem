@@ -1,0 +1,83 @@
+name: 🧪📦 Test packages
+
+on:
+  schedule:
+    - cron: "0 7 * * 1"
+
+jobs:
+  run-tests-with-pip:
+    name: Run tests with Symfem installed from pip
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/checkout@v2
+        with:
+          ref: v2021.7.5
+        name: Get latest Symfem version
+      - run: rm -rf symfem VERSION
+        name: Remove downloaded symfem
+      - run: python3 -m pip install symfem
+        name: Install Symfem
+      - run: pip install pytest
+        name: Install pytest
+      - run: python3 -m pytest test/
+        name: Run unit tests
+      - run: python3 -m pytest demo/test_demos.py
+        name: Run demos
+
+  run-tests-with-conda:
+    name: Run tests with Symfem installed from conda-forge
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+    steps:
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          activate-environment: symfem
+      - uses: actions/checkout@v2
+        with:
+          ref: v2021.7.5
+        name: Get latest Symfem version
+      - run: rm -rf symfem VERSION
+        name: Remove downloaded symfem
+      - run: |
+          conda config --add channels conda-forge
+          conda config --set channel_priority strict
+          conda install symfem
+          conda install pytest
+          pytest test/
+          pytest demo/test_demos.py
+        shell: bash -l {0}
+        name: Install Symfem and run tests
+
+  run-test-with-pypi-zip:
+    name: Run tests with Symfem downloaded from PyPI
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: |
+          wget -O symfem.tar.gz https://pypi.io/packages/source/s/symfem/symfem-2021.7.5.tar.gz
+          tar -xvzf symfem.tar.gz
+        name: Download and unpack latest version of Symfem
+      - run: pip install pytest sympy numpy
+        name: Install pytest, sympy and numpy
+      - run: |
+          cd symfem-2021.7.5
+          python3 -m pytest test/
+          python3 -m pytest demo/test_demos.py
+        name: Run tests and demos

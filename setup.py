@@ -18,6 +18,7 @@ Symfem is a symbolic finite element definition library, that can be used to
 symbolically evaluate the basis functions of a finite element space.
 
 ## Installing Symfem
+### Installing from repo
 Symfem can be installed by downloading the [GitHub repo](https://github.com/mscroggs/symfem)
 and running:
 
@@ -25,10 +26,18 @@ and running:
 python3 setup.py install
 ```
 
-Alternatively, the latest stable release can be installed by running:
+### Installing using pip
+The latest release of Symfem can be installed by running:
 
 ```bash
 pip3 install symfem
+```
+
+### Installing using conda
+The latest release of Symfem can be installed by running:
+
+```bash
+conda install symfem
 ```
 
 ## Testing Symfem
@@ -46,7 +55,8 @@ Documentation of the latest release version of Symfem can be found on
 You can find information about how to contribute to Symfem [here](CONTRIBUTING.md).
 """
 
-data_files = ["LICENSE", ("test", ["test/__init__.py", "test/utils.py", "test/conftest.py"])]
+data_files = ["LICENSE", "requirements.txt",
+              ("test", ["test/__init__.py", "test/utils.py", "test/conftest.py"])]
 
 if __name__ == "__main__":
     setuptools.setup(
