@@ -43,7 +43,7 @@ with open("symfem/version.py", "w") as f:
 
 # .github/workflows/test-packages.yml
 new_test = ""
-with open(os.path.join(root, ".github/workflows/test-packages.yml")) as f:
+with open(".github/workflows/test-packages.yml") as f:
     for line in f:
         if "ref:" in line:
             new_test += line.split("ref:")[0]
