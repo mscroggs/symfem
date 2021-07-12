@@ -47,7 +47,10 @@ jobs:
         with:
           ref: v2021.7.5
         name: Get latest Symfem version
-      - run: conda install symfem
+      - run: |
+          conda config --add channels conda-forge
+          conda config --set channel_priority strict
+          conda install symfem
         name: Install Symfem
       - run: rm -rf symfem VERSION
         name: Remove downloaded symfem
