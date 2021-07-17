@@ -19,40 +19,46 @@ bibliography: paper.bib
 
 # Summary
 
-The finite element method (FEM) is a popular method that is used to numerically solving a wide
+The finite element method (FEM) is a popular method for numerically solving a wide
 range of partial differential equations (PDEs). To solve a problem using FEM, the PDE is first
 written in a weak form, for example: find $u\in V$ such that for all $v\in V,$
 
 $$\int_\Omega \nabla u\cdot\nabla v=\int_\Omega fv,$$
 
-where $f$ is a known function, and $\Omega$ is the domain on which the problem is defined.
-This form is then discretised by defining a finite dimensional subspace of $V$, and looking for a
-solution in this subspace that satisfied the equation for all functions $v$ in the subspace. These
-finite dimensional subspaces are defined by meshing the domain of the problem, then defining
-a set of basis function on each cell in the mesh (and enforcing any desired continuity between the
-cells).
+where $f$ is a known function, and $\Omega$ is the domain on which the problem is begin solved.
+This form is then discretised by defining a finite dimensional subspace of $V$---often called
+$V_h$---and looking for a solution $u_h\in V_h$ that satisfies the above equation for all functions
+$v_h\in V_h$. These finite dimensional subspaces are defined by meshing the domain of the problem,
+then defining a set of basis functions on each cell in the mesh (and enforcing any desired
+continuity between the cells).
 
 For different applications, there are a wide range of finite dimensional spaces that can be used.
-Symfem is a Python library that can be used to compute symbolic representations of the basis
-functions of these spaces. The symbolic representation are created using Sympy [@sympy], allowing
+Symfem is a Python library that can be used to symbolically compute basis functions of these
+spaces. The symbolic representations are created using Sympy [@sympy], allowing
 them to be easily manipulated using Sympy's functionality once they are created.
 
 # Statement of need
 
-In finite element libraries, it is common to define basis functions so that they, and their
-derivatives, can quickly and efficiently be evaluated at a collection of points. The libraries
-FIAT [@fiat] and Basix [@basix]---which are part of the FEniCS project [@fenics]---implement
-this functionality as stand-alone libraries. Many other finite element libraries define their
-basis functions as part of the core library functionality.
+In FEM libraries, it is common to define basis functions so that they, and their
+derivatives, can quickly and efficiently be evaluated at a collection of points, thereby allowing
+full computations to be completed quickyl. The libraries FIAT [@fiat] and Basix [@basix]---which
+are part of the FEniCS project [@fenics]---implement this functionality as stand-alone libraries.
+Many other FEM libraries define their basis functions as part of the core library functionality.
+It is not common to be able to compute a symbolic representation of the basis functions.
 
-As is computes its basis functions symbolically, Symfem is slower that these libraries (and
-therefore higher order elements are often impractical to compute). In some situations, however,
-it is useful to have a symbolic representation of the basis functions of a space.
+Symfem offers a wider range of finite element spaces than other FEM libraries, and the ability
+to symbolically compute basis functions. There are a number of situations in which the symbolic
+representation of a basis function is useful: it is easy to confirm, for example, that the
+derivatives of the basis functions have a certain desired property, or check what they are
+equal to when restricted to one face or edge of the cell.
 
-When validating
-useful for:
+Symfem can also be used to explore the behaviour of the wide range of spaces it supports, so the
+user can decide which spaces to implement in a faster way in their FEM code. Additionally,
+Symfem can be used to prototype new finite element spaces, as custom spaces can easily be
+added, then it can be checked that the basis functions of the space behave as expected.
 
-- prototyping
-- validation
-    
+As basis functions are computed symbolically in Symfem, it is much slower than the alternative
+libraries. It is therefore not suitable for performing actual finite element calculations. It
+should instead be seen as a library for research and experimentation.
+
 # References
