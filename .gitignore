@@ -8,3 +8,6 @@ dist/
 feast.egg-info/
 docs/_build
 .coverage
+
+joss/build.sh
+joss/paper.pdf
