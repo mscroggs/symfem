@@ -67,6 +67,27 @@ def test_available_elements():
     assert set(symfem.create._elementmap.keys()) == supported
 
 
+def test_readme_references():
+    elementlist = {}
+    for e in symfem.create._elementlist:
+        for r in e.references:
+            if r not in elementlist:
+                elementlist[r] = []
+            elementlist[r].append(e.names[0])
+
+    root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+    with open(os.path.join(root, "README.md")) as f:
+        readme = f.read().split("## List of supported elements")[1]
+    cells = []
+    for r in readme.split("###")[1:]:
+        lines = r.split("\n")
+        cell = lines[0].strip().lower()
+        cells.append(cell)
+        elements = [i[2:].strip() for i in lines[1:] if i.strip() != ""]
+        assert set(elementlist[cell]) == set(elements)
+    assert set(elementlist.keys()) == set(cells)
+
+
 @pytest.mark.parametrize("script, output", doc_data)
 def test_snippets(script, output):
     root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
