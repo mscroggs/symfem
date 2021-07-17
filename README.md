@@ -46,3 +46,126 @@ Documentation of the latest release version of Symfem can be found on
 
 ## Contributing to Symfem
 You can find information about how to contribute to Symfem [here](CONTRIBUTING.md).
+
+## List of supported elements
+### Interval
+- Bernstein
+- bubble
+- discontinuous Lagrange
+- Hermite
+- Lagrange
+- Morley-Wang-Xu
+- serendipity
+- Taylor
+- vector discontinuous Lagrange
+- vector Lagrange
+- Wu-Xu
+
+### Triangle
+- Argyris
+- Arnold-Winther
+- Bell
+- Bernardi-Raugel
+- Bernstein
+- Brezzi-Douglas-Fortin-Marini
+- Brezzi-Douglas-Marini
+- bubble
+- bubble enriched Lagrange
+- bubble enriched vector Lagrange
+- conforming Crouzeix-Raviart
+- Crouzeix-Raviart
+- discontinuous Lagrange
+- Fortin-Soulie
+- Hellan-Herrmann-Johnson
+- Hermite
+- Hsieh-Clough-Tocher
+- Kong-Mulder-Veldhuizen
+- Lagrange
+- Mardal-Tai-Winther
+- matrix discontinuous Lagrange
+- Morley
+- Morley-Wang-Xu
+- Nedelec
+- Nedelec2
+- Raviart-Thomas
+- reduced Hsieh-Clough-Tocher
+- Regge
+- symmetric matrix discontinuous Lagrange
+- Taylor
+- transition
+- vector discontinuous Lagrange
+- vector Lagrange
+- Wu-Xu
+
+### Quadrilateral
+- Bogner-Fox-Schmit
+- Brezzi-Douglas-Fortin-Marini
+- bubble
+- direct serendipity
+- discontinuous Lagrange
+- dQ
+- matrix discontinuous Lagrange
+- NCE
+- NCF
+- Q
+- serendipity
+- serendipity Hcurl
+- serendipity Hdiv
+- symmetric matrix discontinuous Lagrange
+- vector discontinuous Lagrange
+- vector Q
+
+### Tetrahedron
+- Bernardi-Raugel
+- Bernstein
+- Brezzi-Douglas-Fortin-Marini
+- Brezzi-Douglas-Marini
+- bubble
+- Crouzeix-Raviart
+- discontinuous Lagrange
+- Hermite
+- Kong-Mulder-Veldhuizen
+- Lagrange
+- Mardal-Tai-Winther
+- matrix discontinuous Lagrange
+- Morley-Wang-Xu
+- Nedelec
+- Nedelec2
+- Raviart-Thomas
+- Regge
+- symmetric matrix discontinuous Lagrange
+- Taylor
+- transition
+- vector discontinuous Lagrange
+- vector Lagrange
+- Wu-Xu
+
+### Hexahedron
+- Brezzi-Douglas-Duran-Fortin
+- Brezzi-Douglas-Fortin-Marini
+- bubble
+- discontinuous Lagrange
+- dQ
+- matrix discontinuous Lagrange
+- NCE
+- NCF
+- Q
+- serendipity
+- serendipity Hcurl
+- serendipity Hdiv
+- symmetric matrix discontinuous Lagrange
+- vector discontinuous Lagrange
+- vector Q
+
+### Prism
+- Lagrange
+- Nedelec
+
+### Pyramid
+- Lagrange
+
+### Dual polygon
+- Buffa-Christiansen
+- dual
+- rotated Buffa-Christiansen
+
