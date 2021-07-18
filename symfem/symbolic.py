@@ -249,3 +249,16 @@ class PiecewiseFunction:
                 [(i[0], i[1] + j[1]) for i, j in zip(self.pieces, other.pieces)])
 
         return PiecewiseFunction([(i, other + j) for i, j in self.pieces])
+
+    def _iter_list(self):
+        from .basis_function import BasisFunction
+        for p in self.pieces:
+            assert isinstance(p[1], (list, tuple)) or (
+                isinstance(p[1], BasisFunction) and
+                isinstance(p[1].get_function(), (list, tuple)))
+        return [PiecewiseFunction([(j[0], j[1][i])
+                                   for j in self.pieces])
+                for i in range(len(self.pieces[0][1]))]
+
+    def __iter__(self):
+        return self._iter_list().__iter__()

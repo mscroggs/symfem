@@ -235,7 +235,7 @@ class DotPointEvaluation(BaseFunctional):
 
     def eval(self, function, symbolic=True):
         """Apply to the functional to a function."""
-        value = subs(vdot(function, self.vector), x, self.point)
+        value = vdot(subs(function, x, self.point), subs(self.vector, x, self.point))
         if symbolic:
             return value
         else:
@@ -361,7 +361,12 @@ class IntegralMoment(BaseFunctional):
         for i, a in enumerate(zip(*self.reference.axes)):
             for j, k in zip(a, t):
                 point[i] += j * k
+
         integrand = self.dot(subs(function, x, point))
+        if isinstance(integrand, PiecewiseFunction):
+            mid = tuple(j + sym_sum(sympy.Rational(1, 2) * k[i] for k in self.reference.axes)
+                        for i, j in enumerate(self.reference.origin))
+            integrand = integrand.get_piece(mid)
         value = self.reference.integral(integrand)
         if symbolic:
             return value

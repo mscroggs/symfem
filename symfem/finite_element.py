@@ -248,11 +248,17 @@ class CiarletElement(FiniteElement):
             else:
                 # Vector space
                 for i, dof in enumerate(self.dofs):
-                    b = [0 for i in self.get_polynomial_basis()[0]]
+                    b = [0 for i in range(self.range_dim)]
                     for c, d in zip(minv.row(i), self.get_polynomial_basis()):
                         for j, d_j in enumerate(d):
                             b[j] += c * d_j
                     self._basis_functions.append(b)
+            if self.reference.vertices != self.reference.reference_vertices:
+                map = self.reference.get_map_to_self()
+                inv_map = self.reference.get_inverse_map_to_self()
+                self._basis_functions = self.map_to_cell(
+                    self.reference.vertices, self._basis_functions, map=map,
+                    inverse_map=inv_map)
 
         if reshape and self.range_shape is not None:
             if len(self.range_shape) != 2:
@@ -264,11 +270,10 @@ class CiarletElement(FiniteElement):
 
         return self._basis_functions
 
-    def map_to_cell(self, vertices, basis=None):
+    def map_to_cell(self, vertices, basis=None, map=None, inverse_map=None):
         """Map the basis onto a cell using the appropriate mapping for the element."""
         if basis is None:
             basis = self.get_basis_functions()
-        map = self.reference.get_map_to(vertices)
         if isinstance(basis[0], PiecewiseFunction):
             pieces = [[] for i in basis]
             for i, j in enumerate(basis[0].pieces):
@@ -276,7 +281,11 @@ class CiarletElement(FiniteElement):
                 for k, f in enumerate(self.map_to_cell(vertices, [b.pieces[i][1] for b in basis])):
                     pieces[k].append((new_i, f))
             return [PiecewiseFunction(p) for p in pieces]
-        inverse_map = self.reference.get_inverse_map_to(vertices)
+
+        if map is None:
+            map = self.reference.get_map_to(vertices)
+        if inverse_map is None:
+            inverse_map = self.reference.get_inverse_map_to(vertices)
 
         out = [None for f in basis]
         for dim in range(self.reference.tdim + 1):
