@@ -80,5 +80,4 @@ jobs:
           cd symfem-2021.7.6
           pip install -r requirements.txt
           python3 -m pytest test/
-          python3 -m pytest demo/test_demos.py
         name: Install requirements, run tests and demos
