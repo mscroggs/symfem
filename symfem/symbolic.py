@@ -209,10 +209,16 @@ class PiecewiseFunction:
 
     def get_piece(self, point):
         """Get the piece of the function defined at the given point."""
-        from .vectors import point_in_triangle
-        for tri, value in self.pieces:
-            if point_in_triangle(point[:2], tri):
-                return value
+        if len(self.pieces[0][0]) == 3:
+            from .vectors import point_in_triangle
+            for tri, value in self.pieces:
+                if point_in_triangle(point[:2], tri):
+                    return value
+        if len(self.pieces[0][0]) == 4:
+            from .vectors import point_in_tetrahedron
+            for tet, value in self.pieces:
+                if point_in_tetrahedron(point, tet):
+                    return value
 
         raise NotImplementedError("Evaluation of piecewise functions outside domain not supported.")
 

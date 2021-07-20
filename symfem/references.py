@@ -263,12 +263,20 @@ class Triangle(Reference):
 
     def get_inverse_map_to_self(self):
         """Get the inverse map from the canonical reference to this reference."""
-        p = vsub(x, self.vertices[0])
-        v1 = vsub(self.vertices[1], self.vertices[0])
-        v2 = vsub(self.vertices[2], self.vertices[0])
-        mat = sympy.Matrix([[v1[0], v2[0]],
-                            [v1[1], v2[1]]]).inv()
-        return (vdot(mat.row(0), p), vdot(mat.row(1), p))
+        if len(self.vertices[0]) == 2:
+            p = vsub(x, self.vertices[0])
+            v1 = vsub(self.vertices[1], self.vertices[0])
+            v2 = vsub(self.vertices[2], self.vertices[0])
+            mat = sympy.Matrix([[v1[0], v2[0]],
+                                [v1[1], v2[1]]]).inv()
+            return (vdot(mat.row(0), p), vdot(mat.row(1), p))
+
+        print(tuple(
+            vdot(vsub(x, self.origin), a) / vnorm(a) for a in self.axes
+        ))
+        return tuple(
+            vdot(vsub(x, self.origin), a) / vnorm(a) for a in self.axes
+        )
 
     def volume(self):
         """Calculate the volume."""
