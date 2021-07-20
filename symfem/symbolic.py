@@ -257,6 +257,7 @@ class PiecewiseFunction:
         return PiecewiseFunction([(i, other + j) for i, j in self.pieces])
 
     def _iter_list(self):
+        """Make am iterable list."""
         from .basis_function import BasisFunction
         for p in self.pieces:
             assert isinstance(p[1], (list, tuple)) or (
@@ -267,4 +268,5 @@ class PiecewiseFunction:
                 for i in range(len(self.pieces[0][1]))]
 
     def __iter__(self):
+        """Get iterable."""
         return self._iter_list().__iter__()
