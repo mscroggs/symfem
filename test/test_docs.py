@@ -119,6 +119,7 @@ def test_version_numbers():
     with open(os.path.join(root, "codemeta.json")) as f:
         data = json.load(f)
     assert data["version"] == version
+    date = data["dateModified"]
 
     # setup.py
     with open(os.path.join(root, "setup.py")) as f:
@@ -141,6 +142,13 @@ def test_version_numbers():
             elif "cd symfem-" in line:
                 assert line.split("cd symfem-")[1].strip() == version
 
+    # CITATION.cff
+    with open("CITATION.cff") as f:
+        for line in f:
+            if line.startswith("version: "):
+                assert line.split("version: ")[1].strip() == version
+            elif line.startswith("date-released: "):
+                assert line.split("date-released: ")[1].strip() == date
 
 def test_requirements():
     root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
