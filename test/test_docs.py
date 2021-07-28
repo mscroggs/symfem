@@ -150,6 +150,7 @@ def test_version_numbers():
             elif line.startswith("date-released: "):
                 assert line.split("date-released: ")[1].strip() == date
 
+
 def test_requirements():
     root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
     if not os.path.isfile(os.path.join(root, "VERSION")):
