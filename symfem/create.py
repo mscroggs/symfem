@@ -111,7 +111,7 @@ def create_reference(cell_type, vertices=None):
         raise ValueError(f"Unknown cell type: {cell_type}")
 
 
-def create_element(cell_type, element_type, order, **kwargs):
+def create_element(cell_type, element_type, order, vertices=None, **kwargs):
     """Make a finite element.
 
     Parameters
@@ -176,8 +176,13 @@ def create_element(cell_type, element_type, order, **kwargs):
         transition
     order : int
         The order of the element.
+    vertices : list
+        The vertices of the reference.
     """
-    reference = create_reference(cell_type)
+    if vertices is None:
+        reference = create_reference(cell_type)
+    else:
+        reference = create_reference(cell_type, vertices=vertices)
 
     if element_type in _elementmap:
         if reference.name not in _elementmap[element_type]:

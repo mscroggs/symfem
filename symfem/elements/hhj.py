@@ -15,6 +15,8 @@ class HellanHerrmannJohnson(CiarletElement):
     """A Hellan-Herrmann-Johnson element."""
 
     def __init__(self, reference, order, variant="equispaced"):
+        if reference.vertices != reference.reference_vertices:
+            raise NotImplementedError()
         assert reference.name == "triangle"
         poly = [(p[0], p[1], p[1], p[2])
                 for p in polynomial_set(reference.tdim, 3, order)]
@@ -27,8 +29,13 @@ class HellanHerrmannJohnson(CiarletElement):
                    {"variant": variant}),
         )
 
+        self.variant = variant
+
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))
+
+    def init_kwargs(self):
+        return {"variant": self.variant}
 
     names = ["Hellan-Herrmann-Johnson", "HHJ"]
     references = ["triangle"]

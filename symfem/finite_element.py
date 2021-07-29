@@ -233,32 +233,38 @@ class CiarletElement(FiniteElement):
                     p, symbolic=False, use_legendre=use_legendre))
             return mat
 
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {}
+
     def get_basis_functions(self, reshape=True):
         """Get the basis functions of the element."""
         if self._basis_functions is None:
-            minv = self.get_dual_matrix().inv("LU")
-            self._basis_functions = []
-            if self.range_dim == 1:
-                # Scalar space
-                for i, dof in enumerate(self.dofs):
-                    self._basis_functions.append(
-                        sym_sum(c * d for c, d in zip(
-                            minv.row(i),
-                            self.get_polynomial_basis())))
-            else:
-                # Vector space
-                for i, dof in enumerate(self.dofs):
-                    b = [0 for i in range(self.range_dim)]
-                    for c, d in zip(minv.row(i), self.get_polynomial_basis()):
-                        for j, d_j in enumerate(d):
-                            b[j] += c * d_j
-                    self._basis_functions.append(b)
+            from . import create_reference
             if self.reference.vertices != self.reference.reference_vertices:
-                map = self.reference.get_map_to_self()
-                inv_map = self.reference.get_inverse_map_to_self()
-                self._basis_functions = self.map_to_cell(
-                    self.reference.vertices, self._basis_functions, map=map,
-                    inverse_map=inv_map)
+                element_with_default_vertices = type(self)(
+                    create_reference(self.reference.name), self.order, **self.init_kwargs()
+                )
+                self._basis_functions = element_with_default_vertices.map_to_cell(
+                    self.reference.vertices)
+            else:
+                minv = self.get_dual_matrix().inv("LU")
+                self._basis_functions = []
+                if self.range_dim == 1:
+                    # Scalar space
+                    for i, dof in enumerate(self.dofs):
+                        self._basis_functions.append(
+                            sym_sum(c * d for c, d in zip(
+                                minv.row(i),
+                                self.get_polynomial_basis())))
+                else:
+                    # Vector space
+                    for i, dof in enumerate(self.dofs):
+                        b = [0 for i in range(self.range_dim)]
+                        for c, d in zip(minv.row(i), self.get_polynomial_basis()):
+                            for j, d_j in enumerate(d):
+                                b[j] += c * d_j
+                        self._basis_functions.append(b)
 
         if reshape and self.range_shape is not None:
             if len(self.range_shape) != 2:
@@ -274,6 +280,11 @@ class CiarletElement(FiniteElement):
         """Map the basis onto a cell using the appropriate mapping for the element."""
         if basis is None:
             basis = self.get_basis_functions()
+        if map is None:
+            map = self.reference.get_map_to(vertices)
+        if inverse_map is None:
+            inverse_map = self.reference.get_inverse_map_to(vertices)
+
         if isinstance(basis[0], PiecewiseFunction):
             pieces = [[] for i in basis]
             for i, j in enumerate(basis[0].pieces):
@@ -282,10 +293,25 @@ class CiarletElement(FiniteElement):
                     pieces[k].append((new_i, f))
             return [PiecewiseFunction(p) for p in pieces]
 
-        if map is None:
-            map = self.reference.get_map_to(vertices)
-        if inverse_map is None:
-            inverse_map = self.reference.get_inverse_map_to(vertices)
+        if isinstance(basis[0], (list, tuple)) and isinstance(basis[0][0], PiecewiseFunction):
+            for b in basis:
+                pieces = [[] for f in b]
+                for f in b:
+                    for i, j in enumerate(f.pieces):
+                        assert j[0] == basis[0][0].pieces[i][0]
+            new_tris = [[subs(map, x, k) for k in p[0]] for p in basis[0][0].pieces]
+            output_pieces = []
+            for p in range(len(basis[0][0].pieces)):
+                piece_basis = []
+                for b in basis:
+                    piece_basis.append([
+                        f.pieces[p][1] for f in b
+                    ])
+                output_pieces.append(self.map_to_cell(
+                    vertices, piece_basis, map, inverse_map))
+
+            return [PiecewiseFunction(list(zip(new_tris, fs)))
+                    for fs in zip(*output_pieces)]
 
         out = [None for f in basis]
         for dim in range(self.reference.tdim + 1):

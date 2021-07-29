@@ -27,7 +27,7 @@ class HsiehCloughTocher(CiarletElement):
         for e_n, vs in enumerate(reference.sub_entities(1)):
             sub_ref = create_reference(
                 reference.sub_entity_types[1],
-                vertices=[reference.reference_vertices[v] for v in vs])
+                vertices=[reference.vertices[v] for v in vs])
             midpoint = tuple(sym_sum(i) / len(i)
                              for i in zip(*[reference.vertices[i] for i in vs]))
             dofs.append(

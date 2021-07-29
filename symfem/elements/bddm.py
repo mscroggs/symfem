@@ -42,7 +42,12 @@ class BDDF(CiarletElement):
             cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, {"variant": variant})
         )
 
+        self.variant = variant
+
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+
+    def init_kwargs(self):
+        return {"variant": self.variant}
 
     names = ["Brezzi-Douglas-Duran-Fortin", "BDDF"]
     references = ["hexahedron"]

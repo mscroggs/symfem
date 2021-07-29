@@ -25,7 +25,7 @@ class Transition(CiarletElement):
 
         dofs = []
         poly = polynomial_set(reference.tdim, 1, 1)
-        for v_n, v in enumerate(reference.reference_vertices):
+        for v_n, v in enumerate(reference.vertices):
             dofs.append(PointEvaluation(v, entity=(0, v_n)))
 
         for edim in range(1, 4):
@@ -85,6 +85,13 @@ class Transition(CiarletElement):
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1
         )
+        self.variant = variant
+        self.face_orders = face_orders
+        self.edge_orders = edge_orders
+
+    def init_kwargs(self):
+        return {"variant": self.variant, "face_orders": self.face_orders,
+                "edge_orders": self.edge_orders}
 
     names = ["transition"]
     references = ["triangle", "tetrahedron"]

@@ -1,7 +1,7 @@
 """Reference elements."""
 
 import sympy
-from .symbolic import t, x, subs
+from .symbolic import t, x, subs, sym_sum
 from .vectors import vsub, vnorm, vdot, vcross, vnormalise, vadd
 
 
@@ -12,6 +12,12 @@ class Reference:
         self.gdim = len(self.origin)
         self.simplex = simplex
         self.tp = tp
+
+    def get_point(self, reference_coords):
+        """Get a point in the reference from reference coordinates."""
+        assert len(reference_coords) == len(self.axes)
+        return tuple(o + sym_sum(a[i] * b for a, b in zip(self.axes, reference_coords))
+                     for i, o in enumerate(self.origin))
 
     def integral(self, f):
         """Calculate the integral over the element."""
@@ -36,6 +42,10 @@ class Reference:
     def volume(self):
         """Calculate the volume."""
         raise NotImplementedError
+
+    def midpoint(self):
+        """Calculate the midpoint."""
+        return tuple(sum(i) * sympy.Integer(1) / len(i) for i in zip(*self.vertices))
 
     def jacobian(self):
         """Calculate the jacobian."""
@@ -271,9 +281,6 @@ class Triangle(Reference):
                                 [v1[1], v2[1]]]).inv()
             return (vdot(mat.row(0), p), vdot(mat.row(1), p))
 
-        print(tuple(
-            vdot(vsub(x, self.origin), a) / vnorm(a) for a in self.axes
-        ))
         return tuple(
             vdot(vsub(x, self.origin), a) / vnorm(a) for a in self.axes
         )

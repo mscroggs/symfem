@@ -50,6 +50,10 @@ class Nedelec(CiarletElement):
                 dofs.append(IntegralAgainst(reference, f, entity=(3, 0), mapping="covariant"))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        self.variant = variant
+
+    def init_kwargs(self):
+        return {"variant": self.variant}
 
     names = ["Nedelec", "Ncurl"]
     references = ["prism"]

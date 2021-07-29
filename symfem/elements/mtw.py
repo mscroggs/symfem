@@ -53,6 +53,10 @@ class MardalTaiWinther(CiarletElement):
                                    {"variant": variant}))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        self.variant = variant
+
+    def init_kwargs(self):
+        return {"variant": self.variant}
 
     names = ["Mardal-Tai-Winther", "MTW"]
     references = ["triangle", "tetrahedron"]

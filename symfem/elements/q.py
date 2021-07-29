@@ -25,13 +25,13 @@ class Q(CiarletElement):
             points, _ = get_quadrature(variant, order + 1)
 
             dofs = []
-            for v_n, v in enumerate(reference.reference_vertices):
+            for v_n, v in enumerate(reference.vertices):
                 dofs.append(PointEvaluation(v, entity=(0, v_n)))
             for edim in range(1, 4):
                 for e_n, vs in enumerate(reference.sub_entities(edim)):
                     entity = create_reference(
                         reference.sub_entity_types[edim],
-                        vertices=tuple(reference.reference_vertices[i] for i in vs))
+                        vertices=tuple(reference.vertices[i] for i in vs))
                     for i in product(range(1, order), repeat=edim):
                         dofs.append(
                             PointEvaluation(
@@ -46,6 +46,10 @@ class Q(CiarletElement):
             dofs,
             reference.tdim,
             1)
+        self.variant = variant
+
+    def init_kwargs(self):
+        return {"variant": self.variant}
 
     names = ["Q", "Lagrange", "P"]
     references = ["quadrilateral", "hexahedron"]
@@ -76,6 +80,10 @@ class DiscontinuousQ(CiarletElement):
             dofs,
             reference.tdim,
             1)
+        self.variant = variant
+
+    def init_kwargs(self):
+        return {"variant": self.variant}
 
     names = ["dQ"]
     references = ["quadrilateral", "hexahedron"]
@@ -107,6 +115,10 @@ class VectorQ(CiarletElement):
             reference.tdim,
             reference.tdim,
         )
+        self.variant = variant
+
+    def init_kwargs(self):
+        return {"variant": self.variant}
 
     names = ["vector Q", "vQ"]
     references = ["quadrilateral", "hexahedron"]
@@ -129,6 +141,10 @@ class Nedelec(CiarletElement):
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        self.variant = variant
+
+    def init_kwargs(self):
+        return {"variant": self.variant}
 
     names = ["NCE", "RTCE", "Qcurl", "Nedelec", "Ncurl"]
     references = ["quadrilateral", "hexahedron"]
@@ -150,6 +166,10 @@ class RaviartThomas(CiarletElement):
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        self.variant = variant
+
+    def init_kwargs(self):
+        return {"variant": self.variant}
 
     names = ["NCF", "RTCF", "Qdiv"]
     references = ["quadrilateral", "hexahedron"]

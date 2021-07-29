@@ -23,8 +23,12 @@ class BDM(CiarletElement):
             facets=(NormalIntegralMoment, DiscontinuousLagrange, order, {"variant": variant}),
             cells=(IntegralMoment, NedelecFirstKind, order - 1, {"variant": variant}),
         )
+        self.variant = variant
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+
+    def init_kwargs(self):
+        return {"variant": self.variant}
 
     names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]
     references = ["triangle", "tetrahedron"]

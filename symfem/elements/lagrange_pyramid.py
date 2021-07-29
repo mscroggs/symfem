@@ -31,7 +31,7 @@ class Lagrange(CiarletElement):
 
             dofs = []
             # Vertices
-            for v_n, v in enumerate(reference.reference_vertices):
+            for v_n, v in enumerate(reference.vertices):
                 dofs.append(PointEvaluation(v, entity=(0, v_n)))
             # Edges
             for e_n in range(reference.sub_entity_count(1)):
@@ -67,6 +67,10 @@ class Lagrange(CiarletElement):
         poly = pyramid_polynomial_set(reference.tdim, 1, order)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        self.variant = variant
+
+    def init_kwargs(self):
+        return {"variant": self.variant}
 
     names = ["Lagrange", "P"]
     references = ["pyramid"]

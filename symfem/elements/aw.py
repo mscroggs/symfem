@@ -20,6 +20,7 @@ class ArnoldWinther(CiarletElement):
     def __init__(self, reference, order, variant="equispaced"):
         from symfem import create_reference
         assert reference.name == "triangle"
+        self.variant = variant
         poly = [(p[0], p[1], p[1], p[2])
                 for p in polynomial_set(reference.tdim, 3, order - 1)]
         poly += [((order - k + 1) * (order - k + 2) * x[0] ** k * x[1] ** (order - k),
@@ -64,6 +65,9 @@ class ArnoldWinther(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))
+
+    def init_kwargs(self):
+        return {"variant": self.variant}
 
     names = ["Arnold-Winther", "AW"]
     references = ["triangle"]

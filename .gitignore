@@ -1,5 +1,6 @@
 *.pyc
 symfem/VERSION
+symfem/_guzman_neilan*
 
 .*.swp
 

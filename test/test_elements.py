@@ -212,10 +212,21 @@ def test_element_functionals_and_continuity(
             f = basis[fi]
             g = basis2[gi]
 
-            if isinstance(f, PiecewiseFunction):
-                assert space.reference.tdim == 2
-                f = f.get_piece((0, sympy.Rational(1, 2)))
-                g = g.get_piece((0, sympy.Rational(1, 2)))
+            def get_piece(f, point):
+                if isinstance(f, PiecewiseFunction):
+                    return f.get_piece(point)
+                if isinstance(f, list):
+                    return [get_piece(g, point) for g in f]
+                if isinstance(f, tuple):
+                    return tuple(get_piece(g, point) for g in f)
+                return f
+
+            if space.reference.tdim == 2:
+                f = get_piece(f, (0, sympy.Rational(1, 2)))
+                g = get_piece(g, (0, sympy.Rational(1, 2)))
+            elif space.reference.tdim == 3:
+                f = get_piece(f, (0, sympy.Rational(1, 3), sympy.Rational(1, 3)))
+                g = get_piece(g, (0, sympy.Rational(1, 3), sympy.Rational(1, 3)))
 
             f = subs(f, [x[0]], [0])
             g = subs(g, [x[0]], [0])

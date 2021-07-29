@@ -27,6 +27,10 @@ class RaviartThomas(CiarletElement):
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        self.variant = variant
+
+    def init_kwargs(self):
+        return {"variant": self.variant}
 
     names = ["Raviart-Thomas", "RT", "N1div"]
     references = ["triangle", "tetrahedron"]
