@@ -173,7 +173,8 @@ def create_element(cell_type, element_type, order, vertices=None, **kwargs):
         Fortin-Soulie, FS,
         Bernardi-Raugel,
         Wu-Xu,
-        transition
+        transition,
+        Guzman-Neilan
     order : int
         The order of the element.
     vertices : list
