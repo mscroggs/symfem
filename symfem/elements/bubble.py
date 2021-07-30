@@ -16,7 +16,8 @@ class Bubble(CiarletElement):
     """Bubble finite element."""
 
     def __init__(self, reference, order, variant="equispaced"):
-        p1 = Lagrange(reference, 1)
+        from .. import create_element
+        p1 = create_element(reference.name, "Lagrange", 1)
         bubble = 1
         for f in p1.get_basis_functions():
             bubble *= f
@@ -44,7 +45,7 @@ class Bubble(CiarletElement):
             f = max
         for i in product(range(1, order), repeat=reference.tdim):
             if f(i) < order:
-                point = reference.get_point([sympy.Rational(j, order) for j in i])
+                point = tuple(sympy.Rational(j, order) for j in i)
                 dofs.append(PointEvaluation(point, entity=(reference.tdim, 0)))
 
         self.variant = variant

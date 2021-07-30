@@ -46,7 +46,6 @@ def make_integral_moment_dofs(
     peaks: tuple
         DOFs on codimension 3 entities.
     """
-    from . import create_reference
     dofs = []
 
     # DOFs per dimension
@@ -57,11 +56,10 @@ def make_integral_moment_dofs(
                 assert dim > 0
                 for i, vs in enumerate(reference.sub_entities(dim)):
                     sub_ref = reference.sub_entity(dim, i, True)
-                    sub_ref_ref = create_reference(sub_ref.name)
                     IntegralMoment, SubElement, order, mapping, kwargs = extract_moment_data(
                         moment_data, sub_ref.name)
                     if order >= SubElement.min_order:
-                        sub_element = SubElement(sub_ref_ref, order, **kwargs)
+                        sub_element = SubElement(sub_ref, order, **kwargs)
                         for dn, d in enumerate(sub_element.dofs):
                             f = sub_element.get_basis_function(dn)
                             if mapping is None:
@@ -79,11 +77,10 @@ def make_integral_moment_dofs(
                 assert dim > 0
                 for i, vs in enumerate(reference.sub_entities(dim)):
                     sub_ref = reference.sub_entity(dim, i, True)
-                    sub_ref_ref = create_reference(sub_ref.name)
                     IntegralMoment, SubElement, order, mapping, kwargs = extract_moment_data(
                         moment_data, sub_ref.name)
                     if order >= SubElement.min_order:
-                        sub_element = SubElement(sub_ref_ref, order, **kwargs)
+                        sub_element = SubElement(sub_ref, order, **kwargs)
                         for dn, d in enumerate(sub_element.dofs):
                             f = sub_element.get_basis_function(dn)
                             if mapping is None:

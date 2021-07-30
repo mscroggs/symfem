@@ -216,7 +216,6 @@ class CiarletElement(FiniteElement):
                     row.append(d.eval(to_sympy(b), symbolic=symbolic))
                 mat.append(row)
             return sympy.Matrix(mat)
-
         else:
             for d in self.dofs:
                 if d.get_points_and_weights is None:
@@ -240,31 +239,23 @@ class CiarletElement(FiniteElement):
     def get_basis_functions(self, reshape=True):
         """Get the basis functions of the element."""
         if self._basis_functions is None:
-            from . import create_reference
-            if self.reference.vertices != self.reference.reference_vertices:
-                element_with_default_vertices = type(self)(
-                    create_reference(self.reference.name), self.order, **self.init_kwargs()
-                )
-                self._basis_functions = element_with_default_vertices.map_to_cell(
-                    self.reference.vertices)
+            minv = self.get_dual_matrix().inv("LU")
+            self._basis_functions = []
+            if self.range_dim == 1:
+                # Scalar space
+                for i, dof in enumerate(self.dofs):
+                    self._basis_functions.append(
+                        sym_sum(c * d for c, d in zip(
+                            minv.row(i),
+                            self.get_polynomial_basis())))
             else:
-                minv = self.get_dual_matrix().inv("LU")
-                self._basis_functions = []
-                if self.range_dim == 1:
-                    # Scalar space
-                    for i, dof in enumerate(self.dofs):
-                        self._basis_functions.append(
-                            sym_sum(c * d for c, d in zip(
-                                minv.row(i),
-                                self.get_polynomial_basis())))
-                else:
-                    # Vector space
-                    for i, dof in enumerate(self.dofs):
-                        b = [0 for i in range(self.range_dim)]
-                        for c, d in zip(minv.row(i), self.get_polynomial_basis()):
-                            for j, d_j in enumerate(d):
-                                b[j] += c * d_j
-                        self._basis_functions.append(b)
+                # Vector space
+                for i, dof in enumerate(self.dofs):
+                    b = [0 for i in range(self.range_dim)]
+                    for c, d in zip(minv.row(i), self.get_polynomial_basis()):
+                        for j, d_j in enumerate(d):
+                            b[j] += c * d_j
+                    self._basis_functions.append(b)
 
         if reshape and self.range_shape is not None:
             if len(self.range_shape) != 2:

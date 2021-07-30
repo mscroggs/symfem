@@ -26,7 +26,7 @@ class Lagrange(CiarletElement):
             points, _ = get_quadrature(variant, order + 1)
 
             dofs = []
-            for v_n, v in enumerate(reference.vertices):
+            for v_n, v in enumerate(reference.reference_vertices):
                 dofs.append(PointEvaluation(v, entity=(0, v_n)))
             for edim in range(1, 4):
                 for e_n in range(reference.sub_entity_count(edim)):
@@ -66,7 +66,7 @@ class DiscontinuousLagrange(CiarletElement):
             dofs = []
             for i in product(range(order + 1), repeat=reference.tdim):
                 if sum(i) <= order:
-                    point = reference.get_point([sympy.Rational(j, order) for j in i])
+                    point = tuple(sympy.Rational(j, order) for j in i)
                     dofs.append(PointEvaluation(point, entity=(reference.tdim, 0)))
 
         super().__init__(
