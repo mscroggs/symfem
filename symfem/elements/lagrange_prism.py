@@ -65,6 +65,7 @@ class Lagrange(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = ["Lagrange", "P"]
@@ -98,6 +99,7 @@ class DiscontinuousLagrange(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = []
@@ -134,6 +136,7 @@ class VectorLagrange(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = []
@@ -170,6 +173,7 @@ class VectorDiscontinuousLagrange(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = []

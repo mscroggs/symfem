@@ -53,6 +53,7 @@ class CrouzeixRaviart(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = ["Crouzeix-Raviart", "CR", "Crouzeix-Falk", "CF"]

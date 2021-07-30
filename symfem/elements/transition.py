@@ -90,6 +90,7 @@ class Transition(CiarletElement):
         self.edge_orders = edge_orders
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant, "face_orders": self.face_orders,
                 "edge_orders": self.edge_orders}
 

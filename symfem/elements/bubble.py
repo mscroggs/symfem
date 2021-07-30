@@ -54,6 +54,7 @@ class Bubble(CiarletElement):
         )
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = ["bubble"]
@@ -78,6 +79,7 @@ class BubbleEnrichedLagrange(CiarletElement):
         )
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = ["bubble enriched Lagrange"]
@@ -105,6 +107,7 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
         super().__init__(reference, order, basis, dofs, reference.tdim, 2)
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = ["bubble enriched vector Lagrange"]

@@ -36,6 +36,7 @@ class Bell(CiarletElement):
         )
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = ["Bell"]

@@ -28,6 +28,7 @@ class BDM(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]

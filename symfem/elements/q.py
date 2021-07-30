@@ -49,6 +49,7 @@ class Q(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = ["Q", "Lagrange", "P"]
@@ -83,6 +84,7 @@ class DiscontinuousQ(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = ["dQ"]
@@ -118,6 +120,7 @@ class VectorQ(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = ["vector Q", "vQ"]
@@ -144,6 +147,7 @@ class Nedelec(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = ["NCE", "RTCE", "Qcurl", "Nedelec", "Ncurl"]
@@ -169,6 +173,7 @@ class RaviartThomas(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = ["NCF", "RTCF", "Qdiv"]

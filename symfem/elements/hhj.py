@@ -35,6 +35,7 @@ class HellanHerrmannJohnson(CiarletElement):
                          (reference.tdim, reference.tdim))
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = ["Hellan-Herrmann-Johnson", "HHJ"]

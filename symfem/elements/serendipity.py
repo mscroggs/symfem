@@ -34,6 +34,7 @@ class Serendipity(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = ["serendipity", "S"]
@@ -62,6 +63,7 @@ class SerendipityCurl(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
@@ -88,6 +90,7 @@ class SerendipityDiv(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self):
+        """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]
