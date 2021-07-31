@@ -1,4 +1,4 @@
-"""Lagrange elements on simplices."""
+"""Transition elements on simplices."""
 
 from itertools import product
 from ..finite_element import CiarletElement
@@ -25,11 +25,12 @@ class Transition(CiarletElement):
 
         dofs = []
         poly = polynomial_set(reference.tdim, 1, 1)
-        for v_n, v in enumerate(reference.vertices):
+        for v_n, v in enumerate(reference.reference_vertices):
             dofs.append(PointEvaluation(v, entity=(0, v_n)))
 
         for edim in range(1, 4):
             for e_n in range(reference.sub_entity_count(edim)):
+                print(edim, e_n)
                 entity = reference.sub_entity(edim, e_n)
                 if edim == reference.tdim:
                     entity_order = order
@@ -44,12 +45,8 @@ class Transition(CiarletElement):
                 points, _ = get_quadrature(variant, entity_order + 1)
                 for i in product(range(1, entity_order), repeat=edim):
                     if sum(i) < entity_order:
-                        dofs.append(
-                            PointEvaluation(
-                                tuple(o + sum(a[j] * points[b]
-                                              for a, b in zip(entity.axes, i))
-                                      for j, o in enumerate(entity.origin)),
-                                entity=(edim, e_n)))
+                        pt = entity.get_point([points[j] for j in i])
+                        dofs.append(PointEvaluation(pt, entity=(edim, e_n)))
 
                 # Basis
                 if entity_order > edim:
@@ -79,9 +76,15 @@ class Transition(CiarletElement):
                             i += 1
                         used.append(i)
                         vars.append(origin[i] + (p[i] - origin[i]) * x[i])
-
+                    print("----")
+                    print(bubble_space.get_basis_functions())
+                    print(vars)
+                    print(space.get_basis_functions())
+                    print([subs(f, x, vars) * bubble for f in space.get_basis_functions()])
                     poly += [subs(f, x, vars) * bubble for f in space.get_basis_functions()]
 
+        print(poly)
+        print([d.point for d in dofs])
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1
         )
