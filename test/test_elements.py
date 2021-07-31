@@ -204,10 +204,7 @@ def test_element_functionals_and_continuity(
     for dim, entities in entity_pairs:
         for fi, gi in zip(*[space.entity_dofs(dim, i) for i in entities]):
             basis = space.get_basis_functions()
-            try:
-                basis2 = space.map_to_cell(vertices)
-            except NotImplementedError:
-                pytest.xfail("Mapping not implemented for this element yet")
+            basis2 = space.map_to_cell(vertices)
 
             f = basis[fi]
             g = basis2[gi]
