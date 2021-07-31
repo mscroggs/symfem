@@ -30,7 +30,6 @@ class Transition(CiarletElement):
 
         for edim in range(1, 4):
             for e_n in range(reference.sub_entity_count(edim)):
-                print(edim, e_n)
                 entity = reference.sub_entity(edim, e_n)
                 if edim == reference.tdim:
                     entity_order = order
@@ -76,15 +75,8 @@ class Transition(CiarletElement):
                             i += 1
                         used.append(i)
                         vars.append(origin[i] + (p[i] - origin[i]) * x[i])
-                    print("----")
-                    print(bubble_space.get_basis_functions())
-                    print(vars)
-                    print(space.get_basis_functions())
-                    print([subs(f, x, vars) * bubble for f in space.get_basis_functions()])
                     poly += [subs(f, x, vars) * bubble for f in space.get_basis_functions()]
 
-        print(poly)
-        print([d.point for d in dofs])
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1
         )
