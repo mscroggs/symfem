@@ -5,6 +5,7 @@ import sympy
 
 def to_sympy(i):
     """Convert to a sympy expression."""
+    from .basis_function import BasisFunction
     if isinstance(i, list):
         return [to_sympy(j) for j in i]
     if isinstance(i, tuple):
@@ -14,6 +15,9 @@ def to_sympy(i):
         return sympy.Integer(i)
     if isinstance(i, Monomial):
         return i.to_sympy()
+
+    if isinstance(i, BasisFunction):
+        return i.get_function()
 
     return i
 

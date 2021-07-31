@@ -213,7 +213,7 @@ class CiarletElement(FiniteElement):
             for b in self.get_polynomial_basis(use_legendre=use_legendre):
                 row = []
                 for d in self.dofs:
-                    row.append(d.eval(to_sympy(b), symbolic=symbolic))
+                    row.append(to_sympy(d.eval(to_sympy(b), symbolic=symbolic)))
                 mat.append(row)
             return sympy.Matrix(mat)
         else:
