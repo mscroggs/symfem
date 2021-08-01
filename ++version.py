@@ -1,3 +1,9 @@
+"""
+This script increases the version number of Symfem in all the relevant
+locations. Once this has been run and the code pushed, Symfembot will
+automatically create a new version tag on GitHub.
+"""
+
 import json
 from datetime import datetime
 
@@ -59,5 +65,18 @@ with open(".github/workflows/test-packages.yml") as f:
             new_test += line
 with open(".github/workflows/test-packages.yml", "w") as f:
     f.write(new_test)
+
+# CITATION.cff
+new_citation = ""
+with open("CITATION.cff") as f:
+    for line in f:
+        if line.startswith("version: "):
+            new_citation += f"version: {new_version_str}\n"
+        elif line.startswith("date-released: "):
+            new_citation += f"date-released: {now.strftime('%Y-%m-%d')}\n"
+        else:
+            new_citation += line
+with open("CITATION.cff", "w") as f:
+    f.write(new_citation)
 
 print(f"Updated version to {new_version_str}")

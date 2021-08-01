@@ -1,0 +1,10 @@
+cff-version: 1.1.0
+message: If you use this software, please cite it as below.
+authors:
+  - family-names: Scroggs
+    given-names: Matthew W.
+    orcid: 0000-0002-4658-2443
+title: Symfem
+version: 2021.7.6
+date-released: 2021-07-12
+license: MIT

@@ -1,3 +1,7 @@
+"""
+This script updated the list of available elements in README.md.
+"""
+
 import symfem
 
 cells = ["interval", "triangle", "quadrilateral", "tetrahedron",
