@@ -1,4 +1,4 @@
-"""Lagrange elements on simplices."""
+"""Transition elements on simplices."""
 
 from itertools import product
 from ..finite_element import CiarletElement
@@ -44,12 +44,8 @@ class Transition(CiarletElement):
                 points, _ = get_quadrature(variant, entity_order + 1)
                 for i in product(range(1, entity_order), repeat=edim):
                     if sum(i) < entity_order:
-                        dofs.append(
-                            PointEvaluation(
-                                tuple(o + sum(a[j] * points[b]
-                                              for a, b in zip(entity.axes, i))
-                                      for j, o in enumerate(entity.origin)),
-                                entity=(edim, e_n)))
+                        pt = entity.get_point([points[j] for j in i])
+                        dofs.append(PointEvaluation(pt, entity=(edim, e_n)))
 
                 # Basis
                 if entity_order > edim:
@@ -79,12 +75,19 @@ class Transition(CiarletElement):
                             i += 1
                         used.append(i)
                         vars.append(origin[i] + (p[i] - origin[i]) * x[i])
-
                     poly += [subs(f, x, vars) * bubble for f in space.get_basis_functions()]
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1
         )
+        self.variant = variant
+        self.face_orders = face_orders
+        self.edge_orders = edge_orders
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant, "face_orders": self.face_orders,
+                "edge_orders": self.edge_orders}
 
     names = ["transition"]
     references = ["triangle", "tetrahedron"]

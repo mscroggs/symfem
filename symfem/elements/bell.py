@@ -29,10 +29,15 @@ class Bell(CiarletElement):
             reference,
             edges=(NormalDerivativeIntegralMoment, DiscontinuousLagrange, 0, {"variant": variant}),
         )
+        self.variant = variant
 
         super().__init__(
             reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["Bell"]
     references = ["triangle"]

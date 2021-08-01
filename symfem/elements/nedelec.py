@@ -29,6 +29,11 @@ class NedelecFirstKind(CiarletElement):
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["Nedelec", "Nedelec1", "N1curl"]
     references = ["triangle", "tetrahedron"]
@@ -50,6 +55,11 @@ class NedelecSecondKind(CiarletElement):
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["Nedelec2", "N2curl"]
     references = ["triangle", "tetrahedron"]

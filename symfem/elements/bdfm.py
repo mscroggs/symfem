@@ -55,8 +55,13 @@ class BDFM(CiarletElement):
             facets=(NormalIntegralMoment, DiscontinuousLagrange, order - 1, {"variant": variant}),
             cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, {"variant": variant}),
         )
+        self.variant = variant
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["Brezzi-Douglas-Fortin-Marini", "BDFM"]
     references = ["triangle", "quadrilateral", "hexahedron", "tetrahedron"]

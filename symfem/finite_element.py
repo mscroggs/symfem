@@ -213,10 +213,9 @@ class CiarletElement(FiniteElement):
             for b in self.get_polynomial_basis(use_legendre=use_legendre):
                 row = []
                 for d in self.dofs:
-                    row.append(to_sympy(d).eval(to_sympy(b), symbolic=symbolic))
+                    row.append(to_sympy(d.eval(to_sympy(b), symbolic=symbolic)))
                 mat.append(row)
             return sympy.Matrix(mat)
-
         else:
             for d in self.dofs:
                 if d.get_points_and_weights is None:
@@ -233,6 +232,10 @@ class CiarletElement(FiniteElement):
                     p, symbolic=False, use_legendre=use_legendre))
             return mat
 
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {}
+
     def get_basis_functions(self, reshape=True):
         """Get the basis functions of the element."""
         if self._basis_functions is None:
@@ -248,7 +251,7 @@ class CiarletElement(FiniteElement):
             else:
                 # Vector space
                 for i, dof in enumerate(self.dofs):
-                    b = [0 for i in self.get_polynomial_basis()[0]]
+                    b = [0 for i in range(self.range_dim)]
                     for c, d in zip(minv.row(i), self.get_polynomial_basis()):
                         for j, d_j in enumerate(d):
                             b[j] += c * d_j
@@ -264,11 +267,15 @@ class CiarletElement(FiniteElement):
 
         return self._basis_functions
 
-    def map_to_cell(self, vertices, basis=None):
+    def map_to_cell(self, vertices, basis=None, map=None, inverse_map=None):
         """Map the basis onto a cell using the appropriate mapping for the element."""
         if basis is None:
             basis = self.get_basis_functions()
-        map = self.reference.get_map_to(vertices)
+        if map is None:
+            map = self.reference.get_map_to(vertices)
+        if inverse_map is None:
+            inverse_map = self.reference.get_inverse_map_to(vertices)
+
         if isinstance(basis[0], PiecewiseFunction):
             pieces = [[] for i in basis]
             for i, j in enumerate(basis[0].pieces):
@@ -276,7 +283,26 @@ class CiarletElement(FiniteElement):
                 for k, f in enumerate(self.map_to_cell(vertices, [b.pieces[i][1] for b in basis])):
                     pieces[k].append((new_i, f))
             return [PiecewiseFunction(p) for p in pieces]
-        inverse_map = self.reference.get_inverse_map_to(vertices)
+
+        if isinstance(basis[0], (list, tuple)) and isinstance(basis[0][0], PiecewiseFunction):
+            for b in basis:
+                pieces = [[] for f in b]
+                for f in b:
+                    for i, j in enumerate(f.pieces):
+                        assert j[0] == basis[0][0].pieces[i][0]
+            new_tris = [[subs(map, x, k) for k in p[0]] for p in basis[0][0].pieces]
+            output_pieces = []
+            for p in range(len(basis[0][0].pieces)):
+                piece_basis = []
+                for b in basis:
+                    piece_basis.append([
+                        f.pieces[p][1] for f in b
+                    ])
+                output_pieces.append(self.map_to_cell(
+                    vertices, piece_basis, map, inverse_map))
+
+            return [PiecewiseFunction(list(zip(new_tris, fs)))
+                    for fs in zip(*output_pieces)]
 
         out = [None for f in basis]
         for dim in range(self.reference.tdim + 1):

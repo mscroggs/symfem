@@ -33,16 +33,17 @@ class Lagrange(CiarletElement):
                     entity = reference.sub_entity(edim, e_n)
                     for i in product(range(1, order), repeat=edim):
                         if sum(i) < order:
-                            dofs.append(
-                                PointEvaluation(
-                                    tuple(o + sum(a[j] * points[b]
-                                                  for a, b in zip(entity.axes, i))
-                                          for j, o in enumerate(entity.origin)),
-                                    entity=(edim, e_n)))
+                            point = entity.get_point([sympy.Rational(j, order) for j in i[::-1]])
+                            dofs.append(PointEvaluation(point, entity=(edim, e_n)))
 
         super().__init__(
             reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["Lagrange", "P"]
     references = ["interval", "triangle", "tetrahedron"]
@@ -65,12 +66,16 @@ class DiscontinuousLagrange(CiarletElement):
             dofs = []
             for i in product(range(order + 1), repeat=reference.tdim):
                 if sum(i) <= order:
-                    dofs.append(PointEvaluation(tuple(points[j] for j in i[::-1]),
-                                                entity=(reference.tdim, 0)))
-
+                    point = tuple(sympy.Rational(j, order) for j in i[::-1])
+                    dofs.append(PointEvaluation(point, entity=(reference.tdim, 0)))
         super().__init__(
             reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["discontinuous Lagrange", "dP", "DP"]
     references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
@@ -102,6 +107,11 @@ class VectorLagrange(CiarletElement):
             reference.tdim,
             reference.tdim,
         )
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["vector Lagrange", "vP"]
     references = ["interval", "triangle", "tetrahedron"]
@@ -133,6 +143,11 @@ class VectorDiscontinuousLagrange(CiarletElement):
             reference.tdim,
             reference.tdim,
         )
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["vector discontinuous Lagrange", "vdP", "vDP"]
     references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
@@ -165,6 +180,11 @@ class MatrixDiscontinuousLagrange(CiarletElement):
             reference.tdim ** 2,
             (reference.tdim, reference.tdim),
         )
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["matrix discontinuous Lagrange"]
     references = ["triangle", "tetrahedron", "quadrilateral", "hexahedron"]
@@ -208,6 +228,11 @@ class SymmetricMatrixDiscontinuousLagrange(CiarletElement):
             reference.tdim ** 2,
             (reference.tdim, reference.tdim),
         )
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["symmetric matrix discontinuous Lagrange"]
     references = ["triangle", "tetrahedron", "quadrilateral", "hexahedron"]

@@ -15,6 +15,8 @@ class ConformingCrouzeixRaviart(CiarletElement):
     """Conforming Crouzeix-Raviart finite element."""
 
     def __init__(self, reference, order):
+        if reference.vertices != reference.reference_vertices:
+            raise NotImplementedError()
         assert reference.name == "triangle"
 
         poly = polynomial_set(reference.tdim, 1, order)

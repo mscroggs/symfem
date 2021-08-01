@@ -7,25 +7,22 @@ This element's definition appears in https://doi.org/10.1017/S0001925900004546
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set
 from ..functionals import PointEvaluation, PointNormalDerivativeEvaluation
-from ..symbolic import sym_sum
 
 
 class Morley(CiarletElement):
     """Morley finite element."""
 
     def __init__(self, reference, order):
-        from symfem import create_reference
+        if reference.vertices != reference.reference_vertices:
+            raise NotImplementedError()
         assert order == 2
         assert reference.name == "triangle"
         dofs = []
         for v_n, vs in enumerate(reference.vertices):
             dofs.append(PointEvaluation(vs, entity=(0, v_n)))
-        for e_n, vs in enumerate(reference.sub_entities(1)):
-            sub_ref = create_reference(
-                reference.sub_entity_types[1],
-                vertices=[reference.reference_vertices[v] for v in vs])
-            midpoint = tuple(sym_sum(i) / len(i)
-                             for i in zip(*[reference.vertices[i] for i in vs]))
+        for e_n in range(reference.sub_entity_count(1)):
+            sub_ref = reference.sub_entity(1, e_n)
+            midpoint = sub_ref.midpoint()
             dofs.append(
                 PointNormalDerivativeEvaluation(midpoint, sub_ref, entity=(1, e_n)))
 

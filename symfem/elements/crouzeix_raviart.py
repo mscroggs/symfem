@@ -28,7 +28,7 @@ class CrouzeixRaviart(CiarletElement):
         for e_n, vs in enumerate(reference.sub_entities(reference.tdim - 1)):
             entity = create_reference(
                 reference.sub_entity_types[reference.tdim - 1],
-                vertices=tuple(reference.reference_vertices[i] for i in vs))
+                vertices=tuple(reference.vertices[i] for i in vs))
             for i in product(range(1, order + 1), repeat=reference.tdim - 1):
                 if sum(i) < order + reference.tdim - 1:
                     dofs.append(
@@ -49,7 +49,12 @@ class CrouzeixRaviart(CiarletElement):
                         entity=(reference.tdim, 0)))
 
         poly = polynomial_set(reference.tdim, 1, order)
+        self.variant = variant
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["Crouzeix-Raviart", "CR", "Crouzeix-Falk", "CF"]
     references = ["triangle", "tetrahedron"]

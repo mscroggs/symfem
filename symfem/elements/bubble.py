@@ -6,7 +6,6 @@ This element's definition appears in https://doi.org/10.1007/978-3-642-23099-8_3
 
 import sympy
 from itertools import product
-from ..symbolic import x
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set, quolynomial_set
 from ..functionals import PointEvaluation, DotPointEvaluation
@@ -17,21 +16,26 @@ class Bubble(CiarletElement):
     """Bubble finite element."""
 
     def __init__(self, reference, order, variant="equispaced"):
+        from .. import create_element
+        p1 = create_element(reference.name, "Lagrange", 1)
+        bubble = 1
+        for f in p1.get_basis_functions():
+            bubble *= f
         # TODO: variants
         if reference.name == "interval":
-            poly = [x[0] * (1 - x[0]) * p for p in polynomial_set(reference.tdim, 1, order - 2)]
+            poly = [bubble * p for p in polynomial_set(reference.tdim, 1, order - 2)]
         elif reference.name == "triangle":
-            poly = [x[0] * x[1] * (1 - x[0] - x[1]) * p
+            poly = [bubble * p
                     for p in polynomial_set(reference.tdim, 1, order - 3)]
         elif reference.name == "tetrahedron":
-            poly = [x[0] * x[1] * x[2] * (1 - x[0] - x[1] - x[2]) * p
+            poly = [bubble * p
                     for p in polynomial_set(reference.tdim, 1, order - 4)]
         elif reference.name == "quadrilateral":
-            poly = [x[0] * x[1] * (1 - x[0]) * (1 - x[1]) * p
+            poly = [bubble * p
                     for p in quolynomial_set(reference.tdim, 1, order - 2)]
         else:
             assert reference.name == "hexahedron"
-            poly = [x[0] * x[1] * x[2] * (1 - x[0]) * (1 - x[1]) * (1 - x[2]) * p
+            poly = [bubble * p
                     for p in quolynomial_set(reference.tdim, 1, order - 2)]
 
         dofs = []
@@ -41,16 +45,18 @@ class Bubble(CiarletElement):
             f = max
         for i in product(range(1, order), repeat=reference.tdim):
             if f(i) < order:
-                dofs.append(
-                    PointEvaluation(
-                        tuple(o + sum(sympy.Rational(a[j] * b, order)
-                                      for a, b in zip(reference.axes, i))
-                              for j, o in enumerate(reference.origin)),
-                        entity=(reference.tdim, 0)))
+                point = tuple(sympy.Rational(j, order) for j in i)
+                dofs.append(PointEvaluation(point, entity=(reference.tdim, 0)))
+
+        self.variant = variant
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1
         )
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["bubble"]
     references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
@@ -66,10 +72,16 @@ class BubbleEnrichedLagrange(CiarletElement):
         lagrange = Lagrange(reference, order, variant)
         bubble = Bubble(reference, order + 2, variant)
 
+        self.variant = variant
+
         super().__init__(
             reference, order, lagrange._basis + bubble._basis,
             lagrange.dofs + bubble.dofs, reference.tdim, 1
         )
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["bubble enriched Lagrange"]
     references = ["triangle"]
@@ -91,7 +103,13 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
                 for d in lagrange.dofs + bubble.dofs
                 for v in [(1, 0), (0, 1)]]
 
+        self.variant = variant
+
         super().__init__(reference, order, basis, dofs, reference.tdim, 2)
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["bubble enriched vector Lagrange"]
     references = ["triangle"]

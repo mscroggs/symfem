@@ -31,6 +31,11 @@ class Serendipity(CiarletElement):
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["serendipity", "S"]
     references = ["interval", "quadrilateral", "hexahedron"]
@@ -55,6 +60,11 @@ class SerendipityCurl(CiarletElement):
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
     references = ["quadrilateral", "hexahedron"]
@@ -77,6 +87,11 @@ class SerendipityDiv(CiarletElement):
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]
     references = ["quadrilateral", "hexahedron"]

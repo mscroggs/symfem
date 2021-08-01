@@ -5,6 +5,7 @@ import sympy
 
 def to_sympy(i):
     """Convert to a sympy expression."""
+    from .basis_function import BasisFunction
     if isinstance(i, list):
         return [to_sympy(j) for j in i]
     if isinstance(i, tuple):
@@ -14,6 +15,9 @@ def to_sympy(i):
         return sympy.Integer(i)
     if isinstance(i, Monomial):
         return i.to_sympy()
+
+    if isinstance(i, BasisFunction):
+        return i.get_function()
 
     return i
 
@@ -209,11 +213,18 @@ class PiecewiseFunction:
 
     def get_piece(self, point):
         """Get the piece of the function defined at the given point."""
-        from .vectors import point_in_triangle
-        for tri, value in self.pieces:
-            if point_in_triangle(point[:2], tri):
-                return value
+        if len(self.pieces[0][0]) == 3:
+            from .vectors import point_in_triangle
+            for tri, value in self.pieces:
+                if point_in_triangle(point[:2], tri):
+                    return value
+        if len(self.pieces[0][0]) == 4:
+            from .vectors import point_in_tetrahedron
+            for tet, value in self.pieces:
+                if point_in_tetrahedron(point, tet):
+                    return value
 
+        print(point)
         raise NotImplementedError("Evaluation of piecewise functions outside domain not supported.")
 
     def evaluate(self, values):
@@ -249,3 +260,18 @@ class PiecewiseFunction:
                 [(i[0], i[1] + j[1]) for i, j in zip(self.pieces, other.pieces)])
 
         return PiecewiseFunction([(i, other + j) for i, j in self.pieces])
+
+    def _iter_list(self):
+        """Make am iterable list."""
+        from .basis_function import BasisFunction
+        for p in self.pieces:
+            assert isinstance(p[1], (list, tuple)) or (
+                isinstance(p[1], BasisFunction) and
+                isinstance(p[1].get_function(), (list, tuple)))
+        return [PiecewiseFunction([(j[0], j[1][i])
+                                   for j in self.pieces])
+                for i in range(len(self.pieces[0][1]))]
+
+    def __iter__(self):
+        """Get iterable."""
+        return self._iter_list().__iter__()

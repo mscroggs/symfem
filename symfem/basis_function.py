@@ -54,6 +54,10 @@ class BasisFunction:
         """Negate."""
         return -self.get_function()
 
+    def __len__(self):
+        """Get length."""
+        return len(self.get_function())
+
 
 class ElementBasisFunction(BasisFunction):
     """A basis function of a finite element."""

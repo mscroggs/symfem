@@ -26,6 +26,10 @@ class P1Hermite(CiarletElement):
             reference, order, poly, dofs, reference.tdim, 1
         )
 
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"poly": self._basis}
+
     names = []
     references = ["triangle"]
     min_order = 3

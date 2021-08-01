@@ -70,43 +70,29 @@ def create_reference(cell_type, vertices=None):
     vertices : list
         The vertices of the reference.
     """
+    args = []
+    if vertices is not None:
+        args.append(vertices)
+
     if cell_type == "point":
-        if vertices is not None:
-            return _references.Point(vertices)
-        return _references.Point()
+        return _references.Point(*args)
     if cell_type == "interval":
-        if vertices is not None:
-            return _references.Interval(vertices)
-        return _references.Interval()
+        return _references.Interval(*args)
     elif cell_type == "triangle":
-        if vertices is not None:
-            return _references.Triangle(vertices)
-        return _references.Triangle()
+        return _references.Triangle(*args)
     elif cell_type == "tetrahedron":
-        if vertices is not None:
-            return _references.Tetrahedron(vertices)
-        return _references.Tetrahedron()
+        return _references.Tetrahedron(*args)
     elif cell_type == "quadrilateral":
-        if vertices is not None:
-            return _references.Quadrilateral(vertices)
-        return _references.Quadrilateral()
+        return _references.Quadrilateral(*args)
     elif cell_type == "hexahedron":
-        if vertices is not None:
-            return _references.Hexahedron(vertices)
-        return _references.Hexahedron()
+        return _references.Hexahedron(*args)
     elif cell_type == "prism":
-        if vertices is not None:
-            return _references.Prism(vertices)
-        return _references.Prism()
+        return _references.Prism(*args)
     elif cell_type == "pyramid":
-        if vertices is not None:
-            return _references.Pyramid(vertices)
-        return _references.Pyramid()
+        return _references.Pyramid(*args)
     elif cell_type.startswith("dual polygon"):
         n_tri = int(cell_type.split("(")[1].split(")")[0])
-        if vertices is not None:
-            return _references.DualPolygon(n_tri, vertices)
-        return _references.DualPolygon(n_tri)
+        return _references.DualPolygon(n_tri, *args)
     else:
         raise ValueError(f"Unknown cell type: {cell_type}")
 
@@ -173,7 +159,8 @@ def create_element(cell_type, element_type, order, **kwargs):
         Fortin-Soulie, FS,
         Bernardi-Raugel,
         Wu-Xu,
-        transition
+        transition,
+        Guzman-Neilan
     order : int
         The order of the element.
     """

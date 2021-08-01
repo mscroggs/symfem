@@ -77,6 +77,7 @@ You can find information about how to contribute to Symfem [here](CONTRIBUTING.m
 - Crouzeix-Raviart
 - discontinuous Lagrange
 - Fortin-Soulie
+- Guzman-Neilan
 - Hellan-Herrmann-Johnson
 - Hermite
 - Hsieh-Clough-Tocher
@@ -124,6 +125,7 @@ You can find information about how to contribute to Symfem [here](CONTRIBUTING.m
 - bubble
 - Crouzeix-Raviart
 - discontinuous Lagrange
+- Guzman-Neilan
 - Hermite
 - Kong-Mulder-Veldhuizen
 - Lagrange

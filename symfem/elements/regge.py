@@ -30,7 +30,7 @@ class Regge(CiarletElement):
             for e_n, vs in enumerate(reference.sub_entities(edim)):
                 entity = create_reference(
                     reference.sub_entity_types[edim],
-                    vertices=tuple(reference.reference_vertices[i] for i in vs))
+                    vertices=tuple(reference.vertices[i] for i in vs))
                 for i in product(range(1, order + 2), repeat=edim):
                     if sum(i) < order + 2:
                         for edge in entity.edges[::-1]:

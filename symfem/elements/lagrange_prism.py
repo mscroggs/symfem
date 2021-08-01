@@ -27,7 +27,7 @@ class Lagrange(CiarletElement):
 
             dofs = []
             # Vertices
-            for v_n, v in enumerate(reference.reference_vertices):
+            for v_n, v in enumerate(reference.vertices):
                 dofs.append(PointEvaluation(v, entity=(0, v_n)))
             # Edges
             for e_n in range(reference.sub_entity_count(1)):
@@ -62,6 +62,11 @@ class Lagrange(CiarletElement):
 
         poly = prism_polynomial_set(reference.tdim, 1, order)
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["Lagrange", "P"]
     references = ["prism"]
@@ -91,6 +96,11 @@ class DiscontinuousLagrange(CiarletElement):
             reference, order, prism_polynomial_set(reference.tdim, 1, order), dofs,
             reference.tdim, 1
         )
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = []
     # names = ["discontinuous Lagrange", "dP", "DP"]
@@ -123,6 +133,11 @@ class VectorLagrange(CiarletElement):
             reference.tdim,
             reference.tdim,
         )
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = []
     # names = ["vector Lagrange", "vP"]
@@ -155,6 +170,11 @@ class VectorDiscontinuousLagrange(CiarletElement):
             reference.tdim,
             reference.tdim,
         )
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = []
     # names = ["vector discontinuous Lagrange", "vdP", "vDP"]
