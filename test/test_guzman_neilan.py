@@ -80,8 +80,6 @@ def test_basis_continuity_tetrahedron(order):
                     if pts[0] in p[0] and pts[1] in p[0]:
                         if value is None:
                             value = symfem.symbolic.subs(p[1], symfem.symbolic.x, pt)
-                        if value != symfem.symbolic.subs(p[1], symfem.symbolic.x, pt):
-                            from IPython import embed; embed()
                         assert value == symfem.symbolic.subs(p[1], symfem.symbolic.x, pt)
     for pts in combinations([(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1),
                              (quarter, quarter, quarter)], 3):
@@ -141,7 +139,6 @@ def test_piecewise_lagrange_tetrahedron(order):
                                         sympy.Rational(j, N)))
                 for f in fs:
                     assert subs(f, x, point) == (0, 0, 0)
-
 
     fs = make_piecewise_lagrange(sub_tets, "tetrahedron", order, zero_at_centre=True)
     for f in fs:
