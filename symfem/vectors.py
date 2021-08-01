@@ -88,6 +88,14 @@ def point_in_triangle(point, triangle):
     u = (dot11 * dot02 - dot01 * dot12) / det
     v = (dot00 * dot12 - dot01 * dot02) / det
 
+    if numpy.isclose(float(u), 0):
+        u = 0
+    if numpy.isclose(float(v), 0):
+        v = 0
+    if u >= 0 and v >= 0 and numpy.isclose(float(u + v), 1):
+        return True
+
+
     return u >= 0 and v >= 0 and u + v <= 1
 
 
@@ -125,14 +133,13 @@ def point_in_tetrahedron(point, tetrahedron):
     w += (dot00 * dot11 - dot01 * dot01) * dot23
     w /= det
 
-    if isinstance(u, float) or isinstance(v, float) or isinstance(w, float):
-        if numpy.isclose(u, 0):
-            u = 0
-        if numpy.isclose(w, 0):
-            v = 0
-        if numpy.isclose(w, 0):
-            w = 0
-        if u >= 0 and v >= 0 and w >= 0 and numpy.isclose(u + v + w, 1):
-            return True
+    if numpy.isclose(float(u), 0):
+        u = 0
+    if numpy.isclose(float(v), 0):
+        v = 0
+    if numpy.isclose(float(w), 0):
+        w = 0
+    if u >= 0 and v >= 0 and w >= 0 and numpy.isclose(float(u + v + w), 1):
+        return True
 
     return u >= 0 and v >= 0 and w >= 0 and u + v + w <= 1
