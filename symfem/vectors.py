@@ -95,7 +95,6 @@ def point_in_triangle(point, triangle):
     if u >= 0 and v >= 0 and numpy.isclose(float(u + v), 1):
         return True
 
-
     return u >= 0 and v >= 0 and u + v <= 1
 
 
