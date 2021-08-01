@@ -53,7 +53,7 @@ class GuzmanNeilan(CiarletElement):
 
             # Interior edges
             for v in reference.vertices:
-                p = tuple((i + sympy.Rational(1, 3)) / 2 for i in v)
+                p = tuple((i + sympy.Rational(1, 4)) / 2 for i in v)
                 for d in [(1, 0, 0), (0, 1, 0), (0, 0, 1)]:
                     dofs.append(DotPointEvaluation(
                         p, d, entity=(3, 0), mapping="contravariant"))
