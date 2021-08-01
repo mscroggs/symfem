@@ -224,7 +224,6 @@ class PiecewiseFunction:
                 if point_in_tetrahedron(point, tet):
                     return value
 
-        print(point)
         raise NotImplementedError("Evaluation of piecewise functions outside domain not supported.")
 
     def evaluate(self, values):
