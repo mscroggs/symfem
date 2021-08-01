@@ -1,6 +1,7 @@
 """Functions to handle vectors."""
 
 import sympy
+import numpy
 
 
 def vsub(v, w):
@@ -123,5 +124,15 @@ def point_in_tetrahedron(point, tetrahedron):
     w += (dot01 * dot02 - dot00 * dot12) * dot13
     w += (dot00 * dot11 - dot01 * dot01) * dot23
     w /= det
+
+    if isinstance(u, float) or isinstance(v, float) or isinstance(w, float):
+        if numpy.isclose(u, 0):
+            u = 0
+        if numpy.isclose(w, 0):
+            v = 0
+        if numpy.isclose(w, 0):
+            w = 0
+        if u >= 0 and v >= 0 and w >= 0 and numpy.isclose(u + v + w, 1):
+            return True
 
     return u >= 0 and v >= 0 and w >= 0 and u + v + w <= 1
