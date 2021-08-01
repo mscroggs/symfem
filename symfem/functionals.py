@@ -364,10 +364,8 @@ class IntegralMoment(BaseFunctional):
 
         integrand = self.dot(subs(function, x, point))
         if isinstance(integrand, PiecewiseFunction):
-            mid = tuple(j + sym_sum(sympy.Rational(1, 2) * k[i] for k in self.reference.axes)
-                        for i, j in enumerate(self.reference.origin))
-            integrand = integrand.get_piece(mid)
-        value = self.reference.integral(integrand)
+            integrand = integrand.get_piece(self.reference.midpoint())
+        value = self.reference.integral(to_sympy(integrand))
         if symbolic:
             return value
         else:

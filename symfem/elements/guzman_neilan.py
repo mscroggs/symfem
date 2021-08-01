@@ -66,7 +66,8 @@ class GuzmanNeilan(CiarletElement):
         mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
         for i in range(reference.tdim):
             dir = tuple(1 if i == j else 0 for j in range(reference.tdim))
-            dofs.append(DotPointEvaluation(mid, dir, entity=(reference.tdim, 0)))
+            dofs.append(DotPointEvaluation(mid, dir, entity=(reference.tdim, 0),
+                                           mapping="contravariant"))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 

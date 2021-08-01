@@ -54,14 +54,10 @@ for ref in ["triangle", "tetrahedron"]:
     sub_basis = make_piecewise_lagrange(sub_cells, ref, br.reference.tdim, True)
 
     filename = os.path.join(folder, f"_guzman_neilan_{ref}.py")
-
-    with open(filename, "w") as ff:
-        ff.write("import sympy\n\n")
-        ff.write("coeffs = [\n")
+    output = "import sympy\n\ncoeffs = [\n"
 
     for f in fs:
-        with open(filename, "a") as ff:
-            ff.write("    [\n")
+        output += "    [\n"
         fun = (div(f) - reference.integral(
             subs(div(f), x, t)
         ) / reference.volume()).as_coefficients_dict()
@@ -115,16 +111,13 @@ for ref in ["triangle", "tetrahedron"]:
             else:
                 next = f" sympy.Rational({frac.numerator()}, {frac.denominator()}),"
             if len(line + next) > line_length:
-                with open(filename, "a") as ff:
-                    ff.write(line + "\n")
+                output += line + "\n"
                 line = " " * 7 + next
             else:
                 line += next
-        with open(filename, "a") as ff:
-            ff.write(line + "\n")
+        output += line + "\n    ],\n"
 
-        with open(filename, "a") as ff:
-            ff.write("    ],\n")
+    output += "]\n"
 
-    with open(filename, "a") as ff:
-        ff.write("]\n")
+    with open(filename, "w") as ff:
+        ff.write(output)
