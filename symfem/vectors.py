@@ -120,7 +120,7 @@ def point_in_tetrahedron(point, tetrahedron):
     v += (dot02 * dot01 - dot00 * dot12) * dot23
     v /= det
     w = (dot01 * dot12 - dot11 * dot02) * dot03
-    w += (dot01 * dot12 - dot00 * dot12) * dot13
+    w += (dot01 * dot02 - dot00 * dot12) * dot13
     w += (dot00 * dot11 - dot01 * dot01) * dot23
     w /= det
 

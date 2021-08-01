@@ -74,17 +74,7 @@ class GuzmanNeilan(CiarletElement):
         """Make the polyset for a triangle."""
         assert order == 1
 
-        coeffs = [
-            [sympy.Rational(1, 6), sympy.Rational(1, 6), sympy.Rational(5, 24),
-             sympy.Rational(-1, 24), sympy.Rational(5, 24), sympy.Rational(5, 24),
-             sympy.Rational(-1, 24), sympy.Rational(5, 24)],
-            [sympy.Rational(1, 3), sympy.Rational(-2, 3), sympy.Rational(5, 12),
-             sympy.Rational(-1, 3), sympy.Rational(-1, 12), sympy.Rational(-1, 3),
-             sympy.Rational(5, 12), sympy.Rational(-5, 6)],
-            [sympy.Rational(2, 3), sympy.Rational(-1, 3), sympy.Rational(5, 6),
-             sympy.Rational(-5, 12), sympy.Rational(1, 3), sympy.Rational(1, 12),
-             sympy.Rational(1, 3), sympy.Rational(-5, 12)]
-        ]
+        from ._guzman_neilan_triangle import coeffs
 
         mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
 
@@ -106,69 +96,8 @@ class GuzmanNeilan(CiarletElement):
     def _make_polyset_tetrahedron(self, reference, order):
         """Make the polyset for a tetrahedron."""
         assert order in [1, 2]
+        from ._guzman_neilan_tetrahedron import coeffs
 
-        coeffs = [
-            [
-                0, 0, 0, sympy.Rational(1, 3), sympy.Rational(1, 3), sympy.Rational(1, 3),
-                sympy.Rational(-121, 1620), sympy.Rational(-1379, 1620), sympy.Rational(25, 27),
-                sympy.Rational(149, 810), sympy.Rational(-1109, 810), sympy.Rational(23, 27),
-                sympy.Rational(-1379, 1620), sympy.Rational(25, 27), sympy.Rational(-121, 1620),
-                sympy.Rational(-1109, 810), sympy.Rational(23, 27), sympy.Rational(149, 810),
-                sympy.Rational(25, 27), sympy.Rational(-121, 1620), sympy.Rational(-1379, 1620),
-                sympy.Rational(23, 27), sympy.Rational(149, 810), sympy.Rational(-1109, 810),
-                sympy.Rational(-679, 360), sympy.Rational(193, 120), sympy.Rational(-5, 54),
-                sympy.Rational(-1379, 3240), sympy.Rational(-35, 54), sympy.Rational(-121, 3240),
-                sympy.Rational(-35, 54), sympy.Rational(-121, 3240), sympy.Rational(-1379, 3240),
-                sympy.Rational(193, 120), sympy.Rational(-5, 54), sympy.Rational(-679, 360),
-                sympy.Rational(-121, 3240), sympy.Rational(-1379, 3240), sympy.Rational(-35, 54),
-                sympy.Rational(-5, 54), sympy.Rational(-679, 360), sympy.Rational(193, 120),
-            ],
-            [
-                0, 0, 0, sympy.Rational(-1, 3), sympy.Rational(-1, 3), sympy.Rational(-1, 3),
-                sympy.Rational(-1087, 810), sympy.Rational(1987, 810), sympy.Rational(-25, 18),
-                sympy.Rational(-1222, 405), sympy.Rational(1852, 405), sympy.Rational(-16, 9),
-                sympy.Rational(1087, 810), sympy.Rational(-25, 18), sympy.Rational(-187, 810),
-                sympy.Rational(952, 405), sympy.Rational(-16, 9), sympy.Rational(-322, 405),
-                0, sympy.Rational(-431, 405), sympy.Rational(656, 405), 1,
-                sympy.Rational(-997, 405), sympy.Rational(1177, 405), sympy.Rational(229, 60),
-                sympy.Rational(-787, 180), sympy.Rational(25, 36), sympy.Rational(1087, 1620),
-                sympy.Rational(5, 12), sympy.Rational(-187, 1620), sympy.Rational(10, 9),
-                sympy.Rational(-431, 810), sympy.Rational(328, 405), sympy.Rational(-1487, 180),
-                sympy.Rational(25, 36), sympy.Rational(1387, 180), sympy.Rational(-1087, 1620),
-                sympy.Rational(1987, 1620), sympy.Rational(5, 12), sympy.Rational(-10, 9),
-                sympy.Rational(631, 90), sympy.Rational(-76, 15),
-            ],
-            [
-                0, 0, 0, sympy.Rational(1, 3), sympy.Rational(1, 3), sympy.Rational(1, 3),
-                sympy.Rational(-143, 90), sympy.Rational(43, 90), sympy.Rational(25, 18),
-                sympy.Rational(-128, 45), sympy.Rational(58, 45), sympy.Rational(16, 9),
-                sympy.Rational(1, 5), 0, sympy.Rational(-34, 45), sympy.Rational(11, 15),
-                -1, sympy.Rational(-53, 45), sympy.Rational(25, 18), sympy.Rational(-43, 90),
-                sympy.Rational(-19, 30), sympy.Rational(16, 9), sympy.Rational(-28, 45),
-                sympy.Rational(-14, 15), sympy.Rational(29, 60), sympy.Rational(13, 180),
-                sympy.Rational(-25, 36), sympy.Rational(1, 10), sympy.Rational(-10, 9),
-                sympy.Rational(-17, 45), sympy.Rational(-5, 12), sympy.Rational(-43, 180),
-                sympy.Rational(-19, 60), sympy.Rational(-281, 90), sympy.Rational(10, 9),
-                sympy.Rational(53, 45), sympy.Rational(-143, 180), sympy.Rational(43, 180),
-                sympy.Rational(-5, 12), sympy.Rational(-25, 36), sympy.Rational(787, 180),
-                sympy.Rational(-229, 60),
-            ],
-            [
-                0, 0, 0, sympy.Rational(-1, 3), sympy.Rational(-1, 3), sympy.Rational(-1, 3),
-                sympy.Rational(19, 810), sympy.Rational(431, 810), 0, sympy.Rational(-116, 405),
-                sympy.Rational(296, 405), 1, sympy.Rational(553, 405), sympy.Rational(-25, 18),
-                sympy.Rational(-103, 405), sympy.Rational(971, 405), sympy.Rational(-16, 9),
-                sympy.Rational(-341, 405), sympy.Rational(-25, 18), sympy.Rational(347, 405),
-                sympy.Rational(103, 405), sympy.Rational(-16, 9), sympy.Rational(559, 405),
-                sympy.Rational(71, 405), sympy.Rational(127, 60), sympy.Rational(-31, 180),
-                sympy.Rational(-10, 9), sympy.Rational(553, 810), sympy.Rational(5, 12),
-                sympy.Rational(-103, 810), sympy.Rational(5, 12), sympy.Rational(347, 810),
-                sympy.Rational(103, 810), sympy.Rational(47, 90), sympy.Rational(25, 36),
-                sympy.Rational(-97, 90), sympy.Rational(19, 1620), sympy.Rational(431, 1620),
-                sympy.Rational(10, 9), sympy.Rational(25, 36), sympy.Rational(253, 90),
-                sympy.Rational(-101, 30),
-            ],
-        ]
         mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
 
         sub_tets = [
@@ -179,7 +108,7 @@ class GuzmanNeilan(CiarletElement):
 
         basis = make_piecewise_lagrange(sub_tets, "tetrahedron", order)
 
-        sub_basis = make_piecewise_lagrange(sub_tets, "tetrahedron", reference.tdim, True, True)
+        sub_basis = make_piecewise_lagrange(sub_tets, "tetrahedron", reference.tdim, True)
         fs = BernardiRaugel(reference, 1).get_basis_functions()[-4:]
         for c, f in zip(coeffs, fs):
             fun = [[f[j] - sym_sum(k * b.pieces[i][1][j] for k, b in zip(c, sub_basis))
@@ -253,7 +182,7 @@ def make_piecewise_lagrange(sub_cells, cell_name, order, zero_on_boundary=False,
         # DOFs on edges
         nones = [None for i in lagrange_space.entity_dofs(1, 0)]
         for edge in [(2, None, None, 5), (5, 5, None, None), (4, None, 5, None),
-                     (None, 2, None, 4), (None, 4, 4, None), (None, None, 5, 5),
+                     (None, 2, None, 4), (None, 4, 4, None), (None, None, 2, 2),
                      (3, 3, 3, None), (None, 0, 0, 0), (0, None, 1, 1), (1, 1, None, 3)]:
             if zero_on_boundary and (2 in edge or 4 in edge or 5 in edge):
                 continue
