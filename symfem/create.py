@@ -146,7 +146,7 @@ def create_element(cell_type, element_type, order, **kwargs):
         Brezzi-Douglas-Fortin-Marini, BDFM,
         Brezzi-Douglas-Duran-Fortin, BDDF,
         Hellan-Herrmann-Johnson, HHJ,
-        Arnold-Winther, AW,
+        Arnold-Winther, AW, conforming Arnold-Winther,
         Bell,
         Kong-Mulder-Veldhuizen, KMV,
         Bernstein, Bernstein-Bezier,
@@ -160,7 +160,8 @@ def create_element(cell_type, element_type, order, **kwargs):
         Bernardi-Raugel,
         Wu-Xu,
         transition,
-        Guzman-Neilan
+        Guzman-Neilan,
+        nonconforming Arnold-Winther, nonconforming AW
     order : int
         The order of the element.
     """
