@@ -1,7 +1,8 @@
 """Arnold-Winther elements on simplices.
 
-This element's definition appears in https://doi.org/10.1007/s002110100348
-(Arnold, Winther, 2002)
+Thse elements definitions appear in https://doi.org/10.1007/s002110100348
+(Arnold, Winther, 2002) [conforming] and https://doi.org/10.1142/S0218202503002507
+(Arnold, Winther, 2003) [nonconforming]
 """
 
 import sympy
