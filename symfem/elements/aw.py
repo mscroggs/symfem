@@ -70,7 +70,61 @@ class ArnoldWinther(CiarletElement):
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
-    names = ["Arnold-Winther", "AW"]
+    names = ["Arnold-Winther", "AW", "conforming Arnold-Winther"]
     references = ["triangle"]
     min_order = 3
+    continuity = "integral inner H(div)"
+
+
+class NonConformingArnoldWinther(CiarletElement):
+    """A nonconforming Arnold-Winther element."""
+
+    def __init__(self, reference, order, variant="equispaced"):
+        from symfem import create_reference
+        assert reference.name == "triangle"
+        self.variant = variant
+        poly = [(p[0], p[1], p[1], p[2])
+                for p in polynomial_set(reference.tdim, 3, order - 1)]
+
+        poly += [
+            [0, x[1] ** 2, x[1] ** 2, -2 * x[1] ** 2],
+            [-2 * x[0] ** 2, x[0] ** 2, x[0] ** 2, 0],
+            [-2 * x[0] * x[1], x[0] * x[1], x[0] * x[1], 0],
+            [x[0] * (x[0] - x[1]), 0, 0, 0],
+            [x[0] ** 2, 0, 0, x[0] * x[1]],
+            [x[0] ** 2, 0, 0, x[1] ** 2]
+        ]
+
+        dofs = []
+        for e_n, edge in enumerate(reference.edges):
+            sub_ref = create_reference(
+                reference.sub_entity_types[1],
+                vertices=tuple(reference.vertices[i] for i in edge))
+            sub_e = DiscontinuousLagrange(sub_ref, 1, variant)
+            for dof_n, dof in enumerate(sub_e.dofs):
+                p = sub_e.get_basis_function(dof_n)
+                for component in [sub_ref.normal(), sub_ref.tangent()]:
+                    dofs.append(
+                        InnerProductIntegralMoment(sub_ref, p, component, sub_ref.normal(), dof,
+                                                   entity=(1, e_n), mapping="double_contravariant"))
+        sub_e = DiscontinuousLagrange(reference, 0, variant)
+        for dof_n, dof in enumerate(sub_e.dofs):
+            p = sub_e.get_basis_function(dof_n)
+            for component in [(1, 0, 0, 0), (0, 1, 0, 0),
+                              (0, 0, 0, 1)]:
+                dofs.append(VecIntegralMoment(reference, p, component, dof, entity=(2, 0)))
+
+        print(len(poly), len(dofs))
+
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
+                         (reference.tdim, reference.tdim))
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
+
+    names = ["nonconforming Arnold-Winther", "nonconforming AW"]
+    references = ["triangle"]
+    min_order = 2
+    max_order = 2
     continuity = "integral inner H(div)"

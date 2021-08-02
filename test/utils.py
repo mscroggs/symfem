@@ -44,6 +44,7 @@ test_elements = {
         "MWX": [[{}, [1, 2]]],
         "Regge": [[{}, range(4)]],
         "AW": [[{"variant": "equispaced"}, range(3, 5)]],
+        "nonconforming AW": [[{"variant": "equispaced"}, [2]]],
         "Nedelec1": [[{"variant": "equispaced"}, range(1, 4)]],
         "Nedelec2": [[{"variant": "equispaced"}, range(1, 4)]],
         "RT": [[{"variant": "equispaced"}, range(1, 4)]],

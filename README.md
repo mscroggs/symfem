@@ -89,6 +89,7 @@ You can find information about how to contribute to Symfem [here](CONTRIBUTING.m
 - Morley-Wang-Xu
 - Nedelec
 - Nedelec2
+- nonconforming Arnold-Winther
 - Raviart-Thomas
 - reduced Hsieh-Clough-Tocher
 - Regge
