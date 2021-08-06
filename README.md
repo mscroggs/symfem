@@ -1,4 +1,4 @@
-![Symfem](https://raw.githubusercontent.com/mscroggs/symfem/main/logo/logo.png)
+![Symfem](logo/logo.png)
 
 [![Documentation status](https://readthedocs.org/projects/symfem/badge/?version=latest)](https://symfem.readthedocs.io/en/latest/?badge=latest)
 [![Style checks](https://github.com/mscroggs/symfem/actions/workflows/style-checks.yml/badge.svg)](https://github.com/mscroggs/symfem/actions)
