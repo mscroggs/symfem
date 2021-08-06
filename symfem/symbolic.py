@@ -274,3 +274,13 @@ class PiecewiseFunction:
     def __iter__(self):
         """Get iterable."""
         return self._iter_list().__iter__()
+
+
+def all_symequal(a, b):
+    """Check if two symbolic numbers or vectors are equal."""
+    if isinstance(a, (list, tuple)):
+        for i, j in zip(a, b):
+            if not all_symequal(i, j):
+                return False
+        return True
+    return sympy.expand(sympy.simplify(a)) == sympy.expand(sympy.simplify(b))

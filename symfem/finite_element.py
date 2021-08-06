@@ -3,7 +3,9 @@
 import sympy
 import warnings
 import numpy
-from .symbolic import x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float
+from .symbolic import x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float, all_symequal
+from .calculus import diff
+from .vectors import vsub
 from .basis_function import ElementBasisFunction
 from .legendre import evaluate_legendre_basis, get_legendre_basis
 
@@ -79,6 +81,132 @@ class FiniteElement:
     def map_to_cell(self, vertices, basis=None):
         """Map the basis onto a cell using the appropriate mapping for the element."""
         raise NotImplementedError()
+
+    def test(self):
+        """Run tests for this element."""
+        if self.order <= 4:
+            self.test_continuity()
+
+    def test_continuity(self):
+        """Test that this element has the correct continuity."""
+        continuity = self.continuity
+        if "{order}" in continuity:
+            continuity = continuity.replace("{order}", f"{self.order}")
+
+        # Test continuity
+        if self.reference.name == "interval":
+            vertices = ((-1, ), (0, ))
+            entity_pairs = [[0, (0, 1)]]
+        elif self.reference.name == "triangle":
+            vertices = ((-1, 0), (0, 0), (0, 1))
+            entity_pairs = [[0, (0, 1)], [0, (2, 2)], [1, (1, 0)]]
+        elif self.reference.name == "tetrahedron":
+            vertices = ((-1, 0, 0), (0, 0, 0), (0, 1, 0), (0, 0, 1))
+            entity_pairs = [[0, (0, 1)], [0, (2, 2)], [0, (3, 3)],
+                            [1, (0, 0)], [1, (3, 1)], [1, (4, 2)],
+                            [2, (1, 0)]]
+        elif self.reference.name == "quadrilateral":
+            vertices = ((0, 0), (0, 1), (-1, 0), (-1, 1))
+            entity_pairs = [[0, (0, 0)], [0, (2, 1)], [1, (1, 0)]]
+        elif self.reference.name == "hexahedron":
+            vertices = ((0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 1, 1),
+                        (-1, 0, 0), (-1, 0, 1), (-1, 1, 0), (-1, 1, 1))
+            entity_pairs = [[0, (0, 0)], [0, (2, 2)], [0, (4, 1)], [0, (6, 3)],
+                            [1, (1, 1)], [1, (2, 0)], [1, (6, 5)], [1, (9, 3)],
+                            [2, (0, 2)]]
+        elif self.reference.name == "prism":
+            vertices = ((-1, 0, 0), (0, 0, 0), (0, 1, 0),
+                        (-1, 0, 1), (0, 0, 1), (0, 1, 1))
+            entity_pairs = [[0, (0, 1)], [0, (2, 2)], [0, (3, 4)], [0, (5, 5)],
+                            [1, (1, 3)], [1, (2, 4)], [1, (6, 6)], [1, (7, 8)],
+                            [2, (2, 3)]]
+        elif self.reference.name == "pyramid":
+            vertices = ((-1, 0, 0), (0, 0, 0), (-1, 1, 0),
+                        (0, 1, 0), (0, 0, 1))
+            entity_pairs = [[0, (0, 1)], [0, (2, 3)], [0, (4, 4)],
+                            [1, (1, 3)], [1, (2, 4)], [1, (6, 7)],
+                            [2, (2, 3)]]
+
+        if continuity == "L2":
+            return
+
+        for dim, entities in entity_pairs:
+            for fi, gi in zip(*[self.entity_dofs(dim, i) for i in entities]):
+                basis = self.get_basis_functions()
+                try:
+                    basis2 = self.map_to_cell(vertices)
+                except NotImplementedError:
+                    return "Mapping not implemented for this element."
+
+                f = basis[fi]
+                g = basis2[gi]
+
+                def get_piece(f, point):
+                    if isinstance(f, PiecewiseFunction):
+                        return f.get_piece(point)
+                    if isinstance(f, list):
+                        return [get_piece(g, point) for g in f]
+                    if isinstance(f, tuple):
+                        return tuple(get_piece(g, point) for g in f)
+                    return f
+
+                if self.reference.tdim == 2:
+                    f = get_piece(f, (0, sympy.Rational(1, 2)))
+                    g = get_piece(g, (0, sympy.Rational(1, 2)))
+                elif self.reference.tdim == 3:
+                    f = get_piece(f, (0, sympy.Rational(1, 3), sympy.Rational(1, 3)))
+                    g = get_piece(g, (0, sympy.Rational(1, 3), sympy.Rational(1, 3)))
+
+                f = subs(f, [x[0]], [0])
+                g = subs(g, [x[0]], [0])
+
+                if continuity[0] == "C":
+                    order = int(continuity[1:])
+                    deriv_f = [f]
+                    deriv_g = [g]
+                    f = [f]
+                    g = [g]
+                    for _ in range(order):
+                        deriv_f = [diff(d, i) for d in deriv_f for i in x[:self.reference.tdim]]
+                        f += deriv_f
+                        deriv_g = [diff(d, i) for d in deriv_g for i in x[:self.reference.tdim]]
+                        g += deriv_g
+                elif continuity == "H(div)":
+                    f = f[0]
+                    g = g[0]
+                elif continuity == "H(curl)":
+                    f = f[1:]
+                    g = g[1:]
+                elif continuity == "inner H(curl)":
+                    if len(vertices[0]) == 2:
+                        f = f[3]
+                        g = g[3]
+                    if len(vertices[0]) == 3:
+                        if dim == 1:
+                            vs = self.reference.sub_entities(1)[entities[0]]
+                            v0 = self.reference.vertices[vs[0]]
+                            v1 = self.reference.vertices[vs[1]]
+                            tangent = vsub(v1, v0)
+                            f = sum(i * f[ni * len(tangent) + nj] * j
+                                    for ni, i in enumerate(tangent)
+                                    for nj, j in enumerate(tangent))
+                            g = sum(i * g[ni * len(tangent) + nj] * j
+                                    for ni, i in enumerate(tangent)
+                                    for nj, j in enumerate(tangent))
+                        else:
+                            assert dim == 2
+                            f = [f[4], f[8]]
+                            g = [g[4], g[8]]
+                elif continuity == "inner H(div)":
+                    f = f[0]
+                    g = g[0]
+                elif continuity == "integral inner H(div)":
+                    f = f[0].integrate((to_sympy(x[1]), 0, 1))
+                    g = g[0].integrate((to_sympy(x[1]), 0, 1))
+                else:
+                    raise ValueError(f"Unknown continuity: {continuity}")
+
+                assert all_symequal(f, g)
 
     @property
     def name(self):
@@ -326,6 +454,30 @@ class CiarletElement(FiniteElement):
             assert i is not None
         return out
 
+    def test(self):
+        """Run tests for this element."""
+        super().test()
+        self.test_functional_entities()
+        self.test_functionals()
+
+    def test_functional_entities(self):
+        """Test that the dof entities are valid and match the references of integrals."""
+        for dof in self.dofs:
+            dim, entity = dof.entity
+            assert entity < self.reference.sub_entity_count(dim)
+            if hasattr(dof, "reference"):
+                assert dim == dof.reference.tdim
+
+    def test_functionals(self):
+        """Test that the functionals are satisfied by the basis functions."""
+        for i, f in enumerate(self.get_basis_functions()):
+            for j, d in enumerate(self.dofs):
+                if i == j:
+                    assert d.eval(f).expand().simplify() == 1
+                else:
+                    assert d.eval(f).expand().simplify() == 0
+                assert d.entity_dim() is not None
+
     names = []
 
 
@@ -355,5 +507,46 @@ class DirectElement(FiniteElement):
                  for i in range(self.range_shape[0])]) for b in self._basis_functions]
 
         return self._basis_functions
+
+    def test(self):
+        """Run tests for this element."""
+        super().test()
+        self.test_independence()
+
+    def test_independence(self):
+        """Test that the basis functions of this element are linearly independent."""
+        basis = self.get_basis_functions()
+        all_terms = set()
+
+        try:
+            basis[0].as_coefficients_dict()
+            scalar = True
+        except AttributeError:
+            scalar = False
+
+        if scalar:
+            for f in basis:
+                for term in f.as_coefficients_dict():
+                    all_terms.add(term)
+            mat = [[0 for i in all_terms] for j in basis]
+            for i, t in enumerate(all_terms):
+                for j, f in enumerate(basis):
+                    fd = f.as_coefficients_dict()
+                    if t in fd:
+                        mat[j][i] = fd[t]
+        else:
+            for f in basis:
+                for fi, fpart in enumerate(f):
+                    for term in fpart.as_coefficients_dict():
+                        all_terms.add((fi, term))
+            mat = [[0 for i in all_terms] for j in basis]
+            for i, (fi, t) in enumerate(all_terms):
+                for j, f in enumerate(basis):
+                    fd = f[fi].as_coefficients_dict()
+                    if t in fd:
+                        mat[j][i] = fd[t]
+        mat = sympy.Matrix(mat)
+
+        assert mat.rank() == mat.rows
 
     names = []

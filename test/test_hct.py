@@ -1,7 +1,6 @@
 import symfem
 import sympy
-from .utils import all_symequal
-from symfem.symbolic import x, t, subs, to_sympy
+from symfem.symbolic import x, t, subs, to_sympy, all_symequal
 from symfem.calculus import grad, diff
 half = sympy.Rational(1, 2)
 x = [to_sympy(i) for i in x]
