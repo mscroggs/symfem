@@ -45,6 +45,9 @@ python3 -m pytest test/
 Documentation of the latest release version of Symfem can be found on
 [Read the Docs](https://symfem.readthedocs.io/en/latest/).
 
+You can ask questions about using Symfem by opening [an issue with the support label](https://github.com/mscroggs/symfem/issues/new?assignees=&labels=support&template=support.md&title=).
+You can view previously answered questions [here](https://github.com/mscroggs/symfem/issues?q=is%3Aclosed+label%3Asupport).
+
 ## Contributing to Symfem
 You can find information about how to contribute to Symfem [here](CONTRIBUTING.md).
 
