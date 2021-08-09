@@ -143,7 +143,7 @@ def test_version_numbers():
                 assert line.split("cd symfem-")[1].strip() == version
 
     # CITATION.cff
-    with open("CITATION.cff") as f:
+    with open(os.path.join(root, "CITATION.cff")) as f:
         for line in f:
             if line.startswith("version: "):
                 assert line.split("version: ")[1].strip() == version
