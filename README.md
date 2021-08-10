@@ -9,7 +9,10 @@
 [![status](https://joss.theoj.org/papers/95e093272d6555489b1f941aebd6494b/status.svg)](https://joss.theoj.org/papers/95e093272d6555489b1f941aebd6494b)
 
 Symfem is a symbolic finite element definition library, that can be used to
-symbolically evaluate the basis functions of a finite element space.
+symbolically evaluate the basis functions of a finite element space. Symfem can
+be used to create a very wide range of finite element spaces. The basis functions
+of these spaces can be computed symbolically, allowing them to easily be further
+manipulated.
 
 ## Installing Symfem
 ### Installing from repo
@@ -42,9 +45,44 @@ python3 -m pytest test/
 ```
 
 ## Using Symfem
-Documentation of the latest release version of Symfem can be found on
-[Read the Docs](https://symfem.readthedocs.io/en/latest/).
+Symfem can be used to symbolically compute the basis functions of a wide range of finite
+elements, and manipulate the results.
 
+### Finite elements
+Finite elements can be created in symfem using the `symfem.create_element()`
+function. For example, some elements are created in the following snippet:
+
+```python
+import symfem
+
+lagrange = symfem.create_element("triangle", "Lagrange", 1)
+rt = symfem.create_element("tetrahedron", "Raviart-Thomas", 2)
+nedelec = symfem.create_element("triangle", "N2curl", 1)
+qcurl = symfem.create_element("quadrilateral", "Qcurl", 2)
+```
+
+The polynomial basis of an element can be obtained by calling `get_polynomial_basis()`:
+
+```python
+import symfem
+
+lagrange = symfem.create_element("triangle", "Lagrange", 1)
+print(lagrange.get_basis_functions())
+```
+```
+[1, x, y]
+```
+
+
+
+
+### Further documentation
+More detailed documentation of the latest release version of Symfem can be found on
+[Read the Docs](https://symfem.readthedocs.io/en/latest/). A series of example uses
+of Symfem can be found in the [`demo` folder](demo/) or viewed on
+[Read the Docs](https://symfem.readthedocs.io/en/latest/demos/index.html).
+
+## Getting help
 You can ask questions about using Symfem by opening [an issue with the support label](https://github.com/mscroggs/symfem/issues/new?assignees=&labels=support&template=support.md&title=).
 You can view previously answered questions [here](https://github.com/mscroggs/symfem/issues?q=is%3Aclosed+label%3Asupport).
 

@@ -27,7 +27,7 @@ Using Symfem
 
 Finite elements
 ---------------
-Finite elements can be created in symfem using the :func:`symfem.create_element` function.
+Finite elements can be created in Symfem using the :func:`symfem.create_element` function.
 For example, some elements are created in the following snippet:
 
 .. code-block:: python
@@ -89,9 +89,9 @@ at a set of points:
     [-x - y + 1, x, y]
     [[1, 0, 0], [0.500000000000000, 0.500000000000000, 0], [0, 1, 0], [0.500000000000000, 0.250000000000000, 0.250000000000000]]
 
-Reference elements
-------------------
-Reference elements can be obtained from a :class:`symfem.finite_element.FiniteElement`:
+Reference cells
+---------------
+Reference cells can be obtained from a :class:`symfem.finite_element.FiniteElement`:
 
 .. code-block:: python
 
@@ -100,7 +100,7 @@ Reference elements can be obtained from a :class:`symfem.finite_element.FiniteEl
     lagrange = symfem.create_element("triangle", "Lagrange", 1)
     reference = lagrange.reference
 
-Alternatively, reference elements can be created using the :func:`symfem.create_reference` function.
+Alternatively, reference cells can be created using the :func:`symfem.create_reference` function.
 For example:
 
 .. code-block:: python
@@ -115,7 +115,7 @@ For example:
 In the final example, the vertices of the reference have been provided, so a reference
 with these three vertices will be created.
 
-Various information about the reference can be accessed. The reference element's subentities
+Various information about the reference can be accessed. The reference cell's subentities
 can be obtained:
 
 .. code-block:: python
