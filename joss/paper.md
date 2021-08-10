@@ -25,14 +25,14 @@ written in a weak form, for example: find $u\in V$ such that for all $v\in V,$
 
 $$\int_\Omega \nabla u\cdot\nabla v=\int_\Omega fv,$$
 
-where $f$ is a known function, and $\Omega$ is the domain on which the problem is begin solved.
-This form is then discretised by defining a finite dimensional subspace of $V$---often called
+where $f$ is a known function, and $\Omega$ is the domain on which the problem is being solved.
+This form is then discretised by defining a finite-dimensional subspace of $V$---often called
 $V_h$---and looking for a solution $u_h\in V_h$ that satisfies the above equation for all functions
-$v_h\in V_h$. These finite dimensional subspaces are defined by meshing the domain of the problem,
+$v_h\in V_h$. These finite-dimensional subspaces are defined by meshing the domain of the problem,
 then defining a set of basis functions on each cell in the mesh (and enforcing any desired
 continuity between the cells).
 
-For different applications, there are a wide range of finite dimensional spaces that can be used.
+For different applications, there are a wide range of finite-dimensional spaces that can be used.
 Symfem is a Python library that can be used to symbolically compute basis functions of these
 spaces. The symbolic representations are created using Sympy [@sympy], allowing
 them to be easily manipulated using Sympy's functionality once they are created.
@@ -41,7 +41,7 @@ them to be easily manipulated using Sympy's functionality once they are created.
 
 In FEM libraries, it is common to define basis functions so that they, and their
 derivatives, can quickly and efficiently be evaluated at a collection of points, thereby allowing
-full computations to be completed quickyl. The libraries FIAT [@fiat] and Basix [@basix]---which
+full computations to be completed quickly. The libraries FIAT [@fiat] and Basix [@basix]---which
 are part of the FEniCS project [@fenics]---implement this functionality as stand-alone libraries.
 Many other FEM libraries define their basis functions as part of the core library functionality.
 It is not common to be able to compute a symbolic representation of the basis functions.
