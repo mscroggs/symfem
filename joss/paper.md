@@ -19,7 +19,7 @@ bibliography: paper.bib
 
 # Summary
 
-The finite element method (FEM) is a popular method for numerically solving a wide
+The finite element method (FEM) [@ciarlet] is a popular method for numerically solving a wide
 range of partial differential equations (PDEs). To solve a problem using FEM, the PDE is first
 written in a weak form, for example: find $u\in V$ such that for all $v\in V,$
 
