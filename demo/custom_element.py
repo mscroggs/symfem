@@ -1,3 +1,7 @@
+"""
+This demo shows how a custom element can be created in Symfem.
+"""
+
 import symfem
 import sympy
 from symfem.finite_element import CiarletElement
@@ -40,3 +44,6 @@ symfem.add_element(CustomElement)
 # Create the element and print its basis functions
 element = symfem.create_element("quadrilateral", "custom quad element", 1)
 print(element.get_basis_functions())
+
+# Run the Symfem tests on the custom element
+element.test()

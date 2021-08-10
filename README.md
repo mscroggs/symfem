@@ -66,7 +66,7 @@ lagrange = symfem.create_element("triangle", "Lagrange", 1)
 print(lagrange.get_basis_functions())
 ```
 ```
-[1, x, y]
+[-x - y + 1, x, y]
 ```
 
 Each basis function will be a [Sympy](https://www.sympy.org) symbolic expression.
@@ -86,17 +86,18 @@ print(lagrange.get_basis_functions())
 print(lagrange.map_to_cell([(0,0), (2, 0), (2, 1)]))
 ```
 ```
-[1, x, y]
-[1 - x/2, x/2 - y, y])
+[-x - y + 1, x, y]
+[1 - x/2, x/2 - y, y]
 ```
-
-
 
 ### Further documentation
 More detailed documentation of the latest release version of Symfem can be found on
 [Read the Docs](https://symfem.readthedocs.io/en/latest/). A series of example uses
 of Symfem can be found in the [`demo` folder](demo/) or viewed on
 [Read the Docs](https://symfem.readthedocs.io/en/latest/demos/index.html).
+
+Details of the definition of each element can be found on [DefElement](https://defelement.com)
+alongside Symfem snippets for creating the element.
 
 ## Getting help
 You can ask questions about using Symfem by opening [an issue with the support label](https://github.com/mscroggs/symfem/issues/new?assignees=&labels=support&template=support.md&title=).

@@ -8,6 +8,7 @@ import pytest
 
 code = False
 output = False
+check_for_output = False
 lines = []
 doc_data = []
 outputlines = []
@@ -39,6 +40,40 @@ if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),
                         output = False
                         code = False
                         doc_data.append(("\n".join(codelines), "\n".join(outputlines)))
+if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                  "../README.md")):
+    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+              "../README.md")) as f:
+        for line in f:
+            if line.strip() != "":
+                if line.strip() == "```python":
+                    check_for_output = False
+                    code = True
+                    output = False
+                    codelines = []
+                    outputlines = []
+                elif line.strip() == "```":
+                    if code:
+                        code = False
+                        check_for_output = True
+                    elif output:
+                        output = False
+                    elif check_for_output:
+                        check_for_output = False
+                        output = True
+                elif check_for_output:
+                    check_for_output = False
+                elif code or output:
+                    if code:
+                        assert not output
+                        codelines.append(line.strip("\n"))
+                    else:
+                        assert output
+                        outputlines.append(line.strip("\n"))
+                if len(codelines) > 0 and not code and not output and not check_for_output:
+                    doc_data.append(("\n".join(codelines), "\n".join(outputlines)))
+                    codelines = []
+                    outputlines = []
 
 
 def test_available_references():

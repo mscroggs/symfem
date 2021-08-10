@@ -6,7 +6,11 @@
 Symfem
 ======
 
-Welcome to the documention of Symfem: a symbolic finite element definition library
+Welcome to the documention of Symfem: a symbolic finite element definition library.
+
+Symfem can be used to create a very wide range of finite element spaces. The basis functions
+of these spaces can be computed symbolically, allowing them to easily be further
+manipulated.
 
 *****************
 Installing Symfem
