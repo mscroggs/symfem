@@ -40,37 +40,6 @@ For example, some elements are created in the following snippet:
     qcurl = symfem.create_element("quadrilateral", "Qcurl", 2)
 
 `create_element` will create a :class:`symfem.finite_element.FiniteElement` object.
-From this object, the polynomial basis of the element can be obtained:
-
-.. code-block:: python
-
-    import symfem
-
-    lagrange = symfem.create_element("triangle", "Lagrange", 1)
-    print(lagrange.get_polynomial_basis())
-
-::
-
-    [1, x, y]
-
-Each item in the polynomial basis will be a `Sympy <https://www.sympy.org>`_ symbolic expression.
-
-The functionals that define the DOFs of the finite element space can be obtained with the following
-snippet.
-
-.. code-block:: python
-
-    import symfem
-
-    lagrange = symfem.create_element("triangle", "Lagrange", 1)
-    print(lagrange.dofs)
-
-::
-
-    [<symfem.functionals.PointEvaluation object at 0x{ADDRESS}>, <symfem.functionals.PointEvaluation object at 0x{ADDRESS}>, <symfem.functionals.PointEvaluation object at 0x{ADDRESS}>]
-
-Each functional will be a functional defined in :mod:`symfem.functionals`.
-
 The basis functions spanning the finite element space can be obtained, or tabulated
 at a set of points:
 
@@ -89,13 +58,46 @@ at a set of points:
     [-x - y + 1, x, y]
     [[1, 0, 0], [0.500000000000000, 0.500000000000000, 0], [0, 1, 0], [0.500000000000000, 0.250000000000000, 0.250000000000000]]
 
+Each basis function will be a `Sympy <https://www.sympy.org>`_ symbolic expression.
+
+The majority of the elements in Symfem are defined using Ciarlet's [Ciarlet]_ definition of
+a finite element (:class:`symfem.finite_element.CiarletElement`): these elements are using a
+polynomial set, and a set of functionals. In Symfem, the polynomial set
+of an element can be obtained by:
+
+.. code-block:: python
+
+    import symfem
+
+    lagrange = symfem.create_element("triangle", "Lagrange", 1)
+    print(lagrange.get_polynomial_basis())
+
+::
+
+    [1, x, y]
+
+The functionals of the finite element space can be obtained with the following snippet.
+
+.. code-block:: python
+
+    import symfem
+
+    lagrange = symfem.create_element("triangle", "Lagrange", 1)
+    print(lagrange.dofs)
+
+::
+
+    [<symfem.functionals.PointEvaluation object at 0x{ADDRESS}>, <symfem.functionals.PointEvaluation object at 0x{ADDRESS}>, <symfem.functionals.PointEvaluation object at 0x{ADDRESS}>]
+
+Each functional will be a functional defined in :mod:`symfem.functionals`.
+
 Reference cells
 ---------------
 Reference cells can be obtained from a :class:`symfem.finite_element.FiniteElement`:
 
 .. code-block:: python
 
-    import symfem
+    import symfem   
 
     lagrange = symfem.create_element("triangle", "Lagrange", 1)
     reference = lagrange.reference
@@ -196,3 +198,5 @@ Documentation index
 
    demos/index
    docs/index
+
+.. [Ciarlet] P. G. Ciarlet, The Finite Element Method for Elliptic Problems (2002, first published 1978) [DOI: 10.1137/1.9780898719208](https://doi.org/10.1137/1.9780898719208)

@@ -45,11 +45,7 @@ python3 -m pytest test/
 ```
 
 ## Using Symfem
-Symfem can be used to symbolically compute the basis functions of a wide range of finite
-elements, and manipulate the results.
-
-### Finite elements
-Finite elements can be created in symfem using the `symfem.create_element()`
+Finite elements can be created in Symfem using the `symfem.create_element()`
 function. For example, some elements are created in the following snippet:
 
 ```python
@@ -73,6 +69,26 @@ print(lagrange.get_basis_functions())
 [1, x, y]
 ```
 
+Each basis function will be a [Sympy](https://www.sympy.org) symbolic expression.
+
+Derivative of these basis functions can be computed using the functions in
+[`symfem.calculus`](symfem/calculus.py). Vector-valued basis functions can
+be manipulated using the functions in [`symfem.vector`](symfem/vectors.py).
+
+The function `map_to_cell` can be used to map the basis functions of a finite element
+to a non-default cell:
+
+```python
+import symfem
+
+lagrange = symfem.create_element("triangle", "Lagrange", 1)
+print(lagrange.get_basis_functions())
+print(lagrange.map_to_cell([(0,0), (2, 0), (2, 1)]))
+```
+```
+[1, x, y]
+[1 - x/2, x/2 - y, y])
+```
 
 
 
