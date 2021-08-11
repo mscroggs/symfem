@@ -39,7 +39,7 @@ else:
         old_changes = old_changelog_file.decoded_content.decode("utf8").strip()
 
         new_changelog = (f"# Version {version} ({datetime.now().strftime('%d %B %Y')})\n\n"
-                         f"{changes}\n\n{old_changes}")
+                         f"{changes}\n\n{old_changes}\n")
 
         symfem.update_file(
             "CHANGELOG.md", "Update CHANGELOG.md", new_changelog, sha=old_changelog_file.sha,
