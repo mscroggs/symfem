@@ -22,7 +22,7 @@ if __name__ == "__main__":
         description="a symbolic finite element definition library",
         long_description=long_description,
         long_description_content_type="text/markdown",
-        version="2021.7.6",
+        version="2021.8.1",
         author="Matthew Scroggs",
         license="MIT",
         author_email="symfem@mscroggs.co.uk",

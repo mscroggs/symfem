@@ -1,0 +1,3 @@
+- Added Guzman-Neilan element
+- Added nonconforming Arnold-Winther element
+- Wrote JOSS paper
