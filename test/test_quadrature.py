@@ -1,7 +1,7 @@
 import pytest
 import sympy
 from symfem import quadrature
-from symfem.symbolic import all_symequal
+from symfem.symbolic import symequal
 
 
 @pytest.mark.parametrize("order", range(1, 7))
@@ -11,7 +11,7 @@ def test_equispaced(order):
     x = sympy.Symbol("x")
     poly = x
 
-    assert all_symequal(
+    assert symequal(
         poly.integrate((x, 0, 1)),
         sum(i * poly.subs(x, j) for i, j in zip(weights, points)))
 
@@ -23,7 +23,7 @@ def test_lobatto(order):
     x = sympy.Symbol("x")
     poly = x ** (2 * order - 1)
 
-    assert all_symequal(
+    assert symequal(
         poly.integrate((x, 0, 1)),
         sum(i * poly.subs(x, j) for i, j in zip(weights, points)))
 
@@ -35,7 +35,7 @@ def test_radau(order):
     x = sympy.Symbol("x")
     poly = x ** (2 * order - 1)
 
-    assert all_symequal(
+    assert symequal(
         poly.integrate((x, 0, 1)),
         sum(i * poly.subs(x, j) for i, j in zip(weights, points)))
 
@@ -47,6 +47,6 @@ def test_legendre(order):
     x = sympy.Symbol("x")
     poly = x ** (2 * order - 1)
 
-    assert all_symequal(
+    assert symequal(
         poly.integrate((x, 0, 1)),
         sum(i * poly.subs(x, j) for i, j in zip(weights, points)))

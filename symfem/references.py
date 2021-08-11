@@ -6,7 +6,7 @@ from .vectors import vsub, vnorm, vdot, vcross, vnormalise, vadd
 
 
 class Reference:
-    """A reference element."""
+    """A reference cell on which a finite element can be defined."""
 
     def __init__(self, simplex=False, tp=False):
         self.gdim = len(self.origin)

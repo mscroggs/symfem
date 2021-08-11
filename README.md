@@ -9,10 +9,15 @@
 [![status](https://joss.theoj.org/papers/95e093272d6555489b1f941aebd6494b/status.svg)](https://joss.theoj.org/papers/95e093272d6555489b1f941aebd6494b)
 
 Symfem is a symbolic finite element definition library, that can be used to
-symbolically evaluate the basis functions of a finite element space.
+symbolically evaluate the basis functions of a finite element space. Symfem can:
+
+- Symbolically compute the basis functions of a wide range of finite element spaces
+- Symbolically compute derivatives and vector products and substitute values into functions
+- Allow the user to define their own element using the Ciarlet definition of a finite element
+- Be used to verify that the basis functions of a given space have some desired properties
 
 ## Installing Symfem
-### Installing from repo
+### Installing from sourde
 Symfem can be installed by downloading the [GitHub repo](https://github.com/mscroggs/symfem)
 and running:
 
@@ -41,10 +46,68 @@ To run the Symfem unit tests, clone the repository and run:
 python3 -m pytest test/
 ```
 
-## Using Symfem
-Documentation of the latest release version of Symfem can be found on
-[Read the Docs](https://symfem.readthedocs.io/en/latest/).
+You may instead like to run the following, as this will skip the slowest tests.
 
+```bash
+python3 -m pytest test/ --speed fast
+```
+
+## Using Symfem
+Finite elements can be created in Symfem using the `symfem.create_element()`
+function. For example, some elements are created in the following snippet:
+
+```python
+import symfem
+
+lagrange = symfem.create_element("triangle", "Lagrange", 1)
+rt = symfem.create_element("tetrahedron", "Raviart-Thomas", 2)
+nedelec = symfem.create_element("triangle", "N2curl", 1)
+qcurl = symfem.create_element("quadrilateral", "Qcurl", 2)
+```
+
+The polynomial basis of an element can be obtained by calling `get_polynomial_basis()`:
+
+```python
+import symfem
+
+lagrange = symfem.create_element("triangle", "Lagrange", 1)
+print(lagrange.get_basis_functions())
+```
+```
+[-x - y + 1, x, y]
+```
+
+Each basis function will be a [Sympy](https://www.sympy.org) symbolic expression.
+
+Derivative of these basis functions can be computed using the functions in
+[`symfem.calculus`](symfem/calculus.py). Vector-valued basis functions can
+be manipulated using the functions in [`symfem.vector`](symfem/vectors.py).
+
+The function `map_to_cell` can be used to map the basis functions of a finite element
+to a non-default cell:
+
+```python
+import symfem
+
+lagrange = symfem.create_element("triangle", "Lagrange", 1)
+print(lagrange.get_basis_functions())
+print(lagrange.map_to_cell([(0,0), (2, 0), (2, 1)]))
+```
+```
+[-x - y + 1, x, y]
+[1 - x/2, x/2 - y, y]
+```
+
+### Further documentation
+More detailed documentation of the latest release version of Symfem can be found on
+[Read the Docs](https://symfem.readthedocs.io/en/latest/). A series of example uses
+of Symfem can be found in the [`demo` folder](demo/) or viewed on
+[Read the Docs](https://symfem.readthedocs.io/en/latest/demos/index.html).
+
+Details of the definition of each element can be found on [DefElement](https://defelement.com)
+alongside Symfem snippets for creating the element.
+
+## Getting help
 You can ask questions about using Symfem by opening [an issue with the support label](https://github.com/mscroggs/symfem/issues/new?assignees=&labels=support&template=support.md&title=).
 You can view previously answered questions [here](https://github.com/mscroggs/symfem/issues?q=is%3Aclosed+label%3Asupport).
 
@@ -175,4 +238,3 @@ You can find information about how to contribute to Symfem [here](CONTRIBUTING.m
 - Buffa-Christiansen
 - dual
 - rotated Buffa-Christiansen
-
