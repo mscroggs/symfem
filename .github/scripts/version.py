@@ -42,11 +42,12 @@ else:
                          f"{changes}\n\n{old_changes}")
 
         symfem.update_file(
-            "CHANGELOG.md", "Update CHANGELOG.md", new_changelog, sha=old_changelog_file.sha
+            "CHANGELOG.md", "Update CHANGELOG.md", new_changelog, sha=old_changelog_file.sha,
+            branch=f"v{version}-changelog"
         )
         symfem.update_file(
             "CHANGELOG_SINCE_LAST_VERSION.md", "Reset CHANGELOG_SINCE_LAST_VERSION.md", "",
-            sha=changelog_file.sha
+            sha=changelog_file.sha, branch=f"v{version}-changelog"
         )
 
         symfem.create_pull(
