@@ -1,6 +1,7 @@
 import json
 import sys
 import github
+from datetime import datetime
 
 access_key = sys.argv[-1]
 
@@ -33,7 +34,8 @@ else:
     old_changelog_file = symfem.get_contents("CHANGELOG.md", branch.commit.sha)
     old_changes = old_changelog_file.decoded_content.decode("utf8").strip()
 
-    new_changelog = f"# Version {version}\n\n{changes}\n\n{old_changes}"
+    new_changelog = (f"# Version {version} ({datetime.now().strftime('%d %B %Y')})\n\n"
+                     f"{changes}\n\n{old_changes}")
 
     symfem.update_file(
         "CHANGELOG.md", "Update CHANGELOG.md", new_changelog, sha=old_changelog_file.sha
