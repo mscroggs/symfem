@@ -14,8 +14,12 @@ space on a triangle.
 
 import symfem
 from symfem.polynomials import polynomial_set
-from symfem.vectors import vdot
 from symfem.symbolic import x, subs, symequal
+
+# In this demo, we use the function vdot to compute the dot product of two vectors.
+# The module symfem.vectors contains many functions that can be used to manipulate
+# vectors.
+from symfem.vectors import vdot
 
 element = symfem.create_element("triangle", "Nedelec1", 4)
 polys = element.get_polynomial_basis()
