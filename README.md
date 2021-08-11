@@ -17,7 +17,7 @@ symbolically evaluate the basis functions of a finite element space. Symfem can:
 - Be used to verify that the basis functions of a given space have some desired properties
 
 ## Installing Symfem
-### Installing from sourde
+### Installing from source
 Symfem can be installed by downloading the [GitHub repo](https://github.com/mscroggs/symfem)
 and running:
 
