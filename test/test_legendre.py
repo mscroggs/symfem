@@ -37,15 +37,14 @@ max_orders = {"interval": 10, "triangle": 8, "tetrahedron": 5, "quadrilateral": 
     [(c, o) for c in ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron",
                       "prism", "pyramid"] for o in range(1, max_orders[c])])
 def test_legendre(cell, order):
+    if cell == "pyramid":
+        pytest.xfail("Legendre polynomials not implemented for pyramids yet.")
+
     e = create_element(cell, "Lagrange", order)
     points = make_lattice(cell)
 
     basis = legendre.get_legendre_basis(e._basis, e.reference)
     values = legendre.evaluate_legendre_basis(points, e._basis, e.reference)
-
-    if basis is None:
-        assert values is None
-        pytest.skip()
 
     for b in basis:
         assert b != 0
@@ -58,14 +57,14 @@ def test_legendre(cell, order):
 @pytest.mark.parametrize("cell", ["interval", "triangle", "tetrahedron", "quadrilateral",
                                   "hexahedron", "prism", "pyramid"])
 def test_orthogonal(cell):
+    if cell == "pyramid":
+        pytest.xfail("Legendre polynomials not implemented for pyramids yet.")
+
     if cell == "interval":
         e = create_element(cell, "Lagrange", 5)
     else:
         e = create_element(cell, "Lagrange", 2)
     basis = legendre.get_legendre_basis(e._basis, e.reference)
-
-    if basis is None:
-        pytest.skip()
 
     for i, f in enumerate(basis):
         for g in basis[:i]:
