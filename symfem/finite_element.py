@@ -3,7 +3,7 @@
 import sympy
 import warnings
 import numpy
-from .symbolic import x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float, all_symequal
+from .symbolic import x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float, symequal
 from .calculus import diff
 from .vectors import vsub
 from .basis_function import ElementBasisFunction
@@ -206,7 +206,7 @@ class FiniteElement:
                 else:
                     raise ValueError(f"Unknown continuity: {continuity}")
 
-                assert all_symequal(f, g)
+                assert symequal(f, g)
 
     @property
     def name(self):
