@@ -17,7 +17,7 @@ symbolically evaluate the basis functions of a finite element space. Symfem can:
 - Be used to verify that the basis functions of a given space have some desired properties
 
 ## Installing Symfem
-### Installing from repo
+### Installing from sourde
 Symfem can be installed by downloading the [GitHub repo](https://github.com/mscroggs/symfem)
 and running:
 
@@ -44,6 +44,12 @@ To run the Symfem unit tests, clone the repository and run:
 
 ```bash
 python3 -m pytest test/
+```
+
+You may instead like to run the following, as this will skip the slowest tests.
+
+```bash
+python3 -m pytest test/ --speed fast
 ```
 
 ## Using Symfem
@@ -232,4 +238,3 @@ You can find information about how to contribute to Symfem [here](CONTRIBUTING.m
 - Buffa-Christiansen
 - dual
 - rotated Buffa-Christiansen
-
