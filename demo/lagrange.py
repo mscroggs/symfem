@@ -9,24 +9,34 @@ In this demo, we verify that this is true for an order 5 Lagrange element on a t
 """
 
 import symfem
-from symfem.symbolic import x, subs
+import sympy
+from symfem.symbolic import x, subs, symequal
 
 element = symfem.create_element("triangle", "Lagrange", 5)
 edge_element = symfem.create_element("interval", "Lagrange", 5)
 
-# Get the DOFs on edge 0 (from vertex 1 (1,0) to vertex 2 (0,1))
-dofs = element.entity_dofs(0, 1)
-dofs += element.entity_dofs(0, 2)
-dofs += element.entity_dofs(1, 0)
+# Define a parameter that will go from 0 to 1 on the chosen edge
+a = sympy.Symbol("a")
 
-# Get the basis functions of the Lagrange space
+# Get the basis functions of the Lagrange space and substitute the parameter into the
+# functions on the edge
 basis = element.get_basis_functions()
-edge_basis = edge_element.get_basis_functions()
+edge_basis = [subs(f, x[0], a) for f in edge_element.get_basis_functions()]
 
-# Check that the basis functions are equal
+# Get the DOFs on edge 0 (from vertex 1 (1,0) to vertex 2 (0,1))
+# (1 - a, a) is a parametrisation of this edge
+dofs = element.entity_dofs(0, 1) + element.entity_dofs(0, 2) + element.entity_dofs(1, 0)
+# Check that the basis functions on this edge are equal
 for d, edge_f in zip(dofs, edge_basis):
+    # symequal will simplify the expressions then check that they are equal
+    assert symequal(subs(basis[d], x[:2], (1 - a, a)),  edge_f)
 
-    # Map triangle's edge 0 to interval [0,1] on x-axis
-    mapped_basis = subs(subs(basis[d], x[0], 1-x[0]), x[1], x[0]).expand()
+# Get the DOFs on edge 1 (from vertex 0 (0,0) to vertex 2 (0,1), parametrised (0, a))
+dofs = element.entity_dofs(0, 0) + element.entity_dofs(0, 2) + element.entity_dofs(1, 1)
+for d, edge_f in zip(dofs, edge_basis):
+    assert symequal(subs(basis[d], x[:2], (0, a)),  edge_f)
 
-    assert mapped_basis == edge_f
+# Get the DOFs on edge 2 (from vertex 0 (0,0) to vertex 1 (1,0), parametrised (a, 0))
+dofs = element.entity_dofs(0, 0) + element.entity_dofs(0, 1) + element.entity_dofs(1, 2)
+for d, edge_f in zip(dofs, edge_basis):
+    assert symequal(subs(basis[d], x[:2], (a, 0)),  edge_f)

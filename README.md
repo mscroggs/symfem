@@ -9,10 +9,12 @@
 [![status](https://joss.theoj.org/papers/95e093272d6555489b1f941aebd6494b/status.svg)](https://joss.theoj.org/papers/95e093272d6555489b1f941aebd6494b)
 
 Symfem is a symbolic finite element definition library, that can be used to
-symbolically evaluate the basis functions of a finite element space. Symfem can
-be used to create a very wide range of finite element spaces. The basis functions
-of these spaces can be computed symbolically, allowing them to easily be further
-manipulated.
+symbolically evaluate the basis functions of a finite element space. Symfem can:
+
+- Symbolically compute the basis functions of a wide range of finite element spaces
+- Symbolically compute derivatives and vector products and substitute values into functions
+- Allow the user to define their own element using the Ciarlet definition of a finite element
+- Be used to verify that the basis functions of a given space have some desired properties
 
 ## Installing Symfem
 ### Installing from repo

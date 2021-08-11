@@ -1,6 +1,6 @@
 import symfem
 import sympy
-from symfem.symbolic import x, t, subs, to_sympy, all_symequal
+from symfem.symbolic import x, t, subs, to_sympy, symequal
 from symfem.calculus import grad, diff
 half = sympy.Rational(1, 2)
 x = [to_sympy(i) for i in x]
@@ -15,8 +15,8 @@ def test_hct():
         line = ((1 - 2 * t[0], t[0]))
         f1 = subs(f1, x[:2], line)
         f2 = subs(f2, x[:2], line)
-        assert all_symequal(f1, f2)
-        assert all_symequal(grad(f1, 2), grad(f2, 2))
+        assert symequal(f1, f2)
+        assert symequal(grad(f1, 2), grad(f2, 2))
 
         # edge from (0,1) to (1/3,1/3)
         f1 = f.get_piece((half, half))
@@ -24,8 +24,8 @@ def test_hct():
         line = ((t[0], 1 - 2 * t[0]))
         f1 = subs(f1, x[:2], line)
         f2 = subs(f2, x[:2], line)
-        assert all_symequal(f1, f2)
-        assert all_symequal(grad(f1, 2), grad(f2, 2))
+        assert symequal(f1, f2)
+        assert symequal(grad(f1, 2), grad(f2, 2))
 
         # edge from (0,0) to (1/3,1/3)
         f1 = f.get_piece((0, half))
@@ -33,8 +33,8 @@ def test_hct():
         line = ((t[0], t[0]))
         f1 = subs(f1, x[:2], line)
         f2 = subs(f2, x[:2], line)
-        assert all_symequal(f1, f2)
-        assert all_symequal(grad(f1, 2), grad(f2, 2))
+        assert symequal(f1, f2)
+        assert symequal(grad(f1, 2), grad(f2, 2))
 
 
 def test_rhct():
@@ -46,8 +46,8 @@ def test_rhct():
         line = ((1 - 2 * t[0], t[0]))
         f1 = subs(f1, x[:2], line)
         f2 = subs(f2, x[:2], line)
-        assert all_symequal(f1, f2)
-        assert all_symequal(grad(f1, 2), grad(f2, 2))
+        assert symequal(f1, f2)
+        assert symequal(grad(f1, 2), grad(f2, 2))
 
         # edge from (0,1) to (1/3,1/3)
         f1 = f.get_piece((half, half))
@@ -55,8 +55,8 @@ def test_rhct():
         line = ((t[0], 1 - 2 * t[0]))
         f1 = subs(f1, x[:2], line)
         f2 = subs(f2, x[:2], line)
-        assert all_symequal(f1, f2)
-        assert all_symequal(grad(f1, 2), grad(f2, 2))
+        assert symequal(f1, f2)
+        assert symequal(grad(f1, 2), grad(f2, 2))
 
         # edge from (0,0) to (1/3,1/3)
         f1 = f.get_piece((0, half))
@@ -64,8 +64,8 @@ def test_rhct():
         line = ((t[0], t[0]))
         f1 = subs(f1, x[:2], line)
         f2 = subs(f2, x[:2], line)
-        assert all_symequal(f1, f2)
-        assert all_symequal(grad(f1, 2), grad(f2, 2))
+        assert symequal(f1, f2)
+        assert symequal(grad(f1, 2), grad(f2, 2))
 
         # Check that normal derivatives are linear
         f1 = diff(f.get_piece((half, 0)), x[1]).subs(x[1], 0)

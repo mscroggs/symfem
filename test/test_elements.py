@@ -1,7 +1,7 @@
 import pytest
 import symfem
 from symfem import create_element
-from symfem.symbolic import subs, x, all_symequal
+from symfem.symbolic import subs, x, symequal
 from .utils import test_elements
 
 
@@ -74,7 +74,7 @@ def test_dual_elements(elements_to_test, cells_to_test, n_tri, order):
             map = sub_e.reference.get_map_to(piece[0])
             for dof, value in zip(sub_e.dofs, coeffs):
                 point = subs(map, x, dof.point)
-                assert all_symequal(value, subs(piece[1], x, point))
+                assert symequal(value, subs(piece[1], x, point))
 
 
 @pytest.mark.parametrize("n_tri", [3, 4])
