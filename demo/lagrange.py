@@ -25,4 +25,8 @@ edge_basis = edge_element.get_basis_functions()
 
 # Check that the basis functions are equal
 for d, edge_f in zip(dofs, edge_basis):
-    assert subs(basis[d], x[1], 1 - x[0]).expand() == subs(edge_f, x[0], x[1]).expand()
+
+    # Map triangle's edge 0 to interval [0,1] on x-axis
+    mapped_basis = subs(subs(basis[d], x[0], 1-x[0]), x[1], x[0]).expand()
+
+    assert mapped_basis == edge_f
