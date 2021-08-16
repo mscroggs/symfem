@@ -7,6 +7,13 @@ automatically create a new version tag on GitHub.
 import json
 from datetime import datetime
 
+# Check that CHANGELOG_SINCE_LAST_VERSION.md is not empty
+with open("CHANGELOG_SINCE_LAST_VERSION.md") as f:
+    changes = f.read().strip()
+if changes == "":
+    raise RuntimeError("CHANGELOG_SINCE_LAST_VERSION.md should not be empty")
+
+
 # Calculate new version number
 with open("VERSION") as f:
     version = tuple(int(i) for i in f.read().split("."))

@@ -16,6 +16,8 @@ symbolically evaluate the basis functions of a finite element space. Symfem can:
 - Allow the user to define their own element using the Ciarlet definition of a finite element
 - Be used to verify that the basis functions of a given space have some desired properties
 
+You can find details of recent changes to Symfem in [the changelog](CHANGELOG.md).
+
 ## Installing Symfem
 ### Installing from source
 Symfem can be installed by downloading the [GitHub repo](https://github.com/mscroggs/symfem)
