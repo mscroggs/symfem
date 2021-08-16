@@ -27,8 +27,10 @@ else:
     new_branch = symfem.get_branch(f"v{version}-changelog")
     changelog_file = symfem.get_contents("CHANGELOG_SINCE_LAST_VERSION.md", new_branch.commit.sha)
     changes = changelog_file.decoded_content.decode("utf8").strip()
+
     if changes == "":
-        changes = "- Released new version of Symfem"
+        raise RuntimeError("CHANGELOG_SINCE_LAST_VERSION.md should not be empty")
+
     symfem.create_git_tag_and_release(
         f"v{version}", f"Version {version}", f"Version {version}", changes,
         branch.commit.sha, "commit")
