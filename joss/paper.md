@@ -23,7 +23,9 @@ The finite element method (FEM) [@ciarlet] is a popular method for numerically s
 range of partial differential equations (PDEs). To solve a problem using FEM, the PDE is first
 written in a weak form, for example: find $u\in V$ such that for all $v\in V,$
 
-$$\int_\Omega \nabla u\cdot\nabla v=\int_\Omega fv,$$
+\begin{equation}
+\int_\Omega \nabla u\cdot\nabla v=\int_\Omega fv,
+\end{equation}
 
 where $f$ is a known function, and $\Omega$ is the domain on which the problem is being solved.
 This form is then discretised by defining a finite-dimensional subspace of $V$---often called
