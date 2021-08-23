@@ -37,7 +37,7 @@ jobs:
         name: Run unit tests
         continue-on-error: true
       - name: Upload to Coveralls
-        if: ${{ github.repository == 'mscroggs/symfem' }}
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.coverall_token }}
         run: coveralls
+        if: {{ github.ref == 'ref/head/main' }}
