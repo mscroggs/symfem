@@ -33,11 +33,11 @@ jobs:
             sudo cmake --install build-dir
             pip install ./python/
         name: Install basix
-      - run: python3 -m pytest -n=auto --cov=symfem test/test_docs.py > .coveralls_output
+      - run: python3 -m pytest -n=auto --cov=symfem test/ > .coveralls_output
         name: Run unit tests
         continue-on-error: true
       - name: Check coverage is over 80%
-        run: python3 -c "with open(\".coveralls_output\") as f: assert int(f.read().split(\"TOTAL\")[-1].split(\"%\")[0].split(\" \")[-1]) > 40"
+        run: python3 -c "with open(\".coveralls_output\") as f: assert int(f.read().split(\"TOTAL\")[-1].split(\"%\")[0].split(\" \")[-1]) > 80"
       - name: Upload to Coveralls
         if: ${{ github.ref == 'ref/head/main' }}
         env:
