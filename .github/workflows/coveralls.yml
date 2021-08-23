@@ -33,11 +33,13 @@ jobs:
             sudo cmake --install build-dir
             pip install ./python/
         name: Install basix
-      - run: python3 -m pytest -n=auto --cov=symfem --durations=50 test/
+      - run: python3 -m pytest -n=auto --cov=symfem test/ > .coveralls_output
         name: Run unit tests
         continue-on-error: true
+      - name: Check coverage is over 80%
+        run: python3 .github/scripts/coveralls_check.py
       - name: Upload to Coveralls
-        if: ${{ github.repository == 'mscroggs/symfem' }}
+        if: ${{ github.ref == 'ref/head/main' }}
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.coverall_token }}
         run: coveralls
