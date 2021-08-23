@@ -37,7 +37,7 @@ jobs:
         name: Run unit tests
         continue-on-error: true
       - name: Check coverage is over 80%
-        run: python3 scripts/coveralls_check.py
+        run: python3 .github/scripts/coveralls_check.py
       - name: Upload to Coveralls
         if: ${{ github.ref == 'ref/head/main' }}
         env:
