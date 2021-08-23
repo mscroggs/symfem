@@ -37,7 +37,7 @@ jobs:
         name: Run unit tests
         continue-on-error: true
       - name: Check coverage is over 80%
-        run: python3 -c \"with open(\\\".coveralls_output\\\") as f: assert int(f.read().split(\\\"TOTAL\\\")[-1].split(\\\"%\\\")[0].split(\\\" \\\")[-1]) > 80\"
+        run: python3 scripts/coveralls_check.py
       - name: Upload to Coveralls
         if: ${{ github.ref == 'ref/head/main' }}
         env:
