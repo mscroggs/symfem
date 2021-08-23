@@ -33,7 +33,7 @@ jobs:
             sudo cmake --install build-dir
             pip install ./python/
         name: Install basix
-      - run: python3 -m pytest -n=auto --cov=symfem --durations=50 test/
+      - run: python3 -m pytest -n=auto --cov=symfem --durations=50 test/test_docs.py
         name: Run unit tests
         continue-on-error: true
       - name: Upload to Coveralls
