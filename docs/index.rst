@@ -26,6 +26,10 @@ Alternatively, the latest release can be installed from PyPI by running::
 
     pip3 install symfem
 
+... or from Conda by running::
+
+    conda install symfem
+
 Using Symfem
 ============
 
