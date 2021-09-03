@@ -60,7 +60,6 @@ jobs:
       - run: |
             python3 setup.py install
         name: Install symfem
-      - name: Clone Basix
       - run: pip install git+https://github.com/FEniCS/basix.git
         name: Install basix
       - run: python3 -m pytest -n=auto --durations=50 test/test_against_basix.py --has-basix 1

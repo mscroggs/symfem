@@ -7,6 +7,7 @@ from ..polynomials import (Hcurl_polynomials, polynomial_set_1d,
 from ..functionals import TangentIntegralMoment, IntegralMoment, IntegralAgainst
 from ..symbolic import x
 from .lagrange import Lagrange, VectorLagrange
+from .dpc import DPC, VectorDPC
 from .q import RaviartThomas as QRT
 
 
@@ -48,6 +49,8 @@ class Nedelec(CiarletElement):
                      space2.get_basis_function(j) * space1.get_basis_function(i)[1],
                      0)
                 dofs.append(IntegralAgainst(reference, f, entity=(3, 0), mapping="covariant"))
+
+        print(len(poly), len(dofs))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
