@@ -10,7 +10,7 @@ from ..polynomials import polynomial_set
 from ..symbolic import x
 from ..calculus import curl
 from ..functionals import NormalIntegralMoment, IntegralMoment
-from .lagrange import Lagrange, VectorLagrange
+from .dpc import DPC, VectorDPC
 
 
 def bddf_polyset(reference, order):
@@ -38,8 +38,8 @@ class BDDF(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Lagrange, order, {"variant": variant}),
-            cells=(IntegralMoment, VectorLagrange, order - 2, {"variant": variant})
+            facets=(NormalIntegralMoment, DPC, order, {"variant": variant}),
+            cells=(IntegralMoment, VectorDPC, order - 2, {"variant": variant})
         )
 
         self.variant = variant
