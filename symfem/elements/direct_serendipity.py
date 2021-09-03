@@ -6,7 +6,7 @@ This element's definition appears in https://arxiv.org/abs/1809.02192
 
 from ..finite_element import DirectElement
 from ..symbolic import x
-from .lagrange import Lagrange
+from .dpc import DPC
 
 
 class DirectSerendipity(DirectElement):
@@ -62,7 +62,7 @@ class DirectSerendipity(DirectElement):
 
         # Functions in interior
         if order >= 4:
-            for f in Lagrange(reference, 4, "equispaced").get_basis_functions():
+            for f in DPC(reference, 4, "equispaced").get_basis_functions():
                 basis_functions.append(f * x[0] * x[1] * (1 - x[0]) * (1 - x[1]))
                 basis_entities.append((2, 0))
 
