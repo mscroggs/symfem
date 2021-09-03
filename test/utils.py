@@ -5,6 +5,7 @@ test_elements = {
         "P": [[{"variant": "equispaced"}, range(6)], [{"variant": "lobatto"}, range(4)]],
         "vP": [[{"variant": "equispaced"}, range(6)], [{"variant": "lobatto"}, range(3)],
                [{"variant": "radau"}, range(3)], [{"variant": "legendre"}, range(3)]],
+        "dPc": [[{"variant": "equispaced"}, range(6)], [{"variant": "lobatto"}, range(4)]],
         "bubble": [[{"variant": "equispaced"}, range(2, 6)],
                    [{"variant": "lobatto"}, range(2, 3)]],
         "serendipity": [[{"variant": "equispaced"}, range(1, 6)],
@@ -101,13 +102,11 @@ test_elements = {
                          "variant": "equispaced"}, range(1, 5)]],
     },
     "quadrilateral": {
-        "symmetric matrix Lagrange": [
-            [{"variant": "equispaced"}, range(2)]],
-        "matrix Lagrange": [
-            [{"variant": "equispaced"}, range(2)]],
         "bubble": [[{"variant": "equispaced"}, range(2, 4)], [{"variant": "lobatto"}, range(2, 4)]],
         "Q": [[{"variant": "equispaced"}, range(4)], [{"variant": "lobatto"}, range(3)]],
         "vQ": [[{"variant": "equispaced"}, range(4)], [{"variant": "lobatto"}, range(3)]],
+        "dPc": [[{"variant": "equispaced"}, range(4)], [{"variant": "lobatto"}, range(3)]],
+        "vector dPc": [[{"variant": "equispaced"}, range(4)], [{"variant": "lobatto"}, range(3)]],
         "serendipity": [[{"variant": "equispaced"}, range(1, 4)],
                         [{"variant": "lobatto"}, range(1, 3)]],
         "direct serendipity": [[{}, range(1, 7)]],
@@ -120,12 +119,10 @@ test_elements = {
     },
     "hexahedron": {
         "bubble": [[{"variant": "equispaced"}, range(2, 4)], [{"variant": "lobatto"}, range(2, 4)]],
-        "symmetric matrix Lagrange": [
-            [{"variant": "equispaced"}, range(2)]],
-        "matrix Lagrange": [
-            [{"variant": "equispaced"}, range(2)]],
         "Q": [[{"variant": "equispaced"}, range(3)], [{"variant": "lobatto"}, range(3)]],
         "vQ": [[{"variant": "equispaced"}, range(3)], [{"variant": "lobatto"}, range(3)]],
+        "dPc": [[{"variant": "equispaced"}, range(3)], [{"variant": "lobatto"}, range(3)]],
+        "vector dPc": [[{"variant": "equispaced"}, range(3)], [{"variant": "lobatto"}, range(3)]],
         "serendipity": [[{"variant": "equispaced"}, range(1, 3)],
                         [{"variant": "lobatto"}, range(1, 3)]],
         "Scurl": [[{"variant": "equispaced"}, range(1, 3)], [{"variant": "lobatto"}, range(1, 3)]],

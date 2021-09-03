@@ -119,7 +119,7 @@ class MatrixLagrange(CiarletElement):
         return {"variant": self.variant}
 
     names = ["matrix Lagrange"]
-    references = ["triangle", "tetrahedron", "quadrilateral", "hexahedron"]
+    references = ["triangle", "tetrahedron"]
     min_order = 0
     continuity = "L2"
 
@@ -167,6 +167,6 @@ class SymmetricMatrixLagrange(CiarletElement):
         return {"variant": self.variant}
 
     names = ["symmetric matrix Lagrange"]
-    references = ["triangle", "tetrahedron", "quadrilateral", "hexahedron"]
+    references = ["triangle", "tetrahedron"]
     min_order = 0
     continuity = "L2"

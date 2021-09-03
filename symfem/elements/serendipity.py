@@ -10,7 +10,7 @@ from ..polynomials import (serendipity_set, polynomial_set,
                            Hdiv_serendipity, Hcurl_serendipity)
 from ..functionals import (
     PointEvaluation, IntegralMoment, TangentIntegralMoment, NormalIntegralMoment)
-from .lagrange import Lagrange, VectorLagrange
+from .dpc import DPC, VectorDPC
 
 
 class Serendipity(CiarletElement):
@@ -25,9 +25,9 @@ class Serendipity(CiarletElement):
             dofs.append(PointEvaluation(p, entity=(0, v_n)))
         dofs += make_integral_moment_dofs(
             reference,
-            edges=(IntegralMoment, Lagrange, order - 2, {"variant": variant}),
-            faces=(IntegralMoment, Lagrange, order - 4, {"variant": variant}),
-            volumes=(IntegralMoment, Lagrange, order - 6, {"variant": variant}),
+            edges=(IntegralMoment, DPC, order - 2, {"variant": variant}),
+            faces=(IntegralMoment, DPC, order - 4, {"variant": variant}),
+            volumes=(IntegralMoment, DPC, order - 6, {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
@@ -52,10 +52,10 @@ class SerendipityCurl(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, Lagrange, order, {"variant": variant}),
-            faces=(IntegralMoment, VectorLagrange, order - 2, "covariant",
+            edges=(TangentIntegralMoment, DPC, order, {"variant": variant}),
+            faces=(IntegralMoment, VectorDPC, order - 2, "covariant",
                    {"variant": variant}),
-            volumes=(IntegralMoment, VectorLagrange, order - 4, "covariant",
+            volumes=(IntegralMoment, VectorDPC, order - 4, "covariant",
                      {"variant": variant}),
         )
 
@@ -81,8 +81,8 @@ class SerendipityDiv(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Lagrange, order, {"variant": variant}),
-            cells=(IntegralMoment, VectorLagrange, order - 2, "contravariant",
+            facets=(NormalIntegralMoment, DPC, order, {"variant": variant}),
+            cells=(IntegralMoment, VectorDPC, order - 2, "contravariant",
                    {"variant": variant}),
         )
 

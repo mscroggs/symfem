@@ -120,6 +120,7 @@ You can find information about how to contribute to Symfem [here](CONTRIBUTING.m
 ### Interval
 - Bernstein
 - bubble
+- dPc
 - Hermite
 - Lagrange
 - Morley-Wang-Xu
@@ -169,14 +170,14 @@ You can find information about how to contribute to Symfem [here](CONTRIBUTING.m
 - Brezzi-Douglas-Fortin-Marini
 - bubble
 - direct serendipity
-- matrix Lagrange
+- dPc
 - NCE
 - NCF
 - Q
 - serendipity
 - serendipity Hcurl
 - serendipity Hdiv
-- symmetric matrix Lagrange
+- vector dPc
 - vector Q
 
 ### Tetrahedron
@@ -207,14 +208,14 @@ You can find information about how to contribute to Symfem [here](CONTRIBUTING.m
 - Brezzi-Douglas-Duran-Fortin
 - Brezzi-Douglas-Fortin-Marini
 - bubble
-- matrix Lagrange
+- dPc
 - NCE
 - NCF
 - Q
 - serendipity
 - serendipity Hcurl
 - serendipity Hdiv
-- symmetric matrix Lagrange
+- vector dPc
 - vector Q
 
 ### Prism

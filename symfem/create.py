@@ -116,6 +116,8 @@ def create_element(cell_type, element_type, order, **kwargs):
         vector Lagrange, vP,
         matrix Lagrange,
         symmetric matrix Lagrange,
+        dPc,
+        vector dPc,
         Crouzeix-Raviart, CR, Crouzeix-Falk, CF,
         conforming Crouzeix-Raviart, conforming CR,
         serendipity, S,
