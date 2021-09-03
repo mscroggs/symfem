@@ -120,13 +120,11 @@ You can find information about how to contribute to Symfem [here](CONTRIBUTING.m
 ### Interval
 - Bernstein
 - bubble
-- discontinuous Lagrange
 - Hermite
 - Lagrange
 - Morley-Wang-Xu
 - serendipity
 - Taylor
-- vector discontinuous Lagrange
 - vector Lagrange
 - Wu-Xu
 
@@ -143,7 +141,6 @@ You can find information about how to contribute to Symfem [here](CONTRIBUTING.m
 - bubble enriched vector Lagrange
 - conforming Crouzeix-Raviart
 - Crouzeix-Raviart
-- discontinuous Lagrange
 - Fortin-Soulie
 - Guzman-Neilan
 - Hellan-Herrmann-Johnson
@@ -152,7 +149,7 @@ You can find information about how to contribute to Symfem [here](CONTRIBUTING.m
 - Kong-Mulder-Veldhuizen
 - Lagrange
 - Mardal-Tai-Winther
-- matrix discontinuous Lagrange
+- matrix Lagrange
 - Morley
 - Morley-Wang-Xu
 - Nedelec
@@ -161,10 +158,9 @@ You can find information about how to contribute to Symfem [here](CONTRIBUTING.m
 - Raviart-Thomas
 - reduced Hsieh-Clough-Tocher
 - Regge
-- symmetric matrix discontinuous Lagrange
+- symmetric matrix Lagrange
 - Taylor
 - transition
-- vector discontinuous Lagrange
 - vector Lagrange
 - Wu-Xu
 
@@ -173,17 +169,14 @@ You can find information about how to contribute to Symfem [here](CONTRIBUTING.m
 - Brezzi-Douglas-Fortin-Marini
 - bubble
 - direct serendipity
-- discontinuous Lagrange
-- dQ
-- matrix discontinuous Lagrange
+- matrix Lagrange
 - NCE
 - NCF
 - Q
 - serendipity
 - serendipity Hcurl
 - serendipity Hdiv
-- symmetric matrix discontinuous Lagrange
-- vector discontinuous Lagrange
+- symmetric matrix Lagrange
 - vector Q
 
 ### Tetrahedron
@@ -193,22 +186,20 @@ You can find information about how to contribute to Symfem [here](CONTRIBUTING.m
 - Brezzi-Douglas-Marini
 - bubble
 - Crouzeix-Raviart
-- discontinuous Lagrange
 - Guzman-Neilan
 - Hermite
 - Kong-Mulder-Veldhuizen
 - Lagrange
 - Mardal-Tai-Winther
-- matrix discontinuous Lagrange
+- matrix Lagrange
 - Morley-Wang-Xu
 - Nedelec
 - Nedelec2
 - Raviart-Thomas
 - Regge
-- symmetric matrix discontinuous Lagrange
+- symmetric matrix Lagrange
 - Taylor
 - transition
-- vector discontinuous Lagrange
 - vector Lagrange
 - Wu-Xu
 
@@ -216,17 +207,14 @@ You can find information about how to contribute to Symfem [here](CONTRIBUTING.m
 - Brezzi-Douglas-Duran-Fortin
 - Brezzi-Douglas-Fortin-Marini
 - bubble
-- discontinuous Lagrange
-- dQ
-- matrix discontinuous Lagrange
+- matrix Lagrange
 - NCE
 - NCF
 - Q
 - serendipity
 - serendipity Hcurl
 - serendipity Hdiv
-- symmetric matrix discontinuous Lagrange
-- vector discontinuous Lagrange
+- symmetric matrix Lagrange
 - vector Q
 
 ### Prism
@@ -240,3 +228,4 @@ You can find information about how to contribute to Symfem [here](CONTRIBUTING.m
 - Buffa-Christiansen
 - dual
 - rotated Buffa-Christiansen
+

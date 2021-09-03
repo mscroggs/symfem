@@ -8,7 +8,7 @@ from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set
 from ..functionals import (PointEvaluation, NormalDerivativeIntegralMoment,
                            DerivativePointEvaluation)
-from .lagrange import DiscontinuousLagrange
+from .lagrange import Lagrange
 
 
 class Bell(CiarletElement):
@@ -27,7 +27,7 @@ class Bell(CiarletElement):
             dofs.append(DerivativePointEvaluation(v, (0, 2), entity=(0, v_n)))
         dofs += make_integral_moment_dofs(
             reference,
-            edges=(NormalDerivativeIntegralMoment, DiscontinuousLagrange, 0, {"variant": variant}),
+            edges=(NormalDerivativeIntegralMoment, Lagrange, 0, {"variant": variant}),
         )
         self.variant = variant
 

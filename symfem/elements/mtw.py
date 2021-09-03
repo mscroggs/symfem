@@ -11,7 +11,7 @@ from ..polynomials import polynomial_set
 from ..symbolic import x
 from ..calculus import curl
 from ..functionals import NormalIntegralMoment, TangentIntegralMoment, IntegralMoment
-from .lagrange import DiscontinuousLagrange
+from .lagrange import Lagrange
 from .nedelec import NedelecFirstKind
 
 
@@ -22,7 +22,7 @@ class MardalTaiWinther(CiarletElement):
         assert order == 3
 
         dofs = make_integral_moment_dofs(
-            reference, facets=(NormalIntegralMoment, DiscontinuousLagrange, 1,
+            reference, facets=(NormalIntegralMoment, Lagrange, 1,
                                "contravariant", {"variant": variant}))
 
         if reference.name == "triangle":
@@ -38,7 +38,7 @@ class MardalTaiWinther(CiarletElement):
                     (2 * x[0] ** 2 * x[1] + x[0] ** 2 + 3 * x[0] * x[1] ** 2,
                      -2 * x[0] * x[1] ** 2 - 2 * x[0] * x[1] - x[1] ** 3)]
             dofs += make_integral_moment_dofs(
-                reference, facets=(TangentIntegralMoment, DiscontinuousLagrange, 0,
+                reference, facets=(TangentIntegralMoment, Lagrange, 0,
                                    "contravariant", {"variant": variant}))
         else:
             assert reference.name == "tetrahedron"

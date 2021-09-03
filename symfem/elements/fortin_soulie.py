@@ -9,7 +9,7 @@ from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set
 from ..functionals import PointEvaluation, IntegralMoment
 from ..moments import make_integral_moment_dofs
-from .lagrange import DiscontinuousLagrange
+from .lagrange import Lagrange
 
 
 class FortinSoulie(CiarletElement):
@@ -22,7 +22,7 @@ class FortinSoulie(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            edges=(IntegralMoment, DiscontinuousLagrange, order - 1, {"variant": "equispaced"}),
+            edges=(IntegralMoment, Lagrange, order - 1, {"variant": "equispaced"}),
         )
         dofs[-1] = PointEvaluation((sympy.Rational(1, 3), sympy.Rational(1, 3)), entity=(2, 0))
 

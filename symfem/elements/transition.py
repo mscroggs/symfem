@@ -6,7 +6,7 @@ from ..polynomials import polynomial_set
 from ..functionals import PointEvaluation
 from ..quadrature import get_quadrature
 from ..symbolic import x, subs
-from .lagrange import DiscontinuousLagrange
+from .lagrange import Lagrange
 
 
 class Transition(CiarletElement):
@@ -21,7 +21,7 @@ class Transition(CiarletElement):
             assert len(face_orders) == 4
             assert len(edge_orders) == 6
 
-        bubble_space = DiscontinuousLagrange(reference, 1)
+        bubble_space = Lagrange(reference, 1)
 
         dofs = []
         poly = polynomial_set(reference.tdim, 1, 1)
@@ -64,8 +64,7 @@ class Transition(CiarletElement):
                         for i, f in enumerate(bubble_space.get_basis_functions()):
                             if i in reference.edges[e_n]:
                                 bubble *= f
-                    space = DiscontinuousLagrange(entity, entity_order - edim - 1,
-                                                  variant=variant)
+                    space = Lagrange(entity, entity_order - edim - 1, variant=variant)
                     vars = []
                     origin = entity.vertices[0]
                     used = []

@@ -74,41 +74,6 @@ class Lagrange(CiarletElement):
     continuity = "C0"
 
 
-class DiscontinuousLagrange(CiarletElement):
-    """Discontinuous Lagrange finite element."""
-
-    def __init__(self, reference, order, variant="equispaced"):
-        if order == 0:
-            dofs = [
-                PointEvaluation(
-                    tuple(sympy.Rational(1, reference.tdim + 1) for i in range(reference.tdim)),
-                    entity=(reference.tdim, 0))]
-        else:
-            points, _ = get_quadrature(variant, order + 1)
-
-            dofs = []
-            for i in product(range(order + 1), repeat=reference.tdim):
-                if i[0] + i[1] <= order:
-                    dofs.append(PointEvaluation(tuple(points[j] for j in i[::-1]),
-                                                entity=(reference.tdim, 0)))
-
-        super().__init__(
-            reference, order, prism_polynomial_set(reference.tdim, 1, order), dofs,
-            reference.tdim, 1
-        )
-        self.variant = variant
-
-    def init_kwargs(self):
-        """Return the kwargs used to create this element."""
-        return {"variant": self.variant}
-
-    names = []
-    # names = ["discontinuous Lagrange", "dP", "DP"]
-    references = ["prism"]
-    min_order = 0
-    continuity = "L2"
-
-
 class VectorLagrange(CiarletElement):
     """Vector Lagrange finite element."""
 
@@ -144,40 +109,3 @@ class VectorLagrange(CiarletElement):
     references = ["prism"]
     min_order = 0
     continuity = "C0"
-
-
-class VectorDiscontinuousLagrange(CiarletElement):
-    """Vector Lagrange finite element."""
-
-    def __init__(self, reference, order, variant="equispaced"):
-        scalar_space = DiscontinuousLagrange(reference, order, variant)
-        dofs = []
-        if reference.tdim == 1:
-            directions = [1]
-        else:
-            directions = [
-                tuple(1 if i == j else 0 for j in range(reference.tdim))
-                for i in range(reference.tdim)
-            ]
-        for p in scalar_space.dofs:
-            for d in directions:
-                dofs.append(DotPointEvaluation(p.point, d, entity=p.entity))
-
-        super().__init__(
-            reference, order,
-            prism_polynomial_set(reference.tdim, reference.tdim, order),
-            dofs,
-            reference.tdim,
-            reference.tdim,
-        )
-        self.variant = variant
-
-    def init_kwargs(self):
-        """Return the kwargs used to create this element."""
-        return {"variant": self.variant}
-
-    names = []
-    # names = ["vector discontinuous Lagrange", "vdP", "vDP"]
-    references = ["prism"]
-    min_order = 0
-    continuity = "L2"

@@ -8,7 +8,7 @@ from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set, Hdiv_polynomials
 from ..functionals import NormalIntegralMoment, IntegralMoment
-from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
+from .lagrange import Lagrange, VectorLagrange
 
 
 class RaviartThomas(CiarletElement):
@@ -20,9 +20,9 @@ class RaviartThomas(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, DiscontinuousLagrange, order - 1,
+            facets=(NormalIntegralMoment, Lagrange, order - 1,
                     {"variant": variant}),
-            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, "contravariant",
+            cells=(IntegralMoment, VectorLagrange, order - 2, "contravariant",
                    {"variant": variant}),
         )
 

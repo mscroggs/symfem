@@ -3,11 +3,6 @@
 test_elements = {
     "interval": {
         "P": [[{"variant": "equispaced"}, range(6)], [{"variant": "lobatto"}, range(4)]],
-        "dP": [[{"variant": "equispaced"}, range(6)], [{"variant": "lobatto"}, range(4)],
-               [{"variant": "radau"}, range(3)], [{"variant": "legendre"}, range(3)]],
-        "vdP": [[{"variant": "equispaced"}, range(6)], [{"variant": "lobatto"}, range(3)],
-                [{"variant": "radau"}, range(3)],
-                [{"variant": "legendre"}, range(3)]],
         "vP": [[{"variant": "equispaced"}, range(6)], [{"variant": "lobatto"}, range(3)],
                [{"variant": "radau"}, range(3)], [{"variant": "legendre"}, range(3)]],
         "bubble": [[{"variant": "equispaced"}, range(2, 6)],
@@ -22,12 +17,10 @@ test_elements = {
     },
     "triangle": {
         "P": [[{"variant": "equispaced"}, range(5)], [{"variant": "lobatto"}, range(3)]],
-        "dP": [[{"variant": "equispaced"}, range(5)], [{"variant": "lobatto"}, range(3)]],
-        "vdP": [[{"variant": "equispaced"}, range(5)], [{"variant": "lobatto"}, range(3)]],
         "vP": [[{"variant": "equispaced"}, range(5)], [{"variant": "lobatto"}, range(3)]],
-        "matrix discontinuous Lagrange": [[{"variant": "equispaced"}, range(3)],
-                                          [{"variant": "lobatto"}, range(3)]],
-        "symmetric matrix discontinuous Lagrange": [
+        "matrix Lagrange": [[{"variant": "equispaced"}, range(3)],
+                            [{"variant": "lobatto"}, range(3)]],
+        "symmetric matrix Lagrange": [
             [{"variant": "equispaced"}, range(3)], [{"variant": "lobatto"}, range(3)]],
         "bubble": [[{"variant": "equispaced"}, range(3, 5)], [{"variant": "lobatto"}, range(3, 3)]],
         "bubble enriched Lagrange": [[{"variant": "equispaced"}, range(1, 3)],
@@ -68,13 +61,11 @@ test_elements = {
     },
     "tetrahedron": {
         "P": [[{"variant": "equispaced"}, range(3)], [{"variant": "lobatto"}, range(3)]],
-        "dP": [[{"variant": "equispaced"}, range(3)], [{"variant": "lobatto"}, range(3)]],
-        "vdP": [[{"variant": "equispaced"}, range(3)], [{"variant": "lobatto"}, range(3)]],
         "vP": [[{"variant": "equispaced"}, range(3)], [{"variant": "lobatto"}, range(3)]],
-        "matrix discontinuous Lagrange": [[{"variant": "equispaced"}, range(2)],
-                                          [{"variant": "lobatto"}, range(3)]],
-        "symmetric matrix discontinuous Lagrange": [[{"variant": "equispaced"}, range(2)],
-                                                    [{"variant": "lobatto"}, range(3)]],
+        "matrix Lagrange": [[{"variant": "equispaced"}, range(2)],
+                            [{"variant": "lobatto"}, range(3)]],
+        "symmetric matrix Lagrange": [[{"variant": "equispaced"}, range(2)],
+                                      [{"variant": "lobatto"}, range(3)]],
         "bubble": [[{"variant": "equispaced"}, [4]], [{"variant": "lobatto"}, [4]]],
         "CR": [[{"variant": "equispaced"}, [1]]],
         "Regge": [[{}, range(3)]],
@@ -110,17 +101,12 @@ test_elements = {
                          "variant": "equispaced"}, range(1, 5)]],
     },
     "quadrilateral": {
-        "dP": [[{"variant": "equispaced"}, range(4)], [{"variant": "lobatto"}, range(3)],
-               [{"variant": "radau"}, range(3)], [{"variant": "legendre"}, range(3)]],
-        "vdP": [[{"variant": "equispaced"}, range(4)], [{"variant": "lobatto"}, range(3)],
-                [{"variant": "radau"}, range(3)], [{"variant": "legendre"}, range(3)]],
-        "symmetric matrix discontinuous Lagrange": [
+        "symmetric matrix Lagrange": [
             [{"variant": "equispaced"}, range(2)]],
-        "matrix discontinuous Lagrange": [
+        "matrix Lagrange": [
             [{"variant": "equispaced"}, range(2)]],
         "bubble": [[{"variant": "equispaced"}, range(2, 4)], [{"variant": "lobatto"}, range(2, 4)]],
         "Q": [[{"variant": "equispaced"}, range(4)], [{"variant": "lobatto"}, range(3)]],
-        "dQ": [[{"variant": "equispaced"}, range(4)], [{"variant": "lobatto"}, range(3)]],
         "vQ": [[{"variant": "equispaced"}, range(4)], [{"variant": "lobatto"}, range(3)]],
         "serendipity": [[{"variant": "equispaced"}, range(1, 4)],
                         [{"variant": "lobatto"}, range(1, 3)]],
@@ -133,17 +119,12 @@ test_elements = {
         "BDFM": [[{"variant": "equispaced"}, range(1, 4)]],
     },
     "hexahedron": {
-        "dP": [[{"variant": "equispaced"}, range(3)], [{"variant": "lobatto"}, range(3)],
-               [{"variant": "radau"}, range(3)], [{"variant": "legendre"}, range(3)]],
-        "vdP": [[{"variant": "equispaced"}, range(3)], [{"variant": "lobatto"}, range(3)],
-                [{"variant": "radau"}, range(3)], [{"variant": "legendre"}, range(3)]],
         "bubble": [[{"variant": "equispaced"}, range(2, 4)], [{"variant": "lobatto"}, range(2, 4)]],
-        "symmetric matrix discontinuous Lagrange": [
+        "symmetric matrix Lagrange": [
             [{"variant": "equispaced"}, range(2)]],
-        "matrix discontinuous Lagrange": [
+        "matrix Lagrange": [
             [{"variant": "equispaced"}, range(2)]],
         "Q": [[{"variant": "equispaced"}, range(3)], [{"variant": "lobatto"}, range(3)]],
-        "dQ": [[{"variant": "equispaced"}, range(3)], [{"variant": "lobatto"}, range(3)]],
         "vQ": [[{"variant": "equispaced"}, range(3)], [{"variant": "lobatto"}, range(3)]],
         "serendipity": [[{"variant": "equispaced"}, range(1, 3)],
                         [{"variant": "lobatto"}, range(1, 3)]],

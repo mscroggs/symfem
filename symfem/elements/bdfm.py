@@ -9,7 +9,7 @@ from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set
 from ..symbolic import x
 from ..functionals import NormalIntegralMoment, IntegralMoment
-from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
+from .lagrange import Lagrange, VectorLagrange
 
 
 def bdfm_polyset(reference, order):
@@ -52,8 +52,8 @@ class BDFM(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, DiscontinuousLagrange, order - 1, {"variant": variant}),
-            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, {"variant": variant}),
+            facets=(NormalIntegralMoment, Lagrange, order - 1, {"variant": variant}),
+            cells=(IntegralMoment, VectorLagrange, order - 2, {"variant": variant}),
         )
         self.variant = variant
 

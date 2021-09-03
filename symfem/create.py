@@ -113,11 +113,9 @@ def create_element(cell_type, element_type, order, **kwargs):
 
         Supported values:
         Lagrange, P,
-        discontinuous Lagrange, dP, DP,
         vector Lagrange, vP,
-        vector discontinuous Lagrange, vdP, vDP,
-        matrix discontinuous Lagrange,
-        symmetric matrix discontinuous Lagrange,
+        matrix Lagrange,
+        symmetric matrix Lagrange,
         Crouzeix-Raviart, CR, Crouzeix-Falk, CF,
         conforming Crouzeix-Raviart, conforming CR,
         serendipity, S,
@@ -130,7 +128,6 @@ def create_element(cell_type, element_type, order, **kwargs):
         Raviart-Thomas, RT, N1div,
         Brezzi-Douglas-Marini, BDM, N2div,
         Q,
-        dQ,
         vector Q, vQ,
         NCE, RTCE, Qcurl,
         NCF, RTCF, Qdiv,

@@ -13,6 +13,10 @@ class Reference:
         self.simplex = simplex
         self.tp = tp
 
+    def default_reference(self):
+        """Get the default reference for this cell type."""
+        raise NotImplementedError
+
     def get_point(self, reference_coords):
         """Get a point in the reference from reference coordinates."""
         assert len(reference_coords) == len(self.axes)
@@ -154,6 +158,10 @@ class Point(Reference):
         self.sub_entity_types = ["point", None, None, None]
         super().__init__(simplex=True, tp=True)
 
+    def default_reference(self):
+        """Get the default reference for this cell type."""
+        return Point(self.reference_vertices)
+
     def integral(self, f):
         """Calculate the integral over the element."""
         return subs(f, t, self.vertices[0])
@@ -196,6 +204,10 @@ class Interval(Reference):
         self.volumes = tuple()
         self.sub_entity_types = ["point", "interval", None, None]
         super().__init__(simplex=True, tp=True)
+
+    def default_reference(self):
+        """Get the default reference for this cell type."""
+        return Interval(self.reference_vertices)
 
     def integral(self, f):
         """Calculate the integral over the element."""
@@ -243,6 +255,10 @@ class Triangle(Reference):
         self.volumes = tuple()
         self.sub_entity_types = ["point", "interval", "triangle", None]
         super().__init__(simplex=True)
+
+    def default_reference(self):
+        """Get the default reference for this cell type."""
+        return Triangle(self.reference_vertices)
 
     def integral(self, f):
         """Calculate the integral over the element."""
@@ -310,6 +326,10 @@ class Tetrahedron(Reference):
         self.sub_entity_types = ["point", "interval", "triangle", "tetrahedron"]
         super().__init__(simplex=True)
 
+    def default_reference(self):
+        """Get the default reference for this cell type."""
+        return Tetrahedron(self.reference_vertices)
+
     def integral(self, f):
         """Calculate the integral over the element."""
         return (
@@ -374,6 +394,10 @@ class Quadrilateral(Reference):
         self.volumes = tuple()
         self.sub_entity_types = ["point", "interval", "quadrilateral", None]
         super().__init__(tp=True)
+
+    def default_reference(self):
+        """Get the default reference for this cell type."""
+        return Quadrilateral(self.reference_vertices)
 
     def integral(self, f):
         """Calculate the integral over the element."""
@@ -447,6 +471,10 @@ class Hexahedron(Reference):
         self.volumes = ((0, 1, 2, 3, 4, 5, 6, 7),)
         self.sub_entity_types = ["point", "interval", "quadrilateral", "hexahedron"]
         super().__init__(tp=True)
+
+    def default_reference(self):
+        """Get the default reference for this cell type."""
+        return Hexahedron(self.reference_vertices)
 
     def integral(self, f):
         """Calculate the integral over the element."""
@@ -541,6 +569,10 @@ class Prism(Reference):
             "prism"]
         super().__init__(tp=True)
 
+    def default_reference(self):
+        """Get the default reference for this cell type."""
+        return Prism(self.reference_vertices)
+
     def integral(self, f):
         """Calculate the integral over the element."""
         return (
@@ -629,6 +661,10 @@ class Pyramid(Reference):
             ["quadrilateral", "triangle", "triangle", "triangle", "triangle"],
             "pyramid"]
         super().__init__(tp=True)
+
+    def default_reference(self):
+        """Get the default reference for this cell type."""
+        return Pyramid(self.reference_vertices)
 
     def integral(self, f):
         """Calculate the integral over the element."""

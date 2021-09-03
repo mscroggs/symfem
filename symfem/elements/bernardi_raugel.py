@@ -11,7 +11,7 @@ from ..polynomials import polynomial_set
 from ..functionals import (NormalIntegralMoment, DotPointEvaluation,
                            DivergenceIntegralMoment)
 from ..symbolic import x
-from .lagrange import Lagrange, DiscontinuousLagrange
+from .lagrange import Lagrange
 
 
 class BernardiRaugel(CiarletElement):
@@ -41,7 +41,7 @@ class BernardiRaugel(CiarletElement):
 
         dofs += make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, DiscontinuousLagrange, 0, "contravariant",
+            facets=(NormalIntegralMoment, Lagrange, 0, "contravariant",
                     {"variant": "equispaced"}),
         )
 
@@ -70,7 +70,7 @@ class BernardiRaugel(CiarletElement):
                     dofs.append(DotPointEvaluation(midpoint, normal, entity=(2, f_n),
                                                    mapping="contravariant"))
 
-            p = DiscontinuousLagrange(reference, 0, variant="equispaced")
+            p = Lagrange(reference, 0, variant="equispaced")
 
             for i in range(3):
                 d = tuple(1 if j == i else 0 for j in range(reference.tdim))

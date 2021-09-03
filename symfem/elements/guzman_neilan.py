@@ -9,7 +9,7 @@ from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..functionals import NormalIntegralMoment, DotPointEvaluation
 from ..symbolic import PiecewiseFunction, sym_sum
-from .lagrange import DiscontinuousLagrange, VectorLagrange
+from .lagrange import Lagrange, VectorLagrange
 from .bernardi_raugel import BernardiRaugel
 
 
@@ -60,7 +60,7 @@ class GuzmanNeilan(CiarletElement):
 
         dofs += make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, DiscontinuousLagrange, 0, "contravariant"),
+            facets=(NormalIntegralMoment, Lagrange, 0, "contravariant"),
         )
 
         mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))

@@ -6,7 +6,7 @@ from ..polynomials import (Hcurl_polynomials, polynomial_set_1d,
                            polynomial_set)
 from ..functionals import TangentIntegralMoment, IntegralMoment, IntegralAgainst
 from ..symbolic import x
-from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
+from .lagrange import Lagrange, VectorLagrange
 from .q import RaviartThomas as QRT
 
 
@@ -25,9 +25,9 @@ class Nedelec(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, DiscontinuousLagrange, order - 1,
+            edges=(TangentIntegralMoment, Lagrange, order - 1,
                    {"variant": variant}),
-            faces={"triangle": (IntegralMoment, VectorDiscontinuousLagrange, order - 2,
+            faces={"triangle": (IntegralMoment, VectorLagrange, order - 2,
                                 "covariant", {"variant": variant}),
                    "quadrilateral": (IntegralMoment, QRT, order - 1, "covariant",
                                      {"variant": variant})},
@@ -36,8 +36,8 @@ class Nedelec(CiarletElement):
         triangle = create_reference("triangle")
         interval = create_reference("interval")
 
-        space1 = VectorDiscontinuousLagrange(triangle, order - 2, variant)
-        space2 = DiscontinuousLagrange(interval, order - 2, variant)
+        space1 = VectorLagrange(triangle, order - 2, variant)
+        space2 = Lagrange(interval, order - 2, variant)
 
         if order > 2:
             raise NotImplementedError()
