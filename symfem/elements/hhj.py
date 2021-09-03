@@ -8,7 +8,7 @@ from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set
 from ..functionals import NormalInnerProductIntegralMoment, IntegralMoment
-from .lagrange import DiscontinuousLagrange, SymmetricMatrixDiscontinuousLagrange
+from .lagrange import Lagrange, SymmetricMatrixLagrange
 
 
 class HellanHerrmannJohnson(CiarletElement):
@@ -23,9 +23,9 @@ class HellanHerrmannJohnson(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalInnerProductIntegralMoment, DiscontinuousLagrange, order,
+            facets=(NormalInnerProductIntegralMoment, Lagrange, order,
                     {"variant": variant}),
-            cells=(IntegralMoment, SymmetricMatrixDiscontinuousLagrange, order - 1,
+            cells=(IntegralMoment, SymmetricMatrixLagrange, order - 1,
                    {"variant": variant}),
         )
 

@@ -8,7 +8,7 @@ from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set
 from ..functionals import NormalIntegralMoment, IntegralMoment
-from .lagrange import DiscontinuousLagrange
+from .lagrange import Lagrange
 from .nedelec import NedelecFirstKind
 
 
@@ -20,7 +20,7 @@ class BDM(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, DiscontinuousLagrange, order, {"variant": variant}),
+            facets=(NormalIntegralMoment, Lagrange, order, {"variant": variant}),
             cells=(IntegralMoment, NedelecFirstKind, order - 1, {"variant": variant}),
         )
         self.variant = variant

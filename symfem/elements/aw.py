@@ -12,7 +12,7 @@ from ..functionals import (PointInnerProduct, InnerProductIntegralMoment,
                            VecIntegralMoment, IntegralMoment)
 from ..symbolic import x
 from ..calculus import diff
-from .lagrange import DiscontinuousLagrange
+from .lagrange import Lagrange
 
 
 class ArnoldWinther(CiarletElement):
@@ -43,26 +43,30 @@ class ArnoldWinther(CiarletElement):
             sub_ref = create_reference(
                 reference.sub_entity_types[1],
                 vertices=tuple(reference.vertices[i] for i in edge))
-            sub_e = DiscontinuousLagrange(sub_ref, order - 2, variant)
+            sub_e = Lagrange(sub_ref.default_reference(), order - 2, variant)
             for dof_n, dof in enumerate(sub_e.dofs):
                 p = sub_e.get_basis_function(dof_n)
                 for component in [sub_ref.normal(), sub_ref.tangent()]:
+                    InnerProductIntegralMoment(sub_ref, p, component, sub_ref.normal(), dof,
+                                               entity=(1, e_n), mapping="double_contravariant")
                     dofs.append(
                         InnerProductIntegralMoment(sub_ref, p, component, sub_ref.normal(), dof,
                                                    entity=(1, e_n), mapping="double_contravariant"))
-        sub_e = DiscontinuousLagrange(reference, order - 3, variant)
+        sub_e = Lagrange(reference, order - 3, variant)
         for dof_n, dof in enumerate(sub_e.dofs):
             p = sub_e.get_basis_function(dof_n)
             for component in [(1, 0, 0, 0), (0, 1, 0, 0),
                               (0, 0, 0, 1)]:
                 dofs.append(VecIntegralMoment(reference, p, component, dof, entity=(2, 0)))
-        sub_e = DiscontinuousLagrange(reference, order - 4, variant)
-        for p, dof in zip(sub_e.get_basis_functions(), sub_e.dofs):
-            if sympy.Poly(p, x[:2]).degree() != order - 4:
-                continue
-            f = p * x[0] ** 2 * x[1] ** 2 * (1 - x[0] - x[1]) ** 2
-            J = tuple(diff(f, x[i], x[j]) for i in range(2) for j in range(2))
-            dofs.append(IntegralMoment(reference, J, dof, entity=(2, 0)))
+
+        if order >= 4:
+            sub_e = Lagrange(reference, order - 4, variant)
+            for p, dof in zip(sub_e.get_basis_functions(), sub_e.dofs):
+                if sympy.Poly(p, x[:2]).degree() != order - 4:
+                    continue
+                f = p * x[0] ** 2 * x[1] ** 2 * (1 - x[0] - x[1]) ** 2
+                J = tuple(diff(f, x[i], x[j]) for i in range(2) for j in range(2))
+                dofs.append(IntegralMoment(reference, J, dof, entity=(2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))
@@ -101,21 +105,19 @@ class NonConformingArnoldWinther(CiarletElement):
             sub_ref = create_reference(
                 reference.sub_entity_types[1],
                 vertices=tuple(reference.vertices[i] for i in edge))
-            sub_e = DiscontinuousLagrange(sub_ref, 1, variant)
+            sub_e = Lagrange(sub_ref.default_reference(), 1, variant)
             for dof_n, dof in enumerate(sub_e.dofs):
                 p = sub_e.get_basis_function(dof_n)
                 for component in [sub_ref.normal(), sub_ref.tangent()]:
                     dofs.append(
                         InnerProductIntegralMoment(sub_ref, p, component, sub_ref.normal(), dof,
                                                    entity=(1, e_n), mapping="double_contravariant"))
-        sub_e = DiscontinuousLagrange(reference, 0, variant)
+        sub_e = Lagrange(reference, 0, variant)
         for dof_n, dof in enumerate(sub_e.dofs):
             p = sub_e.get_basis_function(dof_n)
             for component in [(1, 0, 0, 0), (0, 1, 0, 0),
                               (0, 0, 0, 1)]:
                 dofs.append(VecIntegralMoment(reference, p, component, dof, entity=(2, 0)))
-
-        print(len(poly), len(dofs))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))

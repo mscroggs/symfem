@@ -59,7 +59,7 @@ def make_integral_moment_dofs(
                     IntegralMoment, SubElement, order, mapping, kwargs = extract_moment_data(
                         moment_data, sub_ref.name)
                     if order >= SubElement.min_order:
-                        sub_element = SubElement(sub_ref, order, **kwargs)
+                        sub_element = SubElement(sub_ref.default_reference(), order, **kwargs)
                         for dn, d in enumerate(sub_element.dofs):
                             f = sub_element.get_basis_function(dn)
                             if mapping is None:
@@ -80,7 +80,7 @@ def make_integral_moment_dofs(
                     IntegralMoment, SubElement, order, mapping, kwargs = extract_moment_data(
                         moment_data, sub_ref.name)
                     if order >= SubElement.min_order:
-                        sub_element = SubElement(sub_ref, order, **kwargs)
+                        sub_element = SubElement(sub_ref.default_reference(), order, **kwargs)
                         for dn, d in enumerate(sub_element.dofs):
                             f = sub_element.get_basis_function(dn)
                             if mapping is None:

@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8]
+        python-version: [3.7, 3.8, 3.9]
     steps:
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8]
+        python-version: [3.7, 3.8, 3.9]
     steps:
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -60,18 +60,7 @@ jobs:
       - run: |
             python3 setup.py install
         name: Install symfem
-      - name: Clone Basix
-        uses: actions/checkout@v2
-        with:
-          path: ./basix-src
-          repository: FEniCS/basix
-          ref: main
-      - run: |
-            cd basix-src
-            cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DXTENSOR_ENABLE_ASSERT=ON -B build-dir -S .
-            cmake --build build-dir
-            sudo cmake --install build-dir
-            pip install ./python/
+      - run: pip install git+https://github.com/FEniCS/basix.git
         name: Install basix
       - run: python3 -m pytest -n=auto --durations=50 test/test_against_basix.py --has-basix 1
         name: Run unit tests

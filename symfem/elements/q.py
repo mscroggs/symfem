@@ -58,41 +58,6 @@ class Q(CiarletElement):
     continuity = "C0"
 
 
-class DiscontinuousQ(CiarletElement):
-    """A dQ element."""
-
-    def __init__(self, reference, order, variant="equispaced"):
-        if order == 0:
-            dofs = [
-                PointEvaluation(
-                    tuple(sympy.Rational(1, 2) for i in range(reference.tdim)),
-                    entity=(reference.tdim, 0))]
-        else:
-            points, _ = get_quadrature(variant, order + 1)
-
-            dofs = []
-            for i in product(range(order + 1), repeat=reference.tdim):
-                dofs.append(PointEvaluation(tuple(points[j] for j in i[::-1]),
-                                            entity=(reference.tdim, 0)))
-
-        super().__init__(
-            reference, order,
-            quolynomial_set(reference.tdim, 1, order),
-            dofs,
-            reference.tdim,
-            1)
-        self.variant = variant
-
-    def init_kwargs(self):
-        """Return the kwargs used to create this element."""
-        return {"variant": self.variant}
-
-    names = ["dQ"]
-    references = ["quadrilateral", "hexahedron"]
-    min_order = 0
-    continuity = "L2"
-
-
 class VectorQ(CiarletElement):
     """A vector Q element."""
 
@@ -138,7 +103,7 @@ class Nedelec(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, DiscontinuousQ, order - 1, {"variant": variant}),
+            edges=(TangentIntegralMoment, Q, order - 1, {"variant": variant}),
             faces=(IntegralMoment, RaviartThomas, order - 1, "covariant", {"variant": variant}),
             volumes=(IntegralMoment, RaviartThomas, order - 1, "covariant", {"variant": variant}),
         )
@@ -165,7 +130,7 @@ class RaviartThomas(CiarletElement):
 
         dofs = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, DiscontinuousQ, order - 1, {"variant": variant}),
+            facets=(NormalIntegralMoment, Q, order - 1, {"variant": variant}),
             cells=(IntegralMoment, Nedelec, order - 1, "contravariant", {"variant": variant}),
         )
 

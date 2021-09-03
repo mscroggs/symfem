@@ -9,7 +9,8 @@ from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set
 from ..symbolic import x
 from ..functionals import NormalIntegralMoment, IntegralMoment
-from .lagrange import DiscontinuousLagrange, VectorDiscontinuousLagrange
+from .lagrange import Lagrange, VectorLagrange
+from .dpc import DPC, VectorDPC
 
 
 def bdfm_polyset(reference, order):
@@ -50,11 +51,18 @@ class BDFM(CiarletElement):
     def __init__(self, reference, order, variant="equispaced"):
         poly = bdfm_polyset(reference, order)
 
-        dofs = make_integral_moment_dofs(
-            reference,
-            facets=(NormalIntegralMoment, DiscontinuousLagrange, order - 1, {"variant": variant}),
-            cells=(IntegralMoment, VectorDiscontinuousLagrange, order - 2, {"variant": variant}),
-        )
+        if reference.name in ["triangle", "tetrahedron"]:
+            dofs = make_integral_moment_dofs(
+                reference,
+                facets=(NormalIntegralMoment, Lagrange, order - 1, {"variant": variant}),
+                cells=(IntegralMoment, VectorLagrange, order - 2, {"variant": variant}),
+            )
+        else:
+            dofs = make_integral_moment_dofs(
+                reference,
+                facets=(NormalIntegralMoment, DPC, order - 1, {"variant": variant}),
+                cells=(IntegralMoment, VectorDPC, order - 2, {"variant": variant}),
+            )
         self.variant = variant
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
