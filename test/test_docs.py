@@ -122,6 +122,19 @@ def test_readme_elements():
         lines = r.split("### List of supported elements")[1].strip().split("\n")
         elements = [i[2:].split("(alternative names:")[0].strip()
                     for i in lines if i.strip() != ""]
+
+        for line in r.split("\n"):
+            if "(alternative names:" in line:
+                n, others = line.split("(alternative names:")
+                names = [n[1:].strip()] + [i.strip() for i in others.split(")")[0].split(",")]
+                print(names)
+                for e in symfem.create._elementlist:
+                    if names[0] in e.names and cell in e.references:
+                        assert set(names) == set(e.names)
+                        break
+                else:
+                    raise ValueError(f"Could not find element: {names[0]}")
+
         assert set(elementlist[cell]) == set(elements)
     assert set(elementlist.keys()) == set(cells)
 
