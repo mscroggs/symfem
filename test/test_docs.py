@@ -118,7 +118,8 @@ def test_readme_elements():
         lines = r.split("\n")
         cell = lines[0].strip().lower()
         cells.append(cell)
-        elements = [i[2:].split("(alternative names:")[0].strip() for i in lines[1:] if i.strip() != ""]
+        elements = [i[2:].split("(alternative names:")[0].strip()
+                    for i in lines[1:] if i.strip() != ""]
         assert set(elementlist[cell]) == set(elements)
     assert set(elementlist.keys()) == set(cells)
 

@@ -11,7 +11,7 @@ elementlist = {i: [] for i in cells}
 for e in symfem.create._elementlist:
     name = e.names[0]
     if len(e.names) > 1:
-        name += " (alternative names: " + ", ".join(e.names[1:])  + ")"
+        name += " (alternative names: " + ", ".join(e.names[1:]) + ")"
     for r in e.references:
         elementlist[r].append(name)
 
