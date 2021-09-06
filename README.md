@@ -17,8 +17,8 @@ symbolically evaluate the basis functions of a finite element space. Symfem can:
 
 You can find details of recent changes to Symfem in [the changelog](CHANGELOG.md).
 
-## Installing Symfem
-### Installing from source
+# Installing Symfem
+## Installing from source
 Symfem can be installed by downloading the [GitHub repo](https://github.com/mscroggs/symfem)
 and running:
 
@@ -26,21 +26,21 @@ and running:
 python3 setup.py install
 ```
 
-### Installing using pip
+## Installing using pip
 The latest release of Symfem can be installed by running:
 
 ```bash
 pip3 install symfem
 ```
 
-### Installing using conda
+## Installing using conda
 The latest release of Symfem can be installed by running:
 
 ```bash
 conda install symfem
 ```
 
-## Testing Symfem
+# Testing Symfem
 To run the Symfem unit tests, clone the repository and run:
 
 ```bash
@@ -53,7 +53,7 @@ You may instead like to run the following, as this will skip the slowest tests.
 python3 -m pytest test/ --speed fast
 ```
 
-## Using Symfem
+# Using Symfem
 Finite elements can be created in Symfem using the `symfem.create_element()`
 function. For example, some elements are created in the following snippet:
 
@@ -99,7 +99,7 @@ print(lagrange.map_to_cell([(0,0), (2, 0), (2, 1)]))
 [1 - x/2, x/2 - y, y]
 ```
 
-### Further documentation
+## Further documentation
 More detailed documentation of the latest release version of Symfem can be found on
 [Read the Docs](https://symfem.readthedocs.io/en/latest/). A series of example uses
 of Symfem can be found in the [`demo` folder](demo/) or viewed on
@@ -112,16 +112,15 @@ alongside Symfem snippets for creating the element.
 You can ask questions about using Symfem by using [GitHub Discussions](https://github.com/mscroggs/symfem/discussions).
 Bugs can be reported using the [GitHub issue tracker](https://github.com/mscroggs/symfem/issues).
 
-## Contributing to Symfem
-
-### Reporting bugs
+# Contributing to Symfem
+## Reporting bugs
 If you find a bug in Symfem, please report it on the [issue tracker](https://github.com/mscroggs/symfem/issues/new?assignees=&labels=bug&template=bug_report.md&title=).
 
-### Suggesting enhancements
+## Suggesting enhancements
 If you want to suggest a new feature or an improvement of a current feature, you can submit this
 on the [issue tracker](https://github.com/mscroggs/symfem/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=).
 
-### Submitting a pull request
+## Submitting a pull request
 If you want to directly submit code to Symfem, you can do this by forking the Symfem repo, then submitting a pull request.
 If you want to contribute, but are unsure where to start, have a look at the
 [issues labelled "good first issue")[https://github.com/mscroggs/symfem/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22].
@@ -129,7 +128,7 @@ If you want to contribute, but are unsure where to start, have a look at the
 On opening a pull request, unit tests and flake8 style checks will run. You can click on these in the pull request
 to see where (if anywhere) there are errors in your code.
 
-### Code of conduct
+## Code of conduct
 We expect all our contributors to follow [the Contributor Covenant](CODE_OF_CONDUCT.md). Any unacceptable
 behaviour can be reported to Matthew (symfem@mscroggs.co.uk).
 
