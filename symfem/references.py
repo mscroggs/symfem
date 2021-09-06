@@ -112,8 +112,11 @@ class Reference:
             return create_reference(
                 entity_type, [self.reference_vertices[i] for i in self.sub_entities(dim)[n]])
         else:
-            return create_reference(
-                entity_type, [self.vertices[i] for i in self.sub_entities(dim)[n]])
+            if self.tdim == dim:
+                return self
+            else:
+                return create_reference(
+                    entity_type, [self.vertices[i] for i in self.sub_entities(dim)[n]])
 
     def at_vertex(self, point):
         """Check if a point is a vertex of the reference."""
