@@ -89,7 +89,7 @@ class Dual(DualCiarletElement):
             dual_coefficients, fine_space, reference, order, [], [], reference.tdim, 1
         )
 
-    names = ["dual"]
+    names = ["dual polynomial", "dual P", "dual"]
     references = ["dual polygon"]
     min_order = 0
     max_order = 1
