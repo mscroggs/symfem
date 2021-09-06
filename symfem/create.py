@@ -139,7 +139,7 @@ def create_element(cell_type, element_type, order, **kwargs):
         Mardal-Tai-Winther, MTW,
         Argyris,
         bubble,
-        dual,
+        dual polynomial, dual P, dual,
         Buffa-Christiansen, BC,
         rotated Buffa-Christiansen, RBC,
         Brezzi-Douglas-Fortin-Marini, BDFM,

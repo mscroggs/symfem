@@ -112,14 +112,16 @@ def test_readme_elements():
 
     root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
     with open(os.path.join(root, "README.md")) as f:
-        readme = f.read().split("## List of supported elements")[1]
+        readme = f.read().split("# Available cells and elements")[1]
     cells = []
-    for r in readme.split("###")[1:]:
+    for r in readme.split("\n## ")[1:]:
         lines = r.split("\n")
-        cell = lines[0].strip().lower()
+        cell = r.split("\n")[0].strip().lower()
         cells.append(cell)
+        print(r)
+        lines = r.split("### List of supported elements")[1].strip().split("\n")
         elements = [i[2:].split("(alternative names:")[0].strip()
-                    for i in lines[1:] if i.strip() != ""]
+                    for i in lines if i.strip() != ""]
         assert set(elementlist[cell]) == set(elements)
     assert set(elementlist.keys()) == set(cells)
 

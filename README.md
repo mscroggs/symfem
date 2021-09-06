@@ -133,51 +133,12 @@ We expect all our contributors to follow [the Contributor Covenant](CODE_OF_COND
 behaviour can be reported to Matthew (symfem@mscroggs.co.uk).
 
 # Available cells and elements
-
-## Reference cells
-
-### Interval
+## Interval
 The reference interval has vertices (0,) and (1,). Its sub-entities are numbered as follows.
 
 ![The numbering of a reference interval](img/interval_numbering.png)
 
-### Triangle
-The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities are numbered as follows.
-
-![The numbering of a reference triangle](img/triangle_numbering.png)
-
-### Quadrilateral
-The reference quadrilateral has vertices (0, 0), (1, 0), (0, 1), and (1, 1). Its sub-entities are numbered as follows.
-
-![The numbering of a reference quadrilateral](img/quadrilateral_numbering.png)
-
-### Tetrahedron
-The reference tetrahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), and (0, 0, 1). Its sub-entities are numbered as follows.
-
-![The numbering of a reference tetrahedron](img/tetrahedron_numbering.png)
-
-### Hexahedron
-The reference hexahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0), (0, 0, 1), (1, 0, 1), (0, 1, 1), and (1, 1, 1). Its sub-entities are numbered as follows.
-
-![The numbering of a reference hexahedron](img/hexahedron_numbering.png)
-
-### Prism
-The reference prism has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (1, 0, 1), and (0, 1, 1). Its sub-entities are numbered as follows.
-
-![The numbering of a reference prism](img/prism_numbering.png)
-
-### Pyramid
-The reference pyramid has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0), and (0, 0, 1). Its sub-entities are numbered as follows.
-
-![The numbering of a reference pyramid](img/pyramid_numbering.png)
-
-### Dual polygon
-The reference dual polygon (hexagon) has vertices (1, 0), (3/4, sqrt(3)/4), (1/2, sqrt(3)/2), (0, sqrt(3)/2), (-1/2, sqrt(3)/2), (-3/4, sqrt(3)/4), (-1, 0), (-3/4, -sqrt(3)/4), (-1/2, -sqrt(3)/2), (0, -sqrt(3)/2), (1/2, -sqrt(3)/2), and (3/4, -sqrt(3)/4). Its sub-entities are numbered as follows.
-
-![The numbering of a reference dual polygon](img/dual_polygon_numbering.png)
-
-## List of supported elements
-### Interval
+### List of supported elements
 - Bernstein (alternative names: Bernstein-Bezier)
 - bubble
 - dPc
@@ -189,7 +150,12 @@ The reference dual polygon (hexagon) has vertices (1, 0), (3/4, sqrt(3)/4), (1/2
 - vector Lagrange (alternative names: vP)
 - Wu-Xu
 
-### Triangle
+## Triangle
+The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities are numbered as follows.
+
+![The numbering of a reference triangle](img/triangle_numbering.png)
+
+### List of supported elements
 - Argyris
 - Arnold-Winther (alternative names: AW, conforming Arnold-Winther)
 - Bell
@@ -225,7 +191,12 @@ The reference dual polygon (hexagon) has vertices (1, 0), (3/4, sqrt(3)/4), (1/2
 - vector Lagrange (alternative names: vP)
 - Wu-Xu
 
-### Quadrilateral
+## Quadrilateral
+The reference quadrilateral has vertices (0, 0), (1, 0), (0, 1), and (1, 1). Its sub-entities are numbered as follows.
+
+![The numbering of a reference quadrilateral](img/quadrilateral_numbering.png)
+
+### List of supported elements
 - Bogner-Fox-Schmit (alternative names: BFS)
 - Brezzi-Douglas-Fortin-Marini (alternative names: BDFM)
 - bubble
@@ -240,7 +211,12 @@ The reference dual polygon (hexagon) has vertices (1, 0), (3/4, sqrt(3)/4), (1/2
 - vector dPc
 - vector Q (alternative names: vQ)
 
-### Tetrahedron
+## Tetrahedron
+The reference tetrahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), and (0, 0, 1). Its sub-entities are numbered as follows.
+
+![The numbering of a reference tetrahedron](img/tetrahedron_numbering.png)
+
+### List of supported elements
 - Bernardi-Raugel
 - Bernstein (alternative names: Bernstein-Bezier)
 - Brezzi-Douglas-Fortin-Marini (alternative names: BDFM)
@@ -264,7 +240,12 @@ The reference dual polygon (hexagon) has vertices (1, 0), (3/4, sqrt(3)/4), (1/2
 - vector Lagrange (alternative names: vP)
 - Wu-Xu
 
-### Hexahedron
+## Hexahedron
+The reference hexahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0), (0, 0, 1), (1, 0, 1), (0, 1, 1), and (1, 1, 1). Its sub-entities are numbered as follows.
+
+![The numbering of a reference hexahedron](img/hexahedron_numbering.png)
+
+### List of supported elements
 - Brezzi-Douglas-Duran-Fortin (alternative names: BDDF)
 - Brezzi-Douglas-Fortin-Marini (alternative names: BDFM)
 - bubble
@@ -278,14 +259,29 @@ The reference dual polygon (hexagon) has vertices (1, 0), (3/4, sqrt(3)/4), (1/2
 - vector dPc
 - vector Q (alternative names: vQ)
 
-### Prism
+## Prism
+The reference prism has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (1, 0, 1), and (0, 1, 1). Its sub-entities are numbered as follows.
+
+![The numbering of a reference prism](img/prism_numbering.png)
+
+### List of supported elements
 - Lagrange (alternative names: P)
 - Nedelec (alternative names: Ncurl)
 
-### Pyramid
+## Pyramid
+The reference pyramid has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0), and (0, 0, 1). Its sub-entities are numbered as follows.
+
+![The numbering of a reference pyramid](img/pyramid_numbering.png)
+
+### List of supported elements
 - Lagrange (alternative names: P)
 
-### Dual polygon
+## Dual polygon
+The reference dual polygon (hexagon) has vertices (1, 0), (3/4, sqrt(3)/4), (1/2, sqrt(3)/2), (0, sqrt(3)/2), (-1/2, sqrt(3)/2), (-3/4, sqrt(3)/4), (-1, 0), (-3/4, -sqrt(3)/4), (-1/2, -sqrt(3)/2), (0, -sqrt(3)/2), (1/2, -sqrt(3)/2), and (3/4, -sqrt(3)/4). Its sub-entities are numbered as follows.
+
+![The numbering of a reference dual polygon](img/dual_polygon_numbering.png)
+
+### List of supported elements
 - Buffa-Christiansen (alternative names: BC)
 - dual polynomial (alternative names: dual P, dual)
 - rotated Buffa-Christiansen (alternative names: RBC)

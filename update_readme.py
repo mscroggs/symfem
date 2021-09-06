@@ -19,13 +19,14 @@ for j in elementlist.values():
     j.sort(key=lambda x: x.lower())
 
 with open("README.md") as f:
-    pre = f.read().split("## Reference cells")[0]
+    pre = f.read().split("# Available cells and elements")[0]
 
 with open("README.md", "w") as f:
+
     f.write(pre)
-    f.write("## Reference cells\n\n")
+    f.write("# Available cells and elements\n")
     for cell in cells:
-        f.write(f"### {cell[0].upper()}{cell[1:]}\n")
+        f.write(f"## {cell[0].upper()}{cell[1:]}\n")
         if cell == "dual polygon":
             f.write(f"The reference {cell} (hexagon) has vertices ")
             ref = symfem.create_reference("dual polygon(6)")
@@ -40,8 +41,7 @@ with open("README.md", "w") as f:
         f.write(". Its sub-entities are numbered as follows.\n\n")
         f.write(f"![The numbering of a reference {cell}]"
                 f"(img/{cell.replace(' ', '_')}_numbering.png)\n\n")
-    f.write("## List of supported elements\n")
-    for cell in cells:
-        f.write(f"### {cell[0].upper() + cell[1:]}\n")
+
+        f.write("### List of supported elements\n")
         f.write("\n".join([f"- {i}" for i in elementlist[cell]]))
         f.write("\n\n")
