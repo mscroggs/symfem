@@ -115,6 +115,48 @@ Bugs can be reported using the [GitHub issue tracker](https://github.com/mscrogg
 ## Contributing to Symfem
 You can find information about how to contribute to Symfem [here](CONTRIBUTING.md).
 
+## Reference cells
+
+### Interval
+The reference interval has vertices (0,) and (1,). Its sub-entities are numbered as follows.
+
+![The numbering of a reference interval](img/interval_numbering.png)
+
+### Triangle
+The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities are numbered as follows.
+
+![The numbering of a reference triangle](img/triangle_numbering.png)
+
+### Quadrilateral
+The reference quadrilateral has vertices (0, 0), (1, 0), (0, 1), and (1, 1). Its sub-entities are numbered as follows.
+
+![The numbering of a reference quadrilateral](img/quadrilateral_numbering.png)
+
+### Tetrahedron
+The reference tetrahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), and (0, 0, 1). Its sub-entities are numbered as follows.
+
+![The numbering of a reference tetrahedron](img/tetrahedron_numbering.png)
+
+### Hexahedron
+The reference hexahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0), (0, 0, 1), (1, 0, 1), (0, 1, 1), and (1, 1, 1). Its sub-entities are numbered as follows.
+
+![The numbering of a reference hexahedron](img/hexahedron_numbering.png)
+
+### Prism
+The reference prism has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (1, 0, 1), and (0, 1, 1). Its sub-entities are numbered as follows.
+
+![The numbering of a reference prism](img/prism_numbering.png)
+
+### Pyramid
+The reference pyramid has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0), and (0, 0, 1). Its sub-entities are numbered as follows.
+
+![The numbering of a reference pyramid](img/pyramid_numbering.png)
+
+### Dual polygon
+The reference dual polygon has vertices (1, 0), (3/4, sqrt(3)/4), (1/2, sqrt(3)/2), (0, sqrt(3)/2), (-1/2, sqrt(3)/2), (-3/4, sqrt(3)/4), (-1, 0), (-3/4, -sqrt(3)/4), (-1/2, -sqrt(3)/2), (0, -sqrt(3)/2), (1/2, -sqrt(3)/2), and (3/4, -sqrt(3)/4). Its sub-entities are numbered as follows.
+
+![The numbering of a reference dual polygon](img/dual polygon_numbering.png)
+
 ## List of supported elements
 ### Interval
 - Bernstein
