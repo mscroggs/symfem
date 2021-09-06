@@ -24,7 +24,7 @@ with open("README.md", "w") as f:
     for cell in cells:
         f.write(f"### {cell[0].upper()}{cell[1:]}\n")
         if cell == "dual polygon":
-            f.write(f"The reference {cell} (with 6 vertices) has vertices ")
+            f.write(f"The reference {cell} (hexagon) has vertices ")
             ref = symfem.create_reference("dual polygon(6)")
         else:
             f.write(f"The reference {cell} has vertices ")

@@ -1,25 +1,6 @@
 import os
 import symfem
 
-
-def to_x(p):
-    if len(p) == 1:
-        return float(100 * p[0])
-    if len(p) == 2:
-        return float(100 * p[0])
-    if len(p) == 3:
-        return float(100 * p[0] + 30 * p[1])
-
-
-def to_y(p):
-    if len(p) == 1:
-        return float(120)
-    if len(p) == 2:
-        return float(120 - 100 * p[1])
-    if len(p) == 3:
-        return float(120 - 100 * p[2] - 40 * p[1])
-
-
 for shape in ["interval", "triangle", "tetrahedron",
               "quadrilateral", "hexahedron", "prism", "pyramid",
               "dual polygon"]:
@@ -30,15 +11,46 @@ for shape in ["interval", "triangle", "tetrahedron",
 
     yadd = 0
     width = 100
-    if shape == "interval":
+    if shape == "dual polygon":
+        yadd = 60
+        width = 160
+
+        def to_x(p):
+            return float(85 + 85 * p[0])
+
+        def to_y(p):
+            return float(35 - 85 * p[1])
+
+    elif ref.gdim == 1:
         yadd = -100
-    if shape == "hexahedron":
-        yadd = 40
-        width = 140
-    if shape == "pyramid":
-        width = 140
-    if shape == "prism":
-        yadd = 40
+
+        def to_x(p):
+            return float(100 * p[0])
+
+        def to_y(p):
+            return float(120)
+
+    elif ref.gdim == 2:
+        def to_x(p):
+            return float(100 * p[0])
+
+        def to_y(p):
+            return float(120 - 100 * p[1])
+
+    elif ref.gdim == 3:
+        if shape == "hexahedron":
+            yadd = 40
+            width = 140
+        elif shape == "pyramid":
+            width = 140
+        elif shape == "prism":
+            yadd = 40
+
+        def to_x(p):
+            return float(100 * p[0] + 30 * p[1])
+
+        def to_y(p):
+            return float(120 - 100 * p[2] - 40 * p[1])
 
     svg = ""
 
@@ -46,7 +58,9 @@ for shape in ["interval", "triangle", "tetrahedron",
         svg += (f"<line x1='20' y1='{120 + yadd}' x2='50' y2='{120 + yadd}' />\n"
                 f"<line x1='40' y1='{115 + yadd}' x2='50' y2='{120 + yadd}' />\n"
                 f"<line x1='40' y1='{125 + yadd}' x2='50' y2='{120 + yadd}' />\n"
-                f"<text x='60' y='{120 + yadd}' fill='#000000' dy='.3em' style='font-family:\"Libertinus Serif Semibold Italic\";font-size:20px'>x</text>\n")
+                f"<text x='60' y='{120 + yadd}' fill='#000000' dy='.3em'"
+                " style='font-family:\"Libertinus Serif Semibold Italic\";font-size:20px'>x</text>"
+                "\n")
     elif ref.gdim == 2:
         svg += (f"<line x1='20' y1='{120 + yadd}' x2='20' y2='{90 + yadd}' />\n"
                 f"<line x1='15' y1='{100 + yadd}' x2='20' y2='{90 + yadd}' />\n"
@@ -54,8 +68,12 @@ for shape in ["interval", "triangle", "tetrahedron",
                 f"<line x1='20' y1='{120 + yadd}' x2='50' y2='{120 + yadd}' />\n"
                 f"<line x1='40' y1='{115 + yadd}' x2='50' y2='{120 + yadd}' />\n"
                 f"<line x1='40' y1='{125 + yadd}' x2='50' y2='{120 + yadd}' />\n"
-                f"<text x='60' y='{120 + yadd}' fill='#000000' dy='.3em' style='font-family:\"Libertinus Serif Semibold Italic\";font-size:20px'>x</text>\n"
-                f"<text x='20' y='{75 + yadd}' fill='#000000' dy='.3em' style='font-family:\"Libertinus Serif Semibold Italic\";font-size:20px'>y</text>\n")
+                f"<text x='60' y='{120 + yadd}' fill='#000000' dy='.3em'"
+                " style='font-family:\"Libertinus Serif Semibold Italic\";font-size:20px'>x</text>"
+                "\n"
+                f"<text x='20' y='{75 + yadd}' fill='#000000' dy='.3em'"
+                " style='font-family:\"Libertinus Serif Semibold Italic\";font-size:20px'>y</text>"
+                "\n")
     elif ref.gdim == 3:
         svg += (f"<line x1='20' y1='{120 + yadd}' x2='20' y2='{90 + yadd}' />\n"
                 f"<line x1='15' y1='{100 + yadd}' x2='20' y2='{90 + yadd}' />\n"
@@ -66,17 +84,25 @@ for shape in ["interval", "triangle", "tetrahedron",
                 f"<line x1='20' y1='{120 + yadd}' x2='44' y2='{102 + yadd}' />\n"
                 f"<line x1='33' y1='{104 + yadd}' x2='44' y2='{102 + yadd}' />\n"
                 f"<line x1='39' y1='{112 + yadd}' x2='44' y2='{102 + yadd}' />\n"
-                f"<text x='60' y='{120 + yadd}' fill='#000000' dy='.3em' style='font-family:\"Libertinus Serif Semibold Italic\";font-size:20px'>x</text>\n"
-                f"<text x='52' y='{91 + yadd}' fill='#000000' dy='.3em' style='font-family:\"Libertinus Serif Semibold Italic\";font-size:20px'>y</text>\n"
-                f"<text x='20' y='{75 + yadd}' fill='#000000' dy='.3em' style='font-family:\"Libertinus Serif Semibold Italic\";font-size:20px'>z</text>\n")
+                f"<text x='60' y='{120 + yadd}' fill='#000000' dy='.3em'"
+                " style='font-family:\"Libertinus Serif Semibold Italic\";font-size:20px'>x</text>"
+                "\n"
+                f"<text x='52' y='{91 + yadd}' fill='#000000' dy='.3em'"
+                " style='font-family:\"Libertinus Serif Semibold Italic\";font-size:20px'>y</text>"
+                "\n"
+                f"<text x='20' y='{75 + yadd}' fill='#000000' dy='.3em'"
+                " style='font-family:\"Libertinus Serif Semibold Italic\";font-size:20px'>z</text>"
+                "\n")
 
     xpos = 100
     for dim in range(ref.gdim + 1):
         es = ref.sub_entities(dim)
         lines = []
         for e in ref.sub_entities(1):
-            lines.append(f"<line x1='{xpos + to_x(ref.vertices[e[0]])}' y1='{yadd + to_y(ref.vertices[e[0]])}'"
-                         f" x2='{xpos + to_x(ref.vertices[e[1]])}' y2='{yadd + to_y(ref.vertices[e[1]])}' />\n")
+            lines.append(f"<line x1='{xpos + to_x(ref.vertices[e[0]])}'"
+                         f" y1='{yadd + to_y(ref.vertices[e[0]])}'"
+                         f" x2='{xpos + to_x(ref.vertices[e[1]])}'"
+                         f" y2='{yadd + to_y(ref.vertices[e[1]])}' />\n")
 
         entities = []
         for n_e, e in enumerate(es):
@@ -144,7 +170,9 @@ for shape in ["interval", "triangle", "tetrahedron",
 
         xpos += width + 70
 
-    with open(f"../img/{shape}_numbering.svg", "w") as f:
+    filename = shape.replace(" ", "_") + "_numbering"
+
+    with open(f"../img/{filename}.svg", "w") as f:
         f.write(f"<svg width='{xpos - 50}' height='{140 + yadd}'>\n")
         f.write("<style type=\"text/css\"><![CDATA[\n"
                 "  text { text-anchor:middle; font-size:15px; font-family: \"Lato Bold\" }\n"
@@ -156,4 +184,4 @@ for shape in ["interval", "triangle", "tetrahedron",
 
         f.write(svg)
         f.write("</svg>")
-    os.system(f"convert ../img/{shape}_numbering.svg ../img/{shape}_numbering.png")
+    os.system(f"convert ../img/{filename}.svg ../img/{filename}.png")
