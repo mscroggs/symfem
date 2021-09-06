@@ -109,8 +109,8 @@ Details of the definition of each element can be found on [DefElement](https://d
 alongside Symfem snippets for creating the element.
 
 ## Getting help
-You can ask questions about using Symfem by opening [an issue with the support label](https://github.com/mscroggs/symfem/issues/new?assignees=&labels=support&template=support.md&title=).
-You can view previously answered questions [here](https://github.com/mscroggs/symfem/issues?q=is%3Aclosed+label%3Asupport).
+You can ask questions about using Symfem by using [GitHub Discussions](https://github.com/mscroggs/symfem/discussions).
+Bugs can be reported using the [GitHub issue tracker](https://github.com/mscroggs/symfem/issues).
 
 ## Contributing to Symfem
 You can find information about how to contribute to Symfem [here](CONTRIBUTING.md).
