@@ -102,7 +102,7 @@ def test_available_elements():
     assert set(symfem.create._elementmap.keys()) == supported
 
 
-def test_readme_references():
+def test_readme_elements():
     elementlist = {}
     for e in symfem.create._elementlist:
         for r in e.references:
@@ -118,7 +118,7 @@ def test_readme_references():
         lines = r.split("\n")
         cell = lines[0].strip().lower()
         cells.append(cell)
-        elements = [i[2:].strip() for i in lines[1:] if i.strip() != ""]
+        elements = [i[2:].split("(alternative names:")[0].strip() for i in lines[1:] if i.strip() != ""]
         assert set(elementlist[cell]) == set(elements)
     assert set(elementlist.keys()) == set(cells)
 

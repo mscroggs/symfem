@@ -172,121 +172,121 @@ The reference pyramid has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0), a
 ![The numbering of a reference pyramid](img/pyramid_numbering.png)
 
 ### Dual polygon
-The reference dual polygon (with 6 vertices) has vertices (1, 0), (3/4, sqrt(3)/4), (1/2, sqrt(3)/2), (0, sqrt(3)/2), (-1/2, sqrt(3)/2), (-3/4, sqrt(3)/4), (-1, 0), (-3/4, -sqrt(3)/4), (-1/2, -sqrt(3)/2), (0, -sqrt(3)/2), (1/2, -sqrt(3)/2), and (3/4, -sqrt(3)/4). Its sub-entities are numbered as follows.
+The reference dual polygon (hexagon) has vertices (1, 0), (3/4, sqrt(3)/4), (1/2, sqrt(3)/2), (0, sqrt(3)/2), (-1/2, sqrt(3)/2), (-3/4, sqrt(3)/4), (-1, 0), (-3/4, -sqrt(3)/4), (-1/2, -sqrt(3)/2), (0, -sqrt(3)/2), (1/2, -sqrt(3)/2), and (3/4, -sqrt(3)/4). Its sub-entities are numbered as follows.
 
 ![The numbering of a reference dual polygon](img/dual_polygon_numbering.png)
 
 ## List of supported elements
 ### Interval
-- Bernstein
+- Bernstein (alternative names: Bernstein-Bezier)
 - bubble
 - dPc
 - Hermite
-- Lagrange
-- Morley-Wang-Xu
-- serendipity
-- Taylor
-- vector Lagrange
+- Lagrange (alternative names: P)
+- Morley-Wang-Xu (alternative names: MWX)
+- serendipity (alternative names: S)
+- Taylor (alternative names: discontinuous Taylor)
+- vector Lagrange (alternative names: vP)
 - Wu-Xu
 
 ### Triangle
 - Argyris
-- Arnold-Winther
+- Arnold-Winther (alternative names: AW, conforming Arnold-Winther)
 - Bell
 - Bernardi-Raugel
-- Bernstein
-- Brezzi-Douglas-Fortin-Marini
-- Brezzi-Douglas-Marini
+- Bernstein (alternative names: Bernstein-Bezier)
+- Brezzi-Douglas-Fortin-Marini (alternative names: BDFM)
+- Brezzi-Douglas-Marini (alternative names: BDM, N2div)
 - bubble
 - bubble enriched Lagrange
 - bubble enriched vector Lagrange
-- conforming Crouzeix-Raviart
-- Crouzeix-Raviart
-- Fortin-Soulie
+- conforming Crouzeix-Raviart (alternative names: conforming CR)
+- Crouzeix-Raviart (alternative names: CR, Crouzeix-Falk, CF)
+- Fortin-Soulie (alternative names: FS)
 - Guzman-Neilan
-- Hellan-Herrmann-Johnson
+- Hellan-Herrmann-Johnson (alternative names: HHJ)
 - Hermite
-- Hsieh-Clough-Tocher
-- Kong-Mulder-Veldhuizen
-- Lagrange
-- Mardal-Tai-Winther
+- Hsieh-Clough-Tocher (alternative names: Clough-Tocher, HCT, CT)
+- Kong-Mulder-Veldhuizen (alternative names: KMV)
+- Lagrange (alternative names: P)
+- Mardal-Tai-Winther (alternative names: MTW)
 - matrix Lagrange
 - Morley
-- Morley-Wang-Xu
-- Nedelec
-- Nedelec2
-- nonconforming Arnold-Winther
-- Raviart-Thomas
-- reduced Hsieh-Clough-Tocher
+- Morley-Wang-Xu (alternative names: MWX)
+- Nedelec (alternative names: Nedelec1, N1curl)
+- Nedelec2 (alternative names: N2curl)
+- nonconforming Arnold-Winther (alternative names: nonconforming AW)
+- Raviart-Thomas (alternative names: RT, N1div)
+- reduced Hsieh-Clough-Tocher (alternative names: rHCT)
 - Regge
 - symmetric matrix Lagrange
-- Taylor
+- Taylor (alternative names: discontinuous Taylor)
 - transition
-- vector Lagrange
+- vector Lagrange (alternative names: vP)
 - Wu-Xu
 
 ### Quadrilateral
-- Bogner-Fox-Schmit
-- Brezzi-Douglas-Fortin-Marini
+- Bogner-Fox-Schmit (alternative names: BFS)
+- Brezzi-Douglas-Fortin-Marini (alternative names: BDFM)
 - bubble
 - direct serendipity
 - dPc
-- NCE
-- NCF
-- Q
-- serendipity
-- serendipity Hcurl
-- serendipity Hdiv
+- NCE (alternative names: RTCE, Qcurl, Nedelec, Ncurl)
+- NCF (alternative names: RTCF, Qdiv)
+- Q (alternative names: Lagrange, P)
+- serendipity (alternative names: S)
+- serendipity Hcurl (alternative names: Scurl, BDMCE, AAE)
+- serendipity Hdiv (alternative names: Sdiv, BDMCF, AAF)
 - vector dPc
-- vector Q
+- vector Q (alternative names: vQ)
 
 ### Tetrahedron
 - Bernardi-Raugel
-- Bernstein
-- Brezzi-Douglas-Fortin-Marini
-- Brezzi-Douglas-Marini
+- Bernstein (alternative names: Bernstein-Bezier)
+- Brezzi-Douglas-Fortin-Marini (alternative names: BDFM)
+- Brezzi-Douglas-Marini (alternative names: BDM, N2div)
 - bubble
-- Crouzeix-Raviart
+- Crouzeix-Raviart (alternative names: CR, Crouzeix-Falk, CF)
 - Guzman-Neilan
 - Hermite
-- Kong-Mulder-Veldhuizen
-- Lagrange
-- Mardal-Tai-Winther
+- Kong-Mulder-Veldhuizen (alternative names: KMV)
+- Lagrange (alternative names: P)
+- Mardal-Tai-Winther (alternative names: MTW)
 - matrix Lagrange
-- Morley-Wang-Xu
-- Nedelec
-- Nedelec2
-- Raviart-Thomas
+- Morley-Wang-Xu (alternative names: MWX)
+- Nedelec (alternative names: Nedelec1, N1curl)
+- Nedelec2 (alternative names: N2curl)
+- Raviart-Thomas (alternative names: RT, N1div)
 - Regge
 - symmetric matrix Lagrange
-- Taylor
+- Taylor (alternative names: discontinuous Taylor)
 - transition
-- vector Lagrange
+- vector Lagrange (alternative names: vP)
 - Wu-Xu
 
 ### Hexahedron
-- Brezzi-Douglas-Duran-Fortin
-- Brezzi-Douglas-Fortin-Marini
+- Brezzi-Douglas-Duran-Fortin (alternative names: BDDF)
+- Brezzi-Douglas-Fortin-Marini (alternative names: BDFM)
 - bubble
 - dPc
-- NCE
-- NCF
-- Q
-- serendipity
-- serendipity Hcurl
-- serendipity Hdiv
+- NCE (alternative names: RTCE, Qcurl, Nedelec, Ncurl)
+- NCF (alternative names: RTCF, Qdiv)
+- Q (alternative names: Lagrange, P)
+- serendipity (alternative names: S)
+- serendipity Hcurl (alternative names: Scurl, BDMCE, AAE)
+- serendipity Hdiv (alternative names: Sdiv, BDMCF, AAF)
 - vector dPc
-- vector Q
+- vector Q (alternative names: vQ)
 
 ### Prism
-- Lagrange
-- Nedelec
+- Lagrange (alternative names: P)
+- Nedelec (alternative names: Ncurl)
 
 ### Pyramid
-- Lagrange
+- Lagrange (alternative names: P)
 
 ### Dual polygon
-- Buffa-Christiansen
+- Buffa-Christiansen (alternative names: BC)
 - dual
-- rotated Buffa-Christiansen
+- rotated Buffa-Christiansen (alternative names: RBC)
 
