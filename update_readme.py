@@ -35,7 +35,8 @@ with open("README.md", "w") as f:
         else:
             f.write(", and ".join([", ".join(str_v[:-1]), str_v[-1]]))
         f.write(". Its sub-entities are numbered as follows.\n\n")
-        f.write(f"![The numbering of a reference {cell}](img/{cell.replace(' ', '_')}_numbering.png)\n\n")
+        f.write(f"![The numbering of a reference {cell}]"
+                f"(img/{cell.replace(' ', '_')}_numbering.png)\n\n")
     f.write("## List of supported elements\n")
     for cell in cells:
         f.write(f"### {cell[0].upper() + cell[1:]}\n")
