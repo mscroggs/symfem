@@ -1,1 +1,2 @@
 - Removed discontinuous elements.
+- Added pictures of reference cells to readme.
