@@ -3,11 +3,11 @@ import numpy as np
 import pytest
 
 elements = {
-    "interval": [("P", "Lagrange", range(1, 4), [("LatticeType", "equispaced")]),
+    "interval": [("P", "Lagrange", range(1, 4), [("LagrangeVariant", "equispaced")]),
                  ("serendipity", "Serendipity", range(1, 5), []),
                  ("bubble", "Bubble", range(2, 5), []),
                  ("dPc", "DPC", range(0, 5), [("bool", True)])],
-    "triangle": [("P", "Lagrange", range(1, 4), [("LatticeType", "equispaced")]),
+    "triangle": [("P", "Lagrange", range(1, 4), [("LagrangeVariant", "equispaced")]),
                  ("bubble", "Bubble", range(3, 5), []),
                  ("N1curl", "Nedelec 1st kind H(curl)", range(1, 4), []),
                  ("N2curl", "Nedelec 2nd kind H(curl)", range(1, 4), []),
@@ -15,7 +15,7 @@ elements = {
                  ("N2div", "Brezzi-Douglas-Marini", range(1, 4), []),
                  ("Regge", "Regge", range(0, 4), []),
                  ("Crouzeix-Raviart", "Crouzeix-Raviart", [1], [])],
-    "tetrahedron": [("P", "Lagrange", range(1, 4), [("LatticeType", "equispaced")]),
+    "tetrahedron": [("P", "Lagrange", range(1, 4), [("LagrangeVariant", "equispaced")]),
                     ("bubble", "Bubble", range(4, 6), []),
                     ("N1curl", "Nedelec 1st kind H(curl)", range(1, 4), []),
                     ("N2curl", "Nedelec 2nd kind H(curl)", range(1, 3), []),
@@ -23,20 +23,20 @@ elements = {
                     ("N2div", "Brezzi-Douglas-Marini", range(1, 3), []),
                     ("Regge", "Regge", range(0, 3), []),
                     ("Crouzeix-Raviart", "Crouzeix-Raviart", [1], [])],
-    "quadrilateral": [("Q", "Lagrange", range(1, 4), [("LatticeType", "equispaced")]),
+    "quadrilateral": [("Q", "Lagrange", range(1, 4), [("LagrangeVariant", "equispaced")]),
                       ("dPc", "DPC", range(0, 4), [("bool", True)]),
                       ("serendipity", "Serendipity", range(1, 5), []),
                       ("Qdiv", "Raviart-Thomas", range(1, 4), []),
                       ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 4), []),
                       ("Sdiv", "Brezzi-Douglas-Marini", range(1, 4), []),
                       ("Scurl", "Nedelec 2nd kind H(curl)", range(1, 4), [])],
-    "hexahedron": [("Q", "Lagrange", range(1, 3), [("LatticeType", "equispaced")]),
+    "hexahedron": [("Q", "Lagrange", range(1, 3), [("LagrangeVariant", "equispaced")]),
                    ("serendipity", "Serendipity", range(1, 5), []),
                    ("Qdiv", "Raviart-Thomas", range(1, 3), []),
                    ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 3), []),
                    ("Sdiv", "Brezzi-Douglas-Marini", range(1, 3), []),
                    ("Scurl", "Nedelec 2nd kind H(curl)", range(1, 3), [])],
-    "prism": [("Lagrange", "Lagrange", range(1, 4), [("LatticeType", "equispaced")])]
+    "prism": [("Lagrange", "Lagrange", range(1, 4), [("LagrangeVariant", "equispaced")])]
 }
 
 
@@ -94,8 +94,8 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
     points = make_lattice(cell, 2)
     parsed_args = []
     for a in args:
-        if a[0] == "LatticeType":
-            parsed_args.append(basix.lattice.string_to_type(a[1]))
+        if a[0] == "LagrangeVariant":
+            parsed_args.append(basix.variants.string_to_lagrange_variant(a[1]))
         elif a[0] == "bool":
             parsed_args.append(a[1])
         else:
