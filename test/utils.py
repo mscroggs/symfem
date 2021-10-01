@@ -116,6 +116,7 @@ test_elements = {
         "Qdiv": [[{"variant": "equispaced"}, range(1, 4)]],
         "BFS": [[{}, [3]]],
         "BDFM": [[{"variant": "equispaced"}, range(1, 4)]],
+        "TScurl": [[{"variant": "equispaced"}, range(1, 4)]]
     },
     "hexahedron": {
         "bubble": [[{"variant": "equispaced"}, range(2, 4)], [{"variant": "lobatto"}, range(2, 4)]],
