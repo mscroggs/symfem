@@ -1,3 +1,2 @@
 - Removed discontinuous elements.
 - Added pictures of reference cells to readme.
-- Added trimmed serendipity Hdiv and Hcurl elements.
