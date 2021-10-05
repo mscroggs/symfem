@@ -160,9 +160,7 @@ def create_element(cell_type, element_type, order, **kwargs):
         Wu-Xu,
         transition,
         Guzman-Neilan,
-        nonconforming Arnold-Winther, nonconforming AW,
-        TScurl, trimmed serendipity Hcurl,
-        TSdiv, trimmed serendipity Hdiv
+        nonconforming Arnold-Winther, nonconforming AW
     order : int
         The order of the element.
     """
