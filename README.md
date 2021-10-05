@@ -208,6 +208,7 @@ The reference quadrilateral has vertices (0, 0), (1, 0), (0, 1), and (1, 1). Its
 - serendipity (alternative names: S)
 - serendipity Hcurl (alternative names: Scurl, BDMCE, AAE)
 - serendipity Hdiv (alternative names: Sdiv, BDMCF, AAF)
+- trimmed serendipity Hcurl (alternative names: TScurl)
 - vector dPc
 - vector Q (alternative names: vQ)
 
@@ -256,6 +257,7 @@ The reference hexahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0)
 - serendipity (alternative names: S)
 - serendipity Hcurl (alternative names: Scurl, BDMCE, AAE)
 - serendipity Hdiv (alternative names: Sdiv, BDMCF, AAF)
+- trimmed serendipity Hcurl (alternative names: TScurl)
 - vector dPc
 - vector Q (alternative names: vQ)
 
