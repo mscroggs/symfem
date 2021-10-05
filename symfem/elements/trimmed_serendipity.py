@@ -5,8 +5,6 @@ These elements' definitions appear in https://doi.org/10.1137/16M1073352
 (Gilette, Kloefkorn, 2018)
 """
 
-import sympy
-from itertools import product
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set
 from ..functionals import IntegralMoment, TangentIntegralMoment, IntegralAgainst
@@ -33,8 +31,32 @@ class TrimmedSerendipityHcurl(CiarletElement):
                 poly += [(x[1] ** order, order * x[0] * x[1] ** (order - 1)),
                          (order * x[0] ** (order - 1) * x[1], x[0] ** order)]
         else:
-            poly += [vcross(x, x[0] ** i * x[1] ** j * x[2] ** (order - 1 - i - j))
-                     for i in range(order) for j in range(order - i)]
+            poly += [
+                vcross(x, [x[0] ** i * x[1] ** j * x[2] ** (order - 1 - i - j)
+                           if d == dim else 0 for d in range(3)])
+                for i in range(order) for j in range(order - i) for dim in range(3)
+                if i == 0 or dim != 0]
+
+            if order == 1:
+                poly += [grad(x[0] * x[1] * x[2] ** order, 3)]
+            else:
+                poly += [grad(x[0] * x[1] * x[2] ** order, 3),
+                         grad(x[0] * x[1] ** order * x[2], 3),
+                         grad(x[0] ** order * x[1] * x[2], 3)]
+            # TODO
+            poly += [grad(x[0] * x[1] ** i * x[2] ** (order - i), 3) for i in range(order + 1)]
+            poly += [grad(x[1] * x[0] ** i * x[2] ** (order - i), 3) for i in range(order + 1)
+                     if i != 1]
+            poly += [grad(x[2] * x[0] ** i * x[1] ** (order - i), 3) for i in range(order + 1)
+                     if i != 1 and order - i != 1]
+            for i in range(order):
+                p = x[0] * x[1] ** i * x[2] ** (order - 1 - i)
+                poly.append((0, -x[2] * p, x[1] * p))
+                p = x[1] * x[0] ** i * x[2] ** (order - 1 - i)
+                poly.append((-x[2] * p, 0, x[0] * p))
+                if order > 1:
+                    p = x[2] * x[0] ** i * x[1] ** (order - 1 - i)
+                    poly.append((-x[1] * p, x[0] * p, 0))
 
         points, _ = get_quadrature(variant, order)
 
@@ -50,7 +72,6 @@ class TrimmedSerendipityHcurl(CiarletElement):
         if order >= 2:
             for f_n in range(reference.sub_entity_count(2)):
                 face = reference.sub_entity(2, f_n)
-                r = VectorDPC(face, order - 3)
                 for i in range(order):
                     f = grad(x[0] ** (order - 1 - i) * x[1] ** i, 2)
                     f = subs([f[1], -f[0]], x, t)
