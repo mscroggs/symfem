@@ -138,7 +138,8 @@ class TrimmedSerendipityHdiv(CiarletElement):
                       for i in range(order) for j in range(order - i)]
             for f in fs:
                 f = subs(f, x, t)
-                dofs.append(IntegralAgainst(reference, f, entity=(reference.tdim, 0), mapping="covariant"))
+                dofs.append(IntegralAgainst(reference, f, entity=(reference.tdim, 0),
+                                            mapping="covariant"))
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, reference.tdim
