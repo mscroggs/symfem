@@ -9,7 +9,6 @@ from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set
 from ..functionals import (IntegralMoment, TangentIntegralMoment, IntegralAgainst,
                            NormalIntegralMoment)
-from ..quadrature import get_quadrature
 from ..symbolic import x, t, subs
 from ..calculus import grad, curl
 from ..vectors import vcross
@@ -57,8 +56,6 @@ class TrimmedSerendipityHcurl(CiarletElement):
                 if order > 1:
                     p = x[2] * x[0] ** i * x[1] ** (order - 1 - i)
                     poly.append((-x[1] * p, x[0] * p, 0))
-
-        points, _ = get_quadrature(variant, order)
 
         dofs = []
         dofs += make_integral_moment_dofs(
@@ -119,8 +116,6 @@ class TrimmedSerendipityHdiv(CiarletElement):
                 if order > 1:
                     p = x[2] * x[0] ** i * x[1] ** (order - 1 - i)
                     poly.append(curl((-x[1] * p, x[0] * p, 0)))
-
-        points, _ = get_quadrature(variant, order)
 
         dofs = []
         dofs += make_integral_moment_dofs(
