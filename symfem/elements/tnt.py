@@ -72,7 +72,6 @@ class TNTcurl(CiarletElement):
                         face = reference.sub_entity(2, f_n)
                         dofs.append(IntegralAgainst(face, grad_f, entity=(2, f_n),
                                                     mapping="contravariant"))
-        print(len(dofs))
         # if order >= 2:
         #    for f_n in range(reference.sub_entity_count(2)):
         #        face = reference.sub_entity(2, f_n)
@@ -80,8 +79,6 @@ class TNTcurl(CiarletElement):
         #            f = grad(x[0] ** (order - 1 - i) * x[1] ** i, 2)
         #            f = subs([f[1], -f[0]], x, t)
         #            dofs.append(IntegralAgainst(face, f, entity=(2, f_n), mapping="contravariant"))
-        print(poly)
-        print(len(poly))
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, reference.tdim
@@ -164,7 +161,7 @@ class TNTdiv(CiarletElement):
                         )
                         dofs.append(IntegralAgainst(
                             reference, f, entity=(reference.tdim, 0), mapping="covariant"))
-                        if k < 2:
+                        if k in [0, 2]:
                             f = (
                                 0,
                                 x[0] ** k * x[1] ** (i - 1) * (1 - x[1]) * x[2] ** (j - 2) * (
