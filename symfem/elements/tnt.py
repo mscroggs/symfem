@@ -10,11 +10,12 @@ from ..polynomials import quolynomial_set
 from ..functionals import (TangentIntegralMoment, IntegralAgainst,
                            NormalIntegralMoment)
 from ..symbolic import x, t, subs
-from ..calculus import grad
+from ..calculus import grad, curl
 from ..moments import make_integral_moment_dofs
-from .q import Q
+from ..vectors import vcross
 from ..legendre import get_legendre_basis
 from ..references import Interval
+from .q import Q
 
 
 def P(k, v):
@@ -45,40 +46,102 @@ class TNTcurl(CiarletElement):
             for i in product([0, 1], repeat=2):
                 if sum(i) != 0:
                     poly.append([j.expand() for j in [
-                        B(order + 1, i[0] * x[0]) * P(order, i[1] * x[1]),
                         P(order, i[0] * x[0]) * B(order + 1, i[1] * x[1]),
+                        -B(order + 1, i[0] * x[0]) * P(order, i[1] * x[1]),
                     ]])
         else:
-            for i in product([0, 1], repeat=3):
+            face_poly = []
+            for i in product([0, 1], repeat=2):
                 if sum(i) != 0:
-                    poly.append([
-                        B(order + 1, i[0] * x[0]) * P(order, i[1] * x[1]) * P(order, i[2] * x[2]),
-                        P(order, i[0] * x[0]) * B(order + 1, i[1] * x[1]) * P(order, i[2] * x[2]),
-                        P(order, i[0] * x[0]) * P(order, i[1] * x[1]) * B(order + 1, i[2] * x[2]),
-                    ])
+                    face_poly.append([j.expand() for j in [
+                        B(order + 1, i[0] * t[0]) * P(order, i[1] * t[1]),
+                        P(order, i[0] * t[0]) * B(order + 1, i[1] * t[1]),
+                    ]])
+            for lamb_n in [(x[0], 0, 0), (1 - x[0], 0, 0),
+                           (0, x[1], 0), (0, 1 - x[1], 0),
+                           (0, 0, x[2]), (0, 0, 1 - x[2])]:
+                vars = tuple(i for i, j in enumerate(lamb_n) if j == 0)
+                poly += [vcross(lamb_n, [
+                    subs(p[0], t[:2], [x[j] for j in vars]) if i == vars[0]
+                    else (subs(p[1], t[:2], [x[j] for j in vars]) if i == vars[1] else 0)
+                    for i in range(3)
+                ]) for p in face_poly]
 
         dofs = []
         dofs += make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, Q, order, {"variant": variant}),
         )
+
+        # Face moments
+        face_moments = []
         for i in product(range(order + 1), repeat=2):
             if sum(i) > 0:
                 f = x[0] ** i[0] * x[1] ** i[1]
                 grad_f = grad(f, 2)
-                grad_f = subs(grad_f, x, t)
-                if grad_f != 0:
-                    for f_n in range(reference.sub_entity_count(2)):
-                        face = reference.sub_entity(2, f_n)
-                        dofs.append(IntegralAgainst(face, grad_f, entity=(2, f_n),
-                                                    mapping="contravariant"))
-        # if order >= 2:
-        #    for f_n in range(reference.sub_entity_count(2)):
-        #        face = reference.sub_entity(2, f_n)
-        #        for i in range(order):
-        #            f = grad(x[0] ** (order - 1 - i) * x[1] ** i, 2)
-        #            f = subs([f[1], -f[0]], x, t)
-        #            dofs.append(IntegralAgainst(face, f, entity=(2, f_n), mapping="contravariant"))
+                grad_f = subs((grad_f[1], -grad_f[0]), x[:2], t[:2])
+                face_moments.append(grad_f)
+
+        """if reference.tdim == 2:
+            for i in range(2, order + 1):
+                for j in range(2, order + 1):
+                    f = (x[1] ** (j - 1) * (1 - x[1]) * x[0] ** (i - 2) * (i * x[0] - i + 1),
+                         -x[0] ** (i - 1) * (1 - x[0]) * x[1] ** (j - 2) * (j - 1 - j * x[1]))
+                    dofs.append(IntegralAgainst(
+                        reference, f, entity=(reference.tdim, 0), mapping="contravariant"))"""
+        """if reference.tdim == 3:
+            # Face moments
+            for i in range(2, order + 1):
+                for j in range(2, order + 1):
+                    face_moments.append((
+                        t[1] ** (j - 1) * (1 - t[1]) * t[0] ** (i - 2) * (i * t[0] - i + 1),
+                        -t[0] ** (i - 1) * (1 - t[0]) * t[1] ** (j - 2) * (j - 1 - j * t[1])))
+        """
+        for i in range(2, order + 1):
+            for j in range(2, order + 1):
+                face_moments.append((
+                    t[1] ** (j - 1) * (1 - t[1]) * t[0] ** (i - 2) * (i * t[0] - i + 1),
+                    -t[0] ** (i - 1) * (1 - t[0]) * t[1] ** (j - 2) * (j - 1 - j * t[1])))
+        if reference.tdim == 2:
+            for f in face_moments:
+                dofs.append(IntegralAgainst(
+                    reference, f, entity=(2, 0), mapping="contravariant"))
+        elif reference.tdim == 3:
+            for face_n in range(6):
+                face = reference.sub_entity(2, face_n)
+                vars = tuple(i for i, j in enumerate(face.normal()) if j == 0)
+                for f in face_moments:
+                    dofs.append(IntegralAgainst(
+                        face, f, entity=(2, face_n), mapping="contravariant"))
+
+        # Interior Moments
+        if reference.tdim == 3:
+            for i in range(1, order):
+                for j in range(1, order):
+                    for k in range(order + 1):
+                        f = (x[0] ** k * x[1] ** i * (1 - x[1]) * x[2] ** j * (1 - x[2]), 0, 0)
+                        dofs.append(IntegralAgainst(
+                            reference, curl(curl(f)), entity=(3, 0), mapping="covariant"))
+
+                        f = (0, x[1] ** k * x[0] ** i * (1 - x[0]) * x[2] ** j * (1 - x[2]), 0, 0)
+                        dofs.append(IntegralAgainst(
+                            reference, curl(curl(f)), entity=(3, 0), mapping="covariant"))
+
+                        if k in [0, 2]:
+                            f = (0, 0,  x[2] ** k * x[0] ** i * (1 - x[0]) * x[1] ** j * (1 - x[1]))
+                            dofs.append(IntegralAgainst(
+                                reference, curl(curl(f)), entity=(3, 0), mapping="covariant"))
+
+            for i in range(2, order + 1):
+                for j in range(2, order + 1):
+                    for k in range(2, order + 1):
+                        f = x[0] ** (i - 1) * x[0] ** i
+                        f *= x[1] ** (j - 1) * x[1] ** j
+                        f *= x[2] ** (k - 1) * x[2] ** k
+                        grad_f = grad(f, 3)
+                        dofs.append(IntegralAgainst(
+                            reference, grad_f, entity=(3, 0), mapping="contravariant"))
+        print(len(poly), len(dofs))
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, reference.tdim
