@@ -43,13 +43,24 @@ class TNT(CiarletElement):
 
     def __init__(self, reference, order, variant="equispaced"):
         poly = quolynomial_set(reference.tdim, 1, order)
+        if reference.tdim == 2:
+            for i in range(2):
+                vars = [x[j] for j in range(2) if j != i]
+                for f in [1 - vars[0], vars[0]]:
+                    poly.append(f * B(order + 1, x[i]))
+
+        elif reference.tdim == 3:
+            for i in range(3):
+                vars = [x[j] for j in range(3) if j != i]
+                for f0 in [1 - vars[0], vars[0]]:
+                    for f1 in [1 - vars[1], vars[1]]:
+                        poly.append(f0 * f1 * B(order + 1, x[i]))
+
         dofs = []
         for i, v in enumerate(reference.vertices):
             dofs.append(PointEvaluation(v, entity=(0, i)))
 
-        
-
-        for i in range(1, order):
+        for i in range(1, order + 1):
             f = i * t[0] ** (i - 1)
             for edge_n in range(reference.sub_entity_count(1)):
                 edge = reference.sub_entity(1, edge_n)
@@ -59,21 +70,20 @@ class TNT(CiarletElement):
         for i in range(1, order):
             for j in range(1, order):
                 f = t[0] ** i * (t[0] - 1) * t[1] ** j * (t[1] - 1)
-                delta_f = f.diff(t[0]).diff(t[0]) + f.diff(t[1]).diff(t[1])
+                delta_f = (f.diff(t[0]).diff(t[0]) + f.diff(t[1]).diff(t[1])).expand()
                 for face_n in range(reference.sub_entity_count(2)):
                     face = reference.sub_entity(2, face_n)
                     dofs.append(IntegralAgainst(
                         face, delta_f, entity=(2, face_n), mapping="identity"))
 
-        for i in product(range(1, order), repeat=reference.tdim):
-            f = 1
-            for j, k in zip(i, x):
-                f *= k ** j * (k - 1)
-            grad_f = grad(f, reference.tdim)
-            dofs.append(DerivativeIntegralMoment(
-                reference, 1, grad_f, None, entity=(reference.tdim, 0), mapping="identity"))
-
-        print(len(poly), len(dofs))
+        if reference.tdim == 3:
+            for i in product(range(1, order), repeat=3):
+                f = 1
+                for j, k in zip(i, x):
+                    f *= k ** j * (k - 1)
+                grad_f = tuple(j.expand() for j in grad(f, 3))
+                dofs.append(DerivativeIntegralMoment(
+                    reference, 1, grad_f, None, entity=(3, 0), mapping="identity"))
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1
@@ -178,7 +188,6 @@ class TNTcurl(CiarletElement):
                         grad_f = grad(f, 3)
                         dofs.append(IntegralAgainst(
                             reference, grad_f, entity=(3, 0), mapping="contravariant"))
-        print(len(poly), len(dofs))
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, reference.tdim
