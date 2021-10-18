@@ -138,9 +138,9 @@ test_elements = {
         "BDDF": [[{"variant": "equispaced"}, range(1, 3)]],
         "TScurl": [[{"variant": "equispaced"}, range(1, 4)]],
         "TSdiv": [[{"variant": "equispaced"}, range(1, 4)]],
-        "TNT": [[{"variant": "equispaced"}, range(1, 3)]],
-        "TNTcurl": [[{"variant": "equispaced"}, range(1, 3)]],
-        "TNTdiv": [[{"variant": "equispaced"}, range(1, 3)]],
+        "TNT": [[{"variant": "equispaced"}, range(1, 2)]],
+        "TNTcurl": [[{"variant": "equispaced"}, range(1, 2)]],
+        "TNTdiv": [[{"variant": "equispaced"}, range(1, 2)]],
     },
     "prism": {
         "Lagrange": [[{"variant": "equispaced"}, range(4)]],
