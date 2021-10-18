@@ -163,6 +163,7 @@ def create_element(cell_type, element_type, order, **kwargs):
         nonconforming Arnold-Winther, nonconforming AW,
         TScurl, trimmed serendipity Hcurl,
         TSdiv, trimmed serendipity Hdiv,
+        TNT, tiniest tensor,
         TNTcurl, tiniest tensor Hcurl,
         TNTdiv, tiniest tensor Hdiv
     order : int
