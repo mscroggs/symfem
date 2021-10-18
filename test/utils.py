@@ -118,6 +118,9 @@ test_elements = {
         "BDFM": [[{"variant": "equispaced"}, range(1, 4)]],
         "TScurl": [[{"variant": "equispaced"}, range(1, 5)]],
         "TSdiv": [[{"variant": "equispaced"}, range(1, 5)]],
+        "TNT": [[{"variant": "equispaced"}, range(1, 4)]],
+        "TNTcurl": [[{"variant": "equispaced"}, range(1, 4)]],
+        "TNTdiv": [[{"variant": "equispaced"}, range(1, 4)]],
     },
     "hexahedron": {
         "bubble": [[{"variant": "equispaced"}, range(2, 4)], [{"variant": "lobatto"}, range(2, 4)]],
@@ -134,7 +137,10 @@ test_elements = {
         "BDFM": [[{"variant": "equispaced"}, range(1, 3)]],
         "BDDF": [[{"variant": "equispaced"}, range(1, 3)]],
         "TScurl": [[{"variant": "equispaced"}, range(1, 4)]],
-        "TSdiv": [[{"variant": "equispaced"}, range(1, 4)]]
+        "TSdiv": [[{"variant": "equispaced"}, range(1, 4)]],
+        "TNT": [[{"variant": "equispaced"}, range(1, 2)]],
+        "TNTcurl": [[{"variant": "equispaced"}, range(1, 2)]],
+        "TNTdiv": [[{"variant": "equispaced"}, range(1, 2)]],
     },
     "prism": {
         "Lagrange": [[{"variant": "equispaced"}, range(4)]],
