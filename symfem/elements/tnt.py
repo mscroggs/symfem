@@ -8,7 +8,8 @@ from itertools import product
 from ..finite_element import CiarletElement
 from ..polynomials import quolynomial_set
 from ..functionals import (TangentIntegralMoment, IntegralAgainst,
-                           NormalIntegralMoment)
+                           NormalIntegralMoment, PointEvaluation,
+                           DerivativeIntegralMoment)
 from ..symbolic import x, t, subs
 from ..calculus import grad, curl
 from ..moments import make_integral_moment_dofs
@@ -35,6 +36,58 @@ def B(k, v):
     if k == 1:
         return 0
     return (P(k, v) - P(k - 2, v)) / (4 + k - 2)
+
+
+class TNT(CiarletElement):
+    """TiNiest Tensor scalar finite element."""
+
+    def __init__(self, reference, order, variant="equispaced"):
+        poly = quolynomial_set(reference.tdim, 1, order)
+        dofs = []
+        for i, v in enumerate(reference.vertices):
+            dofs.append(PointEvaluation(v, entity=(0, i)))
+
+        
+
+        for i in range(1, order):
+            f = i * t[0] ** (i - 1)
+            for edge_n in range(reference.sub_entity_count(1)):
+                edge = reference.sub_entity(1, edge_n)
+                dofs.append(IntegralAgainst(
+                    edge, f, entity=(1, edge_n), mapping="identity"))
+
+        for i in range(1, order):
+            for j in range(1, order):
+                f = t[0] ** i * (t[0] - 1) * t[1] ** j * (t[1] - 1)
+                delta_f = f.diff(t[0]).diff(t[0]) + f.diff(t[1]).diff(t[1])
+                for face_n in range(reference.sub_entity_count(2)):
+                    face = reference.sub_entity(2, face_n)
+                    dofs.append(IntegralAgainst(
+                        face, delta_f, entity=(2, face_n), mapping="identity"))
+
+        for i in product(range(1, order), repeat=reference.tdim):
+            f = 1
+            for j, k in zip(i, x):
+                f *= k ** j * (k - 1)
+            grad_f = grad(f, reference.tdim)
+            dofs.append(DerivativeIntegralMoment(
+                reference, 1, grad_f, None, entity=(reference.tdim, 0), mapping="identity"))
+
+        print(len(poly), len(dofs))
+
+        super().__init__(
+            reference, order, poly, dofs, reference.tdim, 1
+        )
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
+
+    names = ["tiniest tensor", "TNT"]
+    references = ["quadrilateral", "hexahedron"]
+    min_order = 1
+    continuity = "C0"
 
 
 class TNTcurl(CiarletElement):
@@ -82,21 +135,6 @@ class TNTcurl(CiarletElement):
                 grad_f = subs((grad_f[1], -grad_f[0]), x[:2], t[:2])
                 face_moments.append(grad_f)
 
-        """if reference.tdim == 2:
-            for i in range(2, order + 1):
-                for j in range(2, order + 1):
-                    f = (x[1] ** (j - 1) * (1 - x[1]) * x[0] ** (i - 2) * (i * x[0] - i + 1),
-                         -x[0] ** (i - 1) * (1 - x[0]) * x[1] ** (j - 2) * (j - 1 - j * x[1]))
-                    dofs.append(IntegralAgainst(
-                        reference, f, entity=(reference.tdim, 0), mapping="contravariant"))"""
-        """if reference.tdim == 3:
-            # Face moments
-            for i in range(2, order + 1):
-                for j in range(2, order + 1):
-                    face_moments.append((
-                        t[1] ** (j - 1) * (1 - t[1]) * t[0] ** (i - 2) * (i * t[0] - i + 1),
-                        -t[0] ** (i - 1) * (1 - t[0]) * t[1] ** (j - 2) * (j - 1 - j * t[1])))
-        """
         for i in range(2, order + 1):
             for j in range(2, order + 1):
                 face_moments.append((
@@ -109,7 +147,6 @@ class TNTcurl(CiarletElement):
         elif reference.tdim == 3:
             for face_n in range(6):
                 face = reference.sub_entity(2, face_n)
-                vars = tuple(i for i, j in enumerate(face.normal()) if j == 0)
                 for f in face_moments:
                     dofs.append(IntegralAgainst(
                         face, f, entity=(2, face_n), mapping="contravariant"))
