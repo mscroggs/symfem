@@ -37,7 +37,7 @@ pip3 install symfem
 The latest release of Symfem can be installed by running:
 
 ```bash
-conda install symfem
+conda install -c conda-forge symfem
 ```
 
 # Testing Symfem
