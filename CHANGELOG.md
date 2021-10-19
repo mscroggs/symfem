@@ -1,3 +1,10 @@
+# Version 2021.10.1 (19 October 2021)
+
+- Removed discontinuous elements.
+- Added pictures of reference cells to readme.
+- Added trimmed serendipity Hdiv and Hcurl elements.
+- Added TNT scalar, Hdiv and Hcurl elements.
+
 # Version 2021.8.2 (24 August 2021)
 
 - New release for JOSS paper
