@@ -46,7 +46,7 @@ for line in old_meta_lines:
         new_meta_lines.append(newline)
     elif "number" in line:
         newline = line.split("number")[0]
-        newline += "number: 0\n"
+        newline += "number: 0"
         new_meta_lines.append(newline)
     else:
         new_meta_lines.append(line)
