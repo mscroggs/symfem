@@ -367,7 +367,7 @@ class CiarletElement(FiniteElement):
     def get_basis_functions(self, reshape=True):
         """Get the basis functions of the element."""
         if self._basis_functions is None:
-            minv = self.get_dual_matrix().inv("LU")
+            minv = self.get_dual_matrix().inv()
             self._basis_functions = []
             if self.range_dim == 1:
                 # Scalar space
