@@ -4,6 +4,7 @@ import numpy
 from .symbolic import subs, x, t, PiecewiseFunction, sym_sum, to_sympy, to_float
 from .vectors import vdot
 from .calculus import derivative, jacobian_component, grad, diff, div
+from .basis_function import BasisFunction
 from . import mappings
 
 
@@ -342,18 +343,23 @@ class IntegralMoment(BaseFunctional):
         super().__init__(entity, mapping)
         self.reference = reference
         self.dof = dof
-        self.f = subs(f, x, t)
-        if isinstance(self.f, tuple):
-            if len(self.f) == self.reference.tdim:
-                # TODO: is this one of the mappings?
-                self.f = tuple(
-                    sum(self.reference.axes[j][i] * c / to_sympy(self.reference.jacobian())
-                        for j, c in enumerate(self.f))
-                    for i, o in enumerate(self.reference.origin)
-                )
+
+        if isinstance(f, BasisFunction):
+            f = f.get_function()
+        f = subs(f, x, t)
+
+        if isinstance(f, tuple):
+            if len(f) == self.reference.tdim:
+                self.f = mappings.contravariant(
+                    f, reference.get_map_to_self(), reference.get_inverse_map_to_self(),
+                    reference.tdim)
             else:
-                assert len(self.f) == self.reference.tdim ** 2
-                assert self.reference.vertices == self.reference.reference_vertices
+                assert len(f) == self.reference.tdim ** 2
+                self.f = mappings.double_contravariant(
+                    f, reference.get_map_to_self(), reference.get_inverse_map_to_self(),
+                    reference.tdim)
+        else:
+            self.f = f
 
     def eval(self, function, symbolic=True):
         """Apply to the functional to a function."""

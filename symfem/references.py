@@ -12,6 +12,8 @@ class Reference:
         self.gdim = len(self.origin)
         self.simplex = simplex
         self.tp = tp
+        self._inverse_map_to_self = None
+        self._map_to_self = None
 
     def default_reference(self):
         """Get the default reference for this cell type."""
@@ -37,10 +39,22 @@ class Reference:
 
     def get_map_to_self(self):
         """Get the map from the canonical reference to this reference."""
+        if self._map_to_self is None:
+            self._map_to_self = self._compute_map_to_self()
+        return self._map_to_self
+
+    def _compute_map_to_self(self):
+        """Compute the map from the canonical reference to this reference."""
         raise NotImplementedError
 
     def get_inverse_map_to_self(self):
         """Get the inverse map from the canonical reference to this reference."""
+        if self._inverse_map_to_self is None:
+            self._inverse_map_to_self = self._compute_inverse_map_to_self()
+        return self._inverse_map_to_self
+
+    def _compute_inverse_map_to_self(self):
+        """Compute the inverse map from the canonical reference to this reference."""
         raise NotImplementedError
 
     def volume(self):
@@ -179,12 +193,12 @@ class Point(Reference):
         assert self.vertices == self.reference_vertices
         return self.vertices
 
-    def get_map_to_self(self):
-        """Get the map from the canonical reference to this reference."""
+    def _compute_map_to_self(self):
+        """Compute the map from the canonical reference to this reference."""
         return self.vertices
 
-    def get_inverse_map_to_self(self):
-        """Get the inverse map from the canonical reference to this reference."""
+    def _compute_inverse_map_to_self(self):
+        """Compute the inverse map from the canonical reference to this reference."""
         return self.reference_vertices
 
     def volume(self):
@@ -228,12 +242,12 @@ class Interval(Reference):
         v = vsub(vertices[1], vertices[0])
         return (vdot(p, v) / vdot(v, v), )
 
-    def get_map_to_self(self):
-        """Get the map from the canonical reference to this reference."""
+    def _compute_map_to_self(self):
+        """Compute the map from the canonical reference to this reference."""
         return tuple(v0 + (v1 - v0) * x[0] for v0, v1 in zip(*self.vertices))
 
-    def get_inverse_map_to_self(self):
-        """Get the inverse map from the canonical reference to this reference."""
+    def _compute_inverse_map_to_self(self):
+        """Compute the inverse map from the canonical reference to this reference."""
         p = vsub(x, self.vertices[0])
         v = vsub(self.vertices[1], self.vertices[0])
         return (vdot(p, v) / vdot(v, v), )
@@ -285,13 +299,13 @@ class Triangle(Reference):
                             [v1[1], v2[1]]]).inv()
         return (vdot(mat.row(0), p), vdot(mat.row(1), p))
 
-    def get_map_to_self(self):
-        """Get the map from the canonical reference to this reference."""
+    def _compute_map_to_self(self):
+        """Compute the map from the canonical reference to this reference."""
         return tuple(v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1]
                      for v0, v1, v2 in zip(*self.vertices))
 
-    def get_inverse_map_to_self(self):
-        """Get the inverse map from the canonical reference to this reference."""
+    def _compute_inverse_map_to_self(self):
+        """Compute the inverse map from the canonical reference to this reference."""
         if len(self.vertices[0]) == 2:
             p = vsub(x, self.vertices[0])
             v1 = vsub(self.vertices[1], self.vertices[0])
@@ -361,13 +375,13 @@ class Tetrahedron(Reference):
                             [v1[2], v2[2], v3[2]]]).inv()
         return (vdot(mat.row(0), p), vdot(mat.row(1), p), vdot(mat.row(2), p))
 
-    def get_map_to_self(self):
-        """Get the map from the canonical reference to this reference."""
+    def _compute_map_to_self(self):
+        """Compute the map from the canonical reference to this reference."""
         return tuple(v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1] + (v3 - v0) * x[2]
                      for v0, v1, v2, v3 in zip(*self.vertices))
 
-    def get_inverse_map_to_self(self):
-        """Get the inverse map from the canonical reference to this reference."""
+    def _compute_inverse_map_to_self(self):
+        """Compute the inverse map from the canonical reference to this reference."""
         p = vsub(x, self.vertices[0])
         v1 = vsub(self.vertices[1], self.vertices[0])
         v2 = vsub(self.vertices[2], self.vertices[0])
@@ -416,31 +430,49 @@ class Quadrilateral(Reference):
     def get_inverse_map_to(self, vertices):
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
-        assert len(vertices[0]) == 2
         assert vadd(vertices[0], vertices[3]) == vadd(vertices[1], vertices[2])
         p = vsub(x, vertices[0])
         v1 = vsub(vertices[1], vertices[0])
         v2 = vsub(vertices[2], vertices[0])
-        mat = sympy.Matrix([[v1[0], v2[0]],
-                            [v1[1], v2[1]]]).inv()
+
+        if len(self.vertices[0]) == 2:
+            mat = sympy.Matrix([[v1[0], v2[0]],
+                                [v1[1], v2[1]]]).inv()
+        elif len(self.vertices[0]) == 3:
+            v3 = vcross(v1, v2)
+            mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
+                                [v1[1], v2[1], v3[1]],
+                                [v1[2], v2[2], v3[2]]]).inv()
+        else:
+            raise RuntimeError("Cannot get inverse map.")
+
         return (vdot(mat.row(0), p), vdot(mat.row(1), p))
 
-    def get_map_to_self(self):
-        """Get the map from the canonical reference to this reference."""
+    def _compute_map_to_self(self):
+        """Compute the map from the canonical reference to this reference."""
         return tuple(
             (1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1) + x[1] * ((1 - x[0]) * v2 + x[0] * v3)
             for v0, v1, v2, v3 in zip(*self.vertices))
 
-    def get_inverse_map_to_self(self):
-        """Get the inverse map from the canonical reference to this reference."""
-        assert len(self.vertices[0]) == 2
+    def _compute_inverse_map_to_self(self):
+        """Compute the inverse map from the canonical reference to this reference."""
         assert vadd(self.vertices[0], self.vertices[3]) == vadd(self.vertices[1],
                                                                 self.vertices[2])
         p = vsub(x, self.vertices[0])
         v1 = vsub(self.vertices[1], self.vertices[0])
         v2 = vsub(self.vertices[2], self.vertices[0])
-        mat = sympy.Matrix([[v1[0], v2[0]],
-                            [v1[1], v2[1]]]).inv()
+
+        if len(self.vertices[0]) == 2:
+            mat = sympy.Matrix([[v1[0], v2[0]],
+                                [v1[1], v2[1]]]).inv()
+        elif len(self.vertices[0]) == 3:
+            v3 = vcross(v1, v2)
+            mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
+                                [v1[1], v2[1], v3[1]],
+                                [v1[2], v2[2], v3[2]]]).inv()
+        else:
+            raise RuntimeError("Cannot get inverse map.")
+
         return (vdot(mat.row(0), p), vdot(mat.row(1), p))
 
     def volume(self):
@@ -513,8 +545,8 @@ class Hexahedron(Reference):
                             [v1[2], v2[2], v3[2]]]).inv()
         return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
 
-    def get_map_to_self(self):
-        """Get the map from the canonical reference to this reference."""
+    def _compute_map_to_self(self):
+        """Compute the map from the canonical reference to this reference."""
         return tuple(
             (1 - x[2]) * ((1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1)
                           + x[1] * ((1 - x[0]) * v2 + x[0] * v3))
@@ -522,8 +554,8 @@ class Hexahedron(Reference):
                       + x[1] * ((1 - x[0]) * v6 + x[0] * v7))
             for v0, v1, v2, v3, v4, v5, v6, v7 in zip(*self.vertices))
 
-    def get_inverse_map_to_self(self):
-        """Get the inverse map from the canonical reference to this reference."""
+    def _compute_inverse_map_to_self(self):
+        """Compute the inverse map from the canonical reference to this reference."""
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces:
             assert vadd(self.vertices[a], self.vertices[d]) == vadd(self.vertices[b],
@@ -608,15 +640,15 @@ class Prism(Reference):
                             [v1[2], v2[2], v3[2]]]).inv()
         return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
 
-    def get_map_to_self(self):
-        """Get the map from the canonical reference to this reference."""
+    def _compute_map_to_self(self):
+        """Compute the map from the canonical reference to this reference."""
         return tuple(
             (1 - x[2]) * (v0 + x[0] * (v1 - v0) + x[1] * (v2 - v0))
             + x[2] * (v3 + x[0] * (v4 - v3) + x[1] * (v5 - v3))
             for v0, v1, v2, v3, v4, v5 in zip(*self.vertices))
 
-    def get_inverse_map_to_self(self):
-        """Get the inverse map from the canonical reference to this reference."""
+    def _compute_inverse_map_to_self(self):
+        """Compute the inverse map from the canonical reference to this reference."""
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces[1:4]:
             assert vadd(self.vertices[a], self.vertices[d]) == vadd(self.vertices[b],
@@ -703,8 +735,8 @@ class Pyramid(Reference):
                             [v1[2], v2[2], v3[2]]]).inv()
         return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
 
-    def get_map_to_self(self):
-        """Get the map from the canonical reference to this reference."""
+    def _compute_map_to_self(self):
+        """Compute the map from the canonical reference to this reference."""
         return tuple(
             (1 - x[2]) * (
                 (1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1)
@@ -712,8 +744,8 @@ class Pyramid(Reference):
             ) + x[2] * v4
             for v0, v1, v2, v3, v4 in zip(*self.vertices))
 
-    def get_inverse_map_to_self(self):
-        """Get the inverse map from the canonical reference to this reference."""
+    def _compute_inverse_map_to_self(self):
+        """Compute the inverse map from the canonical reference to this reference."""
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces[:1]:
             assert vadd(self.vertices[a], self.vertices[d]) == vadd(self.vertices[b],

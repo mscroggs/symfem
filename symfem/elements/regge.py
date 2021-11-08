@@ -10,15 +10,18 @@ http://aurora.asc.tuwien.ac.at/~mneunteu/thesis/doctorthesis_neunteufel.pdf
 import sympy
 from itertools import product
 from ..finite_element import CiarletElement
+from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set
-from ..functionals import PointInnerProduct
-from ..symbolic import x
+from ..functionals import (PointInnerProduct, InnerProductIntegralMoment, IntegralMoment,
+                           IntegralAgainst)
+from ..symbolic import x, t, subs
+from .lagrange import Lagrange
 
 
 class Regge(CiarletElement):
     """A Regge element on a simplex."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant="point"):
         from symfem import create_reference
         if reference.tdim == 2:
             poly = [(p[0], p[1], p[1], p[2])
@@ -28,24 +31,74 @@ class Regge(CiarletElement):
                     for p in polynomial_set(reference.tdim, 6, order)]
 
         dofs = []
-        for edim in range(1, 4):
-            for e_n, vs in enumerate(reference.sub_entities(edim)):
-                entity = create_reference(
-                    reference.sub_entity_types[edim],
-                    vertices=tuple(reference.vertices[i] for i in vs))
-                for i in product(range(1, order + 2), repeat=edim):
-                    if sum(i) < order + 2:
-                        for edge in entity.edges[::-1]:
-                            tangent = [b - a for a, b in zip(entity.vertices[edge[0]],
-                                                             entity.vertices[edge[1]])]
-                            dofs.append(PointInnerProduct(
-                                tuple(o + sum(sympy.Rational(a[j] * b, order + 2)
-                                              for a, b in zip(entity.axes, i[::-1]))
-                                      for j, o in enumerate(entity.origin)),
-                                tangent, tangent, entity=(edim, e_n), mapping="double_covariant"))
+        if variant == "point":
+            for edim in range(1, 4):
+                for e_n, vs in enumerate(reference.sub_entities(edim)):
+                    entity = create_reference(
+                        reference.sub_entity_types[edim],
+                        vertices=tuple(reference.vertices[i] for i in vs))
+                    for i in product(range(1, order + 2), repeat=edim):
+                        if sum(i) < order + 2:
+                            for edge in entity.edges[::-1]:
+                                tangent = [b - a for a, b in zip(entity.vertices[edge[0]],
+                                                                 entity.vertices[edge[1]])]
+                                dofs.append(PointInnerProduct(
+                                    tuple(o + sum(sympy.Rational(a[j] * b, order + 2)
+                                                  for a, b in zip(entity.axes, i[::-1]))
+                                          for j, o in enumerate(entity.origin)),
+                                    tangent, tangent, entity=(edim, e_n),
+                                    mapping="double_covariant"))
+
+        elif variant == "integral":
+            space = Lagrange(create_reference("interval"), order, "equispaced")
+            basis = [subs(f, x, t) for f in space.get_basis_functions()]
+            for e_n, vs in enumerate(reference.sub_entities(1)):
+                edge = reference.sub_entity(1, e_n)
+                edge_space = Lagrange(edge, order, "equispaced")
+                tangent = [(b - a) / edge.jacobian()
+                           for a, b in zip(edge.vertices[0], edge.vertices[1])]
+                for f, dof in zip(basis, edge_space.dofs):
+                    dofs.append(InnerProductIntegralMoment(
+                        edge, f, tangent, tangent, dof, entity=(1, e_n),
+                        mapping="double_covariant"))
+
+            if reference.tdim == 2:
+                if order > 0:
+                    dofs += make_integral_moment_dofs(
+                        reference,
+                        cells=(IntegralMoment, Regge, order - 1, "double_covariant",
+                               {"variant": "integral"}),
+                    )
+
+            elif reference.tdim == 3:
+                if order > 0:
+                    space = Regge(create_reference("triangle"), order - 1, "integral")
+                    basis = [subs(f, x, t) for f in space.get_basis_functions()]
+                    for f_n, vs in enumerate(reference.sub_entities(2)):
+                        face = reference.sub_entity(2, f_n)
+                        face_space = Regge(face, order - 1, "integral")
+                        for f, dof in zip(basis, face_space.dofs):
+                            dofs.append(IntegralMoment(
+                                face, tuple(i * face.jacobian() for i in f), dof, entity=(2, f_n),
+                                mapping="double_covariant"))
+
+                if order > 1:
+                    dofs += make_integral_moment_dofs(
+                        reference,
+                        cells=(IntegralMoment, Regge, order - 2, "double_covariant",
+                               {"variant": "integral"}),
+                    )
+
+        else:
+            raise ValueError(f"Unknown variant: {variant}")
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["Regge"]
     references = ["triangle", "tetrahedron"]
@@ -56,8 +109,9 @@ class Regge(CiarletElement):
 class ReggeTP(CiarletElement):
     """A Regge element on a tensor product cell."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference, order, variant="integral"):
         from symfem import create_reference
+
         if reference.tdim == 2:
             poly = []
             for i in range(order + 1):
@@ -69,27 +123,67 @@ class ReggeTP(CiarletElement):
                     poly.append((0, x[0] ** i * x[1] ** j, x[0] ** i * x[1] ** j, 0))
 
         dofs = []
-        for e_n, vs in enumerate(reference.sub_entities(1)):
-            entity = create_reference(
-                reference.sub_entity_types[1],
-                vertices=tuple(reference.vertices[i] for i in vs))
-            for i in range(1, order + 2):
-                for edge in entity.edges[::-1]:
-                    tangent = [b - a for a, b in zip(entity.vertices[edge[0]],
-                                                     entity.vertices[edge[1]])]
-                    dofs.append(PointInnerProduct(
-                        tuple(o + sympy.Rational(entity.axes[0][j] * i, order + 2)
-                              for j, o in enumerate(entity.origin)),
-                        tangent, tangent, entity=(1, e_n), mapping="double_covariant"))
+        if variant == "integral":
+            space = Lagrange(create_reference("interval"), order, "equispaced")
+            basis = [subs(f, x, t) for f in space.get_basis_functions()]
+            for e_n, vs in enumerate(reference.sub_entities(1)):
+                edge = reference.sub_entity(1, e_n)
+                edge_space = Lagrange(edge, order, "equispaced")
+                tangent = [(b - a) / edge.jacobian()
+                           for a, b in zip(edge.vertices[0], edge.vertices[1])]
+                for f, dof in zip(basis, edge_space.dofs):
+                    dofs.append(InnerProductIntegralMoment(
+                        edge, f, tangent, tangent, dof, entity=(1, e_n),
+                        mapping="double_covariant"))
 
-        dofs.append(PointInnerProduct(
-            (sympy.Rational(1, 2), sympy.Rational(1, 2)),
-            (1, 1), (1, 1), entity=(2, 0), mapping="double_covariant"))
+            if reference.tdim == 2:
+                if order == 0:
+                    dofs.append(IntegralAgainst(
+                        reference, (0, 1, 1, 0), entity=(2, 0), mapping="double_covariant"))
+                else:
+                    for i in range(order + 1):
+                        for j in range(order + 1):
+                            dofs.append(IntegralAgainst(
+                                reference, (0, x[0] ** i * x[1] ** j, x[0] ** i * x[1] ** j, 0),
+                                entity=(2, 0), mapping="double_covariant"))
+                    for i in range(1, order + 1):
+                        for j in range(order + 1):
+                            dofs.append(IntegralAgainst(
+                                reference, (x[1] ** i * x[0] ** j * (1 - x[1]), 0, 0, 0),
+                                entity=(2, 0), mapping="double_covariant"))
+                            dofs.append(IntegralAgainst(
+                                reference, (0, 0, 0, x[0] ** i * x[1] ** j * (1 - x[0])),
+                                entity=(2, 0), mapping="double_covariant"))
 
-        print(len(dofs), len(poly))
+            elif reference.tdim == 3:
+                if order > 0:
+                    space = ReggeTP(create_reference("quadrilateral"), order - 1, "integral")
+                    basis = [subs(f, x, t) for f in space.get_basis_functions()]
+                    for f_n, vs in enumerate(reference.sub_entities(2)):
+                        face = reference.sub_entity(2, f_n)
+                        face_space = ReggeTP(face, order - 1, "integral")
+                        for f, dof in zip(basis, face_space.dofs):
+                            dofs.append(IntegralMoment(
+                                face, tuple(i * face.jacobian() for i in f), dof, entity=(2, f_n),
+                                mapping="double_covariant"))
+
+                if order > 1:
+                    dofs += make_integral_moment_dofs(
+                        reference,
+                        cells=(IntegralMoment, ReggeTP, order - 2, "double_covariant",
+                               {"variant": "integral"}),
+                    )
+
+        else:
+            raise ValueError(f"Unknown variant: {variant}")
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))
+        self.variant = variant
+
+    def init_kwargs(self):
+        """Return the kwargs used to create this element."""
+        return {"variant": self.variant}
 
     names = ["Regge"]
     references = ["quadrilateral"]
