@@ -259,18 +259,23 @@ class IntegralAgainst(BaseFunctional):
     def __init__(self, reference, f, entity=(None, None), mapping="identity"):
         super().__init__(entity, mapping)
         self.reference = reference
-        self.f = subs(f, x, t)
-        if isinstance(self.f, tuple):
-            if len(self.f) == self.reference.tdim:
-                # TODO: is this one of the mappings?
-                self.f = tuple(
-                    sum(self.reference.axes[j][i] * c / to_sympy(self.reference.jacobian())
-                        for j, c in enumerate(self.f))
-                    for i, o in enumerate(self.reference.origin)
-                )
+
+        if isinstance(f, BasisFunction):
+            f = f.get_function()
+        f = subs(f, x, t)
+
+        if isinstance(f, tuple):
+            if len(f) == self.reference.tdim:
+                self.f = mappings.contravariant(
+                    f, reference.get_map_to_self(), reference.get_inverse_map_to_self(),
+                    reference.tdim)
             else:
-                assert len(self.f) == self.reference.tdim ** 2
-                assert self.reference.vertices == self.reference.reference_vertices
+                assert len(f) == self.reference.tdim ** 2
+                self.f = mappings.double_contravariant(
+                    f, reference.get_map_to_self(), reference.get_inverse_map_to_self(),
+                    reference.tdim)
+        else:
+            self.f = f
 
     def dof_point(self):
         """Get the location of the DOF in the cell."""
