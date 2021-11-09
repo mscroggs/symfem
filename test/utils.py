@@ -142,6 +142,7 @@ test_elements = {
         "TNT": [[{"variant": "equispaced"}, range(1, 2)]],
         "TNTcurl": [[{"variant": "equispaced"}, range(1, 2)]],
         "TNTdiv": [[{"variant": "equispaced"}, range(1, 2)]],
+        "Regge": [[{"variant": "integral"}, range(2)]],
     },
     "prism": {
         "Lagrange": [[{"variant": "equispaced"}, range(4)]],
