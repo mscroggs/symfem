@@ -205,6 +205,7 @@ The reference quadrilateral has vertices (0, 0), (1, 0), (0, 1), and (1, 1). Its
 - NCE (alternative names: RTCE, Qcurl, Nedelec, Ncurl)
 - NCF (alternative names: RTCF, Qdiv)
 - Q (alternative names: Lagrange, P)
+- Regge
 - serendipity (alternative names: S)
 - serendipity Hcurl (alternative names: Scurl, BDMCE, AAE)
 - serendipity Hdiv (alternative names: Sdiv, BDMCF, AAF)
@@ -258,6 +259,7 @@ The reference hexahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0)
 - NCE (alternative names: RTCE, Qcurl, Nedelec, Ncurl)
 - NCF (alternative names: RTCF, Qdiv)
 - Q (alternative names: Lagrange, P)
+- Regge
 - serendipity (alternative names: S)
 - serendipity Hcurl (alternative names: Scurl, BDMCE, AAE)
 - serendipity Hdiv (alternative names: Sdiv, BDMCF, AAF)
