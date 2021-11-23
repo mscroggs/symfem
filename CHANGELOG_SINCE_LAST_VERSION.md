@@ -1,1 +1,2 @@
 - Added Regge element on tensor product cells.
+- Added tensor product factorisation of Q element.
