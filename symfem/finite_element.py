@@ -3,7 +3,8 @@
 import sympy
 import warnings
 import numpy
-from .symbolic import x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float, symequal
+from itertools import product
+from .symbolic import x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float, symequal, sym_product
 from .calculus import diff
 from .vectors import vsub
 from .basis_function import ElementBasisFunction
@@ -13,8 +14,8 @@ from .legendre import evaluate_legendre_basis, get_legendre_basis
 class NoTensorProduct(BaseException):
     """Error for element without a tensor representation."""
 
-    def __str__(self):
-        return "This element does not have a tensor product representation."
+    def __init__(self):
+        super().__init__("This element does not have a tensor product representation.")
 
 
 class FiniteElement:
@@ -33,7 +34,7 @@ class FiniteElement:
         """Get the numbers of the DOFs associated with the given entity."""
         raise NotImplementedError()
 
-    def get_basis_functions(self, reshape=True, symbolic=True):
+    def get_basis_functions(self, reshape=True, symbolic=True, use_tensor_factorisation=False):
         """Get the basis functions of the element."""
         raise NotImplementedError()
 
@@ -219,6 +220,20 @@ class FiniteElement:
         """Get the representation of the element as a tensor product."""
         raise NoTensorProduct()
 
+    def _get_basis_functions_tensor(self):
+        """Compute the basis functions using the space's tensor product factorisation."""
+        factorisation = self.get_tensor_factorisation()
+        basis = {}
+        for t_type, factors, perm in factorisation:
+            if t_type == "scalar":
+                tensor_bases = [[subs(i, x[0], x_i) for i in f.get_basis_functions()]
+                                for x_i, f in zip(x, factors)]
+                for p, k in zip(perm, product(*tensor_bases)):
+                    basis[p] = sym_product(k)
+            else:
+                raise ValueError(f"Unknown tensor product type: {t_type}")
+        return [basis[i] for i in range(len(basis))]
+
     @property
     def name(self):
         """Get the name of the element."""
@@ -375,26 +390,29 @@ class CiarletElement(FiniteElement):
         """Return the kwargs used to create this element."""
         return {}
 
-    def get_basis_functions(self, reshape=True):
+    def get_basis_functions(self, reshape=True, symbolic=True, use_tensor_factorisation=False):
         """Get the basis functions of the element."""
         if self._basis_functions is None:
-            minv = self.get_dual_matrix().inv("LU")
-            self._basis_functions = []
-            if self.range_dim == 1:
-                # Scalar space
-                for i, dof in enumerate(self.dofs):
-                    self._basis_functions.append(
-                        sym_sum(c * d for c, d in zip(
-                            minv.row(i),
-                            self.get_polynomial_basis())))
+            if use_tensor_factorisation:
+                self._basis_functions = self._get_basis_functions_tensor()
             else:
-                # Vector space
-                for i, dof in enumerate(self.dofs):
-                    b = [0 for i in range(self.range_dim)]
-                    for c, d in zip(minv.row(i), self.get_polynomial_basis()):
-                        for j, d_j in enumerate(d):
-                            b[j] += c * d_j
-                    self._basis_functions.append(b)
+                minv = self.get_dual_matrix().inv("LU")
+                self._basis_functions = []
+                if self.range_dim == 1:
+                    # Scalar space
+                    for i, dof in enumerate(self.dofs):
+                        self._basis_functions.append(
+                            sym_sum(c * d for c, d in zip(
+                                minv.row(i),
+                                self.get_polynomial_basis())))
+                else:
+                    # Vector space
+                    for i, dof in enumerate(self.dofs):
+                        b = [0 for i in range(self.range_dim)]
+                        for c, d in zip(minv.row(i), self.get_polynomial_basis()):
+                            for j, d_j in enumerate(d):
+                                b[j] += c * d_j
+                        self._basis_functions.append(b)
 
         if reshape and self.range_shape is not None:
             if len(self.range_shape) != 2:
@@ -507,8 +525,11 @@ class DirectElement(FiniteElement):
         """Get the numbers of the DOFs associated with the given entity."""
         return [i for i, j in enumerate(self._basis_entities) if j == (entity_dim, entity_number)]
 
-    def get_basis_functions(self, reshape=True):
+    def get_basis_functions(self, reshape=True, symbolic=True, use_tensor_factorisation=False):
         """Get the basis functions of the element."""
+        if use_tensor_factorisation:
+            return self._get_basis_functions_tensor()
+
         if reshape and self.range_shape is not None:
             if len(self.range_shape) != 2:
                 raise NotImplementedError

@@ -1,9 +1,8 @@
 import pytest
 import symfem
 import sympy
-from itertools import product
 from symfem import create_element
-from symfem.symbolic import subs, x, symequal, sym_product
+from symfem.symbolic import symequal
 from .utils import test_elements
 
 
@@ -52,21 +51,10 @@ def test_element(
 
     element = create_element(cell_type, element_type, order, **kwargs)
     try:
-        factorisation = element.get_tensor_factorisation()
+        factorised_basis = element._get_basis_functions_tensor()
     except symfem.finite_element.NoTensorProduct:
         pytest.skip("This element does not have a tensor product representation.")
-
     basis = element.get_basis_functions()
-
-    factorised_basis = [None for i in basis]
-    for t_type, factors, perm in factorisation:
-        if t_type == "scalar":
-            tensor_bases = [[subs(i, x[0], x_i) for i in f.get_basis_functions()]
-                            for x_i, f in zip(x, factors)]
-            for p, k in zip(perm, product(*tensor_bases)):
-                factorised_basis[p] = sym_product(k)
-        else:
-            raise ValueError(f"Unknown tensor product type: {t_type}")
 
     for i, j in zip(basis, factorised_basis):
         assert symequal(i, j)
