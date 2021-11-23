@@ -48,7 +48,6 @@ def to_float(a):
 
 
 def make_lattice(cell, N=3):
-    import numpy as np
     if cell == "interval":
         return np.array([[i / N] for i in range(N + 1)])
     if cell == "triangle":

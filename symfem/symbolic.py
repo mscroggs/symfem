@@ -205,6 +205,14 @@ def sym_sum(ls):
     return out
 
 
+def sym_product(ls):
+    """Symbolically computes the sum of a list."""
+    out = to_sympy(1)
+    for i in ls:
+        out *= i
+    return out
+
+
 class PiecewiseFunction:
     """A function defined piecewise on a collection of triangles."""
 

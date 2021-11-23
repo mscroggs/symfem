@@ -48,6 +48,42 @@ class Q(CiarletElement):
             1)
         self.variant = variant
 
+    def get_tensor_factorisation(self):
+        """Get the representation of the element as a tensor product."""
+        from symfem import create_element
+        interval_q = create_element("interval", "Lagrange", self.order)
+
+        if self.order == 0:
+            perm = [0]
+        elif self.reference.name == "quadrilateral":
+            n = self.order - 1
+            perm = [0, 2] + [4 + n + i for i in range(n)]
+            perm += [1, 3] + [4 + 2 * n + i for i in range(n)]
+            for i in range(n):
+                perm += [4 + i, 4 + 3 * n + i] + [4 + i + (4 + j) * n for j in range(n)]
+        elif self.reference.name == "hexahedron":
+            n = self.order - 1
+            perm = [0, 4] + [8 + 2 * n + i for i in range(n)]
+            perm += [2, 6] + [8 + 6 * n + i for i in range(n)]
+            for i in range(n):
+                perm += [8 + n + i, 8 + 9 * n + i]
+                perm += [8 + 12 * n + 2 * n ** 2 + i + n * j for j in range(n)]
+            perm += [1, 5] + [8 + 4 * n + i for i in range(n)]
+            perm += [3, 7] + [8 + 7 * n + i for i in range(n)]
+            for i in range(n):
+                perm += [8 + 3 * n + i, 8 + 10 * n + i]
+                perm += [8 + 12 * n + 3 * n ** 2 + i + n * j for j in range(n)]
+            for i in range(n):
+                perm += [8 + i, 8 + 8 * n + i]
+                perm += [8 + 12 * n + n ** 2 + i + n * j for j in range(n)]
+                perm += [8 + 5 * n + i, 8 + 11 * n + i]
+                perm += [8 + 12 * n + 4 * n ** 2 + i + n * j for j in range(n)]
+                for j in range(n):
+                    perm += [8 + 12 * n + i + n * j, 8 + 12 * n + 5 * n ** 5 + i + n * j]
+                    perm += [8 + 12 * n + 6 * n ** 2 + i + n * j + n ** 2 * k for k in range(n)]
+
+        return [("scalar", [interval_q for i in range(self.reference.tdim)], perm)]
+
     def init_kwargs(self):
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
