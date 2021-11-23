@@ -10,6 +10,13 @@ from .basis_function import ElementBasisFunction
 from .legendre import evaluate_legendre_basis, get_legendre_basis
 
 
+class NoTensorProduct(BaseException):
+    """Error for element without a tensor representation."""
+
+    def __str__(self):
+        return "This element does not have a tensor product representation."
+
+
 class FiniteElement:
     """Abstract finite element."""
 
@@ -207,6 +214,10 @@ class FiniteElement:
                     raise ValueError(f"Unknown continuity: {continuity}")
 
                 assert symequal(f, g)
+
+    def get_tensor_factorisation(self):
+        """Get the representation of the element as a tensor product."""
+        raise NoTensorProduct()
 
     @property
     def name(self):
