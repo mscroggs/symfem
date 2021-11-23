@@ -82,7 +82,8 @@ class Q(CiarletElement):
                     perm += [8 + 12 * n + i + n * j, 8 + 12 * n + 5 * n ** 5 + i + n * j]
                     perm += [8 + 12 * n + 6 * n ** 2 + i + n * j + n ** 2 * k for k in range(n)]
 
-        return [("scalar", [interval_q for i in range(self.reference.tdim)], perm)]
+        mult = [1 for i in perm]
+        return [("scalar", [interval_q for i in range(self.reference.tdim)], 1)], perm, mult
 
     def init_kwargs(self):
         """Return the kwargs used to create this element."""
@@ -157,6 +158,20 @@ class Nedelec(CiarletElement):
     continuity = "H(curl)"
 
 
+class QFactor(CiarletElement):
+    """An element used in the tensor product representation of Raviart-Thomas."""
+    def __init__(self, order, variant="equispaced"):
+        from symfem import create_reference
+        reference = create_reference("interval")
+        poly = quolynomial_set(1, 1, order)
+        dofs = make_integral_moment_dofs(
+            reference,
+            cells=(IntegralMoment, Q, order, {"variant": variant}),
+        )
+
+        super().__init__(reference, order, poly, dofs, 1, 1)
+
+
 class RaviartThomas(CiarletElement):
     """Raviart-Thomas Hdiv finite element."""
 
@@ -176,6 +191,37 @@ class RaviartThomas(CiarletElement):
     def init_kwargs(self):
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
+
+    def get_tensor_factorisation(self):
+        """Get the representation of the element as a tensor product."""
+        from ..finite_element import NoTensorProduct
+        from symfem import create_element
+
+        if self.reference.name != "quadrilateral":
+            raise NoTensorProduct()
+
+        interval_q = create_element("interval", "serendipity", self.order)
+        interval_q_lower = QFactor(self.order - 1)
+
+        """n = self.order - 1
+        perm = [0, 2] + [4 + n + i for i in range(n)]
+        perm += [1, 3] + [4 + 2 * n + i for i in range(n)]
+        for i in range(n):
+            perm += [4 + i, 4 + 3 * n + i] + [4 + i + (4 + j) * n for j in range(n)]"""
+        perm = list(range(self.order * (self.order + 1) * 2))
+
+        mult = [-1 if i < 2 * self.order else 1 for i, _ in enumerate(perm)]
+
+        if self.order == 1:
+            perm = [1, 2, 0, 3]
+        if self.order == 2:
+            perm = [2, 3, 4, 5, 8, 11, 0, 6, 9, 1, 7, 10]
+        if self.order == 3:
+            perm = [3, 5, 4, 6, 8, 7, 12, 18, 21, 13, 19, 22,
+                    0, 9, 14, 15, 1, 10, 20, 23, 2, 11, 16, 17]
+
+        return [("vector 0", [interval_q, interval_q_lower]),
+                ("vector 1", [interval_q_lower, interval_q])], perm, mult
 
     names = ["NCF", "RTCF", "Qdiv"]
     references = ["quadrilateral", "hexahedron"]

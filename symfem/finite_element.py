@@ -222,14 +222,22 @@ class FiniteElement:
 
     def _get_basis_functions_tensor(self):
         """Compute the basis functions using the space's tensor product factorisation."""
-        factorisation = self.get_tensor_factorisation()
+        factorisation, perm, mult = self.get_tensor_factorisation()
         basis = {}
-        for t_type, factors, perm in factorisation:
+        for t_type, factors in factorisation:
+            offset = len(basis)
+            tensor_bases = [[subs(i, x[0], x_i) for i in f.get_basis_functions()]
+                            for x_i, f in zip(x, factors)]
             if t_type == "scalar":
-                tensor_bases = [[subs(i, x[0], x_i) for i in f.get_basis_functions()]
-                                for x_i, f in zip(x, factors)]
-                for p, k in zip(perm, product(*tensor_bases)):
-                    basis[p] = sym_product(k)
+                assert self.range_dim == 0
+                for p, m, k in zip(perm[offset:], mult[offset:], product(*tensor_bases)):
+                    basis[p] = m * sym_product(k)
+            elif t_type.startswith("vector"):
+                component = int(t_type[6:])
+                assert self.range_shape is None and component < self.range_dim
+                for p, m, k in zip(perm[offset:], mult[offset:], product(*tensor_bases)):
+                    basis[p] = [m * sym_product(k) if i == component else 0
+                                for i in range(self.range_dim)]
             else:
                 raise ValueError(f"Unknown tensor product type: {t_type}")
         return [basis[i] for i in range(len(basis))]
