@@ -122,6 +122,7 @@ test_elements = {
         "TNTcurl": [[{"variant": "equispaced"}, range(1, 4)]],
         "TNTdiv": [[{"variant": "equispaced"}, range(1, 4)]],
         "Regge": [[{"variant": "integral"}, range(3)]],
+        "ABF": [[{}, range(3)]],
     },
     "hexahedron": {
         "bubble": [[{"variant": "equispaced"}, range(2, 4)], [{"variant": "lobatto"}, range(2, 4)]],

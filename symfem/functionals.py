@@ -301,6 +301,41 @@ class IntegralAgainst(BaseFunctional):
     name = "Integral against"
 
 
+class IntegralOfDivergenceAgainst(BaseFunctional):
+    """An integral of the divergence against a function."""
+
+    def __init__(self, reference, f, entity=(None, None), mapping="identity"):
+        super().__init__(entity, mapping)
+        self.reference = reference
+
+        if isinstance(f, BasisFunction):
+            f = f.get_function()
+        self.f = subs(f, x, t)
+
+    def dof_point(self):
+        """Get the location of the DOF in the cell."""
+        return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.reference.vertices))
+
+    def eval(self, function, symbolic=True):
+        """Apply to the functional to a function."""
+        point = [i for i in self.reference.origin]
+        for i, a in enumerate(zip(*self.reference.axes)):
+            for j, k in zip(a, t):
+                point[i] += j * k
+        integrand = self.dot(subs(div(function), x, point))
+        value = self.reference.integral(integrand)
+        if symbolic:
+            return value
+        else:
+            return to_float(value)
+
+    def dot(self, function):
+        """Dot a function with the moment function."""
+        return function * self.f
+
+    name = "Integral of divergence against"
+
+
 class IntegralOfDirectionalMultiderivative(BaseFunctional):
     """An integral of a directional derivative of a scalar function."""
 

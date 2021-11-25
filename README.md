@@ -197,6 +197,7 @@ The reference quadrilateral has vertices (0, 0), (1, 0), (0, 1), and (1, 1). Its
 ![The numbering of a reference quadrilateral](img/quadrilateral_numbering.png)
 
 ### List of supported elements
+- Arnold-Boffi-Falk (alternative names: ABF)
 - Bogner-Fox-Schmit (alternative names: BFS)
 - Brezzi-Douglas-Fortin-Marini (alternative names: BDFM)
 - bubble

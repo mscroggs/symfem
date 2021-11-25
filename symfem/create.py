@@ -165,7 +165,8 @@ def create_element(cell_type, element_type, order, **kwargs):
         TSdiv, trimmed serendipity Hdiv,
         TNT, tiniest tensor,
         TNTcurl, tiniest tensor Hcurl,
-        TNTdiv, tiniest tensor Hdiv
+        TNTdiv, tiniest tensor Hdiv,
+        Arnold-Boffi-Falk, ABF
     order : int
         The order of the element.
     """
