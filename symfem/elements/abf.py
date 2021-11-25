@@ -4,13 +4,10 @@ Thse elements definitions appear in 10.1137/S0036142903431924
 (Arnold, Boffi, Falk, 2005)
 """
 
-import sympy
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set
 from ..functionals import NormalIntegralMoment, IntegralMoment, IntegralOfDivergenceAgainst
 from ..moments import make_integral_moment_dofs
 from ..symbolic import x
-from ..calculus import diff
 from .lagrange import Lagrange
 from .q import Nedelec
 
@@ -23,7 +20,7 @@ class ArnoldBoffiFalk(CiarletElement):
         poly = [(x[0] ** i * x[1] ** j, 0)
                 for i in range(order + 3) for j in range(order + 1)]
         poly += [(0, x[0] ** i * x[1] ** j)
-                for i in range(order + 1) for j in range(order + 3)]
+                 for i in range(order + 1) for j in range(order + 3)]
 
         dofs = make_integral_moment_dofs(
             reference,
