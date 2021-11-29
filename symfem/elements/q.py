@@ -79,7 +79,7 @@ class Q(CiarletElement):
                 perm += [8 + 5 * n + i, 8 + 11 * n + i]
                 perm += [8 + 12 * n + 4 * n ** 2 + i + n * j for j in range(n)]
                 for j in range(n):
-                    perm += [8 + 12 * n + i + n * j, 8 + 12 * n + 5 * n ** 5 + i + n * j]
+                    perm += [8 + 12 * n + i + n * j, 8 + 12 * n + 5 * n ** 2 + i + n * j]
                     perm += [8 + 12 * n + 6 * n ** 2 + i + n * j + n ** 2 * k for k in range(n)]
 
         return [("scalar", [interval_q for i in range(self.reference.tdim)], perm)]
