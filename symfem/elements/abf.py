@@ -1,6 +1,6 @@
 """Arnold-Boffi-Falk elements on quadrilaterals.
 
-Thse elements definitions appear in 10.1137/S0036142903431924
+Thse elements definitions appear in https://dx.doi.org/10.1137/S0036142903431924
 (Arnold, Boffi, Falk, 2005)
 """
 
