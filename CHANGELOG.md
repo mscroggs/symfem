@@ -1,3 +1,10 @@
+# Version 2021.12.1 (01 December 2021)
+
+- Added Regge element on tensor product cells.
+- Added tensor product factorisation of Q element.
+- Added Arnold-Boffi-Falk element
+- Added Arbogast-Correa element
+
 # Version 2021.10.1 (19 October 2021)
 
 - Removed discontinuous elements.
