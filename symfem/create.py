@@ -166,7 +166,8 @@ def create_element(cell_type, element_type, order, **kwargs):
         TNT, tiniest tensor,
         TNTcurl, tiniest tensor Hcurl,
         TNTdiv, tiniest tensor Hdiv,
-        Arnold-Boffi-Falk, ABF
+        Arnold-Boffi-Falk, ABF,
+        Arbogast-Correa, AC, AC full, Arbogast-Correa full
     order : int
         The order of the element.
     """
