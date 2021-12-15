@@ -19,14 +19,14 @@ from ..references import Interval
 from .q import Q
 
 
-def P(k, v):
+def p(k, v):
     """Return the kth Legendre polynomial."""
     return subs(
         get_legendre_basis([x[0] ** i for i in range(k + 1)], Interval())[-1],
         x[0], v)
 
 
-def B(k, v):
+def b(k, v):
     """
     Return the function B_k.
 
@@ -35,7 +35,7 @@ def B(k, v):
     """
     if k == 1:
         return 0
-    return (P(k, v) - P(k - 2, v)) / (4 + k - 2)
+    return (p(k, v) - p(k - 2, v)) / (4 + k - 2)
 
 
 class TNT(CiarletElement):
@@ -45,16 +45,16 @@ class TNT(CiarletElement):
         poly = quolynomial_set(reference.tdim, 1, order)
         if reference.tdim == 2:
             for i in range(2):
-                vars = [x[j] for j in range(2) if j != i]
-                for f in [1 - vars[0], vars[0]]:
-                    poly.append(f * B(order + 1, x[i]))
+                variables = [x[j] for j in range(2) if j != i]
+                for f in [1 - variables[0], variables[0]]:
+                    poly.append(f * b(order + 1, x[i]))
 
         elif reference.tdim == 3:
             for i in range(3):
-                vars = [x[j] for j in range(3) if j != i]
-                for f0 in [1 - vars[0], vars[0]]:
-                    for f1 in [1 - vars[1], vars[1]]:
-                        poly.append(f0 * f1 * B(order + 1, x[i]))
+                variables = [x[j] for j in range(3) if j != i]
+                for f0 in [1 - variables[0], variables[0]]:
+                    for f1 in [1 - variables[1], variables[1]]:
+                        poly.append(f0 * f1 * b(order + 1, x[i]))
 
         dofs = []
         for i, v in enumerate(reference.vertices):
@@ -109,24 +109,24 @@ class TNTcurl(CiarletElement):
             for i in product([0, 1], repeat=2):
                 if sum(i) != 0:
                     poly.append([j.expand() for j in [
-                        P(order, i[0] * x[0]) * B(order + 1, i[1] * x[1]),
-                        -B(order + 1, i[0] * x[0]) * P(order, i[1] * x[1]),
+                        p(order, i[0] * x[0]) * b(order + 1, i[1] * x[1]),
+                        -b(order + 1, i[0] * x[0]) * p(order, i[1] * x[1]),
                     ]])
         else:
             face_poly = []
             for i in product([0, 1], repeat=2):
                 if sum(i) != 0:
                     face_poly.append([j.expand() for j in [
-                        B(order + 1, i[0] * t[0]) * P(order, i[1] * t[1]),
-                        P(order, i[0] * t[0]) * B(order + 1, i[1] * t[1]),
+                        b(order + 1, i[0] * t[0]) * p(order, i[1] * t[1]),
+                        p(order, i[0] * t[0]) * b(order + 1, i[1] * t[1]),
                     ]])
             for lamb_n in [(x[0], 0, 0), (1 - x[0], 0, 0),
                            (0, x[1], 0), (0, 1 - x[1], 0),
                            (0, 0, x[2]), (0, 0, 1 - x[2])]:
-                vars = tuple(i for i, j in enumerate(lamb_n) if j == 0)
+                variables = tuple(i for i, j in enumerate(lamb_n) if j == 0)
                 poly += [vcross(lamb_n, [
-                    subs(p[0], t[:2], [x[j] for j in vars]) if i == vars[0]
-                    else (subs(p[1], t[:2], [x[j] for j in vars]) if i == vars[1] else 0)
+                    subs(p[0], t[:2], [x[j] for j in variables]) if i == variables[0]
+                    else (subs(p[1], t[:2], [x[j] for j in variables]) if i == variables[1] else 0)
                     for i in range(3)
                 ]) for p in face_poly]
 
@@ -213,16 +213,16 @@ class TNTdiv(CiarletElement):
             for i in product([0, 1], repeat=2):
                 if sum(i) != 0:
                     poly.append([j.expand() for j in [
-                        B(order + 1, i[0] * x[0]) * P(order, i[1] * x[1]),
-                        P(order, i[0] * x[0]) * B(order + 1, i[1] * x[1]),
+                        b(order + 1, i[0] * x[0]) * p(order, i[1] * x[1]),
+                        p(order, i[0] * x[0]) * b(order + 1, i[1] * x[1]),
                     ]])
         else:
             for i in product([0, 1], repeat=3):
                 if sum(i) != 0:
                     poly.append([
-                        B(order + 1, i[0] * x[0]) * P(order, i[1] * x[1]) * P(order, i[2] * x[2]),
-                        P(order, i[0] * x[0]) * B(order + 1, i[1] * x[1]) * P(order, i[2] * x[2]),
-                        P(order, i[0] * x[0]) * P(order, i[1] * x[1]) * B(order + 1, i[2] * x[2]),
+                        b(order + 1, i[0] * x[0]) * p(order, i[1] * x[1]) * p(order, i[2] * x[2]),
+                        p(order, i[0] * x[0]) * b(order + 1, i[1] * x[1]) * p(order, i[2] * x[2]),
+                        p(order, i[0] * x[0]) * p(order, i[1] * x[1]) * b(order + 1, i[2] * x[2]),
                     ])
 
         dofs = []

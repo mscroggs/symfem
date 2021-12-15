@@ -23,8 +23,8 @@ class Argyris(CiarletElement):
         for v_n, vs in enumerate(reference.vertices):
             dofs.append(PointEvaluation(vs, entity=(0, v_n)))
             for i in range(reference.tdim):
-                dir = tuple(1 if i == j else 0 for j in range(reference.tdim))
-                dofs.append(PointDirectionalDerivativeEvaluation(vs, dir, entity=(0, v_n)))
+                direction = tuple(1 if i == j else 0 for j in range(reference.tdim))
+                dofs.append(PointDirectionalDerivativeEvaluation(vs, direction, entity=(0, v_n)))
             for i in range(reference.tdim):
                 for j in range(i + 1):
                     dofs.append(PointComponentSecondDerivativeEvaluation(
