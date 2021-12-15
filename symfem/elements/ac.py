@@ -1,6 +1,6 @@
 """Arbogast-Correa elements on quadrilaterals.
 
-This element's definition appears in https://epubs.siam.org/doi/10.1137/15M1013705
+This element's definition appears in https://dx.doi.org/10.1137/15M1013705
 (Arbogast, Correa, 2016)
 """
 
