@@ -73,7 +73,6 @@ class BernardiRaugel(CiarletElement):
             p = Lagrange(reference, 0, variant="equispaced")
 
             for i in range(3):
-                d = tuple(1 if j == i else 0 for j in range(reference.tdim))
                 dofs.append(DivergenceIntegralMoment(
                     reference, x[i], p.dofs[0], entity=(3, 0),
                     mapping="contravariant"

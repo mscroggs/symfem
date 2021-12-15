@@ -11,7 +11,7 @@ from .basis_function import ElementBasisFunction
 from .legendre import evaluate_legendre_basis, get_legendre_basis
 
 
-class NoTensorProduct(BaseException):
+class NoTensorProduct(Exception):
     """Error for element without a tensor representation."""
 
     def __init__(self):
@@ -179,7 +179,7 @@ class FiniteElement:
                         f += deriv_f
                         deriv_g = [diff(d, i) for d in deriv_g for i in x[:self.reference.tdim]]
                         g += deriv_g
-                elif continuity == "H(div)":
+                elif continuity == "H(div)" or continuity == "inner H(div)":
                     f = f[0]
                     g = g[0]
                 elif continuity == "H(curl)":
@@ -205,9 +205,6 @@ class FiniteElement:
                             assert dim == 2
                             f = [f[4], f[8]]
                             g = [g[4], g[8]]
-                elif continuity == "inner H(div)":
-                    f = f[0]
-                    g = g[0]
                 elif continuity == "integral inner H(div)":
                     f = f[0].integrate((to_sympy(x[1]), 0, 1))
                     g = g[0].integrate((to_sympy(x[1]), 0, 1))
@@ -424,30 +421,29 @@ class CiarletElement(FiniteElement):
 
         return self._basis_functions
 
-    def map_to_cell(self, vertices, basis=None, map=None, inverse_map=None):
+    def map_to_cell(self, vertices, basis=None, forward_map=None, inverse_map=None):
         """Map the basis onto a cell using the appropriate mapping for the element."""
         if basis is None:
             basis = self.get_basis_functions()
-        if map is None:
-            map = self.reference.get_map_to(vertices)
+        if forward_map is None:
+            forward_map = self.reference.get_map_to(vertices)
         if inverse_map is None:
             inverse_map = self.reference.get_inverse_map_to(vertices)
 
         if isinstance(basis[0], PiecewiseFunction):
             pieces = [[] for i in basis]
             for i, j in enumerate(basis[0].pieces):
-                new_i = [subs(map, x, k) for k in j[0]]
+                new_i = [subs(forward_map, x, k) for k in j[0]]
                 for k, f in enumerate(self.map_to_cell(vertices, [b.pieces[i][1] for b in basis])):
                     pieces[k].append((new_i, f))
             return [PiecewiseFunction(p) for p in pieces]
 
         if isinstance(basis[0], (list, tuple)) and isinstance(basis[0][0], PiecewiseFunction):
             for b in basis:
-                pieces = [[] for f in b]
                 for f in b:
                     for i, j in enumerate(f.pieces):
                         assert j[0] == basis[0][0].pieces[i][0]
-            new_tris = [[subs(map, x, k) for k in p[0]] for p in basis[0][0].pieces]
+            new_tris = [[subs(forward_map, x, k) for k in p[0]] for p in basis[0][0].pieces]
             output_pieces = []
             for p in range(len(basis[0][0].pieces)):
                 piece_basis = []
@@ -456,7 +452,7 @@ class CiarletElement(FiniteElement):
                         f.pieces[p][1] for f in b
                     ])
                 output_pieces.append(self.map_to_cell(
-                    vertices, piece_basis, map, inverse_map))
+                    vertices, piece_basis, forward_map, inverse_map))
 
             return [PiecewiseFunction(list(zip(new_tris, fs)))
                     for fs in zip(*output_pieces)]
@@ -475,7 +471,7 @@ class CiarletElement(FiniteElement):
                 for ds in dofs_by_type.values():
                     mapped_dofs = self.dofs[ds[0]].perform_mapping(
                         [basis[d] for d in ds],
-                        map, inverse_map, self.reference.tdim)
+                        forward_map, inverse_map, self.reference.tdim)
                     for d_n, d in zip(ds, mapped_dofs):
                         out[d_n] = d
 

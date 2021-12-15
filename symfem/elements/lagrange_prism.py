@@ -105,7 +105,6 @@ class VectorLagrange(CiarletElement):
         return {"variant": self.variant}
 
     names = []
-    # names = ["vector Lagrange", "vP"]
     references = ["prism"]
     min_order = 0
     continuity = "C0"

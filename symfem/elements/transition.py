@@ -65,7 +65,7 @@ class Transition(CiarletElement):
                             if i in reference.edges[e_n]:
                                 bubble *= f
                     space = Lagrange(entity, entity_order - edim - 1, variant=variant)
-                    vars = []
+                    variables = []
                     origin = entity.vertices[0]
                     used = []
                     for p in entity.vertices[1:]:
@@ -73,8 +73,8 @@ class Transition(CiarletElement):
                         while p[i] == origin[i] or origin[i] == 1 or i in used:
                             i += 1
                         used.append(i)
-                        vars.append(origin[i] + (p[i] - origin[i]) * x[i])
-                    poly += [subs(f, x, vars) * bubble for f in space.get_basis_functions()]
+                        variables.append(origin[i] + (p[i] - origin[i]) * x[i])
+                    poly += [subs(f, x, variables) * bubble for f in space.get_basis_functions()]
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1
