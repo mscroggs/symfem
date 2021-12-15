@@ -23,11 +23,11 @@ class DualCiarletElement(CiarletElement):
         """Get the polynomial basis for the element."""
         raise ValueError("Polynomial basis not supported for barycentric dual elements.")
 
-    def get_dual_matrix(self, use_legendre=False):
+    def get_dual_matrix(self, symbolic=True, use_legendre=False):
         """Get the dual matrix."""
         raise ValueError("Dual matrix not supported for barycentric dual elements.")
 
-    def get_basis_functions(self, reshape=True, use_tensor_factorisation=False):
+    def get_basis_functions(self, reshape=True, symbolic=True, use_tensor_factorisation=False):
         """Get the basis functions of the element."""
         assert not use_tensor_factorisation
 
