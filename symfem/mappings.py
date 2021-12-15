@@ -24,7 +24,8 @@ def identity(f, map, inverse_map, tdim):
 def covariant(f, map, inverse_map, tdim):
     """Map H(curl) functions."""
     g = subs(f, x, inverse_map)
-    j_inv = sympy.Matrix([[diff(i, x[j]) for j in range(len(map))] for i in inverse_map]).transpose()
+    j_inv = sympy.Matrix([[diff(i, x[j]) for j in range(len(map))]
+                          for i in inverse_map]).transpose()
     return tuple(vdot(j_inv.row(i), g) for i in range(j_inv.rows))
 
 
@@ -39,7 +40,8 @@ def contravariant(f, map, inverse_map, tdim):
 def double_covariant(f, map, inverse_map, tdim):
     """Map matrix functions."""
     g = subs(f, x, inverse_map)
-    j_inv = sympy.Matrix([[diff(i, x[j]) for j in range(len(map))] for i in inverse_map]).transpose()
+    j_inv = sympy.Matrix([[diff(i, x[j]) for j in range(len(map))]
+                          for i in inverse_map]).transpose()
 
     g_mat = sympy.Matrix([g[i * tdim: (i + 1) * tdim] for i in range(tdim)])
     out = j_inv * g_mat * j_inv.transpose()

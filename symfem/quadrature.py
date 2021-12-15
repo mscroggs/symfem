@@ -63,7 +63,7 @@ def lobatto(n):
                  (124 + 7 * sympy.sqrt(15)) / 700,
                  (124 - 7 * sympy.sqrt(15)) / 700,
                  sympy.Rational(1, 42)])
-    raise notImplementedError()
+    raise NotImplementedError()
 
 
 def radau(n):
