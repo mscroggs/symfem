@@ -6,7 +6,7 @@
 | Testing & coverage | [![Style checks](https://github.com/mscroggs/symfem/actions/workflows/style-checks.yml/badge.svg)](https://github.com/mscroggs/symfem/actions) [![Run tests](https://github.com/mscroggs/symfem/actions/workflows/run-tests.yml/badge.svg)](https://github.com/mscroggs/symfem/actions) [![Coverage Status](https://coveralls.io/repos/github/mscroggs/symfem/badge.svg?branch=main)](https://coveralls.io/github/mscroggs/symfem?branch=main) |
 | Packages | [![PyPI](https://img.shields.io/pypi/v/symfem?color=blue&label=PyPI&logo=pypi&logoColor=white)](https://pypi.org/project/symfem/) [![conda](https://anaconda.org/conda-forge/symfem/badges/version.svg)](https://anaconda.org/conda-forge/symfem) |
 | Paper | [![DOI](https://joss.theoj.org/papers/10.21105/joss.03556/status.svg)](https://doi.org/10.21105/joss.03556) |
-| Code quality | [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mscroggs_symfem&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=mscroggs_symfem) |
+| Code quality | [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mscroggs_symfem&metric=alert_status)](https://sonarcloud.io/project/overview?id=mscroggs_symfem) |
 
 Symfem is a symbolic finite element definition library, that can be used to
 symbolically evaluate the basis functions of a finite element space. Symfem can:
