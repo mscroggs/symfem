@@ -14,6 +14,7 @@ elements = {
                  ("N1div", "Raviart-Thomas", range(1, 4), []),
                  ("N2div", "Brezzi-Douglas-Marini", range(1, 4), []),
                  ("Regge", "Regge", range(0, 4), []),
+                 # ("HHJ", "Hellan-Herrmann-Johnson", range(0, 4), []),
                  ("Crouzeix-Raviart", "Crouzeix-Raviart", [1], [])],
     "tetrahedron": [("P", "Lagrange", range(1, 4), [("LagrangeVariant", "equispaced")]),
                     ("bubble", "Bubble", range(4, 6), []),
