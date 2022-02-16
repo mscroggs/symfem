@@ -4,27 +4,25 @@ import sympy
 from itertools import product
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set
-from ..quadrature import get_quadrature
 from ..functionals import PointEvaluation, DotPointEvaluation
+from .lagrange import Lagrange
 
 
 class DPC(CiarletElement):
     """A dPc element."""
 
     def __init__(self, reference, order, variant="equispaced"):
-        if order == 0:
-            dofs = [
-                PointEvaluation(
-                    tuple(sympy.Rational(1, reference.tdim + 1) for i in range(reference.tdim)),
-                    entity=(reference.tdim, 0))]
+        if reference.name == "interval":
+            points = [d.dof_point() for d in Lagrange(reference, order, variant).dofs]
         else:
-            points, _ = get_quadrature(variant, order + 1)
+            points = [
+                tuple(sympy.Rational(j, order) for j in i[::-1])
+                for i in product(range(order + 1), repeat=reference.tdim)
+                if sum(i) <= order
+            ]
 
-            dofs = []
-            for i in product(range(order + 1), repeat=reference.tdim):
-                if sum(i) <= order:
-                    point = tuple(sympy.Rational(j, order) for j in i[::-1])
-                    dofs.append(PointEvaluation(point, entity=(reference.tdim, 0)))
+        dofs = [PointEvaluation(d, entity=(reference.tdim, 0)) for d in points]
+
         super().__init__(
             reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
