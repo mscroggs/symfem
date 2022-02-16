@@ -124,4 +124,7 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
     if len(result.shape) != len(sym_result.shape):
         sym_result = sym_result.reshape(result.shape)
 
+    if not np.allclose(result, sym_result):
+        from IPython import embed; embed()
+
     assert np.allclose(result, sym_result)
