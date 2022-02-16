@@ -1,30 +1,28 @@
 """DPC elements on tensor product cells."""
 
-import sympy
-from itertools import product
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set
-from ..quadrature import get_quadrature
 from ..functionals import PointEvaluation, DotPointEvaluation
+from .lagrange import Lagrange
 
 
 class DPC(CiarletElement):
     """A dPc element."""
 
     def __init__(self, reference, order, variant="equispaced"):
-        if order == 0:
-            dofs = [
-                PointEvaluation(
-                    tuple(sympy.Rational(1, reference.tdim + 1) for i in range(reference.tdim)),
-                    entity=(reference.tdim, 0))]
-        else:
-            points, _ = get_quadrature(variant, order + 1)
+        from symfem import create_reference
 
-            dofs = []
-            for i in product(range(order + 1), repeat=reference.tdim):
-                if sum(i) <= order:
-                    point = tuple(sympy.Rational(j, order) for j in i[::-1])
-                    dofs.append(PointEvaluation(point, entity=(reference.tdim, 0)))
+        if reference.name == "interval":
+            lag = Lagrange(reference, order, variant)
+        elif reference.name == "quadrilateral":
+            lag = Lagrange(create_reference("triangle"), order, variant)
+        elif reference.name == "hexahedron":
+            lag = Lagrange(create_reference("tetrahedron"), order, variant)
+
+        dofs = [
+            PointEvaluation(d.dof_point(), entity=(reference.tdim, 0))
+            for d in lag.dofs]
+
         super().__init__(
             reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
         )
