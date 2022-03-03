@@ -3,6 +3,7 @@
 import sympy
 import warnings
 import numpy
+import math
 from itertools import product
 from .symbolic import x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float, symequal, sym_product
 from .calculus import diff
@@ -92,8 +93,16 @@ class FiniteElement:
 
     def test(self):
         """Run tests for this element."""
-        if self.order <= 4:
+        self.test_dof_points()
+        if False or self.order <= 4:
             self.test_continuity()
+
+    def test_dof_points(self):
+        """Test that DOF points are valid."""
+        for d in self.dofs:
+            for i in d.dof_point():
+                if i is not None:
+                    assert not math.isnan(float(i))
 
     def test_continuity(self):
         """Test that this element has the correct continuity."""
