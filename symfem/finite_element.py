@@ -94,7 +94,7 @@ class FiniteElement:
     def test(self):
         """Run tests for this element."""
         self.test_dof_points()
-        if False or self.order <= 4:
+        if self.order <= 4:
             self.test_continuity()
 
     def test_dof_points(self):
