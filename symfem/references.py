@@ -158,6 +158,10 @@ class Reference:
                 return True
         return False
 
+    def contains(self, point):
+        """Check is a point is contained in the reference."""
+        raise NotImplementedError
+
 
 class Point(Reference):
     """A point."""
@@ -204,6 +208,11 @@ class Point(Reference):
     def volume(self):
         """Calculate the volume."""
         return 0
+
+    def contains(self, point):
+        """Check is a point is contained in the reference."""
+        if self.tdim == 0:
+            return point in self.vertices
 
 
 class Interval(Reference):
@@ -255,6 +264,12 @@ class Interval(Reference):
     def volume(self):
         """Calculate the volume."""
         return self.jacobian()
+
+    def contains(self, point):
+        """Check is a point is contained in the reference."""
+        if self.vertices != self.reference_vertices:
+            raise NotImplementedError
+        return 0 <= point[0] <= 1
 
 
 class Triangle(Reference):
@@ -321,6 +336,12 @@ class Triangle(Reference):
     def volume(self):
         """Calculate the volume."""
         return sympy.Rational(1, 2) * self.jacobian()
+
+    def contains(self, point):
+        """Check is a point is contained in the reference."""
+        if self.vertices != self.reference_vertices:
+            raise NotImplementedError
+        return 0 <= point[0] and 0 <= point[1] and sum(point) <= 1
 
 
 class Tetrahedron(Reference):
@@ -394,6 +415,12 @@ class Tetrahedron(Reference):
     def volume(self):
         """Calculate the volume."""
         return sympy.Rational(1, 6) * self.jacobian()
+
+    def contains(self, point):
+        """Check is a point is contained in the reference."""
+        if self.vertices != self.reference_vertices:
+            raise NotImplementedError
+        return 0 <= point[0] and 0 <= point[1] and 0 <= point[2] and sum(point) <= 1
 
 
 class Quadrilateral(Reference):
@@ -478,6 +505,12 @@ class Quadrilateral(Reference):
     def volume(self):
         """Calculate the volume."""
         return self.jacobian()
+
+    def contains(self, point):
+        """Check is a point is contained in the reference."""
+        if self.vertices != self.reference_vertices:
+            raise NotImplementedError
+        return 0 <= point[0] <= 1 and 0 <= point[1] <= 1
 
 
 class Hexahedron(Reference):
@@ -573,6 +606,12 @@ class Hexahedron(Reference):
         """Calculate the volume."""
         return self.jacobian()
 
+    def contains(self, point):
+        """Check is a point is contained in the reference."""
+        if self.vertices != self.reference_vertices:
+            raise NotImplementedError
+        return 0 <= point[0] <= 1 and 0 <= point[1] <= 1 and 0 <= point[2] <= 1
+
 
 class Prism(Reference):
     """A (triangular) prism."""
@@ -665,6 +704,13 @@ class Prism(Reference):
     def volume(self):
         """Calculate the volume."""
         return sympy.Rational(1, 2) * self.jacobian()
+
+    def contains(self, point):
+        """Check is a point is contained in the reference."""
+        if self.vertices != self.reference_vertices:
+            raise NotImplementedError
+        return (point[0] >= 0 and point[1] >= 0 and point[2] >= 0
+                and point[2] <= 1 and point[0] + point[1] <= 1)
 
 
 class Pyramid(Reference):
@@ -762,6 +808,13 @@ class Pyramid(Reference):
     def volume(self):
         """Calculate the volume."""
         return sympy.Rational(1, 3) * self.jacobian()
+
+    def contains(self, point):
+        """Check is a point is contained in the reference."""
+        if self.vertices != self.reference_vertices:
+            raise NotImplementedError
+        return (point[0] >= 0 and point[1] >= 0 and point[2] >= 0
+                and point[0] + point[2] <= 1 and point[1] + point[2] <= 1)
 
 
 class DualPolygon(Reference):
