@@ -15,7 +15,7 @@ class DPC(CiarletElement):
         if reference.name == "interval":
             points = [d.dof_point() for d in Lagrange(reference, order, variant).dofs]
         elif order == 0:
-            points = [tuple(sympy.Rational(1, 2) for i in range(reference.tdim))]
+            points = [tuple(sympy.Rational(1, 2) for _ in range(reference.tdim))]
         else:
             points = [
                 tuple(sympy.Rational(j, order) for j in i[::-1])
