@@ -54,10 +54,9 @@ class Regge(CiarletElement):
             basis = [subs(f, x, t) for f in space.get_basis_functions()]
             for e_n, vs in enumerate(reference.sub_entities(1)):
                 edge = reference.sub_entity(1, e_n)
-                edge_space = Lagrange(edge, order, "equispaced")
                 tangent = [(b - a) / edge.jacobian()
                            for a, b in zip(edge.vertices[0], edge.vertices[1])]
-                for f, dof in zip(basis, edge_space.dofs):
+                for f, dof in zip(basis, space.dofs):
                     dofs.append(InnerProductIntegralMoment(
                         edge, f, tangent, tangent, dof, entity=(1, e_n),
                         mapping="double_covariant"))

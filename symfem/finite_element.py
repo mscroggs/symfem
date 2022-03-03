@@ -93,16 +93,8 @@ class FiniteElement:
 
     def test(self):
         """Run tests for this element."""
-        self.test_dof_points()
         if self.order <= 4:
             self.test_continuity()
-
-    def test_dof_points(self):
-        """Test that DOF points are valid."""
-        for d in self.dofs:
-            for i in d.dof_point():
-                if i is not None:
-                    assert not math.isnan(float(i))
 
     def test_continuity(self):
         """Test that this element has the correct continuity."""
@@ -493,6 +485,22 @@ class CiarletElement(FiniteElement):
         super().test()
         self.test_functional_entities()
         self.test_functionals()
+        self.test_dof_points()
+
+    def test_dof_points(self):
+        """Test that DOF points are valid."""
+        for d in self.dofs:
+            p = d.dof_point()
+            print(p)
+            print(self.reference.gdim)
+            assert len(p) == self.reference.gdim
+            for i in p:
+                if i is None:
+                    break
+                else:
+                    assert not math.isnan(float(i))
+            else:
+                assert self.reference.contains(p)
 
     def test_functional_entities(self):
         """Test that the dof entities are valid and match the references of integrals."""
