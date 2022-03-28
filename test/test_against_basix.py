@@ -94,6 +94,9 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
     if speed == "fast" and order > 2:
         pytest.skip()
 
+    if symfem_type in ["Sdiv", "Scurl"]:
+        pytest.xfail("Basix elements cannot yet be provided equispaced variant")
+
     if has_basix:
         import basix
     else:
