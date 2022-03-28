@@ -29,7 +29,8 @@ for triangle in triangles:
     for test_i, test_f in zip(triangle, basis):
         for trial_i, trial_f in zip(triangle, basis):
             # Compute the integral of grad(u)-dot-grad(v) for each pair of basis
-            # functions u and v
+            # functions u and v. The second input (x) into `ref.integral` tells
+            # symfem which variables to use in the integral.
             integrand = vdot(grad(test_f, 2), grad(trial_f, 2))
             print(integrand)
             matrix[test_i][trial_i] += ref.integral(integrand, x)
