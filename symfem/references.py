@@ -25,7 +25,7 @@ class Reference:
         return tuple(o + sym_sum(a[i] * b for a, b in zip(self.axes, reference_coords))
                      for i, o in enumerate(self.origin))
 
-    def integral(self, f):
+    def integral(self, f, vars=t):
         """Calculate the integral over the element."""
         raise NotImplementedError
 
@@ -183,9 +183,9 @@ class Point(Reference):
         """Get the default reference for this cell type."""
         return Point(self.reference_vertices)
 
-    def integral(self, f):
+    def integral(self, f, vars=t):
         """Calculate the integral over the element."""
-        return subs(f, t, self.vertices[0])
+        return subs(f, vars, self.vertices[0])
 
     def get_map_to(self, vertices):
         """Get the map from the reference to a cell."""
@@ -235,9 +235,9 @@ class Interval(Reference):
         """Get the default reference for this cell type."""
         return Interval(self.reference_vertices)
 
-    def integral(self, f):
+    def integral(self, f, vars=t):
         """Calculate the integral over the element."""
-        return (f * self.jacobian()).integrate((t[0], 0, 1))
+        return (f * self.jacobian()).integrate((vars[0], 0, 1))
 
     def get_map_to(self, vertices):
         """Get the map from the reference to a cell."""
@@ -292,10 +292,10 @@ class Triangle(Reference):
         """Get the default reference for this cell type."""
         return Triangle(self.reference_vertices)
 
-    def integral(self, f):
+    def integral(self, f, vars=t):
         """Calculate the integral over the element."""
         return (
-            (f * self.jacobian()).integrate((t[1], 0, 1 - t[0])).integrate((t[0], 0, 1))
+            (f * self.jacobian()).integrate((vars[1], 0, 1 - vars[0])).integrate((vars[0], 0, 1))
         )
 
     def get_map_to(self, vertices):
@@ -368,13 +368,13 @@ class Tetrahedron(Reference):
         """Get the default reference for this cell type."""
         return Tetrahedron(self.reference_vertices)
 
-    def integral(self, f):
+    def integral(self, f, vars=t):
         """Calculate the integral over the element."""
         return (
             (f * self.jacobian())
-            .integrate((t[2], 0, 1 - t[0] - t[1]))
-            .integrate((t[1], 0, 1 - t[0]))
-            .integrate((t[0], 0, 1))
+            .integrate((vars[2], 0, 1 - vars[0] - vars[1]))
+            .integrate((vars[1], 0, 1 - vars[0]))
+            .integrate((vars[0], 0, 1))
         )
 
     def get_map_to(self, vertices):
@@ -443,9 +443,9 @@ class Quadrilateral(Reference):
         """Get the default reference for this cell type."""
         return Quadrilateral(self.reference_vertices)
 
-    def integral(self, f):
+    def integral(self, f, vars=t):
         """Calculate the integral over the element."""
-        return (f * self.jacobian()).integrate((t[1], 0, 1)).integrate((t[0], 0, 1))
+        return (f * self.jacobian()).integrate((vars[1], 0, 1)).integrate((vars[0], 0, 1))
 
     def get_map_to(self, vertices):
         """Get the map from the reference to a cell."""
@@ -544,13 +544,13 @@ class Hexahedron(Reference):
         """Get the default reference for this cell type."""
         return Hexahedron(self.reference_vertices)
 
-    def integral(self, f):
+    def integral(self, f, vars=t):
         """Calculate the integral over the element."""
         return (
             (f * self.jacobian())
-            .integrate((t[2], 0, 1))
-            .integrate((t[1], 0, 1))
-            .integrate((t[0], 0, 1))
+            .integrate((vars[2], 0, 1))
+            .integrate((vars[1], 0, 1))
+            .integrate((vars[0], 0, 1))
         )
 
     def get_map_to(self, vertices):
@@ -647,13 +647,13 @@ class Prism(Reference):
         """Get the default reference for this cell type."""
         return Prism(self.reference_vertices)
 
-    def integral(self, f):
+    def integral(self, f, vars=t):
         """Calculate the integral over the element."""
         return (
             (f * self.jacobian())
-            .integrate((t[2], 0, 1))
-            .integrate((t[1], 0, 1 - t[0]))
-            .integrate((t[0], 0, 1))
+            .integrate((vars[2], 0, 1))
+            .integrate((vars[1], 0, 1 - vars[0]))
+            .integrate((vars[0], 0, 1))
         )
 
     def get_map_to(self, vertices):
@@ -747,13 +747,13 @@ class Pyramid(Reference):
         """Get the default reference for this cell type."""
         return Pyramid(self.reference_vertices)
 
-    def integral(self, f):
+    def integral(self, f, vars=t):
         """Calculate the integral over the element."""
         return (
             (f * self.jacobian())
-            .integrate((t[2], 0, 1))
-            .integrate((t[1], 0, 1 - t[0]))
-            .integrate((t[0], 0, 1))
+            .integrate((vars[2], 0, 1))
+            .integrate((vars[1], 0, 1 - vars[0]))
+            .integrate((vars[0], 0, 1))
         )
 
     def get_map_to(self, vertices):

@@ -5,6 +5,7 @@ This demo shows how Symfem can be used to compute a stiffness matrix.
 import symfem
 from symfem.vectors import vdot
 from symfem.calculus import grad
+from symfem.symbolic import x
 
 # Define the vertived and triangles of the mesh
 vertices = [(0, 0), (1, 0), (0, 1), (1, 1)]
@@ -14,7 +15,7 @@ triangles = [[0, 1, 2], [1, 3, 2]]
 matrix = [[0 for i in range(4)] for j in range(4)]
 
 # Create a Lagrange element
-element = symfem.create_element("triangle", "Lagrange", 1)
+element = symfem.create_element("triangle", "Lagrange", 2)
 
 for triangle in triangles:
     # Get the vertices of the triangle
@@ -30,6 +31,7 @@ for triangle in triangles:
             # Compute the integral of grad(u)-dot-grad(v) for each pair of basis
             # functions u and v
             integrand = vdot(grad(test_f, 2), grad(trial_f, 2))
-            matrix[test_i][trial_i] += ref.integral(integrand)
+            print(integrand)
+            matrix[test_i][trial_i] += ref.integral(integrand, x)
 
 print(matrix)
