@@ -15,7 +15,7 @@ triangles = [[0, 1, 2], [1, 3, 2]]
 matrix = [[0 for i in range(4)] for j in range(4)]
 
 # Create a Lagrange element
-element = symfem.create_element("triangle", "Lagrange", 2)
+element = symfem.create_element("triangle", "Lagrange", 1)
 
 for triangle in triangles:
     # Get the vertices of the triangle
