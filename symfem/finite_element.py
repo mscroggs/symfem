@@ -491,8 +491,6 @@ class CiarletElement(FiniteElement):
         """Test that DOF points are valid."""
         for d in self.dofs:
             p = d.dof_point()
-            print(p)
-            print(self.reference.gdim)
             assert len(p) == self.reference.gdim
             for i in p:
                 if i is None:
