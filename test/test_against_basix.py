@@ -35,8 +35,10 @@ elements = {
          [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")]),
         ("Qdiv", "Raviart-Thomas", range(1, 4), [("LagrangeVariant", "equispaced")]),
         ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 4), [("LagrangeVariant", "equispaced")]),
-        ("Sdiv", "Brezzi-Douglas-Marini", range(1, 4), [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")]),
-        ("Scurl", "Nedelec 2nd kind H(curl)", range(1, 4), [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")])],
+        ("Sdiv", "Brezzi-Douglas-Marini", range(1, 4),
+         [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")]),
+        ("Scurl", "Nedelec 2nd kind H(curl)", range(1, 4),
+         [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")])],
     "hexahedron": [
         ("Q", "Lagrange", range(1, 3), [("LagrangeVariant", "equispaced")]),
         ("dPc", "DPC", range(0, 3),
@@ -45,8 +47,10 @@ elements = {
          [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")]),
         ("Qdiv", "Raviart-Thomas", range(1, 3), [("LagrangeVariant", "equispaced")]),
         ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 3), [("LagrangeVariant", "equispaced")]),
-        ("Sdiv", "Brezzi-Douglas-Marini", range(1, 3), [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")]),
-        ("Scurl", "Nedelec 2nd kind H(curl)", range(1, 3), [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")])],
+        ("Sdiv", "Brezzi-Douglas-Marini", range(1, 3),
+         [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")]),
+        ("Scurl", "Nedelec 2nd kind H(curl)", range(1, 3),
+         [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")])],
     "prism": [
         ("Lagrange", "Lagrange", range(1, 4), [("LagrangeVariant", "equispaced")])]
 }
