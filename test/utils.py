@@ -124,6 +124,7 @@ test_elements = {
         "Regge": [[{"variant": "integral"}, range(3)]],
         "ABF": [[{}, range(3)]],
         "AC": [[{}, range(4)]],
+        "Rannacher-Turek": [[{}, [1]]],
     },
     "hexahedron": {
         "bubble": [[{"variant": "equispaced"}, range(2, 4)], [{"variant": "lobatto"}, range(2, 4)]],
@@ -145,6 +146,7 @@ test_elements = {
         "TNTcurl": [[{"variant": "equispaced"}, range(1, 2)]],
         "TNTdiv": [[{"variant": "equispaced"}, range(1, 2)]],
         "Regge": [[{"variant": "integral"}, range(2)]],
+        "Rannacher-Turek": [[{}, [1]]],
     },
     "prism": {
         "Lagrange": [[{"variant": "equispaced"}, range(4)]],
