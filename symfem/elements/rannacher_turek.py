@@ -4,11 +4,8 @@ This element's definition appears in https://doi.org/10.1002/num.1690080202
 (Rannacher, Turek, 1992)
 """
 
-from itertools import product
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set
 from ..functionals import PointEvaluation
-from ..quadrature import get_quadrature
 from ..symbolic import x
 
 
