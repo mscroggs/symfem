@@ -269,7 +269,9 @@ def pyramid_polynomial_set_1d(dim, order):
     for d in range(order):
         for i in range(d + 1):
             for j in range(d + 1 - i):
-                poly.append(x[0] ** i * x[1] ** j * x[2] ** (d - i - j) * (x[0] * x[1] / (1 - x[2])) ** (order - d))
+                p = x[0] ** i * x[1] ** j * x[2] ** (d - i - j)
+                p *= (x[0] * x[1] / (1 - x[2])) ** (order - d)
+                poly.append(p)
 
     return poly
 
