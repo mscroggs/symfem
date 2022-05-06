@@ -200,6 +200,7 @@ The reference quadrilateral has vertices (0, 0), (1, 0), (0, 1), and (1, 1). Its
 ### List of supported elements
 - Arbogast-Correa (alternative names: AC, AC full, Arbogast-Correa full)
 - Arnold-Boffi-Falk (alternative names: ABF)
+- Arnold-Boffi-Falk alternative
 - Bogner-Fox-Schmit (alternative names: BFS)
 - Brezzi-Douglas-Fortin-Marini (alternative names: BDFM)
 - bubble
