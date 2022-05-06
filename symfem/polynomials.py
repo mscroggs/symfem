@@ -265,8 +265,6 @@ def pyramid_polynomial_set_1d(dim, order):
     if order == 0:
         return [Monomial()]
 
-    poly = polynomial_set_1d(3, order)
-
     poly = [x[0] ** a * x[1] ** b * x[2] ** c / (1 - x[2]) ** (a + b + c - order)
             for c in range(order)
             for a in range(order + 1 - c) for b in range(order + 1 - c)]

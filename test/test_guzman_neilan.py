@@ -13,7 +13,6 @@ def test_guzman_neilan_triangle(order):
 
     for p in e._basis[-3:]:
         for piece in p.pieces:
-            print(div(piece[1]).expand())
             float(div(piece[1]).expand())
 
 
@@ -24,7 +23,6 @@ def test_guzman_neilan_tetrahedron(order):
     mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*e.reference.vertices))
     for p in e._basis[-4:]:
         for piece in p.pieces:
-            print(div(piece[1]).expand())
             float(div(piece[1]).expand())
 
         assert subs(p, x, mid) == (0, 0, 0)
