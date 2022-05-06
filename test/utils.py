@@ -123,6 +123,7 @@ test_elements = {
         "TNTdiv": [[{"variant": "equispaced"}, range(1, 4)]],
         "Regge": [[{"variant": "integral"}, range(3)]],
         "ABF": [[{}, range(3)]],
+        "Arnold-Boffi-Falk alternative": [[{}, range(3)]],
         "AC": [[{}, range(4)]],
         "Rannacher-Turek": [[{}, [1]]],
     },
