@@ -1,6 +1,6 @@
 import pytest
 import sympy
-from symfem.polynomials import Hdiv_polynomials, Hcurl_polynomials
+from symfem.polynomials import Hdiv_polynomials, Hcurl_polynomials, orthogonal_basis
 from symfem.vectors import vdot
 from symfem.symbolic import x, t, subs
 from symfem.calculus import div
@@ -61,3 +61,16 @@ def test_BDFM_space(reference, order):
                                                         sub_ref.axes[1])])
             poly = vdot(p_edge, sub_ref.normal()).expand().simplify()
             assert poly.is_real or sympy.Poly(poly).degree() <= order - 1
+
+
+@pytest.mark.parametrize("reference, order", [
+    (r, i) for r, maxi in [
+        ("interval", 4), ("triangle", 4), ("quadrilateral", 4),
+        ("tetrahedron", 4), ("hexahedron", 4), ("prism", 4), ("pyramid", 2)
+    ] for i in range(maxi + 1)])
+def test_orthogonal_polynomials(reference, order):
+    polynomials = orthogonal_basis(reference, order)
+    ref = create_reference(reference)
+    for i, p in enumerate(polynomials):
+        for q in polynomials[:i]:
+            assert ref.integral(p * q, x) == 0

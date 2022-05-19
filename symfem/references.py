@@ -294,9 +294,8 @@ class Triangle(Reference):
 
     def integral(self, f, vars=t):
         """Calculate the integral over the element."""
-        return (
-            (f * self.jacobian()).integrate((vars[1], 0, 1 - vars[0])).integrate((vars[0], 0, 1))
-        )
+        return (f * self.jacobian()).integrate(
+            (vars[1], 0, 1 - vars[0]), (vars[0], 0, 1))
 
     def get_map_to(self, vertices):
         """Get the map from the reference to a cell."""
@@ -370,12 +369,8 @@ class Tetrahedron(Reference):
 
     def integral(self, f, vars=t):
         """Calculate the integral over the element."""
-        return (
-            (f * self.jacobian())
-            .integrate((vars[2], 0, 1 - vars[0] - vars[1]))
-            .integrate((vars[1], 0, 1 - vars[0]))
-            .integrate((vars[0], 0, 1))
-        )
+        return (f * self.jacobian()).integrate(
+            (vars[2], 0, 1 - vars[0] - vars[1]), (vars[1], 0, 1 - vars[0]), (vars[0], 0, 1))
 
     def get_map_to(self, vertices):
         """Get the map from the reference to a cell."""
@@ -445,7 +440,7 @@ class Quadrilateral(Reference):
 
     def integral(self, f, vars=t):
         """Calculate the integral over the element."""
-        return (f * self.jacobian()).integrate((vars[1], 0, 1)).integrate((vars[0], 0, 1))
+        return (f * self.jacobian()).integrate((vars[1], 0, 1), (vars[0], 0, 1))
 
     def get_map_to(self, vertices):
         """Get the map from the reference to a cell."""
@@ -546,12 +541,8 @@ class Hexahedron(Reference):
 
     def integral(self, f, vars=t):
         """Calculate the integral over the element."""
-        return (
-            (f * self.jacobian())
-            .integrate((vars[2], 0, 1))
-            .integrate((vars[1], 0, 1))
-            .integrate((vars[0], 0, 1))
-        )
+        return (f * self.jacobian()).integrate(
+            (vars[2], 0, 1), (vars[1], 0, 1), (vars[0], 0, 1))
 
     def get_map_to(self, vertices):
         """Get the map from the reference to a cell."""
@@ -649,12 +640,8 @@ class Prism(Reference):
 
     def integral(self, f, vars=t):
         """Calculate the integral over the element."""
-        return (
-            (f * self.jacobian())
-            .integrate((vars[2], 0, 1))
-            .integrate((vars[1], 0, 1 - vars[0]))
-            .integrate((vars[0], 0, 1))
-        )
+        return(f * self.jacobian()).integrate(
+            (vars[2], 0, 1), (vars[1], 0, 1 - vars[0]), (vars[0], 0, 1))
 
     def get_map_to(self, vertices):
         """Get the map from the reference to a cell."""
@@ -749,12 +736,8 @@ class Pyramid(Reference):
 
     def integral(self, f, vars=t):
         """Calculate the integral over the element."""
-        return (
-            (f * self.jacobian())
-            .integrate((vars[2], 0, 1))
-            .integrate((vars[1], 0, 1 - vars[0]))
-            .integrate((vars[0], 0, 1))
-        )
+        return (f * self.jacobian()).integrate(
+            (vars[0], 0, 1 - vars[2]), (vars[1], 0, 1 - vars[2]), (vars[2], 0, 1))
 
     def get_map_to(self, vertices):
         """Get the map from the reference to a cell."""
