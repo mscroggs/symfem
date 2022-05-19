@@ -5,6 +5,7 @@ from symfem.vectors import vdot
 from symfem.symbolic import x, t, subs
 from symfem.calculus import div
 from symfem import create_reference, create_element
+from random import choice
 
 
 @pytest.mark.parametrize("reference", ["triangle", "tetrahedron"])
@@ -63,14 +64,20 @@ def test_BDFM_space(reference, order):
             assert poly.is_real or sympy.Poly(poly).degree() <= order - 1
 
 
-@pytest.mark.parametrize("reference, order", [
-    (r, i) for r, maxi in [
-        ("interval", 4), ("triangle", 4), ("quadrilateral", 4),
-        ("tetrahedron", 4), ("hexahedron", 4), ("prism", 4), ("pyramid", 2)
-    ] for i in range(maxi + 1)])
+@pytest.mark.parametrize("reference", [
+    "interval", "triangle", "quadrilateral",
+    "tetrahedron", "hexahedron", "prism", "pyramid"])
+@pytest.mark.parametrize("order", range(5))
 def test_orthogonal_polynomials(reference, order):
     polynomials = orthogonal_basis(reference, order)
     ref = create_reference(reference)
-    for i, p in enumerate(polynomials):
-        for q in polynomials[:i]:
-            assert ref.integral(p * q, x) == 0
+    if len(polynomials) <= 5:
+        for i, p in enumerate(polynomials):
+            for q in polynomials[:i]:
+                assert ref.integral(p * q, x) == 0
+    else:
+        for _ in range(15):
+            p = choice(polynomials)
+            q = choice(polynomials)
+            if p != q:
+                assert ref.integral(p * q, x) == 0

@@ -5,6 +5,15 @@ from .calculus import curl, diff
 from itertools import product
 
 
+def _jrc(a, n):
+    """Get the Jacobi recurrence relation coefficients."""
+    return (
+        sympy.Rational((a + 2 * n + 1) * (a + 2 * n + 2), 2 * (n + 1) * (a + n + 1)),
+        sympy.Rational(a * a * (a + 2 * n + 1), 2 * (n + 1) * (a + n + 1) * (a + 2 * n)),
+        sympy.Rational(n * (a + n) * (a + 2 * n + 2), (n + 1) * (a + n + 1) * (a + 2 * n))
+    )
+
+
 def orthogonal_basis_interval(order, vars=None):
     """Create a basis of orthogonal polynomials."""
     if vars is None:
@@ -25,7 +34,32 @@ def orthogonal_basis_triangle(order, vars=None):
     if vars is None:
         vars = [x[0], x[1]]
     assert len(vars) == 2
-    raise NotImplementedError()
+
+    def index(p, q):
+        return (p + q + 1) * (p + q) // 2 + q
+
+    poly = [None for i in range((order + 1) * (order + 2) // 2)]
+    poly[0] = sympy.Integer(1)
+
+    for p in range(1, order + 1):
+        pinv = sympy.Rational(1, p)
+        poly[index(0, p)] = (2 * vars[0] + vars[1] - 1) * poly[index(0, p - 1)] * (2 - pinv)
+        if p > 1:
+            poly[index(0, p)] -= (1 - vars[1]) ** 2 * poly[index(0, p - 2)] * (1 - pinv)
+
+    for p in range(order):
+        poly[index(1, p)] = (
+            poly[index(0, p)]
+            * ((2 * vars[1] - 1) * (sympy.Rational(3, 2) + p) + sympy.Rational(1, 2) + p)
+        )
+
+        for q in range(1, order - p):
+            a, b, c = _jrc(2 * p + 1, q)
+            poly[index(q + 1, p)] = (
+                poly[index(q, p)] * ((vars[1] * 2 - 1) * a + b) - poly[index(q - 1, p)] * c
+            )
+
+    return poly
 
 
 def orthogonal_basis_quadrilateral(order, vars=None):
@@ -33,7 +67,10 @@ def orthogonal_basis_quadrilateral(order, vars=None):
     if vars is None:
         vars = [x[0], x[1]]
     assert len(vars) == 2
-    raise NotImplementedError()
+
+    p0 = orthogonal_basis_interval(order, [vars[0]])
+    p1 = orthogonal_basis_interval(order, [vars[1]])
+    return [a * b for a in p0 for b in p1]
 
 
 def orthogonal_basis_tetrahedron(order, vars=None):
@@ -49,7 +86,11 @@ def orthogonal_basis_hexahedron(order, vars=None):
     if vars is None:
         vars = x
     assert len(vars) == 3
-    raise NotImplementedError()
+
+    p0 = orthogonal_basis_interval(order, [vars[0]])
+    p1 = orthogonal_basis_interval(order, [vars[1]])
+    p2 = orthogonal_basis_interval(order, [vars[2]])
+    return [a * b * c for a in p0 for b in p1 for c in p2]
 
 
 def orthogonal_basis_prism(order, vars=None):
@@ -66,14 +107,7 @@ def orthogonal_basis_pyramid(order, vars=None):
         vars = x
     assert len(vars) == 3
 
-    def jrc(a, n):
-        return (
-            sympy.Rational((a + 2 * n + 1) * (a + 2 * n + 2), 2 * (n + 1) * (a + n + 1)),
-            sympy.Rational(a * a * (a + 2 * n + 1), 2 * (n + 1) * (a + n + 1) * (a + 2 * n)),
-            sympy.Rational(n * (a + n) * (a + 2 * n + 2), (n + 1) * (a + n + 1) * (a + 2 * n))
-        )
-
-    def pyr_idx(i, j, k):
+    def index(i, j, k):
         out = k + j * (order + 1) + i * (order + 1) * (order + 2) // 2 - i * (i ** 2 + 5) // 6
         if i > j:
             out -= i * (j - 1)
@@ -88,33 +122,33 @@ def orthogonal_basis_pyramid(order, vars=None):
 
     for i in range(order + 1):
         if i > 0:
-            poly[pyr_idx(i, 0, 0)] = (
-                (2 * vars[0] / (1 - vars[2]) - 1) * poly[pyr_idx(i - 1, 0, 0)] * (1 - vars[2])
+            poly[index(i, 0, 0)] = (
+                (2 * vars[0] / (1 - vars[2]) - 1) * poly[index(i - 1, 0, 0)] * (1 - vars[2])
                 * (2 * i - 1) / i
             )
         if i > 1:
-            poly[pyr_idx(i, 0, 0)] -= (i - 1) * poly[pyr_idx(i - 2, 0, 0)] * (1 - vars[2]) ** 2 / i
+            poly[index(i, 0, 0)] -= (i - 1) * poly[index(i - 2, 0, 0)] * (1 - vars[2]) ** 2 / i
 
         for j in range(order + 1):
             if j > 0:
-                poly[pyr_idx(i, j, 0)] = (
-                    poly[pyr_idx(i, j - 1, 0)]
+                poly[index(i, j, 0)] = (
+                    poly[index(i, j - 1, 0)]
                     * (2 * vars[1] / (1 - vars[2]) - 1)
                     * (1 - vars[2]) ** (max(i, j) - max(i, j - 1))
                     * (2 * j - 1) / j
                 )
             if j > 1:
-                poly[pyr_idx(i, j, 0)] -= (
-                    poly[pyr_idx(i, j - 2, 0)] * (1 - vars[2]) ** (max(i, j) - max(i, j - 2))
+                poly[index(i, j, 0)] -= (
+                    poly[index(i, j - 2, 0)] * (1 - vars[2]) ** (max(i, j) - max(i, j - 2))
                     * (j - 1) / j
                 )
 
             for k in range(1, order + 1 - max(i, j)):
-                a, b, c = jrc(2 * max(i, j) + 2, k - 1)
-                poly[pyr_idx(i, j, k)] = a * (2 * vars[2] - 1) * poly[pyr_idx(i, j, k - 1)]
-                poly[pyr_idx(i, j, k)] += b * poly[pyr_idx(i, j, k - 1)]
+                a, b, c = _jrc(2 * max(i, j) + 2, k - 1)
+                poly[index(i, j, k)] = a * (2 * vars[2] - 1) * poly[index(i, j, k - 1)]
+                poly[index(i, j, k)] += b * poly[index(i, j, k - 1)]
                 if k > 1:
-                    poly[pyr_idx(i, j, k)] -= c * poly[pyr_idx(i, j, k - 2)]
+                    poly[index(i, j, k)] -= c * poly[index(i, j, k - 2)]
 
     return poly
 
