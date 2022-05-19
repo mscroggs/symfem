@@ -5,172 +5,6 @@ from .calculus import curl, diff
 from itertools import product
 
 
-def _jrc(a, n):
-    """Get the Jacobi recurrence relation coefficients."""
-    return (
-        sympy.Rational((a + 2 * n + 1) * (a + 2 * n + 2), 2 * (n + 1) * (a + n + 1)),
-        sympy.Rational(a * a * (a + 2 * n + 1), 2 * (n + 1) * (a + n + 1) * (a + 2 * n)),
-        sympy.Rational(n * (a + n) * (a + 2 * n + 2), (n + 1) * (a + n + 1) * (a + 2 * n))
-    )
-
-
-def orthogonal_basis_interval(order, vars=None):
-    """Create a basis of orthogonal polynomials."""
-    if vars is None:
-        vars = [x[0]]
-    assert len(vars) == 1
-
-    poly = [None for i in range(order + 1)]
-    poly[0] = sympy.Integer(1)
-    for i in range(1, order + 1):
-        poly[i] = (2 * i - 1) * (2 * vars[0] - 1) * poly[i - 1] / i
-        if i > 1:
-            poly[i] -= (i - 1) * poly[i - 2] / i
-    return poly
-
-
-def orthogonal_basis_triangle(order, vars=None):
-    """Create a basis of orthogonal polynomials."""
-    if vars is None:
-        vars = [x[0], x[1]]
-    assert len(vars) == 2
-
-    def index(p, q):
-        return (p + q + 1) * (p + q) // 2 + q
-
-    poly = [None for i in range((order + 1) * (order + 2) // 2)]
-    poly[0] = sympy.Integer(1)
-
-    for p in range(1, order + 1):
-        pinv = sympy.Rational(1, p)
-        poly[index(0, p)] = (2 * vars[0] + vars[1] - 1) * poly[index(0, p - 1)] * (2 - pinv)
-        if p > 1:
-            poly[index(0, p)] -= (1 - vars[1]) ** 2 * poly[index(0, p - 2)] * (1 - pinv)
-
-    for p in range(order):
-        poly[index(1, p)] = (
-            poly[index(0, p)]
-            * ((2 * vars[1] - 1) * (sympy.Rational(3, 2) + p) + sympy.Rational(1, 2) + p)
-        )
-
-        for q in range(1, order - p):
-            a, b, c = _jrc(2 * p + 1, q)
-            poly[index(q + 1, p)] = (
-                poly[index(q, p)] * ((vars[1] * 2 - 1) * a + b) - poly[index(q - 1, p)] * c
-            )
-
-    return poly
-
-
-def orthogonal_basis_quadrilateral(order, vars=None):
-    """Create a basis of orthogonal polynomials."""
-    if vars is None:
-        vars = [x[0], x[1]]
-    assert len(vars) == 2
-
-    p0 = orthogonal_basis_interval(order, [vars[0]])
-    p1 = orthogonal_basis_interval(order, [vars[1]])
-    return [a * b for a in p0 for b in p1]
-
-
-def orthogonal_basis_tetrahedron(order, vars=None):
-    """Create a basis of orthogonal polynomials."""
-    if vars is None:
-        vars = x
-    assert len(vars) == 3
-    raise NotImplementedError()
-
-
-def orthogonal_basis_hexahedron(order, vars=None):
-    """Create a basis of orthogonal polynomials."""
-    if vars is None:
-        vars = x
-    assert len(vars) == 3
-
-    p0 = orthogonal_basis_interval(order, [vars[0]])
-    p1 = orthogonal_basis_interval(order, [vars[1]])
-    p2 = orthogonal_basis_interval(order, [vars[2]])
-    return [a * b * c for a in p0 for b in p1 for c in p2]
-
-
-def orthogonal_basis_prism(order, vars=None):
-    """Create a basis of orthogonal polynomials."""
-    if vars is None:
-        vars = x
-    assert len(vars) == 3
-    raise NotImplementedError()
-
-
-def orthogonal_basis_pyramid(order, vars=None):
-    """Create a basis of orthogonal polynomials."""
-    if vars is None:
-        vars = x
-    assert len(vars) == 3
-
-    def index(i, j, k):
-        out = k + j * (order + 1) + i * (order + 1) * (order + 2) // 2 - i * (i ** 2 + 5) // 6
-        if i > j:
-            out -= i * (j - 1)
-        else:
-            out -= j * (j - 1) // 2 + i * (i - 1) // 2
-        return out
-
-    pn = (2 * order + 3) * (order + 2) * (order + 1) // 6
-
-    poly = [None for i in range(pn)]
-    poly[0] = sympy.Integer(1)
-
-    for i in range(order + 1):
-        if i > 0:
-            poly[index(i, 0, 0)] = (
-                (2 * vars[0] / (1 - vars[2]) - 1) * poly[index(i - 1, 0, 0)] * (1 - vars[2])
-                * (2 * i - 1) / i
-            )
-        if i > 1:
-            poly[index(i, 0, 0)] -= (i - 1) * poly[index(i - 2, 0, 0)] * (1 - vars[2]) ** 2 / i
-
-        for j in range(order + 1):
-            if j > 0:
-                poly[index(i, j, 0)] = (
-                    poly[index(i, j - 1, 0)]
-                    * (2 * vars[1] / (1 - vars[2]) - 1)
-                    * (1 - vars[2]) ** (max(i, j) - max(i, j - 1))
-                    * (2 * j - 1) / j
-                )
-            if j > 1:
-                poly[index(i, j, 0)] -= (
-                    poly[index(i, j - 2, 0)] * (1 - vars[2]) ** (max(i, j) - max(i, j - 2))
-                    * (j - 1) / j
-                )
-
-            for k in range(1, order + 1 - max(i, j)):
-                a, b, c = _jrc(2 * max(i, j) + 2, k - 1)
-                poly[index(i, j, k)] = a * (2 * vars[2] - 1) * poly[index(i, j, k - 1)]
-                poly[index(i, j, k)] += b * poly[index(i, j, k - 1)]
-                if k > 1:
-                    poly[index(i, j, k)] -= c * poly[index(i, j, k - 2)]
-
-    return poly
-
-
-def orthogonal_basis(cell, order, vars=None):
-    """Create a basis of orthogonal polynomials."""
-    if cell == "interval":
-        return orthogonal_basis_interval(order, vars)
-    if cell == "triangle":
-        return orthogonal_basis_triangle(order, vars)
-    if cell == "quadrilateral":
-        return orthogonal_basis_quadrilateral(order, vars)
-    if cell == "tetrahedron":
-        return orthogonal_basis_tetrahedron(order, vars)
-    if cell == "hexahedron":
-        return orthogonal_basis_hexahedron(order, vars)
-    if cell == "prism":
-        return orthogonal_basis_prism(order, vars)
-    if cell == "pyramid":
-        return orthogonal_basis_pyramid(order, vars)
-
-
 def polynomial_set_1d(dim, order, vars=x):
     """One dimensional polynomial set."""
     if dim == 1:
@@ -453,3 +287,216 @@ def pyramid_polynomial_set(domain_dim, range_dim, order):
         for p in set1d
         for i in range(range_dim)
     ]
+
+
+def _jrc(a, n):
+    """Get the Jacobi recurrence relation coefficients."""
+    return (
+        sympy.Rational((a + 2 * n + 1) * (a + 2 * n + 2), 2 * (n + 1) * (a + n + 1)),
+        sympy.Rational(a * a * (a + 2 * n + 1), 2 * (n + 1) * (a + n + 1) * (a + 2 * n)),
+        sympy.Rational(n * (a + n) * (a + 2 * n + 2), (n + 1) * (a + n + 1) * (a + 2 * n))
+    )
+
+
+def orthogonal_basis_interval(order, vars=None):
+    """Create a basis of orthogonal polynomials."""
+    if vars is None:
+        vars = [x[0]]
+    assert len(vars) == 1
+
+    poly = [None for i in range(order + 1)]
+    poly[0] = sympy.Integer(1)
+    for i in range(1, order + 1):
+        poly[i] = (2 * i - 1) * (2 * vars[0] - 1) * poly[i - 1] / i
+        if i > 1:
+            poly[i] -= (i - 1) * poly[i - 2] / i
+    return poly
+
+
+def orthogonal_basis_triangle(order, vars=None):
+    """Create a basis of orthogonal polynomials."""
+    if vars is None:
+        vars = [x[0], x[1]]
+    assert len(vars) == 2
+
+    def index(p, q):
+        return (p + q + 1) * (p + q) // 2 + q
+
+    poly = [None for i in range((order + 1) * (order + 2) // 2)]
+    poly[0] = sympy.Integer(1)
+
+    for p in range(1, order + 1):
+        pinv = sympy.Rational(1, p)
+        poly[index(0, p)] = (2 * vars[0] + vars[1] - 1) * poly[index(0, p - 1)] * (2 - pinv)
+        if p > 1:
+            poly[index(0, p)] -= (1 - vars[1]) ** 2 * poly[index(0, p - 2)] * (1 - pinv)
+
+    for p in range(order):
+        poly[index(1, p)] = (
+            poly[index(0, p)]
+            * ((2 * vars[1] - 1) * (sympy.Rational(3, 2) + p) + sympy.Rational(1, 2) + p)
+        )
+
+        for q in range(1, order - p):
+            a, b, c = _jrc(2 * p + 1, q)
+            poly[index(q + 1, p)] = (
+                poly[index(q, p)] * ((vars[1] * 2 - 1) * a + b) - poly[index(q - 1, p)] * c
+            )
+
+    return poly
+
+
+def orthogonal_basis_quadrilateral(order, vars=None):
+    """Create a basis of orthogonal polynomials."""
+    if vars is None:
+        vars = [x[0], x[1]]
+    assert len(vars) == 2
+
+    p0 = orthogonal_basis_interval(order, [vars[0]])
+    p1 = orthogonal_basis_interval(order, [vars[1]])
+    return [a * b for a in p0 for b in p1]
+
+
+def orthogonal_basis_tetrahedron(order, vars=None):
+    """Create a basis of orthogonal polynomials."""
+    if vars is None:
+        vars = x
+    assert len(vars) == 3
+
+    def index(p, q, r):
+        return (p + q + r) * (p + q + r + 1) * (p + q + r + 2) // 6 + (q + r) * (q + r + 1) // 2 + r
+
+    poly = [None for i in range((order + 1) * (order + 2) * (order + 3) // 6)]
+    poly[0] = sympy.Integer(1)
+
+    for p in range(1, order + 1):
+        invp = sympy.Rational(1, p)
+        poly[index(0, 0, p)] = (
+            poly[index(0, 0, p - 1)] * (2 * vars[0] + vars[1] + vars[2] - 1) * (2 - invp)
+        )
+
+        if p > 1:
+            poly[index(0, 0, p)] -= (
+                poly[index(0, 0, p - 2)] * (vars[1] + vars[2] - 1) ** 2 * (1 - invp)
+            )
+
+    for p in range(order):
+        poly[index(0, 1, p)] = poly[index(0, 0, p)] * ((2 * p + 3) * vars[1] + vars[2] - 1)
+
+        for q in range(1, order - p):
+            a, b, c = _jrc(2 * p + 1, q)
+            poly[index(0, q + 1, p)] = (
+                poly[index(0, q, p)]
+                * ((2 * vars[1] + vars[2] - 1) * a + (1 - vars[2]) * b)
+                - poly[index(0, q - 1, p)] * (1 - vars[2]) ** 2 * c
+            )
+
+    for p in range(order):
+        for q in range(order - p):
+            poly[index(1, q, p)] = (
+                poly[index(0, q, p)] * (1 + p + q + (vars[2] * 2 - 1) * (2 + p + q))
+            )
+
+    for p in range(order - 1):
+        for q in range(order - p - 1):
+            for r in range(1, order - p - q):
+                a, b, c = _jrc(2 * p + 2 * q + 2, r)
+                poly[index(r + 1, q, p)] = (
+                    poly[index(r, q, p)] * ((vars[2] * 2 - 1) * a + b)
+                    - poly[index(r - 1, q, p)] * c
+                )
+
+    return poly
+
+
+def orthogonal_basis_hexahedron(order, vars=None):
+    """Create a basis of orthogonal polynomials."""
+    if vars is None:
+        vars = x
+    assert len(vars) == 3
+
+    p0 = orthogonal_basis_interval(order, [vars[0]])
+    p1 = orthogonal_basis_interval(order, [vars[1]])
+    p2 = orthogonal_basis_interval(order, [vars[2]])
+    return [a * b * c for a in p0 for b in p1 for c in p2]
+
+
+def orthogonal_basis_prism(order, vars=None):
+    """Create a basis of orthogonal polynomials."""
+    if vars is None:
+        vars = x
+    assert len(vars) == 3
+
+    p01 = orthogonal_basis_triangle(order, [vars[0], vars[1]])
+    p2 = orthogonal_basis_interval(order, [vars[2]])
+    return [a * b for a in p01 for b in p2]
+
+
+def orthogonal_basis_pyramid(order, vars=None):
+    """Create a basis of orthogonal polynomials."""
+    if vars is None:
+        vars = x
+    assert len(vars) == 3
+
+    def index(i, j, k):
+        out = k + j * (order + 1) + i * (order + 1) * (order + 2) // 2 - i * (i ** 2 + 5) // 6
+        if i > j:
+            out -= i * (j - 1)
+        else:
+            out -= j * (j - 1) // 2 + i * (i - 1) // 2
+        return out
+
+    pn = (2 * order + 3) * (order + 2) * (order + 1) // 6
+
+    poly = [None for i in range(pn)]
+    poly[0] = sympy.Integer(1)
+
+    for i in range(order + 1):
+        if i > 0:
+            poly[index(i, 0, 0)] = (
+                (2 * vars[0] / (1 - vars[2]) - 1) * poly[index(i - 1, 0, 0)] * (1 - vars[2])
+                * (2 * i - 1) / i
+            )
+        if i > 1:
+            poly[index(i, 0, 0)] -= (i - 1) * poly[index(i - 2, 0, 0)] * (1 - vars[2]) ** 2 / i
+
+        for j in range(order + 1):
+            if j > 0:
+                poly[index(i, j, 0)] = (
+                    poly[index(i, j - 1, 0)]
+                    * (2 * vars[1] / (1 - vars[2]) - 1)
+                    * (1 - vars[2]) ** (max(i, j) - max(i, j - 1))
+                    * (2 * j - 1) / j
+                )
+            if j > 1:
+                poly[index(i, j, 0)] -= (
+                    poly[index(i, j - 2, 0)] * (1 - vars[2]) ** (max(i, j) - max(i, j - 2))
+                    * (j - 1) / j
+                )
+
+            for k in range(1, order + 1 - max(i, j)):
+                a, b, c = _jrc(2 * max(i, j) + 2, k - 1)
+                poly[index(i, j, k)] = a * (2 * vars[2] - 1) * poly[index(i, j, k - 1)]
+                poly[index(i, j, k)] += b * poly[index(i, j, k - 1)]
+                if k > 1:
+                    poly[index(i, j, k)] -= c * poly[index(i, j, k - 2)]
+
+    return poly
+
+
+def orthogonal_basis(cell, order, vars=None):
+    """Create a basis of orthogonal polynomials."""
+    if cell == "interval":
+        return orthogonal_basis_interval(order, vars)
+    if cell == "triangle":
+        return orthogonal_basis_triangle(order, vars)
+    if cell == "quadrilateral":
+        return orthogonal_basis_quadrilateral(order, vars)
+    if cell == "tetrahedron":
+        return orthogonal_basis_tetrahedron(order, vars)
+    if cell == "hexahedron":
+        return orthogonal_basis_hexahedron(order, vars)
+    if cell == "prism":
+        return orthogonal_basis_prism(order, vars)
+    if cell == "pyramid":
+        return orthogonal_basis_pyramid(order, vars)
