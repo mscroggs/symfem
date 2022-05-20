@@ -362,9 +362,9 @@ def orthogonal_basis_quadrilateral(order, derivs, vars=None):
     p1 = orthogonal_basis_interval(order, derivs, [vars[1]])
     poly = []
     for d in range(derivs + 1):
-        for i in range(d + 1):
+        for i in range(d, -1, -1):
             j = d - i
-            poly.append([a * b for a in p0[j] for b in p1[i]])
+            poly.append([a * b for a in p0[i] for b in p1[j]])
     return poly
 
 
@@ -431,10 +431,10 @@ def orthogonal_basis_hexahedron(order, derivs, vars=None):
     p2 = orthogonal_basis_interval(order, derivs, [vars[2]])
     poly = []
     for d in range(derivs + 1):
-        for i in range(d + 1):
-            for j in range(0, d + 1 - i):
+        for i in range(d, -1, -1):
+            for j in range(d - i, -1, -1):
                 k = d - i - j
-                poly.append([a * b * c for a in p0[k] for b in p1[j] for c in p2[i]])
+                poly.append([a * b * c for a in p0[i] for b in p1[j] for c in p2[k]])
     return poly
 
 
