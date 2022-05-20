@@ -74,14 +74,10 @@ def test_orthogonal_polynomials(reference, order):
     if len(polynomials) <= 5:
         for i, p in enumerate(polynomials):
             for q in polynomials[:i]:
-                print(p * q)
-                print(x)
-                print(ref.integral(p * q, x))
                 assert ref.integral(p * q, x) == 0
     else:
         for _ in range(15):
             p = choice(polynomials)
             q = choice(polynomials)
             if p != q:
-                print(ref.integral(p * q, x))
                 assert ref.integral(p * q, x) == 0

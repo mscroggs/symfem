@@ -72,6 +72,11 @@ class Monomial:
         else:
             return _x[0] ** self._x * _x[1] ** self._y * _x[2] ** self._z
 
+    @property
+    def __class__(self):
+        """Get class of underlying Sympy object."""
+        return self.to_sympy().__class__
+
     def __hash__(self):
         """Return hash."""
         return hash(self.to_sympy())
