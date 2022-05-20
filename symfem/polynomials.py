@@ -329,24 +329,19 @@ def orthogonal_basis_triangle(order, vars=None):
         return (p + q + 1) * (p + q) // 2 + q
 
     poly = [None for i in range((order + 1) * (order + 2) // 2)]
-    poly[0] = sympy.Integer(1)
 
-    for p in range(1, order + 1):
-        pinv = sympy.Rational(1, p)
-        poly[index(0, p)] = (2 * vars[0] + vars[1] - 1) * poly[index(0, p - 1)] * (2 - pinv)
-        if p > 1:
-            poly[index(0, p)] -= (1 - vars[1]) ** 2 * poly[index(0, p - 2)] * (1 - pinv)
-
-    for p in range(order):
-        poly[index(1, p)] = (
-            poly[index(0, p)]
-            * ((2 * vars[1] - 1) * (sympy.Rational(3, 2) + p) + sympy.Rational(1, 2) + p)
-        )
-
-        for q in range(1, order - p):
-            a, b, c = _jrc(2 * p + 1, q)
-            poly[index(q + 1, p)] = (
-                poly[index(q, p)] * ((vars[1] * 2 - 1) * a + b) - poly[index(q - 1, p)] * c
+    for p in range(order + 1):
+        if p == 0:
+            poly[index(0, p)] = sympy.Integer(1)
+        else:
+            pinv = sympy.Rational(1, p)
+            poly[index(0, p)] = (2 * vars[0] + vars[1] - 1) * poly[index(0, p - 1)] * (2 - pinv)
+            if p > 1:
+                poly[index(0, p)] -= (1 - vars[1]) ** 2 * poly[index(0, p - 2)] * (1 - pinv)
+        for q in range(1, order - p + 1):
+            a, b, c = _jrc(2 * p + 1, q - 1)
+            poly[index(q, p)] = (
+                poly[index(q - 1, p)] * ((2 * vars[1] - 1) * a + b) - poly[index(q - 2, p)] * c
             )
 
     return poly
