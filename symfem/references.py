@@ -370,6 +370,8 @@ class Tetrahedron(Reference):
     def integral(self, f, vars=t):
         """Calculate the integral over the element."""
         print(f * self.jacobian())
+        print((f * self.jacobian()).integrate((vars[0], 0, 1)))
+        print((f * self.jacobian()).integrate((vars[0], 0, 1 - vars[1] - vars[2])))
         return (f * self.jacobian()).integrate(
             (vars[0], 0, 1 - vars[1] - vars[2]), (vars[1], 0, 1 - vars[2]), (vars[2], 0, 1))
 
