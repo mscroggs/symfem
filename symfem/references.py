@@ -369,8 +369,9 @@ class Tetrahedron(Reference):
 
     def integral(self, f, vars=t):
         """Calculate the integral over the element."""
+        print(f * self.jacobian())
         return (f * self.jacobian()).integrate(
-            (vars[2], 0, 1 - vars[0] - vars[1]), (vars[1], 0, 1 - vars[0]), (vars[0], 0, 1))
+            (vars[0], 0, 1 - vars[1] - vars[2]), (vars[1], 0, 1 - vars[2]), (vars[2], 0, 1))
 
     def get_map_to(self, vertices):
         """Get the map from the reference to a cell."""
