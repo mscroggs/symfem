@@ -69,7 +69,7 @@ def test_BDFM_space(reference, order):
     "tetrahedron", "hexahedron", "prism", "pyramid"])
 @pytest.mark.parametrize("order", range(5))
 def test_orthogonal_polynomials(reference, order):
-    polynomials = orthogonal_basis(reference, order)
+    polynomials = orthogonal_basis(reference, order, 0)[0]
     ref = create_reference(reference)
     if len(polynomials) <= 5:
         for i, p in enumerate(polynomials):
@@ -81,3 +81,36 @@ def test_orthogonal_polynomials(reference, order):
             q = choice(polynomials)
             if p != q:
                 assert ref.integral(p * q, x) == 0
+
+
+@pytest.mark.parametrize("reference", [
+    "interval",
+    # "triangle",
+    "quadrilateral",
+    # "tetrahedron",
+    "hexahedron",
+    # "prism", "pyramid"
+])
+@pytest.mark.parametrize("order", range(5))
+def test_orthogonal_polynomial_derivatives(reference, order):
+    polynomials = orthogonal_basis(reference, order, 2)
+    ref = create_reference(reference)
+
+    if ref.tdim == 1:
+        first_d = [(1, 0)]
+        second_d = [(2, 0, 0)]
+    elif ref.tdim == 2:
+        first_d = [(1, 0), (2, 1)]
+        second_d = [(3, 0, 0), (4, 0, 1), (5, 1, 1)]
+    elif ref.tdim == 3:
+        first_d = [(1, 0), (2, 1), (3, 2)]
+        second_d = [(4, 0, 0), (5, 0, 1), (6, 1, 1), (7, 0, 2), (8, 1, 2), (9, 2, 2)]
+    else:
+        raise NotImplementedError()
+
+    for i, j in first_d:
+        for p, q in zip(polynomials[0], polynomials[i]):
+            assert (p.diff(x[j]) - q).simplify() == 0
+    for i, j, k in second_d:
+        for p, q in zip(polynomials[0], polynomials[i]):
+            assert (p.diff(x[j]).diff(x[k]) - q).simplify() == 0

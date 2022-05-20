@@ -1,6 +1,6 @@
 """Polynomial sets."""
 import sympy
-from .symbolic import x, Monomial
+from .symbolic import x
 from .calculus import curl, diff
 from itertools import product
 
@@ -88,7 +88,7 @@ def quolynomial_set_1d(dim, order):
     """One dimensional quolynomial set."""
     basis = []
     for j in product(range(order + 1), repeat=dim):
-        poly = Monomial()
+        poly = sympy.Integer(1)
         for a, b in zip(x, j):
             poly *= a ** b
         basis.append(poly)
@@ -264,7 +264,7 @@ def pyramid_polynomial_set_1d(dim, order):
     """One dimensional polynomial set."""
     assert dim == 3
     if order == 0:
-        return [Monomial()]
+        return [sympy.Integer(1)]
 
     poly = polynomial_set_1d(3, order)
     for d in range(order):
@@ -298,18 +298,24 @@ def _jrc(a, n):
     )
 
 
-def orthogonal_basis_interval(order, vars=None):
+def orthogonal_basis_interval(order, derivs, vars=None):
     """Create a basis of orthogonal polynomials."""
     if vars is None:
         vars = [x[0]]
     assert len(vars) == 1
 
-    poly = [None for i in range(order + 1)]
-    poly[0] = sympy.Integer(1)
-    for i in range(1, order + 1):
-        poly[i] = (2 * i - 1) * (2 * vars[0] - 1) * poly[i - 1] / i
-        if i > 1:
-            poly[i] -= (i - 1) * poly[i - 2] / i
+    poly = [[None for i in range(order + 1)] for i in range(derivs + 1)]
+    for k in range(derivs + 1):
+        if k == 0:
+            poly[k][0] = sympy.Integer(1)
+        else:
+            poly[k][0] = sympy.Integer(0)
+        for i in range(1, order + 1):
+            poly[k][i] = poly[k][i - 1] * (2 * vars[0] - 1) * (2 * i - 1) / i
+            if k > 0:
+                poly[k][i] += poly[k - 1][i - 1] * 2 * k * (2 * i - 1) / i
+            if i > 1:
+                poly[k][i] -= (i - 1) * poly[k][i - 2] / i
     return poly
 
 
@@ -346,15 +352,20 @@ def orthogonal_basis_triangle(order, vars=None):
     return poly
 
 
-def orthogonal_basis_quadrilateral(order, vars=None):
+def orthogonal_basis_quadrilateral(order, derivs, vars=None):
     """Create a basis of orthogonal polynomials."""
     if vars is None:
         vars = [x[0], x[1]]
     assert len(vars) == 2
 
-    p0 = orthogonal_basis_interval(order, [vars[0]])
-    p1 = orthogonal_basis_interval(order, [vars[1]])
-    return [a * b for a in p0 for b in p1]
+    p0 = orthogonal_basis_interval(order, derivs, [vars[0]])
+    p1 = orthogonal_basis_interval(order, derivs, [vars[1]])
+    poly = []
+    for d in range(derivs + 1):
+        for i in range(d + 1):
+            j = d - i
+            poly.append([a * b for a in p0[j] for b in p1[i]])
+    return poly
 
 
 def orthogonal_basis_tetrahedron(order, vars=None):
@@ -409,16 +420,22 @@ def orthogonal_basis_tetrahedron(order, vars=None):
     return poly
 
 
-def orthogonal_basis_hexahedron(order, vars=None):
+def orthogonal_basis_hexahedron(order, derivs, vars=None):
     """Create a basis of orthogonal polynomials."""
     if vars is None:
         vars = x
     assert len(vars) == 3
 
-    p0 = orthogonal_basis_interval(order, [vars[0]])
-    p1 = orthogonal_basis_interval(order, [vars[1]])
-    p2 = orthogonal_basis_interval(order, [vars[2]])
-    return [a * b * c for a in p0 for b in p1 for c in p2]
+    p0 = orthogonal_basis_interval(order, derivs, [vars[0]])
+    p1 = orthogonal_basis_interval(order, derivs, [vars[1]])
+    p2 = orthogonal_basis_interval(order, derivs, [vars[2]])
+    poly = []
+    for d in range(derivs + 1):
+        for i in range(d + 1):
+            for j in range(0, d + 1 - i):
+                k = d - i - j
+                poly.append([a * b * c for a in p0[k] for b in p1[j] for c in p2[i]])
+    return poly
 
 
 def orthogonal_basis_prism(order, vars=None):
@@ -428,7 +445,7 @@ def orthogonal_basis_prism(order, vars=None):
     assert len(vars) == 3
 
     p01 = orthogonal_basis_triangle(order, [vars[0], vars[1]])
-    p2 = orthogonal_basis_interval(order, [vars[2]])
+    p2 = orthogonal_basis_interval(order, 0, [vars[2]])[0]
     return [a * b for a in p01 for b in p2]
 
 
@@ -484,19 +501,21 @@ def orthogonal_basis_pyramid(order, vars=None):
     return poly
 
 
-def orthogonal_basis(cell, order, vars=None):
+def orthogonal_basis(cell, order, derivs, vars=None):
     """Create a basis of orthogonal polynomials."""
     if cell == "interval":
-        return orthogonal_basis_interval(order, vars)
-    if cell == "triangle":
-        return orthogonal_basis_triangle(order, vars)
+        return orthogonal_basis_interval(order, derivs, vars)
     if cell == "quadrilateral":
-        return orthogonal_basis_quadrilateral(order, vars)
-    if cell == "tetrahedron":
-        return orthogonal_basis_tetrahedron(order, vars)
+        return orthogonal_basis_quadrilateral(order, derivs, vars)
     if cell == "hexahedron":
-        return orthogonal_basis_hexahedron(order, vars)
+        return orthogonal_basis_hexahedron(order, derivs, vars)
+
+    assert derivs == 0
+    if cell == "triangle":
+        return [orthogonal_basis_triangle(order, vars)]
+    if cell == "tetrahedron":
+        return [orthogonal_basis_tetrahedron(order, vars)]
     if cell == "prism":
-        return orthogonal_basis_prism(order, vars)
+        return [orthogonal_basis_prism(order, vars)]
     if cell == "pyramid":
-        return orthogonal_basis_pyramid(order, vars)
+        return [orthogonal_basis_pyramid(order, vars)]

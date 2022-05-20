@@ -6,7 +6,7 @@ These elements' definitions appear in https://doi.org/10.1090/S0025-5718-2013-02
 
 from itertools import product
 from ..finite_element import CiarletElement
-from ..polynomials import quolynomial_set
+from ..polynomials import quolynomial_set, orthogonal_basis
 from ..functionals import (TangentIntegralMoment, IntegralAgainst,
                            NormalIntegralMoment, PointEvaluation,
                            DerivativeIntegralMoment)
@@ -14,16 +14,12 @@ from ..symbolic import x, t, subs
 from ..calculus import grad, curl
 from ..moments import make_integral_moment_dofs
 from ..vectors import vcross
-from ..legendre import get_legendre_basis
-from ..references import Interval
 from .q import Q
 
 
 def p(k, v):
     """Return the kth Legendre polynomial."""
-    return subs(
-        get_legendre_basis([x[0] ** i for i in range(k + 1)], Interval())[-1],
-        x[0], v)
+    return orthogonal_basis("interval", k, 0, [v])[0][-1]
 
 
 def b(k, v):
