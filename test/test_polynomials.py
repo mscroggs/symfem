@@ -80,4 +80,5 @@ def test_orthogonal_polynomials(reference, order):
             p = choice(polynomials)
             q = choice(polynomials)
             if p != q:
+                print(ref.integral(p * q, x))
                 assert ref.integral(p * q, x) == 0
