@@ -378,7 +378,7 @@ class Tetrahedron(Reference):
         print("d")
         print((f * self.jacobian()).integrate((vars[0], 0, 1 - vars[1] - vars[2]), (vars[1], 0, 1 - vars[2])))
         print("e")
-        print((f * self.jacobian()).integrate((vars[0], 0, 1 - vars[1] - vars[2]), (vars[1], 0, 1 - vars[2])(.integrate((vars[2], 0, 1)))
+        print((f * self.jacobian()).integrate((vars[0], 0, 1 - vars[1] - vars[2]), (vars[1], 0, 1 - vars[2])).integrate((vars[2], 0, 1)))
         print("a")
         print((f * self.jacobian()).integrate((vars[0], 0, 1 - vars[1] - vars[2]), (vars[1], 0, 1 - vars[2]), (vars[2], 0, 1)))
         print("g")
