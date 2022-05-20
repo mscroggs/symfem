@@ -31,7 +31,7 @@ jobs:
       - run: |
             python3 setup.py install
         name: Install symfem
-      - run: python3 -m pytest -n=auto --durations=50 test/
+      - run: python3 -m pytest -n=auto --durations=50 test/test_polynomials.py::test_orthogonal_polynomials[1-tetrahedron]
         name: Run unit tests
       - run: python3 -m pytest demo/test_demos.py
         name: Run demos
