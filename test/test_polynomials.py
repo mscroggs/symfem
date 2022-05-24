@@ -85,11 +85,10 @@ def test_orthogonal_polynomials(reference, order):
 
 @pytest.mark.parametrize("reference", [
     "interval",
-    # "triangle",
-    "quadrilateral",
+    "triangle", "quadrilateral",
     # "tetrahedron",
-    "hexahedron",
-    # "prism", "pyramid"
+    "hexahedron", "prism",
+    # "pyramid"
 ])
 @pytest.mark.parametrize("order", range(5))
 def test_orthogonal_polynomial_derivatives(reference, order):
