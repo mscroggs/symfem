@@ -10,7 +10,7 @@ from random import choice
 
 @pytest.mark.parametrize("reference", ["triangle", "tetrahedron"])
 @pytest.mark.parametrize("order", range(1, 4))
-def xtest_Hdiv_space(reference, order):
+def test_Hdiv_space(reference, order):
     ref = create_reference(reference)
     polynomials = Hdiv_polynomials(ref.tdim, ref.tdim, order)
     for p in polynomials:
@@ -20,7 +20,7 @@ def xtest_Hdiv_space(reference, order):
 
 @pytest.mark.parametrize("reference", ["triangle", "tetrahedron"])
 @pytest.mark.parametrize("order", range(1, 4))
-def xtest_Hcurl_space(reference, order):
+def test_Hcurl_space(reference, order):
     ref = create_reference(reference)
     polynomials = Hcurl_polynomials(ref.tdim, ref.tdim, order)
     for p in polynomials:
@@ -28,7 +28,7 @@ def xtest_Hcurl_space(reference, order):
 
 
 @pytest.mark.parametrize("reference", ["triangle"])
-def xtest_MTW_space(reference):
+def test_MTW_space(reference):
     e = create_element(reference, "MTW", 3)
     polynomials = e.get_polynomial_basis()
     for p in polynomials:
@@ -45,7 +45,7 @@ def xtest_MTW_space(reference):
 @pytest.mark.parametrize("reference", ["triangle", "quadrilateral",
                                        "tetrahedron", "hexahedron"])
 @pytest.mark.parametrize("order", range(1, 5))
-def xtest_BDFM_space(reference, order):
+def test_BDFM_space(reference, order):
     e = create_element(reference, "BDFM", order)
     polynomials = e.get_polynomial_basis()
     tdim = e.reference.tdim
@@ -66,7 +66,8 @@ def xtest_BDFM_space(reference, order):
 
 @pytest.mark.parametrize("reference", [
     "interval", "triangle", "quadrilateral",
-    "tetrahedron", "hexahedron", "prism", "pyramid"])
+    "tetrahedron", "hexahedron", "prism",
+    "pyramid"])
 @pytest.mark.parametrize("order", range(5))
 def test_orthogonal_polynomials(reference, order):
     polynomials = orthogonal_basis(reference, order, 0)[0]
