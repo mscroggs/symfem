@@ -5,19 +5,19 @@ from .calculus import curl, diff
 from itertools import product
 
 
-def polynomial_set_1d(dim, order, vars=x):
+def polynomial_set_1d(dim, order, variables=x):
     """One dimensional polynomial set."""
     if dim == 1:
-        return [vars[0] ** i for i in range(order + 1)]
+        return [variables[0] ** i for i in range(order + 1)]
     if dim == 2:
         return [
-            vars[0] ** i * vars[1] ** j
+            variables[0] ** i * variables[1] ** j
             for j in range(order + 1)
             for i in range(order + 1 - j)
         ]
     if dim == 3:
         return [
-            vars[0] ** i * vars[1] ** j * vars[2] ** k
+            variables[0] ** i * variables[1] ** j * variables[2] ** k
             for k in range(order + 1)
             for j in range(order + 1 - k)
             for i in range(order + 1 - k - j)
@@ -298,17 +298,17 @@ def _jrc(a, n):
     )
 
 
-def orthogonal_basis_interval(order, derivs, vars=None):
+def orthogonal_basis_interval(order, derivs, variables=None):
     """Create a basis of orthogonal polynomials."""
-    if vars is None:
-        vars = [x[0]]
-    assert len(vars) == 1
+    if variables is None:
+        variables = [x[0]]
+    assert len(variables) == 1
 
     poly = [[None for i in range(order + 1)] for d in range(derivs + 1)]
     for dx in range(derivs + 1):
         poly[dx][0] = sympy.Integer(1 if dx == 0 else 0)
         for i in range(1, order + 1):
-            poly[dx][i] = poly[dx][i - 1] * (2 * vars[0] - 1) * (2 * i - 1) / i
+            poly[dx][i] = poly[dx][i - 1] * (2 * variables[0] - 1) * (2 * i - 1) / i
             if dx > 0:
                 poly[dx][i] += poly[dx - 1][i - 1] * 2 * dx * (2 * i - 1) / i
             if i > 1:
@@ -316,11 +316,11 @@ def orthogonal_basis_interval(order, derivs, vars=None):
     return poly
 
 
-def orthogonal_basis_triangle(order, derivs, vars=None):
+def orthogonal_basis_triangle(order, derivs, variables=None):
     """Create a basis of orthogonal polynomials."""
-    if vars is None:
-        vars = [x[0], x[1]]
-    assert len(vars) == 2
+    if variables is None:
+        variables = [x[0], x[1]]
+    assert len(variables) == 2
 
     def index(p, q):
         return (p + q + 1) * (p + q) // 2 + q
@@ -340,7 +340,7 @@ def orthogonal_basis_triangle(order, derivs, vars=None):
                     pinv = sympy.Rational(1, p)
 
                     poly[d_index(dx, dy)][index(0, p)] = (
-                        (2 * vars[0] + vars[1] - 1) * poly[d_index(dx, dy)][index(0, p - 1)]
+                        (2 * variables[0] + variables[1] - 1) * poly[d_index(dx, dy)][index(0, p - 1)]
                         * (2 - pinv)
                     )
                     if dy > 0:
@@ -353,11 +353,11 @@ def orthogonal_basis_triangle(order, derivs, vars=None):
                         )
                     if p > 1:
                         poly[d_index(dx, dy)][index(0, p)] -= (
-                            (1 - vars[1]) ** 2 * poly[d_index(dx, dy)][index(0, p - 2)] * (1 - pinv)
+                            (1 - variables[1]) ** 2 * poly[d_index(dx, dy)][index(0, p - 2)] * (1 - pinv)
                         )
                         if dy > 0:
                             poly[d_index(dx, dy)][index(0, p)] += (
-                                2 * dy * (1 - vars[1])
+                                2 * dy * (1 - variables[1])
                                 * poly[d_index(dx, dy - 1)][index(0, p - 2)] * (1 - pinv)
                             )
                         if dy > 1:
@@ -369,7 +369,7 @@ def orthogonal_basis_triangle(order, derivs, vars=None):
                 for q in range(1, order - p + 1):
                     a, b, c = _jrc(2 * p + 1, q - 1)
                     poly[d_index(dx, dy)][index(q, p)] = (
-                        poly[d_index(dx, dy)][index(q - 1, p)] * ((2 * vars[1] - 1) * a + b)
+                        poly[d_index(dx, dy)][index(q - 1, p)] * ((2 * variables[1] - 1) * a + b)
                     )
                     if q > 1:
                         poly[d_index(dx, dy)][index(q, p)] -= (
@@ -383,17 +383,17 @@ def orthogonal_basis_triangle(order, derivs, vars=None):
     return poly
 
 
-def orthogonal_basis_quadrilateral(order, derivs, vars=None):
+def orthogonal_basis_quadrilateral(order, derivs, variables=None):
     """Create a basis of orthogonal polynomials."""
-    if vars is None:
-        vars = [x[0], x[1]]
-    assert len(vars) == 2
+    if variables is None:
+        variables = [x[0], x[1]]
+    assert len(variables) == 2
 
     def d_index(p, q):
         return (p + q + 1) * (p + q) // 2 + q
 
-    p0 = orthogonal_basis_interval(order, derivs, [vars[0]])
-    p1 = orthogonal_basis_interval(order, derivs, [vars[1]])
+    p0 = orthogonal_basis_interval(order, derivs, [variables[0]])
+    p1 = orthogonal_basis_interval(order, derivs, [variables[1]])
     poly = [None for d in range((derivs + 1) * (derivs + 2) // 2)]
     for i in range(derivs + 1):
         for j in range(derivs + 1 - i):
@@ -401,11 +401,11 @@ def orthogonal_basis_quadrilateral(order, derivs, vars=None):
     return poly
 
 
-def orthogonal_basis_tetrahedron(order, derivs, vars=None):
+def orthogonal_basis_tetrahedron(order, derivs, variables=None):
     """Create a basis of orthogonal polynomials."""
-    if vars is None:
-        vars = x
-    assert len(vars) == 3
+    if variables is None:
+        variables = x
+    assert len(variables) == 3
 
     def index(p, q, r):
         return (p + q + r) * (p + q + r + 1) * (p + q + r + 2) // 6 + (q + r) * (q + r + 1) // 2 + r
@@ -426,7 +426,7 @@ def orthogonal_basis_tetrahedron(order, derivs, vars=None):
                         invp = sympy.Rational(1, p)
                         poly[d_index(dx, dy, dz)][index(0, 0, p)] = (
                             poly[d_index(dx, dy, dz)][index(0, 0, p - 1)]
-                            * (2 * vars[0] + vars[1] + vars[2] - 1) * (2 - invp)
+                            * (2 * variables[0] + variables[1] + variables[2] - 1) * (2 - invp)
                         )
                         if dx > 0:
                             poly[d_index(dx, dy, dz)][index(0, 0, p)] += (
@@ -445,12 +445,12 @@ def orthogonal_basis_tetrahedron(order, derivs, vars=None):
                     if p > 1:
                         poly[d_index(dx, dy, dz)][index(0, 0, p)] -= (
                             poly[d_index(dx, dy, dz)][index(0, 0, p - 2)]
-                            * (vars[1] + vars[2] - 1) ** 2 * (1 - invp)
+                            * (variables[1] + variables[2] - 1) ** 2 * (1 - invp)
                         )
                         if dy > 0:
                             poly[d_index(dx, dy, dz)][index(0, 0, p)] -= (
                                 poly[d_index(dx, dy - 1, dz)][index(0, 0, p - 2)]
-                                * 2 * (vars[1] + vars[2] - 1) * dy * (1 - invp)
+                                * 2 * (variables[1] + variables[2] - 1) * dy * (1 - invp)
                             )
                         if dy > 1:
                             poly[d_index(dx, dy, dz)][index(0, 0, p)] -= (
@@ -460,7 +460,7 @@ def orthogonal_basis_tetrahedron(order, derivs, vars=None):
                         if dz > 0:
                             poly[d_index(dx, dy, dz)][index(0, 0, p)] -= (
                                 poly[d_index(dx, dy, dz - 1)][index(0, 0, p - 2)]
-                                * 2 * (vars[1] + vars[2] - 1) * dz * (1 - invp)
+                                * 2 * (variables[1] + variables[2] - 1) * dz * (1 - invp)
                             )
                         if dz > 1:
                             poly[d_index(dx, dy, dz)][index(0, 0, p)] -= (
@@ -478,7 +478,7 @@ def orthogonal_basis_tetrahedron(order, derivs, vars=None):
                             a, b, c = _jrc(2 * p + 1, q - 1)
                             poly[d_index(dx, dy, dz)][index(0, q, p)] = (
                                 poly[d_index(dx, dy, dz)][index(0, q - 1, p)]
-                                * ((2 * vars[1] + vars[2] - 1) * a + (1 - vars[2]) * b)
+                                * ((2 * variables[1] + variables[2] - 1) * a + (1 - variables[2]) * b)
                             )
                             if dy > 0:
                                 poly[d_index(dx, dy, dz)][index(0, q, p)] += (
@@ -493,12 +493,12 @@ def orthogonal_basis_tetrahedron(order, derivs, vars=None):
                             if q > 1:
                                 poly[d_index(dx, dy, dz)][index(0, q, p)] -= (
                                     poly[d_index(dx, dy, dz)][index(0, q - 2, p)]
-                                    * (1 - vars[2]) ** 2 * c
+                                    * (1 - variables[2]) ** 2 * c
                                 )
                                 if dz > 0:
                                     poly[d_index(dx, dy, dz)][index(0, q, p)] += (
                                         poly[d_index(dx, dy, dz - 1)][index(0, q - 2, p)]
-                                        * 2 * (1 - vars[2]) * dz * c
+                                        * 2 * (1 - variables[2]) * dz * c
                                     )
                                 if dz > 1:
                                     poly[d_index(dx, dy, dz)][index(0, q, p)] -= (
@@ -510,7 +510,7 @@ def orthogonal_basis_tetrahedron(order, derivs, vars=None):
                             a, b, c = _jrc(2 * p + 2 * q + 2, r - 1)
                             poly[d_index(dx, dy, dz)][index(r, q, p)] = (
                                 poly[d_index(dx, dy, dz)][index(r - 1, q, p)]
-                                * ((vars[2] * 2 - 1) * a + b)
+                                * ((variables[2] * 2 - 1) * a + b)
                             )
                             if dz > 0:
                                 poly[d_index(dx, dy, dz)][index(r, q, p)] += (
@@ -524,18 +524,18 @@ def orthogonal_basis_tetrahedron(order, derivs, vars=None):
     return poly
 
 
-def orthogonal_basis_hexahedron(order, derivs, vars=None):
+def orthogonal_basis_hexahedron(order, derivs, variables=None):
     """Create a basis of orthogonal polynomials."""
-    if vars is None:
-        vars = x
-    assert len(vars) == 3
+    if variables is None:
+        variables = x
+    assert len(variables) == 3
 
     def d_index(p, q, r):
         return (p + q + r) * (p + q + r + 1) * (p + q + r + 2) // 6 + (q + r) * (q + r + 1) // 2 + r
 
-    p0 = orthogonal_basis_interval(order, derivs, [vars[0]])
-    p1 = orthogonal_basis_interval(order, derivs, [vars[1]])
-    p2 = orthogonal_basis_interval(order, derivs, [vars[2]])
+    p0 = orthogonal_basis_interval(order, derivs, [variables[0]])
+    p1 = orthogonal_basis_interval(order, derivs, [variables[1]])
+    p2 = orthogonal_basis_interval(order, derivs, [variables[2]])
     poly = [None for d in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
     for i in range(derivs + 1):
         for j in range(derivs + 1 - i):
@@ -544,11 +544,11 @@ def orthogonal_basis_hexahedron(order, derivs, vars=None):
     return poly
 
 
-def orthogonal_basis_prism(order, derivs, vars=None):
+def orthogonal_basis_prism(order, derivs, variables=None):
     """Create a basis of orthogonal polynomials."""
-    if vars is None:
-        vars = x
-    assert len(vars) == 3
+    if variables is None:
+        variables = x
+    assert len(variables) == 3
 
     def d_index_tri(p, q):
         return (p + q + 1) * (p + q) // 2 + q
@@ -556,8 +556,8 @@ def orthogonal_basis_prism(order, derivs, vars=None):
     def d_index(p, q, r):
         return (p + q + r) * (p + q + r + 1) * (p + q + r + 2) // 6 + (q + r) * (q + r + 1) // 2 + r
 
-    p01 = orthogonal_basis_triangle(order, derivs, [vars[0], vars[1]])
-    p2 = orthogonal_basis_interval(order, derivs, [vars[2]])
+    p01 = orthogonal_basis_triangle(order, derivs, [variables[0], variables[1]])
+    p2 = orthogonal_basis_interval(order, derivs, [variables[2]])
     poly = [None for d in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
     for i in range(derivs + 1):
         for j in range(derivs + 1 - i):
@@ -566,11 +566,11 @@ def orthogonal_basis_prism(order, derivs, vars=None):
     return poly
 
 
-def orthogonal_basis_pyramid(order, derivs, vars=None):
+def orthogonal_basis_pyramid(order, derivs, variables=None):
     """Create a basis of orthogonal polynomials."""
-    if vars is None:
-        vars = x
-    assert len(vars) == 3
+    if variables is None:
+        variables = x
+    assert len(variables) == 3
 
     def index(i, j, k):
         out = k + j * (order + 1) + i * (order + 1) * (order + 2) // 2 - i * (i ** 2 + 5) // 6
@@ -600,7 +600,7 @@ def orthogonal_basis_pyramid(order, derivs, vars=None):
                     if i > 0:
                         poly[d_index(dx, dy, dz)][index(i, 0, 0)] = (
                             poly[d_index(dx, dy, dz)][index(i - 1, 0, 0)]
-                            * (2 * vars[0] + vars[2] - 1) * (2 * i - 1) / i
+                            * (2 * variables[0] + variables[2] - 1) * (2 * i - 1) / i
                         )
                         if dx > 0:
                             poly[d_index(dx, dy, dz)][index(i, 0, 0)] += (
@@ -615,12 +615,12 @@ def orthogonal_basis_pyramid(order, derivs, vars=None):
                     if i > 1:
                         poly[d_index(dx, dy, dz)][index(i, 0, 0)] -= (
                             poly[d_index(dx, dy, dz)][index(i - 2, 0, 0)]
-                            * (1 - vars[2]) ** 2 * (i - 1) / i
+                            * (1 - variables[2]) ** 2 * (i - 1) / i
                         )
                         if dz > 0:
                             poly[d_index(dx, dy, dz)][index(i, 0, 0)] += (
                                 poly[d_index(dx, dy, dz - 1)][index(i - 2, 0, 0)]
-                                * 2 * (1 - vars[2]) * dz * (i - 1) / i
+                                * 2 * (1 - variables[2]) * dz * (i - 1) / i
                             )
                         if dz > 1:
                             poly[d_index(dx, dy, dz)][index(i, 0, 0)] -= (
@@ -633,33 +633,33 @@ def orthogonal_basis_pyramid(order, derivs, vars=None):
                             if i >= j:
                                 poly[d_index(dx, dy, dz)][index(i, j, 0)] = (
                                     poly[d_index(dx, dy, dz)][index(i, j - 1, 0)]
-                                    * (2 * vars[1] / (1 - vars[2]) - 1)
+                                    * (2 * variables[1] / (1 - variables[2]) - 1)
                                     * (2 * j - 1) / j
                                 )
                                 if dy > 0:
                                     poly[d_index(dx, dy, dz)][index(i, j, 0)] += (
                                         poly[d_index(dx, dy - 1, dz)][index(i, j - 1, 0)]
-                                        * 2 * dy / (1 - vars[2])
+                                        * 2 * dy / (1 - variables[2])
                                         * (2 * j - 1) / j
                                     )
                                 for di in range(1, dz + 1):
                                     poly[d_index(dx, dy, dz)][index(i, j, 0)] += (
                                         poly[d_index(dx, dy, dz - di)][index(i, j - 1, 0)]
                                         * combinations(dz, di)
-                                        * vars[1] / (1 - vars[2]) ** (di + 1)
+                                        * variables[1] / (1 - variables[2]) ** (di + 1)
                                         * 2 * (2 * j - 1) / j
                                     )
                                     if dy > 0:
                                         poly[d_index(dx, dy, dz)][index(i, j, 0)] += (
                                             poly[d_index(dx, dy - 1, dz - di)][index(i, j - 1, 0)]
                                             * combinations(dz, di)
-                                            * dy / (1 - vars[2]) ** (di + 1)
+                                            * dy / (1 - variables[2]) ** (di + 1)
                                             * 2 * (2 * j - 1) / j
                                         )
                             else:
                                 poly[d_index(dx, dy, dz)][index(i, j, 0)] = (
                                     poly[d_index(dx, dy, dz)][index(i, j - 1, 0)]
-                                    * (2 * vars[1] + vars[2] - 1)
+                                    * (2 * variables[1] + variables[2] - 1)
                                     * (2 * j - 1) / j
                                 )
                                 if dy > 0:
@@ -681,7 +681,7 @@ def orthogonal_basis_pyramid(order, derivs, vars=None):
                             elif i + 1 == j:
                                 poly[d_index(dx, dy, dz)][index(i, j, 0)] -= (
                                     poly[d_index(dx, dy, dz)][index(i, j - 2, 0)]
-                                    * (1 - vars[2]) * (j - 1) / j
+                                    * (1 - variables[2]) * (j - 1) / j
                                 )
                                 if dz > 0:
                                     poly[d_index(dx, dy, dz)][index(i, j, 0)] += (
@@ -691,12 +691,12 @@ def orthogonal_basis_pyramid(order, derivs, vars=None):
                             else:
                                 poly[d_index(dx, dy, dz)][index(i, j, 0)] -= (
                                     poly[d_index(dx, dy, dz)][index(i, j - 2, 0)]
-                                    * (1 - vars[2]) ** 2 * (j - 1) / j
+                                    * (1 - variables[2]) ** 2 * (j - 1) / j
                                 )
                                 if dz > 0:
                                     poly[d_index(dx, dy, dz)][index(i, j, 0)] += (
                                         poly[d_index(dx, dy, dz - 1)][index(i, j - 2, 0)]
-                                        * 2 * dz * (1 - vars[2]) * (j - 1) / j
+                                        * 2 * dz * (1 - variables[2]) * (j - 1) / j
                                     )
                                 if dz > 1:
                                     poly[d_index(dx, dy, dz)][index(i, j, 0)] -= (
@@ -708,7 +708,7 @@ def orthogonal_basis_pyramid(order, derivs, vars=None):
                             a, b, c = _jrc(2 * max(i, j) + 2, k - 1)
                             poly[d_index(dx, dy, dz)][index(i, j, k)] = (
                                 poly[d_index(dx, dy, dz)][index(i, j, k - 1)]
-                                * a * (2 * vars[2] - 1)
+                                * a * (2 * variables[2] - 1)
                             )
                             if dz > 0:
                                 poly[d_index(dx, dy, dz)][index(i, j, k)] += (
@@ -726,19 +726,19 @@ def orthogonal_basis_pyramid(order, derivs, vars=None):
     return poly
 
 
-def orthogonal_basis(cell, order, derivs, vars=None):
+def orthogonal_basis(cell, order, derivs, variables=None):
     """Create a basis of orthogonal polynomials."""
     if cell == "interval":
-        return orthogonal_basis_interval(order, derivs, vars)
+        return orthogonal_basis_interval(order, derivs, variables)
     if cell == "triangle":
-        return orthogonal_basis_triangle(order, derivs, vars)
+        return orthogonal_basis_triangle(order, derivs, variables)
     if cell == "quadrilateral":
-        return orthogonal_basis_quadrilateral(order, derivs, vars)
+        return orthogonal_basis_quadrilateral(order, derivs, variables)
     if cell == "hexahedron":
-        return orthogonal_basis_hexahedron(order, derivs, vars)
+        return orthogonal_basis_hexahedron(order, derivs, variables)
     if cell == "tetrahedron":
-        return orthogonal_basis_tetrahedron(order, derivs, vars)
+        return orthogonal_basis_tetrahedron(order, derivs, variables)
     if cell == "prism":
-        return orthogonal_basis_prism(order, derivs, vars)
+        return orthogonal_basis_prism(order, derivs, variables)
     if cell == "pyramid":
-        return orthogonal_basis_pyramid(order, derivs, vars)
+        return orthogonal_basis_pyramid(order, derivs, variables)
