@@ -340,8 +340,8 @@ def orthogonal_basis_triangle(order, derivs, variables=None):
                     pinv = sympy.Rational(1, p)
 
                     poly[d_index(dx, dy)][index(0, p)] = (
-                        (2 * variables[0] + variables[1] - 1) * poly[d_index(dx, dy)][index(0, p - 1)]
-                        * (2 - pinv)
+                        poly[d_index(dx, dy)][index(0, p - 1)]
+                        * (2 * variables[0] + variables[1] - 1) * (2 - pinv)
                     )
                     if dy > 0:
                         poly[d_index(dx, dy)][index(0, p)] += (
@@ -353,7 +353,8 @@ def orthogonal_basis_triangle(order, derivs, variables=None):
                         )
                     if p > 1:
                         poly[d_index(dx, dy)][index(0, p)] -= (
-                            (1 - variables[1]) ** 2 * poly[d_index(dx, dy)][index(0, p - 2)] * (1 - pinv)
+                            poly[d_index(dx, dy)][index(0, p - 2)]
+                            * (1 - variables[1]) ** 2 * (1 - pinv)
                         )
                         if dy > 0:
                             poly[d_index(dx, dy)][index(0, p)] += (
@@ -478,7 +479,8 @@ def orthogonal_basis_tetrahedron(order, derivs, variables=None):
                             a, b, c = _jrc(2 * p + 1, q - 1)
                             poly[d_index(dx, dy, dz)][index(0, q, p)] = (
                                 poly[d_index(dx, dy, dz)][index(0, q - 1, p)]
-                                * ((2 * variables[1] + variables[2] - 1) * a + (1 - variables[2]) * b)
+                                * ((2 * variables[1] + variables[2] - 1) * a
+                                   + (1 - variables[2]) * b)
                             )
                             if dy > 0:
                                 poly[d_index(dx, dy, dz)][index(0, q, p)] += (
