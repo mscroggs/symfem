@@ -98,6 +98,10 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
     if speed == "fast" and order > 2:
         pytest.skip()
 
+    # TODO: Implement faster non-symbolic mode and remove this
+    if order > 1:
+        pytest.skip()
+
     if symfem_type in ["Sdiv", "Scurl"]:
         pytest.xfail("Basix elements cannot yet be provided equispaced variant")
 
@@ -126,7 +130,7 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
     result = space.tabulate(0, points)[0]
 
     element = create_element(cell, symfem_type, order)
-    sym_result = element.tabulate_basis(points, "xyz,xyz", symbolic=False, use_legendre=True)
+    sym_result = element.tabulate_basis(points, "xyz,xyz", symbolic=False)
 
     if len(result.shape) != len(sym_result.shape):
         sym_result = sym_result.reshape(result.shape)
