@@ -304,7 +304,7 @@ def orthogonal_basis_interval(order, derivs, vars=None):
         vars = [x[0]]
     assert len(vars) == 1
 
-    poly = [[None for i in range(order + 1)] for i in range(derivs + 1)]
+    poly = [[None for i in range(order + 1)] for d in range(derivs + 1)]
     for dx in range(derivs + 1):
         poly[dx][0] = sympy.Integer(1 if dx == 0 else 0)
         for i in range(1, order + 1):
@@ -328,7 +328,7 @@ def orthogonal_basis_triangle(order, derivs, vars=None):
     d_index = index
 
     poly = [[None for i in range((order + 1) * (order + 2) // 2)]
-            for j in range((derivs + 1) * (derivs + 2) // 2)]
+            for d in range((derivs + 1) * (derivs + 2) // 2)]
 
     for dx in range(derivs + 1):
         for dy in range(derivs + 1 - dx):
@@ -394,7 +394,7 @@ def orthogonal_basis_quadrilateral(order, derivs, vars=None):
 
     p0 = orthogonal_basis_interval(order, derivs, [vars[0]])
     p1 = orthogonal_basis_interval(order, derivs, [vars[1]])
-    poly = [None for i in range((derivs + 1) * (derivs + 2) // 2)]
+    poly = [None for d in range((derivs + 1) * (derivs + 2) // 2)]
     for i in range(derivs + 1):
         for j in range(derivs + 1 - i):
             poly[d_index(i, j)] = [a * b for a in p0[i] for b in p1[j]]
@@ -536,7 +536,7 @@ def orthogonal_basis_hexahedron(order, derivs, vars=None):
     p0 = orthogonal_basis_interval(order, derivs, [vars[0]])
     p1 = orthogonal_basis_interval(order, derivs, [vars[1]])
     p2 = orthogonal_basis_interval(order, derivs, [vars[2]])
-    poly = [None for i in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
+    poly = [None for d in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
     for i in range(derivs + 1):
         for j in range(derivs + 1 - i):
             for k in range(derivs + 1 - i - j):
@@ -558,7 +558,7 @@ def orthogonal_basis_prism(order, derivs, vars=None):
 
     p01 = orthogonal_basis_triangle(order, derivs, [vars[0], vars[1]])
     p2 = orthogonal_basis_interval(order, derivs, [vars[2]])
-    poly = [None for i in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
+    poly = [None for d in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
     for i in range(derivs + 1):
         for j in range(derivs + 1 - i):
             for k in range(derivs + 1 - i - j):
@@ -572,8 +572,6 @@ def orthogonal_basis_pyramid(order, derivs, vars=None):
         vars = x
     assert len(vars) == 3
 
-    assert derivs == 0
-
     def index(i, j, k):
         out = k + j * (order + 1) + i * (order + 1) * (order + 2) // 2 - i * (i ** 2 + 5) // 6
         if i > j:
@@ -582,40 +580,148 @@ def orthogonal_basis_pyramid(order, derivs, vars=None):
             out -= j * (j - 1) // 2 + i * (i - 1) // 2
         return out
 
-    pn = (2 * order + 3) * (order + 2) * (order + 1) // 6
+    def d_index(p, q, r):
+        return (p + q + r) * (p + q + r + 1) * (p + q + r + 2) // 6 + (q + r) * (q + r + 1) // 2 + r
 
-    poly = [None for i in range(pn)]
-    poly[0] = sympy.Integer(1)
+    def combinations(n, k):
+        out = 1
+        for i in range(n, n - k, -1):
+            out *= i
+        return out
 
-    for i in range(order + 1):
-        if i > 0:
-            poly[index(i, 0, 0)] = (
-                (2 * vars[0] / (1 - vars[2]) - 1) * poly[index(i - 1, 0, 0)] * (1 - vars[2])
-                * (2 * i - 1) / i
-            )
-        if i > 1:
-            poly[index(i, 0, 0)] -= (i - 1) * poly[index(i - 2, 0, 0)] * (1 - vars[2]) ** 2 / i
+    poly = [[None for i in range((2 * order + 3) * (order + 2) * (order + 1) // 6)]
+            for d in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
+    for dx in range(derivs + 1):
+        for dy in range(derivs + 1 - dx):
+            for dz in range(derivs + 1 - dx - dy):
+                poly[d_index(dx, dy, dz)][0] = sympy.Integer(1 if dx == dy == dz == 0 else 0)
 
-        for j in range(order + 1):
-            if j > 0:
-                poly[index(i, j, 0)] = (
-                    poly[index(i, j - 1, 0)]
-                    * (2 * vars[1] / (1 - vars[2]) - 1)
-                    * (1 - vars[2]) ** (max(i, j) - max(i, j - 1))
-                    * (2 * j - 1) / j
-                )
-            if j > 1:
-                poly[index(i, j, 0)] -= (
-                    poly[index(i, j - 2, 0)] * (1 - vars[2]) ** (max(i, j) - max(i, j - 2))
-                    * (j - 1) / j
-                )
+                for i in range(order + 1):
+                    if i > 0:
+                        poly[d_index(dx, dy, dz)][index(i, 0, 0)] = (
+                            poly[d_index(dx, dy, dz)][index(i - 1, 0, 0)]
+                            * (2 * vars[0] + vars[2] - 1) * (2 * i - 1) / i
+                        )
+                        if dx > 0:
+                            poly[d_index(dx, dy, dz)][index(i, 0, 0)] += (
+                                poly[d_index(dx - 1, dy, dz)][index(i - 1, 0, 0)]
+                                * 2 * dx * (2 * i - 1) / i
+                            )
+                        if dz > 0:
+                            poly[d_index(dx, dy, dz)][index(i, 0, 0)] += (
+                                poly[d_index(dx, dy, dz - 1)][index(i - 1, 0, 0)]
+                                * dz * (2 * i - 1) / i
+                            )
+                    if i > 1:
+                        poly[d_index(dx, dy, dz)][index(i, 0, 0)] -= (
+                            poly[d_index(dx, dy, dz)][index(i - 2, 0, 0)]
+                            * (1 - vars[2]) ** 2 * (i - 1) / i
+                        )
+                        if dz > 0:
+                            poly[d_index(dx, dy, dz)][index(i, 0, 0)] += (
+                                poly[d_index(dx, dy, dz - 1)][index(i - 2, 0, 0)]
+                                * 2 * (1 - vars[2]) * dz * (i - 1) / i
+                            )
+                        if dz > 1:
+                            poly[d_index(dx, dy, dz)][index(i, 0, 0)] -= (
+                                poly[d_index(dx, dy, dz - 2)][index(i - 2, 0, 0)]
+                                * dz * (dz - 1) * (i - 1) / i
+                            )
 
-            for k in range(1, order + 1 - max(i, j)):
-                a, b, c = _jrc(2 * max(i, j) + 2, k - 1)
-                poly[index(i, j, k)] = a * (2 * vars[2] - 1) * poly[index(i, j, k - 1)]
-                poly[index(i, j, k)] += b * poly[index(i, j, k - 1)]
-                if k > 1:
-                    poly[index(i, j, k)] -= c * poly[index(i, j, k - 2)]
+                    for j in range(order + 1):
+                        if j > 0:
+                            if i >= j:
+                                poly[d_index(dx, dy, dz)][index(i, j, 0)] = (
+                                    poly[d_index(dx, dy, dz)][index(i, j - 1, 0)]
+                                    * (2 * vars[1] / (1 - vars[2]) - 1)
+                                    * (2 * j - 1) / j
+                                )
+                                if dy > 0:
+                                    poly[d_index(dx, dy, dz)][index(i, j, 0)] += (
+                                        poly[d_index(dx, dy - 1, dz)][index(i, j - 1, 0)]
+                                        * 2 * dy / (1 - vars[2])
+                                        * (2 * j - 1) / j
+                                    )
+                                for di in range(1, dz + 1):
+                                    poly[d_index(dx, dy, dz)][index(i, j, 0)] += (
+                                        poly[d_index(dx, dy, dz - di)][index(i, j - 1, 0)]
+                                        * combinations(dz, di)
+                                        * vars[1] / (1 - vars[2]) ** (di + 1)
+                                        * 2 * (2 * j - 1) / j
+                                    )
+                                    if dy > 0:
+                                        poly[d_index(dx, dy, dz)][index(i, j, 0)] += (
+                                            poly[d_index(dx, dy - 1, dz - di)][index(i, j - 1, 0)]
+                                            * combinations(dz, di)
+                                            * dy / (1 - vars[2]) ** (di + 1)
+                                            * 2 * (2 * j - 1) / j
+                                        )
+                            else:
+                                poly[d_index(dx, dy, dz)][index(i, j, 0)] = (
+                                    poly[d_index(dx, dy, dz)][index(i, j - 1, 0)]
+                                    * (2 * vars[1] + vars[2] - 1)
+                                    * (2 * j - 1) / j
+                                )
+                                if dy > 0:
+                                    poly[d_index(dx, dy, dz)][index(i, j, 0)] += (
+                                        poly[d_index(dx, dy - 1, dz)][index(i, j - 1, 0)]
+                                        * 2 * dy * (2 * j - 1) / j
+                                    )
+                                if dz > 0:
+                                    poly[d_index(dx, dy, dz)][index(i, j, 0)] += (
+                                        poly[d_index(dx, dy, dz - 1)][index(i, j - 1, 0)]
+                                        * dz * (2 * j - 1) / j
+                                    )
+                        if j > 1:
+                            if i >= j:
+                                poly[d_index(dx, dy, dz)][index(i, j, 0)] -= (
+                                    poly[d_index(dx, dy, dz)][index(i, j - 2, 0)]
+                                    * (j - 1) / j
+                                )
+                            elif i + 1 == j:
+                                poly[d_index(dx, dy, dz)][index(i, j, 0)] -= (
+                                    poly[d_index(dx, dy, dz)][index(i, j - 2, 0)]
+                                    * (1 - vars[2]) * (j - 1) / j
+                                )
+                                if dz > 0:
+                                    poly[d_index(dx, dy, dz)][index(i, j, 0)] += (
+                                        poly[d_index(dx, dy, dz - 1)][index(i, j - 2, 0)]
+                                        * dz * (j - 1) / j
+                                    )
+                            else:
+                                poly[d_index(dx, dy, dz)][index(i, j, 0)] -= (
+                                    poly[d_index(dx, dy, dz)][index(i, j - 2, 0)]
+                                    * (1 - vars[2]) ** 2 * (j - 1) / j
+                                )
+                                if dz > 0:
+                                    poly[d_index(dx, dy, dz)][index(i, j, 0)] += (
+                                        poly[d_index(dx, dy, dz - 1)][index(i, j - 2, 0)]
+                                        * 2 * dz * (1 - vars[2]) * (j - 1) / j
+                                    )
+                                if dz > 1:
+                                    poly[d_index(dx, dy, dz)][index(i, j, 0)] -= (
+                                        poly[d_index(dx, dy, dz - 2)][index(i, j - 2, 0)]
+                                        * dz * (dz - 1) * (j - 1) / j
+                                    )
+
+                        for k in range(1, order + 1 - max(i, j)):
+                            a, b, c = _jrc(2 * max(i, j) + 2, k - 1)
+                            poly[d_index(dx, dy, dz)][index(i, j, k)] = (
+                                poly[d_index(dx, dy, dz)][index(i, j, k - 1)]
+                                * a * (2 * vars[2] - 1)
+                            )
+                            if dz > 0:
+                                poly[d_index(dx, dy, dz)][index(i, j, k)] += (
+                                    poly[d_index(dx, dy, dz - 1)][index(i, j, k - 1)]
+                                    * a * 2 * dz
+                                )
+                            poly[d_index(dx, dy, dz)][index(i, j, k)] += (
+                                b * poly[d_index(dx, dy, dz)][index(i, j, k - 1)]
+                            )
+                            if k > 1:
+                                poly[d_index(dx, dy, dz)][index(i, j, k)] -= (
+                                    c * poly[d_index(dx, dy, dz)][index(i, j, k - 2)]
+                                )
 
     return poly
 
