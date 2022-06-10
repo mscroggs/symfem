@@ -36,4 +36,4 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.coverall_token }}
-        run: coveralls
+        run: python3 -m coveralls
