@@ -33,7 +33,7 @@ jobs:
       - name: Check coverage is over 80%
         run: python3 .github/scripts/coveralls_check.py
       - name: Upload to Coveralls
-        if: ${{ github.ref == 'ref/head/main' }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.coverall_token }}
         run: coveralls
