@@ -1,13 +1,16 @@
 """Bernstein elements on simplices.
 
-This element's definition appears in https://doi.org/10.1007/s00211-010-0327-2
-(Kirby, 2011)
+This element's definition appears in
+https://doi.org/10.1007/s00211-010-0327-2 (Kirby, 2011) and
+https://doi.org/10.1137/11082539X (Ainsworth, Andriamaro, Davydov, 2011)
 """
 
+import sympy
 from ..symbolic import x, to_sympy
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set
-from ..functionals import IntegralAgainst
+from ..functionals import BaseFunctional
+from ..polynomials import orthogonal_basis
 
 
 def single_choose(n, k):
@@ -65,16 +68,38 @@ def bernstein_polynomials(n, d):
     return poly
 
 
+class BernsteinFunctional(BaseFunctional):
+    def __init__(self, reference, index, degree):
+        self.orth = [
+            o / sympy.sqrt(reference.integral(o * o, x))
+            for o in orthogonal_basis(reference.name, degree, 0)[0]
+        ]
+        self.reference = reference
+
+        bern = bernstein_polynomials(degree, reference.tdim)
+        mat = sympy.Matrix(
+            [[reference.integral(o * b, x) for b in bern] for o in self.orth])
+        minv = mat.inv()
+        self.alpha = minv.row(index)
+
+    def eval(self, function, symbolic=True):
+        """Apply the functional to a function"""
+        coeffs = [
+            self.reference.integral(function * f, x)
+            for f in self.orth
+        ]
+        return sum(i * j for i, j in zip(self.alpha, coeffs))
+
+
 class Bernstein(CiarletElement):
     """Bernstein finite element."""
 
     def __init__(self, reference, order):
-
-        dofs = [
-            IntegralAgainst(reference, p, entity=(reference.tdim, 0))
-            for p in bernstein_polynomials(order, reference.tdim)
-        ]
         poly = polynomial_set(reference.tdim, 1, order)
+        dofs = [
+            BernsteinFunctional(reference, i, order)
+            for i, _ in enumerate(poly)
+        ]
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     names = ["Bernstein", "Bernstein-Bezier"]

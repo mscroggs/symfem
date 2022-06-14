@@ -16,7 +16,7 @@ class BaseFunctional:
         self.mapping = mapping
 
     def eval(self, fun, symbolic=True):
-        """Apply to the functional to a function."""
+        """Apply the functional to a function."""
         raise NotImplementedError
 
     def dof_point(self):
@@ -47,7 +47,7 @@ class PointEvaluation(BaseFunctional):
         self.point = point
 
     def eval(self, function, symbolic=True):
-        """Apply to the functional to a function."""
+        """Apply the functional to a function."""
         value = subs(function, x, self.point)
         if symbolic:
             return value
@@ -74,7 +74,7 @@ class WeightedPointEvaluation(BaseFunctional):
         self.weight = weight
 
     def eval(self, function, symbolic=True):
-        """Apply to the functional to a function."""
+        """Apply the functional to a function."""
         value = subs(function, x, self.point) * self.weight
         if symbolic:
             return value
@@ -101,7 +101,7 @@ class DerivativePointEvaluation(BaseFunctional):
         self.derivative = derivative
 
     def eval(self, function, symbolic=True):
-        """Apply to the functional to a function."""
+        """Apply the functional to a function."""
         for i, j in zip(x, self.derivative):
             for k in range(j):
                 function = diff(function, i)
@@ -138,7 +138,7 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
         self.dir = direction
 
     def eval(self, function, symbolic=True):
-        """Apply to the functional to a function."""
+        """Apply the functional to a function."""
         if isinstance(function, PiecewiseFunction):
             function = function.get_piece(self.point)
         value = subs(derivative(function, self.dir), x, self.point)
@@ -177,7 +177,7 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
         self.component = component
 
     def eval(self, function, symbolic=True):
-        """Apply to the functional to a function."""
+        """Apply the functional to a function."""
         value = subs(jacobian_component(function, self.component), x, self.point)
         if symbolic:
             return value
@@ -201,7 +201,7 @@ class PointInnerProduct(BaseFunctional):
         self.rvec = rvec
 
     def eval(self, function, symbolic=True):
-        """Apply to the functional to a function."""
+        """Apply the functional to a function."""
         v = subs(function, x, self.point)
         tdim = len(self.lvec)
         assert len(function) == tdim ** 2
@@ -235,7 +235,7 @@ class DotPointEvaluation(BaseFunctional):
         self.vector = vector
 
     def eval(self, function, symbolic=True):
-        """Apply to the functional to a function."""
+        """Apply the functional to a function."""
         value = vdot(subs(function, x, self.point), subs(self.vector, x, self.point))
         if symbolic:
             return value
@@ -282,7 +282,7 @@ class IntegralAgainst(BaseFunctional):
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.reference.vertices))
 
     def eval(self, function, symbolic=True):
-        """Apply to the functional to a function."""
+        """Apply the functional to a function."""
         point = [i for i in self.reference.origin]
         for i, a in enumerate(zip(*self.reference.axes)):
             for j, k in zip(a, t):
@@ -317,7 +317,7 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.reference.vertices))
 
     def eval(self, function, symbolic=True):
-        """Apply to the functional to a function."""
+        """Apply the functional to a function."""
         point = [i for i in self.reference.origin]
         for i, a in enumerate(zip(*self.reference.axes)):
             for j, k in zip(a, t):
@@ -352,7 +352,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.reference.vertices))
 
     def eval(self, function, symbolic=True):
-        """Apply to the functional to a function."""
+        """Apply the functional to a function."""
         for dir, o in zip(self.directions, self.orders):
             for i in range(o):
                 function = sum(d * diff(function, x[j]) for j, d in enumerate(dir))
@@ -402,7 +402,7 @@ class IntegralMoment(BaseFunctional):
             self.f = f
 
     def eval(self, function, symbolic=True):
-        """Apply to the functional to a function."""
+        """Apply the functional to a function."""
         point = [i for i in self.reference.origin]
         for i, a in enumerate(zip(*self.reference.axes)):
             for j, k in zip(a, t):
@@ -476,7 +476,7 @@ class DerivativeIntegralMoment(IntegralMoment):
         return self.dot_with
 
     def eval(self, function, symbolic=True):
-        """Apply to the functional to a function."""
+        """Apply the functional to a function."""
         point = [i for i in self.reference.origin]
         for i, a in enumerate(zip(*self.reference.axes)):
             for j, k in zip(a, t):
@@ -498,7 +498,7 @@ class DivergenceIntegralMoment(IntegralMoment):
         super().__init__(reference, f, dof, entity=entity, mapping=mapping)
 
     def eval(self, function, symbolic=True):
-        """Apply to the functional to a function."""
+        """Apply the functional to a function."""
         point = [i for i in self.reference.origin]
         for i, a in enumerate(zip(*self.reference.axes)):
             for j, k in zip(a, t):
