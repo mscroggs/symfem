@@ -78,6 +78,8 @@ class BernsteinFunctional(BaseFunctional):
             for o in orthogonal_basis(reference.name, degree, 0)[0]
         ]
         self.reference = reference
+        self.index = index
+        self.degree = degree
 
         bern = bernstein_polynomials(degree, reference.tdim)
         mat = sympy.Matrix(
@@ -92,6 +94,13 @@ class BernsteinFunctional(BaseFunctional):
             for f in self.orth
         ]
         return sum(i * j for i, j in zip(self.alpha, coeffs))
+
+    def get_tex(self):
+        """Get a representation of the functional as TeX, and list of terms involved."""
+        return f"v\\mapsto c_{{{self.index}}}", [
+            "\\(v=\\sum_ic_iB_i\\)",
+            f"\\(B_1\\) to \\(B_n\\) are the degree {self.degree} Bernstein polynomials on the cell"
+        ]
 
 
 class Bernstein(CiarletElement):
