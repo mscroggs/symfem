@@ -69,7 +69,10 @@ def bernstein_polynomials(n, d):
 
 
 class BernsteinFunctional(BaseFunctional):
-    def __init__(self, reference, index, degree):
+    """Functional for a Bernstein element."""
+
+    def __init__(self, reference, index, degree, entity):
+        super().__init__(entity)
         self.orth = [
             o / sympy.sqrt(reference.integral(o * o, x))
             for o in orthogonal_basis(reference.name, degree, 0)[0]
@@ -83,7 +86,7 @@ class BernsteinFunctional(BaseFunctional):
         self.alpha = minv.row(index)
 
     def eval(self, function, symbolic=True):
-        """Apply the functional to a function"""
+        """Apply the functional to a function."""
         coeffs = [
             self.reference.integral(function * f, x)
             for f in self.orth
@@ -97,7 +100,7 @@ class Bernstein(CiarletElement):
     def __init__(self, reference, order):
         poly = polynomial_set(reference.tdim, 1, order)
         dofs = [
-            BernsteinFunctional(reference, i, order)
+            BernsteinFunctional(reference, i, order, (reference.tdim, 0))
             for i, _ in enumerate(poly)
         ]
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
