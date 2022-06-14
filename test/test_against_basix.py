@@ -98,10 +98,6 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
     if speed == "fast" and order > 2:
         pytest.skip()
 
-    # TODO: Implement faster non-symbolic mode and remove this
-    if order > 1:
-        pytest.skip()
-
     if symfem_type in ["Sdiv", "Scurl"]:
         pytest.xfail("Basix elements cannot yet be provided equispaced variant")
 

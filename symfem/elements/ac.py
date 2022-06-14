@@ -47,6 +47,7 @@ class AC(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
+        self.max_order = order + 1
 
     def init_kwargs(self):
         """Return the kwargs used to create this element."""

@@ -37,6 +37,7 @@ class ArnoldBoffiFalk(CiarletElement):
                 entity=(2, 0), mapping="contravariant"))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        self.max_order = order + 2
 
     def init_kwargs(self):
         """Return the kwargs used to create this element."""

@@ -9,6 +9,7 @@ from .symbolic import x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float, s
 from .calculus import diff
 from .vectors import vsub
 from .basis_function import ElementBasisFunction
+from .polynomials import orthogonal_basis
 
 
 class NoTensorProduct(Exception):
@@ -45,6 +46,10 @@ class FiniteElement:
     def tabulate_basis(self, points, order="xyzxyz", symbolic=True):
         """Evaluate the basis functions of the element at the given points."""
         if not symbolic:
+            output = self._tabulate_basis_nonsymbolic(points, order)
+            if output is not None:
+                return output
+
             warnings.warn("Converting from symbolic to float. This may be slow.")
             return numpy.array([to_float(self.tabulate_basis(points, order=order,
                                                              symbolic=True))])
@@ -85,6 +90,10 @@ class FiniteElement:
                 output.append(row)
             return output
         raise ValueError(f"Unknown order: {order}")
+
+    def _tabulate_basis_nonsymbolic(self, points, order="xyzxyz"):
+        """Evaluate the basis functions of the element at the given points."""
+        return None
 
     def map_to_cell(self, vertices, basis=None):
         """Map the basis onto a cell using the appropriate mapping for the element."""
@@ -251,6 +260,8 @@ class CiarletElement(FiniteElement):
         self._basis_functions = None
         self._reshaped_basis_functions = None
         self._dual_inv = None
+        self._wcoeffs = None
+        self.max_order = order
 
     def entity_dofs(self, entity_dim, entity_number):
         """Get the numbers of the DOFs associated with the given entity."""
@@ -280,12 +291,24 @@ class CiarletElement(FiniteElement):
                 [to_float(subs(f, x, p)) for f in self.get_polynomial_basis()]
                 for p in points])
 
-    def tabulate_basis(self, points, order="xyzxyz", symbolic=True):
+    def _tabulate_basis_nonsymbolic(self, points, order="xyzxyz"):
         """Evaluate the basis functions of the element at the given points."""
-        if symbolic:
-            return super().tabulate_basis(points, order, symbolic=True)
 
-        assert not symbolic
+        if self._wcoeffs is None:
+            obasis = orthogonal_basis(self.reference.name, self.max_order, 0)[0]
+            mat = numpy.empty((len(self._basis), len(obasis) * self.range_dim))
+            for j, g in enumerate(self._basis):
+                for i, f in enumerate(obasis):
+                    if self.range_dim == 1:
+                        # TODO: do these integrals numerically
+                        mat[j, i] = float(self.reference.integral(f * g, x))
+                    else:
+                        for d in range(self.range_dim):
+                            mat[j, i + d * len(obasis)] = float(self.reference.integral(f * g[d], x))
+                for jj in range(j):
+                    mat[j, :] -= numpy.dot(mat[jj, :], mat[j, :]) * mat[jj, :]
+                mat[j, :] /= numpy.linalg.norm(mat[j, :])
+            self._wcoeffs = mat
 
         tabulated_polyset = self.get_tabulated_polynomial_basis(
             points, symbolic=False)
@@ -323,6 +346,7 @@ class CiarletElement(FiniteElement):
                 for point in range(results.shape[1])
             ])
         raise ValueError(f"Unknown order: {order}")
+
 
     def get_dual_matrix(self, symbolic=True):
         """Get the dual matrix."""
