@@ -9,7 +9,7 @@ import sympy
 from ..symbolic import x, to_sympy
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set
-from ..functionals import BaseFunctional
+from ..functionals import BaseFunctional, PointEvaluation
 from ..polynomials import orthogonal_basis
 
 
@@ -61,7 +61,7 @@ def bernstein_polynomials(n, d):
 
     for p in powers:
         f = choose(n, p)
-        for a, b in zip(lambdas, p):
+        for a, b in zip(lambdas[::-1], p):
             f *= a ** b
         poly.append(f)
 
@@ -77,7 +77,7 @@ class BernsteinFunctional(BaseFunctional):
             o / sympy.sqrt(reference.integral(o * o, x))
             for o in orthogonal_basis(reference.name, degree, 0)[0]
         ]
-        self.reference = reference
+        self.ref = reference
         self.index = index
         self.degree = degree
 
@@ -87,10 +87,18 @@ class BernsteinFunctional(BaseFunctional):
         minv = mat.inv()
         self.alpha = minv.row(index)
 
+    def dof_point(self):
+        """Get the location of the DOF in the cell."""
+        return self.ref.sub_entity(*self.entity).midpoint()
+
+    def dof_direction(self):
+        """Get the direction of the DOF."""
+        return None
+
     def eval(self, function, symbolic=True):
         """Apply the functional to a function."""
         coeffs = [
-            self.reference.integral(function * f, x)
+            self.ref.integral(function * f, x)
             for f in self.orth
         ]
         return sum(i * j for i, j in zip(self.alpha, coeffs))
@@ -108,10 +116,60 @@ class Bernstein(CiarletElement):
 
     def __init__(self, reference, order):
         poly = polynomial_set(reference.tdim, 1, order)
-        dofs = [
-            BernsteinFunctional(reference, i, order, (reference.tdim, 0))
-            for i, _ in enumerate(poly)
-        ]
+
+        if order == 0:
+            dofs = [PointEvaluation(reference.midpoint(), (reference.tdim, 0))]
+        else:
+            dofs = [
+                BernsteinFunctional(reference, i, order, (reference.tdim, 0))
+                for i, _ in enumerate(poly)
+            ]
+
+            def index(x, y=0, z=0):
+                return (
+                    z * (z ** 2 - 3 * z * order - 6 * z + 3 * order ** 2 + 12 * order + 11) // 6
+                    + y * (2 * (order - z) + 3 - y) // 2
+                    + x
+                )
+
+            # Replace DOFs at vertices with point evaluations
+            if reference.name == "interval":
+                dofs[index(0)] = PointEvaluation((0,), (0, 0))
+                dofs[index(order)] = PointEvaluation((1,), (0, 1))
+            if reference.name == "triangle":
+                dofs[index(0, 0)] = PointEvaluation((0, 0), (0, 0))
+                dofs[index(order, 0)] = PointEvaluation((1, 0), (0, 1))
+                dofs[index(0, order)] = PointEvaluation((0, 1), (0, 2))
+            if reference.name == "tetrahedron":
+                dofs[index(0, 0, 0)] = PointEvaluation((0, 0, 0), (0, 0))
+                dofs[index(order, 0, 0)] = PointEvaluation((1, 0, 0), (0, 1))
+                dofs[index(0, order, 0)] = PointEvaluation((0, 1, 0), (0, 2))
+                dofs[index(0, 0, order)] = PointEvaluation((0, 0, 1), (0, 3))
+
+            # Change entities for points on edges
+            if reference.name == "triangle":
+                for i in range(1, order):
+                    dofs[index(order - i, i)].entity = (1, 0)
+                    dofs[index(0, i)].entity = (1, 1)
+                    dofs[index(i, 0)].entity = (1, 2)
+            if reference.name == "tetrahedon":
+                for i in range(1, order):
+                    dofs[index(0, order - i, i)].entity = (1, 0)
+                    dofs[index(order - i, 0, i)].entity = (1, 1)
+                    dofs[index(order - i, i, 0)].entity = (1, 2)
+                    dofs[index(0, 0, i)].entity = (1, 3)
+                    dofs[index(0, i, 0)].entity = (1, 4)
+                    dofs[index(i, 0, 0)].entity = (1, 5)
+
+            # Change entities for points on faces
+            if reference.name == "tetrahedon":
+                for i in range(1, order):
+                    for j in range(1, order - i):
+                        dofs[index(order - i - j, i, j)].entity = (2, 0)
+                        dofs[index(0, i, j)].entity = (2, 1)
+                        dofs[index(i, 0, j)].entity = (2, 2)
+                        dofs[index(i, j, 0)].entity = (2, 3)
+
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     names = ["Bernstein", "Bernstein-Bezier"]

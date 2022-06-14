@@ -9,18 +9,18 @@ from .basis_function import BasisFunction
 from . import mappings
 
 
-def to_tex(f, tfrac=False):
+def _to_tex(f, tfrac=False):
     """Concert an expresson to tex."""
     if isinstance(f, (list, tuple)):
         return "\\left(\\begin{array}{c}" + "\\\\".join(
-            ["\\displaystyle " + to_tex(i) for i in f]) + "\\end{array}\\right)"
+            ["\\displaystyle " + _to_tex(i) for i in f]) + "\\end{array}\\right)"
     if isinstance(f, PiecewiseFunction):
         out = "\\begin{cases}\n"
         joiner = ""
         for points, func in f.pieces:
             out += joiner
             joiner = "\\\\"
-            out += to_tex(func, True)
+            out += _to_tex(func, True)
             out += f"&\\text{{in }}\\operatorname{{Triangle}}({points})"
         out += "\\end{cases}"
         return out
@@ -34,7 +34,7 @@ def to_tex(f, tfrac=False):
         return out
 
 
-def nth(n):
+def _nth(n):
     """Add th, st or nd to a number."""
     if n % 10 == 1 and n != 11:
         return f"{n}st"
@@ -43,25 +43,25 @@ def nth(n):
     return f"{n}th"
 
 
-def get_entity(reference, dof):
+def _get_entity(reference, dof):
     """Get the entity the dof is associated with."""
     if dof.entity_dim() == reference.tdim:
         return "R"
     else:
-        return f"{'vefc'[dof.entity_dim()]}_{{{get_entity_number(reference, dof)}}}"
+        return f"{'vefc'[dof.entity_dim()]}_{{{_get_entity_number(reference, dof)}}}"
 
 
-def get_entity_definition(reference, dof):
+def _get_entity_definition(reference, dof):
     """Get the definition of the entity the dof is associated with."""
     if dof.entity_dim() == reference.tdim:
         return "R is the reference element"
     else:
-        return (f"{get_entity(reference, dof)} is the "
-                f"{nth(get_entity_number(reference, dof))} "
+        return (f"{_get_entity(reference, dof)} is the "
+                f"{_nth(_get_entity_number(reference, dof))} "
                 f"{['vertex', 'edge', 'face', 'volume'][reference.tdim]}")
 
 
-def get_entity_number(reference, dof):
+def _get_entity_number(reference, dof):
     """Get the number of the entity the dof is associated with."""
     if dof.entity_dim() == 1:
         entities = reference.edges
@@ -80,14 +80,6 @@ class BaseFunctional(ABC):
         self.entity = entity
         self.mapping = mapping
 
-    def dof_point(self):
-        """Get the location of the DOF in the cell."""
-        return tuple(None for i in range(self.reference.gdim))
-
-    def dof_direction(self):
-        """Get the direction of the DOF."""
-        return None
-
     def entity_dim(self):
         """Get the dimension of the entitiy this DOF is associated with."""
         return self.entity[0]
@@ -95,6 +87,16 @@ class BaseFunctional(ABC):
     def perform_mapping(self, fs, map, inverse_map, tdim):
         """Map functions to a cell."""
         return [getattr(mappings, self.mapping)(f, map, inverse_map, tdim) for f in fs]
+
+    @abstractmethod
+    def dof_point(self):
+        """Get the location of the DOF in the cell."""
+        pass
+
+    @abstractmethod
+    def dof_direction(self):
+        """Get the direction of the DOF."""
+        pass
 
     @abstractmethod
     def eval(self, fun, symbolic=True):
@@ -129,13 +131,17 @@ class PointEvaluation(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return self.point
 
+    def dof_direction(self):
+        """Get the direction of the DOF."""
+        return None
+
     def get_points_and_weights(self, max_order=None):
         """Get points and weights that can be used to numerically evaluate functional."""
         return numpy.array([self.point]), numpy.array([1])
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
-        return f"v\\mapsto v({','.join([to_tex(i, True) for i in self.point])})", []
+        return f"v\\mapsto v({','.join([_to_tex(i, True) for i in self.point])})", []
 
     name = "Point evaluation"
 
@@ -160,14 +166,18 @@ class WeightedPointEvaluation(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return self.point
 
+    def dof_direction(self):
+        """Get the direction of the DOF."""
+        return None
+
     def get_points_and_weights(self, max_order=None):
         """Get points and weights that can be used to numerically evaluate functional."""
         return numpy.array([self.point]), numpy.array([self.weight])
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
-        return (f"v\\mapsto {to_tex(self.weight)} "
-                f"v({','.join([to_tex(i, True) for i in self.point])})"), []
+        return (f"v\\mapsto {_to_tex(self.weight)} "
+                f"v({','.join([_to_tex(i, True) for i in self.point])})"), []
 
     name = "Weighted point evaluation"
 
@@ -195,6 +205,10 @@ class DerivativePointEvaluation(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return self.point
 
+    def dof_direction(self):
+        """Get the direction of the DOF."""
+        return None
+
     def perform_mapping(self, fs, map, inverse_map, tdim):
         """Map functions to a cell."""
         if self.mapping is not None:
@@ -210,7 +224,7 @@ class DerivativePointEvaluation(BaseFunctional):
         """Get a representation of the functional as TeX, and list of terms involved."""
         if len(self.point) == 1:
             desc = "v\\mapsto "
-            desc += f"v'({','.join([to_tex(i, True) for i in self.point])})"
+            desc += f"v'({','.join([_to_tex(i, True) for i in self.point])})"
             return desc, []
         desc = "v\\mapsto"
         desc += "\\frac{\\partial"
@@ -223,7 +237,7 @@ class DerivativePointEvaluation(BaseFunctional):
                 if i > 1:
                     desc += f"^{{{i}}}"
         desc += "}"
-        desc += f"v({','.join([to_tex(i, True) for i in self.point])})"
+        desc += f"v({','.join([_to_tex(i, True) for i in self.point])})"
         return desc, []
 
     name = "Point derivative evaluation"
@@ -259,12 +273,12 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
         """Get a representation of the functional as TeX, and list of terms involved."""
         if len(self.point) == 1:
             desc = "v\\mapsto "
-            desc += f"v'({','.join([to_tex(i, True) for i in self.point])})"
+            desc += f"v'({','.join([_to_tex(i, True) for i in self.point])})"
             return desc, []
         desc = "v\\mapsto"
-        desc += f"\\nabla{{v}}({','.join([to_tex(i, True) for i in self.point])})"
+        desc += f"\\nabla{{v}}({','.join([_to_tex(i, True) for i in self.point])})"
         desc += "\\cdot\\left(\\begin{array}{c}"
-        desc += "\\\\".join([to_tex(i) for i in self.dir])
+        desc += "\\\\".join([_to_tex(i) for i in self.dir])
         desc += "\\end{array}\\right)"
         return desc, []
 
@@ -281,8 +295,8 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
         desc = "v\\mapsto"
-        desc += "\\nabla{v}(" + ",".join([to_tex(i, True) for i in self.dof_point()]) + ")"
-        entity_n = get_entity_number(self.reference, self)
+        desc += "\\nabla{v}(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
+        entity_n = _get_entity_number(self.reference, self)
         desc += "\\cdot\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}}"
         return desc, [
             "\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}} is the normal to facet {entity_n}"
@@ -311,13 +325,17 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return self.point
 
+    def dof_direction(self):
+        """Get the direction of the DOF."""
+        return None
+
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
         desc = "v\\mapsto"
         desc += "\\frac{\\partial^2v}{"
         for c in self.component:
             desc += "\\partial " + "xyz"[c]
-        desc += "}(" + ",".join([to_tex(i, True) for i in self.dof_point()]) + ")"
+        desc += "}(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
         return desc, []
 
     name = "Point evaluation of Jacobian component"
@@ -350,7 +368,7 @@ class PointInnerProduct(BaseFunctional):
         return self.point
 
     def dof_direction(self):
-        """Get the location of the DOF in the cell."""
+        """Get the direction of the DOF."""
         if self.rvec != self.lvec:
             return None
         return self.lvec
@@ -359,11 +377,11 @@ class PointInnerProduct(BaseFunctional):
         """Get a representation of the functional as TeX, and list of terms involved."""
         desc = "\\mathbf{V}\\mapsto"
         desc += "\\left(\\begin{array}{c}"
-        desc += "\\\\".join([to_tex(i) for i in self.lvec])
+        desc += "\\\\".join([_to_tex(i) for i in self.lvec])
         desc += "\\end{array}\\right)^{\\text{t}}"
-        desc += "\\mathbf{V}(" + ",".join([to_tex(i, True) for i in self.dof_point()]) + ")"
+        desc += "\\mathbf{V}(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
         desc += "\\left(\\begin{array}{c}"
-        desc += "\\\\".join([to_tex(i) for i in self.rvec])
+        desc += "\\\\".join([_to_tex(i) for i in self.rvec])
         desc += "\\end{array}\\right)"
         return desc, []
 
@@ -397,13 +415,13 @@ class DotPointEvaluation(BaseFunctional):
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
         desc = "\\boldsymbol{v}\\mapsto"
-        desc += "\\boldsymbol{v}(" + ",".join([to_tex(i, True) for i in self.dof_point()]) + ")"
+        desc += "\\boldsymbol{v}(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
         if isinstance(self.vector, (tuple, list)):
             desc += "\\cdot\\left(\\begin{array}{c}"
-            desc += "\\\\".join([to_tex(i) for i in self.vector])
+            desc += "\\\\".join([_to_tex(i) for i in self.vector])
             desc += "\\end{array}\\right)"
         elif self.vector != 1:
-            desc += f"\\cdot{to_tex(self.vector)}"
+            desc += f"\\cdot{_to_tex(self.vector)}"
         return desc, []
 
     name = "Dot point evaluation"
@@ -437,6 +455,10 @@ class IntegralAgainst(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.reference.vertices))
 
+    def dof_direction(self):
+        """Get the direction of the DOF."""
+        return None
+
     def eval(self, function, symbolic=True):
         """Apply the functional to a function."""
         point = [i for i in self.reference.origin]
@@ -456,18 +478,18 @@ class IntegralAgainst(BaseFunctional):
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
-        entity = get_entity(self.reference, self)
-        entity_def = get_entity_definition(self.reference, self)
+        entity = _get_entity(self.reference, self)
+        entity_def = _get_entity_definition(self.reference, self)
         if isinstance(self.f, tuple):
             desc = "\\mathbf{v}\\mapsto"
             desc += f"\\displaystyle\\int_{{{entity}}}"
-            desc += to_tex(self.f, True) + "\\cdot"
+            desc += _to_tex(self.f, True) + "\\cdot"
             desc += "\\mathbf{v}"
         else:
             desc = "\\mathbf{v}\\mapsto"
             desc += f"\\displaystyle\\int_{{{entity}}}"
             if self.f != 1:
-                desc += "(" + to_tex(self.f, True) + ")"
+                desc += "(" + _to_tex(self.f, True) + ")"
             desc += "v"
         return desc, [entity_def]
 
@@ -489,6 +511,10 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.reference.vertices))
 
+    def dof_direction(self):
+        """Get the direction of the DOF."""
+        return None
+
     def eval(self, function, symbolic=True):
         """Apply the functional to a function."""
         point = [i for i in self.reference.origin]
@@ -508,12 +534,12 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
-        entity = get_entity(self.reference, self)
-        entity_def = get_entity_definition(self.reference, self)
+        entity = _get_entity(self.reference, self)
+        entity_def = _get_entity_definition(self.reference, self)
         desc = "\\mathbf{v}\\mapsto"
         desc += f"\\displaystyle\\int_{{{entity}}}"
         if self.f != 1:
-            desc += "(" + to_tex(self.f, True) + ")"
+            desc += "(" + _to_tex(self.f, True) + ")"
         desc += "\\nabla\\cdot\\mathbf{v}"
         return desc, [entity_def]
 
@@ -534,6 +560,10 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
     def dof_point(self):
         """Get the location of the DOF in the cell."""
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.reference.vertices))
+
+    def dof_direction(self):
+        """Get the direction of the DOF."""
+        return None
 
     def eval(self, function, symbolic=True):
         """Apply the functional to a function."""
@@ -559,12 +589,12 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
-        entity = get_entity(self.reference, self)
-        entity_def = get_entity_definition(self.reference, self)
+        entity = _get_entity(self.reference, self)
+        entity_def = _get_entity_definition(self.reference, self)
         desc = "\\mathbf{V}\\mapsto"
         desc += "\\displaystyle"
         if self.scale != 1:
-            desc += to_tex(self.scale)
+            desc += _to_tex(self.scale)
         desc += f"\\int_{{{entity}}}"
         for order, dir in zip(self.orders, self.directions):
             if order > 0:
@@ -572,7 +602,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
                 if order > 1:
                     desc += f"^{{{order}}}"
                 desc += "}{"
-                desc += "\\partial" + to_tex(dir)
+                desc += "\\partial" + _to_tex(dir)
                 if order > 1:
                     desc += f"^{{{order}}}"
                 desc += "}"
@@ -647,8 +677,8 @@ class IntegralMoment(BaseFunctional):
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
-        entity = get_entity(self.reference, self)
-        entity_def = get_entity_definition(self.reference, self)
+        entity = _get_entity(self.reference, self)
+        entity_def = _get_entity_definition(self.reference, self)
         try:
             self.f[0]
             if len(self.f) == self.reference.tdim:
@@ -656,7 +686,7 @@ class IntegralMoment(BaseFunctional):
                 desc += f"\\displaystyle\\int_{{{entity}}}"
                 desc += "\\boldsymbol{v}\\cdot"
                 desc += "\\left(\\begin{array}{c}"
-                desc += "\\\\".join([to_tex(i) for i in self.f])
+                desc += "\\\\".join([_to_tex(i) for i in self.f])
                 desc += "\\end{array}\\right)"
             else:
                 assert len(self.f) == self.reference.tdim ** 2
@@ -665,15 +695,15 @@ class IntegralMoment(BaseFunctional):
                 desc += "\\mathbf{V}:"
                 desc += "\\left(\\begin{array}{" + "c" * self.reference.tdim + "}"
                 desc += "\\\\".join(["&".join(
-                    [to_tex(self.f[i]) for i in range(self.reference.tdim * row,
-                                                      self.reference.tdim * (row + 1))]
+                    [_to_tex(self.f[i]) for i in range(self.reference.tdim * row,
+                                                       self.reference.tdim * (row + 1))]
                 ) for row in range(self.reference.tdim)])
                 desc += "\\end{array}\\right)"
         except:  # noqa: E722
             desc = "v\\mapsto"
             desc += f"\\displaystyle\\int_{{{entity}}}"
             if self.f != 1:
-                desc += "(" + to_tex(self.f) + ")"
+                desc += "(" + _to_tex(self.f) + ")"
             desc += "v"
         return desc, [entity_def]
 
@@ -697,14 +727,14 @@ class VecIntegralMoment(IntegralMoment):
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
-        entity = get_entity(self.reference, self)
-        entity_def = get_entity_definition(self.reference, self)
+        entity = _get_entity(self.reference, self)
+        entity_def = _get_entity_definition(self.reference, self)
         desc = "\\boldsymbol{v}\\mapsto"
         desc += f"\\displaystyle\\int_{{{entity}}}"
         if self.f != 1:
-            desc += "(" + to_tex(self.f, True) + ")"
+            desc += "(" + _to_tex(self.f, True) + ")"
         desc += "\\boldsymbol{v}\\cdot"
-        desc += to_tex(self.dot_with)
+        desc += _to_tex(self.dot_with)
         return desc, [entity_def]
 
     name = "Vector integral moment"
@@ -762,12 +792,12 @@ class DivergenceIntegralMoment(IntegralMoment):
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
-        entity = get_entity(self.reference, self)
-        entity_def = get_entity_definition(self.reference, self)
+        entity = _get_entity(self.reference, self)
+        entity_def = _get_entity_definition(self.reference, self)
         desc = "\\boldsymbol{v}\\mapsto"
         desc += f"\\displaystyle\\int_{{{entity}}}"
         if self.f != 1:
-            desc += "(" + to_tex(self.f, True) + ")"
+            desc += "(" + _to_tex(self.f, True) + ")"
         desc += "\\nabla\\cdot\\boldsymbol{v}"
         return desc, [entity_def]
 
@@ -782,14 +812,14 @@ class TangentIntegralMoment(VecIntegralMoment):
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
-        entity = get_entity(self.reference, self)
-        entity_n = get_entity_number(self.reference, self)
-        entity_def = get_entity_definition(self.reference, self)
+        entity = _get_entity(self.reference, self)
+        entity_n = _get_entity_number(self.reference, self)
+        entity_def = _get_entity_definition(self.reference, self)
         desc = "\\boldsymbol{v}\\mapsto"
         desc += f"\\displaystyle\\int_{{{entity}}}"
         desc += "\\boldsymbol{v}\\cdot"
         if self.f != 1:
-            desc += "(" + to_tex(self.f) + ")"
+            desc += "(" + _to_tex(self.f) + ")"
         desc += "\\hat{\\boldsymbol{t}}" + f"_{{{entity_n}}}"
         return desc, [
             entity_def,
@@ -807,14 +837,14 @@ class NormalIntegralMoment(VecIntegralMoment):
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
-        entity = get_entity(self.reference, self)
-        entity_n = get_entity_number(self.reference, self)
-        entity_def = get_entity_definition(self.reference, self)
+        entity = _get_entity(self.reference, self)
+        entity_n = _get_entity_number(self.reference, self)
+        entity_def = _get_entity_definition(self.reference, self)
         desc = "\\boldsymbol{v}\\mapsto"
         desc += f"\\displaystyle\\int_{{{entity}}}"
         desc += "\\boldsymbol{v}\\cdot"
         if self.f != 1:
-            desc += "(" + to_tex(self.f, True) + ")"
+            desc += "(" + _to_tex(self.f, True) + ")"
         desc += "\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}}"
         return desc, [
             entity_def,
@@ -832,13 +862,13 @@ class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
-        entity = get_entity(self.reference, self)
-        entity_n = get_entity_number(self.reference, self)
-        entity_def = get_entity_definition(self.reference, self)
+        entity = _get_entity(self.reference, self)
+        entity_n = _get_entity_number(self.reference, self)
+        entity_def = _get_entity_definition(self.reference, self)
         desc = "v\\mapsto"
         desc += f"\\displaystyle\\int_{{{entity}}}"
         if self.f != 1:
-            desc += "(" + to_tex(self.f, True) + ")"
+            desc += "(" + _to_tex(self.f, True) + ")"
         desc += "\\frac{\\partial v}"
         desc += "{\\partial\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}}" + "}"
         return desc, [
@@ -873,15 +903,15 @@ class InnerProductIntegralMoment(IntegralMoment):
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
-        entity = get_entity(self.reference, self)
-        entity_def = get_entity_definition(self.reference, self)
+        entity = _get_entity(self.reference, self)
+        entity_def = _get_entity_definition(self.reference, self)
         desc = "\\boldsymbol{V}\\mapsto"
         desc += f"\\displaystyle\\int_{{{entity}}}"
         if self.f != 1:
-            desc += "(" + to_tex(self.f, True) + ")"
-        desc += to_tex(self.inner_with_left) + "^{\\text{t}}"
+            desc += "(" + _to_tex(self.f, True) + ")"
+        desc += _to_tex(self.inner_with_left) + "^{\\text{t}}"
         desc += "\\boldsymbol{V}"
-        desc += to_tex(self.inner_with_right)
+        desc += _to_tex(self.inner_with_right)
         return desc, [entity_def]
 
     name = "Inner product integral moment"
@@ -896,13 +926,13 @@ class NormalInnerProductIntegralMoment(InnerProductIntegralMoment):
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
-        entity = get_entity(self.reference, self)
-        entity_n = get_entity_number(self.reference, self)
-        entity_def = get_entity_definition(self.reference, self)
+        entity = _get_entity(self.reference, self)
+        entity_n = _get_entity_number(self.reference, self)
+        entity_def = _get_entity_definition(self.reference, self)
         desc = "\\mathbf{V}\\mapsto"
         desc += f"\\displaystyle\\int_{{{entity}}}"
         if self.f != 1:
-            desc += "(" + to_tex(self.f, True) + ")"
+            desc += "(" + _to_tex(self.f, True) + ")"
         desc += f"|{{{entity}}}|"
         desc += "\\hat{\\boldsymbol{n}}^{\\text{t}}" + f"_{{{entity_n}}}"
         desc += "\\mathbf{V}"
