@@ -398,9 +398,12 @@ class DotPointEvaluation(BaseFunctional):
         """Get a representation of the functional as TeX, and list of terms involved."""
         desc = "\\boldsymbol{v}\\mapsto"
         desc += "\\boldsymbol{v}(" + ",".join([to_tex(i, True) for i in self.dof_point()]) + ")"
-        desc += "\\cdot\\left(\\begin{array}{c}"
-        desc += "\\\\".join([to_tex(i) for i in self.dof_direction()])
-        desc += "\\end{array}\\right)"
+        if isinstance(self.vector, (tuple, list)):
+            desc += "\\cdot\\left(\\begin{array}{c}"
+            desc += "\\\\".join([to_tex(i) for i in self.vector])
+            desc += "\\end{array}\\right)"
+        elif self.vector != 1:
+            desc += f"\\cdot{to_tex(self.vector)}"
         return desc, []
 
     name = "Dot point evaluation"
@@ -734,10 +737,6 @@ class DerivativeIntegralMoment(IntegralMoment):
             return value
         else:
             return to_float(value)
-
-    def get_tex(self):
-        """Get a representation of the functional as TeX, and list of terms involved."""
-        raise NotImplementedError
 
     name = "Derivative integral moment"
 
