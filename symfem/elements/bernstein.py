@@ -32,7 +32,7 @@ def choose(n, powers):
     return out
 
 
-def bernstein_polynomials(n, d):
+def bernstein_polynomials(n, d, vars=x):
     """
     Return a list of Bernstein polynomials.
 
@@ -42,18 +42,20 @@ def bernstein_polynomials(n, d):
         The polynomial order
     d : int
         The topological dimension
+    vars: list
+        The variables to use
     """
     poly = []
     if d == 1:
-        lambdas = [1 - x[0], x[0]]
+        lambdas = [1 - vars[0], vars[0]]
         powers = [[i, n - i] for i in range(n + 1)]
     elif d == 2:
-        lambdas = [1 - x[0] - x[1], x[0], x[1]]
+        lambdas = [1 - vars[0] - vars[1], vars[0], vars[1]]
         powers = [[i, j, n - i - j]
                   for i in range(n + 1)
                   for j in range(n + 1 - i)]
     elif d == 3:
-        lambdas = [1 - x[0] - x[1] - x[2], x[0], x[1], x[2]]
+        lambdas = [1 - vars[0] - vars[1] - vars[2], vars[0], vars[1], vars[2]]
         powers = [[i, j, k, n - i - j - k]
                   for i in range(n + 1)
                   for j in range(n + 1 - i)
@@ -74,17 +76,17 @@ class BernsteinFunctional(BaseFunctional):
     def __init__(self, reference, integral_domain, index, degree, entity, sub_entity=False):
         super().__init__(reference, entity, "identity")
         self.orth = [
-            subs(o / sympy.sqrt(integral_domain.integral(o * o, x)), x, t)
-            for o in orthogonal_basis(integral_domain.name, degree, 0)[0]
+            o / sympy.sqrt(integral_domain.integral(o * o))
+            for o in orthogonal_basis(integral_domain.name, degree, 0, t[:integral_domain.tdim])[0]
         ]
         self.ref = integral_domain
         self.index = index
         self.degree = degree
         self.sub_entity = sub_entity
 
-        bern = bernstein_polynomials(degree, integral_domain.tdim)
+        bern = bernstein_polynomials(degree, integral_domain.tdim, t)
         mat = sympy.Matrix(
-            [[reference.integral(o * subs(b, x, t)) for b in bern] for o in self.orth])
+            [[integral_domain.integral(o * b) for b in bern] for o in self.orth])
         minv = mat.inv()
         self.alpha = minv.row(index)
 
