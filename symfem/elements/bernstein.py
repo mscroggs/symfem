@@ -112,7 +112,7 @@ class BernsteinFunctional(BaseFunctional):
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
-        if self.reference.tdim == self.integral_domain.tdim:
+        if self.reference.tdim == self.ref.tdim:
             return f"v\\mapsto c_{{{self.index}}}", [
                 "\\(v=\\sum_ic_iB_i\\)",
                 f"\\(B_1\\) to \\(B_n\\) "
