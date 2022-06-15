@@ -33,7 +33,7 @@ class AC(CiarletElement):
             for j in range(order + 1 - i):
                 if i + j > 0:
                     f = (i * x[0] ** (i - 1) * x[1] ** j, j * x[0] ** i * x[1] ** (j - 1))
-                    dofs.append(IntegralAgainst(reference, f, entity=(2, 0),
+                    dofs.append(IntegralAgainst(reference, reference, f, entity=(2, 0),
                                                 mapping="contravariant"))
 
         for i in range(1, order - 1):
@@ -42,7 +42,7 @@ class AC(CiarletElement):
                     x[0] ** i * (1 - x[0]) * x[1] ** (j - 1) * (j * (1 - x[1]) - x[1]),
                     -x[0] ** (i - 1) * (i * (1 - x[0]) - x[0]) * x[1] ** j * (1 - x[1])
                 )
-                dofs.append(IntegralAgainst(reference, f, entity=(2, 0),
+                dofs.append(IntegralAgainst(reference, reference, f, entity=(2, 0),
                                             mapping="contravariant"))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

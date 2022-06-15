@@ -15,7 +15,7 @@ class Lagrange(CiarletElement):
         if order == 0:
             dofs = [
                 PointEvaluation(
-                    tuple(
+                    reference, tuple(
                         sympy.Rational(1, reference.tdim + 1)
                         for i in range(reference.tdim)
                     ),
@@ -27,14 +27,14 @@ class Lagrange(CiarletElement):
 
             dofs = []
             for v_n, v in enumerate(reference.reference_vertices):
-                dofs.append(PointEvaluation(v, entity=(0, v_n)))
+                dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
             for edim in range(1, 4):
                 for e_n in range(reference.sub_entity_count(edim)):
                     entity = reference.sub_entity(edim, e_n)
                     for i in product(range(1, order), repeat=edim):
                         if sum(i) < order:
                             point = entity.get_point([sympy.Rational(j, order) for j in i[::-1]])
-                            dofs.append(PointEvaluation(point, entity=(edim, e_n)))
+                            dofs.append(PointEvaluation(reference, point, entity=(edim, e_n)))
 
         super().__init__(
             reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
@@ -66,7 +66,7 @@ class VectorLagrange(CiarletElement):
             ]
         for p in scalar_space.dofs:
             for d in directions:
-                dofs.append(DotPointEvaluation(p.point, d, entity=p.entity))
+                dofs.append(DotPointEvaluation(reference, p.point, d, entity=p.entity))
 
         super().__init__(
             reference, order,
@@ -102,7 +102,7 @@ class MatrixLagrange(CiarletElement):
             ]
         for p in scalar_space.dofs:
             for d in directions:
-                dofs.append(DotPointEvaluation(p.point, d, entity=p.entity))
+                dofs.append(DotPointEvaluation(reference, p.point, d, entity=p.entity))
 
         super().__init__(
             reference, order,
@@ -151,7 +151,7 @@ class SymmetricMatrixLagrange(CiarletElement):
         dofs = []
         for p in scalar_space.dofs:
             for d in directions:
-                dofs.append(DotPointEvaluation(p.point, d, entity=p.entity))
+                dofs.append(DotPointEvaluation(reference, p.point, d, entity=p.entity))
 
         super().__init__(
             reference, order,

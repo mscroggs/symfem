@@ -20,7 +20,8 @@ class Taylor(CiarletElement):
         midpoint = tuple(sym_sum(i) / len(i) for i in zip(*reference.vertices))
         for i in product(range(order + 1), repeat=reference.tdim):
             if 1 <= sum(i) <= order:
-                dofs.append(DerivativePointEvaluation(midpoint, i, entity=(reference.tdim, 0)))
+                dofs.append(DerivativePointEvaluation(
+                    reference, midpoint, i, entity=(reference.tdim, 0)))
 
         poly = polynomial_set(reference.tdim, 1, order)
 

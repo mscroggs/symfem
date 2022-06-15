@@ -19,14 +19,14 @@ class Q(CiarletElement):
         if order == 0:
             dofs = [
                 PointEvaluation(
-                    tuple(sympy.Rational(1, 2) for i in range(reference.tdim)),
+                    reference, tuple(sympy.Rational(1, 2) for i in range(reference.tdim)),
                     entity=(reference.tdim, 0))]
         else:
             points, _ = get_quadrature(variant, order + 1)
 
             dofs = []
             for v_n, v in enumerate(reference.vertices):
-                dofs.append(PointEvaluation(v, entity=(0, v_n)))
+                dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
             for edim in range(1, 4):
                 for e_n, vs in enumerate(reference.sub_entities(edim)):
                     entity = create_reference(
@@ -35,9 +35,9 @@ class Q(CiarletElement):
                     for i in product(range(1, order), repeat=edim):
                         dofs.append(
                             PointEvaluation(
-                                tuple(o + sum(a[j] * points[b]
-                                              for a, b in zip(entity.axes, i[::-1]))
-                                      for j, o in enumerate(entity.origin)),
+                                reference, tuple(o + sum(a[j] * points[b]
+                                                         for a, b in zip(entity.axes, i[::-1]))
+                                                 for j, o in enumerate(entity.origin)),
                                 entity=(edim, e_n)))
 
         super().__init__(
@@ -109,7 +109,7 @@ class VectorQ(CiarletElement):
             ]
         for p in scalar_space.dofs:
             for d in directions:
-                dofs.append(DotPointEvaluation(p.point, d, entity=p.entity))
+                dofs.append(DotPointEvaluation(reference, p.point, d, entity=p.entity))
 
         super().__init__(
             reference, order,

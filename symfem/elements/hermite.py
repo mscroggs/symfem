@@ -17,15 +17,15 @@ class Hermite(CiarletElement):
         assert order == 3
         dofs = []
         for v_n, vs in enumerate(reference.vertices):
-            dofs.append(PointEvaluation(vs, entity=(0, v_n)))
+            dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
             for i in range(reference.tdim):
                 dofs.append(DerivativePointEvaluation(
-                    vs, tuple(1 if i == j else 0 for j in range(reference.tdim)),
+                    reference, vs, tuple(1 if i == j else 0 for j in range(reference.tdim)),
                     entity=(0, v_n)))
         for e_n, vs in enumerate(reference.sub_entities(2)):
             midpoint = tuple(sym_sum(i) / len(i)
                              for i in zip(*[reference.vertices[i] for i in vs]))
-            dofs.append(PointEvaluation(midpoint, entity=(2, e_n)))
+            dofs.append(PointEvaluation(reference, midpoint, entity=(2, e_n)))
 
         super().__init__(
             reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1

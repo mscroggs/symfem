@@ -46,7 +46,7 @@ class Bubble(CiarletElement):
         for i in product(range(1, order), repeat=reference.tdim):
             if f(i) < order:
                 point = tuple(sympy.Rational(j, order) for j in i)
-                dofs.append(PointEvaluation(point, entity=(reference.tdim, 0)))
+                dofs.append(PointEvaluation(reference, point, entity=(reference.tdim, 0)))
 
         self.variant = variant
 
@@ -99,7 +99,7 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
         basis = [(i, 0) for i in lagrange._basis + bubble._basis]
         basis += [(0, i) for i in lagrange._basis + bubble._basis]
 
-        dofs = [DotPointEvaluation(d.point, v, entity=d.entity)
+        dofs = [DotPointEvaluation(reference, d.point, v, entity=d.entity)
                 for d in lagrange.dofs + bubble.dofs
                 for v in [(1, 0), (0, 1)]]
 

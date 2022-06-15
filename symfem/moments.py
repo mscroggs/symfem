@@ -63,10 +63,11 @@ def make_integral_moment_dofs(
                         for dn, d in enumerate(sub_element.dofs):
                             f = sub_element.get_basis_function(dn)
                             if mapping is None:
-                                dofs.append(IntegralMoment(sub_ref, f, d, entity=(dim, i)))
+                                dofs.append(IntegralMoment(
+                                    reference, sub_ref, f, d, entity=(dim, i)))
                             else:
-                                dofs.append(IntegralMoment(sub_ref, f, d, entity=(dim, i),
-                                                           mapping=mapping))
+                                dofs.append(IntegralMoment(
+                                    reference, sub_ref, f, d, entity=(dim, i), mapping=mapping))
 
     # DOFs per codimension
     for _dim, moment_data in enumerate([peaks, ridges, facets, cells]):
@@ -84,9 +85,10 @@ def make_integral_moment_dofs(
                         for dn, d in enumerate(sub_element.dofs):
                             f = sub_element.get_basis_function(dn)
                             if mapping is None:
-                                dofs.append(IntegralMoment(sub_ref, f, d, entity=(dim, i)))
+                                dofs.append(IntegralMoment(
+                                    reference, sub_ref, f, d, entity=(dim, i)))
                             else:
-                                dofs.append(IntegralMoment(sub_ref, f, d, entity=(dim, i),
-                                                           mapping=mapping))
+                                dofs.append(IntegralMoment(
+                                    reference, sub_ref, f, d, entity=(dim, i), mapping=mapping))
 
     return dofs

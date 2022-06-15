@@ -37,7 +37,7 @@ class ArnoldWinther(CiarletElement):
             for d in [[(1, 0), (1, 0)],
                       [(1, 0), (0, 1)],
                       [(0, 1), (0, 1)]]:
-                dofs.append(PointInnerProduct(v, d[0], d[1], entity=(0, v_n),
+                dofs.append(PointInnerProduct(reference, v, d[0], d[1], entity=(0, v_n),
                                               mapping="double_contravariant"))
         for e_n, edge in enumerate(reference.edges):
             sub_ref = create_reference(
@@ -47,17 +47,20 @@ class ArnoldWinther(CiarletElement):
             for dof_n, dof in enumerate(sub_e.dofs):
                 p = sub_e.get_basis_function(dof_n)
                 for component in [sub_ref.normal(), sub_ref.tangent()]:
-                    InnerProductIntegralMoment(sub_ref, p, component, sub_ref.normal(), dof,
-                                               entity=(1, e_n), mapping="double_contravariant")
+                    InnerProductIntegralMoment(
+                        reference, sub_ref, p, component, sub_ref.normal(), dof,
+                        entity=(1, e_n), mapping="double_contravariant")
                     dofs.append(
-                        InnerProductIntegralMoment(sub_ref, p, component, sub_ref.normal(), dof,
-                                                   entity=(1, e_n), mapping="double_contravariant"))
+                        InnerProductIntegralMoment(
+                            reference, sub_ref, p, component, sub_ref.normal(), dof,
+                            entity=(1, e_n), mapping="double_contravariant"))
         sub_e = Lagrange(reference, order - 3, variant)
         for dof_n, dof in enumerate(sub_e.dofs):
             p = sub_e.get_basis_function(dof_n)
             for component in [(1, 0, 0, 0), (0, 1, 0, 0),
                               (0, 0, 0, 1)]:
-                dofs.append(VecIntegralMoment(reference, p, component, dof, entity=(2, 0)))
+                dofs.append(VecIntegralMoment(
+                    reference, reference, p, component, dof, entity=(2, 0)))
 
         if order >= 4:
             sub_e = Lagrange(reference, order - 4, variant)
@@ -66,7 +69,7 @@ class ArnoldWinther(CiarletElement):
                     continue
                 f = p * x[0] ** 2 * x[1] ** 2 * (1 - x[0] - x[1]) ** 2
                 J = tuple(diff(f, x[i], x[j]) for i in range(2) for j in range(2))
-                dofs.append(IntegralMoment(reference, J, dof, entity=(2, 0)))
+                dofs.append(IntegralMoment(reference, reference, J, dof, entity=(2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))
@@ -110,14 +113,16 @@ class NonConformingArnoldWinther(CiarletElement):
                 p = sub_e.get_basis_function(dof_n)
                 for component in [sub_ref.normal(), sub_ref.tangent()]:
                     dofs.append(
-                        InnerProductIntegralMoment(sub_ref, p, component, sub_ref.normal(), dof,
-                                                   entity=(1, e_n), mapping="double_contravariant"))
+                        InnerProductIntegralMoment(
+                            reference, sub_ref, p, component, sub_ref.normal(), dof,
+                            entity=(1, e_n), mapping="double_contravariant"))
         sub_e = Lagrange(reference, 0, variant)
         for dof_n, dof in enumerate(sub_e.dofs):
             p = sub_e.get_basis_function(dof_n)
             for component in [(1, 0, 0, 0), (0, 1, 0, 0),
                               (0, 0, 0, 1)]:
-                dofs.append(VecIntegralMoment(reference, p, component, dof, entity=(2, 0)))
+                dofs.append(VecIntegralMoment(
+                    reference, reference, p, component, dof, entity=(2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))

@@ -28,7 +28,7 @@ class GuzmanNeilan(CiarletElement):
             facet = reference.sub_entity(reference.tdim - 1, n)
             for v in facet.vertices:
                 dofs.append(DotPointEvaluation(
-                    v, tuple(i * facet.jacobian() for i in facet.normal()),
+                    reference, v, tuple(i * facet.jacobian() for i in facet.normal()),
                     entity=(reference.tdim - 1, n),
                     mapping="contravariant"))
 
@@ -39,7 +39,7 @@ class GuzmanNeilan(CiarletElement):
             for n in range(reference.sub_entity_count(1)):
                 edge = reference.sub_entity(1, n)
                 dofs.append(DotPointEvaluation(
-                    edge.midpoint(), tuple(i * edge.jacobian() for i in edge.tangent()),
+                    reference, edge.midpoint(), tuple(i * edge.jacobian() for i in edge.tangent()),
                     entity=(1, n), mapping="contravariant"))
 
             # Midpoints of edges of faces
@@ -48,7 +48,8 @@ class GuzmanNeilan(CiarletElement):
                 for m in range(3):
                     edge = face.sub_entity(1, m)
                     dofs.append(DotPointEvaluation(
-                        edge.midpoint(), tuple(i * face.jacobian() for i in face.normal()),
+                        reference, edge.midpoint(),
+                        tuple(i * face.jacobian() for i in face.normal()),
                         entity=(2, n), mapping="contravariant"))
 
             # Interior edges
@@ -56,7 +57,7 @@ class GuzmanNeilan(CiarletElement):
                 p = tuple((i + sympy.Rational(1, 4)) / 2 for i in v)
                 for d in [(1, 0, 0), (0, 1, 0), (0, 0, 1)]:
                     dofs.append(DotPointEvaluation(
-                        p, d, entity=(3, 0), mapping="contravariant"))
+                        reference, p, d, entity=(3, 0), mapping="contravariant"))
 
         dofs += make_integral_moment_dofs(
             reference,
@@ -66,7 +67,7 @@ class GuzmanNeilan(CiarletElement):
         mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
         for i in range(reference.tdim):
             direction = tuple(1 if i == j else 0 for j in range(reference.tdim))
-            dofs.append(DotPointEvaluation(mid, direction, entity=(reference.tdim, 0),
+            dofs.append(DotPointEvaluation(reference, mid, direction, entity=(reference.tdim, 0),
                                            mapping="contravariant"))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

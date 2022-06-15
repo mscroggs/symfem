@@ -471,8 +471,8 @@ class CiarletElement(FiniteElement):
         for dof in self.dofs:
             dim, entity = dof.entity
             assert entity < self.reference.sub_entity_count(dim)
-            if hasattr(dof, "reference"):
-                assert dim == dof.reference.tdim
+            if hasattr(dof, "integral_domain"):
+                assert dim == dof.integral_domain.tdim
 
     def test_functionals(self):
         """Test that the functionals are satisfied by the basis functions."""

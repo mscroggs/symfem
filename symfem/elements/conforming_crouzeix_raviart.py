@@ -28,20 +28,20 @@ class ConformingCrouzeixRaviart(CiarletElement):
 
         dofs = []
         for i, v in enumerate(reference.vertices):
-            dofs.append(PointEvaluation(v, entity=(0, i)))
+            dofs.append(PointEvaluation(reference, v, entity=(0, i)))
         if order >= 2:
             for i, edge in enumerate(reference.edges):
                 for p in range(1, order):
                     v = tuple(sympy.Rational((order - p) * a + p * b, order) for a, b in zip(
                         reference.vertices[edge[0]], reference.vertices[edge[1]]))
-                    dofs.append(PointEvaluation(v, entity=(1, i)))
+                    dofs.append(PointEvaluation(reference, v, entity=(1, i)))
             for i in range(1, order):
                 for j in range(1, order + 1 - i):
                     point = (
                         sympy.Rational(3 * i - 1, 3 * order),
                         sympy.Rational(3 * j - 1, 3 * order)
                     )
-                    dofs.append(PointEvaluation(point, entity=(2, 0)))
+                    dofs.append(PointEvaluation(reference, point, entity=(2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 

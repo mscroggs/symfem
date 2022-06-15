@@ -19,12 +19,12 @@ class Morley(CiarletElement):
         assert reference.name == "triangle"
         dofs = []
         for v_n, vs in enumerate(reference.vertices):
-            dofs.append(PointEvaluation(vs, entity=(0, v_n)))
+            dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
         for e_n in range(reference.sub_entity_count(1)):
             sub_ref = reference.sub_entity(1, e_n)
             midpoint = sub_ref.midpoint()
             dofs.append(
-                PointNormalDerivativeEvaluation(midpoint, sub_ref, entity=(1, e_n)))
+                PointNormalDerivativeEvaluation(reference, midpoint, sub_ref, entity=(1, e_n)))
 
         super().__init__(
             reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
