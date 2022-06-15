@@ -33,6 +33,7 @@ class CrouzeixRaviart(CiarletElement):
                 if sum(i) < order + reference.tdim - 1:
                     dofs.append(
                         PointEvaluation(
+                            reference,
                             tuple(o + sum(a[j] * points[b]
                                           for a, b in zip(entity.axes, i))
                                   for j, o in enumerate(entity.origin)),
@@ -43,6 +44,7 @@ class CrouzeixRaviart(CiarletElement):
             if sum(i) < order:
                 dofs.append(
                     PointEvaluation(
+                        reference,
                         tuple(o + sum(a[j] * points[b]
                                       for a, b in zip(reference.axes, i))
                               for j, o in enumerate(reference.origin)),

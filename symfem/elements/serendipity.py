@@ -22,7 +22,7 @@ class Serendipity(CiarletElement):
 
         dofs = []
         for v_n, p in enumerate(reference.vertices):
-            dofs.append(PointEvaluation(p, entity=(0, v_n)))
+            dofs.append(PointEvaluation(reference, p, entity=(0, v_n)))
         dofs += make_integral_moment_dofs(
             reference,
             edges=(IntegralMoment, DPC, order - 2, {"variant": variant}),

@@ -18,7 +18,7 @@ class RannacherTurek(CiarletElement):
         dofs = []
         for e_n, vs in enumerate(reference.sub_entities(reference.tdim - 1)):
             pt = reference.sub_entity(reference.tdim - 1, e_n).midpoint()
-            dofs.append(PointEvaluation(pt, entity=(reference.tdim - 1, e_n)))
+            dofs.append(PointEvaluation(reference, pt, entity=(reference.tdim - 1, e_n)))
 
         if reference.name == "quadrilateral":
             poly = [1, x[0], x[1], x[0]**2 - x[1]**2]

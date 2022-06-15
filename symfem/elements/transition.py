@@ -26,7 +26,7 @@ class Transition(CiarletElement):
         dofs = []
         poly = polynomial_set(reference.tdim, 1, 1)
         for v_n, v in enumerate(reference.reference_vertices):
-            dofs.append(PointEvaluation(v, entity=(0, v_n)))
+            dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
 
         for edim in range(1, 4):
             for e_n in range(reference.sub_entity_count(edim)):
@@ -45,7 +45,7 @@ class Transition(CiarletElement):
                 for i in product(range(1, entity_order), repeat=edim):
                     if sum(i) < entity_order:
                         pt = entity.get_point([points[j] for j in i])
-                        dofs.append(PointEvaluation(pt, entity=(edim, e_n)))
+                        dofs.append(PointEvaluation(reference, pt, entity=(edim, e_n)))
 
                 # Basis
                 if entity_order > edim:

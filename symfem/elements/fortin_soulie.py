@@ -24,7 +24,8 @@ class FortinSoulie(CiarletElement):
             reference,
             edges=(IntegralMoment, Lagrange, order - 1, {"variant": "equispaced"}),
         )
-        dofs[-1] = PointEvaluation((sympy.Rational(1, 3), sympy.Rational(1, 3)), entity=(2, 0))
+        dofs[-1] = PointEvaluation(reference, (sympy.Rational(1, 3), sympy.Rational(1, 3)),
+                                   entity=(2, 0))
 
         poly = polynomial_set(reference.tdim, 1, order)
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)

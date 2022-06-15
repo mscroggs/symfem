@@ -35,9 +35,8 @@ class BernardiRaugel(CiarletElement):
             facet = reference.sub_entity(reference.tdim - 1, n)
             for v in facet.vertices:
                 dofs.append(DotPointEvaluation(
-                    v, tuple(i * facet.jacobian() for i in facet.normal()),
-                    entity=(reference.tdim - 1, n),
-                    mapping="contravariant"))
+                    reference, v, tuple(i * facet.jacobian() for i in facet.normal()),
+                    entity=(reference.tdim - 1, n), mapping="contravariant"))
 
         dofs += make_integral_moment_dofs(
             reference,
@@ -59,7 +58,7 @@ class BernardiRaugel(CiarletElement):
                 v2 = reference.vertices[edge[1]]
                 midpoint = tuple(sympy.Rational(i + j, 2) for i, j in zip(v1, v2))
                 d = tuple(j - i for i, j in zip(v1, v2))
-                dofs.append(DotPointEvaluation(midpoint, d, entity=(1, e_n),
+                dofs.append(DotPointEvaluation(reference, midpoint, d, entity=(1, e_n),
                                                mapping="contravariant"))
             for f_n in range(reference.sub_entity_count(2)):
                 face = reference.sub_entity(2, f_n)
@@ -67,14 +66,14 @@ class BernardiRaugel(CiarletElement):
                 for e_n in range(3):
                     edge = face.sub_entity(1, e_n)
                     midpoint = tuple(sympy.Rational(i + j, 2) for i, j in zip(*edge.vertices))
-                    dofs.append(DotPointEvaluation(midpoint, normal, entity=(2, f_n),
-                                                   mapping="contravariant"))
+                    dofs.append(DotPointEvaluation(
+                        reference, midpoint, normal, entity=(2, f_n), mapping="contravariant"))
 
             p = Lagrange(reference, 0, variant="equispaced")
 
             for i in range(3):
                 dofs.append(DivergenceIntegralMoment(
-                    reference, x[i], p.dofs[0], entity=(3, 0),
+                    reference, reference, x[i], p.dofs[0], entity=(3, 0),
                     mapping="contravariant"
                 ))
 

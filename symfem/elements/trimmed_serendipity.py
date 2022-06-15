@@ -72,7 +72,8 @@ class TrimmedSerendipityHcurl(CiarletElement):
                 for i in range(order):
                     f = grad(x[0] ** (order - 1 - i) * x[1] ** i, 2)
                     f = subs([f[1], -f[0]], x, t)
-                    dofs.append(IntegralAgainst(face, f, entity=(2, f_n), mapping="contravariant"))
+                    dofs.append(IntegralAgainst(
+                        reference, face, f, entity=(2, f_n), mapping="contravariant"))
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, reference.tdim
@@ -133,7 +134,7 @@ class TrimmedSerendipityHdiv(CiarletElement):
                       for i in range(order) for j in range(order - i)]
             for f in fs:
                 f = subs(f, x, t)
-                dofs.append(IntegralAgainst(reference, f, entity=(reference.tdim, 0),
+                dofs.append(IntegralAgainst(reference, reference, f, entity=(reference.tdim, 0),
                                             mapping="covariant"))
 
         super().__init__(

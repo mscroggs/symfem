@@ -43,9 +43,9 @@ class Regge(CiarletElement):
                                 tangent = [b - a for a, b in zip(entity.vertices[edge[0]],
                                                                  entity.vertices[edge[1]])]
                                 dofs.append(PointInnerProduct(
-                                    tuple(o + sum(sympy.Rational(a[j] * b, order + 2)
-                                                  for a, b in zip(entity.axes, i[::-1]))
-                                          for j, o in enumerate(entity.origin)),
+                                    reference, tuple(o + sum(sympy.Rational(a[j] * b, order + 2)
+                                                             for a, b in zip(entity.axes, i[::-1]))
+                                                     for j, o in enumerate(entity.origin)),
                                     tangent, tangent, entity=(edim, e_n),
                                     mapping="double_covariant"))
 
@@ -58,7 +58,7 @@ class Regge(CiarletElement):
                            for a, b in zip(edge.vertices[0], edge.vertices[1])]
                 for f, dof in zip(basis, space.dofs):
                     dofs.append(InnerProductIntegralMoment(
-                        edge, f, tangent, tangent, dof, entity=(1, e_n),
+                        reference, edge, f, tangent, tangent, dof, entity=(1, e_n),
                         mapping="double_covariant"))
 
             if reference.tdim == 2:
@@ -77,8 +77,8 @@ class Regge(CiarletElement):
                         face = reference.sub_entity(2, f_n)
                         for f, dof in zip(basis, space.dofs):
                             dofs.append(IntegralMoment(
-                                face, tuple(i * face.jacobian() for i in f), dof, entity=(2, f_n),
-                                mapping="double_covariant"))
+                                reference, face, tuple(i * face.jacobian() for i in f), dof,
+                                entity=(2, f_n), mapping="double_covariant"))
 
                 if order > 1:
                     dofs += make_integral_moment_dofs(
@@ -147,7 +147,7 @@ class ReggeTP(CiarletElement):
                            for a, b in zip(edge.vertices[0], edge.vertices[1])]
                 for f, dof in zip(basis, space.dofs):
                     dofs.append(InnerProductIntegralMoment(
-                        edge, f, tangent, tangent, dof, entity=(1, e_n),
+                        reference, edge, f, tangent, tangent, dof, entity=(1, e_n),
                         mapping="double_covariant"))
 
             # DOFs on faces
@@ -156,15 +156,15 @@ class ReggeTP(CiarletElement):
                 for i in range(order + 1):
                     for j in range(order + 1):
                         dofs.append(IntegralAgainst(
-                            face, (0, x[0] ** i * x[1] ** j, x[0] ** i * x[1] ** j, 0),
+                            reference, face, (0, x[0] ** i * x[1] ** j, x[0] ** i * x[1] ** j, 0),
                             entity=(2, f_n), mapping="double_covariant"))
                 for i in range(1, order + 1):
                     for j in range(order + 1):
                         dofs.append(IntegralAgainst(
-                            face, (x[1] ** i * x[0] ** j * (1 - x[1]), 0, 0, 0),
+                            reference, face, (x[1] ** i * x[0] ** j * (1 - x[1]), 0, 0, 0),
                             entity=(2, f_n), mapping="double_covariant"))
                         dofs.append(IntegralAgainst(
-                            face, (0, 0, 0, x[0] ** i * x[1] ** j * (1 - x[0])),
+                            reference, face, (0, 0, 0, x[0] ** i * x[1] ** j * (1 - x[0])),
                             entity=(2, f_n), mapping="double_covariant"))
 
             if reference.tdim == 3:
@@ -174,30 +174,30 @@ class ReggeTP(CiarletElement):
                         for k in range(order + 1):
                             f = x[0] ** i * x[1] ** j * x[2] ** k * (1 - x[0])
                             dofs.append(IntegralAgainst(
-                                reference, (0, 0, 0, 0, 0, f, 0, f, 0),
+                                reference, reference, (0, 0, 0, 0, 0, f, 0, f, 0),
                                 entity=(3, 0), mapping="double_covariant"))
                             f = x[1] ** i * x[0] ** j * x[2] ** k * (1 - x[1])
                             dofs.append(IntegralAgainst(
-                                reference, (0, 0, f, 0, 0, 0, f, 0, 0),
+                                reference, reference, (0, 0, f, 0, 0, 0, f, 0, 0),
                                 entity=(3, 0), mapping="double_covariant"))
                             f = x[2] ** i * x[0] ** j * x[1] ** k * (1 - x[2])
                             dofs.append(IntegralAgainst(
-                                reference, (0, f, 0, f, 0, 0, 0, 0, 0),
+                                reference, reference, (0, f, 0, f, 0, 0, 0, 0, 0),
                                 entity=(3, 0), mapping="double_covariant"))
                 for i in range(order + 1):
                     for j in range(1, order + 1):
                         for k in range(1, order + 1):
                             f = x[0] ** i * x[1] ** j * x[2] ** k * (1 - x[1]) * (1 - x[2])
                             dofs.append(IntegralAgainst(
-                                reference, (f, 0, 0, 0, 0, 0, 0, 0, 0),
+                                reference, reference, (f, 0, 0, 0, 0, 0, 0, 0, 0),
                                 entity=(3, 0), mapping="double_covariant"))
                             f = x[1] ** i * x[0] ** j * x[2] ** k * (1 - x[0]) * (1 - x[2])
                             dofs.append(IntegralAgainst(
-                                reference, (0, 0, 0, 0, f, 0, 0, 0, 0),
+                                reference, reference, (0, 0, 0, 0, f, 0, 0, 0, 0),
                                 entity=(3, 0), mapping="double_covariant"))
                             f = x[2] ** i * x[0] ** j * x[1] ** k * (1 - x[0]) * (1 - x[1])
                             dofs.append(IntegralAgainst(
-                                reference, (0, 0, 0, 0, 0, 0, 0, 0, f),
+                                reference, reference, (0, 0, 0, 0, 0, 0, 0, 0, f),
                                 entity=(3, 0), mapping="double_covariant"))
         else:
             raise ValueError(f"Unknown variant: {variant}")

@@ -23,9 +23,9 @@ class CustomElement(CiarletElement):
         # The DOFs are point evaluations at vertex 3,
         # and the midpoints of edges 0 and 1
         dofs = [
-            PointEvaluation((one, one), entity=(0, 3)),
-            PointEvaluation((half, zero), entity=(1, 0)),
-            PointEvaluation((zero, half), entity=(1, 1)),
+            PointEvaluation(reference, (one, one), entity=(0, 3)),
+            PointEvaluation(reference, (half, zero), entity=(1, 0)),
+            PointEvaluation(reference, (zero, half), entity=(1, 1)),
         ]
 
         super().__init__(reference, order, poly_set, dofs, reference.tdim, 1)

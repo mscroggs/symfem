@@ -41,10 +41,10 @@ class WuXu(CiarletElement):
         dofs = []
 
         for v_n, vs in enumerate(reference.vertices):
-            dofs.append(PointEvaluation(vs, entity=(0, v_n)))
+            dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
             for i in range(reference.tdim):
                 dofs.append(DerivativePointEvaluation(
-                    vs, tuple(1 if i == j else 0 for j in range(reference.tdim)),
+                    reference, vs, tuple(1 if i == j else 0 for j in range(reference.tdim)),
                     entity=(0, v_n)))
         for codim in range(1, reference.tdim):
             dim = reference.tdim - codim
@@ -63,8 +63,8 @@ class WuXu(CiarletElement):
                     raise NotImplementedError
                 for orders in derivatives(len(normals), len(normals)):
                     dofs.append(IntegralOfDirectionalMultiderivative(
-                        subentity, normals, orders, scale=1 / volume,
-                        entity=(dim, e_n)))
+                        reference, subentity, normals, orders, (dim, e_n),
+                        scale=1 / volume))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 

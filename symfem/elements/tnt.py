@@ -54,14 +54,14 @@ class TNT(CiarletElement):
 
         dofs = []
         for i, v in enumerate(reference.vertices):
-            dofs.append(PointEvaluation(v, entity=(0, i)))
+            dofs.append(PointEvaluation(reference, v, entity=(0, i)))
 
         for i in range(1, order + 1):
             f = i * t[0] ** (i - 1)
             for edge_n in range(reference.sub_entity_count(1)):
                 edge = reference.sub_entity(1, edge_n)
                 dofs.append(IntegralAgainst(
-                    edge, f, entity=(1, edge_n), mapping="identity"))
+                    reference, edge, f, entity=(1, edge_n), mapping="identity"))
 
         for i in range(1, order):
             for j in range(1, order):
@@ -70,7 +70,7 @@ class TNT(CiarletElement):
                 for face_n in range(reference.sub_entity_count(2)):
                     face = reference.sub_entity(2, face_n)
                     dofs.append(IntegralAgainst(
-                        face, delta_f, entity=(2, face_n), mapping="identity"))
+                        reference, face, delta_f, entity=(2, face_n), mapping="identity"))
 
         if reference.tdim == 3:
             for i in product(range(1, order), repeat=3):
@@ -79,7 +79,7 @@ class TNT(CiarletElement):
                     f *= k ** j * (k - 1)
                 grad_f = tuple(j.expand() for j in grad(f, 3))
                 dofs.append(DerivativeIntegralMoment(
-                    reference, 1, grad_f, None, entity=(3, 0), mapping="identity"))
+                    reference, reference, 1, grad_f, None, entity=(3, 0), mapping="identity"))
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1
@@ -149,13 +149,13 @@ class TNTcurl(CiarletElement):
         if reference.tdim == 2:
             for f in face_moments:
                 dofs.append(IntegralAgainst(
-                    reference, f, entity=(2, 0), mapping="contravariant"))
+                    reference, reference, f, entity=(2, 0), mapping="contravariant"))
         elif reference.tdim == 3:
             for face_n in range(6):
                 face = reference.sub_entity(2, face_n)
                 for f in face_moments:
                     dofs.append(IntegralAgainst(
-                        face, f, entity=(2, face_n), mapping="contravariant"))
+                        reference, face, f, entity=(2, face_n), mapping="contravariant"))
 
         # Interior Moments
         if reference.tdim == 3:
@@ -164,16 +164,19 @@ class TNTcurl(CiarletElement):
                     for k in range(order + 1):
                         f = (x[0] ** k * x[1] ** i * (1 - x[1]) * x[2] ** j * (1 - x[2]), 0, 0)
                         dofs.append(IntegralAgainst(
-                            reference, curl(curl(f)), entity=(3, 0), mapping="covariant"))
+                            reference, reference, curl(curl(f)), entity=(3, 0),
+                            mapping="covariant"))
 
                         f = (0, x[1] ** k * x[0] ** i * (1 - x[0]) * x[2] ** j * (1 - x[2]), 0, 0)
                         dofs.append(IntegralAgainst(
-                            reference, curl(curl(f)), entity=(3, 0), mapping="covariant"))
+                            reference, reference, curl(curl(f)), entity=(3, 0),
+                            mapping="covariant"))
 
                         if k in [0, 2]:
                             f = (0, 0,  x[2] ** k * x[0] ** i * (1 - x[0]) * x[1] ** j * (1 - x[1]))
                             dofs.append(IntegralAgainst(
-                                reference, curl(curl(f)), entity=(3, 0), mapping="covariant"))
+                                reference, reference, curl(curl(f)), entity=(3, 0),
+                                mapping="covariant"))
 
             for i in range(2, order + 1):
                 for j in range(2, order + 1):
@@ -183,7 +186,7 @@ class TNTcurl(CiarletElement):
                         f *= x[2] ** (k - 1) * x[2] ** k
                         grad_f = grad(f, 3)
                         dofs.append(IntegralAgainst(
-                            reference, grad_f, entity=(3, 0), mapping="contravariant"))
+                            reference, reference, grad_f, entity=(3, 0), mapping="contravariant"))
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, reference.tdim
@@ -234,8 +237,8 @@ class TNTdiv(CiarletElement):
                 else:
                     f = x[0] ** i[0] * x[1] ** i[1] * x[2] ** i[2]
                 grad_f = grad(f, reference.tdim)
-                dofs.append(IntegralAgainst(reference, grad_f, entity=(reference.tdim, 0),
-                                            mapping="covariant"))
+                dofs.append(IntegralAgainst(
+                    reference, reference, grad_f, entity=(reference.tdim, 0), mapping="covariant"))
 
         if reference.tdim == 2:
             for i in range(2, order + 1):
@@ -243,7 +246,7 @@ class TNTdiv(CiarletElement):
                     f = (x[0] ** (i - 1) * (1 - x[0]) * x[1] ** (j - 2) * (j - 1 - j * x[1]),
                          x[1] ** (j - 1) * (1 - x[1]) * x[0] ** (i - 2) * (i * x[0] - i + 1))
                     dofs.append(IntegralAgainst(
-                        reference, f, entity=(reference.tdim, 0), mapping="covariant"))
+                        reference, reference, f, entity=(reference.tdim, 0), mapping="covariant"))
         if reference.tdim == 3:
             for i in range(2, order + 1):
                 for j in range(2, order + 1):
@@ -256,7 +259,8 @@ class TNTdiv(CiarletElement):
                             0
                         )
                         dofs.append(IntegralAgainst(
-                            reference, f, entity=(reference.tdim, 0), mapping="covariant"))
+                            reference, reference, f, entity=(reference.tdim, 0),
+                            mapping="covariant"))
                         f = (
                             x[1] ** k * x[0] ** (i - 1) * (1 - x[0]) * x[2] ** (j - 2) * (
                                 j - 1 - j * x[2]),
@@ -265,7 +269,8 @@ class TNTdiv(CiarletElement):
                                 i * x[0] - i + 1)
                         )
                         dofs.append(IntegralAgainst(
-                            reference, f, entity=(reference.tdim, 0), mapping="covariant"))
+                            reference, reference, f, entity=(reference.tdim, 0),
+                            mapping="covariant"))
                         if k in [0, 2]:
                             f = (
                                 0,
@@ -275,7 +280,8 @@ class TNTdiv(CiarletElement):
                                     i * x[1] - i + 1)
                             )
                             dofs.append(IntegralAgainst(
-                                reference, f, entity=(reference.tdim, 0), mapping="covariant"))
+                                reference, reference, f, entity=(reference.tdim, 0),
+                                mapping="covariant"))
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, reference.tdim

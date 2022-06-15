@@ -18,9 +18,9 @@ class P1Hermite(CiarletElement):
         assert order == 3
         dofs = []
         for v_n, vs in enumerate(reference.vertices):
-            dofs.append(PointEvaluation(vs, entity=(0, v_n)))
-            dofs.append(DerivativePointEvaluation(vs, (1, 0), entity=(0, v_n)))
-            dofs.append(DerivativePointEvaluation(vs, (0, 1), entity=(0, v_n)))
+            dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
+            dofs.append(DerivativePointEvaluation(reference, vs, (1, 0), entity=(0, v_n)))
+            dofs.append(DerivativePointEvaluation(reference, vs, (0, 1), entity=(0, v_n)))
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1
@@ -46,9 +46,9 @@ class ReducedHsiehCloughTocher(CiarletElement):
         assert reference.name == "triangle"
         dofs = []
         for v_n, vs in enumerate(reference.vertices):
-            dofs.append(PointEvaluation(vs, entity=(0, v_n)))
-            dofs.append(DerivativePointEvaluation(vs, (1, 0), entity=(0, v_n)))
-            dofs.append(DerivativePointEvaluation(vs, (0, 1), entity=(0, v_n)))
+            dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
+            dofs.append(DerivativePointEvaluation(reference, vs, (1, 0), entity=(0, v_n)))
+            dofs.append(DerivativePointEvaluation(reference, vs, (0, 1), entity=(0, v_n)))
 
         mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
 

@@ -19,12 +19,12 @@ class Bell(CiarletElement):
         assert order == 5
         dofs = []
         for v_n, v in enumerate(reference.vertices):
-            dofs.append(PointEvaluation(v, entity=(0, v_n)))
-            dofs.append(DerivativePointEvaluation(v, (1, 0), entity=(0, v_n)))
-            dofs.append(DerivativePointEvaluation(v, (0, 1), entity=(0, v_n)))
-            dofs.append(DerivativePointEvaluation(v, (2, 0), entity=(0, v_n)))
-            dofs.append(DerivativePointEvaluation(v, (1, 1), entity=(0, v_n)))
-            dofs.append(DerivativePointEvaluation(v, (0, 2), entity=(0, v_n)))
+            dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
+            dofs.append(DerivativePointEvaluation(reference, v, (1, 0), entity=(0, v_n)))
+            dofs.append(DerivativePointEvaluation(reference, v, (0, 1), entity=(0, v_n)))
+            dofs.append(DerivativePointEvaluation(reference, v, (2, 0), entity=(0, v_n)))
+            dofs.append(DerivativePointEvaluation(reference, v, (1, 1), entity=(0, v_n)))
+            dofs.append(DerivativePointEvaluation(reference, v, (0, 2), entity=(0, v_n)))
         dofs += make_integral_moment_dofs(
             reference,
             edges=(NormalDerivativeIntegralMoment, Lagrange, 0, {"variant": variant}),

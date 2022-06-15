@@ -21,9 +21,9 @@ class HsiehCloughTocher(CiarletElement):
         assert reference.name == "triangle"
         dofs = []
         for v_n, vs in enumerate(reference.vertices):
-            dofs.append(PointEvaluation(vs, entity=(0, v_n)))
-            dofs.append(DerivativePointEvaluation(vs, (1, 0), entity=(0, v_n)))
-            dofs.append(DerivativePointEvaluation(vs, (0, 1), entity=(0, v_n)))
+            dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
+            dofs.append(DerivativePointEvaluation(reference, vs, (1, 0), entity=(0, v_n)))
+            dofs.append(DerivativePointEvaluation(reference, vs, (0, 1), entity=(0, v_n)))
         for e_n, vs in enumerate(reference.sub_entities(1)):
             sub_ref = create_reference(
                 reference.sub_entity_types[1],
@@ -31,7 +31,7 @@ class HsiehCloughTocher(CiarletElement):
             midpoint = tuple(sym_sum(i) / len(i)
                              for i in zip(*[reference.vertices[i] for i in vs]))
             dofs.append(
-                PointNormalDerivativeEvaluation(midpoint, sub_ref, entity=(1, e_n)))
+                PointNormalDerivativeEvaluation(reference, midpoint, sub_ref, entity=(1, e_n)))
 
         mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
 

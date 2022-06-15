@@ -23,7 +23,7 @@ class DPC(CiarletElement):
                 if sum(i) <= order
             ]
 
-        dofs = [PointEvaluation(d, entity=(reference.tdim, 0)) for d in points]
+        dofs = [PointEvaluation(reference, d, entity=(reference.tdim, 0)) for d in points]
 
         super().__init__(
             reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
@@ -55,7 +55,7 @@ class VectorDPC(CiarletElement):
             ]
         for p in scalar_space.dofs:
             for d in directions:
-                dofs.append(DotPointEvaluation(p.point, d, entity=p.entity))
+                dofs.append(DotPointEvaluation(reference, p.point, d, entity=p.entity))
 
         super().__init__(
             reference, order,

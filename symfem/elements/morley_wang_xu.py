@@ -22,33 +22,33 @@ class MorleyWangXu(CiarletElement):
         if order == 1:
             if reference.tdim == 1:
                 for v_n, v in enumerate(reference.vertices):
-                    dofs.append(PointEvaluation(v, entity=(0, v_n)))
+                    dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
             else:
                 dim = reference.tdim - 1
                 for facet_n in range(reference.sub_entity_count(dim)):
                     facet = reference.sub_entity(dim, facet_n)
-                    dofs.append(IntegralAgainst(facet, 1 / facet.jacobian(),
+                    dofs.append(IntegralAgainst(reference, facet, 1 / facet.jacobian(),
                                                 entity=(dim, facet_n)))
         elif order == 2:
             if reference.tdim == 2:
                 for v_n, v in enumerate(reference.vertices):
-                    dofs.append(PointEvaluation(v, entity=(0, v_n)))
+                    dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
             else:
                 dim = reference.tdim - 2
                 for ridge_n in range(reference.sub_entity_count(dim)):
                     ridge = reference.sub_entity(dim, ridge_n)
-                    dofs.append(IntegralAgainst(ridge, 1 / ridge.jacobian(),
+                    dofs.append(IntegralAgainst(reference, ridge, 1 / ridge.jacobian(),
                                                 entity=(dim, ridge_n)))
             dim = reference.tdim - 1
             for facet_n in range(reference.sub_entity_count(dim)):
                 facet = reference.sub_entity(dim, facet_n)
                 dofs.append(IntegralOfDirectionalMultiderivative(
-                    facet, (facet.normal(), ), (1, ), scale=1 / facet.jacobian(),
-                    entity=(dim, facet_n)))
+                    reference, facet, (facet.normal(), ), (1, ), (dim, facet_n),
+                    scale=1 / facet.jacobian()))
         else:
             assert order == reference.tdim == 3
             for v_n, v in enumerate(reference.vertices):
-                dofs.append(PointEvaluation(v, entity=(0, v_n)))
+                dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
             for e_n, vs in enumerate(reference.sub_entities(1)):
                 subentity = reference.sub_entity(1, e_n)
                 volume = subentity.jacobian()
@@ -59,14 +59,14 @@ class MorleyWangXu(CiarletElement):
                         normals.append(face.normal())
                 for orders in [(1, 0), (0, 1)]:
                     dofs.append(IntegralOfDirectionalMultiderivative(
-                        subentity, normals, orders, scale=1 / volume,
-                        entity=(1, e_n)))
+                        reference, subentity, normals, orders, (1, e_n),
+                        scale=1 / volume))
             for f_n, vs in enumerate(reference.sub_entities(2)):
                 subentity = reference.sub_entity(2, f_n)
                 volume = subentity.jacobian()
                 dofs.append(IntegralOfDirectionalMultiderivative(
-                    subentity, (subentity.normal(), ), (2, ), scale=1 / volume,
-                    entity=(2, f_n)))
+                    reference, subentity, (subentity.normal(), ), (2, ), (2, f_n),
+                    scale=1 / volume))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
