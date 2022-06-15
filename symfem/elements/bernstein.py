@@ -48,22 +48,22 @@ def bernstein_polynomials(n, d, vars=x):
     poly = []
     if d == 1:
         lambdas = [1 - vars[0], vars[0]]
-        powers = [[i, n - i] for i in range(n + 1)]
+        powers = [[n - i, i] for i in range(n + 1)]
     elif d == 2:
         lambdas = [1 - vars[0] - vars[1], vars[0], vars[1]]
-        powers = [[i, j, n - i - j]
+        powers = [[n - i - j, j, i]
                   for i in range(n + 1)
                   for j in range(n + 1 - i)]
     elif d == 3:
         lambdas = [1 - vars[0] - vars[1] - vars[2], vars[0], vars[1], vars[2]]
-        powers = [[i, j, k, n - i - j - k]
+        powers = [[n - i - j - k, k, j, i]
                   for i in range(n + 1)
                   for j in range(n + 1 - i)
                   for k in range(n + 1 - i - j)]
 
     for p in powers:
         f = choose(n, p)
-        for a, b in zip(lambdas[::-1], p):
+        for a, b in zip(lambdas, p):
             f *= a ** b
         poly.append(f)
 
