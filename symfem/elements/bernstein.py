@@ -175,21 +175,31 @@ class Bernstein(CiarletElement):
                         reference, reference.sub_entity(1, 2), i, order, (1, 2))
             if reference.name == "tetrahedon":
                 for i in range(1, order):
-                    dofs[index(0, order - i, i)].entity = (1, 0)
-                    dofs[index(order - i, 0, i)].entity = (1, 1)
-                    dofs[index(order - i, i, 0)].entity = (1, 2)
-                    dofs[index(0, 0, i)].entity = (1, 3)
-                    dofs[index(0, i, 0)].entity = (1, 4)
-                    dofs[index(i, 0, 0)].entity = (1, 5)
+                    dofs[index(0, order - i, i)] = BernsteinFunctional(
+                        reference, reference.sub_entity(1, 0), i, order, (1, 0))
+                    dofs[index(order - i, 0, i)] = BernsteinFunctional(
+                        reference, reference.sub_entity(1, 1), i, order, (1, 1))
+                    dofs[index(order - i, i, 0)] = BernsteinFunctional(
+                        reference, reference.sub_entity(1, 2), i, order, (1, 2))
+                    dofs[index(0, 0, i)] = BernsteinFunctional(
+                        reference, reference.sub_entity(1, 3), i, order, (1, 3))
+                    dofs[index(0, i, 0)] = BernsteinFunctional(
+                        reference, reference.sub_entity(1, 4), i, order, (1, 4))
+                    dofs[index(i, 0, 0)] = BernsteinFunctional(
+                        reference, reference.sub_entity(1, 5), i, order, (1, 5))
 
             # Change entities for points on faces
             if reference.name == "tetrahedon":
                 for i in range(1, order):
                     for j in range(1, order - i):
-                        dofs[index(order - i - j, i, j)].entity = (2, 0)
-                        dofs[index(0, i, j)].entity = (2, 1)
-                        dofs[index(i, 0, j)].entity = (2, 2)
-                        dofs[index(i, j, 0)].entity = (2, 3)
+                        dofs[index(order - i - j, i, j)] = BernsteinFunctional(
+                            reference, reference.sub_entity(2, 0), index(i, j), (2, 0))
+                        dofs[index(0, i, j)] = BernsteinFunctional(
+                            reference, reference.sub_entity(2, 1), index(i, j), (2, 1))
+                        dofs[index(i, 0, j)] = BernsteinFunctional(
+                            reference, reference.sub_entity(2, 2), index(i, j), (2, 2))
+                        dofs[index(i, j, 0)] = BernsteinFunctional(
+                            reference, reference.sub_entity(2, 3), index(i, j), (2, 3))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
