@@ -157,14 +157,14 @@ class Bernstein(CiarletElement):
                 for i in range(1, order):
                     for j in range(1, order - i):
                         dofs.append(BernsteinFunctional(
-                            reference, reference.sub_entity(2, fn), index(i, j), (2, fn)))
+                            reference, reference.sub_entity(2, fn), index(i, j), order, (2, fn)))
 
             if reference.name == "tetrahedon":
                 for i in range(1, order):
                     for j in range(1, order - i):
                         for k in range(1, order - i - j):
                             dofs.append(BernsteinFunctional(
-                                reference, reference, index(i, j, k), (3, 0)))
+                                reference, reference, index(i, j, k), order, (3, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
