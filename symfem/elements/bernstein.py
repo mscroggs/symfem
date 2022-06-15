@@ -119,12 +119,12 @@ class BernsteinFunctional(BaseFunctional):
                 f"are the degree {self.degree} Bernstein polynomials on the cell"
             ]
         else:
-            e = self.entity_tex(*self.entity)
+            e = self.entity_tex()
             return f"v\\mapsto c^{{{e}}}_{{{self.index}}}", [
                 f"\\(v=\\sum_ic^{{{e}}}_iB^{{{e}}}_i\\)",
                 f"\\(B^{{{e}}}_1\\) to \\(B^{{{e}}}_n\\) "
                 f"are the degree {self.degree} Bernstein polynomials on \\({e}\\)",
-                self.entity_definition(*self.entity)
+                self.entity_definition()
             ]
 
 
