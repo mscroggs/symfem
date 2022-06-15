@@ -2,28 +2,19 @@ import symfem
 import pytest
 
 
-@pytest.mark.parametrize("degree", range(4))
-def test_interval(degree):
-    b = symfem.create_element("interval", "Bernstein", degree)
-    poly = symfem.elements.bernstein.bernstein_polynomials(degree, 1)
+@pytest.mark.parametrize("celltype, degree", [(c, i) for c, n in [
+    ("interval", 4), ("triangle", 3), ("tetrahedron", 2)
+] for i in range(n)])
+def test_bernstein(celltype, degree):
+    b = symfem.create_element(celltype, "Bernstein", degree)
+    poly = symfem.elements.bernstein.bernstein_polynomials(degree, b.reference.tdim)
 
-    for i, j in zip(b.get_basis_functions(), poly):
-        assert (i - j).simplify() == 0
+    for f in b.get_basis_functions():
+        for p in poly:
+            if (f - p).simplify() == 0:
+                poly.remove(p)
+                break
+        else:
+            raise ValueError(f"{f} is not a Bernstein polynomial.")
 
-
-@pytest.mark.parametrize("degree", range(3))
-def test_triangle(degree):
-    b = symfem.create_element("triangle", "Bernstein", degree)
-    poly = symfem.elements.bernstein.bernstein_polynomials(degree, 2)
-
-    for i, j in zip(b.get_basis_functions(), poly):
-        assert (i - j).simplify() == 0
-
-
-@pytest.mark.parametrize("degree", range(2))
-def test_tetrahedron(degree):
-    b = symfem.create_element("tetrahedron", "Bernstein", degree)
-    poly = symfem.elements.bernstein.bernstein_polynomials(degree, 3)
-
-    for i, j in zip(b.get_basis_functions(), poly):
-        assert (i - j).simplify() == 0
+    assert len(poly) == 0
