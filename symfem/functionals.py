@@ -54,9 +54,9 @@ def _get_entity(reference, dof):
 def _get_entity_definition(reference, dof):
     """Get the definition of the entity the dof is associated with."""
     if dof.entity_dim() == reference.tdim:
-        return "R is the reference element"
+        return "\\(R\\) is the reference element"
     else:
-        return (f"{_get_entity(reference, dof)} is the "
+        return (f"\\({_get_entity(reference, dof)}\\) is the "
                 f"{_nth(_get_entity_number(reference, dof))} "
                 f"{['vertex', 'edge', 'face', 'volume'][reference.tdim]}")
 
@@ -299,7 +299,7 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
         entity_n = _get_entity_number(self.reference, self)
         desc += "\\cdot\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}}"
         return desc, [
-            "\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}} is the normal to facet {entity_n}"
+            "\\(\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}}\\) is the normal to facet {entity_n}"
         ]
 
     name = "Point evaluation of normal derivative"
@@ -823,7 +823,7 @@ class TangentIntegralMoment(VecIntegralMoment):
         desc += "\\hat{\\boldsymbol{t}}" + f"_{{{entity_n}}}"
         return desc, [
             entity_def,
-            f"\\hat{{\\boldsymbol{{t}}}}_{{{entity_n}}} is the tangent to edge {entity_n}"
+            f"\\(\\hat{{\\boldsymbol{{t}}}}_{{{entity_n}}}\\) is the tangent to edge {entity_n}"
         ]
 
     name = "Tangential integral moment"
@@ -848,7 +848,7 @@ class NormalIntegralMoment(VecIntegralMoment):
         desc += "\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}}"
         return desc, [
             entity_def,
-            f"\\hat{{\\boldsymbol{{n}}}}_{{{entity_n}}} is the normal to facet {entity_n}"
+            f"\\(\\hat{{\\boldsymbol{{n}}}}_{{{entity_n}}}\\) is the normal to facet {entity_n}"
         ]
 
     name = "Normal integral moment"
@@ -873,7 +873,7 @@ class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
         desc += "{\\partial\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}}" + "}"
         return desc, [
             entity_def,
-            f"\\hat{{\\boldsymbol{{n}}}}_{{{entity_n}}} is the normal to facet {entity_n}"
+            f"\\(\\hat{{\\boldsymbol{{n}}}}_{{{entity_n}}}\\) is the normal to facet {entity_n}"
         ]
 
     name = "Normal derivative integral moment"
@@ -939,7 +939,7 @@ class NormalInnerProductIntegralMoment(InnerProductIntegralMoment):
         desc += "\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}}"
         return desc, [
             entity_def,
-            f"\\hat{{\\boldsymbol{{n}}}}_{{{entity_n}}} is the normal to facet {entity_n}"
+            f"\\(\\hat{{\\boldsymbol{{n}}}}_{{{entity_n}}}\\) is the normal to facet {entity_n}"
         ]
 
     name = "Normal inner product integral moment"
