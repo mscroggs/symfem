@@ -49,7 +49,11 @@ def make_integral_moment_dofs(
     dofs = []
 
     # DOFs per dimension
-    for dim, moment_data in enumerate([vertices, edges, faces, volumes]):
+    for dim, moment_data in [
+        (0, vertices), (1, edges), (2, faces), (3, volumes),
+        (reference.tdim, cells), (reference.tdim - 1, facets), (reference.tdim - 2, ridges),
+        (reference.tdim - 3, peaks),
+    ]:
         if moment_data is not None:
             sub_type = reference.sub_entity_types[dim]
             if sub_type is not None:
@@ -62,33 +66,11 @@ def make_integral_moment_dofs(
                         sub_element = SubElement(sub_ref.default_reference(), order, **kwargs)
                         for dn, d in enumerate(sub_element.dofs):
                             f = sub_element.get_basis_function(dn)
-                            if mapping is None:
-                                dofs.append(IntegralMoment(
-                                    reference, sub_ref, f, d, entity=(dim, i)))
-                            else:
-                                dofs.append(IntegralMoment(
-                                    reference, sub_ref, f, d, entity=(dim, i), mapping=mapping))
+                            kwargs = {}
+                            if mapping is not None:
+                                kwargs["mapping"] = mapping
+                            dofs.append(IntegralMoment(
+                                reference, sub_ref, f, d, (dim, i), **kwargs))
 
-    # DOFs per codimension
-    for _dim, moment_data in enumerate([peaks, ridges, facets, cells]):
-        dim = reference.tdim - 3 + _dim
-        if moment_data is not None:
-            sub_type = reference.sub_entity_types[dim]
-            if sub_type is not None:
-                assert dim > 0
-                for i, vs in enumerate(reference.sub_entities(dim)):
-                    sub_ref = reference.sub_entity(dim, i, True)
-                    IntegralMoment, SubElement, order, mapping, kwargs = extract_moment_data(
-                        moment_data, sub_ref.name)
-                    if order >= SubElement.min_order:
-                        sub_element = SubElement(sub_ref.default_reference(), order, **kwargs)
-                        for dn, d in enumerate(sub_element.dofs):
-                            f = sub_element.get_basis_function(dn)
-                            if mapping is None:
-                                dofs.append(IntegralMoment(
-                                    reference, sub_ref, f, d, entity=(dim, i)))
-                            else:
-                                dofs.append(IntegralMoment(
-                                    reference, sub_ref, f, d, entity=(dim, i), mapping=mapping))
 
     return dofs
