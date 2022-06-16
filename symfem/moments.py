@@ -71,6 +71,4 @@ def make_integral_moment_dofs(
                                 kwargs["mapping"] = mapping
                             dofs.append(IntegralMoment(
                                 reference, sub_ref, f, d, (dim, i), **kwargs))
-
-
     return dofs
