@@ -1,3 +1,10 @@
+# Version 2022.6.1 (18 June 2022)
+
+- Added Rannacher-Turek element
+- Added functions to create orthogonal polynomials on cells
+- Added TeX descriptions of DOF functionals
+- Corrected Bernstein element
+
 # Version 2021.12.1 (01 December 2021)
 
 - Added Regge element on tensor product cells.
