@@ -1,3 +1,3 @@
 """Version number."""
 
-version = "2021.12.1"
+version = "2022.6.1"
