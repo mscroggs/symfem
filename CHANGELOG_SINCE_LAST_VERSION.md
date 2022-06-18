@@ -1,4 +1,0 @@
-- Added Rannacher-Turek element
-- Added functions to create orthogonal polynomials on cells
-- Added TeX descriptions of DOF functionals
-- Corrected Bernstein element
