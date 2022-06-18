@@ -79,14 +79,13 @@ class BaseFunctional(ABC):
             desc += ['vertex', 'edge', 'face', 'volume'][self.entity[0]]
             return desc
 
+    def dof_direction(self):
+        """Get the direction of the DOF."""
+        return None
+
     @abstractmethod
     def dof_point(self):
         """Get the location of the DOF in the cell."""
-        pass
-
-    @abstractmethod
-    def dof_direction(self):
-        """Get the direction of the DOF."""
         pass
 
     @abstractmethod
@@ -195,10 +194,6 @@ class DerivativePointEvaluation(BaseFunctional):
     def dof_point(self):
         """Get the location of the DOF in the cell."""
         return self.point
-
-    def dof_direction(self):
-        """Get the direction of the DOF."""
-        return None
 
     def perform_mapping(self, fs, map, inverse_map, tdim):
         """Map functions to a cell."""
@@ -315,10 +310,6 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
     def dof_point(self):
         """Get the location of the DOF in the cell."""
         return self.point
-
-    def dof_direction(self):
-        """Get the direction of the DOF."""
-        return None
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
@@ -446,10 +437,6 @@ class IntegralAgainst(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.integral_domain.vertices))
 
-    def dof_direction(self):
-        """Get the direction of the DOF."""
-        return None
-
     def eval(self, function, symbolic=True):
         """Apply the functional to a function."""
         point = [i for i in self.integral_domain.origin]
@@ -502,10 +489,6 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.integral_domain.vertices))
 
-    def dof_direction(self):
-        """Get the direction of the DOF."""
-        return None
-
     def eval(self, function, symbolic=True):
         """Apply the functional to a function."""
         point = [i for i in self.integral_domain.origin]
@@ -551,10 +534,6 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
     def dof_point(self):
         """Get the location of the DOF in the cell."""
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.integral_domain.vertices))
-
-    def dof_direction(self):
-        """Get the direction of the DOF."""
-        return None
 
     def eval(self, function, symbolic=True):
         """Apply the functional to a function."""
