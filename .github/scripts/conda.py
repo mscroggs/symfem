@@ -20,7 +20,7 @@ for file in data["releases"][version]:
         hash = file["digests"]["sha256"]
 
 upstream_feedstock = git.get_repo("conda-forge/symfem-feedstock")
-upstream_branch = upstream_feedstock.get_branch("master")
+upstream_branch = upstream_feedstock.get_branch("main")
 
 fork = git.get_user().create_fork(upstream_feedstock)
 
@@ -31,7 +31,7 @@ for repo in u.get_repos():
         repo.delete()
 
 fork = git.get_user().create_fork(upstream_feedstock)
-branch = fork.get_branch("master")
+branch = fork.get_branch("main")
 
 old_meta = fork.get_contents("recipe/meta.yaml", branch.commit.sha)
 
@@ -54,4 +54,4 @@ for line in old_meta_lines:
 fork.update_file("recipe/meta.yaml", "Update version", "\n".join(new_meta_lines), sha=old_meta.sha)
 
 upstream_feedstock.create_pull(title=f"Update version to {version}",
-                               body="", base="master", head="symfembot:master")
+                               body="", base="main", head="symfembot:main")
