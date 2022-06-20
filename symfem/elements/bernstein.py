@@ -75,7 +75,7 @@ class BernsteinFunctional(BaseFunctional):
 
     def __init__(self, reference, integral_domain, index, degree, entity):
         super().__init__(reference, entity, "identity")
-        self.orth = [
+        orth = [
             o / sympy.sqrt(integral_domain.integral(o * o))
             for o in orthogonal_basis(integral_domain.name, degree, 0, t[:integral_domain.tdim])[0]
         ]
@@ -85,11 +85,11 @@ class BernsteinFunctional(BaseFunctional):
 
         bern = bernstein_polynomials(degree, integral_domain.tdim, t)
         mat = sympy.Matrix(
-            [[integral_domain.integral(o * b) for b in bern] for o in self.orth])
+            [[integral_domain.integral(o * b) for b in bern] for o in orth])
         minv = mat.inv()
-        self.alpha = minv.row(index)
+        alpha = minv.row(index)
 
-        self.moment = sum(i * j for i, j in zip(self.alpha, self.orth))
+        self.moment = sum(i * j for i, j in zip(alpha, orth))
 
     def dof_point(self):
         """Get the location of the DOF in the cell."""
