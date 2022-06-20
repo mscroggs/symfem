@@ -89,6 +89,8 @@ class BernsteinFunctional(BaseFunctional):
         minv = mat.inv()
         self.alpha = minv.row(index)
 
+        self.moment = sum(i * j for i, j in zip(self.alpha, self.orth))
+
     def dof_point(self):
         """Get the location of the DOF in the cell."""
         return self.ref.sub_entity(*self.entity).midpoint()
@@ -104,11 +106,7 @@ class BernsteinFunctional(BaseFunctional):
             for j, k in zip(a, t):
                 point[i] += j * k
 
-        coeffs = [
-            self.ref.integral(subs(function, x, point) * f)
-            for f in self.orth
-        ]
-        return sum(i * j for i, j in zip(self.alpha, coeffs))
+        return self.ref.integral(subs(function, x, point) * self.moment)
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""
