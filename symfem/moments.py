@@ -51,8 +51,8 @@ def make_integral_moment_dofs(
     # DOFs per dimension
     for dim, moment_data in [
         (0, vertices), (1, edges), (2, faces), (3, volumes),
-        (reference.tdim, cells), (reference.tdim - 1, facets), (reference.tdim - 2, ridges),
-        (reference.tdim - 3, peaks),
+        (reference.tdim - 3, peaks), (reference.tdim - 2, ridges), (reference.tdim - 1, facets),
+        (reference.tdim, cells),
     ]:
         if moment_data is not None:
             sub_type = reference.sub_entity_types[dim]
