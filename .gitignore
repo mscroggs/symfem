@@ -12,3 +12,5 @@ docs/_build
 
 joss/build.sh
 joss/paper.pdf
+
+test/test-output-*
