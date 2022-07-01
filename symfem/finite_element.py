@@ -1,6 +1,7 @@
 """Abstract finite element classes and functions."""
 
 import sympy
+import typing
 import warnings
 import numpy
 import math
@@ -236,7 +237,7 @@ class FiniteElement:
         """Get the name of the element."""
         return self.names[0]
 
-    names = []
+    names: typing.List[str] = []
 
 
 class CiarletElement(FiniteElement):
@@ -649,7 +650,7 @@ class CiarletElement(FiniteElement):
                     assert d.eval(f).expand().simplify() == 0
                 assert d.entity_dim() is not None
 
-    names = []
+    names: typing.List[str] = []
 
 
 class DirectElement(FiniteElement):
@@ -723,4 +724,4 @@ class DirectElement(FiniteElement):
 
         assert mat.rank() == mat.rows
 
-    names = []
+    names: typing.List[str] = []

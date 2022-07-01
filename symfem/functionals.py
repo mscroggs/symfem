@@ -99,7 +99,7 @@ class BaseFunctional(ABC):
         pass
 
     get_points_and_weights = None
-    name = None
+    name = "Base functional"
 
 
 class PointEvaluation(BaseFunctional):

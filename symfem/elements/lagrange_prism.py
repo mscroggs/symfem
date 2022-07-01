@@ -1,6 +1,7 @@
 """Lagrange elements on a prism."""
 
 import sympy
+import typing
 from itertools import product
 from ..finite_element import CiarletElement
 from ..polynomials import prism_polynomial_set
@@ -102,7 +103,7 @@ class VectorLagrange(CiarletElement):
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
-    names = []
+    names: typing.List[str] = []
     references = ["prism"]
     min_order = 0
     continuity = "C0"

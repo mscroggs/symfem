@@ -20,3 +20,5 @@ jobs:
         name: Run flake8 checks
       - run: python3 -m pydocstyle symfem
         name: Run pydocstyle checks
+      - run: python3 -m mypy symfem
+        name: Run mypy checks

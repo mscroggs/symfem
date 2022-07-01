@@ -5,6 +5,7 @@ This element's definition appears in https://doi.org/10.2307/2006147
 """
 
 import sympy
+import typing
 from ..finite_element import CiarletElement
 from ..functionals import PointEvaluation, DerivativePointEvaluation
 from ..polynomials import polynomial_set
@@ -30,7 +31,7 @@ class P1Hermite(CiarletElement):
         """Return the kwargs used to create this element."""
         return {"poly": self._basis}
 
-    names = []
+    names: typing.List[str] = []
     references = ["triangle"]
     min_order = 3
     max_order = 3

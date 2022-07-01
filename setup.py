@@ -36,7 +36,7 @@ if __name__ == "__main__":
         data_files=data_files,
         install_requires=["sympy", "numpy"],
         extras_require={
-            "style": ["flake8", "pydocstyle"],
+            "style": ["flake8", "pydocstyle", "mypy"],
             "optional": ["svgwrite", "CairoSVG"],
             "test": ["pytest", "symfem[optional]"],
         }
