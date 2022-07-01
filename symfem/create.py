@@ -1,16 +1,19 @@
 """Create elements and references."""
+
+import typing as _typing
 import os as _os
 import importlib as _il
 from . import references as _references
 from .finite_element import FiniteElement as _FiniteElement
+import sympy as _sympy
 
 _folder = _os.path.dirname(_os.path.realpath(__file__))
 
-_elementmap = {}
-_elementlist = []
+_elementmap: _typing.Dict[str, _typing.Dict[str, _typing.Type]] = {}
+_elementlist: _typing.List[_typing.Type] = []
 
 
-def add_element(ElementClass):
+def add_element(ElementClass: _typing.Type):
     """Add an element to Symfem.
 
     Parameters
@@ -56,7 +59,9 @@ for _file in _os.listdir(_os.path.join(_folder, "elements")):
                 add_element(_element)
 
 
-def create_reference(cell_type, vertices=None):
+def create_reference(
+    cell_type: str, vertices: _typing.List[_typing.Tuple[_sympy.core.expr.Expr, ...]] = None
+) -> _references.Reference:
     """Make a reference cell.
 
     Parameters
@@ -97,7 +102,9 @@ def create_reference(cell_type, vertices=None):
         raise ValueError(f"Unknown cell type: {cell_type}")
 
 
-def create_element(cell_type, element_type, order, **kwargs):
+def create_element(
+    cell_type: str, element_type: str, order: int, **kwargs: _typing.Any
+) -> _FiniteElement:
     """Make a finite element.
 
     Parameters
@@ -185,7 +192,9 @@ def create_element(cell_type, element_type, order, **kwargs):
     raise ValueError(f"Unsupported element type: {element_type}")
 
 
-def _order_is_allowed(element_class, ref, order):
+def _order_is_allowed(
+    element_class: _typing.Type, ref: str, order: int
+) -> bool:
     if hasattr(element_class, "min_order"):
         if isinstance(element_class.min_order, dict):
             if ref in element_class.min_order:

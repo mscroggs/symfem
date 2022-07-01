@@ -9,6 +9,10 @@ class Reference:
     """A reference cell on which a finite element can be defined."""
 
     def __init__(self, simplex=False, tp=False):
+        try:
+            self.name
+        except:
+            self.name = None
         self.gdim = len(self.origin)
         self.simplex = simplex
         self.tp = tp

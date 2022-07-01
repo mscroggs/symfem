@@ -5,11 +5,13 @@ import typing
 import warnings
 import numpy
 import math
+from abc import ABC, abstractmethod
 from itertools import product
 from .symbolic import x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float, symequal, sym_product
 from .calculus import diff
 from .vectors import vsub, vnorm, vdiv, vadd
-from .basis_function import ElementBasisFunction
+from .basis_function import BasisFunction
+from .references import Reference
 
 
 class NoTensorProduct(Exception):
@@ -19,11 +21,13 @@ class NoTensorProduct(Exception):
         super().__init__("This element does not have a tensor product representation.")
 
 
-class FiniteElement:
+class FiniteElement(ABC):
     """Abstract finite element."""
 
-    def __init__(self, reference, order, space_dim, domain_dim, range_dim,
-                 range_shape=None):
+    def __init__(
+        self, reference: Reference, order: int, space_dim: int, domain_dim: int, range_dim: int,
+        range_shape: typing.Tuple[int, ...] = None
+    ):
         self.reference = reference
         self.order = order
         self.space_dim = space_dim
@@ -31,19 +35,32 @@ class FiniteElement:
         self.range_dim = range_dim
         self.range_shape = range_shape
 
-    def entity_dofs(self, entity_dim, entity_number):
+    @abstractmethod
+    def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
         """Get the numbers of the DOFs associated with the given entity."""
-        raise NotImplementedError()
+        pass
 
-    def get_basis_functions(self, reshape=True, symbolic=True, use_tensor_factorisation=False):
+    @abstractmethod
+    def get_basis_functions(
+        self, reshape: bool = True, symbolic: bool = True, use_tensor_factorisation: bool = False
+    ) -> typing.Union[
+        typing.List[sympy.core.expr.Expr],
+        typing.List[typing.List[sympy.core.expr.Expr]]
+    ]:
         """Get the basis functions of the element."""
-        raise NotImplementedError()
+        pass
 
-    def get_basis_function(self, n):
+    def get_basis_function(self, n: int) -> BasisFunction:
         """Get a single basis function of the element."""
         return ElementBasisFunction(self, n)
 
-    def tabulate_basis(self, points, order="xyzxyz", symbolic=True):
+    def tabulate_basis(
+        self, points: typing.List[typing.Tuple[sympy.core.expr.Expr, ...]],
+        order: str = "xyzxyz", symbolic: bool = True
+    ) -> typing.Union[
+        typing.List[typing.Union[sympy.core.expr.Expr, float]],
+        typing.List[typing.List[typing.Union[sympy.core.expr.Expr, float]]]
+    ]:
         """Evaluate the basis functions of the element at the given points."""
         if not symbolic:
             warnings.warn("Converting from symbolic to float. This may be slow.")
@@ -87,9 +104,19 @@ class FiniteElement:
             return output
         raise ValueError(f"Unknown order: {order}")
 
-    def map_to_cell(self, vertices, basis=None):
+    @abstractmethod
+    def map_to_cell(
+        self, vertices: typing.List[typing.Tuple[sympy.core.expr.Expr, ...]],
+        basis: typing.Union[
+            typing.List[sympy.core.expr.Expr],
+            typing.List[typing.List[sympy.core.expr.Expr]]
+        ] = None
+    ) -> typing.Union[
+        typing.List[sympy.core.expr.Expr],
+        typing.List[typing.List[sympy.core.expr.Expr]]
+    ]:
         """Map the basis onto a cell using the appropriate mapping for the element."""
-        raise NotImplementedError()
+        pass
 
     def test(self):
         """Run tests for this element."""
@@ -214,7 +241,7 @@ class FiniteElement:
 
                 assert symequal(f, g)
 
-    def get_tensor_factorisation(self):
+    def get_tensor_factorisation(self) -> int:
         """Get the representation of the element as a tensor product."""
         raise NoTensorProduct()
 
@@ -238,6 +265,7 @@ class FiniteElement:
         return self.names[0]
 
     names: typing.List[str] = []
+    references: typing.List[str] = []
 
 
 class CiarletElement(FiniteElement):
@@ -650,8 +678,6 @@ class CiarletElement(FiniteElement):
                     assert d.eval(f).expand().simplify() == 0
                 assert d.entity_dim() is not None
 
-    names: typing.List[str] = []
-
 
 class DirectElement(FiniteElement):
     """Finite element defined directly."""
@@ -724,4 +750,14 @@ class DirectElement(FiniteElement):
 
         assert mat.rank() == mat.rows
 
-    names: typing.List[str] = []
+
+class ElementBasisFunction(BasisFunction):
+    """A basis function of a finite element."""
+
+    def __init__(self, element: FiniteElement, n: int):
+        self.element = element
+        self.n = n
+
+    def get_function(self) -> sympy.core.expr.Expr:
+        """Return the symbolic function."""
+        return self.element.get_basis_functions()[self.n]

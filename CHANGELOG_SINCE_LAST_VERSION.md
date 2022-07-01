@@ -1,1 +1,2 @@
 - Added DOF diagrams
+- Added typing
