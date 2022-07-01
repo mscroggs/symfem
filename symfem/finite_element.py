@@ -451,17 +451,17 @@ class CiarletElement(FiniteElement):
                 dofs.sort(key=lambda d: z(d.dof_point()))
                 for d in dofs:
                     if d.dof_direction() is not None:
-                        dir = d.dof_direction()
-                        dir = vdiv(dir, vnorm(dir))
-                        dir = vdiv(dir, 8)
+                        direction = d.dof_direction()
+                        direction = vdiv(direction, vnorm(direction))
+                        direction = vdiv(direction, 8)
                         start = d.dof_point()
                         for d2 in self.dofs:
                             if d != d2 and d.dof_point() == d2.dof_point():
-                                start = vadd(start, vdiv(dir, 3))
+                                start = vadd(start, vdiv(direction, 3))
                                 break
                         ddata.append((
                             "arrow",
-                            (to_2d(start), to_2d(vadd(start, dir)), colors[d.entity[0]])))
+                            (to_2d(start), to_2d(vadd(start, direction)), colors[d.entity[0]])))
                         ddata.append((
                             "ncircle", (to_2d(start), self.dofs.index(d), colors[d.entity[0]])))
                     else:
@@ -514,21 +514,26 @@ class CiarletElement(FiniteElement):
                 s, e, c = info
                 img.add(img.line(
                     map_pt(s), map_pt(e), stroke=c, stroke_width=4, stroke_linecap="round"))
-                dir = vsub(e, s)
-                dir = vdiv(dir, vnorm(dir))
-                dir = vdiv(dir, 30)
-                perp = (-dir[1], dir[0])
+                direction = vsub(e, s)
+                direction = vdiv(direction, vnorm(direction))
+                direction = vdiv(direction, 30)
+                perp = (-direction[1], direction[0])
                 perp = vdiv(perp, 2.5)
                 for f in [vadd, vsub]:
-                    a_end = tuple(float(i) for i in f(vsub(e, dir), perp))
+                    a_end = tuple(float(i) for i in f(vsub(e, direction), perp))
                     img.add(img.line(
                         map_pt(a_end), map_pt(e), stroke=c, stroke_width=4, stroke_linecap="round"))
             elif t == "ncircle":
                 p, n, c = info
                 img.add(img.circle(map_pt(p), 20, stroke=c, stroke_width=4, fill=white))
+                if n < 10:
+                    font_size = 25
+                elif n < 100:
+                    font_size = 20
+                else:
+                    font_size = 12
                 img.add(img.text(
-                    f"{n}", map_pt(p), fill=black,
-                    font_size=25 if n < 10 else (20 if n < 100 else 12),
+                    f"{n}", map_pt(p), fill=black, font_size=font_size,
                     style=("text-anchor:middle;dominant-baseline:middle;"
                            "font-family:sans-serif")
                 ))
