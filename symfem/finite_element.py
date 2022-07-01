@@ -7,7 +7,7 @@ import math
 from itertools import product
 from .symbolic import x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float, symequal, sym_product
 from .calculus import diff
-from .vectors import vsub
+from .vectors import vsub, vnorm, vdiv, vadd
 from .basis_function import ElementBasisFunction
 
 
@@ -416,6 +416,7 @@ class CiarletElement(FiniteElement):
 
         colors = ["#FF8800", "#44AAFF", "#55FF00", "#DD2299"]
         black = "#000000"
+        white = "#FFFFFF"
 
         dofs_by_subentity = {i: {j: [] for j in range(self.reference.sub_entity_count(i))}
                              for i in range(self.reference.tdim + 1)}
@@ -423,8 +424,10 @@ class CiarletElement(FiniteElement):
         # Possible entries in ddata:
         #   ("line", (start, end, color))
         #       A line from start to end of the given color
+        #   ("arrow", (start, end, color))
+        #       An arrow from start to end of the given color
         #   ("ncircle", (center, number, color))
-        #       A circle containing a number, filled with the given color
+        #       A circle containing a number, drawn with the given color
         #   ("fill", (vertices, color, opacity))
         #       An polygon filled with the given color and opacity
         ddata = []
@@ -432,26 +435,44 @@ class CiarletElement(FiniteElement):
         for d in self.dofs:
             dofs_by_subentity[d.entity[0]][d.entity[1]].append(d)
 
-        for dim, e in self.reference.z_ordered_entities():
-            if dim == 1:
-                pts = [to_2d(self.reference.vertices[i]) for i in self.reference.edges[e]]
-                ddata.append(("line", (pts[0], pts[1], black)))
-            if dim == 2:
-                pts = [to_2d(self.reference.vertices[i]) for i in self.reference.faces[e]]
-                if len(pts) == 4:
-                    pts = [pts[0], pts[1], pts[3], pts[2]]
-                ddata.append(("fill", (pts, "#FFFFFF", 0.5)))
+        for entities in self.reference.z_ordered_entities():
+            for dim, e in entities:
+                if dim == 1:
+                    pts = [to_2d(self.reference.vertices[i]) for i in self.reference.edges[e]]
+                    ddata.append(("line", (pts[0], pts[1], black)))
+                if dim == 2:
+                    pts = [to_2d(self.reference.vertices[i]) for i in self.reference.faces[e]]
+                    if len(pts) == 4:
+                        pts = [pts[0], pts[1], pts[3], pts[2]]
+                    ddata.append(("fill", (pts, white, 0.5)))
 
-            dofs = dofs_by_subentity[dim][e]
-            dofs.sort(key=lambda d: z(d.dof_point()))
-            for d in dofs:
-                ddata.append(("ncircle",
-                              (to_2d(d.dof_point()), self.dofs.index(d), colors[d.entity[0]])))
+            for dim, e in entities:
+                dofs = dofs_by_subentity[dim][e]
+                dofs.sort(key=lambda d: z(d.dof_point()))
+                for d in dofs:
+                    if d.dof_direction() is not None:
+                        dir = d.dof_direction()
+                        dir = vdiv(dir, vnorm(dir))
+                        dir = vdiv(dir, 8)
+                        start = d.dof_point()
+                        for d2 in self.dofs:
+                            if d != d2 and d.dof_point() == d2.dof_point():
+                                start = vadd(start, vdiv(dir, 3))
+                                break
+                        ddata.append((
+                            "arrow",
+                            (to_2d(start), to_2d(vadd(start, dir)), colors[d.entity[0]])))
+                        ddata.append((
+                            "ncircle", (to_2d(start), self.dofs.index(d), colors[d.entity[0]])))
+                    else:
+                        ddata.append((
+                            "ncircle",
+                            (to_2d(d.dof_point()), self.dofs.index(d), colors[d.entity[0]])))
 
         minx, miny = 1000, 1000
         maxx, maxy = -1000, -1000
         for t, info in ddata:
-            if t == "line":
+            if t == "line" or t == "arrow":
                 s, e, c = info
                 minx = min(s[0], e[0], minx)
                 miny = min(s[1], e[1], miny)
@@ -487,10 +508,24 @@ class CiarletElement(FiniteElement):
         for t, info in ddata:
             if t == "line":
                 s, e, c = info
-                img.add(img.line(map_pt(s), map_pt(e), stroke=c, stroke_width=6))
+                img.add(img.line(
+                    map_pt(s), map_pt(e), stroke=c, stroke_width=6, stroke_linecap="round"))
+            elif t == "arrow":
+                s, e, c = info
+                img.add(img.line(
+                    map_pt(s), map_pt(e), stroke=c, stroke_width=4, stroke_linecap="round"))
+                dir = vsub(e, s)
+                dir = vdiv(dir, vnorm(dir))
+                dir = vdiv(dir, 30)
+                perp = (-dir[1], dir[0])
+                perp = vdiv(perp, 2.5)
+                for f in [vadd, vsub]:
+                    a_end = tuple(float(i) for i in f(vsub(e, dir), perp))
+                    img.add(img.line(
+                        map_pt(a_end), map_pt(e), stroke=c, stroke_width=4, stroke_linecap="round"))
             elif t == "ncircle":
                 p, n, c = info
-                img.add(img.circle(map_pt(p), 20, stroke=black, stroke_width=4, fill=c))
+                img.add(img.circle(map_pt(p), 20, stroke=c, stroke_width=4, fill=white))
                 img.add(img.text(
                     f"{n}", map_pt(p), fill=black,
                     font_size=25 if n < 10 else (20 if n < 100 else 12),

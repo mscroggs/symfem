@@ -21,7 +21,7 @@ class Reference:
 
     def z_ordered_entities(self):
         """Get the subentities of the cell in back-to-front plotting order."""
-        return [(i, j) for i in range(self.tdim, -1, -1) for j in range(self.sub_entity_count(i))]
+        return [[(i, j) for i in range(self.tdim, -1, -1) for j in range(self.sub_entity_count(i))]]
 
     def get_point(self, reference_coords):
         """Get a point in the reference from reference coordinates."""
@@ -370,8 +370,9 @@ class Tetrahedron(Reference):
     def z_ordered_entities(self):
         """Get the subentities of the cell in back-to-front plotting order."""
         return [
-            (2, 0), (2, 1), (2, 3), (1, 0), (1, 2), (1, 4), (0, 2),
-            (3, 0), (2, 2), (1, 1), (1, 3), (1, 5), (0, 0), (0, 1), (0, 3)
+            [(2, 0), (2, 1), (2, 3), (1, 0), (1, 2), (1, 4), (0, 2)],
+            [(3, 0)],
+            [(2, 2), (1, 1), (1, 3), (1, 5), (0, 0), (0, 1), (0, 3)]
         ]
 
     def default_reference(self):
@@ -549,10 +550,11 @@ class Hexahedron(Reference):
     def z_ordered_entities(self):
         """Get the subentities of the cell in back-to-front plotting order."""
         return [
-            (2, 4), (2, 0), (1, 5), (2, 2), (1, 6), (1, 1), (0, 2),
-            (3, 0), (2, 3), (1, 3), (1, 7), (0, 3),
-            (2, 1), (1, 0), (1, 2), (1, 4), (0, 0), (0, 1),
-            (2, 5), (1, 8), (1, 9), (1, 10), (1, 11), (0, 4), (0, 5), (0, 6), (0, 7)
+            [(2, 4), (2, 0), (1, 5), (2, 2), (1, 6), (1, 1), (0, 2)],
+            [(3, 0)],
+            [(2, 3), (1, 3), (1, 7), (0, 3)],
+            [(2, 1), (1, 0), (1, 2), (1, 4), (0, 0), (0, 1)],
+            [(2, 5), (1, 8), (1, 9), (1, 10), (1, 11), (0, 4), (0, 5), (0, 6), (0, 7)]
         ]
 
     def default_reference(self):
@@ -657,10 +659,11 @@ class Prism(Reference):
     def z_ordered_entities(self):
         """Get the subentities of the cell in back-to-front plotting order."""
         return [
-            (2, 0), (2, 3), (1, 3),
-            (2, 2), (1, 1), (1, 5), (0, 2),
-            (3, 0), (2, 1), (1, 0), (1, 2), (1, 4), (0, 0), (0, 1),
-            (2, 4), (1, 6), (1, 7), (1, 8), (0, 3), (0, 4), (0, 5)
+            [(2, 0), (2, 3), (1, 3)],
+            [(2, 2), (1, 1), (1, 5), (0, 2)],
+            [(3, 0)],
+            [(2, 1), (1, 0), (1, 2), (1, 4), (0, 0), (0, 1)],
+            [(2, 4), (1, 6), (1, 7), (1, 8), (0, 3), (0, 4), (0, 5)]
         ]
 
     def default_reference(self):
@@ -762,10 +765,11 @@ class Pyramid(Reference):
     def z_ordered_entities(self):
         """Get the subentities of the cell in back-to-front plotting order."""
         return [
-            (2, 0), (2, 4), (1, 5),
-            (2, 2), (1, 1), (1, 6), (0, 2),
-            (3, 0), (2, 3), (1, 3), (1, 7), (0, 3),
-            (2, 1), (1, 0), (1, 2), (1, 4), (0, 0), (0, 1), (0, 4),
+            [(2, 0), (2, 4), (1, 5)],
+            [(2, 2), (1, 1), (1, 6), (0, 2)],
+            [(3, 0)],
+            [(2, 3), (1, 3), (1, 7), (0, 3)],
+            [(2, 1), (1, 0), (1, 2), (1, 4), (0, 0), (0, 1), (0, 4)]
         ]
 
     def default_reference(self):
