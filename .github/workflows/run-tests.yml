@@ -22,15 +22,9 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - run: |
-            pip install pytest numpy scipy coverage coveralls pytest-cov pytest-xdist
-        name: Install test dependencies
       - uses: actions/checkout@v2
-      - run: python3 -m pip install -r requirements.txt
-        name: Install requirements.txt
-      - run: |
-            python3 setup.py install
-        name: Install symfem
+      - run: pip install .[test] pytest-xdist
+        name: Install Symfem
       - run: python3 -m pytest -n=auto --durations=50 test
         name: Run unit tests
       - run: python3 -m pytest demo/test_demos.py
@@ -51,15 +45,9 @@ jobs:
             sudo apt-get install -y libeigen3-dev libopenblas-dev liblapack-dev ninja-build
             pip install pybind11
         name: Install Basix dependencies
-      - run: |
-            pip install pytest numpy scipy coverage coveralls pytest-cov pytest-xdist
-        name: Install test dependencies
       - uses: actions/checkout@v2
-      - run: python3 -m pip install -r requirements.txt
-        name: Install requirements.txt
-      - run: |
-            python3 setup.py install
-        name: Install symfem
+      - run: pip install .[test] pytest-xdist
+        name: Install Symfem
       - run: pip install git+https://github.com/FEniCS/basix.git
         name: Install basix
       - run: python3 -m pytest -n=auto --durations=50 test/test_against_basix.py --has-basix 1

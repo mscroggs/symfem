@@ -16,7 +16,7 @@ with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "README.md")
 with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "README.md"), "w") as f:
     f.write(long_description)
 
-data_files = ["LICENSE", "requirements.txt", "README.md",
+data_files = ["LICENSE", "README.md",
               ("test", ["test/__init__.py", "test/utils.py", "test/conftest.py"])]
 
 if __name__ == "__main__":
@@ -34,5 +34,10 @@ if __name__ == "__main__":
         packages=["symfem", "symfem.elements"],
         include_package_data=True,
         data_files=data_files,
-        install_requires=["sympy", "numpy"]
+        install_requires=["sympy", "numpy"],
+        extras_require={
+            "style": ["flake8", "pydocstyle"],
+            "optional": ["svgwrite", "CairoSVG"],
+            "test": ["pytest", "symfem[optional]"],
+        }
     )

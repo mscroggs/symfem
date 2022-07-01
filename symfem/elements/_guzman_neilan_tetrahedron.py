@@ -1,3 +1,5 @@
+"""Values for Guzman-Neilan element."""
+
 import sympy
 
 coeffs = [

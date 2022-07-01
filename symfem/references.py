@@ -17,7 +17,11 @@ class Reference:
 
     def default_reference(self):
         """Get the default reference for this cell type."""
-        raise NotImplementedError
+        raise NotImplementedError()
+
+    def z_ordered_entities(self):
+        """Get the subentities of the cell in back-to-front plotting order."""
+        return [[(i, j) for i in range(self.tdim, -1, -1) for j in range(self.sub_entity_count(i))]]
 
     def get_point(self, reference_coords):
         """Get a point in the reference from reference coordinates."""
@@ -27,15 +31,15 @@ class Reference:
 
     def integral(self, f, vars=t):
         """Calculate the integral over the element."""
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def get_map_to(self, vertices):
         """Get the map from the reference to a cell."""
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def get_inverse_map_to(self, vertices):
         """Get the inverse map from a cell to the reference."""
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def get_map_to_self(self):
         """Get the map from the canonical reference to this reference."""
@@ -45,7 +49,7 @@ class Reference:
 
     def _compute_map_to_self(self):
         """Compute the map from the canonical reference to this reference."""
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def get_inverse_map_to_self(self):
         """Get the inverse map from the canonical reference to this reference."""
@@ -55,11 +59,11 @@ class Reference:
 
     def _compute_inverse_map_to_self(self):
         """Compute the inverse map from the canonical reference to this reference."""
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def volume(self):
         """Calculate the volume."""
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def midpoint(self):
         """Calculate the midpoint."""
@@ -160,7 +164,7 @@ class Reference:
 
     def contains(self, point):
         """Check is a point is contained in the reference."""
-        raise NotImplementedError
+        raise NotImplementedError()
 
 
 class Point(Reference):
@@ -268,7 +272,7 @@ class Interval(Reference):
     def contains(self, point):
         """Check is a point is contained in the reference."""
         if self.vertices != self.reference_vertices:
-            raise NotImplementedError
+            raise NotImplementedError()
         return 0 <= point[0] <= 1
 
 
@@ -339,7 +343,7 @@ class Triangle(Reference):
     def contains(self, point):
         """Check is a point is contained in the reference."""
         if self.vertices != self.reference_vertices:
-            raise NotImplementedError
+            raise NotImplementedError()
         return 0 <= point[0] and 0 <= point[1] and sum(point) <= 1
 
 
@@ -362,6 +366,14 @@ class Tetrahedron(Reference):
         self.volumes = ((0, 1, 2, 3),)
         self.sub_entity_types = ["point", "interval", "triangle", "tetrahedron"]
         super().__init__(simplex=True)
+
+    def z_ordered_entities(self):
+        """Get the subentities of the cell in back-to-front plotting order."""
+        return [
+            [(2, 0), (2, 1), (2, 3), (1, 0), (1, 2), (1, 4), (0, 2)],
+            [(3, 0)],
+            [(2, 2), (1, 1), (1, 3), (1, 5), (0, 0), (0, 1), (0, 3)]
+        ]
 
     def default_reference(self):
         """Get the default reference for this cell type."""
@@ -414,7 +426,7 @@ class Tetrahedron(Reference):
     def contains(self, point):
         """Check is a point is contained in the reference."""
         if self.vertices != self.reference_vertices:
-            raise NotImplementedError
+            raise NotImplementedError()
         return 0 <= point[0] and 0 <= point[1] and 0 <= point[2] and sum(point) <= 1
 
 
@@ -504,7 +516,7 @@ class Quadrilateral(Reference):
     def contains(self, point):
         """Check is a point is contained in the reference."""
         if self.vertices != self.reference_vertices:
-            raise NotImplementedError
+            raise NotImplementedError()
         return 0 <= point[0] <= 1 and 0 <= point[1] <= 1
 
 
@@ -534,6 +546,16 @@ class Hexahedron(Reference):
         self.volumes = ((0, 1, 2, 3, 4, 5, 6, 7),)
         self.sub_entity_types = ["point", "interval", "quadrilateral", "hexahedron"]
         super().__init__(tp=True)
+
+    def z_ordered_entities(self):
+        """Get the subentities of the cell in back-to-front plotting order."""
+        return [
+            [(2, 4), (2, 0), (1, 5), (2, 2), (1, 6), (1, 1), (0, 2)],
+            [(3, 0)],
+            [(2, 3), (1, 3), (1, 7), (0, 3)],
+            [(2, 1), (1, 0), (1, 2), (1, 4), (0, 0), (0, 1)],
+            [(2, 5), (1, 8), (1, 9), (1, 10), (1, 11), (0, 4), (0, 5), (0, 6), (0, 7)]
+        ]
 
     def default_reference(self):
         """Get the default reference for this cell type."""
@@ -600,7 +622,7 @@ class Hexahedron(Reference):
     def contains(self, point):
         """Check is a point is contained in the reference."""
         if self.vertices != self.reference_vertices:
-            raise NotImplementedError
+            raise NotImplementedError()
         return 0 <= point[0] <= 1 and 0 <= point[1] <= 1 and 0 <= point[2] <= 1
 
 
@@ -633,6 +655,16 @@ class Prism(Reference):
             ["triangle", "quadrilateral", "quadrilateral", "quadrilateral", "triangle"],
             "prism"]
         super().__init__(tp=True)
+
+    def z_ordered_entities(self):
+        """Get the subentities of the cell in back-to-front plotting order."""
+        return [
+            [(2, 0), (2, 3), (1, 3)],
+            [(2, 2), (1, 1), (1, 5), (0, 2)],
+            [(3, 0)],
+            [(2, 1), (1, 0), (1, 2), (1, 4), (0, 0), (0, 1)],
+            [(2, 4), (1, 6), (1, 7), (1, 8), (0, 3), (0, 4), (0, 5)]
+        ]
 
     def default_reference(self):
         """Get the default reference for this cell type."""
@@ -695,7 +727,7 @@ class Prism(Reference):
     def contains(self, point):
         """Check is a point is contained in the reference."""
         if self.vertices != self.reference_vertices:
-            raise NotImplementedError
+            raise NotImplementedError()
         return (point[0] >= 0 and point[1] >= 0 and point[2] >= 0
                 and point[2] <= 1 and point[0] + point[1] <= 1)
 
@@ -729,6 +761,16 @@ class Pyramid(Reference):
             ["quadrilateral", "triangle", "triangle", "triangle", "triangle"],
             "pyramid"]
         super().__init__(tp=True)
+
+    def z_ordered_entities(self):
+        """Get the subentities of the cell in back-to-front plotting order."""
+        return [
+            [(2, 0), (2, 4), (1, 5)],
+            [(2, 2), (1, 1), (1, 6), (0, 2)],
+            [(3, 0)],
+            [(2, 3), (1, 3), (1, 7), (0, 3)],
+            [(2, 1), (1, 0), (1, 2), (1, 4), (0, 0), (0, 1), (0, 4)]
+        ]
 
     def default_reference(self):
         """Get the default reference for this cell type."""
@@ -795,7 +837,7 @@ class Pyramid(Reference):
     def contains(self, point):
         """Check is a point is contained in the reference."""
         if self.vertices != self.reference_vertices:
-            raise NotImplementedError
+            raise NotImplementedError()
         return (point[0] >= 0 and point[1] >= 0 and point[2] >= 0
                 and point[0] + point[2] <= 1 and point[1] + point[2] <= 1)
 

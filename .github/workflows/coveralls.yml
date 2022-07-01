@@ -18,13 +18,12 @@ jobs:
       - run: |
             sudo apt-get install -y libeigen3-dev libopenblas-dev liblapack-dev ninja-build
             pip install pybind11
-        name: Install Basix dependencies
-      - run: |
-            pip install pytest numpy scipy coverage coveralls pytest-cov pytest-xdist
-        name: Install test dependencies
+        name: Install Basix requirements
+      - run: pip install coverage coveralls pytest-cov
+        name: Install Coveralls
       - uses: actions/checkout@v2
-      - run: python3 -m pip install -r requirements.txt
-        name: Install requirements.txt
+      - run: pip install .[test] pytest-xdist
+        name: Install Symfem
       - run: pip install git+https://github.com/FEniCS/basix.git
         name: Install basix
       - run: python3 -m pytest -n=auto --cov=symfem test/ > .coveralls_output

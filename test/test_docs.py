@@ -198,20 +198,3 @@ def test_version_numbers():
                 assert line.split("version: ")[1].strip() == version
             elif line.startswith("date-released: "):
                 assert line.split("date-released: ")[1].strip() == date
-
-
-def test_requirements():
-    root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
-    if not os.path.isfile(os.path.join(root, "VERSION")):
-        # Skip test if running in tarball source
-        pytest.skip()
-
-    with open(os.path.join(root, "setup.py")) as f:
-        for line in f:
-            if 'install_requires=' in line:
-                in_setup = [
-                    i.strip()[1:-1]
-                    for i in line.split('install_requires=[')[1].split(']')[0].split(",")]
-    with open(os.path.join(root, "requirements.txt")) as f:
-        in_requirements = [i.strip() for i in f]
-    assert set(in_requirements) == set(in_setup)
