@@ -392,7 +392,7 @@ class CiarletElement(FiniteElement):
         """Plot a diagram showing the DOFs of the element."""
         try:
             import svgwrite
-        except:
+        except ImportError:
             raise ImportError("svgwrite is needed for plotting"
                               " (pip install svgwrite)")
 

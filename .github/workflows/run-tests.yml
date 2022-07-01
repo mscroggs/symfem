@@ -45,7 +45,6 @@ jobs:
             sudo apt-get install -y libeigen3-dev libopenblas-dev liblapack-dev ninja-build
             pip install pybind11
         name: Install Basix dependencies
-        name: Install test dependencies
       - uses: actions/checkout@v2
       - run: pip install .[test] pytest-xdist
         name: Install Symfem
