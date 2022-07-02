@@ -1,4 +1,6 @@
 """Functionals used to define the dual sets."""
+
+import typing
 import sympy
 import numpy
 from abc import ABC, abstractmethod
@@ -9,7 +11,7 @@ from .basis_function import BasisFunction
 from . import mappings
 
 
-def _to_tex(f, tfrac=False):
+def _to_tex(f: typing.Any, tfrac: bool = False) -> str:
     """Concert an expresson to tex."""
     if isinstance(f, (list, tuple)):
         return "\\left(\\begin{array}{c}" + "\\\\".join(
@@ -34,7 +36,7 @@ def _to_tex(f, tfrac=False):
         return out
 
 
-def _nth(n):
+def _nth(n: int) -> str:
     """Add th, st or nd to a number."""
     if n % 10 == 1 and n != 11:
         return f"{n}st"
