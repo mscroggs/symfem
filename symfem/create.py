@@ -60,7 +60,7 @@ for _file in _os.listdir(_os.path.join(_folder, "elements")):
 
 
 def create_reference(
-    cell_type: str, vertices: _typing.List[_typing.Tuple[_sympy.core.expr.Expr, ...]] = None
+    cell_type: str, vertices: _typing.Tuple[_typing.Tuple[_sympy.core.expr.Expr, ...], ...] = None
 ) -> _references.Reference:
     """Make a reference cell.
 
