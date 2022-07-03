@@ -3,20 +3,21 @@
 from abc import ABC, abstractmethod
 import sympy
 import typing
-from .symbolic import subs
+from .symbolic import subs, ScalarFunction, AnyFunction, PiecewiseFunction
 
 
 class BasisFunction(ABC):
     """A basis function."""
 
     @abstractmethod
-    def get_function(self) -> sympy.core.expr.Expr:
+    def get_function(self) -> AnyFunction:
         """Return the symbolic function."""
         pass
 
     def subs(
         self, pre: sympy.core.symbol.Symbol, post: sympy.core.expr.Expr
-    ) -> sympy.core.expr.Expr:
+    ) -> typing.Any:
+        # ) -> BasisFunction:
         """Substitute a value into the function."""
         return SubbedBasisFunction(self, pre, post)
 
@@ -24,57 +25,89 @@ class BasisFunction(ABC):
         """Forward all other function calls to symbolic function."""
         return getattr(self.get_function(), attr)
 
-    def __getitem__(self, key: typing.Any) -> sympy.core.expr.Expr:
+    def __getitem__(self, key: typing.Any) -> ScalarFunction:
         """Forward all other function calls to symbolic function."""
-        return self.get_function()[key]
+        f = self.get_function()
+        assert isinstance(f, tuple)
+        return f[key]
 
-    def __mul__(self, other: sympy.core.expr.Expr) -> sympy.core.expr.Expr:
+    def __mul__(self, other: ScalarFunction) -> ScalarFunction:
         """Multiply."""
-        return self.get_function() * other
+        f = self.get_function()
+        assert not isinstance(f, tuple)
+        return f * other
 
-    def __rmul__(self, other: sympy.core.expr.Expr) -> sympy.core.expr.Expr:
+    def __rmul__(self, other: ScalarFunction) -> ScalarFunction:
         """Multiply."""
         return self.__mul__(other)
 
-    def __truediv__(self, other: sympy.core.expr.Expr) -> sympy.core.expr.Expr:
+    def __truediv__(self, other: ScalarFunction) -> ScalarFunction:
         """Divide."""
-        return self.get_function() / other
+        f = self.get_function()
+        assert not isinstance(f, tuple)
+        if isinstance(f, int):
+            f = sympy.Integer(f)
+        if isinstance(other, int):
+            other = sympy.Integer(other)
+        assert isinstance(f, sympy.core.expr.Expr)
+        assert isinstance(other, sympy.core.expr.Expr)
+        return f / other
 
-    def __rtruediv__(self, other: sympy.core.expr.Expr) -> sympy.core.expr.Expr:
+    def __rtruediv__(self, other: ScalarFunction) -> ScalarFunction:
         """Divide."""
-        return other / self.get_function()
+        f = self.get_function()
+        assert not isinstance(f, tuple)
+        if isinstance(f, int):
+            f = sympy.Integer(f)
+        if isinstance(other, int):
+            other = sympy.Integer(other)
+        assert isinstance(f, sympy.core.expr.Expr)
+        assert isinstance(other, sympy.core.expr.Expr)
+        return other / f
 
-    def __add__(self, other: sympy.core.expr.Expr) -> sympy.core.expr.Expr:
+    def __add__(self, other: ScalarFunction) -> ScalarFunction:
         """Add."""
-        return self.get_function() + other
+        f = self.get_function()
+        assert not isinstance(f, tuple)
+        return f + other
 
-    def __sub__(self, other: sympy.core.expr.Expr) -> sympy.core.expr.Expr:
+    def __sub__(self, other: ScalarFunction) -> ScalarFunction:
         """Subtract."""
-        return self.get_function() - other
+        f = self.get_function()
+        assert not isinstance(f, tuple)
+        assert not isinstance(f, PiecewiseFunction)
+        return f - other
 
     def __iter__(self) -> typing.Iterable:
         """Return an iterable."""
-        return iter(self.get_function())
+        f = self.get_function()
+        assert isinstance(f, tuple)
+        return iter(f)
 
-    def __neg__(self) -> sympy.core.expr.Expr:
+    def __neg__(self) -> ScalarFunction:
         """Negate."""
-        return -self.get_function()
+        f = self.get_function()
+        assert not isinstance(f, tuple)
+        assert not isinstance(f, PiecewiseFunction)
+        return -f
 
     def __len__(self) -> int:
         """Get length."""
-        return len(self.get_function())
+        f = self.get_function()
+        assert isinstance(f, tuple)
+        return len(f)
 
 
 class SubbedBasisFunction(BasisFunction):
     """A basis function following a substitution."""
 
     def __init__(
-        self, f: BasisFunction, sub_pre: sympy.core.symbol.Symbol, sub_post: sympy.core.expr.Expr
+        self, f: BasisFunction, sub_pre: sympy.core.symbol.Symbol, sub_post: ScalarFunction
     ):
         self.f = f
         self.sub_pre = sub_pre
         self.sub_post = sub_post
 
-    def get_function(self) -> sympy.core.expr.Expr:
+    def get_function(self) -> AnyFunction:
         """Return the symbolic function."""
         return subs(self.f.get_function(), self.sub_pre, self.sub_post)

@@ -30,7 +30,7 @@ def jacobian(f: sympy.core.expr.Expr, dim: int) -> typing.List[typing.List[sympy
     return [[diff(f, x[i], x[j]) for i in range(dim)] for j in range(dim)]
 
 
-def div(f: sympy.core.expr.Expr) -> sympy.core.expr.Expr:
+def div(f: typing.Tuple[sympy.core.expr.Expr]) -> sympy.core.expr.Expr:
     """Find the divergence of a vector function."""
     return sym_sum(diff(j, x[i]) for i, j in enumerate(f))
 
@@ -47,14 +47,9 @@ def curl(
 
 
 def diff(
-    f: sympy.core.expr.Expr, *vars: typing.List[sympy.core.symbol.Symbol]
+    f: sympy.core.expr.Expr, *vars: sympy.core.symbol.Symbol
 ) -> sympy.core.expr.Expr:
     """Calculate the derivative of a function."""
-    if isinstance(f, list):
-        return [diff(i, *vars) for i in f]
-    if isinstance(f, tuple):
-        return tuple(diff(i, *vars) for i in f)
-
     out = to_sympy(f)
     for i in vars:
         out = out.diff(to_sympy(i))
@@ -62,8 +57,7 @@ def diff(
 
 
 def vdiff(
-    f: typing.Tuple[sympy.core.expr.Expr, ...],
-    *vars: typing.List[sympy.core.symbol.Symbol]
+    f: typing.Tuple[sympy.core.expr.Expr, ...], *vars: sympy.core.symbol.Symbol
 ) -> typing.Tuple[sympy.core.expr.Expr, ...]:
-    """Calculate the derivative of a vector of function."""
+    """Calculate the derivative of a vector of functions."""
     return tuple(diff(i, *vars) for i in f)

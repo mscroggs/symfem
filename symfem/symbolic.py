@@ -1,6 +1,7 @@
 """Symbolic tools."""
 
 import sympy
+import typing
 
 
 def to_sympy(i):
@@ -156,3 +157,20 @@ def symequal(a, b):
                 return False
         return True
     return sympy.expand(sympy.simplify(a)) == sympy.expand(sympy.simplify(b))
+
+
+# Types
+ScalarFunction = typing.Union[sympy.core.expr.Expr, int]
+VectorFunction = typing.Tuple[ScalarFunction, ...]
+MatrixFunction = sympy.matrices.dense.MutableDenseMatrix
+AnyFunction = typing.Union[ScalarFunction, VectorFunction, MatrixFunction, PiecewiseFunction]
+ListOfScalarFunctions = typing.List[ScalarFunction]
+ListOfVectorFunctions = typing.List[VectorFunction]
+ListOfMatrixFunctions = typing.List[MatrixFunction]
+ListOfPiecewiseFunctions = typing.List[PiecewiseFunction]
+ListOfAnyFunctions = typing.Union[
+    ListOfScalarFunctions, ListOfVectorFunctions, ListOfMatrixFunctions,
+    ListOfPiecewiseFunctions]
+PointType = typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...]
+SetOfPoints = typing.Tuple[PointType, ...]
+ScalarValue = ScalarFunction

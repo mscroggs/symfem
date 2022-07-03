@@ -8,12 +8,22 @@ import numpy.typing
 import math
 from abc import ABC, abstractmethod
 from itertools import product
-from .symbolic import x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float, symequal, sym_product
+from .symbolic import (
+    x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float, symequal, sym_product,
+    AnyFunction, SetOfPoints, ListOfAnyFunctions, ListOfScalarFunctions, ListOfVectorFunctions,
+    ListOfMatrixFunctions, ListOfPiecewiseFunctions, PointType)
 from .calculus import diff
 from .vectors import vsub, vnorm, vdiv, vadd
 from .functionals import BaseFunctional
 from .basis_function import BasisFunction
 from .references import Reference
+
+TabulatedBasis = typing.Union[
+    typing.List[sympy.core.expr.Expr],
+    typing.List[typing.Tuple[sympy.core.expr.Expr, ...]],
+    typing.List[sympy.matrices.dense.MutableDenseMatrix],
+    numpy.typing.NDArray[numpy.float64]
+]
 
 
 class NoTensorProduct(Exception):
@@ -45,10 +55,7 @@ class FiniteElement(ABC):
     @abstractmethod
     def get_basis_functions(
         self, reshape: bool = True, symbolic: bool = True, use_tensor_factorisation: bool = False
-    ) -> typing.Union[
-        typing.List[sympy.core.expr.Expr],
-        typing.List[typing.List[sympy.core.expr.Expr]]
-    ]:
+    ) -> ListOfAnyFunctions:
         """Get the basis functions of the element."""
         pass
 
@@ -57,13 +64,8 @@ class FiniteElement(ABC):
         return ElementBasisFunction(self, n)
 
     def tabulate_basis(
-        self, points: typing.List[typing.Tuple[sympy.core.expr.Expr, ...]],
-        order: str = "xyzxyz", symbolic: bool = True
-    ) -> typing.Union[
-        typing.List[typing.Union[sympy.core.expr.Expr, float]],
-        typing.List[typing.List[typing.Union[sympy.core.expr.Expr, float]]],
-        numpy.typing.NDArray[numpy.float64]
-    ]:
+        self, points: SetOfPoints, order: str = "xyzxyz", symbolic: bool = True
+    ) -> TabulatedBasis:
         """Evaluate the basis functions of the element at the given points."""
         if not symbolic:
             warnings.warn("Converting from symbolic to float. This may be slow.")
@@ -76,7 +78,7 @@ class FiniteElement(ABC):
                 row = []
                 for b in self.get_basis_functions(False):
                     row.append(subs(b, x, p))
-                output.append(row)
+                output.append(tuple(row))
             return output
 
         if order == "xxyyzz":
@@ -85,8 +87,9 @@ class FiniteElement(ABC):
                 row = []
                 for d in range(self.range_dim):
                     for b in self.get_basis_functions(False):
+                        assert isinstance(b, tuple)
                         row.append(subs(b[d], x, p))
-                output.append(row)
+                output.append(tuple(row))
             return output
         if order == "xyzxyz":
             output = []
@@ -94,31 +97,26 @@ class FiniteElement(ABC):
                 row = []
                 for b in self.get_basis_functions(False):
                     for i in subs(b, x, p):
+                        assert isinstance(b, tuple)
                         row.append(i)
-                output.append(row)
+                output.append(tuple(row))
             return output
         if order == "xyz,xyz":
             output = []
             for p in points:
                 row = []
                 for b in self.get_basis_functions(False):
+                    assert isinstance(b, tuple)
                     row.append(subs(b, x, p))
-                output.append(row)
+                output.append(tuple(row))
             return output
         raise ValueError(f"Unknown order: {order}")
 
     @abstractmethod
     def map_to_cell(
-        self, vertices: typing.List[typing.Tuple[sympy.core.expr.Expr, ...]],
-        basis: typing.Union[
-            typing.List[sympy.core.expr.Expr],
-            typing.List[typing.List[sympy.core.expr.Expr]]
-        ] = None,
-        forward_map: sympy.core.expr.Expr = None, inverse_map: sympy.core.expr.Expr = None
-    ) -> typing.Union[
-        typing.List[sympy.core.expr.Expr],
-        typing.List[typing.List[sympy.core.expr.Expr]]
-    ]:
+        self, vertices: SetOfPoints, basis: ListOfAnyFunctions = None,
+        forward_map: PointType = None, inverse_map: PointType = None
+    ) -> ListOfAnyFunctions:
         """Map the basis onto a cell using the appropriate mapping for the element."""
         pass
 
@@ -252,12 +250,7 @@ class FiniteElement(ABC):
         """Get the representation of the element as a tensor product."""
         raise NoTensorProduct()
 
-    def _get_basis_functions_tensor(
-        self
-    ) -> typing.Union[
-        typing.List[sympy.core.expr.Expr],
-        typing.List[typing.List[sympy.core.expr.Expr]]
-    ]:
+    def _get_basis_functions_tensor(self) -> ListOfAnyFunctions:
         """Compute the basis functions using the space's tensor product factorisation."""
         factorisation = self.get_tensor_factorisation()
         basis = {}
@@ -284,7 +277,7 @@ class CiarletElement(FiniteElement):
     """Finite element defined using the Ciarlet definition."""
 
     def __init__(
-        self, reference: Reference, order: int, basis: typing.List[sympy.core.expr.Expr],
+        self, reference: Reference, order: int, basis: ListOfAnyFunctions,
         dofs: typing.List[BaseFunctional], domain_dim: int, range_dim: int,
         range_shape: typing.Tuple[int, ...] = None
     ):
@@ -292,11 +285,7 @@ class CiarletElement(FiniteElement):
         assert len(basis) == len(dofs)
         self._basis = basis
         self.dofs = dofs
-        self._basis_functions: typing.Union[
-            typing.List[sympy.core.expr.Expr],
-            typing.List[typing.List[sympy.core.expr.Expr]],
-            None] = None
-        self._reshaped_basis_functions = None
+        self._basis_functions: typing.Union[ListOfAnyFunctions, None] = None
         self._dual_inv: typing.Union[numpy.typing.NDArray[numpy.float64], None] = None
 
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
@@ -305,7 +294,7 @@ class CiarletElement(FiniteElement):
 
     def get_polynomial_basis(
         self, reshape: bool = True
-    ) -> typing.Union[typing.List[sympy.core.expr.Expr], typing.List[sympy.Matrix]]:
+    ) -> ListOfAnyFunctions:
         """Get the symbolic polynomial basis for the element."""
         basis = [to_sympy(i) for i in self._basis]
 
@@ -319,8 +308,7 @@ class CiarletElement(FiniteElement):
         return basis
 
     def get_tabulated_polynomial_basis(
-        self, points: typing.Union[typing.List[sympy.core.expr.Expr], typing.List[float]],
-        symbolic: bool = True
+        self, points: SetOfPoints, symbolic: bool = True
     ) -> typing.Union[
         typing.List[typing.List[sympy.core.expr.Expr]],
         numpy.typing.NDArray[numpy.float64]
@@ -336,8 +324,7 @@ class CiarletElement(FiniteElement):
                 for p in points], dtype=numpy.float64)
 
     def _get_tabulated_polynomial_basis_symbolic(
-        self, points: typing.Union[typing.List[sympy.core.expr.Expr], typing.List[float]],
-        symbolic: bool = True
+        self, points: SetOfPoints, symbolic: bool = True
     ) -> typing.List[typing.List[sympy.core.expr.Expr]]:
         """Get the value of the polynomial basis at the given points."""
         return [
@@ -345,8 +332,7 @@ class CiarletElement(FiniteElement):
             for p in points]
 
     def _get_tabulated_polynomial_basis_nonsymbolic(
-        self, points: typing.Union[typing.List[sympy.core.expr.Expr], typing.List[float]],
-        symbolic: bool = True
+        self, points: SetOfPoints
     ) -> numpy.typing.NDArray[numpy.float64]:
         """Get the value of the polynomial basis at the given points."""
         return numpy.array([
@@ -354,13 +340,8 @@ class CiarletElement(FiniteElement):
             for p in points], dtype=numpy.float64)
 
     def tabulate_basis(
-        self, points: typing.List[typing.Tuple[sympy.core.expr.Expr, ...]],
-        order: str = "xyzxyz", symbolic: bool = True
-    ) -> typing.Union[
-        typing.List[typing.Union[sympy.core.expr.Expr, float]],
-        typing.List[typing.List[typing.Union[sympy.core.expr.Expr, float]]],
-        numpy.typing.NDArray[numpy.float64]
-    ]:
+        self, points: SetOfPoints, order: str = "xyzxyz", symbolic: bool = True
+    ) -> TabulatedBasis:
         """Evaluate the basis functions of the element at the given points."""
         if symbolic:
             return super().tabulate_basis(points, order, symbolic=True)
@@ -368,7 +349,7 @@ class CiarletElement(FiniteElement):
         assert not symbolic
 
         tabulated_polyset = self._get_tabulated_polynomial_basis_nonsymbolic(
-            points, symbolic=False)
+            points)
 
         if self._dual_inv is None:
             dual_mat = self.get_dual_matrix(symbolic=False)
@@ -406,14 +387,14 @@ class CiarletElement(FiniteElement):
 
     def get_dual_matrix(
         self, symbolic: bool = True
-    ) -> typing.Union[sympy.Matrix, numpy.typing.NDArray[numpy.float64]]:
+    ) -> typing.Union[sympy.matrices.dense.MutableDenseMatrix, numpy.typing.NDArray[numpy.float64]]:
         """Get the dual matrix."""
         if symbolic:
             return self._get_dual_matrix_symbolic()
         else:
             return self._get_dual_matrix_nonsymbolic()
 
-    def _get_dual_matrix_symbolic(self) -> sympy.Matrix:
+    def _get_dual_matrix_symbolic(self) -> sympy.matrices.dense.MutableDenseMatrix:
         """Get the dual matrix."""
         mat = []
         for b in self.get_polynomial_basis():
@@ -428,9 +409,9 @@ class CiarletElement(FiniteElement):
             if d.get_points_and_weights is None:
                 warnings.warn("Cannot numerically evaluate all the DOFs in this element. "
                               "Converting symbolic evaluations instead (this may be slow).")
-                mat = self._get_dual_matrix_symbolic()
+                smat = self._get_dual_matrix_symbolic()
                 return numpy.array(
-                    [[float(j) for j in mat.row(i)] for i in range(mat.rows)]
+                    [[float(j) for j in smat.row(i)] for i in range(smat.rows)]
                 )
         mat = numpy.empty((len(self.dofs), len(self.dofs)))
         for i, d in enumerate(self.dofs):
@@ -445,10 +426,7 @@ class CiarletElement(FiniteElement):
 
     def get_basis_functions(
         self, reshape: bool = True, symbolic: bool = True, use_tensor_factorisation: bool = False
-    ) -> typing.Union[
-        typing.List[sympy.core.expr.Expr],
-        typing.List[typing.List[sympy.core.expr.Expr]]
-    ]:
+    ) -> ListOfAnyFunctions:
         """Get the basis functions of the element."""
         if self._basis_functions is None:
             if use_tensor_factorisation:
@@ -457,22 +435,23 @@ class CiarletElement(FiniteElement):
                 m = self.get_dual_matrix()
                 assert isinstance(m, sympy.Matrix)
                 minv = m.inv("LU")
-                self._basis_functions = []
                 if self.range_dim == 1:
                     # Scalar space
-                    for i, dof in enumerate(self.dofs):
-                        self._basis_functions.append(
-                            sym_sum(c * d for c, d in zip(
-                                minv.row(i),
-                                self.get_polynomial_basis())))
+                    self._basis_functions = [
+                        sym_sum(c * d for c, d in zip(minv.row(i), self.get_polynomial_basis()))
+                        for i, dof in enumerate(self.dofs)
+                    ]
                 else:
                     # Vector space
+                    bfs: ListOfVectorFunctions = []
                     for i, dof in enumerate(self.dofs):
-                        b = [0 for i in range(self.range_dim)]
+                        b = [sympy.Integer(0) for i in range(self.range_dim)]
                         for c, d in zip(minv.row(i), self.get_polynomial_basis()):
+                            assert isinstance(d, tuple)
                             for j, d_j in enumerate(d):
                                 b[j] += c * d_j
-                        self._basis_functions.append(b)
+                        bfs.append(tuple(b))
+                    self._basis_functions = bfs
 
         if reshape and self.range_shape is not None:
             if len(self.range_shape) != 2:
@@ -655,16 +634,9 @@ class CiarletElement(FiniteElement):
             svg2png(bytestring=img.tostring(), write_to=filename)
 
     def map_to_cell(
-        self, vertices: typing.List[typing.Tuple[sympy.core.expr.Expr, ...]],
-        basis: typing.Union[
-            typing.List[sympy.core.expr.Expr],
-            typing.List[typing.List[sympy.core.expr.Expr]]
-        ] = None,
-        forward_map: sympy.core.expr.Expr = None, inverse_map: sympy.core.expr.Expr = None
-    ) -> typing.Union[
-        typing.List[sympy.core.expr.Expr],
-        typing.List[typing.List[sympy.core.expr.Expr]]
-    ]:
+        self, vertices: SetOfPoints, basis: ListOfAnyFunctions = None,
+        forward_map: PointType = None, inverse_map: PointType = None
+    ) -> ListOfAnyFunctions:
         """Map the basis onto a cell using the appropriate mapping for the element."""
         if basis is None:
             basis = self.get_basis_functions()
@@ -675,12 +647,16 @@ class CiarletElement(FiniteElement):
 
         if isinstance(basis[0], PiecewiseFunction):
             pieces: typing.List[typing.List[typing.Tuple[
-                typing.List[sympy.core.expr.Expr], typing.Union[
-                    typing.List[sympy.core.expr.Expr], sympy.core.expr.Expr]
+                typing.List[sympy.core.expr.Expr],
+                typing.Union[typing.List[sympy.core.expr.Expr], sympy.core.expr.Expr]
             ]]] = [[] for i in basis]
             for i, j in enumerate(basis[0].pieces):
-                new_i = [subs(forward_map, x, k) for k in j[0]]
-                ps: typing.List[sympy.core.expr.Expr] = []
+                new_i: ListOfVectorFunctions = []
+                for k in j[0]:
+                    subbed = subs(forward_map, x, k)
+                    assert isinstance(subbed, tuple)
+                    new_i.append(subbed)
+                ps: ListOfScalarFunctions = []
                 for b in basis:
                     assert isinstance(b, PiecewiseFunction)
                     ps.append(b.pieces[i][1])
@@ -690,24 +666,29 @@ class CiarletElement(FiniteElement):
 
         if isinstance(basis[0], (list, tuple)) and isinstance(basis[0][0], PiecewiseFunction):
             for b in basis:
+                assert isinstance(b, tuple)
                 for f in b:
+                    assert isinstance(f, PiecewiseFunction)
                     for i, j in enumerate(f.pieces):
                         assert j[0] == basis[0][0].pieces[i][0]
             new_tris = [[subs(forward_map, x, k) for k in p[0]] for p in basis[0][0].pieces]
             output_pieces = []
             for p in range(len(basis[0][0].pieces)):
-                piece_basis = []
+                piece_basis: ListOfVectorFunctions = []
                 for b in basis:
-                    piece_basis.append([
-                        f.pieces[p][1] for f in b
-                    ])
+                    assert isinstance(b, tuple)
+                    pb_item = []
+                    for f in b:
+                        assert isinstance(f, PiecewiseFunction)
+                        pb_item.append(f.pieces[p][1])
+                    piece_basis.append(tuple(pb_item))
                 output_pieces.append(self.map_to_cell(
                     vertices, piece_basis, forward_map, inverse_map))
 
             return [PiecewiseFunction(list(zip(new_tris, fs)))
                     for fs in zip(*output_pieces)]
 
-        out: typing.List[typing.Union[int, None]] = [None for f in basis]
+        functions: typing.List[typing.Union[AnyFunction, None]] = [None for f in basis]
         for dim in range(self.reference.tdim + 1):
             for e in range(self.reference.sub_entity_count(dim)):
                 entity_dofs = self.entity_dofs(dim, e)
@@ -725,11 +706,33 @@ class CiarletElement(FiniteElement):
                         [basis[d] for d in ds],
                         forward_map, inverse_map, self.reference.tdim)
                     for d_n, d in zip(ds, mapped_dofs):
-                        out[d_n] = d
+                        functions[d_n] = d
 
-        for value in out:
-            assert value is not None
-        return out
+        for fun in functions:
+            assert fun is not None
+        if isinstance(functions[0], tuple):
+            vfs: ListOfVectorFunctions = []
+            for fun in functions:
+                assert isinstance(fun, tuple)
+                vfs.append(fun)
+            return vfs
+        if isinstance(functions[0], sympy.Matrix):
+            mfs: ListOfMatrixFunctions = []
+            for fun in functions:
+                assert isinstance(fun, sympy.Matrix)
+                mfs.append(fun)
+            return mfs
+        if isinstance(functions[0], PiecewiseFunction):
+            pfs: ListOfPiecewiseFunctions = []
+            for fun in functions:
+                assert isinstance(fun, PiecewiseFunction)
+                pfs.append(fun)
+            return pfs
+        sfs: ListOfScalarFunctions = []
+        for fun in functions:
+            assert isinstance(fun, (sympy.core.expr.Expr, int))
+            sfs.append(fun)
+        return sfs
 
     def test(self):
         """Run tests for this element."""
@@ -774,7 +777,7 @@ class DirectElement(FiniteElement):
     """Finite element defined directly."""
 
     def __init__(
-        self, reference: Reference, order: int, basis_functions: typing.List[sympy.core.expr.Expr],
+        self, reference: Reference, order: int, basis_functions: ListOfAnyFunctions,
         basis_entities: typing.List[typing.Tuple[int, int]],
         domain_dim: int, range_dim: int, range_shape: typing.Tuple[int, ...] = None
     ):
@@ -782,7 +785,6 @@ class DirectElement(FiniteElement):
                          range_shape)
         self._basis_entities = basis_entities
         self._basis_functions = basis_functions
-        self._reshaped_basis_functions = None
 
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
         """Get the numbers of the DOFs associated with the given entity."""
@@ -790,10 +792,7 @@ class DirectElement(FiniteElement):
 
     def get_basis_functions(
         self, reshape: bool = True, symbolic: bool = True, use_tensor_factorisation: bool = False
-    ) -> typing.Union[
-        typing.List[sympy.core.expr.Expr],
-        typing.List[typing.List[sympy.core.expr.Expr]]
-    ]:
+    ) -> ListOfAnyFunctions:
         """Get the basis functions of the element."""
         if use_tensor_factorisation:
             return self._get_basis_functions_tensor()
@@ -802,9 +801,13 @@ class DirectElement(FiniteElement):
             if len(self.range_shape) != 2:
                 raise NotImplementedError
             assert self.range_shape[0] * self.range_shape[1] == self.range_dim
-            return [sympy.Matrix(
-                [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
-                 for i in range(self.range_shape[0])]) for b in self._basis_functions]
+            matrices: ListOfMatrixFunctions = []
+            for b in self._basis_functions:
+                assert isinstance(b, tuple)
+                matrices.append(sympy.Matrix(
+                    [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
+                     for i in range(self.range_shape[0])]))
+            return matrices
 
         return self._basis_functions
 
@@ -857,6 +860,6 @@ class ElementBasisFunction(BasisFunction):
         self.element = element
         self.n = n
 
-    def get_function(self) -> sympy.core.expr.Expr:
+    def get_function(self) -> AnyFunction:
         """Return the symbolic function."""
         return self.element.get_basis_functions()[self.n]
