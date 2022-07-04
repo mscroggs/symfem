@@ -442,6 +442,22 @@ class CiarletElement(FiniteElement):
                         sym_sum(c * d for c, d in zip(minv.row(i), self.get_polynomial_basis()))
                         for i, dof in enumerate(self.dofs)
                     ]
+                elif isinstance(self.get_polynomial_basis()[0], PiecewiseFunction):
+                    # Piecewise vectors
+                    pfs: ListOfPiecewiseFunctions = []
+                    pb = self.get_polynomial_basis()
+                    for i, dof in enumerate(self.dofs):
+                        assert isinstance(pb[0], PiecewiseFunction)
+                        pieces = [[pi, [sympy.Integer(0) for _ in range(self.range_dim)]]
+                                  for pi, _ in pb[0].pieces]
+                        for c, d in zip(minv.row(i), pb):
+                            assert isinstance(d, PiecewiseFunction)
+                            for n, (pi, pj) in enumerate(d.pieces):
+                                assert pi == pb[0].pieces[n][0]
+                                for j, d_j in enumerate(pj):
+                                    pieces[n][1][j] += c * d_j
+                        pfs.append(PiecewiseFunction([(i, tuple(j)) for i, j in pieces]))
+                    self._basis_functions = pfs
                 else:
                     # Vector or matrix space
                     bfs: ListOfVectorFunctions = []
@@ -459,13 +475,20 @@ class CiarletElement(FiniteElement):
                         bfs.append(tuple(b))
                     self._basis_functions = bfs
 
+        assert isinstance(self._basis_functions, list)
+
         if reshape and self.range_shape is not None:
+            assert isinstance(self._basis_functions[0], tuple)
             if len(self.range_shape) != 2:
                 raise NotImplementedError
             assert self.range_shape[0] * self.range_shape[1] == self.range_dim
-            return [sympy.Matrix(
-                [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
-                 for i in range(self.range_shape[0])]) for b in self._basis_functions]
+            mfs: ListOfMatrixFunctions = []
+            for f in self._basis_functions:
+                assert isinstance(b, tuple)
+                mfs.append(sympy.Matrix(
+                    [f[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
+                     for i in range(self.range_shape[0])]))
+            return mfs
 
         return self._basis_functions
 
