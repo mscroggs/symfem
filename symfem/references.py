@@ -2,7 +2,9 @@
 
 import typing
 import sympy
-from .symbolic import t, x, subs, sym_sum, SetOfPoints, PointType, ScalarFunction, ScalarValue
+from .symbolic import (
+    t, x, subs, sym_sum, SetOfPoints, PointType, ScalarFunction, ScalarValue,
+    SetOfPointsInput)
 from .vectors import vsub, vnorm, vdot, vcross, vnormalise, vadd
 
 
@@ -55,11 +57,11 @@ class Reference:
         """Calculate the integral over the element."""
         raise NotImplementedError()
 
-    def get_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
         raise NotImplementedError()
 
-    def get_inverse_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         raise NotImplementedError()
 
@@ -202,7 +204,7 @@ class Point(Reference):
     """A point."""
 
     def __init__(
-        self, vertices: SetOfPoints = (tuple(), )
+        self, vertices: SetOfPointsInput = (tuple(), )
     ):
         assert len(vertices) == 1
         super().__init__(
@@ -211,7 +213,7 @@ class Point(Reference):
             origin=vertices[0],
             axes=tuple(),
             reference_vertices=(tuple(), ),
-            vertices=vertices,
+            vertices=tuple(vertices),
             edges=tuple(),
             faces=tuple(),
             volumes=tuple(),
@@ -228,12 +230,12 @@ class Point(Reference):
         """Calculate the integral over the element."""
         return subs(f, vars, self.vertices[0])
 
-    def get_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
         assert self.vertices == self.reference_vertices
         return vertices[0]
 
-    def get_inverse_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
         return self.vertices[0]
@@ -261,7 +263,7 @@ class Interval(Reference):
     """An interval."""
 
     def __init__(
-        self, vertices: SetOfPoints = ((0,), (1,))
+        self, vertices: SetOfPointsInput = ((0,), (1,))
     ):
         assert len(vertices) == 2
         super().__init__(
@@ -270,7 +272,7 @@ class Interval(Reference):
             origin=vertices[0],
             axes=(vsub(vertices[1], vertices[0]),),
             reference_vertices=((0,), (1,)),
-            vertices=vertices,
+            vertices=tuple(vertices),
             edges=((0, 1),),
             faces=tuple(),
             volumes=tuple(),
@@ -287,12 +289,12 @@ class Interval(Reference):
         """Calculate the integral over the element."""
         return (f * self.jacobian()).integrate((vars[0], 0, 1))
 
-    def get_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
         assert self.vertices == self.reference_vertices
         return tuple(v0 + (v1 - v0) * x[0] for v0, v1 in zip(*vertices))
 
-    def get_inverse_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
         p = vsub(x, vertices[0])
@@ -324,7 +326,7 @@ class Triangle(Reference):
     """A triangle."""
 
     def __init__(
-        self, vertices: SetOfPoints = ((0, 0), (1, 0), (0, 1))
+        self, vertices: SetOfPointsInput = ((0, 0), (1, 0), (0, 1))
     ):
         assert len(vertices) == 3
         super().__init__(
@@ -333,7 +335,7 @@ class Triangle(Reference):
             origin=vertices[0],
             axes=(vsub(vertices[1], vertices[0]), vsub(vertices[2], vertices[0])),
             reference_vertices=((0, 0), (1, 0), (0, 1)),
-            vertices=vertices,
+            vertices=tuple(vertices),
             edges=((1, 2), (0, 2), (0, 1)),
             faces=((0, 1, 2),),
             volumes=tuple(),
@@ -351,12 +353,12 @@ class Triangle(Reference):
         return (f * self.jacobian()).integrate(
             (vars[1], 0, 1 - vars[0]), (vars[0], 0, 1))
 
-    def get_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
         assert self.vertices == self.reference_vertices
         return tuple(v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1] for v0, v1, v2 in zip(*vertices))
 
-    def get_inverse_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
         assert len(vertices[0]) == 2
@@ -401,7 +403,7 @@ class Tetrahedron(Reference):
     """A tetrahedron."""
 
     def __init__(
-        self, vertices: SetOfPoints = ((0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1))
+        self, vertices: SetOfPointsInput = ((0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1))
     ):
         assert len(vertices) == 4
         super().__init__(
@@ -414,7 +416,7 @@ class Tetrahedron(Reference):
                 vsub(vertices[3], vertices[0]),
             ),
             reference_vertices=((0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1)),
-            vertices=vertices,
+            vertices=tuple(vertices),
             edges=((2, 3), (1, 3), (1, 2), (0, 3), (0, 2), (0, 1)),
             faces=((1, 2, 3), (0, 2, 3), (0, 1, 3), (0, 1, 2)),
             volumes=((0, 1, 2, 3),),
@@ -440,13 +442,13 @@ class Tetrahedron(Reference):
         return (f * self.jacobian()).integrate(
             (vars[0], 0, 1 - vars[1] - vars[2]), (vars[1], 0, 1 - vars[2]), (vars[2], 0, 1))
 
-    def get_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
         assert self.vertices == self.reference_vertices
         return tuple(v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1] + (v3 - v0) * x[2]
                      for v0, v1, v2, v3 in zip(*vertices))
 
-    def get_inverse_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
         assert len(vertices[0]) == 3
@@ -490,7 +492,7 @@ class Quadrilateral(Reference):
     """A quadrilateral."""
 
     def __init__(
-        self, vertices: SetOfPoints = ((0, 0), (1, 0), (0, 1), (1, 1))
+        self, vertices: SetOfPointsInput = ((0, 0), (1, 0), (0, 1), (1, 1))
     ):
         assert len(vertices) == 4
         super().__init__(
@@ -499,7 +501,7 @@ class Quadrilateral(Reference):
             origin=vertices[0],
             axes=(vsub(vertices[1], vertices[0]), vsub(vertices[2], vertices[0])),
             reference_vertices=((0, 0), (1, 0), (0, 1), (1, 1)),
-            vertices=vertices,
+            vertices=tuple(vertices),
             edges=((0, 1), (0, 2), (1, 3), (2, 3)),
             faces=((0, 1, 2, 3),),
             volumes=tuple(),
@@ -516,14 +518,14 @@ class Quadrilateral(Reference):
         """Calculate the integral over the element."""
         return (f * self.jacobian()).integrate((vars[1], 0, 1), (vars[0], 0, 1))
 
-    def get_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
         assert self.vertices == self.reference_vertices
         return tuple(
             (1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1) + x[1] * ((1 - x[0]) * v2 + x[0] * v3)
             for v0, v1, v2, v3 in zip(*vertices))
 
-    def get_inverse_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
         assert vadd(vertices[0], vertices[3]) == vadd(vertices[1], vertices[2])
@@ -586,8 +588,8 @@ class Hexahedron(Reference):
     """A hexahedron."""
 
     def __init__(
-        self, vertices: SetOfPoints = ((0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0),
-                                       (0, 0, 1), (1, 0, 1), (0, 1, 1), (1, 1, 1))
+        self, vertices: SetOfPointsInput = ((0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0),
+                                            (0, 0, 1), (1, 0, 1), (0, 1, 1), (1, 1, 1))
     ):
         assert len(vertices) == 8
         super().__init__(
@@ -602,7 +604,7 @@ class Hexahedron(Reference):
             reference_vertices=(
                 (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0),
                 (0, 0, 1), (1, 0, 1), (0, 1, 1), (1, 1, 1)),
-            vertices=vertices,
+            vertices=tuple(vertices),
             edges=(
                 (0, 1), (0, 2), (0, 4), (1, 3), (1, 5), (2, 3),
                 (2, 6), (3, 7), (4, 5), (4, 6), (5, 7), (6, 7)),
@@ -634,7 +636,7 @@ class Hexahedron(Reference):
         return (f * self.jacobian()).integrate(
             (vars[2], 0, 1), (vars[1], 0, 1), (vars[0], 0, 1))
 
-    def get_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
         assert self.vertices == self.reference_vertices
         return tuple(
@@ -644,7 +646,7 @@ class Hexahedron(Reference):
                       + x[1] * ((1 - x[0]) * v6 + x[0] * v7))
             for v0, v1, v2, v3, v4, v5, v6, v7 in zip(*vertices))
 
-    def get_inverse_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
         assert len(vertices[0]) == 3
@@ -698,8 +700,8 @@ class Prism(Reference):
     """A (triangular) prism."""
 
     def __init__(
-        self, vertices: SetOfPoints = ((0, 0, 0), (1, 0, 0), (0, 1, 0),
-                                       (0, 0, 1), (1, 0, 1), (0, 1, 1))
+        self, vertices: SetOfPointsInput = ((0, 0, 0), (1, 0, 0), (0, 1, 0),
+                                            (0, 0, 1), (1, 0, 1), (0, 1, 1))
     ):
         assert len(vertices) == 6
         super().__init__(
@@ -714,7 +716,7 @@ class Prism(Reference):
             reference_vertices=(
                 (0, 0, 0), (1, 0, 0), (0, 1, 0),
                 (0, 0, 1), (1, 0, 1), (0, 1, 1)),
-            vertices=vertices,
+            vertices=tuple(vertices),
             edges=(
                 (0, 1), (0, 2), (0, 3), (1, 2), (1, 4),
                 (2, 5), (3, 4), (3, 5), (4, 5)),
@@ -749,7 +751,7 @@ class Prism(Reference):
         return(f * self.jacobian()).integrate(
             (vars[2], 0, 1), (vars[1], 0, 1 - vars[0]), (vars[0], 0, 1))
 
-    def get_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
         assert self.vertices == self.reference_vertices
         return tuple(
@@ -757,7 +759,7 @@ class Prism(Reference):
             + x[2] * (v3 + x[0] * (v4 - v3) + x[1] * (v5 - v3))
             for v0, v1, v2, v3, v4, v5 in zip(*vertices))
 
-    def get_inverse_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
         assert len(vertices[0]) == 3
@@ -810,8 +812,8 @@ class Pyramid(Reference):
     """A (square-based) pyramid."""
 
     def __init__(
-        self, vertices: SetOfPoints = ((0, 0, 0), (1, 0, 0), (0, 1, 0),
-                                       (1, 1, 0), (0, 0, 1))
+        self, vertices: SetOfPointsInput = ((0, 0, 0), (1, 0, 0), (0, 1, 0),
+                                            (1, 1, 0), (0, 0, 1))
     ):
         assert len(vertices) == 5
         super().__init__(
@@ -826,7 +828,7 @@ class Pyramid(Reference):
             reference_vertices=(
                 (0, 0, 0), (1, 0, 0), (0, 1, 0),
                 (1, 1, 0), (0, 0, 1)),
-            vertices=vertices,
+            vertices=tuple(vertices),
             edges=(
                 (0, 1), (0, 2), (0, 4), (1, 3),
                 (1, 4), (2, 3), (2, 4), (3, 4)),
@@ -861,7 +863,7 @@ class Pyramid(Reference):
         return (f * self.jacobian()).integrate(
             (vars[0], 0, 1 - vars[2]), (vars[1], 0, 1 - vars[2]), (vars[2], 0, 1))
 
-    def get_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
         assert self.vertices == self.reference_vertices
         return tuple(
@@ -871,7 +873,7 @@ class Pyramid(Reference):
             ) + x[2] * v4
             for v0, v1, v2, v3, v4 in zip(*vertices))
 
-    def get_inverse_map_to(self, vertices: SetOfPoints) -> PointType:
+    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
         assert len(vertices[0]) == 3
@@ -927,7 +929,7 @@ class DualPolygon(Reference):
 
     def __init__(
         self, number_of_triangles: int,
-        vertices: SetOfPoints = None
+        vertices: SetOfPointsInput = None
     ):
         self.number_of_triangles = number_of_triangles
         self.reference_origin = (0, 0)
@@ -954,7 +956,7 @@ class DualPolygon(Reference):
             name="dual polygon",
             axes=tuple(),
             origin=origin,
-            vertices=vertices,
+            vertices=tuple(vertices),
             reference_vertices=tuple(reference_vertices),
             edges=tuple((i, (i + 1) % (2 * number_of_triangles))
                         for i in range(2 * number_of_triangles)),

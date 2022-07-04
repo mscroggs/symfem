@@ -174,3 +174,5 @@ ListOfAnyFunctions = typing.Union[
 PointType = typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...]
 SetOfPoints = typing.Tuple[PointType, ...]
 ScalarValue = ScalarFunction
+
+SetOfPointsInput = typing.Union[typing.Tuple[PointType, ...], typing.List[PointType]]
