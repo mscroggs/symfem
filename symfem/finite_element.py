@@ -443,14 +443,19 @@ class CiarletElement(FiniteElement):
                         for i, dof in enumerate(self.dofs)
                     ]
                 else:
-                    # Vector space
+                    # Vector or matrix space
                     bfs: ListOfVectorFunctions = []
                     for i, dof in enumerate(self.dofs):
                         b = [sympy.Integer(0) for i in range(self.range_dim)]
                         for c, d in zip(minv.row(i), self.get_polynomial_basis()):
-                            assert isinstance(d, tuple)
-                            for j, d_j in enumerate(d):
-                                b[j] += c * d_j
+                            if isinstance(d, tuple):
+                                for j, d_j in enumerate(d):
+                                    b[j] += c * d_j
+                            else:
+                                assert isinstance(d, sympy.Matrix)
+                                for j1 in range(d.rows):
+                                    for j2 in range(d.cols):
+                                        b[j1 * d.cols + j2] += c * d[j1, j2]
                         bfs.append(tuple(b))
                     self._basis_functions = bfs
 
@@ -811,6 +816,13 @@ class DirectElement(FiniteElement):
             return matrices
 
         return self._basis_functions
+
+    def map_to_cell(
+        self, vertices: SetOfPoints, basis: ListOfAnyFunctions = None,
+        forward_map: PointType = None, inverse_map: PointType = None
+    ) -> ListOfAnyFunctions:
+        """Map the basis onto a cell using the appropriate mapping for the element."""
+        raise NotImplementedError()
 
     def test(self):
         """Run tests for this element."""
