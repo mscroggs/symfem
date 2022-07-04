@@ -484,7 +484,7 @@ class CiarletElement(FiniteElement):
             assert self.range_shape[0] * self.range_shape[1] == self.range_dim
             mfs: ListOfMatrixFunctions = []
             for f in self._basis_functions:
-                assert isinstance(b, tuple)
+                assert isinstance(f, tuple)
                 mfs.append(sympy.Matrix(
                     [f[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
                      for i in range(self.range_shape[0])]))

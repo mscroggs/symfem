@@ -184,6 +184,7 @@ ListOfAnyFunctionsInput = typing.Union[
 
 
 def parse_any_function_input(functions: ListOfAnyFunctionsInput) -> ListOfAnyFunctions:
+    """Convert an input list of functions to the correct format."""
     if len(functions) > 0:
         if isinstance(functions[0], (list, tuple)):
             vfs: ListOfVectorFunctions = []
@@ -211,4 +212,5 @@ def parse_any_function_input(functions: ListOfAnyFunctionsInput) -> ListOfAnyFun
 
 
 def parse_point_input(points: SetOfPointsInput) -> SetOfPoints:
+    """Convert an input set of points to the correct format."""
     return tuple(points)
