@@ -205,7 +205,6 @@ def parse_any_function_input(functions: ListOfAnyFunctionsInput) -> ListOfAnyFun
             return pfs
     sfs: ListOfScalarFunctions = []
     for f in functions:
-        print(f)
         assert isinstance(f, (sympy.core.expr.Expr, int))
         sfs.append(f)
     return sfs
