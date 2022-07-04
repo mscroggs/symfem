@@ -1,12 +1,12 @@
 """Functions to map functions between cells."""
 
 import sympy
-from .symbolic import subs, x
+from .symbolic import subs, x, MatrixFunction, ScalarFunction, VectorFunction, PointType
 from .vectors import vdot, vcross, vnorm
 from .calculus import diff
 
 
-def _det(M):
+def _det(M: MatrixFunction) -> sympy.core.expr.Expr:
     """Find the determinant."""
     if M.rows == M.cols:
         return M.det()
@@ -15,13 +15,13 @@ def _det(M):
     raise ValueError(f"Cannot find determinant of {M.rows}x{M.cols} matrix.")
 
 
-def identity(f, map, inverse_map, tdim):
+def identity(f: ScalarFunction, map: PointType, inverse_map: PointType, tdim: int):
     """Map functions."""
     g = subs(f, x, inverse_map)
     return g
 
 
-def covariant(f, map, inverse_map, tdim):
+def covariant(f: VectorFunction, map: PointType, inverse_map: PointType, tdim: int):
     """Map H(curl) functions."""
     g = subs(f, x, inverse_map)
     j_inv = sympy.Matrix([[diff(i, x[j]) for j in range(len(map))]
@@ -29,7 +29,7 @@ def covariant(f, map, inverse_map, tdim):
     return tuple(vdot(j_inv.row(i), g) for i in range(j_inv.rows))
 
 
-def contravariant(f, map, inverse_map, tdim):
+def contravariant(f: VectorFunction, map: PointType, inverse_map: PointType, tdim: int):
     """Map H(div) functions."""
     g = subs(f, x, inverse_map)
     jacobian = sympy.Matrix([[diff(i, x[j]) for j in range(tdim)] for i in map])
@@ -37,7 +37,7 @@ def contravariant(f, map, inverse_map, tdim):
     return tuple(vdot(jacobian.row(i), g) for i in range(jacobian.rows))
 
 
-def double_covariant(f, map, inverse_map, tdim):
+def double_covariant(f: MatrixFunction, map: PointType, inverse_map: PointType, tdim: int):
     """Map matrix functions."""
     g = subs(f, x, inverse_map)
     j_inv = sympy.Matrix([[diff(i, x[j]) for j in range(len(map))]
@@ -48,7 +48,7 @@ def double_covariant(f, map, inverse_map, tdim):
     return tuple(out[i] for i in range(out.rows * out.cols))
 
 
-def double_contravariant(f, map, inverse_map, tdim):
+def double_contravariant(f: MatrixFunction, map: PointType, inverse_map: PointType, tdim: int):
     """Map matrix functions."""
     g = subs(f, x, inverse_map)
     jacobian = sympy.Matrix([[diff(i, x[j]) for j in range(tdim)] for i in map])
