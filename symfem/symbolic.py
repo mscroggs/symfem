@@ -175,4 +175,40 @@ PointType = typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...]
 SetOfPoints = typing.Tuple[PointType, ...]
 ScalarValue = ScalarFunction
 
-SetOfPointsInput = typing.Union[typing.Tuple[PointType, ...], typing.List[PointType]]
+SetOfPointsInput = typing.Union[
+    SetOfPoints,
+    typing.List[PointType]]
+ListOfAnyFunctionsInput = typing.Union[
+    ListOfAnyFunctions,
+    typing.List[typing.List[ScalarFunction]]]
+
+
+def parse_any_function_input(functions: ListOfAnyFunctionsInput) -> ListOfAnyFunctions:
+    if len(functions) > 0:
+        if isinstance(functions[0], (list, tuple)):
+            vfs: ListOfVectorFunctions = []
+            for f in functions:
+                assert isinstance(f, (list, tuple))
+                vfs.append(tuple(f))
+            return vfs
+        if isinstance(functions[0], sympy.Matrix):
+            mfs: ListOfMatrixFunctions = []
+            for f in functions:
+                assert isinstance(f, sympy.Matrix)
+                mfs.append(f)
+            return mfs
+        if isinstance(functions[0], PiecewiseFunction):
+            pfs: ListOfPiecewiseFunctions = []
+            for f in functions:
+                assert isinstance(f, PiecewiseFunction)
+                pfs.append(f)
+            return pfs
+    sfs: ListOfScalarFunctions = []
+    for f in functions:
+        assert isinstance(f, sympy.core.expr.Expr)
+        sfs.append(f)
+    return sfs
+
+
+def parse_point_input(points: SetOfPointsInput) -> SetOfPoints:
+    return tuple(points)

@@ -11,7 +11,8 @@ from itertools import product
 from .symbolic import (
     x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float, symequal, sym_product,
     AnyFunction, SetOfPoints, ListOfAnyFunctions, ListOfScalarFunctions, ListOfVectorFunctions,
-    ListOfMatrixFunctions, ListOfPiecewiseFunctions, PointType)
+    ListOfMatrixFunctions, ListOfPiecewiseFunctions, PointType, ListOfAnyFunctionsInput,
+    parse_any_function_input)
 from .calculus import diff
 from .vectors import vsub, vnorm, vdiv, vadd
 from .functionals import BaseFunctional
@@ -277,13 +278,13 @@ class CiarletElement(FiniteElement):
     """Finite element defined using the Ciarlet definition."""
 
     def __init__(
-        self, reference: Reference, order: int, basis: ListOfAnyFunctions,
+        self, reference: Reference, order: int, basis: ListOfAnyFunctionsInput,
         dofs: typing.List[BaseFunctional], domain_dim: int, range_dim: int,
         range_shape: typing.Tuple[int, ...] = None
     ):
         super().__init__(reference, order, len(dofs), domain_dim, range_dim, range_shape)
         assert len(basis) == len(dofs)
-        self._basis = basis
+        self._basis: ListOfAnyFunctions = parse_any_function_input(basis)
         self.dofs = dofs
         self._basis_functions: typing.Union[ListOfAnyFunctions, None] = None
         self._dual_inv: typing.Union[numpy.typing.NDArray[numpy.float64], None] = None
