@@ -3,7 +3,7 @@
 import sympy
 import typing
 from .vectors import vdot
-from .symbolic import x, sym_sum, to_sympy, ScalarFunction, VectorFunction, PointType
+from .symbolic import x, sym_sum, ScalarFunction, VectorFunction, PointType
 
 
 def derivative(
@@ -49,9 +49,12 @@ def diff(
     f: ScalarFunction, *vars: sympy.core.symbol.Symbol
 ) -> sympy.core.expr.Expr:
     """Calculate the derivative of a function."""
-    out = to_sympy(f)
+    if isinstance(f, int):
+        out = sympy.Integer(f)
+    else:
+        out = f
     for i in vars:
-        out = out.diff(to_sympy(i))
+        out = out.diff(i)
     return out
 
 

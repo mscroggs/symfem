@@ -4,7 +4,7 @@ import typing
 import sympy
 import numpy
 from abc import ABC, abstractmethod
-from .symbolic import subs, x, t, PiecewiseFunction, sym_sum, to_sympy, to_float
+from .symbolic import subs, x, t, PiecewiseFunction, sym_sum
 from .vectors import vdot
 from .calculus import derivative, jacobian_component, grad, diff, div
 from .basis_function import BasisFunction
@@ -117,7 +117,7 @@ class PointEvaluation(BaseFunctional):
         if symbolic:
             return value
         else:
-            return to_float(value)
+            return float(value)
 
     def dof_point(self):
         """Get the location of the DOF in the cell."""
@@ -152,7 +152,7 @@ class WeightedPointEvaluation(BaseFunctional):
         if symbolic:
             return value
         else:
-            return to_float(value)
+            return float(value)
 
     def dof_point(self):
         """Get the location of the DOF in the cell."""
@@ -191,7 +191,7 @@ class DerivativePointEvaluation(BaseFunctional):
         if symbolic:
             return value
         else:
-            return to_float(value)
+            return float(value)
 
     def dof_point(self):
         """Get the location of the DOF in the cell."""
@@ -247,7 +247,7 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
         if symbolic:
             return value
         else:
-            return to_float(value)
+            return float(value)
 
     def dof_point(self):
         """Get the location of the DOF in the cell."""
@@ -307,7 +307,7 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
         if symbolic:
             return value
         else:
-            return to_float(value)
+            return float(value)
 
     def dof_point(self):
         """Get the location of the DOF in the cell."""
@@ -345,7 +345,7 @@ class PointInnerProduct(BaseFunctional):
         if symbolic:
             return value
         else:
-            return to_float(value)
+            return float(value)
 
     def dof_point(self):
         """Get the location of the DOF in the cell."""
@@ -386,7 +386,7 @@ class DotPointEvaluation(BaseFunctional):
         if symbolic:
             return value
         else:
-            return to_float(value)
+            return float(value)
 
     def dof_point(self):
         """Get the location of the DOF in the cell."""
@@ -450,7 +450,7 @@ class IntegralAgainst(BaseFunctional):
         if symbolic:
             return value
         else:
-            return to_float(value)
+            return float(value)
 
     def dot(self, function):
         """Dot a function with the moment function."""
@@ -502,7 +502,7 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
         if symbolic:
             return value
         else:
-            return to_float(value)
+            return float(value)
 
     def dot(self, function):
         """Dot a function with the moment function."""
@@ -551,7 +551,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         if symbolic:
             return value
         else:
-            return to_float(value)
+            return float(value)
 
     def perform_mapping(self, fs, map, inverse_map, tdim):
         """Map functions to a cell."""
@@ -619,11 +619,11 @@ class IntegralMoment(BaseFunctional):
         integrand = self.dot(subs(function, x, point))
         if isinstance(integrand, PiecewiseFunction):
             integrand = integrand.get_piece(self.integral_domain.midpoint())
-        value = self.integral_domain.integral(to_sympy(integrand))
+        value = self.integral_domain.integral(integrand)
         if symbolic:
             return value
         else:
-            return to_float(value)
+            return float(value)
 
     def dot(self, function):
         """Dot a function with the moment function."""
@@ -738,7 +738,7 @@ class DerivativeIntegralMoment(IntegralMoment):
         if symbolic:
             return value
         else:
-            return to_float(value)
+            return float(value)
 
     name = "Derivative integral moment"
 
@@ -760,7 +760,7 @@ class DivergenceIntegralMoment(IntegralMoment):
         if symbolic:
             return value
         else:
-            return to_float(value)
+            return float(value)
 
     def get_tex(self):
         """Get a representation of the functional as TeX, and list of terms involved."""

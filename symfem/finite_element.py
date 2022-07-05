@@ -9,7 +9,7 @@ import math
 from abc import ABC, abstractmethod
 from itertools import product
 from .symbolic import (
-    x, subs, sym_sum, PiecewiseFunction, to_sympy, to_float, symequal, sym_product,
+    x, subs, sym_sum, PiecewiseFunction, symequal, sym_product,
     AnyFunction, SetOfPoints, ListOfAnyFunctions, ListOfScalarFunctions, ListOfVectorFunctions,
     ListOfMatrixFunctions, ListOfPiecewiseFunctions, PointType, ListOfAnyFunctionsInput,
     parse_any_function_input)
@@ -70,6 +70,14 @@ class FiniteElement(ABC):
         """Evaluate the basis functions of the element at the given points."""
         if not symbolic:
             warnings.warn("Converting from symbolic to float. This may be slow.")
+
+            def to_float(values):
+                if isinstance(values, tuple):
+                    return tuple(to_float(i) for i in values)
+                if isinstance(values, list):
+                    return [to_float(i) for i in values]
+                return float(values)
+
             return numpy.array([to_float(self.tabulate_basis(points, order=order,
                                                              symbolic=True))])
 
@@ -237,8 +245,8 @@ class FiniteElement(ABC):
                             f = [f[4], f[8]]
                             g = [g[4], g[8]]
                 elif continuity == "integral inner H(div)":
-                    f = f[0].integrate((to_sympy(x[1]), 0, 1))
-                    g = g[0].integrate((to_sympy(x[1]), 0, 1))
+                    f = f[0].integrate((x[1], 0, 1))
+                    g = g[0].integrate((x[1], 0, 1))
                 else:
                     raise ValueError(f"Unknown continuity: {continuity}")
 
@@ -297,16 +305,21 @@ class CiarletElement(FiniteElement):
         self, reshape: bool = True
     ) -> ListOfAnyFunctions:
         """Get the symbolic polynomial basis for the element."""
-        basis = [to_sympy(i) for i in self._basis]
 
         if reshape and self.range_shape is not None:
+            basis = [i for i in self._basis]
             if len(self.range_shape) != 2:
                 raise NotImplementedError
             assert self.range_shape[0] * self.range_shape[1] == self.range_dim
-            return [sympy.Matrix(
-                [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
-                 for i in range(self.range_shape[0])]) for b in basis]
-        return basis
+            out: ListOfMatrixFunctions = []
+            for b in basis:
+                assert isinstance(b, tuple)
+                out.append(sympy.Matrix([
+                    b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
+                    for i in range(self.range_shape[0])]))
+            return out
+
+        return self._basis
 
     def get_tabulated_polynomial_basis(
         self, points: SetOfPoints, symbolic: bool = True
@@ -316,16 +329,12 @@ class CiarletElement(FiniteElement):
     ]:
         """Get the value of the polynomial basis at the given points."""
         if symbolic:
-            return [
-                [subs(f, x, p) for f in self.get_polynomial_basis()]
-                for p in points]
+            return self._get_tabulated_polynomial_basis_symbolic(points)
         else:
-            return numpy.array([
-                [to_float(subs(f, x, p)) for f in self.get_polynomial_basis()]
-                for p in points], dtype=numpy.float64)
+            return self._get_tabulated_polynomial_basis_nonsymbolic(points)
 
     def _get_tabulated_polynomial_basis_symbolic(
-        self, points: SetOfPoints, symbolic: bool = True
+        self, points: SetOfPoints
     ) -> typing.List[typing.List[sympy.core.expr.Expr]]:
         """Get the value of the polynomial basis at the given points."""
         return [
@@ -336,6 +345,14 @@ class CiarletElement(FiniteElement):
         self, points: SetOfPoints
     ) -> numpy.typing.NDArray[numpy.float64]:
         """Get the value of the polynomial basis at the given points."""
+
+        def to_float(values):
+            if isinstance(values, tuple):
+                return tuple(to_float(i) for i in values)
+            if isinstance(values, list):
+                return [to_float(i) for i in values]
+            return float(values)
+
         return numpy.array([
             [to_float(subs(f, x, p)) for f in self.get_polynomial_basis()]
             for p in points], dtype=numpy.float64)
@@ -401,7 +418,7 @@ class CiarletElement(FiniteElement):
         for b in self.get_polynomial_basis():
             row = []
             for d in self.dofs:
-                row.append(to_sympy(d.eval(to_sympy(b), symbolic=True)))
+                row.append(d.eval(b, symbolic=True))
             mat.append(row)
         return sympy.Matrix(mat)
 

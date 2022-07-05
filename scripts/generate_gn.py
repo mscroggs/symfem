@@ -39,7 +39,7 @@ for ref in ["triangle", "tetrahedron"]:
             (reference.vertices[0], reference.vertices[1], mid),
             (reference.vertices[0], reference.vertices[2], mid),
             (reference.vertices[1], reference.vertices[2], mid)]
-        xx, yy, zz = [i.to_sympy() for i in x]
+        xx, yy, zz = x
         terms = [1, xx, yy]
     if ref == "tetrahedron":
         fs = br.get_basis_functions()[-4:]
@@ -48,7 +48,7 @@ for ref in ["triangle", "tetrahedron"]:
             (reference.vertices[0], reference.vertices[1], reference.vertices[3], mid),
             (reference.vertices[0], reference.vertices[2], reference.vertices[3], mid),
             (reference.vertices[1], reference.vertices[2], reference.vertices[3], mid)]
-        xx, yy, zz = [i.to_sympy() for i in x]
+        xx, yy, zz = x
         terms = [1, xx, yy, zz, xx**2, yy**2, zz**2, xx*yy, xx*zz, yy*zz]
 
     sub_basis = make_piecewise_lagrange(sub_cells, ref, br.reference.tdim, True)

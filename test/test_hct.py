@@ -1,9 +1,8 @@
 import symfem
 import sympy
-from symfem.symbolic import x, t, subs, to_sympy, symequal
+from symfem.symbolic import x, t, subs, symequal
 from symfem.calculus import grad, diff
 half = sympy.Rational(1, 2)
-x = [to_sympy(i) for i in x]
 
 
 def test_hct():

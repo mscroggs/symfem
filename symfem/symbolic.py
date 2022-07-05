@@ -4,33 +4,6 @@ import sympy
 import typing
 
 
-def to_sympy(i):
-    """Convert to a sympy expression."""
-    from .basis_function import BasisFunction
-    if isinstance(i, list):
-        return [to_sympy(j) for j in i]
-    if isinstance(i, tuple):
-        return tuple(to_sympy(j) for j in i)
-
-    if isinstance(i, int):
-        return sympy.Integer(i)
-
-    if isinstance(i, BasisFunction):
-        return i.get_function()
-
-    return i
-
-
-def to_float(i):
-    """Convert to a float."""
-    if isinstance(i, list):
-        return [to_float(j) for j in i]
-    if isinstance(i, tuple):
-        return tuple(to_float(j) for j in i)
-
-    return float(i)
-
-
 x: typing.List[sympy.core.symbol.Symbol] = [
     sympy.Symbol("x"), sympy.Symbol("y"), sympy.Symbol("z")]
 t: typing.List[sympy.core.symbol.Symbol] = [
@@ -49,7 +22,7 @@ def subs(f, vars, values):
     except TypeError:
         pass
     if isinstance(vars, sympy.Symbol):
-        return to_sympy(f).subs(vars, values)
+        return f.subs(vars, values)
 
     if isinstance(f, int):
         return f
@@ -67,7 +40,7 @@ def subs(f, vars, values):
 
 def sym_sum(ls):
     """Symbolically computes the sum of a list."""
-    out = to_sympy(0)
+    out = sympy.Integer(0)
     for i in ls:
         out += i
     return out
@@ -75,7 +48,7 @@ def sym_sum(ls):
 
 def sym_product(ls):
     """Symbolically computes the sum of a list."""
-    out = to_sympy(1)
+    out = sympy.Integer(1)
     for i in ls:
         out *= i
     return out

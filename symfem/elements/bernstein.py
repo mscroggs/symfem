@@ -6,7 +6,7 @@ https://doi.org/10.1137/11082539X (Ainsworth, Andriamaro, Davydov, 2011)
 """
 
 import sympy
-from ..symbolic import x, t, subs, to_sympy
+from ..symbolic import x, t, subs
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set
 from ..functionals import BaseFunctional, PointEvaluation
@@ -15,7 +15,7 @@ from ..polynomials import orthogonal_basis
 
 def single_choose(n, k):
     """Calculate choose function of a set of powers."""
-    out = to_sympy(1)
+    out = sympy.Integer(1)
     for i in range(k + 1, n + 1):
         out *= i
     for i in range(1, n - k + 1):
@@ -25,7 +25,7 @@ def single_choose(n, k):
 
 def choose(n, powers):
     """Calculate choose function of a set of powers."""
-    out = to_sympy(1)
+    out = sympy.Integer(1)
     for p in powers:
         out *= single_choose(n, p)
         n -= p

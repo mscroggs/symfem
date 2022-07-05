@@ -1,8 +1,7 @@
 import sympy
 from symfem import create_element
-from symfem.symbolic import x, to_sympy
+from symfem.symbolic import x
 from symfem.vectors import vdot
-x = [to_sympy(i) for i in x]
 
 
 def test_nedelec_2d():
