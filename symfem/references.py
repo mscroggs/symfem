@@ -45,7 +45,7 @@ class Reference:
         """Get the subentities of the cell in back-to-front plotting order."""
         return [[(i, j) for i in range(self.tdim, -1, -1) for j in range(self.sub_entity_count(i))]]
 
-    def get_point(self, reference_coords: SetOfPoints) -> typing.Tuple[sympy.core.expr.Expr, ...]:
+    def get_point(self, reference_coords: PointType) -> typing.Tuple[sympy.core.expr.Expr, ...]:
         """Get a point in the reference from reference coordinates."""
         assert len(reference_coords) == len(self.axes)
         return tuple(o + sym_sum(a[i] * b for a, b in zip(self.axes, reference_coords))

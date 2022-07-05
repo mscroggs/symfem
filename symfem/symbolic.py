@@ -60,45 +60,74 @@ class PiecewiseFunction:
                 pieces.append((i, j2))
             return PiecewiseFunction(pieces)
 
-    def diff(self, variable):
+    def diff(self, variable: sympy.core.Symbol) -> typing.Any:
+        # def diff(self, variable: sympy.core.Symbol) -> PiecewiseFunction:
         """Differentiate the function."""
         from .calculus import diff
-        return PiecewiseFunction([(i, diff(j, variable)) for i, j in self.pieces])
+        pieces: PFunctionPieces = []
+        for i, j in self.pieces:
+            assert isinstance(j, (int, sympy.core.expr.Expr))
+            j2 = diff(j, variable)
+            assert not isinstance(j2, PiecewiseFunction)
+            pieces.append((i, j2))
+        return PiecewiseFunction(pieces)
 
-    def __rmul__(self, other):
+    def __rmul__(self, other: typing.Any) -> typing.Any:
         """Multiply the function by a scalar."""
         return PiecewiseFunction([(i, other * j) for i, j in self.pieces])
 
-    def __mul__(self, other):
+    def __mul__(self, other: typing.Any) -> typing.Any:
         """Multiply the function by a scalar."""
         return self.__rmul__(other)
 
-    def __radd__(self, other):
+    def __radd__(self, other: typing.Any) -> typing.Any:
         """Add another piecewise function or a scalar."""
         return self.__add__(other)
 
-    def __add__(self, other):
+    def __add__(self, other: typing.Any) -> typing.Any:
         """Add another piecewise function or a scalar."""
         if isinstance(other, PiecewiseFunction):
+            pieces: PFunctionPieces = []
             for i, j in zip(self.pieces, other.pieces):
                 assert i[0] == j[0]
-            return PiecewiseFunction(
-                [(i[0], i[1] + j[1]) for i, j in zip(self.pieces, other.pieces)])
+                j2: typing.Union[ScalarFunction, VectorFunction, MatrixFunction] = 0
+                if isinstance(j, (int, sympy.core.expr.Expr)):
+                    assert isinstance(i, (int, sympy.core.expr.Expr))
+                    j2 = i[1] + j[1]
+                elif isinstance(j, sympy.Matrix):
+                    assert isinstance(i, sympy.Matrix)
+                    j2 = i[1] + j[1]
+                elif isinstance(j, tuple):
+                    raise NotImplementedError()
+                else:
+                    raise ValueError()
+
+                pieces.append((i, j2))
+            return PiecewiseFunction(pieces)
 
         return PiecewiseFunction([(i, other + j) for i, j in self.pieces])
 
-    def _iter_list(self):
-        """Make am iterable list."""
+    def _iter_list(self) -> typing.List[typing.Any]:
+        # def _iter_list(self) -> typing.List[PiecewiseFunction]:
+        """Make an iterable list."""
         from .basis_function import BasisFunction
         for p in self.pieces:
             assert isinstance(p[1], (list, tuple)) or (
                 isinstance(p[1], BasisFunction) and
                 isinstance(p[1].get_function(), (list, tuple)))
-        return [PiecewiseFunction([(j[0], j[1][i])
-                                   for j in self.pieces])
-                for i in range(len(self.pieces[0][1]))]
 
-    def __iter__(self):
+        assert isinstance(self.pieces[0][1], tuple)
+
+        out = []
+        for i in range(len(self.pieces[0][1])):
+            pieces: PFunctionPieces = []
+            for j in self.pieces:
+                assert isinstance(j[1], tuple)
+                pieces.append((j[0], j[1][i]))
+            out.append(PiecewiseFunction(pieces))
+        return out
+
+    def __iter__(self) -> typing.Iterable:
         """Get iterable."""
         return self._iter_list().__iter__()
 
@@ -206,7 +235,7 @@ def _subs_scalar(
     return f
 
 
-def sym_sum(ls):
+def sym_sum(ls: typing.Iterable[ScalarValue]) -> sympy.core.expr.Expr:
     """Symbolically computes the sum of a list."""
     out = sympy.Integer(0)
     for i in ls:
@@ -214,7 +243,7 @@ def sym_sum(ls):
     return out
 
 
-def sym_product(ls):
+def sym_product(ls: typing.Iterable[ScalarValue]) -> sympy.core.expr.Expr:
     """Symbolically computes the sum of a list."""
     out = sympy.Integer(1)
     for i in ls:
@@ -222,11 +251,18 @@ def sym_product(ls):
     return out
 
 
-def symequal(a, b):
+def symequal(
+    a: typing.Union[typing.List, typing.Tuple, ScalarValue],
+    b: typing.Union[typing.List, typing.Tuple, ScalarValue]
+) -> bool:
     """Check if two symbolic numbers or vectors are equal."""
     if isinstance(a, (list, tuple)):
+        assert isinstance(b, (list, tuple))
         for i, j in zip(a, b):
             if not symequal(i, j):
                 return False
         return True
+
+    assert isinstance(a, (int, sympy.core.expr.Expr))
+    assert isinstance(b, (int, sympy.core.expr.Expr))
     return sympy.expand(sympy.simplify(a)) == sympy.expand(sympy.simplify(b))

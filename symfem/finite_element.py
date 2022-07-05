@@ -9,7 +9,7 @@ import math
 from abc import ABC, abstractmethod
 from itertools import product
 from .symbolic import (
-    x, subs, _subs_scalar, sym_sum, PiecewiseFunction, symequal, sym_product,
+    x, subs, _subs_scalar, PiecewiseFunction, symequal, sym_product,
     AnyFunction, SetOfPoints, ListOfAnyFunctions, ListOfScalarFunctions, ListOfVectorFunctions,
     ScalarFunction, VectorFunction, MatrixFunction,
     ListOfMatrixFunctions, ListOfPiecewiseFunctions, PointType, ListOfAnyFunctionsInput,
@@ -261,7 +261,7 @@ class FiniteElement(ABC):
         """Get the representation of the element as a tensor product."""
         raise NoTensorProduct()
 
-    def _get_basis_functions_tensor(self) -> ListOfAnyFunctions:
+    def _get_basis_functions_tensor(self) -> ListOfScalarFunctions:
         """Compute the basis functions using the space's tensor product factorisation."""
         factorisation = self.get_tensor_factorisation()
         basis = {}
@@ -273,7 +273,7 @@ class FiniteElement(ABC):
                     basis[p] = sym_product(k)
             else:
                 raise ValueError(f"Unknown tensor product type: {t_type}")
-        return [basis[i] for i in range(len(basis))]
+        return list(basis.values())
 
     @property
     def name(self) -> str:
@@ -307,7 +307,6 @@ class CiarletElement(FiniteElement):
         self, reshape: bool = True
     ) -> ListOfAnyFunctions:
         """Get the symbolic polynomial basis for the element."""
-
         if reshape and self.range_shape is not None:
             basis = [i for i in self._basis]
             if len(self.range_shape) != 2:
@@ -491,10 +490,15 @@ class CiarletElement(FiniteElement):
                 minv = m.inv("LU")
                 if self.range_dim == 1:
                     # Scalar space
-                    self._basis_functions = [
-                        sym_sum(c * d for c, d in zip(minv.row(i), self.get_polynomial_basis()))
-                        for i, dof in enumerate(self.dofs)
-                    ]
+                    sfs: ListOfScalarFunctions = []
+                    pb = self.get_polynomial_basis()
+                    for i, dof in enumerate(self.dofs):
+                        sf = 0
+                        for c, d in zip(minv.row(i), self.get_polynomial_basis()):
+                            sf += c * d
+                        sfs.append(sf)
+
+                    self._basis_functions = sfs
                 elif isinstance(self.get_polynomial_basis()[0], PiecewiseFunction):
                     # Piecewise vectors
                     pfs: ListOfPiecewiseFunctions = []
