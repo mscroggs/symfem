@@ -1,9 +1,14 @@
 """Quadrature definitions."""
 
 import sympy
+import typing
+
+Scalar = typing.Union[sympy.core.expr.Expr, int]
 
 
-def equispaced(n):
+def equispaced(
+    n: int
+) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
     """Get equispaced points and weights.
 
     Parameters
@@ -16,7 +21,9 @@ def equispaced(n):
              for i in range(n)])
 
 
-def lobatto(n):
+def lobatto(
+    n: int
+) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
     """Get Gauss-Lobatto-Legendre points and weights.
 
     Parameters
@@ -66,7 +73,9 @@ def lobatto(n):
     raise NotImplementedError()
 
 
-def radau(n):
+def radau(
+    n: int
+) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
     """Get Radau points and weights.
 
     Parameters
@@ -83,7 +92,9 @@ def radau(n):
     raise NotImplementedError()
 
 
-def legendre(n):
+def legendre(
+    n: int
+) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
     """Get Gauss-Legendre points and weights.
 
     Parameters
@@ -102,7 +113,9 @@ def legendre(n):
     raise NotImplementedError()
 
 
-def get_quadrature(rule, n):
+def get_quadrature(
+    rule: str, n: int
+) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
     """Get quadrature points and weights.
 
     Parameters
