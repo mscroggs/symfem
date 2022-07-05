@@ -1,28 +1,53 @@
 """Functions to create integral moments."""
 
+import typing
+from .references import Reference
+from .functionals import BaseFunctional
 
-def extract_moment_data(moment_data, sub_type):
+MomentType = typing.Tuple[typing.Type, typing.Type, int, typing.Union[str, None],
+                          typing.Dict[str, typing.Any]]
+MomentTypeInput = typing.Union[
+    MomentType,
+    typing.Tuple[typing.Type, typing.Type, int, str],
+    typing.Tuple[typing.Type, typing.Type, int, typing.Dict[str, typing.Any]],
+    typing.Tuple[typing.Type, typing.Type, int],
+]
+
+
+def extract_moment_data(
+    moment_data: typing.Union[
+        typing.Dict[str, MomentTypeInput],
+        MomentTypeInput
+    ], sub_type: str
+) -> MomentType:
     """Get the information for a moment."""
     if isinstance(moment_data, dict):
         return extract_moment_data(moment_data[sub_type], sub_type)
 
+    mapping: typing.Union[str, None] = None
     if isinstance(moment_data[-1], dict):
         kwargs = moment_data[-1]
-        moment_data = moment_data[:-1]
+        if isinstance(moment_data[-2], str):
+            mapping = moment_data[-2]
     else:
         kwargs = {}
+        if isinstance(moment_data[-1], str):
+            mapping = moment_data[-1]
 
-    if len(moment_data) == 3:
-        return moment_data + (None, kwargs)
-    else:
-        return moment_data + (kwargs, )
+    assert isinstance(moment_data[0], type)
+    assert isinstance(moment_data[1], type)
+    assert isinstance(moment_data[2], int)
+
+    return moment_data[0], moment_data[1], moment_data[2], mapping, kwargs
 
 
 def make_integral_moment_dofs(
-    reference,
-    vertices=None, edges=None, faces=None, volumes=None,
-    cells=None, facets=None, ridges=None, peaks=None
-):
+    reference: Reference,
+    vertices: MomentTypeInput = None, edges: MomentTypeInput = None, faces: MomentTypeInput = None,
+    volumes: MomentTypeInput = None,
+    cells: MomentTypeInput = None, facets: MomentTypeInput = None, ridges: MomentTypeInput = None,
+    peaks: MomentTypeInput = None
+) -> typing.List[BaseFunctional]:
     """Generate DOFs due to integral moments on sub entities.
 
     Parameters
