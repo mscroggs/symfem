@@ -31,10 +31,13 @@ def to_float(i):
     return float(i)
 
 
-x = [sympy.Symbol("x"), sympy.Symbol("y"), sympy.Symbol("z")]
-t = [sympy.Symbol("t0"), sympy.Symbol("t1"), sympy.Symbol("t2")]
-_dummy = [sympy.Symbol("symbolicpyDUMMYx"), sympy.Symbol("symbolicpyDUMMYy"),
-          sympy.Symbol("symbolicpyDUMMYz")]
+x: typing.List[sympy.core.symbol.Symbol] = [
+    sympy.Symbol("x"), sympy.Symbol("y"), sympy.Symbol("z")]
+t: typing.List[sympy.core.symbol.Symbol] = [
+    sympy.Symbol("t0"), sympy.Symbol("t1"), sympy.Symbol("t2")]
+_dummy: typing.List[sympy.core.symbol.Symbol] = [
+    sympy.Symbol("symbolicpyDUMMYx"), sympy.Symbol("symbolicpyDUMMYy"),
+    sympy.Symbol("symbolicpyDUMMYz")]
 
 
 def subs(f, vars, values):
