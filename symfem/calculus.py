@@ -3,7 +3,7 @@
 import sympy
 import typing
 from .vectors import vdot
-from .symbolic import x, sym_sum, ScalarFunction, VectorFunction, PointType
+from .symbolic import x, sym_sum, ScalarFunction, VectorFunction, PointType, AxisVariables
 
 
 def derivative(
@@ -13,7 +13,7 @@ def derivative(
     return vdot(grad(f, len(dir)), dir)
 
 
-def grad(f: ScalarFunction, dim: int, variables: typing.List[sympy.core.symbol.Symbol] = x):
+def grad(f: ScalarFunction, dim: int, variables: AxisVariables = x):
     """Find the gradient of a scalar function."""
     return tuple(diff(f, variables[i]) for i in range(dim))
 

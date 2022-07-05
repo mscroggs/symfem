@@ -2,13 +2,13 @@
 
 import sympy
 import typing
-from .symbolic import x, ListOfScalarFunctions, ListOfVectorFunctions
+from .symbolic import x, ListOfScalarFunctions, ListOfVectorFunctions, AxisVariables
 from .calculus import curl, diff
 from itertools import product
 
 
 def polynomial_set_1d(
-    dim: int, order: int, variables: typing.List[sympy.core.symbol.Symbol] = x
+    dim: int, order: int, variables: AxisVariables = x
 ) -> ListOfScalarFunctions:
     """One dimensional polynomial set."""
     if dim == 1:
@@ -325,7 +325,7 @@ def _jrc(a, n) -> typing.Tuple[
 
 
 def orthogonal_basis_interval(
-    order: int, derivs: int, variables: typing.List[sympy.core.symbol.Symbol] = [x[0]]
+    order: int, derivs: int, variables: AxisVariables = [x[0]]
 ) -> typing.List[ListOfScalarFunctions]:
     """Create a basis of orthogonal polynomials."""
     assert len(variables) == 1
@@ -343,7 +343,7 @@ def orthogonal_basis_interval(
 
 
 def orthogonal_basis_triangle(
-    order: int, derivs: int, variables: typing.List[sympy.core.symbol.Symbol] = [x[0], x[1]]
+    order: int, derivs: int, variables: AxisVariables = [x[0], x[1]]
 ) -> typing.List[ListOfScalarFunctions]:
     """Create a basis of orthogonal polynomials."""
     assert len(variables) == 2
@@ -411,7 +411,7 @@ def orthogonal_basis_triangle(
 
 
 def orthogonal_basis_quadrilateral(
-    order: int, derivs: int, variables: typing.List[sympy.core.symbol.Symbol] = [x[0], x[1]]
+    order: int, derivs: int, variables: AxisVariables = [x[0], x[1]]
 ) -> typing.List[ListOfScalarFunctions]:
     """Create a basis of orthogonal polynomials."""
     assert len(variables) == 2
@@ -429,7 +429,7 @@ def orthogonal_basis_quadrilateral(
 
 
 def orthogonal_basis_tetrahedron(
-    order: int, derivs: int, variables: typing.List[sympy.core.symbol.Symbol] = x
+    order: int, derivs: int, variables: AxisVariables = x
 ) -> typing.List[ListOfScalarFunctions]:
     """Create a basis of orthogonal polynomials."""
     assert len(variables) == 3
@@ -553,7 +553,7 @@ def orthogonal_basis_tetrahedron(
 
 
 def orthogonal_basis_hexahedron(
-    order: int, derivs: int, variables: typing.List[sympy.core.symbol.Symbol] = x
+    order: int, derivs: int, variables: AxisVariables = x
 ) -> typing.List[ListOfScalarFunctions]:
     """Create a basis of orthogonal polynomials."""
     if variables is None:
@@ -575,7 +575,7 @@ def orthogonal_basis_hexahedron(
 
 
 def orthogonal_basis_prism(
-    order: int, derivs: int, variables: typing.List[sympy.core.symbol.Symbol] = x
+    order: int, derivs: int, variables: AxisVariables = x
 ) -> typing.List[ListOfScalarFunctions]:
     """Create a basis of orthogonal polynomials."""
     if variables is None:
@@ -599,7 +599,7 @@ def orthogonal_basis_prism(
 
 
 def orthogonal_basis_pyramid(
-    order: int, derivs: int, variables: typing.List[sympy.core.symbol.Symbol] = x
+    order: int, derivs: int, variables: AxisVariables = x
 ) -> typing.List[ListOfScalarFunctions]:
     """Create a basis of orthogonal polynomials."""
     assert len(variables) == 3
@@ -759,7 +759,7 @@ def orthogonal_basis_pyramid(
 
 
 def orthogonal_basis(
-    cell, order: int, derivs: int, variables: typing.List[sympy.core.symbol.Symbol] = None
+    cell, order: int, derivs: int, variables: AxisVariables = None
 ) -> typing.List[ListOfScalarFunctions]:
     """Create a basis of orthogonal polynomials."""
     args: typing.List[typing.Any] = [order, derivs]

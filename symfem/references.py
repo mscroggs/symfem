@@ -4,7 +4,7 @@ import typing
 import sympy
 from .symbolic import (
     t, x, subs, sym_sum, SetOfPoints, PointType, ScalarFunction, ScalarValue,
-    SetOfPointsInput, parse_point_input)
+    SetOfPointsInput, parse_point_input, AxisVariables)
 from .vectors import vsub, vnorm, vdot, vcross, vnormalise, vadd
 
 
@@ -52,7 +52,7 @@ class Reference:
                      for i, o in enumerate(self.origin))
 
     def integral(
-        self, f: ScalarFunction, vars: typing.List[sympy.core.symbol.Symbol] = t
+        self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
         raise NotImplementedError()
@@ -225,10 +225,12 @@ class Point(Reference):
         return Point(self.reference_vertices)
 
     def integral(
-        self, f: ScalarFunction, vars: typing.List[sympy.core.symbol.Symbol] = t
+        self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
-        return subs(f, vars, self.vertices[0])
+        out = subs(f, vars, self.vertices[0])
+        assert isinstance(out, sympy.core.expr.Expr)
+        return out
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -284,7 +286,7 @@ class Interval(Reference):
         return Interval(self.reference_vertices)
 
     def integral(
-        self, f: ScalarFunction, vars: typing.List[sympy.core.symbol.Symbol] = t
+        self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
         return (f * self.jacobian()).integrate((vars[0], 0, 1))
@@ -347,7 +349,7 @@ class Triangle(Reference):
         return Triangle(self.reference_vertices)
 
     def integral(
-        self, f: ScalarFunction, vars: typing.List[sympy.core.symbol.Symbol] = t
+        self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
         return (f * self.jacobian()).integrate(
@@ -436,7 +438,7 @@ class Tetrahedron(Reference):
         return Tetrahedron(self.reference_vertices)
 
     def integral(
-        self, f: ScalarFunction, vars: typing.List[sympy.core.symbol.Symbol] = t
+        self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
         return (f * self.jacobian()).integrate(
@@ -513,7 +515,7 @@ class Quadrilateral(Reference):
         return Quadrilateral(self.reference_vertices)
 
     def integral(
-        self, f: ScalarFunction, vars: typing.List[sympy.core.symbol.Symbol] = t
+        self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
         return (f * self.jacobian()).integrate((vars[1], 0, 1), (vars[0], 0, 1))
@@ -630,7 +632,7 @@ class Hexahedron(Reference):
         return Hexahedron(self.reference_vertices)
 
     def integral(
-        self, f: ScalarFunction, vars: typing.List[sympy.core.symbol.Symbol] = t
+        self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
         return (f * self.jacobian()).integrate(
@@ -745,7 +747,7 @@ class Prism(Reference):
         return Prism(self.reference_vertices)
 
     def integral(
-        self, f: ScalarFunction, vars: typing.List[sympy.core.symbol.Symbol] = t
+        self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
         return(f * self.jacobian()).integrate(
@@ -857,7 +859,7 @@ class Pyramid(Reference):
         return Pyramid(self.reference_vertices)
 
     def integral(
-        self, f: ScalarFunction, vars: typing.List[sympy.core.symbol.Symbol] = t
+        self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
         return (f * self.jacobian()).integrate(

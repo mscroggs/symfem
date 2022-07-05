@@ -3,64 +3,32 @@
 import sympy
 import typing
 
+# Types
+ScalarFunction = typing.Union[sympy.core.expr.Expr, int]
+VectorFunction = typing.Tuple[ScalarFunction, ...]
+MatrixFunction = sympy.matrices.dense.MutableDenseMatrix
+PointType = typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...]
+SetOfPoints = typing.Tuple[PointType, ...]
+ScalarValue = ScalarFunction
 
-x: typing.List[sympy.core.symbol.Symbol] = [
-    sympy.Symbol("x"), sympy.Symbol("y"), sympy.Symbol("z")]
-t: typing.List[sympy.core.symbol.Symbol] = [
-    sympy.Symbol("t0"), sympy.Symbol("t1"), sympy.Symbol("t2")]
-_dummy: typing.List[sympy.core.symbol.Symbol] = [
-    sympy.Symbol("symbolicpyDUMMYx"), sympy.Symbol("symbolicpyDUMMYy"),
-    sympy.Symbol("symbolicpyDUMMYz")]
+AxisVariables = typing.Union[
+    typing.Tuple[sympy.core.symbol.Symbol, ...], typing.List[sympy.core.symbol.Symbol]]
 
-
-def subs(f, vars, values):
-    """Substitute values into a sympy expression."""
-    if isinstance(f, PiecewiseFunction):
-        return f.evaluate(values)
-    try:
-        return tuple(subs(f_j, vars, values) for f_j in f)
-    except TypeError:
-        pass
-    if isinstance(vars, sympy.Symbol):
-        return f.subs(vars, values)
-
-    if isinstance(f, int):
-        return f
-
-    if len(values) == 1:
-        return f.subs(vars[0], values[0])
-    if len(values) == 2:
-        return f.subs(vars[0], _dummy[0]).subs(vars[1], _dummy[1]).subs(
-            _dummy[0], values[0]).subs(_dummy[1], values[1])
-    if len(values) == 3:
-        return f.subs(vars[0], _dummy[0]).subs(vars[1], _dummy[1]).subs(
-            vars[2], _dummy[2]).subs(_dummy[0], values[0]).subs(
-                _dummy[1], values[1]).subs(_dummy[2], values[2])
-
-
-def sym_sum(ls):
-    """Symbolically computes the sum of a list."""
-    out = sympy.Integer(0)
-    for i in ls:
-        out += i
-    return out
-
-
-def sym_product(ls):
-    """Symbolically computes the sum of a list."""
-    out = sympy.Integer(1)
-    for i in ls:
-        out *= i
-    return out
+PFunctionPieces = typing.List[typing.Tuple[
+    SetOfPoints,
+    typing.Union[ScalarFunction, VectorFunction, MatrixFunction]
+]]
 
 
 class PiecewiseFunction:
     """A function defined piecewise on a collection of triangles."""
 
-    def __init__(self, pieces):
+    def __init__(self, pieces: PFunctionPieces):
         self.pieces = pieces
 
-    def get_piece(self, point):
+    def get_piece(
+        self, point: PointType
+    ) -> typing.Union[ScalarFunction, VectorFunction, MatrixFunction]:
         """Get the piece of the function defined at the given point."""
         if len(self.pieces[0][0]) == 3:
             from .vectors import point_in_triangle
@@ -125,20 +93,6 @@ class PiecewiseFunction:
         return self._iter_list().__iter__()
 
 
-def symequal(a, b):
-    """Check if two symbolic numbers or vectors are equal."""
-    if isinstance(a, (list, tuple)):
-        for i, j in zip(a, b):
-            if not symequal(i, j):
-                return False
-        return True
-    return sympy.expand(sympy.simplify(a)) == sympy.expand(sympy.simplify(b))
-
-
-# Types
-ScalarFunction = typing.Union[sympy.core.expr.Expr, int]
-VectorFunction = typing.Tuple[ScalarFunction, ...]
-MatrixFunction = sympy.matrices.dense.MutableDenseMatrix
 AnyFunction = typing.Union[ScalarFunction, VectorFunction, MatrixFunction, PiecewiseFunction]
 ListOfScalarFunctions = typing.List[ScalarFunction]
 ListOfVectorFunctions = typing.List[VectorFunction]
@@ -147,9 +101,6 @@ ListOfPiecewiseFunctions = typing.List[PiecewiseFunction]
 ListOfAnyFunctions = typing.Union[
     ListOfScalarFunctions, ListOfVectorFunctions, ListOfMatrixFunctions,
     ListOfPiecewiseFunctions]
-PointType = typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...]
-SetOfPoints = typing.Tuple[PointType, ...]
-ScalarValue = ScalarFunction
 
 SetOfPointsInput = typing.Union[
     SetOfPoints,
@@ -190,3 +141,79 @@ def parse_any_function_input(functions: ListOfAnyFunctionsInput) -> ListOfAnyFun
 def parse_point_input(points: SetOfPointsInput) -> SetOfPoints:
     """Convert an input set of points to the correct format."""
     return tuple(points)
+
+
+x: AxisVariables = [
+    sympy.Symbol("x"), sympy.Symbol("y"), sympy.Symbol("z")]
+t: AxisVariables = [
+    sympy.Symbol("t0"), sympy.Symbol("t1"), sympy.Symbol("t2")]
+
+
+def subs(
+    f: AnyFunction,
+    vars: typing.Union[sympy.core.symbol.Symbol, AxisVariables],
+    values: typing.Union[ScalarValue, typing.List[ScalarValue], typing.Tuple[ScalarValue, ...]]
+) -> AnyFunction:
+    """Substitute values into a function expression."""
+    if isinstance(f, PiecewiseFunction):
+        return f.evaluate(values)
+    if isinstance(f, tuple):
+        return tuple(_subs_scalar(f_j, vars, values) for f_j in f)
+    if isinstance(f, sympy.Matrix):
+        return sympy.Matrix([[_subs_scalar(f[i, j], vars, values) for j in range(f.cols)]
+                             for i in range(f.rows)])
+
+    return _subs_scalar(f, vars, values)
+
+
+def _subs_scalar(
+    f: ScalarFunction,
+    vars: typing.Union[sympy.core.symbol.Symbol, AxisVariables],
+    values: typing.Union[ScalarValue, typing.List[ScalarValue], typing.Tuple[ScalarValue, ...]]
+) -> ScalarFunction:
+    """Substitute values into a scalar expression."""
+    if isinstance(f, int):
+        return f
+    if isinstance(vars, sympy.Symbol):
+        return f.subs(vars, values)
+
+    assert isinstance(values, (tuple, list))
+    assert isinstance(vars, (tuple, list))
+    assert len(values) <= len(vars)
+
+    dummy = [sympy.Symbol(f"symbolicpyDUMMY{i}") for i, _ in enumerate(values)]
+
+    for v, d in zip(vars, dummy):
+        assert isinstance(f, sympy.core.expr.Expr)
+        f = f.subs(v, d)
+    for d, val in zip(dummy, values):
+        assert isinstance(f, sympy.core.expr.Expr)
+        f = f.subs(d, val)
+
+    return f
+
+
+def sym_sum(ls):
+    """Symbolically computes the sum of a list."""
+    out = sympy.Integer(0)
+    for i in ls:
+        out += i
+    return out
+
+
+def sym_product(ls):
+    """Symbolically computes the sum of a list."""
+    out = sympy.Integer(1)
+    for i in ls:
+        out *= i
+    return out
+
+
+def symequal(a, b):
+    """Check if two symbolic numbers or vectors are equal."""
+    if isinstance(a, (list, tuple)):
+        for i, j in zip(a, b):
+            if not symequal(i, j):
+                return False
+        return True
+    return sympy.expand(sympy.simplify(a)) == sympy.expand(sympy.simplify(b))

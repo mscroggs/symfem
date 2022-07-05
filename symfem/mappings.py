@@ -42,7 +42,7 @@ def double_covariant(f: MatrixFunction, map: PointType, inverse_map: PointType, 
     g = subs(f, x, inverse_map)
     j_inv = sympy.Matrix([[diff(i, x[j]) for j in range(len(map))]
                           for i in inverse_map]).transpose()
-
+    assert isinstance(g, tuple)
     g_mat = sympy.Matrix([g[i * tdim: (i + 1) * tdim] for i in range(tdim)])
     out = j_inv * g_mat * j_inv.transpose()
     return tuple(out[i] for i in range(out.rows * out.cols))
@@ -54,6 +54,7 @@ def double_contravariant(f: MatrixFunction, map: PointType, inverse_map: PointTy
     jacobian = sympy.Matrix([[diff(i, x[j]) for j in range(tdim)] for i in map])
     jacobian /= _det(jacobian)
 
+    assert isinstance(g, tuple)
     g_mat = sympy.Matrix([g[i * tdim: (i + 1) * tdim] for i in range(tdim)])
     out = jacobian * g_mat * jacobian.transpose()
     return tuple(out[i] for i in range(out.rows * out.cols))
