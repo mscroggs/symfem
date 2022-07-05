@@ -43,12 +43,22 @@ class PiecewiseFunction:
 
         raise NotImplementedError("Evaluation of piecewise functions outside domain not supported.")
 
-    def evaluate(self, values):
+    def evaluate(
+        self, values: PointType
+    ) -> typing.Union[
+        ScalarFunction, VectorFunction, MatrixFunction, typing.Any
+        # ScalarFunction, VectorFunction, MatrixFunction, PiecewiseFunction
+    ]:
         """Evaluate a function."""
         try:
             return subs(self.get_piece(values), x, values)
         except TypeError:
-            return PiecewiseFunction([(i, subs(j, x, values)) for i, j in self.pieces])
+            pieces: PFunctionPieces = []
+            for i, j in self.pieces:
+                j2 = subs(j, x, values)
+                assert not isinstance(j2, PiecewiseFunction)
+                pieces.append((i, j2))
+            return PiecewiseFunction(pieces)
 
     def diff(self, variable):
         """Differentiate the function."""
@@ -156,7 +166,10 @@ def subs(
 ) -> AnyFunction:
     """Substitute values into a function expression."""
     if isinstance(f, PiecewiseFunction):
-        return f.evaluate(values)
+        if isinstance(values, (int, sympy.core.expr.Expr)):
+            return f.evaluate((values, ))
+        else:
+            return f.evaluate(tuple(values))
     if isinstance(f, tuple):
         return tuple(_subs_scalar(f_j, vars, values) for f_j in f)
     if isinstance(f, sympy.Matrix):
