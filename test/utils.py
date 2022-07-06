@@ -59,6 +59,7 @@ test_elements = {
                        [{"edge_orders": [3, 3, 1], "variant": "equispaced"}, range(1, 6)],
                        [{"edge_orders": [3, 3, 2], "variant": "equispaced"}, range(1, 6)],
                        [{"edge_orders": [2, 2, 1], "variant": "lobatto"}, range(1, 3)]],
+        "P1-iso-P2": [[{}, [1]]]
     },
     "tetrahedron": {
         "P": [[{"variant": "equispaced"}, range(3)], [{"variant": "lobatto"}, range(3)]],
@@ -125,6 +126,7 @@ test_elements = {
         "ABF": [[{}, range(3)]],
         "AC": [[{}, range(4)]],
         "Rannacher-Turek": [[{}, [1]]],
+        "P1-iso-P2": [[{}, [1]]]
     },
     "hexahedron": {
         "bubble": [[{"variant": "equispaced"}, range(2, 4)], [{"variant": "lobatto"}, range(2, 4)]],

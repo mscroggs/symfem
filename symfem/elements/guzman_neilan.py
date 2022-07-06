@@ -92,7 +92,7 @@ class GuzmanNeilan(CiarletElement):
         for c, f in zip(coeffs, fs):
             fun = [[f[j] - sym_sum(k * b.pieces[i][1][j] for k, b in zip(c, sub_basis))
                     for j in range(reference.tdim)] for i, _ in enumerate(sub_tris)]
-            basis.append(PiecewiseFunction(list(zip(sub_tris, fun))))
+            basis.append(PiecewiseFunction(list(zip(sub_tris, fun)), "triangle"))
         return basis
 
     def _make_polyset_tetrahedron(self, reference, order):
@@ -115,7 +115,7 @@ class GuzmanNeilan(CiarletElement):
         for c, f in zip(coeffs, fs):
             fun = [[f[j] - sym_sum(k * b.pieces[i][1][j] for k, b in zip(c, sub_basis))
                     for j in range(reference.tdim)] for i, _ in enumerate(sub_tets)]
-            basis.append(PiecewiseFunction(list(zip(sub_tets, fun))))
+            basis.append(PiecewiseFunction(list(zip(sub_tets, fun)), "tetrahedron"))
         return basis
 
     names = ["Guzman-Neilan"]
@@ -223,7 +223,7 @@ def make_piecewise_lagrange(sub_cells, cell_name, order, zero_on_boundary=False,
             PiecewiseFunction(list(zip(sub_cells, [
                 zero if j is None else s[j]
                 for s, j in zip(lagrange_bases, i)
-            ])))
+            ])), cell_name)
         )
 
     return basis
