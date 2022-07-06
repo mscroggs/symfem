@@ -89,7 +89,7 @@ class ReducedHsiehCloughTocher(CiarletElement):
         piece_list.append((0, bases[1][5], bases[2][2]))
 
         poly = [
-            PiecewiseFunction(list(zip(subs, p)))
+            PiecewiseFunction(list(zip(subs, p)), "triangle")
             for p in piece_list
         ]
 

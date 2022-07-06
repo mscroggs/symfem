@@ -98,6 +98,35 @@ def point_in_triangle(point, triangle):
     return u >= 0 and v >= 0 and u + v <= 1
 
 
+def point_in_quadrilateral(point, quad):
+    """Check if a point is inside a quadrilateral."""
+    e0 = vsub(quad[1], quad[0])
+    e1 = vsub(quad[0], quad[2])
+    e2 = vsub(quad[3], quad[1])
+    e3 = vsub(quad[2], quad[3])
+
+    n0 = (-e0[1], e0[0])
+    n1 = (-e1[1], e1[0])
+    n2 = (-e2[1], e2[0])
+    n3 = (-e3[1], e3[0])
+
+    d0 = vdot(n0, vsub(point, quad[0]))
+    d1 = vdot(n1, vsub(point, quad[2]))
+    d2 = vdot(n2, vsub(point, quad[1]))
+    d3 = vdot(n3, vsub(point, quad[3]))
+
+    if numpy.isclose(float(d0), 0):
+        d0 = 0
+    if numpy.isclose(float(d1), 0):
+        d1 = 0
+    if numpy.isclose(float(d2), 0):
+        d2 = 0
+    if numpy.isclose(float(d3), 0):
+        d3 = 0
+
+    return d0 >= 0 and d1 >= 0 and d2 >= 0 and d3 >= 0
+
+
 def point_in_tetrahedron(point, tetrahedron):
     """Check if a point is inside a tetrahedron."""
     v0 = vsub(tetrahedron[3], tetrahedron[0])

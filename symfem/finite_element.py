@@ -568,7 +568,7 @@ class CiarletElement(FiniteElement):
                 new_i = [subs(forward_map, x, k) for k in j[0]]
                 for k, f in enumerate(self.map_to_cell(vertices, [b.pieces[i][1] for b in basis])):
                     pieces[k].append((new_i, f))
-            return [PiecewiseFunction(p) for p in pieces]
+            return [PiecewiseFunction(p, basis[0].cell) for p in pieces]
 
         if isinstance(basis[0], (list, tuple)) and isinstance(basis[0][0], PiecewiseFunction):
             for b in basis:
@@ -586,7 +586,7 @@ class CiarletElement(FiniteElement):
                 output_pieces.append(self.map_to_cell(
                     vertices, piece_basis, forward_map, inverse_map))
 
-            return [PiecewiseFunction(list(zip(new_tris, fs)))
+            return [PiecewiseFunction(list(zip(new_tris, fs)), basis[0][0].cell)
                     for fs in zip(*output_pieces)]
 
         out = [None for f in basis]

@@ -53,7 +53,7 @@ class DualCiarletElement(CiarletElement):
                             sym_sum(a * b[i] for a, b in zip(coeffs, sub_basis))
                             for i in range(self.range_dim))
                     pieces.append(((v0, v1, v2), sub_fun))
-                self._basis_functions.append(PiecewiseFunction(pieces))
+                self._basis_functions.append(PiecewiseFunction(pieces), "triangle")
         return self._basis_functions
 
 
