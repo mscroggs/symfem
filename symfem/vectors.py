@@ -2,17 +2,17 @@
 
 import sympy
 import numpy
+from .symbolic import PointType, ScalarValue, SetOfPoints, PointTypeInput
 
 
-def vsub(v, w):
+def vsub(v: PointTypeInput, w: PointTypeInput) -> PointType:
     """Subtract a vector from another."""
-    try:
+    if isinstance(v, (tuple, list)):
         return tuple(i - j for i, j in zip(v, w))
-    except TypeError:
-        return v - w
+    return v - w
 
 
-def vadd(v, w):
+def vadd(v: PointTypeInput, w: PointTypeInput) -> PointType:
     """Add two vectors."""
     try:
         return tuple(i + j for i, j in zip(v, w))
@@ -20,7 +20,7 @@ def vadd(v, w):
         return v + w
 
 
-def vdiv(v, a):
+def vdiv(v: PointTypeInput, a: ScalarValue) -> PointType:
     """Divide a vector by a scalar."""
     try:
         return tuple(i / a for i in v)
@@ -28,7 +28,7 @@ def vdiv(v, a):
         return v / a
 
 
-def vnorm(v):
+def vnorm(v: PointTypeInput) -> ScalarValue:
     """Find the norm of a vector."""
     try:
         return sympy.sqrt(sum(a ** 2 for a in v))
@@ -36,7 +36,7 @@ def vnorm(v):
         return abs(v)
 
 
-def vdot(v, w):
+def vdot(v: PointTypeInput, w: PointTypeInput) -> ScalarValue:
     """Find the dot product of two vectors."""
     try:
         return sum(a * b for a, b in zip(v, w))
@@ -44,7 +44,7 @@ def vdot(v, w):
         return v * w
 
 
-def vcross(v, w):
+def vcross(v: PointTypeInput, w: PointTypeInput) -> PointType:
     """Find the cross product of two vectors."""
     if len(v) == 2:
         return _vcross2d(v, w)
@@ -53,12 +53,12 @@ def vcross(v, w):
         return _vcross3d(v, w)
 
 
-def _vcross2d(v, w):
+def _vcross2d(v: PointTypeInput, w: PointTypeInput) -> ScalarValue:
     """Find the cross product of two 2D vectors."""
     return v[0] * w[1] - v[1] * w[0]
 
 
-def _vcross3d(v, w):
+def _vcross3d(v: PointTypeInput, w: PointTypeInput) -> PointType:
     """Find the cross product of two 3D vectors."""
     return (
         v[1] * w[2] - v[2] * w[1],
@@ -67,12 +67,12 @@ def _vcross3d(v, w):
     )
 
 
-def vnormalise(v):
+def vnormalise(v: PointTypeInput) -> PointType:
     """Normalise a vector."""
     return vdiv(v, vnorm(v))
 
 
-def point_in_triangle(point, triangle):
+def point_in_triangle(point: PointTypeInput, triangle: SetOfPoints) -> bool:
     """Check if a point is inside a triangle."""
     v0 = vsub(triangle[2], triangle[0])
     v1 = vsub(triangle[1], triangle[0])
@@ -98,7 +98,7 @@ def point_in_triangle(point, triangle):
     return u >= 0 and v >= 0 and u + v <= 1
 
 
-def point_in_tetrahedron(point, tetrahedron):
+def point_in_tetrahedron(point: PointTypeInput, tetrahedron: SetOfPoints) -> bool:
     """Check if a point is inside a tetrahedron."""
     v0 = vsub(tetrahedron[3], tetrahedron[0])
     v1 = vsub(tetrahedron[2], tetrahedron[0])

@@ -7,9 +7,10 @@ import typing
 ScalarFunction = typing.Union[sympy.core.expr.Expr, int]
 VectorFunction = typing.Tuple[ScalarFunction, ...]
 MatrixFunction = sympy.matrices.dense.MutableDenseMatrix
-PointType = typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...]
-SetOfPoints = typing.Tuple[PointType, ...]
 ScalarValue = ScalarFunction
+PointType = typing.Tuple[ScalarValue, ...]
+PointTypeInput = typing.Union[typing.Tuple[ScalarValue, ...], typing.List[ScalarValue]]
+SetOfPoints = typing.Tuple[PointType, ...]
 
 AxisVariables = typing.Union[
     typing.Tuple[sympy.core.symbol.Symbol, ...], typing.List[sympy.core.symbol.Symbol]]
