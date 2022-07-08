@@ -5,7 +5,7 @@ This element's definition appears in https://doi.org/10.2307/2006147
 """
 
 import sympy
-from ..finite_element import CiarletElement
+from ..finite_element import CiarletElement, ElementBasisFunction
 from ..functionals import (PointEvaluation, PointNormalDerivativeEvaluation,
                            DerivativePointEvaluation)
 from ..symbolic import sym_sum, PiecewiseFunction
@@ -72,6 +72,10 @@ class HsiehCloughTocher(CiarletElement):
                            hermite_spaces[2].get_basis_function(1)))
         piece_list.append((0, hermite_spaces[1].get_basis_function(5),
                            hermite_spaces[2].get_basis_function(2)))
+
+        piece_list = [tuple(j.get_function() if isinstance(j, ElementBasisFunction) else j
+                            for j in i) for i in piece_list]
+
         # TODO: are these right to remove??
         # piece_list.append((hermite_spaces[0].get_basis_function(9), 0, 0))
         # piece_list.append((0, hermite_spaces[1].get_basis_function(9), 0))

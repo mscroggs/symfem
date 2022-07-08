@@ -9,9 +9,9 @@ VectorFunction = typing.Tuple[ScalarFunction, ...]
 MatrixFunction = typing.Union[sympy.matrices.dense.MutableDenseMatrix]
 ScalarValue = ScalarFunction
 PointType = typing.Tuple[ScalarValue, ...]
+SetOfPoints = typing.Tuple[PointType, ...]
 PointTypeInput = typing.Union[typing.Tuple[ScalarValue, ...], typing.List[ScalarValue],
                               sympy.matrices.dense.MutableDenseMatrix]
-SetOfPoints = typing.Tuple[PointType, ...]
 
 AxisVariables = typing.Union[
     typing.Tuple[sympy.core.symbol.Symbol, ...], typing.List[sympy.core.symbol.Symbol]]
@@ -111,18 +111,18 @@ class PiecewiseFunction:
             for i, j in zip(self.pieces, other.pieces):
                 assert i[0] == j[0]
                 j2: typing.Union[ScalarFunction, VectorFunction, MatrixFunction] = 0
-                if isinstance(j, (int, sympy.core.expr.Expr)):
-                    assert isinstance(i, (int, sympy.core.expr.Expr))
+                if isinstance(j[1], (int, sympy.core.expr.Expr)):
+                    assert isinstance(i[1], (int, sympy.core.expr.Expr))
                     j2 = i[1] + j[1]
-                elif isinstance(j, sympy.Matrix):
-                    assert isinstance(i, sympy.Matrix)
+                elif isinstance(j[1], sympy.Matrix):
+                    assert isinstance(i[1], sympy.Matrix)
                     j2 = i[1] + j[1]
-                elif isinstance(j, tuple):
+                elif isinstance(j[1], tuple):
                     return NotImplementedError()
                 else:
                     raise ValueError()
 
-                pieces.append((i, j2))
+                pieces.append((i[0], j2))
             return PiecewiseFunction(pieces, self.cell)
 
         return PiecewiseFunction([(i, other + j) for i, j in self.pieces], self.cell)
@@ -304,6 +304,8 @@ def make_single_function_type(functions: typing.List[AnyFunction]) -> ListOfAnyF
     if isinstance(functions[0], tuple):
         vfs: ListOfVectorFunctions = []
         for fun in functions:
+            if isinstance(fun, sympy.Matrix):
+                fun = tuple(fun[i, j] for i in range(fun.rows) for j in range(fun.cols))
             assert isinstance(fun, tuple)
             vfs.append(fun)
         return vfs

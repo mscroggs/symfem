@@ -90,8 +90,9 @@ class GuzmanNeilan(CiarletElement):
         sub_basis = make_piecewise_lagrange(sub_tris, "triangle", reference.tdim, True)
         fs = BernardiRaugel(reference, 1).get_basis_functions()[-3:]
         for c, f in zip(coeffs, fs):
-            fun = [[f[j] - sym_sum(k * b.pieces[i][1][j] for k, b in zip(c, sub_basis))
-                    for j in range(reference.tdim)] for i, _ in enumerate(sub_tris)]
+            fun = [tuple(
+                f[j] - sym_sum(k * b.pieces[i][1][j] for k, b in zip(c, sub_basis))
+                for j in range(reference.tdim)) for i, _ in enumerate(sub_tris)]
             basis.append(PiecewiseFunction(list(zip(sub_tris, fun)), "triangle"))
         return basis
 

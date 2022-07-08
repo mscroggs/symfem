@@ -129,6 +129,8 @@ class PointEvaluation(BaseFunctional):
 
     def eval(self, function: AnyFunction, symbolic: bool = True) -> ScalarValueOrFloat:
         """Apply the functional to a function."""
+        if isinstance(function, PiecewiseFunction):
+            function = function.get_piece(self.point)
         assert isinstance(function, (int, sympy.core.expr.Expr))
         value = subs(function, x, self.point)
         assert isinstance(value, (int, sympy.core.expr.Expr))
@@ -165,6 +167,8 @@ class WeightedPointEvaluation(BaseFunctional):
 
     def eval(self, function: AnyFunction, symbolic: bool = True) -> ScalarValueOrFloat:
         """Apply the functional to a function."""
+        if isinstance(function, PiecewiseFunction):
+            function = function.get_piece(self.point)
         assert isinstance(function, (int, sympy.core.expr.Expr))
         value = subs(function, x, self.point) * self.weight
         assert isinstance(value, (int, sympy.core.expr.Expr))
@@ -202,6 +206,8 @@ class DerivativePointEvaluation(BaseFunctional):
 
     def eval(self, function: AnyFunction, symbolic: bool = True) -> ScalarValueOrFloat:
         """Apply the functional to a function."""
+        if isinstance(function, PiecewiseFunction):
+            function = function.get_piece(self.point)
         assert isinstance(function, (int, sympy.core.expr.Expr))
         for i, j in zip(x, self.derivative):
             for k in range(j):
@@ -336,6 +342,8 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
 
     def eval(self, function: AnyFunction, symbolic: bool = True) -> ScalarValueOrFloat:
         """Apply the functional to a function."""
+        if isinstance(function, PiecewiseFunction):
+            function = function.get_piece(self.point)
         assert isinstance(function, (int, sympy.core.expr.Expr))
         value = subs(jacobian_component(function, self.component), x, self.point)
         assert isinstance(value, (int, sympy.core.expr.Expr))
@@ -372,8 +380,15 @@ class PointInnerProduct(BaseFunctional):
 
     def eval(self, function: AnyFunction, symbolic: bool = True) -> ScalarValueOrFloat:
         """Apply the functional to a function."""
+        if isinstance(function, PiecewiseFunction):
+            function = function.get_piece(self.point)
         v = subs(function, x, self.point)
+        if isinstance(function, sympy.Matrix):
+            function = tuple(function[i, j]
+                             for i in range(function.rows) for j in range(function.cols))
         assert isinstance(function, tuple)
+        if isinstance(v, sympy.Matrix):
+            v = tuple(v[i, j] for i in range(v.rows) for j in range(v.cols))
         assert isinstance(v, tuple)
         tdim = len(self.lvec)
         assert len(function) == tdim ** 2
@@ -422,12 +437,27 @@ class DotPointEvaluation(BaseFunctional):
 
     def eval(self, function: AnyFunction, symbolic: bool = True) -> ScalarValueOrFloat:
         """Apply the functional to a function."""
-        assert isinstance(function, tuple)
+        if isinstance(function, PiecewiseFunction):
+            function = function.get_piece(self.point)
         v1 = subs(function, x, self.point)
         v2 = subs(self.vector, x, self.point)
-        assert isinstance(v1, tuple)
-        assert isinstance(v2, tuple)
-        value = vdot(v1, v2)
+        if isinstance(v2, (int, sympy.core.expr.Expr)):
+            assert isinstance(v1, (int, sympy.core.expr.Expr))
+            value = v1 * v2
+        elif isinstance(v2, tuple):
+            if isinstance(v1, sympy.Matrix):
+                v1t = tuple(v1[i, j] for i in range(v1.rows) for j in range(v1.cols))
+                value = vdot(v1t, v2)
+            else:
+                assert isinstance(v1, tuple)
+                value = vdot(v1, v2)
+        else:
+            assert isinstance(v1, sympy.Matrix)
+            assert isinstance(v2, sympy.Matrix)
+            value = 0
+            for i in range(v1.rows):
+                for j in range(v2.cols):
+                    value += v1[i, j] * v2[i, j]
         if symbolic:
             return value
         else:
@@ -495,7 +525,6 @@ class IntegralAgainst(BaseFunctional):
             for j, k in zip(a, t):
                 point[i] += j * k
         v1 = subs(function, x, point)
-        assert isinstance(v1, tuple)
         integrand = self.dot(v1)
         value = self.integral_domain.integral(integrand)
         assert isinstance(value, (int, sympy.core.expr.Expr))
@@ -507,6 +536,9 @@ class IntegralAgainst(BaseFunctional):
     def dot(self, function: AnyFunction) -> ScalarValue:
         """Dot a function with the moment function."""
         if isinstance(self.f, tuple):
+            if isinstance(function, sympy.Matrix):
+                function = tuple(function[i, j]
+                                 for i in range(function.rows) for j in range(function.cols))
             assert isinstance(function, tuple)
             return vdot(function, self.f)
         assert isinstance(self.f, (int, sympy.core.expr.Expr))
@@ -710,6 +742,17 @@ class IntegralMoment(BaseFunctional):
             assert isinstance(self.f, tuple)
             return vdot(function, self.f)
 
+        if isinstance(function, sympy.Matrix):
+            result = 0
+            for i in range(function.rows):
+                for j in range(function.cols):
+                    if isinstance(self.f, sympy.Matrix):
+                        result += function[i, j] * self.f[i, j]
+                    else:
+                        assert isinstance(self.f, tuple)
+                        result += function[i, j] * self.f[i * function.cols + j]
+            return result
+
         assert isinstance(self.f, (int, sympy.core.expr.Expr))
         assert isinstance(function, (int, sympy.core.expr.Expr))
         return function * self.f
@@ -737,7 +780,7 @@ class IntegralMoment(BaseFunctional):
         entity = self.entity_tex()
         entity_def = self.entity_definition()
         if isinstance(self.f, tuple):
-            if len(self.f) == self.integral_domain.tdim:
+            if len(self.f) in [self.reference.tdim, self.integral_domain.tdim]:
                 desc = "\\boldsymbol{v}\\mapsto"
                 desc += f"\\displaystyle\\int_{{{entity}}}"
                 desc += "\\boldsymbol{v}\\cdot"
@@ -745,15 +788,19 @@ class IntegralMoment(BaseFunctional):
                 desc += "\\\\".join([_to_tex(i) for i in self.f])
                 desc += "\\end{array}\\right)"
             else:
-                assert len(self.f) == self.integral_domain.tdim ** 2
+                if len(self.f) == self.integral_domain.tdim ** 2:
+                    size = self.integral_domain.tdim
+                elif len(self.f) == self.reference.tdim ** 2:
+                    size = self.reference.tdim
+                else:
+                    raise NotImplementedError()
                 desc = "\\mathbf{V}\\mapsto"
                 desc += f"\\displaystyle\\int_{{{entity}}}"
                 desc += "\\mathbf{V}:"
-                desc += "\\left(\\begin{array}{" + "c" * self.integral_domain.tdim + "}"
+                desc += "\\left(\\begin{array}{" + "c" * size + "}"
                 desc += "\\\\".join(["&".join(
-                    [_to_tex(self.f[i]) for i in range(self.integral_domain.tdim * row,
-                                                       self.integral_domain.tdim * (row + 1))]
-                ) for row in range(self.integral_domain.tdim)])
+                    [_to_tex(self.f[i]) for i in range(size * row, size * (row + 1))]
+                ) for row in range(size)])
                 desc += "\\end{array}\\right)"
         else:
             desc = "v\\mapsto"
@@ -777,8 +824,16 @@ class VecIntegralMoment(IntegralMoment):
 
     def dot(self, function: AnyFunction) -> ScalarValue:
         """Dot a function with the moment function."""
-        assert isinstance(function, tuple)
         assert isinstance(self.f, (int, sympy.core.expr.Expr))
+
+        if isinstance(function, sympy.Matrix):
+            result = 0
+            for i in range(function.rows):
+                for j in range(function.cols):
+                    result += function[i, j] * self.dot_with[i * function.cols + j]
+            return result * self.f
+
+        assert isinstance(function, (tuple, PiecewiseFunction))
         return vdot(function, self.dot_with) * self.f
 
     def dof_direction(self) -> typing.Union[PointType, None]:
@@ -971,6 +1026,9 @@ class InnerProductIntegralMoment(IntegralMoment):
 
     def dot(self, function: AnyFunction) -> ScalarValue:
         """Take the inner product of a function with the moment direction."""
+        if isinstance(function, sympy.Matrix):
+            function = tuple(function[i, j]
+                             for i in range(function.rows) for j in range(function.cols))
         assert isinstance(function, tuple)
         tdim = len(self.inner_with_left)
         assert isinstance(self.f, (int, sympy.core.expr.Expr))

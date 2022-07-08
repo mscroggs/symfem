@@ -88,6 +88,8 @@ class FiniteElement(ABC):
             for p in points:
                 row = []
                 for b in self.get_basis_functions(False):
+                    if isinstance(b, PiecewiseFunction):
+                        b = b.get_piece(p)
                     assert isinstance(b, (int, sympy.core.expr.Expr))
                     row.append(_subs_scalar(b, x, p))
                 output.append(tuple(row))
@@ -802,11 +804,10 @@ class CiarletElement(FiniteElement):
             for e in range(self.reference.sub_entity_count(dim)):
                 entity_dofs = self.entity_dofs(dim, e)
                 dofs_by_type: typing.Dict[
-                    typing.Tuple[typing.Type, str], typing.List[int]
+                    typing.Tuple[typing.Type, typing.Union[str, None]], typing.List[int]
                 ] = {}
                 for d in entity_dofs:
                     dof = self.dofs[d]
-                    assert dof.mapping is not None
                     t = (type(dof), dof.mapping)
                     if t not in dofs_by_type:
                         dofs_by_type[t] = []

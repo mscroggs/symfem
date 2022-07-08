@@ -71,7 +71,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
                 face = reference.sub_entity(2, f_n)
                 for i in range(order):
                     f = grad(x[0] ** (order - 1 - i) * x[1] ** i, 2)
-                    f = subs([f[1], -f[0]], x, t)
+                    f = subs((f[1], -f[0]), x, t)
                     dofs.append(IntegralAgainst(
                         reference, face, f, entity=(2, f_n), mapping="contravariant"))
 

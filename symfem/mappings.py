@@ -1,7 +1,9 @@
 """Functions to map functions between cells."""
 
 import sympy
-from .symbolic import subs, x, MatrixFunction, ScalarFunction, VectorFunction, PointType, AnyFunction
+import typing
+from .symbolic import (subs, x, MatrixFunction, ScalarFunction, VectorFunction, PointType,
+                       AnyFunction)
 from .vectors import vdot, vcross, vnorm
 from .calculus import diff
 
@@ -48,14 +50,18 @@ def contravariant(
 
 
 def double_covariant(
-    f: VectorFunction, map: PointType, inverse_map: PointType, tdim: int
+    f: typing.Union[MatrixFunction, VectorFunction], map: PointType,
+    inverse_map: PointType, tdim: int
 ) -> VectorFunction:
     """Map matrix functions."""
     g = subs(f, x, inverse_map)
-    assert isinstance(g, tuple)
+    if isinstance(g, tuple):
+        g_mat = sympy.Matrix([g[i * tdim: (i + 1) * tdim] for i in range(tdim)])
+    else:
+        assert isinstance(g, sympy.Matrix)
+        g_mat = g
     j_inv = sympy.Matrix([[diff(i, x[j]) for j in range(len(map))]
                           for i in inverse_map]).transpose()
-    g_mat = sympy.Matrix([g[i * tdim: (i + 1) * tdim] for i in range(tdim)])
     out = j_inv * g_mat * j_inv.transpose()
     return tuple(out[i] for i in range(out.rows * out.cols))
 
@@ -65,10 +71,13 @@ def double_contravariant(
 ) -> VectorFunction:
     """Map matrix functions."""
     g = subs(f, x, inverse_map)
-    assert isinstance(g, tuple)
+    if isinstance(g, tuple):
+        g_mat = sympy.Matrix([g[i * tdim: (i + 1) * tdim] for i in range(tdim)])
+    else:
+        assert isinstance(g, sympy.Matrix)
+        g_mat = g
     jacobian = sympy.Matrix([[diff(i, x[j]) for j in range(tdim)] for i in map])
     jacobian /= _det(jacobian)
 
-    g_mat = sympy.Matrix([g[i * tdim: (i + 1) * tdim] for i in range(tdim)])
     out = jacobian * g_mat * jacobian.transpose()
     return tuple(out[i] for i in range(out.rows * out.cols))
