@@ -114,8 +114,8 @@ class GuzmanNeilan(CiarletElement):
         sub_basis = make_piecewise_lagrange(sub_tets, "tetrahedron", reference.tdim, True)
         fs = BernardiRaugel(reference, 1).get_basis_functions()[-4:]
         for c, f in zip(coeffs, fs):
-            fun = [[f[j] - sym_sum(k * b.pieces[i][1][j] for k, b in zip(c, sub_basis))
-                    for j in range(reference.tdim)] for i, _ in enumerate(sub_tets)]
+            fun = [tuple(f[j] - sym_sum(k * b.pieces[i][1][j] for k, b in zip(c, sub_basis))
+                         for j in range(reference.tdim)) for i, _ in enumerate(sub_tets)]
             basis.append(PiecewiseFunction(list(zip(sub_tets, fun)), "tetrahedron"))
         return basis
 

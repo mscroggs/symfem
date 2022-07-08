@@ -833,7 +833,10 @@ class VecIntegralMoment(IntegralMoment):
                     result += function[i, j] * self.dot_with[i * function.cols + j]
             return result * self.f
 
-        assert isinstance(function, (tuple, PiecewiseFunction))
+        if isinstance(function, PiecewiseFunction):
+            function = tuple(function._iter_list())
+
+        assert isinstance(function, tuple)
         return vdot(function, self.dot_with) * self.f
 
     def dof_direction(self) -> typing.Union[PointType, None]:
