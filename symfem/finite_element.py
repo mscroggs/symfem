@@ -516,7 +516,8 @@ class CiarletElement(FiniteElement):
                                 for j, d_j in enumerate(pj):
                                     pieces_fs[n][j] += c * d_j
                         pfs.append(PiecewiseFunction(
-                            [(pi, tuple(pj)) for pi, pj in zip(pieces_ls, pieces_fs)]))
+                            [(pi, tuple(pj)) for pi, pj in zip(pieces_ls, pieces_fs)],
+                            pb[0].cell))
                     self._basis_functions = pfs
                 else:
                     # Vector or matrix space
@@ -686,7 +687,7 @@ class CiarletElement(FiniteElement):
                 direction = vsub(e, s)
                 direction = vdiv(direction, vnorm(direction))
                 direction = vdiv(direction, 30)
-                perp = (-direction[1], direction[0])
+                perp: PointType = (-direction[1], direction[0])
                 perp = vdiv(perp, 2.5)
                 for f in [vadd, vsub]:
                     a_end = tuple(float(i) for i in f(vsub(e, direction), perp))

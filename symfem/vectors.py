@@ -1,6 +1,7 @@
 """Functions to handle vectors."""
 
 import sympy
+import typing
 import numpy
 from .symbolic import PointType, ScalarValue, SetOfPoints, PointTypeInput, parse_point_input
 
@@ -30,7 +31,7 @@ def vdot(v: PointTypeInput, w: PointTypeInput) -> ScalarValue:
     return sum(a * b for a, b in zip(parse_point_input(v), parse_point_input(w)))
 
 
-def vcross(v: PointTypeInput, w: PointTypeInput) -> PointType:
+def vcross(v: PointTypeInput, w: PointTypeInput) -> typing.Union[PointType, ScalarValue]:
     """Find the cross product of two vectors."""
     v2 = parse_point_input(v)
     w2 = parse_point_input(w)
