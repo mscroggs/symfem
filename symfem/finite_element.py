@@ -770,7 +770,7 @@ class CiarletElement(FiniteElement):
                     for n, vf in enumerate(self.map_to_cell(vertices, vps)):
                         assert not isinstance(vf, PiecewiseFunction)
                         pieces[n].append((tuple(new_i), vf))
-            return [PiecewiseFunction(p) for p in pieces]
+            return [PiecewiseFunction(p, basis[0].cell) for p in pieces]
 
         if isinstance(basis[0], (list, tuple)) and isinstance(basis[0][0], PiecewiseFunction):
             raise NotImplementedError()

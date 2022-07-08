@@ -1,2 +1,3 @@
 - Added DOF diagrams
+- Added P1-iso-P2 element
 - Added typing

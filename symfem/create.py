@@ -175,7 +175,8 @@ def create_element(
         TNTdiv, tiniest tensor Hdiv,
         Arnold-Boffi-Falk, ABF,
         Arbogast-Correa, AC, AC full, Arbogast-Correa full,
-        Rannacher-Turek
+        Rannacher-Turek,
+        P1-iso-P2, P2-iso-P1, iso-P2 P1
     order : int
         The order of the element.
     """

@@ -23,25 +23,43 @@ PFunctionPieces = typing.List[typing.Tuple[
 
 
 class PiecewiseFunction:
-    """A function defined piecewise on a collection of triangles."""
+    """A function defined piecewise on a collection of shapes."""
 
-    def __init__(self, pieces: PFunctionPieces):
+    def __init__(self, pieces: PFunctionPieces, cell: str):
         self.pieces = pieces
+        self.cell = cell
+        if cell == "point":
+            self.tdim = 0
+        elif cell == "interval":
+            self.tdim = 1
+        elif cell in ["triangle", "quadrilateral"]:
+            self.tdim = 2
+        else:
+            self.tdim = 3
 
     def get_piece(
         self, point: PointType
     ) -> typing.Union[ScalarFunction, VectorFunction, MatrixFunction]:
         """Get the piece of the function defined at the given point."""
-        if len(self.pieces[0][0]) == 3:
-            from .vectors import point_in_triangle
-            for tri, value in self.pieces:
-                if point_in_triangle(point[:2], tri):
-                    return value
-        if len(self.pieces[0][0]) == 4:
+        if self.tdim == 2:
+            from .vectors import point_in_triangle, point_in_quadrilateral
+            for cell, value in self.pieces:
+                if len(cell) == 3:
+                    if point_in_triangle(point[:2], cell):
+                        return value
+                elif len(cell) == 4:
+                    if point_in_quadrilateral(point[:2], cell):
+                        return value
+                else:
+                    raise ValueError("Unsupported cell")
+        if self.tdim == 3:
             from .vectors import point_in_tetrahedron
-            for tet, value in self.pieces:
-                if point_in_tetrahedron(point, tet):
-                    return value
+            for cell, value in self.pieces:
+                if len(cell) == 4:
+                    if point_in_tetrahedron(point, cell):
+                        return value
+                else:
+                    raise ValueError("Unsupported cell")
 
         raise NotImplementedError("Evaluation of piecewise functions outside domain not supported.")
 
@@ -60,7 +78,7 @@ class PiecewiseFunction:
                 j2 = subs(j, x, values)
                 assert not isinstance(j2, PiecewiseFunction)
                 pieces.append((i, j2))
-            return PiecewiseFunction(pieces)
+            return PiecewiseFunction(pieces, self.cell)
 
     def diff(self, variable: sympy.core.Symbol) -> typing.Any:
         # def diff(self, variable: sympy.core.Symbol) -> PiecewiseFunction:
@@ -72,11 +90,11 @@ class PiecewiseFunction:
             j2 = diff(j, variable)
             assert not isinstance(j2, PiecewiseFunction)
             pieces.append((i, j2))
-        return PiecewiseFunction(pieces)
+        return PiecewiseFunction(pieces, self.cell)
 
     def __rmul__(self, other: typing.Any) -> typing.Any:
         """Multiply the function by a scalar."""
-        return PiecewiseFunction([(i, other * j) for i, j in self.pieces])
+        return PiecewiseFunction([(i, other * j) for i, j in self.pieces], self.cell)
 
     def __mul__(self, other: typing.Any) -> typing.Any:
         """Multiply the function by a scalar."""
@@ -105,9 +123,9 @@ class PiecewiseFunction:
                     raise ValueError()
 
                 pieces.append((i, j2))
-            return PiecewiseFunction(pieces)
+            return PiecewiseFunction(pieces, self.cell)
 
-        return PiecewiseFunction([(i, other + j) for i, j in self.pieces])
+        return PiecewiseFunction([(i, other + j) for i, j in self.pieces], self.cell)
 
     def _iter_list(self) -> typing.List[typing.Any]:
         # def _iter_list(self) -> typing.List[PiecewiseFunction]:
@@ -126,7 +144,7 @@ class PiecewiseFunction:
             for j in self.pieces:
                 assert isinstance(j[1], tuple)
                 pieces.append((j[0], j[1][i]))
-            out.append(PiecewiseFunction(pieces))
+            out.append(PiecewiseFunction(pieces, self.cell))
         return out
 
     def __iter__(self) -> typing.Iterable:
