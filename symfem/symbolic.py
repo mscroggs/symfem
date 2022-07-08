@@ -297,3 +297,30 @@ def symequal(
     assert isinstance(a, (int, sympy.core.expr.Expr))
     assert isinstance(b, (int, sympy.core.expr.Expr))
     return sympy.expand(sympy.simplify(a)) == sympy.expand(sympy.simplify(b))
+
+
+def make_single_function_type(functions: typing.List[AnyFunction]) -> ListOfAnyFunctions:
+    """Make a list containing a single function type."""
+    if isinstance(functions[0], tuple):
+        vfs: ListOfVectorFunctions = []
+        for fun in functions:
+            assert isinstance(fun, tuple)
+            vfs.append(fun)
+        return vfs
+    if isinstance(functions[0], sympy.Matrix):
+        mfs: ListOfMatrixFunctions = []
+        for fun in functions:
+            assert isinstance(fun, sympy.Matrix)
+            mfs.append(fun)
+        return mfs
+    if isinstance(functions[0], PiecewiseFunction):
+        pfs: ListOfPiecewiseFunctions = []
+        for fun in functions:
+            assert isinstance(fun, PiecewiseFunction)
+            pfs.append(fun)
+        return pfs
+    sfs: ListOfScalarFunctions = []
+    for fun in functions:
+        assert isinstance(fun, (sympy.core.expr.Expr, int))
+        sfs.append(fun)
+    return sfs

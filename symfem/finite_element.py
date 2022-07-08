@@ -13,7 +13,7 @@ from .symbolic import (
     AnyFunction, SetOfPoints, ListOfAnyFunctions, ListOfScalarFunctions, ListOfVectorFunctions,
     ScalarFunction, VectorFunction, MatrixFunction,
     ListOfMatrixFunctions, ListOfPiecewiseFunctions, PointType, ListOfAnyFunctionsInput,
-    parse_any_function_input, PFunctionPieces)
+    parse_any_function_input, PFunctionPieces, make_single_function_type)
 from .calculus import diff
 from .vectors import vsub, vnorm, vdiv, vadd
 from .functionals import BaseFunctional
@@ -382,7 +382,7 @@ class CiarletElement(FiniteElement):
         return sout
 
     def _get_tabulated_polynomial_basis_nonsymbolic(
-        self, points: SetOfPoints
+        self, points: typing.Union[SetOfPoints, numpy.typing.NDArray[numpy.float64]]
     ) -> numpy.typing.NDArray[numpy.float64]:
         """Get the value of the polynomial basis at the given points."""
 
@@ -477,7 +477,7 @@ class CiarletElement(FiniteElement):
 
     def _get_dual_matrix_nonsymbolic(self) -> numpy.typing.NDArray[numpy.float64]:
         for d in self.dofs:
-            if d.get_points_and_weights is None:
+            if d.get_points_and_weights() is None:
                 warnings.warn("Cannot numerically evaluate all the DOFs in this element. "
                               "Converting symbolic evaluations instead (this may be slow).")
                 smat = self._get_dual_matrix_symbolic()
@@ -486,8 +486,9 @@ class CiarletElement(FiniteElement):
                 )
         mat = numpy.empty((len(self.dofs), len(self.dofs)))
         for i, d in enumerate(self.dofs):
-            assert d.get_points_and_weights is not None
-            p, w = d.get_points_and_weights()
+            pw = d.get_points_and_weights()
+            assert pw is not None
+            p, w = pw
             mat[:, i] = numpy.dot(w, self._get_tabulated_polynomial_basis_nonsymbolic(p))
         return mat
 
@@ -634,8 +635,8 @@ class CiarletElement(FiniteElement):
                 dofs = dofs_by_subentity[dim][e]
                 dofs.sort(key=lambda d: z(d.dof_point()))
                 for d in dofs:
-                    if d.dof_direction() is not None:
-                        direction = d.dof_direction()
+                    direction = d.dof_direction()
+                    if direction is not None:
                         direction = vdiv(direction, vnorm(direction))
                         direction = vdiv(direction, 8)
                         start = d.dof_point()
@@ -796,7 +797,7 @@ class CiarletElement(FiniteElement):
         if isinstance(basis[0], (list, tuple)) and isinstance(basis[0][0], PiecewiseFunction):
             raise NotImplementedError()
 
-        functions: typing.List[typing.Union[AnyFunction, None]] = [None for f in basis]
+        functions: typing.List[AnyFunction] = [0 for f in basis]
         for dim in range(self.reference.tdim + 1):
             for e in range(self.reference.sub_entity_count(dim)):
                 entity_dofs = self.entity_dofs(dim, e)
@@ -805,42 +806,21 @@ class CiarletElement(FiniteElement):
                 ] = {}
                 for d in entity_dofs:
                     dof = self.dofs[d]
+                    assert dof.mapping is not None
                     t = (type(dof), dof.mapping)
                     if t not in dofs_by_type:
                         dofs_by_type[t] = []
                     dofs_by_type[t].append(d)
                 for ds in dofs_by_type.values():
                     mapped_dofs = self.dofs[ds[0]].perform_mapping(
-                        [basis[d] for d in ds],
+                        make_single_function_type([basis[d] for d in ds]),
                         forward_map, inverse_map, self.reference.tdim)
-                    for d_n, d in zip(ds, mapped_dofs):
-                        functions[d_n] = d
+                    for d_n, mdof in zip(ds, mapped_dofs):
+                        functions[d_n] = mdof
 
         for fun in functions:
             assert fun is not None
-        if isinstance(functions[0], tuple):
-            vfs: ListOfVectorFunctions = []
-            for fun in functions:
-                assert isinstance(fun, tuple)
-                vfs.append(fun)
-            return vfs
-        if isinstance(functions[0], sympy.Matrix):
-            mfs: ListOfMatrixFunctions = []
-            for fun in functions:
-                assert isinstance(fun, sympy.Matrix)
-                mfs.append(fun)
-            return mfs
-        if isinstance(functions[0], PiecewiseFunction):
-            pfs: ListOfPiecewiseFunctions = []
-            for fun in functions:
-                assert isinstance(fun, PiecewiseFunction)
-                pfs.append(fun)
-            return pfs
-        sfs: ListOfScalarFunctions = []
-        for fun in functions:
-            assert isinstance(fun, (sympy.core.expr.Expr, int))
-            sfs.append(fun)
-        return sfs
+        return make_single_function_type(functions)
 
     def test(self):
         """Run tests for this element."""
