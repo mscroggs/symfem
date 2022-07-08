@@ -118,7 +118,7 @@ class PiecewiseFunction:
                     assert isinstance(i, sympy.Matrix)
                     j2 = i[1] + j[1]
                 elif isinstance(j, tuple):
-                    raise NotImplementedError()
+                    return NotImplementedError()
                 else:
                     raise ValueError()
 
