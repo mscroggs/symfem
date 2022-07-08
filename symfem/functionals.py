@@ -1004,7 +1004,7 @@ class NormalInnerProductIntegralMoment(InnerProductIntegralMoment):
     """An integral moment of the inner product with the normal direction."""
 
     def __init__(self, reference: Reference, integral_domain: Reference, f: ScalarFunction,
-                 dot_with: VectorFunction, dof: BaseFunctional, entity: typing.Tuple[int, int],
+                 dof: BaseFunctional, entity: typing.Tuple[int, int],
                  mapping: typing.Union[str, None] = "double_contravariant"):
         super().__init__(reference, integral_domain, f, integral_domain.normal(),
                          integral_domain.normal(), dof, entity=entity, mapping=mapping)

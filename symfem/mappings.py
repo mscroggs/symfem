@@ -1,7 +1,7 @@
 """Functions to map functions between cells."""
 
 import sympy
-from .symbolic import subs, x, MatrixFunction, ScalarFunction, VectorFunction, PointType
+from .symbolic import subs, x, MatrixFunction, ScalarFunction, VectorFunction, PointType, AnyFunction
 from .vectors import vdot, vcross, vnorm
 from .calculus import diff
 
@@ -18,11 +18,10 @@ def _det(M: MatrixFunction) -> ScalarFunction:
 
 
 def identity(
-    f: ScalarFunction, map: PointType, inverse_map: PointType, tdim: int
-) -> ScalarFunction:
+    f: AnyFunction, map: PointType, inverse_map: PointType, tdim: int
+) -> AnyFunction:
     """Map functions."""
     g = subs(f, x, inverse_map)
-    assert isinstance(g, (int, sympy.core.expr.Expr))
     return g
 
 
