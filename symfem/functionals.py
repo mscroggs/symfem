@@ -96,7 +96,7 @@ class BaseFunctional(ABC):
         pass
 
     @abstractmethod
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         pass
 
@@ -131,7 +131,7 @@ class PointEvaluation(BaseFunctional):
         """Get points and weights that can be used to numerically evaluate functional."""
         return numpy.array([self.point]), numpy.array([1])
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         return f"v\\mapsto v({','.join([_to_tex(i, True) for i in self.point])})", []
 
@@ -166,7 +166,7 @@ class WeightedPointEvaluation(BaseFunctional):
         """Get points and weights that can be used to numerically evaluate functional."""
         return numpy.array([self.point]), numpy.array([self.weight])
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         return (f"v\\mapsto {_to_tex(self.weight)} "
                 f"v({','.join([_to_tex(i, True) for i in self.point])})"), []
@@ -208,7 +208,7 @@ class DerivativePointEvaluation(BaseFunctional):
                 out.append(sym_sum(a * b for a, b in zip(dofs, J.row(i))))
         return [subs(b, x, inverse_map) for b in out]
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         if len(self.point) == 1:
             desc = "v\\mapsto "
@@ -257,7 +257,7 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
         """Get the direction of the DOF."""
         return self.dir
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         if len(self.point) == 1:
             desc = "v\\mapsto "
@@ -280,7 +280,7 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
         super().__init__(reference, point, edge.normal(), entity=entity, mapping=mapping)
         self.reference = edge
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         desc = "v\\mapsto"
         desc += "\\nabla{v}(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
@@ -313,7 +313,7 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return self.point
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         desc = "v\\mapsto"
         desc += "\\frac{\\partial^2v}{"
@@ -357,7 +357,7 @@ class PointInnerProduct(BaseFunctional):
             return None
         return self.lvec
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         desc = "\\mathbf{V}\\mapsto"
         desc += "\\left(\\begin{array}{c}"
@@ -396,7 +396,7 @@ class DotPointEvaluation(BaseFunctional):
         """Get the direction of the DOF."""
         return self.vector
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         desc = "\\boldsymbol{v}\\mapsto"
         desc += "\\boldsymbol{v}(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
@@ -456,7 +456,7 @@ class IntegralAgainst(BaseFunctional):
         """Dot a function with the moment function."""
         return vdot(function, self.f)
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         entity = self.entity_tex()
         entity_def = self.entity_definition()
@@ -508,7 +508,7 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
         """Dot a function with the moment function."""
         return function * self.f
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         entity = self.entity_tex()
         entity_def = self.entity_definition()
@@ -559,7 +559,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
             raise NotImplementedError("Mapping high order derivatives not implemented")
         return super().perform_mapping(fs, map, inverse_map, tdim)
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         entity = self.entity_tex()
         entity_def = self.entity_definition()
@@ -647,7 +647,7 @@ class IntegralMoment(BaseFunctional):
             for i in range(self.integral_domain.gdim)
         )
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         entity = self.entity_tex()
         entity_def = self.entity_definition()
@@ -697,7 +697,7 @@ class VecIntegralMoment(IntegralMoment):
         """Get the direction of the DOF."""
         return self.dot_with
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         entity = self.entity_tex()
         entity_def = self.entity_definition()
@@ -762,7 +762,7 @@ class DivergenceIntegralMoment(IntegralMoment):
         else:
             return float(value)
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         entity = self.entity_tex()
         entity_def = self.entity_definition()
@@ -783,7 +783,7 @@ class TangentIntegralMoment(VecIntegralMoment):
         super().__init__(reference, integral_domain, f, integral_domain.tangent(), dof,
                          entity=entity, mapping=mapping)
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         entity = self.entity_tex()
         entity_n = self.entity_number()
@@ -809,7 +809,7 @@ class NormalIntegralMoment(VecIntegralMoment):
         super().__init__(reference, integral_domain, f, integral_domain.normal(), dof,
                          entity=entity, mapping=mapping)
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         entity = self.entity_tex()
         entity_n = self.entity_number()
@@ -835,7 +835,7 @@ class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
         super().__init__(reference, integral_domain, f, integral_domain.normal(), dof,
                          entity=entity, mapping=mapping)
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         entity = self.entity_tex()
         entity_n = self.entity_number()
@@ -876,7 +876,7 @@ class InnerProductIntegralMoment(IntegralMoment):
             return None
         return self.inner_with_left
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         entity = self.entity_tex()
         entity_def = self.entity_definition()
@@ -899,7 +899,7 @@ class NormalInnerProductIntegralMoment(InnerProductIntegralMoment):
         super().__init__(reference, integral_domain, f, integral_domain.normal(),
                          integral_domain.normal(), dof, entity=entity, mapping=mapping)
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         entity = self.entity_tex()
         entity_n = self.entity_number()

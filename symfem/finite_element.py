@@ -119,7 +119,7 @@ class FiniteElement(ABC):
                 for b in self.get_basis_functions(False):
                     assert isinstance(b, tuple)
                     vrow.append(subs(b, x, p))
-                voutput.append(tuple(row))
+                voutput.append(tuple(vrow))
             return voutput
         raise ValueError(f"Unknown order: {order}")
 
