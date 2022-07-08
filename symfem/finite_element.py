@@ -393,8 +393,21 @@ class CiarletElement(FiniteElement):
                 return [to_float(i) for i in values]
             return float(values)
 
+        def subs_nonsymbolic(f, x, p):
+            if isinstance(f, tuple):
+                out = []
+                for item in f:
+                    for i, j in zip(x, p):
+                        item = sympy.S(item).subs(i, j)
+                    out.append(float(item))
+                return numpy.asarray(out)
+
+            for i, j in zip(x, p):
+                f = f.subs(i, j)
+            return float(f)
+
         return numpy.array([
-            [to_float(subs(f, x, p)) for f in self.get_polynomial_basis()]
+            [subs_nonsymbolic(f, x, p) for f in self.get_polynomial_basis()]
             for p in points], dtype=numpy.float64)
 
     def tabulate_basis(

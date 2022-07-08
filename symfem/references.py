@@ -102,6 +102,8 @@ class Reference:
             return vnorm(self.axes[0])
         if self.tdim == 2:
             crossed = vcross(self.axes[0], self.axes[1])
+            if isinstance(crossed, tuple):
+                return vnorm(crossed)
             assert not isinstance(crossed, tuple)
             return abs(crossed)
         if self.tdim == 3:
