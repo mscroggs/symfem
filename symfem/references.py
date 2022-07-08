@@ -4,7 +4,7 @@ import typing
 import sympy
 from .symbolic import (
     t, x, subs, sym_sum, SetOfPoints, PointType, ScalarFunction, ScalarValue,
-    SetOfPointsInput, parse_point_input, AxisVariables)
+    SetOfPointsInput, parse_set_of_points_input, AxisVariables)
 from .vectors import vsub, vnorm, vdot, vcross, vnormalise, vadd
 
 
@@ -213,7 +213,7 @@ class Point(Reference):
             origin=vertices[0],
             axes=tuple(),
             reference_vertices=(tuple(), ),
-            vertices=parse_point_input(vertices),
+            vertices=parse_set_of_points_input(vertices),
             edges=tuple(),
             faces=tuple(),
             volumes=tuple(),
@@ -274,7 +274,7 @@ class Interval(Reference):
             origin=vertices[0],
             axes=(vsub(vertices[1], vertices[0]),),
             reference_vertices=((0,), (1,)),
-            vertices=parse_point_input(vertices),
+            vertices=parse_set_of_points_input(vertices),
             edges=((0, 1),),
             faces=tuple(),
             volumes=tuple(),
@@ -337,7 +337,7 @@ class Triangle(Reference):
             origin=vertices[0],
             axes=(vsub(vertices[1], vertices[0]), vsub(vertices[2], vertices[0])),
             reference_vertices=((0, 0), (1, 0), (0, 1)),
-            vertices=parse_point_input(vertices),
+            vertices=parse_set_of_points_input(vertices),
             edges=((1, 2), (0, 2), (0, 1)),
             faces=((0, 1, 2),),
             volumes=tuple(),
@@ -418,7 +418,7 @@ class Tetrahedron(Reference):
                 vsub(vertices[3], vertices[0]),
             ),
             reference_vertices=((0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1)),
-            vertices=parse_point_input(vertices),
+            vertices=parse_set_of_points_input(vertices),
             edges=((2, 3), (1, 3), (1, 2), (0, 3), (0, 2), (0, 1)),
             faces=((1, 2, 3), (0, 2, 3), (0, 1, 3), (0, 1, 2)),
             volumes=((0, 1, 2, 3),),
@@ -503,7 +503,7 @@ class Quadrilateral(Reference):
             origin=vertices[0],
             axes=(vsub(vertices[1], vertices[0]), vsub(vertices[2], vertices[0])),
             reference_vertices=((0, 0), (1, 0), (0, 1), (1, 1)),
-            vertices=parse_point_input(vertices),
+            vertices=parse_set_of_points_input(vertices),
             edges=((0, 1), (0, 2), (1, 3), (2, 3)),
             faces=((0, 1, 2, 3),),
             volumes=tuple(),
@@ -606,7 +606,7 @@ class Hexahedron(Reference):
             reference_vertices=(
                 (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0),
                 (0, 0, 1), (1, 0, 1), (0, 1, 1), (1, 1, 1)),
-            vertices=parse_point_input(vertices),
+            vertices=parse_set_of_points_input(vertices),
             edges=(
                 (0, 1), (0, 2), (0, 4), (1, 3), (1, 5), (2, 3),
                 (2, 6), (3, 7), (4, 5), (4, 6), (5, 7), (6, 7)),
@@ -718,7 +718,7 @@ class Prism(Reference):
             reference_vertices=(
                 (0, 0, 0), (1, 0, 0), (0, 1, 0),
                 (0, 0, 1), (1, 0, 1), (0, 1, 1)),
-            vertices=parse_point_input(vertices),
+            vertices=parse_set_of_points_input(vertices),
             edges=(
                 (0, 1), (0, 2), (0, 3), (1, 2), (1, 4),
                 (2, 5), (3, 4), (3, 5), (4, 5)),
@@ -830,7 +830,7 @@ class Pyramid(Reference):
             reference_vertices=(
                 (0, 0, 0), (1, 0, 0), (0, 1, 0),
                 (1, 1, 0), (0, 0, 1)),
-            vertices=parse_point_input(vertices),
+            vertices=parse_set_of_points_input(vertices),
             edges=(
                 (0, 1), (0, 2), (0, 4), (1, 3),
                 (1, 4), (2, 3), (2, 4), (3, 4)),
@@ -958,7 +958,7 @@ class DualPolygon(Reference):
             name="dual polygon",
             axes=tuple(),
             origin=origin,
-            vertices=parse_point_input(vertices),
+            vertices=parse_set_of_points_input(vertices),
             reference_vertices=tuple(reference_vertices),
             edges=tuple((i, (i + 1) % (2 * number_of_triangles))
                         for i in range(2 * number_of_triangles)),

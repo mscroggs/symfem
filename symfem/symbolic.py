@@ -6,10 +6,11 @@ import typing
 # Types
 ScalarFunction = typing.Union[sympy.core.expr.Expr, int]
 VectorFunction = typing.Tuple[ScalarFunction, ...]
-MatrixFunction = sympy.matrices.dense.MutableDenseMatrix
+MatrixFunction = typing.Union[sympy.matrices.dense.MutableDenseMatrix]
 ScalarValue = ScalarFunction
 PointType = typing.Tuple[ScalarValue, ...]
-PointTypeInput = typing.Union[typing.Tuple[ScalarValue, ...], typing.List[ScalarValue]]
+PointTypeInput = typing.Union[typing.Tuple[ScalarValue, ...], typing.List[ScalarValue],
+                              sympy.matrices.dense.MutableDenseMatrix]
 SetOfPoints = typing.Tuple[PointType, ...]
 
 AxisVariables = typing.Union[
@@ -143,8 +144,8 @@ ListOfAnyFunctions = typing.Union[
     ListOfPiecewiseFunctions]
 
 SetOfPointsInput = typing.Union[
-    SetOfPoints,
-    typing.List[PointType]]
+    typing.Tuple[PointTypeInput, ...],
+    typing.List[PointTypeInput]]
 ListOfAnyFunctionsInput = typing.Union[
     ListOfAnyFunctions,
     typing.List[typing.List[ScalarFunction]]]
@@ -178,9 +179,17 @@ def parse_any_function_input(functions: ListOfAnyFunctionsInput) -> ListOfAnyFun
     return sfs
 
 
-def parse_point_input(points: SetOfPointsInput) -> SetOfPoints:
+def parse_set_of_points_input(points: SetOfPointsInput) -> SetOfPoints:
     """Convert an input set of points to the correct format."""
-    return tuple(points)
+    return tuple(parse_point_input(p) for p in points)
+
+
+def parse_point_input(point: PointTypeInput) -> PointType:
+    """Convert an input point to the correct format."""
+    if isinstance(point, sympy.Matrix):
+        assert point.rows == 1 or point.cols == 1
+        return tuple(i for i in point)
+    return tuple(point)
 
 
 x: AxisVariables = [
