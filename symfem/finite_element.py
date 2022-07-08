@@ -280,7 +280,7 @@ class FiniteElement(ABC):
                     basis[p] = sym_product(k)
             else:
                 raise ValueError(f"Unknown tensor product type: {t_type}")
-        return list(basis.values())
+        return [basis[i] for i in range(len(basis))]
 
     @property
     def name(self) -> str:

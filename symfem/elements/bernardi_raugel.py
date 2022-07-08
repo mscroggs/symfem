@@ -62,7 +62,7 @@ class BernardiRaugel(CiarletElement):
                                                mapping="contravariant"))
             for f_n in range(reference.sub_entity_count(2)):
                 face = reference.sub_entity(2, f_n)
-                normal = [i * face.jacobian() for i in face.normal()]
+                normal = tuple(i * face.jacobian() for i in face.normal())
                 for e_n in range(3):
                     edge = face.sub_entity(1, e_n)
                     midpoint = tuple(sympy.Rational(i + j, 2) for i, j in zip(*edge.vertices))

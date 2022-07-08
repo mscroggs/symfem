@@ -56,5 +56,12 @@ def test_element(
         pytest.skip("This element does not have a tensor product representation.")
     basis = element.get_basis_functions()
 
+    for i in basis:
+        print(i.expand())
+    print("---")
+    for i in factorised_basis:
+        print(i.expand())
+    print("---")
+
     for i, j in zip(basis, factorised_basis):
         assert symequal(i, j)
