@@ -18,6 +18,9 @@ def vadd(v: PointTypeInput, w: PointTypeInput) -> PointType:
 
 def vdiv(v: PointTypeInput, a: ScalarValue) -> PointType:
     """Divide a vector by a scalar."""
+    if isinstance(a, int):
+        a = sympy.Integer(a)
+    assert isinstance(a, sympy.core.expr.Expr)
     return tuple(i / a for i in parse_point_input(v))
 
 

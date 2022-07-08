@@ -23,6 +23,7 @@ from .references import Reference
 TabulatedBasis = typing.Union[
     typing.List[typing.Union[sympy.core.expr.Expr, int]],
     typing.List[typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...]],
+    typing.List[typing.Tuple[typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...], ...]],
     typing.List[sympy.matrices.dense.MutableDenseMatrix],
     numpy.typing.NDArray[numpy.float64]
 ]
@@ -114,11 +115,15 @@ class FiniteElement(ABC):
             return output
         if order == "xyz,xyz":
             voutput = []
+            # voutput: typing.List[typing.Tuple[typing.Tuple[
+            #    typing.Union[sympy.core.expr.Expr, int], ...]]] = []
             for p in points:
                 vrow = []
                 for b in self.get_basis_functions(False):
                     assert isinstance(b, tuple)
-                    vrow.append(subs(b, x, p))
+                    item = subs(b, x, p)
+                    assert isinstance(item, tuple)
+                    vrow.append(item)
                 voutput.append(tuple(vrow))
             return voutput
         raise ValueError(f"Unknown order: {order}")
@@ -684,11 +689,13 @@ class CiarletElement(FiniteElement):
                 s, e, c = info
                 img.add(img.line(
                     map_pt(s), map_pt(e), stroke=c, stroke_width=4, stroke_linecap="round"))
+                assert isinstance(e, tuple)
+                assert isinstance(s, tuple)
                 direction = vsub(e, s)
                 direction = vdiv(direction, vnorm(direction))
                 direction = vdiv(direction, 30)
                 perp: PointType = (-direction[1], direction[0])
-                perp = vdiv(perp, 2.5)
+                perp = vdiv(perp, sympy.Rational(5, 2))
                 for f in [vadd, vsub]:
                     a_end = tuple(float(i) for i in f(vsub(e, direction), perp))
                     img.add(img.line(

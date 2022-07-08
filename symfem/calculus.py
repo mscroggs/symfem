@@ -8,12 +8,12 @@ from .symbolic import x, sym_sum, ScalarFunction, VectorFunction, PointType, Axi
 
 def derivative(
     f: ScalarFunction, dir: PointType
-) -> sympy.core.expr.Expr:
+) -> ScalarFunction:
     """Find the directional derivative of a function."""
     return vdot(grad(f, len(dir)), dir)
 
 
-def grad(f: ScalarFunction, dim: int, variables: AxisVariables = x):
+def grad(f: ScalarFunction, dim: int, variables: AxisVariables = x) -> VectorFunction:
     """Find the gradient of a scalar function."""
     return tuple(diff(f, variables[i]) for i in range(dim))
 

@@ -61,7 +61,7 @@ class Reference:
         """Get the map from the reference to a cell."""
         raise NotImplementedError()
 
-    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
+    def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         raise NotImplementedError()
 
@@ -95,15 +95,19 @@ class Reference:
         """Calculate the midpoint."""
         return tuple(sum(i) * sympy.Integer(1) / len(i) for i in zip(*self.vertices))
 
-    def jacobian(self) -> sympy.core.expr.Expr:
+    def jacobian(self) -> ScalarValue:
         """Calculate the jacobian."""
         assert len(self.axes) == self.tdim
         if self.tdim == 1:
             return vnorm(self.axes[0])
         if self.tdim == 2:
-            return vnorm(vcross(self.axes[0], self.axes[1]))
+            crossed = vcross(self.axes[0], self.axes[1])
+            assert not isinstance(crossed, tuple)
+            return abs(crossed)
         if self.tdim == 3:
-            return vnorm(vdot(vcross(self.axes[0], self.axes[1]), self.axes[2]))
+            crossed = vcross(self.axes[0], self.axes[1])
+            assert isinstance(crossed, tuple)
+            return abs(vdot(crossed, self.axes[2]))
         raise ValueError(f"Unsupported tdim: {self.tdim}")
 
     def scaled_axes(self) -> SetOfPoints:
@@ -125,7 +129,9 @@ class Reference:
                 return vnormalise((-self.axes[0][1], self.axes[0][0]))
         if self.tdim == 2:
             if self.gdim == 3:
-                return vnormalise(vcross(self.axes[0], self.axes[1]))
+                crossed = vcross(self.axes[0], self.axes[1])
+                assert isinstance(crossed, tuple)
+                return vnormalise(crossed)
         raise RuntimeError
 
     def sub_entities(
@@ -181,7 +187,10 @@ class Reference:
         for e in self.edges:
             v0 = self.vertices[e[0]]
             v1 = self.vertices[e[1]]
-            if vnorm(vcross(vsub(v0, point), vsub(v1, point))) == 0:
+            crossed = vcross(vsub(v0, point), vsub(v1, point))
+            if isinstance(crossed, tuple) and vnorm(crossed) == 0:
+                return True
+            if not isinstance(crossed, tuple) and crossed == 0:
                 return True
         return False
 
@@ -191,7 +200,9 @@ class Reference:
             v0 = self.vertices[f[0]]
             v1 = self.vertices[f[1]]
             v2 = self.vertices[f[2]]
-            if vdot(vcross(vsub(v0, point), vsub(v1, point)), vsub(v2, point)):
+            crossed = vcross(vsub(v0, point), vsub(v1, point))
+            assert isinstance(crossed, tuple)
+            if vdot(crossed, vsub(v2, point)):
                 return True
         return False
 
@@ -237,7 +248,7 @@ class Point(Reference):
         assert self.vertices == self.reference_vertices
         return parse_point_input(vertices[0])
 
-    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
+    def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
         return self.vertices[0]
@@ -289,19 +300,24 @@ class Interval(Reference):
         self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
-        return (f * self.jacobian()).integrate((vars[0], 0, 1))
+        integrand = f * self.jacobian()
+        if isinstance(integrand, int):
+            integrand = sympy.Integer(integrand)
+        assert isinstance(integrand, sympy.core.expr.Expr)
+        return integrand.integrate((vars[0], 0, 1))
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
         assert self.vertices == self.reference_vertices
         return tuple(v0 + (v1 - v0) * x[0] for v0, v1 in zip(*vertices))
 
-    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
+    def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
-        p = vsub(x, vertices[0])
+        vertices = parse_set_of_points_input(vertices_in)
+        p = vsub(tuple(x), vertices[0])
         v = vsub(vertices[1], vertices[0])
-        return (vdot(p, v) / vdot(v, v), )
+        return (vdot(p, v) * sympy.Integer(1) / vdot(v, v), )
 
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference."""
@@ -309,9 +325,9 @@ class Interval(Reference):
 
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference."""
-        p = vsub(x, self.vertices[0])
+        p = vsub(tuple(x), self.vertices[0])
         v = vsub(self.vertices[1], self.vertices[0])
-        return (vdot(p, v) / vdot(v, v), )
+        return (vdot(p, v) * sympy.Integer(1) / vdot(v, v), )
 
     def volume(self) -> ScalarValue:
         """Calculate the volume."""
@@ -352,19 +368,23 @@ class Triangle(Reference):
         self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
-        return (f * self.jacobian()).integrate(
-            (vars[1], 0, 1 - vars[0]), (vars[0], 0, 1))
+        integrand = f * self.jacobian()
+        if isinstance(integrand, int):
+            integrand = sympy.Integer(integrand)
+        assert isinstance(integrand, sympy.core.expr.Expr)
+        return integrand.integrate((vars[1], 0, 1 - vars[0]), (vars[0], 0, 1))
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
         assert self.vertices == self.reference_vertices
         return tuple(v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1] for v0, v1, v2 in zip(*vertices))
 
-    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
+    def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
+        vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 2
-        p = vsub(x, vertices[0])
+        p = vsub(tuple(x), vertices[0])
         v1 = vsub(vertices[1], vertices[0])
         v2 = vsub(vertices[2], vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0]],
@@ -379,7 +399,7 @@ class Triangle(Reference):
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference."""
         if len(self.vertices[0]) == 2:
-            p = vsub(x, self.vertices[0])
+            p = vsub(tuple(x), self.vertices[0])
             v1 = vsub(self.vertices[1], self.vertices[0])
             v2 = vsub(self.vertices[2], self.vertices[0])
             mat = sympy.Matrix([[v1[0], v2[0]],
@@ -387,7 +407,7 @@ class Triangle(Reference):
             return (vdot(mat.row(0), p), vdot(mat.row(1), p))
 
         return tuple(
-            vdot(vsub(x, self.origin), a) / vnorm(a) for a in self.axes
+            vdot(vsub(tuple(x), self.origin), a) * sympy.Integer(1) / vnorm(a) for a in self.axes
         )
 
     def volume(self) -> ScalarValue:
@@ -441,7 +461,11 @@ class Tetrahedron(Reference):
         self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
-        return (f * self.jacobian()).integrate(
+        integrand = f * self.jacobian()
+        if isinstance(integrand, int):
+            integrand = sympy.Integer(integrand)
+        assert isinstance(integrand, sympy.core.expr.Expr)
+        return integrand.integrate(
             (vars[0], 0, 1 - vars[1] - vars[2]), (vars[1], 0, 1 - vars[2]), (vars[2], 0, 1))
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
@@ -450,11 +474,12 @@ class Tetrahedron(Reference):
         return tuple(v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1] + (v3 - v0) * x[2]
                      for v0, v1, v2, v3 in zip(*vertices))
 
-    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
+    def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
+        vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 3
-        p = vsub(x, vertices[0])
+        p = vsub(tuple(x), vertices[0])
         v1 = vsub(vertices[1], vertices[0])
         v2 = vsub(vertices[2], vertices[0])
         v3 = vsub(vertices[3], vertices[0])
@@ -470,7 +495,7 @@ class Tetrahedron(Reference):
 
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference."""
-        p = vsub(x, self.vertices[0])
+        p = vsub(tuple(x), self.vertices[0])
         v1 = vsub(self.vertices[1], self.vertices[0])
         v2 = vsub(self.vertices[2], self.vertices[0])
         v3 = vsub(self.vertices[3], self.vertices[0])
@@ -518,7 +543,11 @@ class Quadrilateral(Reference):
         self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
-        return (f * self.jacobian()).integrate((vars[1], 0, 1), (vars[0], 0, 1))
+        integrand = f * self.jacobian()
+        if isinstance(integrand, int):
+            integrand = sympy.Integer(integrand)
+        assert isinstance(integrand, sympy.core.expr.Expr)
+        return integrand.integrate((vars[1], 0, 1), (vars[0], 0, 1))
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -527,11 +556,12 @@ class Quadrilateral(Reference):
             (1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1) + x[1] * ((1 - x[0]) * v2 + x[0] * v3)
             for v0, v1, v2, v3 in zip(*vertices))
 
-    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
+    def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
+        vertices = parse_set_of_points_input(vertices_in)
         assert vadd(vertices[0], vertices[3]) == vadd(vertices[1], vertices[2])
-        p = vsub(x, vertices[0])
+        p = vsub(tuple(x), vertices[0])
         v1 = vsub(vertices[1], vertices[0])
         v2 = vsub(vertices[2], vertices[0])
 
@@ -559,7 +589,7 @@ class Quadrilateral(Reference):
         """Compute the inverse map from the canonical reference to this reference."""
         assert vadd(self.vertices[0], self.vertices[3]) == vadd(self.vertices[1],
                                                                 self.vertices[2])
-        p = vsub(x, self.vertices[0])
+        p = vsub(tuple(x), self.vertices[0])
         v1 = vsub(self.vertices[1], self.vertices[0])
         v2 = vsub(self.vertices[2], self.vertices[0])
 
@@ -637,7 +667,11 @@ class Hexahedron(Reference):
         self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
-        return (f * self.jacobian()).integrate(
+        integrand = f * self.jacobian()
+        if isinstance(integrand, int):
+            integrand = sympy.Integer(integrand)
+        assert isinstance(integrand, sympy.core.expr.Expr)
+        return integrand.integrate(
             (vars[2], 0, 1), (vars[1], 0, 1), (vars[0], 0, 1))
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
@@ -650,13 +684,14 @@ class Hexahedron(Reference):
                       + x[1] * ((1 - x[0]) * v6 + x[0] * v7))
             for v0, v1, v2, v3, v4, v5, v6, v7 in zip(*vertices))
 
-    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
+    def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
+        vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 3
         for a, b, c, d in self.faces:
             assert vadd(vertices[a], vertices[d]) == vadd(vertices[b], vertices[c])
-        p = vsub(x, vertices[0])
+        p = vsub(tuple(x), vertices[0])
         v1 = vsub(vertices[1], vertices[0])
         v2 = vsub(vertices[2], vertices[0])
         v3 = vsub(vertices[4], vertices[0])
@@ -680,7 +715,7 @@ class Hexahedron(Reference):
         for a, b, c, d in self.faces:
             assert vadd(self.vertices[a], self.vertices[d]) == vadd(self.vertices[b],
                                                                     self.vertices[c])
-        p = vsub(x, self.vertices[0])
+        p = vsub(tuple(x), self.vertices[0])
         v1 = vsub(self.vertices[1], self.vertices[0])
         v2 = vsub(self.vertices[2], self.vertices[0])
         v3 = vsub(self.vertices[4], self.vertices[0])
@@ -752,7 +787,11 @@ class Prism(Reference):
         self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
-        return(f * self.jacobian()).integrate(
+        integrand = f * self.jacobian()
+        if isinstance(integrand, int):
+            integrand = sympy.Integer(integrand)
+        assert isinstance(integrand, sympy.core.expr.Expr)
+        return integrand.integrate(
             (vars[2], 0, 1), (vars[1], 0, 1 - vars[0]), (vars[0], 0, 1))
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
@@ -763,13 +802,14 @@ class Prism(Reference):
             + x[2] * (v3 + x[0] * (v4 - v3) + x[1] * (v5 - v3))
             for v0, v1, v2, v3, v4, v5 in zip(*vertices))
 
-    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
+    def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
+        vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 3
         for a, b, c, d in self.faces[1:4]:
             assert vadd(vertices[a], vertices[d]) == vadd(vertices[b], vertices[c])
-        p = vsub(x, vertices[0])
+        p = vsub(tuple(x), vertices[0])
         v1 = vsub(vertices[1], vertices[0])
         v2 = vsub(vertices[2], vertices[0])
         v3 = vsub(vertices[3], vertices[0])
@@ -791,7 +831,7 @@ class Prism(Reference):
         for a, b, c, d in self.faces[1:4]:
             assert vadd(self.vertices[a], self.vertices[d]) == vadd(self.vertices[b],
                                                                     self.vertices[c])
-        p = vsub(x, self.vertices[0])
+        p = vsub(tuple(x), self.vertices[0])
         v1 = vsub(self.vertices[1], self.vertices[0])
         v2 = vsub(self.vertices[2], self.vertices[0])
         v3 = vsub(self.vertices[3], self.vertices[0])
@@ -864,7 +904,11 @@ class Pyramid(Reference):
         self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
-        return (f * self.jacobian()).integrate(
+        integrand = f * self.jacobian()
+        if isinstance(integrand, int):
+            integrand = sympy.Integer(integrand)
+        assert isinstance(integrand, sympy.core.expr.Expr)
+        return integrand.integrate(
             (vars[0], 0, 1 - vars[2]), (vars[1], 0, 1 - vars[2]), (vars[2], 0, 1))
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
@@ -877,13 +921,14 @@ class Pyramid(Reference):
             ) + x[2] * v4
             for v0, v1, v2, v3, v4 in zip(*vertices))
 
-    def get_inverse_map_to(self, vertices: SetOfPointsInput) -> PointType:
+    def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
+        vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 3
         for a, b, c, d in self.faces[:1]:
             assert vadd(vertices[a], vertices[d]) == vadd(vertices[b], vertices[c])
-        p = vsub(x, vertices[0])
+        p = vsub(tuple(x), vertices[0])
         v1 = vsub(vertices[1], vertices[0])
         v2 = vsub(vertices[2], vertices[0])
         v3 = vsub(vertices[4], vertices[0])
@@ -907,7 +952,7 @@ class Pyramid(Reference):
         for a, b, c, d in self.faces[:1]:
             assert vadd(self.vertices[a], self.vertices[d]) == vadd(self.vertices[b],
                                                                     self.vertices[c])
-        p = vsub(x, self.vertices[0])
+        p = vsub(tuple(x), self.vertices[0])
         v1 = vsub(self.vertices[1], self.vertices[0])
         v2 = vsub(self.vertices[2], self.vertices[0])
         v3 = vsub(self.vertices[4], self.vertices[0])

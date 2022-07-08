@@ -206,7 +206,10 @@ def parse_point_input(point: PointTypeInput) -> PointType:
     """Convert an input point to the correct format."""
     if isinstance(point, sympy.Matrix):
         assert point.rows == 1 or point.cols == 1
-        return tuple(i for i in point)
+        if point.rows == 1:
+            return tuple(point[0, i] for i in range(point.cols))
+        else:
+            return tuple(point[i, 0] for i in range(point.rows))
     return tuple(point)
 
 
