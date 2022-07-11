@@ -1,6 +1,4 @@
-"""
-This demo shows how Symfem can be used to compute a stiffness matrix.
-"""
+"""Demo showing how Symfem can be used to compute a stiffness matrix."""
 
 import symfem
 from symfem.vectors import vdot

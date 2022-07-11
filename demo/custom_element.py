@@ -1,6 +1,4 @@
-"""
-This demo shows how a custom element can be created in Symfem.
-"""
+"""Demo showing how a custom element can be created in Symfem."""
 
 import symfem
 import sympy

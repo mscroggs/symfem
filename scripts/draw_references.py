@@ -1,3 +1,5 @@
+"""Draw reference cells for the README."""
+
 import os
 import symfem
 
@@ -18,25 +20,31 @@ for shape in ["interval", "triangle", "tetrahedron",
         width = 160
 
         def to_x(p):
+            """Get x-coordinate."""
             return float(85 + 85 * p[0])
 
         def to_y(p):
+            """Get y-coordinate."""
             return float(35 - 85 * p[1])
 
     elif ref.gdim == 1:
         yadd = -100
 
         def to_x(p):
+            """Get x-coordinate."""
             return float(100 * p[0])
 
         def to_y(p):
+            """Get y-coordinate."""
             return float(120)
 
     elif ref.gdim == 2:
         def to_x(p):
+            """Get x-coordinate."""
             return float(100 * p[0])
 
         def to_y(p):
+            """Get y-coordinate."""
             return float(120 - 100 * p[1])
 
     elif ref.gdim == 3:
@@ -49,9 +57,11 @@ for shape in ["interval", "triangle", "tetrahedron",
             yadd = 40
 
         def to_x(p):
+            """Get x-coordinate."""
             return float(100 * p[0] + 30 * p[1])
 
         def to_y(p):
+            """Get y-coordinate."""
             return float(120 - 100 * p[2] - 40 * p[1])
 
     svg = ""

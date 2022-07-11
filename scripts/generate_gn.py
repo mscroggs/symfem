@@ -1,3 +1,5 @@
+"""Generate coefficients for Guzman-Neilan element."""
+
 import numpy as np
 import typing
 import symfem
@@ -12,15 +14,13 @@ folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../symfem/el
 
 
 def find_solution(mat, aim):
+    """Solve matrix-vector problem."""
     A_data = [[float(j) for j in i] for i in mat]
     b_data = [float(i) for i in aim]
     A = np.asarray(A_data, dtype=np.float64)
     b = np.asarray(b_data)
 
-    try:
-        res = np.linalg.solve(A, b)
-    except:
-        from IPython import embed; embed()()
+    res = np.linalg.solve(A, b)
 
     fractions = []
     for i in res:

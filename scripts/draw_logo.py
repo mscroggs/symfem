@@ -1,3 +1,5 @@
+"""Draw the symfem logo."""
+
 from math import sqrt
 import svgwrite
 import typing
@@ -62,14 +64,17 @@ for n, up in enumerate(ups):
 
 
 def to_2d(x, y, z):
+    """Project a point to 2d."""
     return (90 + (x + (-z+y/2-3)/2) * 30, 68 + (3-y - z) * sqrt(3)/2 * 30)
 
 
 def zvalue(x, y, z):
+    """Get the z-value of a point."""
     return z + x
 
 
 def in_letter(a, b, c):
+    """Check if a triangle is inside a letter."""
     if a == (5, 2) or a == (9, 0) or a == (13, 0) or a == (14, 1) or a == (18, 1) or a == (21, 0):
         return False
     for u in ups:
@@ -143,6 +148,7 @@ svg.save()
 
 
 def to_2d_new(x, y, z):
+    """Project a point to 2d."""
     return (1.6 * (90 + (x + (-z+y/2-3)/2) * 30), 160 + 1.6 * (68 + (3-y - z) * sqrt(3)/2 * 30))
 
 
@@ -210,6 +216,7 @@ svg.save()
 
 
 def fav_move(p):
+    """Shift the origin."""
     return p[0] - 22, p[1] - 15
 
 

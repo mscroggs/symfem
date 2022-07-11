@@ -1,6 +1,5 @@
 """
-This demo shows how Symfem can be used to verify properties of the polynomial basis
-and basis functions of an element.
+Demo showing how Symfem can be used to verify properties of a basis.
 
 The polynomial set of a degree k Nedelec first kind space is:
 {polynomials of degree < k} UNION {polynomials of degree k such that p DOT x = 0}.
