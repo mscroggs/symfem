@@ -1,5 +1,6 @@
 from math import sqrt
 import svgwrite
+import typing
 
 letters = [
     # S
@@ -90,9 +91,10 @@ for x in range(-4, 26):
             else:
                 edge1 = (p2[0] - p1[0], p2[1] - p1[1], z2 - z1)
                 edge2 = (p3[0] - p1[0], p3[1] - p1[1], z3 - z1)
-                normal = (edge1[1] * edge2[2] - edge1[2] * edge2[1],
-                          edge1[2] * edge2[0] - edge1[0] * edge2[2],
-                          edge1[0] * edge2[1] - edge1[1] * edge2[0])
+                normal: typing.Tuple[typing.Union[int, float], ...] = (
+                    edge1[1] * edge2[2] - edge1[2] * edge2[1],
+                    edge1[2] * edge2[0] - edge1[0] * edge2[2],
+                    edge1[0] * edge2[1] - edge1[1] * edge2[0])
                 if p2[0] == x:
                     normal = tuple(-i for i in normal)
                 size = sqrt(sum(i**2 for i in normal))
@@ -136,7 +138,7 @@ for letter in letters:
 svg.save()
 
 
-def to_2d(x, y, z):
+def to_2d_new(x, y, z):
     return (1.6 * (90 + (x + (-z+y/2-3)/2) * 30), 160 + 1.6 * (68 + (3-y - z) * sqrt(3)/2 * 30))
 
 
@@ -180,7 +182,7 @@ for x in range(-4, 27):
                    (z1 + z2 + z3) / 3)
             polys.append((
                 zvalue(*mid),
-                [to_2d(*p1, z1), to_2d(*p2, z2), to_2d(*p3, z3)],
+                [to_2d_new(*p1, z1), to_2d_new(*p2, z2), to_2d_new(*p3, z3)],
                 color,
                 strokecolor,
                 in_letter(p1, p2, p3) and p1[0] < 4
@@ -197,7 +199,7 @@ for letter in letters:
     for line_group in letter:
         for i, j in zip(line_group[:-1], line_group[1:]):
             svg.add(svg.line(
-                to_2d(*i, 1.3), to_2d(*j, 1.3),
+                to_2d_new(*i, 1.3), to_2d_new(*j, 1.3),
                 stroke="black", stroke_width=3, stroke_linecap="round"))
 
 svg.save()
@@ -218,8 +220,8 @@ for p in polys:
 for line_group in letters[0]:
     for i, j in zip(line_group[:-1], line_group[1:]):
         svg.add(svg.line(
-            fav_move(to_2d(*i, 1.3)),
-            fav_move(to_2d(*j, 1.3)),
+            fav_move(to_2d_new(*i, 1.3)),
+            fav_move(to_2d_new(*j, 1.3)),
             stroke="black", stroke_width=3, stroke_linecap="round"))
 
 svg.save()
