@@ -10,11 +10,13 @@ import typing
 from ..references import DualPolygon
 from ..symbolic import (PiecewiseFunction, ScalarValue, ListOfAnyFunctions,
                         ListOfPiecewiseFunctions, PFunctionPieces)
-from ..finite_element import FiniteElement
+from ..finite_element import FiniteElement, CiarletElement
 
 
 class DualCiarletElement(FiniteElement):
     """Abstract barycentric finite element."""
+
+    map_to_cell = CiarletElement.map_to_cell
 
     def __init__(self, dual_coefficients: typing.List[typing.List[typing.List[ScalarValue]]],
                  fine_space: str, reference: DualPolygon, order: int,

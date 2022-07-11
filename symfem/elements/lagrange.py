@@ -62,23 +62,26 @@ class VectorLagrange(CiarletElement):
         scalar_space = Lagrange(reference, order, variant)
         dofs: ListOfFunctionals = []
         if reference.tdim == 1:
-            directions: typing.List[typing.Tuple[int, ...]] = [(1, )]
+            for p in scalar_space.dofs:
+                dofs.append(PointEvaluation(reference, p.dof_point(), entity=p.entity))
+
+            super().__init__(
+                reference, order, polynomial_set_1d(reference.tdim, order),
+                dofs, reference.tdim, reference.tdim,
+            )
         else:
             directions = [
                 tuple(1 if i == j else 0 for j in range(reference.tdim))
                 for i in range(reference.tdim)
             ]
-        for p in scalar_space.dofs:
-            for d in directions:
-                dofs.append(DotPointEvaluation(reference, p.dof_point(), d, entity=p.entity))
+            for p in scalar_space.dofs:
+                for d in directions:
+                    dofs.append(DotPointEvaluation(reference, p.dof_point(), d, entity=p.entity))
 
-        super().__init__(
-            reference, order,
-            polynomial_set_vector(reference.tdim, reference.tdim, order),
-            dofs,
-            reference.tdim,
-            reference.tdim,
-        )
+            super().__init__(
+                reference, order, polynomial_set_vector(reference.tdim, reference.tdim, order),
+                dofs, reference.tdim, reference.tdim,
+            )
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:

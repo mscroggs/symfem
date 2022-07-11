@@ -82,9 +82,10 @@ class Regge(CiarletElement):
                     for f_n, vs in enumerate(reference.sub_entities(2)):
                         face = reference.sub_entity(2, f_n)
                         for f, dof in zip(basis, rspace.dofs):
-                            assert isinstance(f, tuple)
+                            assert isinstance(f, sympy.Matrix)
+                            ft = tuple(f[i, j] for i in range(f.rows) for j in range(f.cols))
                             dofs.append(IntegralMoment(
-                                reference, face, tuple(i * face.jacobian() for i in f), dof,
+                                reference, face, tuple(i * face.jacobian() for i in ft), dof,
                                 entity=(2, f_n), mapping="double_covariant"))
 
                 if order > 1:
