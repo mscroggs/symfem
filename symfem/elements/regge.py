@@ -38,8 +38,8 @@ class Regge(CiarletElement):
         if variant == "point":
             for edim in range(1, 4):
                 et = reference.sub_entity_types[edim]
-                assert isinstance(et, str)
                 for e_n, vs in enumerate(reference.sub_entities(edim)):
+                    assert isinstance(et, str)
                     entity = create_reference(
                         et, vertices=tuple(reference.vertices[i] for i in vs))
                     for i in product(range(1, order + 2), repeat=edim):
