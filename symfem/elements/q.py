@@ -114,7 +114,7 @@ class VectorQ(CiarletElement):
             super().__init__(
                 reference, order, quolynomial_set_1d(reference.tdim, order),
                 dofs, reference.tdim, reference.tdim,
-        )
+            )
         else:
             directions = [
                 tuple(1 if i == j else 0 for j in range(reference.tdim))
