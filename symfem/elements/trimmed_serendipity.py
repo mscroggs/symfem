@@ -37,7 +37,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
             for i in range(order):
                 for j in range(order - i):
                     for dim in range(3):
-                        if i != 0 or dim != 0:
+                        if i == 0 or dim != 0:
                             p = vcross(tuple(x), tuple(
                                 x[0] ** i * x[1] ** j * x[2] ** (order - 1 - i - j)
                                 if d == dim else 0
