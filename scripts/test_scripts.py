@@ -1,6 +1,11 @@
 import pytest
 import os
 
+file_path = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), "../_temp"
+)
+os.system(f"mkdir {file_path}")
+
 
 @pytest.mark.parametrize("file", [
     file
@@ -13,4 +18,4 @@ def test_demo(file):
         file
     )
 
-    assert os.system(f"python3 {file_path}") == 0
+    assert os.system(f"python3 {file_path} test") == 0

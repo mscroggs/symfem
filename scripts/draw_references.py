@@ -2,8 +2,14 @@
 
 import os
 import symfem
+import sys
 
-folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+TESTING = "test" in sys.argv
+
+if TESTING:
+    folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../_temp")
+else:
+    folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../img")
 
 for shape in ["interval", "triangle", "tetrahedron",
               "quadrilateral", "hexahedron", "prism", "pyramid",
@@ -184,7 +190,7 @@ for shape in ["interval", "triangle", "tetrahedron",
 
     filename = shape.replace(" ", "_") + "_numbering"
 
-    with open(f"{folder}/img/{filename}.svg", "w") as f:
+    with open(f"{folder}/{filename}.svg", "w") as f:
         f.write(f"<svg width='{xpos - 50}' height='{140 + yadd}'>\n")
         f.write("<style type=\"text/css\"><![CDATA[\n"
                 "  text { text-anchor:middle; font-size:15px; font-family: \"Lato Bold\" }\n"
@@ -196,4 +202,4 @@ for shape in ["interval", "triangle", "tetrahedron",
 
         f.write(svg)
         f.write("</svg>")
-    os.system(f"convert {folder}/img/{filename}.svg {folder}/img/{filename}.png")
+    os.system(f"convert {folder}/{filename}.svg {folder}/{filename}.png")
