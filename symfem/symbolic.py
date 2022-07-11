@@ -283,8 +283,8 @@ def sym_product(ls: typing.Iterable[ScalarValue]) -> sympy.core.expr.Expr:
 
 
 def symequal(
-    a: typing.Union[typing.List, typing.Tuple, ScalarValue],
-    b: typing.Union[typing.List, typing.Tuple, ScalarValue]
+    a: typing.Union[typing.List, typing.Tuple, AnyFunction],
+    b: typing.Union[typing.List, typing.Tuple, AnyFunction]
 ) -> bool:
     """Check if two symbolic numbers or vectors are equal."""
     if isinstance(a, (list, tuple)):

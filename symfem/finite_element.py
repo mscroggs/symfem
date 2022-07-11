@@ -138,6 +138,13 @@ class FiniteElement(ABC):
         """Map the basis onto a cell using the appropriate mapping for the element."""
         pass
 
+    @abstractmethod
+    def get_polynomial_basis(
+        self, reshape: bool = True
+    ) -> ListOfAnyFunctions:
+        """Get the symbolic polynomial basis for the element."""
+        pass
+
     def test(self):
         """Run tests for this element."""
         if self.order <= 4:
@@ -905,6 +912,12 @@ class DirectElement(FiniteElement):
         forward_map: PointType = None, inverse_map: PointType = None
     ) -> ListOfAnyFunctions:
         """Map the basis onto a cell using the appropriate mapping for the element."""
+        raise NotImplementedError()
+
+    def get_polynomial_basis(
+        self, reshape: bool = True
+    ) -> ListOfAnyFunctions:
+        """Get the symbolic polynomial basis for the element."""
         raise NotImplementedError()
 
     def test(self):

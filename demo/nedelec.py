@@ -34,7 +34,7 @@ for i, j in zip(p3, polys[:20]):
 # Check that the rest of the polynomials in the polynomial basis
 # satisfy p DOT x = 0
 for p in polys[20:]:
-    assert vdot(p, x) == 0
+    assert vdot(p, tuple(x)) == 0
 
 # Get the basis functions associated with the interior of the triangle
 basis = element.get_basis_functions()

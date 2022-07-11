@@ -3,39 +3,52 @@
 import sympy
 import typing
 import numpy
-from .symbolic import PointType, ScalarValue, SetOfPoints, PointTypeInput, parse_point_input
+from .symbolic import (PointType, ScalarValue, SetOfPoints, PointTypeInput, parse_point_input,
+                       AnyFunction)
+
+VecInput = typing.Union[PointTypeInput, AnyFunction]
 
 
-def vsub(v: PointTypeInput, w: PointTypeInput) -> PointType:
+def vsub(v: VecInput, w: VecInput) -> PointType:
     """Subtract a vector from another."""
+    assert isinstance(v, (list, tuple))
+    assert isinstance(w, (list, tuple))
     return tuple(i - j for i, j in zip(parse_point_input(v), parse_point_input(w)))
 
 
-def vadd(v: PointTypeInput, w: PointTypeInput) -> PointType:
+def vadd(v: VecInput, w: VecInput) -> PointType:
     """Add two vectors."""
+    assert isinstance(v, (list, tuple))
+    assert isinstance(w, (list, tuple))
     return tuple(i + j for i, j in zip(parse_point_input(v), parse_point_input(w)))
 
 
-def vdiv(v: PointTypeInput, a: ScalarValue) -> PointType:
+def vdiv(v: VecInput, a: ScalarValue) -> PointType:
     """Divide a vector by a scalar."""
+    assert isinstance(v, (list, tuple))
     if isinstance(a, int):
         a = sympy.Integer(a)
     assert isinstance(a, sympy.core.expr.Expr)
     return tuple(i / a for i in parse_point_input(v))
 
 
-def vnorm(v: PointTypeInput) -> ScalarValue:
+def vnorm(v: VecInput) -> ScalarValue:
     """Find the norm of a vector."""
+    assert isinstance(v, (list, tuple))
     return sympy.sqrt(sum(a ** 2 for a in parse_point_input(v)))
 
 
-def vdot(v: PointTypeInput, w: PointTypeInput) -> ScalarValue:
+def vdot(v: VecInput, w: VecInput) -> ScalarValue:
     """Find the dot product of two vectors."""
+    assert isinstance(v, (list, tuple))
+    assert isinstance(w, (list, tuple))
     return sum(a * b for a, b in zip(parse_point_input(v), parse_point_input(w)))
 
 
-def vcross(v: PointTypeInput, w: PointTypeInput) -> typing.Union[PointType, ScalarValue]:
+def vcross(v: VecInput, w: VecInput) -> typing.Union[PointType, ScalarValue]:
     """Find the cross product of two vectors."""
+    assert isinstance(v, (list, tuple))
+    assert isinstance(w, (list, tuple))
     v2 = parse_point_input(v)
     w2 = parse_point_input(w)
     if len(v2) == 2:
@@ -59,14 +72,16 @@ def _vcross3d(v: PointType, w: PointType) -> PointType:
     )
 
 
-def vnormalise(v: PointTypeInput) -> PointType:
+def vnormalise(v: VecInput) -> PointType:
     """Normalise a vector."""
+    assert isinstance(v, (list, tuple))
     v2 = parse_point_input(v)
     return vdiv(v2, vnorm(v2))
 
 
-def point_in_triangle(point: PointTypeInput, triangle: SetOfPoints) -> bool:
+def point_in_triangle(point: VecInput, triangle: SetOfPoints) -> bool:
     """Check if a point is inside a triangle."""
+    assert isinstance(point, (list, tuple))
     v0 = vsub(triangle[2], triangle[0])
     v1 = vsub(triangle[1], triangle[0])
     v2 = vsub(parse_point_input(point), triangle[0])
@@ -91,8 +106,9 @@ def point_in_triangle(point: PointTypeInput, triangle: SetOfPoints) -> bool:
     return u >= 0 and v >= 0 and u + v <= 1
 
 
-def point_in_quadrilateral(point: PointTypeInput, quad: SetOfPoints) -> bool:
+def point_in_quadrilateral(point: VecInput, quad: SetOfPoints) -> bool:
     """Check if a point is inside a quadrilateral."""
+    assert isinstance(point, (list, tuple))
     point2 = parse_point_input(point)
 
     e0 = vsub(quad[1], quad[0])
@@ -122,8 +138,9 @@ def point_in_quadrilateral(point: PointTypeInput, quad: SetOfPoints) -> bool:
     return d0 >= 0 and d1 >= 0 and d2 >= 0 and d3 >= 0
 
 
-def point_in_tetrahedron(point: PointTypeInput, tetrahedron: SetOfPoints) -> bool:
+def point_in_tetrahedron(point: VecInput, tetrahedron: SetOfPoints) -> bool:
     """Check if a point is inside a tetrahedron."""
+    assert isinstance(point, (list, tuple))
     v0 = vsub(tetrahedron[3], tetrahedron[0])
     v1 = vsub(tetrahedron[2], tetrahedron[0])
     v2 = vsub(tetrahedron[1], tetrahedron[0])

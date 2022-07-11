@@ -25,8 +25,10 @@ class DualCiarletElement(FiniteElement):
                          range_shape=range_shape)
         self._basis_functions: typing.Union[ListOfAnyFunctions, None] = None
 
-    def get_polynomial_basis(self, reshape: bool = True) -> ListOfAnyFunctions:
-        """Get the polynomial basis for the element."""
+    def get_polynomial_basis(
+        self, reshape: bool = True
+    ) -> ListOfAnyFunctions:
+        """Get the symbolic polynomial basis for the element."""
         raise ValueError("Polynomial basis not supported for barycentric dual elements.")
 
     def get_dual_matrix(

@@ -5,14 +5,15 @@ import sys
 import os
 import re
 import pytest
+import typing
 
 code = False
 output = False
 check_for_output = False
-lines = []
+lines: typing.List[str] = []
 doc_data = []
-outputlines = []
-codelines = []
+outputlines: typing.List[str] = []
+codelines: typing.List[str] = []
 
 if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),
                   "../docs/index.rst")):

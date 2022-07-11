@@ -1,8 +1,11 @@
 from symfem import create_element
 import numpy as np
 import pytest
+import typing
 
-elements = {
+elements: typing.Dict[str, typing.List[typing.Tuple[
+    str, str, typing.Iterable, typing.List[typing.Tuple[str, typing.Any]]
+]]] = {
     "interval": [
         ("P", "Lagrange", range(1, 4), [("LagrangeVariant", "equispaced")]),
         ("serendipity", "Serendipity", range(1, 5), [("LagrangeVariant", "equispaced"),
