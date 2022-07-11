@@ -5,46 +5,51 @@ This element's definition appears in https://doi.org/10.1007/978-3-642-23099-8_3
 """
 
 import sympy
+import typing
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from itertools import product
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set, quolynomial_set
+from ..polynomials import polynomial_set_1d, quolynomial_set_1d
 from ..functionals import PointEvaluation, DotPointEvaluation
+from ..symbolic import ListOfScalarFunctions, ListOfVectorFunctions
 from .lagrange import Lagrange
 
 
 class Bubble(CiarletElement):
     """Bubble finite element."""
 
-    def __init__(self, reference, order, variant="equispaced"):
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         from .. import create_element
         p1 = create_element(reference.name, "Lagrange", 1)
         bubble = 1
         for f in p1.get_basis_functions():
+            assert isinstance(f, (int, sympy.core.expr.Expr))
             bubble *= f
         # TODO: variants
         if reference.name == "interval":
-            poly = [bubble * p for p in polynomial_set(reference.tdim, 1, order - 2)]
+            poly = [bubble * p for p in polynomial_set_1d(reference.tdim, order - 2)]
         elif reference.name == "triangle":
             poly = [bubble * p
-                    for p in polynomial_set(reference.tdim, 1, order - 3)]
+                    for p in polynomial_set_1d(reference.tdim, order - 3)]
         elif reference.name == "tetrahedron":
             poly = [bubble * p
-                    for p in polynomial_set(reference.tdim, 1, order - 4)]
+                    for p in polynomial_set_1d(reference.tdim, order - 4)]
         elif reference.name == "quadrilateral":
             poly = [bubble * p
-                    for p in quolynomial_set(reference.tdim, 1, order - 2)]
+                    for p in quolynomial_set_1d(reference.tdim, order - 2)]
         else:
             assert reference.name == "hexahedron"
             poly = [bubble * p
-                    for p in quolynomial_set(reference.tdim, 1, order - 2)]
+                    for p in quolynomial_set_1d(reference.tdim, order - 2)]
 
-        dofs = []
+        dofs: ListOfFunctionals = []
         if reference.name in ["interval", "triangle", "tetrahedron"]:
-            f = sum
+            func = lambda i: sum(i)
         else:
-            f = max
+            func = lambda i: max(i)
         for i in product(range(1, order), repeat=reference.tdim):
-            if f(i) < order:
+            if func(i) < order:
                 point = tuple(sympy.Rational(j, order) for j in i)
                 dofs.append(PointEvaluation(reference, point, entity=(reference.tdim, 0)))
 
@@ -54,7 +59,7 @@ class Bubble(CiarletElement):
             reference, order, poly, dofs, reference.tdim, 1
         )
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
@@ -68,18 +73,24 @@ class Bubble(CiarletElement):
 class BubbleEnrichedLagrange(CiarletElement):
     """Bubble enriched Lagrange element."""
 
-    def __init__(self, reference, order, variant="equispaced"):
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         lagrange = Lagrange(reference, order, variant)
         bubble = Bubble(reference, order + 2, variant)
+
+        poly: ListOfScalarFunctions = []
+        for e in [lagrange, bubble]:
+            for p in e._basis:
+                assert isinstance(p, (int, sympy.core.expr.Expr))
+                poly.append(p)
 
         self.variant = variant
 
         super().__init__(
-            reference, order, lagrange._basis + bubble._basis,
+            reference, order, poly,
             lagrange.dofs + bubble.dofs, reference.tdim, 1
         )
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
@@ -92,22 +103,26 @@ class BubbleEnrichedLagrange(CiarletElement):
 class BubbleEnrichedVectorLagrange(CiarletElement):
     """Bubble enriched Lagrange element."""
 
-    def __init__(self, reference, order, variant="equispaced"):
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         lagrange = Lagrange(reference, order, variant)
         bubble = Bubble(reference, order + 2, variant)
 
-        basis = [(i, 0) for i in lagrange._basis + bubble._basis]
-        basis += [(0, i) for i in lagrange._basis + bubble._basis]
+        poly: ListOfVectorFunctions = []
+        for e in [lagrange, bubble]:
+            for p in e._basis:
+                assert isinstance(p, (int, sympy.core.expr.Expr))
+                poly.append((p, 0))
+                poly.append((0, p))
 
-        dofs = [DotPointEvaluation(reference, d.point, v, entity=d.entity)
-                for d in lagrange.dofs + bubble.dofs
-                for v in [(1, 0), (0, 1)]]
+        dofs: ListOfFunctionals = [DotPointEvaluation(reference, d.dof_point(), v, entity=d.entity)
+                                   for d in lagrange.dofs + bubble.dofs
+                                   for v in [(1, 0), (0, 1)]]
 
         self.variant = variant
 
-        super().__init__(reference, order, basis, dofs, reference.tdim, 2)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 2)
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 

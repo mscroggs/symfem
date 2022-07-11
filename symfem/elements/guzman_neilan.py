@@ -5,10 +5,14 @@ This element's definition appears in https://doi.org/10.1137/17M1153467
 """
 
 import sympy
+import typing
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..functionals import NormalIntegralMoment, DotPointEvaluation
-from ..symbolic import PiecewiseFunction, sym_sum
+from ..symbolic import (PiecewiseFunction, SetOfPoints, ListOfPiecewiseFunctions,
+                        VectorFunction, ListOfVectorFunctions)
 from .lagrange import Lagrange, VectorLagrange
 from .bernardi_raugel import BernardiRaugel
 
@@ -16,13 +20,13 @@ from .bernardi_raugel import BernardiRaugel
 class GuzmanNeilan(CiarletElement):
     """Guzman-Neilan Hdiv finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference: Reference, order: int):
         if reference.name == "triangle":
             poly = self._make_polyset_triangle(reference, order)
         else:
             poly = self._make_polyset_tetrahedron(reference, order)
 
-        dofs = []
+        dofs: ListOfFunctionals = []
 
         for n in range(reference.sub_entity_count(reference.tdim - 1)):
             facet = reference.sub_entity(reference.tdim - 1, n)
@@ -72,15 +76,16 @@ class GuzmanNeilan(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
-    def _make_polyset_triangle(self, reference, order):
+    def _make_polyset_triangle(self, reference: Reference, order: int):
         """Make the polyset for a triangle."""
         assert order == 1
 
         from ._guzman_neilan_triangle import coeffs
 
-        mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
+        mid: VectorFunction = tuple(
+            sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
 
-        sub_tris = [
+        sub_tris: typing.List[SetOfPoints] = [
             (reference.vertices[0], reference.vertices[1], mid),
             (reference.vertices[0], reference.vertices[2], mid),
             (reference.vertices[1], reference.vertices[2], mid)]
@@ -90,20 +95,30 @@ class GuzmanNeilan(CiarletElement):
         sub_basis = make_piecewise_lagrange(sub_tris, "triangle", reference.tdim, True)
         fs = BernardiRaugel(reference, 1).get_basis_functions()[-3:]
         for c, f in zip(coeffs, fs):
-            fun = [tuple(
-                f[j] - sym_sum(k * b.pieces[i][1][j] for k, b in zip(c, sub_basis))
-                for j in range(reference.tdim)) for i, _ in enumerate(sub_tris)]
+            assert isinstance(f, tuple)
+            fun = []
+            for i, _ in enumerate(sub_tris):
+                function = []
+                for j in range(reference.tdim):
+                    component = f[j]
+                    for k, b in zip(c, sub_basis):
+                        bpi = b.pieces[i][1]
+                        assert isinstance(bpi, tuple)
+                        component -= k * bpi[j]
+                    function.append(component)
+                fun.append(tuple(function))
             basis.append(PiecewiseFunction(list(zip(sub_tris, fun)), "triangle"))
         return basis
 
-    def _make_polyset_tetrahedron(self, reference, order):
+    def _make_polyset_tetrahedron(self, reference: Reference, order: int):
         """Make the polyset for a tetrahedron."""
         assert order in [1, 2]
         from ._guzman_neilan_tetrahedron import coeffs
 
-        mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
+        mid: VectorFunction = tuple(
+            sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
 
-        sub_tets = [
+        sub_tets: typing.List[SetOfPoints] = [
             (reference.vertices[0], reference.vertices[1], reference.vertices[2], mid),
             (reference.vertices[0], reference.vertices[1], reference.vertices[3], mid),
             (reference.vertices[0], reference.vertices[2], reference.vertices[3], mid),
@@ -114,8 +129,18 @@ class GuzmanNeilan(CiarletElement):
         sub_basis = make_piecewise_lagrange(sub_tets, "tetrahedron", reference.tdim, True)
         fs = BernardiRaugel(reference, 1).get_basis_functions()[-4:]
         for c, f in zip(coeffs, fs):
-            fun = [tuple(f[j] - sym_sum(k * b.pieces[i][1][j] for k, b in zip(c, sub_basis))
-                         for j in range(reference.tdim)) for i, _ in enumerate(sub_tets)]
+            assert isinstance(f, tuple)
+            fun = []
+            for i, _ in enumerate(sub_tets):
+                function = []
+                for j in range(reference.tdim):
+                    component = f[j]
+                    for k, b in zip(c, sub_basis):
+                        bpi = b.pieces[i][1]
+                        assert isinstance(bpi, tuple)
+                        component -= k * bpi[j]
+                    function.append(component)
+                fun.append(tuple(function))
             basis.append(PiecewiseFunction(list(zip(sub_tets, fun)), "tetrahedron"))
         return basis
 
@@ -126,103 +151,85 @@ class GuzmanNeilan(CiarletElement):
     continuity = "H(div)"
 
 
-def make_piecewise_lagrange(sub_cells, cell_name, order, zero_on_boundary=False,
-                            zero_at_centre=False):
+def make_piecewise_lagrange(
+    sub_cells: typing.List[SetOfPoints], cell_name, order: int, zero_on_boundary: bool = False,
+    zero_at_centre: bool = False
+) -> ListOfPiecewiseFunctions:
     """Make the basis functions of a piecewise Lagrange space."""
     from symfem import create_reference
     lagrange_space = VectorLagrange(create_reference(cell_name), order)
-    lagrange_bases = [lagrange_space.map_to_cell(c) for c in sub_cells]
+    lagrange_bases: typing.List[ListOfVectorFunctions] = []
+    for c in sub_cells:
+        row: ListOfVectorFunctions = []
+        c_basis = lagrange_space.map_to_cell(c)
+        for cb in c_basis:
+            assert isinstance(cb, tuple)
+            row.append(cb)
+        lagrange_bases.append(row)
 
-    basis_dofs = []
+    basis_dofs: typing.List[typing.Tuple[int, ...]] = []
+    zero: typing.Tuple[int, ...] = (0, )
     if cell_name == "triangle":
-        # DOFs on vertices
-        nones = [None for i in lagrange_space.entity_dofs(0, 0)]
-        for vertices in [(0, 0, None), (1, None, 0), (None, 1, 1), (2, 2, 2)]:
-            if zero_on_boundary and (0 in vertices or 1 in vertices):
-                continue
-            if zero_at_centre and (2 in vertices):
-                continue
-            for dofs in zip(*[
-                nones if i is None else lagrange_space.entity_dofs(0, i)
-                for i in vertices
-            ]):
-                basis_dofs.append(dofs)
-        # DOFs on edges
-        nones = [None for i in lagrange_space.entity_dofs(1, 0)]
-        for edge in [(0, None, 1), (1, 1, None), (None, 0, 0),
-                     (2, None, None), (None, 2, None), (None, None, 2)]:
-            if zero_on_boundary and 2 in edge:
-                continue
-            for dofs in zip(*[
-                nones if i is None else lagrange_space.entity_dofs(1, i)
-                for i in edge
-            ]):
-                basis_dofs.append(dofs)
-        # DOFs on interiors
-        nones = [None for i in lagrange_space.entity_dofs(2, 0)]
-        for interior in [(0, None, None), (None, 0, None), (None, None, 0)]:
-            for dofs in zip(*[
-                nones if i is None else lagrange_space.entity_dofs(2, i)
-                for i in interior
-            ]):
-                basis_dofs.append(dofs)
+        for dim, tri_entities in enumerate([
+            [(0, 0, -1), (1, -1, 0), (-1, 1, 1), (2, 2, 2)],
+            [(0, -1, 1), (1, 1, -1), (-1, 0, 0),
+             (2, -1, -1), (-1, 2, -1), (-1, -1, 2)],
+            [(0, -1, -1), (-1, 0, -1), (-1, -1, 0)]
+        ]):
+            nones = [
+                -1 for i in lagrange_space.entity_dofs(dim, 0)]
+            for tri_e in tri_entities:
+                if dim == 0:
+                    if zero_on_boundary and (0 in tri_e or 1 in tri_e):
+                        continue
+                    if zero_at_centre and (2 in tri_e):
+                        continue
+                elif dim == 1:
+                    if zero_on_boundary and (2 in tri_e):
+                        continue
+                doflist = [
+                    nones if i == -1 else lagrange_space.entity_dofs(dim, i) for i in tri_e
+                ]
+                for dofs in zip(*doflist):
+                    basis_dofs.append(dofs)
         zero = (0, 0)
 
     elif cell_name == "tetrahedron":
-        # DOFs on vertices
-        nones = [None for i in lagrange_space.entity_dofs(0, 0)]
-        for vertices in [(0, 0, 0, None), (1, 1, None, 0), (2, None, 1, 1),
-                         (None, 2, 2, 2), (3, 3, 3, 3)]:
-            if zero_on_boundary and (0 in vertices or 1 in vertices or 2 in vertices):
-                continue
-            if zero_at_centre and (3 in vertices):
-                continue
-            for dofs in zip(*[
-                nones if i is None else lagrange_space.entity_dofs(0, i)
-                for i in vertices
-            ]):
-                basis_dofs.append(dofs)
-        # DOFs on edges
-        nones = [None for i in lagrange_space.entity_dofs(1, 0)]
-        for edge in [(2, None, None, 5), (5, 5, None, None), (4, None, 5, None),
-                     (None, 2, None, 4), (None, 4, 4, None), (None, None, 2, 2),
-                     (3, 3, 3, None), (None, 0, 0, 0), (0, None, 1, 1), (1, 1, None, 3)]:
-            if zero_on_boundary and (2 in edge or 4 in edge or 5 in edge):
-                continue
-            for dofs in zip(*[
-                nones if i is None else lagrange_space.entity_dofs(1, i)
-                for i in edge
-            ]):
-                basis_dofs.append(dofs)
-        # DOFs on faces
-        nones = [None for i in lagrange_space.entity_dofs(2, 0)]
-        for face in [(0, None, None, 2), (1, None, 2, None), (2, 2, None, None),
-                     (3, None, None, None), (None, 0, None, 1), (None, 1, 1, None),
-                     (None, 3, None, None), (None, None, 0, 0), (None, None, 3, None),
-                     (None, None, None, 3)]:
-            if zero_on_boundary and 3 in face:
-                continue
-            for dofs in zip(*[
-                nones if i is None else lagrange_space.entity_dofs(2, i)
-                for i in face
-            ]):
-                basis_dofs.append(dofs)
-        # DOFs on interiors
-        nones = [None for i in lagrange_space.entity_dofs(3, 0)]
-        for interior in [(0, None, None, None), (None, 0, None, None),
-                         (None, None, 0, None), (None, None, None, 0)]:
-            for dofs in zip(*[
-                nones if i is None else lagrange_space.entity_dofs(3, i)
-                for i in interior
-            ]):
-                basis_dofs.append(dofs)
+        for dim, tet_entities in enumerate([
+            [(0, 0, 0, -1), (1, 1, -1, 0), (2, -1, 1, 1), (-1, 2, 2, 2), (3, 3, 3, 3)],
+            [(2, -1, -1, 5), (5, 5, -1, -1), (4, -1, 5, -1), (-1, 2, -1, 4),
+             (-1, 4, 4, -1), (-1, -1, 2, 2), (3, 3, 3, -1), (-1, 0, 0, 0), (0, -1, 1, 1),
+             (1, 1, -1, 3)],
+            [(0, -1, -1, 2), (1, -1, 2, -1), (2, 2, -1, -1), (3, -1, -1, -1), (-1, 0, -1, 1),
+             (-1, 1, 1, -1), (-1, 3, -1, -1), (-1, -1, 0, 0), (-1, -1, 3, -1), (-1, -1, -1, 3)],
+            [(0, -1, -1, -1), (-1, 0, -1, -1), (-1, -1, 0, -1), (-1, -1, -1, 0)]
+        ]):
+            nones = [
+                -1 for i in lagrange_space.entity_dofs(dim, 0)]
+            for tet_e in tet_entities:
+                if dim == 0:
+                    if zero_on_boundary and (0 in tet_e or 1 in tet_e or 2 in tet_e):
+                        continue
+                    if zero_at_centre and (3 in tet_e):
+                        continue
+                elif dim == 1:
+                    if zero_on_boundary and (2 in tet_e or 4 in tet_e or 5 in tet_e):
+                        continue
+                elif dim == 2:
+                    if zero_on_boundary and (3 in tet_e):
+                        continue
+                doflist = [
+                    nones if i == -1 else lagrange_space.entity_dofs(dim, i) for i in tet_e
+                ]
+                for dofs in zip(*doflist):
+                    basis_dofs.append(dofs)
         zero = (0, 0, 0)
 
-    basis = []
+    basis: ListOfPiecewiseFunctions = []
     for i in basis_dofs:
         basis.append(
             PiecewiseFunction(list(zip(sub_cells, [
-                zero if j is None else s[j]
+                zero if j == -1 else s[j]
                 for s, j in zip(lagrange_bases, i)
             ])), cell_name)
         )

@@ -5,9 +5,11 @@ This element's definition appears in https://doi.org/10.2307/2007793
 """
 
 import sympy
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
-from ..polynomials import polynomial_set
+from ..polynomials import polynomial_set_vector
 from ..functionals import (NormalIntegralMoment, DotPointEvaluation,
                            DivergenceIntegralMoment)
 from ..symbolic import x
@@ -17,19 +19,19 @@ from .lagrange import Lagrange
 class BernardiRaugel(CiarletElement):
     """Bernardi-Raugel Hdiv finite element."""
 
-    def __init__(self, reference, order):
-        poly = polynomial_set(reference.tdim, reference.tdim, order)
+    def __init__(self, reference: Reference, order: int):
+        poly = polynomial_set_vector(reference.tdim, reference.tdim, order)
 
         p = Lagrange(reference, 1, variant="equispaced")
 
         for i in range(reference.sub_entity_count(reference.tdim - 1)):
             sub_e = reference.sub_entity(reference.tdim - 1, i)
-            bubble = 1
+            bubble = sympy.Integer(1)
             for j in reference.sub_entities(reference.tdim - 1)[i]:
                 bubble *= p.get_basis_function(j)
             poly.append(tuple(bubble * j for j in sub_e.normal()))
 
-        dofs = []
+        dofs: ListOfFunctionals = []
 
         for n in range(reference.sub_entity_count(reference.tdim - 1)):
             facet = reference.sub_entity(reference.tdim - 1, n)
@@ -48,10 +50,13 @@ class BernardiRaugel(CiarletElement):
             assert order == 2 and reference.name == "tetrahedron"
 
             for i in range(reference.tdim):
+                bf = p.get_basis_functions()
+                assert isinstance(bf[0], (int, sympy.core.expr.Expr))
+                assert isinstance(bf[1], (int, sympy.core.expr.Expr))
+                assert isinstance(bf[2], (int, sympy.core.expr.Expr))
+                assert isinstance(bf[3], (int, sympy.core.expr.Expr))
                 poly.append(tuple(
-                    p.get_basis_function(0) * p.get_basis_function(1)
-                    * p.get_basis_function(2) * p.get_basis_function(3)
-                    if j == i else 0 for j in range(reference.tdim)))
+                    bf[0] * bf[1] * bf[2] * bf[3] if j == i else 0 for j in range(reference.tdim)))
 
             for e_n, edge in enumerate(reference.edges):
                 v1 = reference.vertices[edge[0]]
@@ -64,8 +69,8 @@ class BernardiRaugel(CiarletElement):
                 face = reference.sub_entity(2, f_n)
                 normal = tuple(i * face.jacobian() for i in face.normal())
                 for e_n in range(3):
-                    edge = face.sub_entity(1, e_n)
-                    midpoint = tuple(sympy.Rational(i + j, 2) for i, j in zip(*edge.vertices))
+                    edge_entity = face.sub_entity(1, e_n)
+                    midpoint = tuple(sympy.Rational(i + j, 2) for i, j in zip(*edge_entity.vertices))
                     dofs.append(DotPointEvaluation(
                         reference, midpoint, normal, entity=(2, f_n), mapping="contravariant"))
 

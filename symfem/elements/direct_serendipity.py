@@ -4,6 +4,7 @@ This element's definition appears in https://arxiv.org/abs/1809.02192
 (Arbogast, Tao, 2018)
 """
 
+from ..references import Reference
 from ..finite_element import DirectElement
 from ..symbolic import x
 from .dpc import DPC
@@ -12,7 +13,7 @@ from .dpc import DPC
 class DirectSerendipity(DirectElement):
     """A direct serendipity element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference: Reference, order: int):
         basis_functions = []
         basis_entities = []
 

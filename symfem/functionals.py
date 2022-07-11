@@ -313,8 +313,9 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
 class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
     """A point evaluation of a normal derivative."""
 
-    def __init__(self, reference: Reference, point: PointType, edge: Interval,
+    def __init__(self, reference: Reference, point: PointType, edge: Reference,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+        assert isinstance(edge, Interval)
         super().__init__(reference, point, edge.normal(), entity=entity, mapping=mapping)
         self.reference = edge
 
@@ -624,7 +625,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
     """An integral of a directional derivative of a scalar function."""
 
     def __init__(self, reference: Reference, integral_domain: Reference, directions: SetOfPoints,
-                 orders: typing.Tuple[int], entity: typing.Tuple[int, int], scale: int = 1,
+                 orders: typing.Tuple[int, ...], entity: typing.Tuple[int, int], scale: int = 1,
                  mapping: typing.Union[str, None] = "identity"):
         super().__init__(reference, entity, mapping)
         self.integral_domain = integral_domain
@@ -1089,3 +1090,7 @@ class NormalInnerProductIntegralMoment(InnerProductIntegralMoment):
         ]
 
     name = "Normal inner product integral moment"
+
+
+# Types
+ListOfFunctionals = typing.List[BaseFunctional]

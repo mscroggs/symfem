@@ -16,7 +16,7 @@ from .symbolic import (
     parse_any_function_input, PFunctionPieces, make_single_function_type)
 from .calculus import diff
 from .vectors import vsub, vnorm, vdiv, vadd
-from .functionals import BaseFunctional
+from .functionals import ListOfFunctionals
 from .basis_function import BasisFunction
 from .references import Reference
 
@@ -296,7 +296,7 @@ class CiarletElement(FiniteElement):
 
     def __init__(
         self, reference: Reference, order: int, basis: ListOfAnyFunctionsInput,
-        dofs: typing.List[BaseFunctional], domain_dim: int, range_dim: int,
+        dofs: ListOfFunctionals, domain_dim: int, range_dim: int,
         range_shape: typing.Tuple[int, ...] = None
     ):
         super().__init__(reference, order, len(dofs), domain_dim, range_dim, range_shape)
@@ -604,7 +604,7 @@ class CiarletElement(FiniteElement):
         black = "#000000"
         white = "#FFFFFF"
 
-        dofs_by_subentity: typing.Dict[int, typing.Dict[int, typing.List[BaseFunctional]]] = {
+        dofs_by_subentity: typing.Dict[int, typing.Dict[int, ListOfFunctionals]] = {
             i: {j: [] for j in range(self.reference.sub_entity_count(i))}
             for i in range(self.reference.tdim + 1)}
 

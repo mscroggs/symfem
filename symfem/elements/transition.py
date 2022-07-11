@@ -1,8 +1,12 @@
 """Transition elements on simplices."""
 
+import sympy
+import typing
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from itertools import product
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set
+from ..polynomials import polynomial_set_1d
 from ..functionals import PointEvaluation
 from ..quadrature import get_quadrature
 from ..symbolic import x, subs
@@ -12,8 +16,8 @@ from .lagrange import Lagrange
 class Transition(CiarletElement):
     """Transition finite element."""
 
-    def __init__(self, reference, order,
-                 edge_orders=None, face_orders=None, variant="equispaced"):
+    def __init__(self, reference: Reference, order: int,
+                 edge_orders=None, face_orders=None, variant: str = "equispaced"):
         if reference.name == "triangle":
             assert face_orders is None
             assert len(edge_orders) == 3
@@ -23,8 +27,8 @@ class Transition(CiarletElement):
 
         bubble_space = Lagrange(reference, 1)
 
-        dofs = []
-        poly = polynomial_set(reference.tdim, 1, 1)
+        dofs: ListOfFunctionals = []
+        poly = polynomial_set_1d(reference.tdim, 1)
         for v_n, v in enumerate(reference.reference_vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
 
@@ -42,26 +46,29 @@ class Transition(CiarletElement):
 
                 # DOFs
                 points, _ = get_quadrature(variant, entity_order + 1)
-                for i in product(range(1, entity_order), repeat=edim):
-                    if sum(i) < entity_order:
-                        pt = entity.get_point([points[j] for j in i])
+                for ii in product(range(1, entity_order), repeat=edim):
+                    if sum(ii) < entity_order:
+                        pt = entity.get_point([points[j] for j in ii])
                         dofs.append(PointEvaluation(reference, pt, entity=(edim, e_n)))
 
                 # Basis
                 if entity_order > edim:
                     if edim == reference.tdim:
-                        bubble = 1
+                        bubble = sympy.Integer(1)
                         for f in bubble_space.get_basis_functions():
+                            assert isinstance(f, (int, sympy.core.expr.Expr))
                             bubble *= f
                     elif edim == reference.tdim - 1:
-                        bubble = 1
+                        bubble = sympy.Integer(1)
                         for i, f in enumerate(bubble_space.get_basis_functions()):
+                            assert isinstance(f, (int, sympy.core.expr.Expr))
                             if i != e_n:
                                 bubble *= f
                     else:
                         assert edim == 1 and reference.tdim == 3
-                        bubble = 1
+                        bubble = sympy.Integer(1)
                         for i, f in enumerate(bubble_space.get_basis_functions()):
+                            assert isinstance(f, (int, sympy.core.expr.Expr))
                             if i in reference.edges[e_n]:
                                 bubble *= f
                     space = Lagrange(entity, entity_order - edim - 1, variant=variant)
@@ -83,7 +90,7 @@ class Transition(CiarletElement):
         self.face_orders = face_orders
         self.edge_orders = edge_orders
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant, "face_orders": self.face_orders,
                 "edge_orders": self.edge_orders}

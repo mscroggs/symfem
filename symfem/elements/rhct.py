@@ -6,18 +6,20 @@ This element's definition appears in https://doi.org/10.2307/2006147
 
 import sympy
 import typing
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..functionals import PointEvaluation, DerivativePointEvaluation
-from ..polynomials import polynomial_set
-from ..symbolic import PiecewiseFunction, x
+from ..polynomials import polynomial_set_1d
+from ..symbolic import PiecewiseFunction, x, ListOfScalarFunctions, ListOfVectorFunctions
 
 
 class P1Hermite(CiarletElement):
     """P1Hermite finite element."""
 
-    def __init__(self, reference, order, poly):
+    def __init__(self, reference: Reference, order: int, poly: ListOfScalarFunctions):
         assert order == 3
-        dofs = []
+        dofs: ListOfFunctionals = []
         for v_n, vs in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(reference, vs, (1, 0), entity=(0, v_n)))
@@ -27,7 +29,7 @@ class P1Hermite(CiarletElement):
             reference, order, poly, dofs, reference.tdim, 1
         )
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"poly": self._basis}
 
@@ -41,11 +43,11 @@ class P1Hermite(CiarletElement):
 class ReducedHsiehCloughTocher(CiarletElement):
     """Reduced Hsieh-Clough-Tocher finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference: Reference, order: int):
         from symfem import create_reference
         assert order == 3
         assert reference.name == "triangle"
-        dofs = []
+        dofs: ListOfFunctionals = []
         for v_n, vs in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(reference, vs, (1, 0), entity=(0, v_n)))
@@ -60,10 +62,10 @@ class ReducedHsiehCloughTocher(CiarletElement):
 
         refs = [create_reference("triangle", vs) for vs in subs]
 
-        polys = [
-            polynomial_set(reference.tdim, 1, order),
+        polys: typing.List[ListOfScalarFunctions] = [
+            polynomial_set_1d(reference.tdim, order),
             [],
-            polynomial_set(reference.tdim, 1, order),
+            polynomial_set_1d(reference.tdim, order),
         ]
         polys[0].remove(x[0] ** 2 * x[1])
         polys[1] = [1, x[0], x[0] ** 2, x[1], x[0] * x[1], x[1] ** 2,
@@ -71,10 +73,15 @@ class ReducedHsiehCloughTocher(CiarletElement):
                     x[0] ** 3 - x[1] ** 3, x[0] ** 3 + 3 * x[0] * x[1] ** 2]
         polys[2].remove(x[0] * x[1] ** 2)
 
-        bases = [P1Hermite(r, 3, p).get_basis_functions()
-                 for r, p in zip(refs, polys)]
+        bases: typing.List[ListOfScalarFunctions] = []
+        for r, p in zip(refs, polys):
+            bf = []
+            for f in P1Hermite(r, 3, p).get_basis_functions():
+                assert isinstance(f, (int, sympy.core.expr.Expr))
+                bf.append(f)
+            bases.append(bf)
 
-        piece_list = []
+        piece_list: ListOfVectorFunctions = []
         piece_list.append((bases[0][0], 0, bases[2][3]))
         piece_list.append((bases[0][1], 0, bases[2][4]))
         piece_list.append((bases[0][2], 0, bases[2][5]))

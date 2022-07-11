@@ -29,12 +29,10 @@ def polynomial_set_1d(
     raise ValueError(f"Unsupported dimension: {dim}")
 
 
-def polynomial_set(
+def polynomial_set_vector(
     domain_dim: int, range_dim: int, order: int
-) -> typing.Union[ListOfScalarFunctions, ListOfVectorFunctions]:
+) -> ListOfVectorFunctions:
     """Polynomial set."""
-    if range_dim == 1:
-        return polynomial_set_1d(domain_dim, order)
     set1d = polynomial_set_1d(domain_dim, order)
     return [
         tuple(p if i == j else 0 for j in range(range_dim))
@@ -105,12 +103,10 @@ def quolynomial_set_1d(dim: int, order: int) -> ListOfScalarFunctions:
     return basis
 
 
-def quolynomial_set(
+def quolynomial_set_vector(
     domain_dim: int, range_dim: int, order: int
-) -> typing.Union[ListOfScalarFunctions, ListOfVectorFunctions]:
+) -> ListOfVectorFunctions:
     """Quolynomial set."""
-    if range_dim == 1:
-        return quolynomial_set_1d(domain_dim, order)
     set1d = quolynomial_set_1d(domain_dim, order)
     return [
         tuple(p if i == j else 0 for j in range(range_dim))
@@ -179,12 +175,10 @@ def serendipity_set_1d(dim: int, order: int) -> ListOfScalarFunctions:
     return basis
 
 
-def serendipity_set(
+def serendipity_set_vector(
     domain_dim: int, range_dim: int, order: int
-) -> typing.Union[ListOfScalarFunctions, ListOfVectorFunctions]:
+) -> ListOfVectorFunctions:
     """Serendipity set."""
-    if range_dim == 1:
-        return serendipity_set_1d(domain_dim, order)
     set1d = serendipity_set_1d(domain_dim, order)
     return [
         tuple(p if i == j else 0 for j in range(range_dim))
@@ -248,7 +242,7 @@ def Hcurl_serendipity(domain_dim: int, range_dim: int, order: int) -> ListOfVect
                 p = x[0] ** i * x[1] ** (order - 1 - i)
                 out.append((x[1] * x[2] * p, -x[0] * x[2] * p, 0))
 
-        for p in serendipity_set(domain_dim, 1, order + 1):
+        for p in serendipity_set_1d(domain_dim, order + 1):
             out.append(tuple(diff(p, i) for i in x))
         return out
 
@@ -266,12 +260,10 @@ def prism_polynomial_set_1d(dim: int, order: int) -> ListOfScalarFunctions:
     ]
 
 
-def prism_polynomial_set(
+def prism_polynomial_set_vector(
     domain_dim: int, range_dim: int, order: int
-) -> typing.Union[ListOfScalarFunctions, ListOfVectorFunctions]:
+) -> ListOfVectorFunctions:
     """Polynomial set for a prism."""
-    if range_dim == 1:
-        return prism_polynomial_set_1d(domain_dim, order)
     set1d = prism_polynomial_set_1d(domain_dim, order)
     return [
         tuple(p if i == j else 0 for j in range(range_dim))
@@ -297,12 +289,10 @@ def pyramid_polynomial_set_1d(dim: int, order: int) -> ListOfScalarFunctions:
     return poly
 
 
-def pyramid_polynomial_set(
+def pyramid_polynomial_set_vector(
     domain_dim: int, range_dim: int, order: int
-) -> typing.Union[ListOfScalarFunctions, ListOfVectorFunctions]:
+) -> ListOfVectorFunctions:
     """Polynomial set for a pyramid."""
-    if range_dim == 1:
-        return pyramid_polynomial_set_1d(domain_dim, order)
     set1d = pyramid_polynomial_set_1d(domain_dim, order)
     return [
         tuple(p if i == j else 0 for j in range(range_dim))

@@ -4,21 +4,26 @@ This element's definition appears in https://doi.org/10.1007/BF01396752
 (Brezzi, Douglas, Duran, Fortin, 1987)
 """
 
+import typing
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
-from ..polynomials import polynomial_set
-from ..symbolic import x
+from ..polynomials import polynomial_set_vector
+from ..symbolic import x, ListOfVectorFunctions
 from ..calculus import curl
 from ..functionals import NormalIntegralMoment, IntegralMoment
 from .dpc import DPC, VectorDPC
 
 
-def bddf_polyset(reference, order):
+def bddf_polyset(reference: Reference, order: int) -> ListOfVectorFunctions:
     """Create the polynomial basis for a BDDF element."""
     dim = reference.tdim
-    pset = []
+    pset: ListOfVectorFunctions = []
     assert reference.name == "hexahedron"
-    pset = polynomial_set(dim, dim, order)
+    for p in polynomial_set_vector(dim, dim, order):
+        assert isinstance(p, tuple)
+        pset.append(p)
     pset.append(curl((0, 0, x[0] ** (order + 1) * x[1])))
     pset.append(curl((0, x[0] * x[2] ** (order + 1), 0)))
     pset.append(curl((x[1] ** (order + 1) * x[2], 0, 0)))
@@ -33,10 +38,10 @@ def bddf_polyset(reference, order):
 class BDDF(CiarletElement):
     """Brezzi-Douglas-Duran-Fortin Hdiv finite element."""
 
-    def __init__(self, reference, order, variant="equispaced"):
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         poly = bddf_polyset(reference, order)
 
-        dofs = make_integral_moment_dofs(
+        dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
             facets=(NormalIntegralMoment, DPC, order, {"variant": variant}),
             cells=(IntegralMoment, VectorDPC, order - 2, {"variant": variant})
@@ -46,7 +51,7 @@ class BDDF(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 

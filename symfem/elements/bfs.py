@@ -4,17 +4,19 @@ This element's definition appears in http://contrails.iit.edu/reports/8569
 (Bogner, Fox, Schmit, 1966)
 """
 
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
-from ..polynomials import quolynomial_set
+from ..polynomials import quolynomial_set_1d
 from ..functionals import PointEvaluation, DerivativePointEvaluation
 
 
 class BognerFoxSchmit(CiarletElement):
     """Bogner-Fox-Schmit finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference: Reference, order: int):
         assert order == 3
-        dofs = []
+        dofs: ListOfFunctionals = []
         for v_n, vs in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
             for i in range(reference.tdim):
@@ -27,7 +29,7 @@ class BognerFoxSchmit(CiarletElement):
                                                       mapping="identity"))
 
         super().__init__(
-            reference, order, quolynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
+            reference, order, quolynomial_set_1d(reference.tdim, order), dofs, reference.tdim, 1
         )
 
     names = ["Bogner-Fox-Schmit", "BFS"]

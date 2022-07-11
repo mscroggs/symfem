@@ -1,11 +1,14 @@
 """Nedelec elements on prisms."""
 
+import typing
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..polynomials import (Hcurl_polynomials, polynomial_set_1d,
-                           polynomial_set)
+                           polynomial_set_vector)
 from ..functionals import TangentIntegralMoment, IntegralMoment, IntegralAgainst
-from ..symbolic import x
+from ..symbolic import x, ListOfVectorFunctions
 from .lagrange import Lagrange, VectorLagrange
 from .q import RaviartThomas as QRT
 
@@ -13,17 +16,18 @@ from .q import RaviartThomas as QRT
 class Nedelec(CiarletElement):
     """Nedelec Hcurl finite element."""
 
-    def __init__(self, reference, order, variant="equispaced"):
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         from .. import create_reference
 
-        poly = [(i[0] * j, i[1] * j, 0)
-                for i in polynomial_set(2, 2, order - 1) + Hcurl_polynomials(2, 2, order)
-                for j in polynomial_set_1d(1, order, x[2:])]
+        poly: ListOfVectorFunctions = [
+            (i[0] * j, i[1] * j, 0)
+            for i in polynomial_set_vector(2, 2, order - 1) + Hcurl_polynomials(2, 2, order)
+            for j in polynomial_set_1d(1, order, x[2:])]
         poly += [(0, 0, i * j)
                  for i in polynomial_set_1d(2, order, x[:2])
                  for j in polynomial_set_1d(1, order - 1, x[2:])]
 
-        dofs = make_integral_moment_dofs(
+        dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, Lagrange, order - 1,
                    {"variant": variant}),
@@ -54,7 +58,7 @@ class Nedelec(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 

@@ -13,7 +13,7 @@ space on a triangle.
 """
 
 import symfem
-from symfem.polynomials import polynomial_set
+from symfem.polynomials import polynomial_set_vector
 from symfem.symbolic import x, subs, symequal
 
 # In this demo, we use the function vdot to compute the dot product of two vectors.
@@ -26,7 +26,7 @@ polys = element.get_polynomial_basis()
 
 # Check that the first 20 polynomials in the polynomial basis are
 # the polynomials of degree 3
-p3 = polynomial_set(2, 2, 3)
+p3 = polynomial_set_vector(2, 2, 3)
 assert len(p3) == 20
 for i, j in zip(p3, polys[:20]):
     assert i == j

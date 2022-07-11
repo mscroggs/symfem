@@ -5,63 +5,82 @@ These elements' definitions appear in https://doi.org/10.1016/j.crma.2004.12.022
 """
 
 import sympy
-from ..symbolic import sym_sum, PiecewiseFunction
-from ..finite_element import CiarletElement
+import numpy
+import typing
+from ..references import DualPolygon
+from ..functionals import ListOfFunctionals
+from ..symbolic import (sym_sum, PiecewiseFunction, ScalarValue, ListOfAnyFunctions,
+                        ListOfPiecewiseFunctions, PFunctionPieces)
+from ..finite_element import CiarletElement, FiniteElement
 
 
 class DualCiarletElement(CiarletElement):
     """Abstract barycentric finite element."""
 
-    def __init__(self, dual_coefficients, fine_space, reference, order, basis,
-                 dofs, domain_dim, range_dim, range_shape=None):
+    def __init__(self, dual_coefficients: typing.List[typing.List[typing.List[ScalarValue]]],
+                 fine_space: str, reference: DualPolygon, order: int, basis, dofs: ListOfFunctionals,
+                 domain_dim: int, range_dim: int, range_shape: typing.Tuple[int, ...] = None):
         self.dual_coefficients = dual_coefficients
         self.fine_space = fine_space
         super().__init__(reference, order, basis, dofs, domain_dim, range_dim,
                          range_shape=range_shape)
 
-    def get_polynomial_basis(self, reshape=True, use_legendre=False):
+    def get_polynomial_basis(self, reshape: bool = True) -> ListOfAnyFunctions:
         """Get the polynomial basis for the element."""
         raise ValueError("Polynomial basis not supported for barycentric dual elements.")
 
-    def get_dual_matrix(self, symbolic=True, use_legendre=False):
+    def get_dual_matrix(
+        self, symbolic: bool = True
+    ) -> typing.Union[sympy.matrices.dense.MutableDenseMatrix, numpy.typing.NDArray[numpy.float64]]:
         """Get the dual matrix."""
         raise ValueError("Dual matrix not supported for barycentric dual elements.")
 
-    def get_basis_functions(self, reshape=True, symbolic=True, use_tensor_factorisation=False):
+    def get_basis_functions(
+        self, reshape: bool = True, symbolic: bool = True, use_tensor_factorisation: bool = False
+    ) -> ListOfAnyFunctions:
         """Get the basis functions of the element."""
         assert not use_tensor_factorisation
 
         if self._basis_functions is None:
             from symfem import create_element
 
-            self._basis_functions = []
+            bfs: ListOfPiecewiseFunctions = []
             for coeff_list in self.dual_coefficients:
                 v0 = self.reference.origin
-                pieces = []
+                pieces: PFunctionPieces = []
                 for coeffs, v1, v2 in zip(
                     coeff_list, self.reference.vertices,
                     self.reference.vertices[1:] + self.reference.vertices[:1]
                 ):
                     sub_e = create_element("triangle", self.fine_space, self.order)
 
-                    sub_basis = sub_e.map_to_cell([v0, v1, v2])
+                    sub_basis = sub_e.map_to_cell((v0, v1, v2))
 
                     if self.range_dim == 1:
-                        sub_fun = sym_sum(a * b for a, b in zip(coeffs, sub_basis))
+                        sub_fun = sympy.Integer(0)
+                        for a, b in zip(coeffs, sub_basis):
+                            sub_fun += a * b
                     else:
-                        sub_fun = tuple(
-                            sym_sum(a * b[i] for a, b in zip(coeffs, sub_basis))
-                            for i in range(self.range_dim))
+                        sf_list = []
+                        for i in range(self.range_dim):
+                            sf_item = sympy.Integer(0)
+                            for a, b in zip(coeffs, sub_basis):
+                                assert isinstance(b, tuple)
+                                sf_item += a * b[i]
+                            sf_list.append(sf_item)
+                        sub_fun = tuple(sf_list)
                     pieces.append(((v0, v1, v2), sub_fun))
-                self._basis_functions.append(PiecewiseFunction(pieces, "triangle"))
+                bfs.append(PiecewiseFunction(pieces, "triangle"))
+            self._basis_functions = bfs
         return self._basis_functions
 
 
 class Dual(DualCiarletElement):
     """Barycentric dual finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference: DualPolygon, order: int):
 
+        dual_coefficients: typing.List[typing.List[typing.List[ScalarValue]]] = []
         if order == 0:
             dual_coefficients = [
                 [[1] for i in range(2 * reference.number_of_triangles)]
@@ -101,9 +120,9 @@ class Dual(DualCiarletElement):
 class BuffaChristiansen(DualCiarletElement):
     """Buffa-Christiansen barycentric dual finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference: DualPolygon, order: int):
         assert order == 1
-        dual_coefficients = [
+        dual_coefficients: typing.List[typing.List[typing.List[ScalarValue]]] = [
             [[0, 0, 0]
              for i in range(2 * reference.number_of_triangles)]
             for j in range(reference.number_of_triangles)
@@ -131,9 +150,9 @@ class BuffaChristiansen(DualCiarletElement):
 class RotatedBuffaChristiansen(DualCiarletElement):
     """RotatedBuffa-Christiansen barycentric dual finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference: DualPolygon, order: int):
         assert order == 1
-        dual_coefficients = [
+        dual_coefficients: typing.List[typing.List[typing.List[ScalarValue]]] = [
             [[0, 0, 0]
              for i in range(2 * reference.number_of_triangles)]
             for j in range(reference.number_of_triangles)

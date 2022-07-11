@@ -6,20 +6,19 @@ from .functionals import BaseFunctional
 
 MomentType = typing.Tuple[typing.Type, typing.Type, int, typing.Union[str, None],
                           typing.Dict[str, typing.Any]]
-MomentTypeInput = typing.Union[
+SingleMomentTypeInput = typing.Union[
     MomentType,
     typing.Tuple[typing.Type, typing.Type, int, str],
     typing.Tuple[typing.Type, typing.Type, int, typing.Dict[str, typing.Any]],
     typing.Tuple[typing.Type, typing.Type, int],
 ]
+MomentTypeInput = typing.Union[
+    SingleMomentTypeInput,
+    typing.Dict[str, SingleMomentTypeInput]
+]
 
 
-def extract_moment_data(
-    moment_data: typing.Union[
-        typing.Dict[str, MomentTypeInput],
-        MomentTypeInput
-    ], sub_type: str
-) -> MomentType:
+def extract_moment_data(moment_data: MomentTypeInput, sub_type: str) -> MomentType:
     """Get the information for a moment."""
     if isinstance(moment_data, dict):
         return extract_moment_data(moment_data[sub_type], sub_type)
