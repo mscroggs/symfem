@@ -76,13 +76,14 @@ class TNT(CiarletElement):
                         reference, face, delta_f, entity=(2, face_n), mapping="identity"))
 
         if reference.tdim == 3:
+            dummy_dof = PointEvaluation(reference, reference.midpoint(), (3, 0))
             for ii in product(range(1, order), repeat=3):
                 f = sympy.Integer(1)
                 for j, k in zip(ii, x):
                     f *= k ** j * (k - 1)
                 grad_f = tuple(sympy.S(j).expand() for j in grad(f, 3))
                 dofs.append(DerivativeIntegralMoment(
-                    reference, reference, 1, grad_f, None, entity=(3, 0), mapping="identity"))
+                    reference, reference, 1, grad_f, dummy_dof, entity=(3, 0), mapping="identity"))
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1
