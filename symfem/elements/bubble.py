@@ -45,9 +45,9 @@ class Bubble(CiarletElement):
 
         dofs: ListOfFunctionals = []
         if reference.name in ["interval", "triangle", "tetrahedron"]:
-            func = lambda i: sum(i)
+            def func(i): return sum(i)
         else:
-            func = lambda i: max(i)
+            def func(i): return max(i)
         for i in product(range(1, order), repeat=reference.tdim):
             if func(i) < order:
                 point = tuple(sympy.Rational(j, order) for j in i)

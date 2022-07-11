@@ -70,7 +70,8 @@ class BernardiRaugel(CiarletElement):
                 normal = tuple(i * face.jacobian() for i in face.normal())
                 for e_n in range(3):
                     edge_entity = face.sub_entity(1, e_n)
-                    midpoint = tuple(sympy.Rational(i + j, 2) for i, j in zip(*edge_entity.vertices))
+                    midpoint = tuple(
+                        sympy.Rational(i + j, 2) for i, j in zip(*edge_entity.vertices))
                     dofs.append(DotPointEvaluation(
                         reference, midpoint, normal, entity=(2, f_n), mapping="contravariant"))
 

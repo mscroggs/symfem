@@ -9,7 +9,7 @@ from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_1d, polynomial_set_vector
 from ..functionals import PointEvaluation, DotPointEvaluation
 from ..quadrature import get_quadrature
-from ..symbolic import ListOfScalarFunctions, ListOfVectorFunctions
+from ..symbolic import ListOfVectorFunctions
 
 
 class Lagrange(CiarletElement):

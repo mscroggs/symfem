@@ -121,8 +121,8 @@ class TNTcurl(CiarletElement):
                            (0, x[1], 0), (0, 1 - x[1], 0),
                            (0, 0, x[2]), (0, 0, 1 - x[2])]:
                 variables = tuple(i for i, j in enumerate(lamb_n) if j == 0)
-                for p in face_poly:
-                    psub = subs(p, t[:2], [x[j] for j in variables])
+                for pf in face_poly:
+                    psub = subs(pf, t[:2], [x[j] for j in variables])
                     assert isinstance(psub, tuple)
                     pc = vcross(lamb_n, tuple(
                         psub[variables.index(i)] if i in variables else 0 for i in range(3)
@@ -224,9 +224,12 @@ class TNTdiv(CiarletElement):
             for ii in product([0, 1], repeat=3):
                 if sum(ii) != 0:
                     poly.append((
-                        b(order + 1, ii[0] * x[0]) * p(order, ii[1] * x[1]) * p(order, ii[2] * x[2]),
-                        p(order, ii[0] * x[0]) * b(order + 1, ii[1] * x[1]) * p(order, ii[2] * x[2]),
-                        p(order, ii[0] * x[0]) * p(order, ii[1] * x[1]) * b(order + 1, ii[2] * x[2]),
+                        b(order + 1,
+                          ii[0] * x[0]) * p(order, ii[1] * x[1]) * p(order, ii[2] * x[2]),
+                        p(order,
+                          ii[0] * x[0]) * b(order + 1, ii[1] * x[1]) * p(order, ii[2] * x[2]),
+                        p(order,
+                          ii[0] * x[0]) * p(order, ii[1] * x[1]) * b(order + 1, ii[2] * x[2]),
                     ))
 
         dofs: ListOfFunctionals = []

@@ -8,22 +8,22 @@ import sympy
 import numpy
 import typing
 from ..references import DualPolygon
-from ..functionals import ListOfFunctionals
-from ..symbolic import (sym_sum, PiecewiseFunction, ScalarValue, ListOfAnyFunctions,
+from ..symbolic import (PiecewiseFunction, ScalarValue, ListOfAnyFunctions,
                         ListOfPiecewiseFunctions, PFunctionPieces)
-from ..finite_element import CiarletElement, FiniteElement
+from ..finite_element import FiniteElement
 
 
-class DualCiarletElement(CiarletElement):
+class DualCiarletElement(FiniteElement):
     """Abstract barycentric finite element."""
 
     def __init__(self, dual_coefficients: typing.List[typing.List[typing.List[ScalarValue]]],
-                 fine_space: str, reference: DualPolygon, order: int, basis, dofs: ListOfFunctionals,
+                 fine_space: str, reference: DualPolygon, order: int,
                  domain_dim: int, range_dim: int, range_shape: typing.Tuple[int, ...] = None):
         self.dual_coefficients = dual_coefficients
         self.fine_space = fine_space
-        super().__init__(reference, order, basis, dofs, domain_dim, range_dim,
+        super().__init__(reference, order, len(dual_coefficients), domain_dim, range_dim,
                          range_shape=range_shape)
+        self._basis_functions: typing.Union[ListOfAnyFunctions, None] = None
 
     def get_polynomial_basis(self, reshape: bool = True) -> ListOfAnyFunctions:
         """Get the polynomial basis for the element."""
@@ -74,6 +74,10 @@ class DualCiarletElement(CiarletElement):
             self._basis_functions = bfs
         return self._basis_functions
 
+    def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
+        """Get the numbers of the DOFs associated with the given entity."""
+        raise NotImplementedError()
+
 
 class Dual(DualCiarletElement):
     """Barycentric dual finite element."""
@@ -107,7 +111,7 @@ class Dual(DualCiarletElement):
             fine_space = "Lagrange"
 
         super().__init__(
-            dual_coefficients, fine_space, reference, order, [], [], reference.tdim, 1
+            dual_coefficients, fine_space, reference, order, reference.tdim, 1
         )
 
     names = ["dual polynomial", "dual P", "dual"]
@@ -137,7 +141,7 @@ class BuffaChristiansen(DualCiarletElement):
                 dual_coefficients[j][(2 * j + i + 1) % N][1] = sympy.Rational(i + 1 - N // 2, N)
 
         super().__init__(
-            dual_coefficients, "RT", reference, order, [], [], reference.tdim, 2
+            dual_coefficients, "RT", reference, order, reference.tdim, 2
         )
 
     names = ["Buffa-Christiansen", "BC"]
@@ -167,7 +171,7 @@ class RotatedBuffaChristiansen(DualCiarletElement):
                 dual_coefficients[j][(2 * j + i + 1) % N][1] = sympy.Rational(N // 2 - 1 - i, N)
 
         super().__init__(
-            dual_coefficients, "N1curl", reference, order, [], [], reference.tdim, 2
+            dual_coefficients, "N1curl", reference, order, reference.tdim, 2
         )
 
     names = ["rotated Buffa-Christiansen", "RBC"]
