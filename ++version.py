@@ -1,6 +1,7 @@
 """
-This script increases the version number of Symfem in all the relevant
-locations. Once this has been run and the code pushed, Symfembot will
+Script to increase the version number of Symfem.
+
+Once this has been run and the code pushed, Symfembot will
 automatically create a new version tag on GitHub.
 """
 
