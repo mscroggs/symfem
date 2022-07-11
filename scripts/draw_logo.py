@@ -1,6 +1,10 @@
 from math import sqrt
 import svgwrite
 import typing
+import os
+
+folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+
 
 letters = [
     # S
@@ -74,7 +78,7 @@ def in_letter(a, b, c):
     return False
 
 
-svg = svgwrite.Drawing("../logo/logo.svg", size=(800, 200))
+svg = svgwrite.Drawing(os.path.join(folder, "logo/logo.svg"), size=(800, 200))
 
 polys = []
 for x in range(-4, 26):
@@ -142,7 +146,7 @@ def to_2d_new(x, y, z):
     return (1.6 * (90 + (x + (-z+y/2-3)/2) * 30), 160 + 1.6 * (68 + (3-y - z) * sqrt(3)/2 * 30))
 
 
-svg = svgwrite.Drawing("../logo/logo-1280-640.svg", size=(1280, 640))
+svg = svgwrite.Drawing(os.path.join(folder, "logo/logo-1280-640.svg"), size=(1280, 640))
 
 polys = []
 for x in range(-4, 27):
@@ -209,7 +213,7 @@ def fav_move(p):
     return p[0] - 22, p[1] - 15
 
 
-svg = svgwrite.Drawing("../logo/favicon.svg", size=(120, 120))
+svg = svgwrite.Drawing(os.path.join(folder, "logo/favicon.svg"), size=(120, 120))
 
 for p in polys:
     if p[4]:
