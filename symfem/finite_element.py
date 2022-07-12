@@ -101,6 +101,8 @@ class FiniteElement(ABC):
                 row = []
                 for d in range(self.range_dim):
                     for b in self.get_basis_functions(False):
+                        if isinstance(b, PiecewiseFunction):
+                            b = b.get_piece(p)
                         assert isinstance(b, tuple)
                         row.append(_subs_scalar(b[d], x, p))
                 output.append(tuple(row))
@@ -110,6 +112,8 @@ class FiniteElement(ABC):
             for p in points:
                 row = []
                 for b in self.get_basis_functions(False):
+                    if isinstance(b, PiecewiseFunction):
+                        b = b.get_piece(p)
                     assert isinstance(b, tuple)
                     for b_i in b:
                         row.append(_subs_scalar(b_i, x, p))
@@ -117,11 +121,11 @@ class FiniteElement(ABC):
             return output
         if order == "xyz,xyz":
             voutput = []
-            # voutput: typing.List[typing.Tuple[typing.Tuple[
-            #    typing.Union[sympy.core.expr.Expr, int], ...]]] = []
             for p in points:
                 vrow = []
                 for b in self.get_basis_functions(False):
+                    if isinstance(b, PiecewiseFunction):
+                        b = b.get_piece(p)
                     assert isinstance(b, tuple)
                     item = subs(b, x, p)
                     assert isinstance(item, tuple)
