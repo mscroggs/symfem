@@ -5,7 +5,7 @@ import sympy
 from .symbolic import (
     t, x, subs, sym_sum, SetOfPoints, PointType, PointTypeInput, ScalarFunction, ScalarValue,
     SetOfPointsInput, parse_set_of_points_input, AxisVariables, parse_point_input)
-from .vectors import vsub, vnorm, vdot, vcross, vnormalise, vadd
+from .vectors import vsub, vnorm, vdot, vcross3d, vcross2d, vnormalise, vadd
 
 
 class Reference:
@@ -101,13 +101,13 @@ class Reference:
         if self.tdim == 1:
             return vnorm(self.axes[0])
         if self.tdim == 2:
-            crossed = vcross(self.axes[0], self.axes[1])
+            crossed = vcross2d(self.axes[0], self.axes[1])
             if isinstance(crossed, tuple):
                 return vnorm(crossed)
             assert not isinstance(crossed, tuple)
             return abs(crossed)
         if self.tdim == 3:
-            crossed = vcross(self.axes[0], self.axes[1])
+            crossed = vcross3d(self.axes[0], self.axes[1])
             assert isinstance(crossed, tuple)
             return abs(vdot(crossed, self.axes[2]))
         raise ValueError(f"Unsupported tdim: {self.tdim}")
@@ -131,7 +131,7 @@ class Reference:
                 return vnormalise((-self.axes[0][1], self.axes[0][0]))
         if self.tdim == 2:
             if self.gdim == 3:
-                crossed = vcross(self.axes[0], self.axes[1])
+                crossed = vcross3d(self.axes[0], self.axes[1])
                 assert isinstance(crossed, tuple)
                 return vnormalise(crossed)
         raise RuntimeError
@@ -189,10 +189,11 @@ class Reference:
         for e in self.edges:
             v0 = self.vertices[e[0]]
             v1 = self.vertices[e[1]]
-            crossed = vcross(vsub(v0, point), vsub(v1, point))
-            if isinstance(crossed, tuple) and vnorm(crossed) == 0:
-                return True
-            if not isinstance(crossed, tuple) and crossed == 0:
+            if len(v0) == 3:
+                crossed = vnorm(vcross3d(vsub(v0, point), vsub(v1, point)))
+            else:
+                crossed = vcross2d(vsub(v0, point), vsub(v1, point))
+            if crossed == 0:
                 return True
         return False
 
@@ -202,8 +203,7 @@ class Reference:
             v0 = self.vertices[f[0]]
             v1 = self.vertices[f[1]]
             v2 = self.vertices[f[2]]
-            crossed = vcross(vsub(v0, point), vsub(v1, point))
-            assert isinstance(crossed, tuple)
+            crossed = vcross3d(vsub(v0, point), vsub(v1, point))
             if vdot(crossed, vsub(v2, point)):
                 return True
         return False
@@ -571,8 +571,7 @@ class Quadrilateral(Reference):
             mat = sympy.Matrix([[v1[0], v2[0]],
                                 [v1[1], v2[1]]]).inv()
         elif len(self.vertices[0]) == 3:
-            v3 = vcross(v1, v2)
-            assert isinstance(v3, tuple)
+            v3 = vcross3d(v1, v2)
             mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                                 [v1[1], v2[1], v3[1]],
                                 [v1[2], v2[2], v3[2]]]).inv()
@@ -599,8 +598,7 @@ class Quadrilateral(Reference):
             mat = sympy.Matrix([[v1[0], v2[0]],
                                 [v1[1], v2[1]]]).inv()
         elif len(self.vertices[0]) == 3:
-            v3 = vcross(v1, v2)
-            assert isinstance(v3, tuple)
+            v3 = vcross3d(v1, v2)
             mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                                 [v1[1], v2[1], v3[1]],
                                 [v1[2], v2[2], v3[2]]]).inv()
