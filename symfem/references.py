@@ -101,8 +101,12 @@ class Reference:
         if self.tdim == 1:
             return vnorm(self.axes[0])
         if self.tdim == 2:
-            crossed = vcross2d(self.axes[0], self.axes[1])
-            return abs(crossed)
+            if self.gdim == 2:
+                crossed = vcross2d(self.axes[0], self.axes[1])
+                return abs(crossed)
+            elif self.gdim == 3:
+                crossed3 = vcross3d(self.axes[0], self.axes[1])
+                return abs(crossed3)
         if self.tdim == 3:
             crossed3 = vcross3d(self.axes[0], self.axes[1])
             return abs(vdot(crossed3, self.axes[2]))
