@@ -106,7 +106,7 @@ class Reference:
                 return abs(crossed)
             elif self.gdim == 3:
                 crossed3 = vcross3d(self.axes[0], self.axes[1])
-                return abs(crossed3)
+                return vnorm(crossed3)
         if self.tdim == 3:
             crossed3 = vcross3d(self.axes[0], self.axes[1])
             return abs(vdot(crossed3, self.axes[2]))
