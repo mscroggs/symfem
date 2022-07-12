@@ -102,14 +102,10 @@ class Reference:
             return vnorm(self.axes[0])
         if self.tdim == 2:
             crossed = vcross2d(self.axes[0], self.axes[1])
-            if isinstance(crossed, tuple):
-                return vnorm(crossed)
-            assert not isinstance(crossed, tuple)
             return abs(crossed)
         if self.tdim == 3:
-            crossed = vcross3d(self.axes[0], self.axes[1])
-            assert isinstance(crossed, tuple)
-            return abs(vdot(crossed, self.axes[2]))
+            crossed3 = vcross3d(self.axes[0], self.axes[1])
+            return abs(vdot(crossed3, self.axes[2]))
         raise ValueError(f"Unsupported tdim: {self.tdim}")
 
     def scaled_axes(self) -> SetOfPoints:
