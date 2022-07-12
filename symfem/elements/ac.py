@@ -4,9 +4,12 @@ This element's definition appears in https://dx.doi.org/10.1137/15M1013705
 (Arbogast, Correa, 2016)
 """
 
+import typing
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
-from ..polynomials import polynomial_set, Hdiv_serendipity
+from ..polynomials import polynomial_set_vector, Hdiv_serendipity
 from ..functionals import NormalIntegralMoment, IntegralAgainst
 from .dpc import DPC
 from ..symbolic import x
@@ -15,8 +18,8 @@ from ..symbolic import x
 class AC(CiarletElement):
     """Arbogast-Correa Hdiv finite element."""
 
-    def __init__(self, reference, order, variant="equispaced"):
-        poly = polynomial_set(reference.tdim, reference.tdim, order)
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        poly = polynomial_set_vector(reference.tdim, reference.tdim, order)
         if order == 0:
             poly += [(x[0], 0), (0, x[1])]
         else:
@@ -24,7 +27,7 @@ class AC(CiarletElement):
             poly += [(x[0] ** (i + 1) * x[1] ** (order - i), x[0] ** i * x[1] ** (1 + order - i))
                      for i in range(order + 1)]
 
-        dofs = make_integral_moment_dofs(
+        dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
             facets=(NormalIntegralMoment, DPC, order, {"variant": variant}),
         )
@@ -48,7 +51,7 @@ class AC(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 

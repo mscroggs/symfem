@@ -1,3 +1,5 @@
+"""Symfem."""
+
 import os
 import sys
 import setuptools
@@ -32,11 +34,12 @@ if __name__ == "__main__":
         maintainer_email="symfem@mscroggs.co.uk",
         url="https://github.com/mscroggs/symfem",
         packages=["symfem", "symfem.elements"],
+        package_data={"symfem": ["py.typed"]},
         include_package_data=True,
         data_files=data_files,
-        install_requires=["sympy", "numpy"],
+        install_requires=["sympy>=1.10", "numpy>=1.20"],
         extras_require={
-            "style": ["flake8", "pydocstyle"],
+            "style": ["flake8", "pydocstyle", "mypy"],
             "optional": ["svgwrite", "CairoSVG"],
             "test": ["pytest", "symfem[optional]"],
         }

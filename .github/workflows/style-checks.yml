@@ -18,5 +18,7 @@ jobs:
       - run: pip3 install .[style]
       - run: python3 -m flake8 .
         name: Run flake8 checks
-      - run: python3 -m pydocstyle symfem
+      - run: python3 -m pydocstyle .
         name: Run pydocstyle checks
+      - run: python3 -m mypy .
+        name: Run mypy checks

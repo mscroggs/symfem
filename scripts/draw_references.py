@@ -1,5 +1,15 @@
+"""Draw reference cells for the README."""
+
 import os
 import symfem
+import sys
+
+TESTING = "test" in sys.argv
+
+if TESTING:
+    folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../_temp")
+else:
+    folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../img")
 
 for shape in ["interval", "triangle", "tetrahedron",
               "quadrilateral", "hexahedron", "prism", "pyramid",
@@ -16,25 +26,31 @@ for shape in ["interval", "triangle", "tetrahedron",
         width = 160
 
         def to_x(p):
+            """Get x-coordinate."""
             return float(85 + 85 * p[0])
 
         def to_y(p):
+            """Get y-coordinate."""
             return float(35 - 85 * p[1])
 
     elif ref.gdim == 1:
         yadd = -100
 
         def to_x(p):
+            """Get x-coordinate."""
             return float(100 * p[0])
 
         def to_y(p):
+            """Get y-coordinate."""
             return float(120)
 
     elif ref.gdim == 2:
         def to_x(p):
+            """Get x-coordinate."""
             return float(100 * p[0])
 
         def to_y(p):
+            """Get y-coordinate."""
             return float(120 - 100 * p[1])
 
     elif ref.gdim == 3:
@@ -47,9 +63,11 @@ for shape in ["interval", "triangle", "tetrahedron",
             yadd = 40
 
         def to_x(p):
+            """Get x-coordinate."""
             return float(100 * p[0] + 30 * p[1])
 
         def to_y(p):
+            """Get y-coordinate."""
             return float(120 - 100 * p[2] - 40 * p[1])
 
     svg = ""
@@ -172,7 +190,7 @@ for shape in ["interval", "triangle", "tetrahedron",
 
     filename = shape.replace(" ", "_") + "_numbering"
 
-    with open(f"../img/{filename}.svg", "w") as f:
+    with open(f"{folder}/{filename}.svg", "w") as f:
         f.write(f"<svg width='{xpos - 50}' height='{140 + yadd}'>\n")
         f.write("<style type=\"text/css\"><![CDATA[\n"
                 "  text { text-anchor:middle; font-size:15px; font-family: \"Lato Bold\" }\n"
@@ -184,4 +202,4 @@ for shape in ["interval", "triangle", "tetrahedron",
 
         f.write(svg)
         f.write("</svg>")
-    os.system(f"convert ../img/{filename}.svg ../img/{filename}.png")
+    os.system(f"convert {folder}/{filename}.svg {folder}/{filename}.png")

@@ -5,15 +5,17 @@ This element's definition is given in https://doi.org/10.1023/A:1004420829610
 """
 
 import sympy
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set
+from ..polynomials import polynomial_set_1d
 from ..functionals import WeightedPointEvaluation
-from ..symbolic import x
+from ..symbolic import x, ListOfScalarFunctions
 
 
-def kmv_tri_polyset(m, mf):
+def kmv_tri_polyset(m: int, mf: int) -> ListOfScalarFunctions:
     """Create the polynomial set for a KMV space on a triangle."""
-    poly = polynomial_set(2, 1, m)
+    poly = polynomial_set_1d(2, m)
 
     b = x[0] * x[1] * (1 - x[0] - x[1])
     poly += [x[0] ** p * x[1] ** (mf - 3 - p) * b
@@ -22,9 +24,9 @@ def kmv_tri_polyset(m, mf):
     return poly
 
 
-def kmv_tet_polyset(m, mf, mi):
+def kmv_tet_polyset(m: int, mf: int, mi: int) -> ListOfScalarFunctions:
     """Create the polynomial set for a KMV space on a tetrahedron."""
-    poly = polynomial_set(3, 1, m)
+    poly = polynomial_set_1d(3, m)
 
     # TODO: check this
     for axes in [(x[0], x[1]), (x[0], x[2]), (x[1], x[2]), (x[1] - x[0], x[2] - x[0])]:
@@ -44,8 +46,8 @@ def kmv_tet_polyset(m, mf, mi):
 class KongMulderVeldhuizen(CiarletElement):
     """Kong-Mulder-Veldhuizen finite element."""
 
-    def __init__(self, reference, order):
-        dofs = []
+    def __init__(self, reference: Reference, order: int):
+        dofs: ListOfFunctionals = []
         if reference.name == "triangle":
             if order == 1:
                 for v_n, v in enumerate(reference.vertices):

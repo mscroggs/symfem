@@ -1,9 +1,12 @@
 """Lagrange elements on a prism."""
 
 import sympy
+import typing
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from itertools import product
 from ..finite_element import CiarletElement
-from ..polynomials import prism_polynomial_set
+from ..polynomials import prism_polynomial_set_1d, prism_polynomial_set_vector
 from ..functionals import PointEvaluation, DotPointEvaluation
 from ..quadrature import get_quadrature
 
@@ -11,7 +14,8 @@ from ..quadrature import get_quadrature
 class Lagrange(CiarletElement):
     """Lagrange finite element."""
 
-    def __init__(self, reference, order, variant="equispaced"):
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        dofs: ListOfFunctionals = []
         if order == 0:
             dofs = [
                 PointEvaluation(
@@ -25,7 +29,6 @@ class Lagrange(CiarletElement):
         else:
             points, _ = get_quadrature(variant, order + 1)
 
-            dofs = []
             # Vertices
             for v_n, v in enumerate(reference.vertices):
                 dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
@@ -41,28 +44,28 @@ class Lagrange(CiarletElement):
             # Faces
             for e_n in range(reference.sub_entity_count(2)):
                 entity = reference.sub_entity(2, e_n)
-                for i in product(range(1, order), repeat=2):
-                    if len(entity.vertices) == 4 or sum(i) < order:
+                for ii in product(range(1, order), repeat=2):
+                    if len(entity.vertices) == 4 or sum(ii) < order:
                         dofs.append(
                             PointEvaluation(
                                 reference, tuple(
-                                    o + sum(a[j] * points[b] for a, b in zip(entity.axes, i[::-1]))
+                                    o + sum(a[j] * points[b] for a, b in zip(entity.axes, ii[::-1]))
                                     for j, o in enumerate(entity.origin)), entity=(2, e_n)))
 
             # Interior
-            for i in product(range(1, order), repeat=3):
-                if i[0] + i[1] < order:
+            for ii in product(range(1, order), repeat=3):
+                if ii[0] + ii[1] < order:
                     dofs.append(
                         PointEvaluation(
                             reference, tuple(
-                                o + sum(a[j] * points[b] for a, b in zip(reference.axes, i))
+                                o + sum(a[j] * points[b] for a, b in zip(reference.axes, ii))
                                 for j, o in enumerate(reference.origin)), entity=(3, 0)))
 
-        poly = prism_polynomial_set(reference.tdim, 1, order)
+        poly = prism_polynomial_set_1d(reference.tdim, order)
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
@@ -75,34 +78,38 @@ class Lagrange(CiarletElement):
 class VectorLagrange(CiarletElement):
     """Vector Lagrange finite element."""
 
-    def __init__(self, reference, order, variant="equispaced"):
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         scalar_space = Lagrange(reference, order, variant)
-        dofs = []
+        dofs: ListOfFunctionals = []
         if reference.tdim == 1:
-            directions = [1]
+            for p in scalar_space.dofs:
+                dofs.append(PointEvaluation(reference, p.dof_point(), entity=p.entity))
+
+            super().__init__(
+                reference, order, prism_polynomial_set_1d(reference.tdim, order),
+                dofs, reference.tdim, reference.tdim,
+            )
         else:
             directions = [
                 tuple(1 if i == j else 0 for j in range(reference.tdim))
                 for i in range(reference.tdim)
             ]
-        for p in scalar_space.dofs:
-            for d in directions:
-                dofs.append(DotPointEvaluation(reference, p.point, d, entity=p.entity))
+            for p in scalar_space.dofs:
+                for d in directions:
+                    dofs.append(DotPointEvaluation(reference, p.dof_point(), d, entity=p.entity))
 
-        super().__init__(
-            reference, order,
-            prism_polynomial_set(reference.tdim, reference.tdim, order),
-            dofs,
-            reference.tdim,
-            reference.tdim,
-        )
+            super().__init__(
+                reference, order,
+                prism_polynomial_set_vector(reference.tdim, reference.tdim, order),
+                dofs, reference.tdim, reference.tdim,
+            )
         self.variant = variant
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
-    names = []
+    names: typing.List[str] = []
     references = ["prism"]
     min_order = 0
     continuity = "C0"

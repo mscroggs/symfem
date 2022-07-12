@@ -5,6 +5,8 @@ This element's definition appears in https://doi.org/10.1007/BF01399555
 """
 
 import sympy
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..functionals import PointEvaluation
 from ..symbolic import PiecewiseFunction
@@ -14,7 +16,7 @@ from ..symbolic import x as x_variables
 class P1IsoP2Tri(CiarletElement):
     """P1-iso-P2 finite element on a triangle."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference: Reference, order: int):
         half = sympy.Rational(1, 2)
         tris = [
             ((0, 0), (half, 0), (0, half)),
@@ -37,7 +39,7 @@ class P1IsoP2Tri(CiarletElement):
             poly.append(PiecewiseFunction([
                 (t, pieces[i]) if i in pieces else (t, 0) for i, t in enumerate(tris)], "triangle"))
 
-        dofs = []
+        dofs: ListOfFunctionals = []
         for v_n, v in enumerate(reference.reference_vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
         for e_n in range(3):
@@ -58,7 +60,7 @@ class P1IsoP2Tri(CiarletElement):
 class P1IsoP2Quad(CiarletElement):
     """P1-iso-P2 finite element on a quadrilateral."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference: Reference, order: int):
         half = sympy.Rational(1, 2)
         quads = [
             ((0, 0), (half, 0), (0, half), (half, half)),
@@ -84,7 +86,7 @@ class P1IsoP2Quad(CiarletElement):
                 (q, pieces[i]) if i in pieces else (q, 0) for i, q in enumerate(quads)],
                 "quadrilateral"))
 
-        dofs = []
+        dofs: ListOfFunctionals = []
         for v_n, v in enumerate(reference.reference_vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
         for e_n in range(4):

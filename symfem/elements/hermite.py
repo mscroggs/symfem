@@ -4,8 +4,10 @@ This element's definition appears in https://doi.org/10.1016/0045-7825(72)90006-
 (Ciarlet, Raviart, 1972)
 """
 
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set
+from ..polynomials import polynomial_set_1d
 from ..functionals import PointEvaluation, DerivativePointEvaluation
 from ..symbolic import sym_sum
 
@@ -13,9 +15,9 @@ from ..symbolic import sym_sum
 class Hermite(CiarletElement):
     """Hermite finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference: Reference, order: int):
         assert order == 3
-        dofs = []
+        dofs: ListOfFunctionals = []
         for v_n, vs in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
             for i in range(reference.tdim):
@@ -28,7 +30,7 @@ class Hermite(CiarletElement):
             dofs.append(PointEvaluation(reference, midpoint, entity=(2, e_n)))
 
         super().__init__(
-            reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
+            reference, order, polynomial_set_1d(reference.tdim, order), dofs, reference.tdim, 1
         )
 
     names = ["Hermite"]

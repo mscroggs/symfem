@@ -5,8 +5,10 @@ This element's definition appears in https://doi.org/10.1051/m2an/197307R300331
 """
 
 import sympy
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set
+from ..polynomials import polynomial_set_1d
 from ..functionals import PointEvaluation
 from ..symbolic import x
 
@@ -14,19 +16,19 @@ from ..symbolic import x
 class ConformingCrouzeixRaviart(CiarletElement):
     """Conforming Crouzeix-Raviart finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference: Reference, order: int):
         if reference.vertices != reference.reference_vertices:
             raise NotImplementedError()
         assert reference.name == "triangle"
 
-        poly = polynomial_set(reference.tdim, 1, order)
+        poly = polynomial_set_1d(reference.tdim, order)
 
         poly += [
             x[0] ** i * x[1] ** (order - i) * (x[0] + x[1])
             for i in range(1, order)
         ]
 
-        dofs = []
+        dofs: ListOfFunctionals = []
         for i, v in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, i)))
         if order >= 2:

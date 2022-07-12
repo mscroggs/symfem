@@ -1,5 +1,18 @@
+"""Draw the symfem logo."""
+
 from math import sqrt
 import svgwrite
+import typing
+import os
+import sys
+
+TESTING = "test" in sys.argv
+
+if TESTING:
+    folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../_temp")
+else:
+    folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../logo")
+
 
 letters = [
     # S
@@ -57,14 +70,17 @@ for n, up in enumerate(ups):
 
 
 def to_2d(x, y, z):
+    """Project a point to 2d."""
     return (90 + (x + (-z+y/2-3)/2) * 30, 68 + (3-y - z) * sqrt(3)/2 * 30)
 
 
 def zvalue(x, y, z):
+    """Get the z-value of a point."""
     return z + x
 
 
 def in_letter(a, b, c):
+    """Check if a triangle is inside a letter."""
     if a == (5, 2) or a == (9, 0) or a == (13, 0) or a == (14, 1) or a == (18, 1) or a == (21, 0):
         return False
     for u in ups:
@@ -73,7 +89,7 @@ def in_letter(a, b, c):
     return False
 
 
-svg = svgwrite.Drawing("../logo/logo.svg", size=(800, 200))
+svg = svgwrite.Drawing(os.path.join(folder, "logo.svg"), size=(800, 200))
 
 polys = []
 for x in range(-4, 26):
@@ -90,9 +106,10 @@ for x in range(-4, 26):
             else:
                 edge1 = (p2[0] - p1[0], p2[1] - p1[1], z2 - z1)
                 edge2 = (p3[0] - p1[0], p3[1] - p1[1], z3 - z1)
-                normal = (edge1[1] * edge2[2] - edge1[2] * edge2[1],
-                          edge1[2] * edge2[0] - edge1[0] * edge2[2],
-                          edge1[0] * edge2[1] - edge1[1] * edge2[0])
+                normal: typing.Tuple[typing.Union[int, float], ...] = (
+                    edge1[1] * edge2[2] - edge1[2] * edge2[1],
+                    edge1[2] * edge2[0] - edge1[0] * edge2[2],
+                    edge1[0] * edge2[1] - edge1[1] * edge2[0])
                 if p2[0] == x:
                     normal = tuple(-i for i in normal)
                 size = sqrt(sum(i**2 for i in normal))
@@ -136,11 +153,12 @@ for letter in letters:
 svg.save()
 
 
-def to_2d(x, y, z):
+def to_2d_new(x, y, z):
+    """Project a point to 2d."""
     return (1.6 * (90 + (x + (-z+y/2-3)/2) * 30), 160 + 1.6 * (68 + (3-y - z) * sqrt(3)/2 * 30))
 
 
-svg = svgwrite.Drawing("../logo/logo-1280-640.svg", size=(1280, 640))
+svg = svgwrite.Drawing(os.path.join(folder, "logo-1280-640.svg"), size=(1280, 640))
 
 polys = []
 for x in range(-4, 27):
@@ -180,7 +198,7 @@ for x in range(-4, 27):
                    (z1 + z2 + z3) / 3)
             polys.append((
                 zvalue(*mid),
-                [to_2d(*p1, z1), to_2d(*p2, z2), to_2d(*p3, z3)],
+                [to_2d_new(*p1, z1), to_2d_new(*p2, z2), to_2d_new(*p3, z3)],
                 color,
                 strokecolor,
                 in_letter(p1, p2, p3) and p1[0] < 4
@@ -197,17 +215,18 @@ for letter in letters:
     for line_group in letter:
         for i, j in zip(line_group[:-1], line_group[1:]):
             svg.add(svg.line(
-                to_2d(*i, 1.3), to_2d(*j, 1.3),
+                to_2d_new(*i, 1.3), to_2d_new(*j, 1.3),
                 stroke="black", stroke_width=3, stroke_linecap="round"))
 
 svg.save()
 
 
 def fav_move(p):
+    """Shift the origin."""
     return p[0] - 22, p[1] - 15
 
 
-svg = svgwrite.Drawing("../logo/favicon.svg", size=(120, 120))
+svg = svgwrite.Drawing(os.path.join(folder, "favicon.svg"), size=(120, 120))
 
 for p in polys:
     if p[4]:
@@ -218,8 +237,8 @@ for p in polys:
 for line_group in letters[0]:
     for i, j in zip(line_group[:-1], line_group[1:]):
         svg.add(svg.line(
-            fav_move(to_2d(*i, 1.3)),
-            fav_move(to_2d(*j, 1.3)),
+            fav_move(to_2d_new(*i, 1.3)),
+            fav_move(to_2d_new(*j, 1.3)),
             stroke="black", stroke_width=3, stroke_linecap="round"))
 
 svg.save()

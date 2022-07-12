@@ -5,8 +5,11 @@ These elements' definitions appear in https://doi.org/10.1137/16M1073352
 (Gilette, Kloefkorn, 2018)
 """
 
+import typing
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set
+from ..polynomials import polynomial_set_vector
 from ..functionals import (IntegralMoment, TangentIntegralMoment, IntegralAgainst,
                            NormalIntegralMoment)
 from ..symbolic import x, t, subs
@@ -19,8 +22,8 @@ from .dpc import DPC, VectorDPC
 class TrimmedSerendipityHcurl(CiarletElement):
     """Trimmed serendipity Hcurl finite element."""
 
-    def __init__(self, reference, order, variant="equispaced"):
-        poly = polynomial_set(reference.tdim, reference.tdim, order - 1)
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        poly = polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
         if reference.tdim == 2:
             poly += [
                 (x[0] ** j * x[1] ** (order - j), -x[0] ** (j + 1) * x[1] ** (order - 1 - j))
@@ -31,11 +34,16 @@ class TrimmedSerendipityHcurl(CiarletElement):
                 poly += [(x[1] ** order, order * x[0] * x[1] ** (order - 1)),
                          (order * x[0] ** (order - 1) * x[1], x[0] ** order)]
         else:
-            poly += [
-                vcross(x, [x[0] ** i * x[1] ** j * x[2] ** (order - 1 - i - j)
-                           if d == dim else 0 for d in range(3)])
-                for i in range(order) for j in range(order - i) for dim in range(3)
-                if i == 0 or dim != 0]
+            for i in range(order):
+                for j in range(order - i):
+                    for dim in range(3):
+                        if i == 0 or dim != 0:
+                            p = vcross(tuple(x), tuple(
+                                x[0] ** i * x[1] ** j * x[2] ** (order - 1 - i - j)
+                                if d == dim else 0
+                                for d in range(3)))
+                            assert isinstance(p, tuple)
+                            poly.append(p)
 
             if order == 1:
                 poly += [grad(x[0] * x[1] * x[2] ** order, 3)]
@@ -57,7 +65,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
                     p = x[2] * x[0] ** i * x[1] ** (order - 1 - i)
                     poly.append((-x[1] * p, x[0] * p, 0))
 
-        dofs = []
+        dofs: ListOfFunctionals = []
         dofs += make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, DPC, order - 1, {"variant": variant}),
@@ -71,16 +79,16 @@ class TrimmedSerendipityHcurl(CiarletElement):
                 face = reference.sub_entity(2, f_n)
                 for i in range(order):
                     f = grad(x[0] ** (order - 1 - i) * x[1] ** i, 2)
-                    f = subs([f[1], -f[0]], x, t)
+                    f2 = subs((f[1], -f[0]), x, tuple(t))
                     dofs.append(IntegralAgainst(
-                        reference, face, f, entity=(2, f_n), mapping="contravariant"))
+                        reference, face, f2, entity=(2, f_n), mapping="contravariant"))
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, reference.tdim
         )
         self.variant = variant
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
@@ -93,8 +101,8 @@ class TrimmedSerendipityHcurl(CiarletElement):
 class TrimmedSerendipityHdiv(CiarletElement):
     """Trimmed serendipity Hdiv finite element."""
 
-    def __init__(self, reference, order, variant="equispaced"):
-        poly = polynomial_set(reference.tdim, reference.tdim, order - 1)
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        poly = polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
         if reference.tdim == 2:
             poly += [
                 (x[0] ** (j + 1) * x[1] ** (order - 1 - j), x[0] ** j * x[1] ** (order - j))
@@ -118,7 +126,7 @@ class TrimmedSerendipityHdiv(CiarletElement):
                     p = x[2] * x[0] ** i * x[1] ** (order - 1 - i)
                     poly.append(curl((-x[1] * p, x[0] * p, 0)))
 
-        dofs = []
+        dofs: ListOfFunctionals = []
         dofs += make_integral_moment_dofs(
             reference,
             facets=(NormalIntegralMoment, DPC, order - 1, {"variant": variant}),
@@ -133,8 +141,8 @@ class TrimmedSerendipityHdiv(CiarletElement):
                 fs = [grad(x[0] ** (order - 1 - i - j) * x[1] ** i * x[2] ** j, 3)
                       for i in range(order) for j in range(order - i)]
             for f in fs:
-                f = subs(f, x, t)
-                dofs.append(IntegralAgainst(reference, reference, f, entity=(reference.tdim, 0),
+                f2 = subs(f, x, tuple(t))
+                dofs.append(IntegralAgainst(reference, reference, f2, entity=(reference.tdim, 0),
                                             mapping="covariant"))
 
         super().__init__(
@@ -142,7 +150,7 @@ class TrimmedSerendipityHdiv(CiarletElement):
         )
         self.variant = variant
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 

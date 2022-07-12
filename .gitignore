@@ -5,7 +5,7 @@ symfem/VERSION
 
 build/
 dist/
-feast.egg-info/
+symfem.egg-info/
 docs/_build
 .coverage
 .coveralls_output
@@ -14,3 +14,5 @@ joss/build.sh
 joss/paper.pdf
 
 test/test-output-*
+
+_temp/

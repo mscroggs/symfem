@@ -4,9 +4,12 @@ These elements' definitions appear in https://doi.org/10.1007/BF01396415
 (Nedelec, 1980) and https://doi.org/10.1007/BF01389668 (Nedelec, 1986)
 """
 
+import typing
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
-from ..polynomials import polynomial_set, Hcurl_polynomials
+from ..polynomials import polynomial_set_vector, Hcurl_polynomials
 from ..functionals import TangentIntegralMoment, IntegralMoment
 from .lagrange import Lagrange, VectorLagrange
 from .rt import RaviartThomas
@@ -15,10 +18,10 @@ from .rt import RaviartThomas
 class NedelecFirstKind(CiarletElement):
     """Nedelec first kind Hcurl finite element."""
 
-    def __init__(self, reference, order, variant="equispaced"):
-        poly = polynomial_set(reference.tdim, reference.tdim, order - 1)
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        poly = polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
         poly += Hcurl_polynomials(reference.tdim, reference.tdim, order)
-        dofs = make_integral_moment_dofs(
+        dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, Lagrange, order - 1,
                    {"variant": variant}),
@@ -31,7 +34,7 @@ class NedelecFirstKind(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
@@ -44,10 +47,10 @@ class NedelecFirstKind(CiarletElement):
 class NedelecSecondKind(CiarletElement):
     """Nedelec second kind Hcurl finite element."""
 
-    def __init__(self, reference, order, variant="equispaced"):
-        poly = polynomial_set(reference.tdim, reference.tdim, order)
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        poly = polynomial_set_vector(reference.tdim, reference.tdim, order)
 
-        dofs = make_integral_moment_dofs(
+        dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, Lagrange, order, {"variant": variant}),
             faces=(IntegralMoment, RaviartThomas, order - 1, "covariant", {"variant": variant}),
@@ -57,7 +60,7 @@ class NedelecSecondKind(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 

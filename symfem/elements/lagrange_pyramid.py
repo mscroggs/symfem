@@ -5,9 +5,12 @@ This element's definition appears in https://doi.org/10.1007/s10915-009-9334-9
 """
 
 import sympy
+import typing
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from itertools import product
 from ..finite_element import CiarletElement
-from ..polynomials import pyramid_polynomial_set
+from ..polynomials import pyramid_polynomial_set_1d
 from ..functionals import PointEvaluation
 from ..quadrature import get_quadrature
 
@@ -15,7 +18,8 @@ from ..quadrature import get_quadrature
 class Lagrange(CiarletElement):
     """Lagrange finite element."""
 
-    def __init__(self, reference, order, variant="equispaced"):
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        dofs: ListOfFunctionals = []
         if order == 0:
             dofs = [
                 PointEvaluation(
@@ -29,7 +33,6 @@ class Lagrange(CiarletElement):
         else:
             points, _ = get_quadrature(variant, order + 1)
 
-            dofs = []
             # Vertices
             for v_n, v in enumerate(reference.vertices):
                 dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
@@ -45,31 +48,31 @@ class Lagrange(CiarletElement):
             # Faces
             for e_n in range(reference.sub_entity_count(2)):
                 entity = reference.sub_entity(2, e_n)
-                for i in product(range(1, order), repeat=2):
-                    if len(entity.vertices) == 4 or sum(i) < order:
+                for ii in product(range(1, order), repeat=2):
+                    if len(entity.vertices) == 4 or sum(ii) < order:
                         dofs.append(
                             PointEvaluation(
                                 reference, tuple(o + sum(a[j] * points[b]
-                                                         for a, b in zip(entity.axes, i[::-1]))
+                                                         for a, b in zip(entity.axes, ii[::-1]))
                                                  for j, o in enumerate(entity.origin)),
                                 entity=(2, e_n)))
 
             # Interior
-            for i in product(range(1, order), repeat=3):
-                if max(i[0], i[1]) + i[2] < order:
+            for ii in product(range(1, order), repeat=3):
+                if max(ii[0], ii[1]) + ii[2] < order:
                     dofs.append(
                         PointEvaluation(
                             reference, tuple(o + sum(a[j] * points[b]
-                                                     for a, b in zip(reference.axes, i))
+                                                     for a, b in zip(reference.axes, ii))
                                              for j, o in enumerate(reference.origin)),
                             entity=(3, 0)))
 
-        poly = pyramid_polynomial_set(reference.tdim, 1, order)
+        poly = pyramid_polynomial_set_1d(reference.tdim, order)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 

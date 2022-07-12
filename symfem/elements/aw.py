@@ -6,11 +6,14 @@ Thse elements definitions appear in https://doi.org/10.1007/s002110100348
 """
 
 import sympy
+import typing
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set
+from ..polynomials import polynomial_set_vector
 from ..functionals import (PointInnerProduct, InnerProductIntegralMoment,
                            VecIntegralMoment, IntegralMoment)
-from ..symbolic import x
+from ..symbolic import x, ListOfVectorFunctions
 from ..calculus import diff
 from .lagrange import Lagrange
 
@@ -18,12 +21,13 @@ from .lagrange import Lagrange
 class ArnoldWinther(CiarletElement):
     """An Arnold-Winther element."""
 
-    def __init__(self, reference, order, variant="equispaced"):
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         from symfem import create_reference
         assert reference.name == "triangle"
         self.variant = variant
-        poly = [(p[0], p[1], p[1], p[2])
-                for p in polynomial_set(reference.tdim, 3, order - 1)]
+        poly: ListOfVectorFunctions = [
+            (p[0], p[1], p[1], p[2])
+            for p in polynomial_set_vector(reference.tdim, 3, order - 1)]
         poly += [((order - k + 1) * (order - k + 2) * x[0] ** k * x[1] ** (order - k),
                   -k * (order - k + 2) * x[0] ** (k - 1) * x[1] ** (order - k + 1),
                   -k * (order - k + 2) * x[0] ** (k - 1) * x[1] ** (order - k + 1),
@@ -32,7 +36,7 @@ class ArnoldWinther(CiarletElement):
         poly += [(0, x[0] ** order, x[0] ** order, -order * x[0] ** (order - 1) * x[1]),
                  (0, 0, 0, x[0] ** order)]
 
-        dofs = []
+        dofs: ListOfFunctionals = []
         for v_n, v in enumerate(reference.vertices):
             for d in [[(1, 0), (1, 0)],
                       [(1, 0), (0, 1)],
@@ -40,12 +44,14 @@ class ArnoldWinther(CiarletElement):
                 dofs.append(PointInnerProduct(reference, v, d[0], d[1], entity=(0, v_n),
                                               mapping="double_contravariant"))
         for e_n, edge in enumerate(reference.edges):
+            assert isinstance(reference.sub_entity_types[1], str)
             sub_ref = create_reference(
                 reference.sub_entity_types[1],
                 vertices=tuple(reference.vertices[i] for i in edge))
             sub_e = Lagrange(sub_ref.default_reference(), order - 2, variant)
             for dof_n, dof in enumerate(sub_e.dofs):
-                p = sub_e.get_basis_function(dof_n)
+                p = sub_e.get_basis_function(dof_n).get_function()
+                assert isinstance(p, (int, sympy.core.expr.Expr))
                 for component in [sub_ref.normal(), sub_ref.tangent()]:
                     InnerProductIntegralMoment(
                         reference, sub_ref, p, component, sub_ref.normal(), dof,
@@ -56,7 +62,8 @@ class ArnoldWinther(CiarletElement):
                             entity=(1, e_n), mapping="double_contravariant"))
         sub_e = Lagrange(reference, order - 3, variant)
         for dof_n, dof in enumerate(sub_e.dofs):
-            p = sub_e.get_basis_function(dof_n)
+            p = sub_e.get_basis_function(dof_n).get_function()
+            assert isinstance(p, (int, sympy.core.expr.Expr))
             for component in [(1, 0, 0, 0), (0, 1, 0, 0),
                               (0, 0, 0, 1)]:
                 dofs.append(VecIntegralMoment(
@@ -74,7 +81,7 @@ class ArnoldWinther(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 
@@ -87,30 +94,33 @@ class ArnoldWinther(CiarletElement):
 class NonConformingArnoldWinther(CiarletElement):
     """A nonconforming Arnold-Winther element."""
 
-    def __init__(self, reference, order, variant="equispaced"):
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         from symfem import create_reference
         assert reference.name == "triangle"
         self.variant = variant
-        poly = [(p[0], p[1], p[1], p[2])
-                for p in polynomial_set(reference.tdim, 3, order - 1)]
+        poly: ListOfVectorFunctions = [
+            (p[0], p[1], p[1], p[2])
+            for p in polynomial_set_vector(reference.tdim, 3, order - 1)]
 
         poly += [
-            [0, x[1] ** 2, x[1] ** 2, -2 * x[1] ** 2],
-            [-2 * x[0] ** 2, x[0] ** 2, x[0] ** 2, 0],
-            [-2 * x[0] * x[1], x[0] * x[1], x[0] * x[1], 0],
-            [x[0] * (x[0] - x[1]), 0, 0, 0],
-            [x[0] ** 2, 0, 0, x[0] * x[1]],
-            [x[0] ** 2, 0, 0, x[1] ** 2]
+            (0, x[1] ** 2, x[1] ** 2, -2 * x[1] ** 2),
+            (-2 * x[0] ** 2, x[0] ** 2, x[0] ** 2, 0),
+            (-2 * x[0] * x[1], x[0] * x[1], x[0] * x[1], 0),
+            (x[0] * (x[0] - x[1]), 0, 0, 0),
+            (x[0] ** 2, 0, 0, x[0] * x[1]),
+            (x[0] ** 2, 0, 0, x[1] ** 2)
         ]
 
-        dofs = []
+        dofs: ListOfFunctionals = []
         for e_n, edge in enumerate(reference.edges):
+            assert isinstance(reference.sub_entity_types[1], str)
             sub_ref = create_reference(
                 reference.sub_entity_types[1],
                 vertices=tuple(reference.vertices[i] for i in edge))
             sub_e = Lagrange(sub_ref.default_reference(), 1, variant)
             for dof_n, dof in enumerate(sub_e.dofs):
-                p = sub_e.get_basis_function(dof_n)
+                p = sub_e.get_basis_function(dof_n).get_function()
+                assert isinstance(p, (int, sympy.core.expr.Expr))
                 for component in [sub_ref.normal(), sub_ref.tangent()]:
                     dofs.append(
                         InnerProductIntegralMoment(
@@ -118,7 +128,8 @@ class NonConformingArnoldWinther(CiarletElement):
                             entity=(1, e_n), mapping="double_contravariant"))
         sub_e = Lagrange(reference, 0, variant)
         for dof_n, dof in enumerate(sub_e.dofs):
-            p = sub_e.get_basis_function(dof_n)
+            p = sub_e.get_basis_function(dof_n).get_function()
+            assert isinstance(p, (int, sympy.core.expr.Expr))
             for component in [(1, 0, 0, 0), (0, 1, 0, 0),
                               (0, 0, 0, 1)]:
                 dofs.append(VecIntegralMoment(
@@ -127,7 +138,7 @@ class NonConformingArnoldWinther(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 

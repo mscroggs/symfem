@@ -4,14 +4,17 @@ This element's definition appears in https://doi.org/10.1090/mcom/3361
 (Wu, Xu, 2019)
 """
 
+import typing
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set
+from ..polynomials import polynomial_set_1d
 from ..functionals import (PointEvaluation, DerivativePointEvaluation,
                            IntegralOfDirectionalMultiderivative)
-from ..symbolic import x
+from ..symbolic import x, ListOfVectorFunctions
 
 
-def derivatives(dim, order):
+def derivatives(dim: int, order: int) -> typing.List[typing.Tuple[int, ...]]:
     """Return all the orders of a multidimensional derivative."""
     if dim == 1:
         return [(order, )]
@@ -25,9 +28,9 @@ def derivatives(dim, order):
 class WuXu(CiarletElement):
     """Wu-Xu finite element."""
 
-    def __init__(self, reference, order):
+    def __init__(self, reference: Reference, order: int):
         assert order == reference.tdim + 1
-        poly = polynomial_set(reference.tdim, 1, order)
+        poly = polynomial_set_1d(reference.tdim, order)
 
         if reference.name == "interval":
             bubble = x[0] * (1 - x[0])
@@ -36,9 +39,9 @@ class WuXu(CiarletElement):
         elif reference.name == "tetrahedron":
             bubble = x[0] * x[1] * x[2] * (1 - x[0] - x[1] - x[2])
 
-        poly += [bubble * i for i in polynomial_set(reference.tdim, 1, 1)[1:]]
+        poly += [bubble * i for i in polynomial_set_1d(reference.tdim, 1)[1:]]
 
-        dofs = []
+        dofs: ListOfFunctionals = []
 
         for v_n, vs in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
@@ -51,10 +54,10 @@ class WuXu(CiarletElement):
             for e_n, vs in enumerate(reference.sub_entities(codim=codim)):
                 subentity = reference.sub_entity(dim, e_n)
                 volume = subentity.jacobian()
+                normals: ListOfVectorFunctions = []
                 if codim == 1:
                     normals = [subentity.normal()]
                 elif codim == 2 and reference.tdim == 3:
-                    normals = []
                     for f_n, f_vs in enumerate(reference.sub_entities(2)):
                         if vs[0] in f_vs and vs[1] in f_vs:
                             face = reference.sub_entity(2, f_n)
@@ -63,7 +66,7 @@ class WuXu(CiarletElement):
                     raise NotImplementedError
                 for orders in derivatives(len(normals), len(normals)):
                     dofs.append(IntegralOfDirectionalMultiderivative(
-                        reference, subentity, normals, orders, (dim, e_n),
+                        reference, subentity, tuple(normals), orders, (dim, e_n),
                         scale=1 / volume))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)

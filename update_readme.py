@@ -1,12 +1,11 @@
-"""
-This script updated the list of available elements in README.md.
-"""
+"""Script to update the list of available elements in README.md."""
 
 import symfem
+import typing
 
 cells = ["interval", "triangle", "quadrilateral", "tetrahedron",
          "hexahedron", "prism", "pyramid", "dual polygon"]
-elementlist = {i: [] for i in cells}
+elementlist: typing.Dict[str, typing.List[str]] = {i: [] for i in cells}
 
 for e in symfem.create._elementlist:
     name = e.names[0]

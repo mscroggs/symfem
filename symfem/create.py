@@ -1,43 +1,46 @@
 """Create elements and references."""
+
+import typing as _typing
 import os as _os
 import importlib as _il
 from . import references as _references
 from .finite_element import FiniteElement as _FiniteElement
+from .symbolic import SetOfPoints as _SetOfPoints
 
 _folder = _os.path.dirname(_os.path.realpath(__file__))
 
-_elementmap = {}
-_elementlist = []
+_elementmap: _typing.Dict[str, _typing.Dict[str, _typing.Type]] = {}
+_elementlist: _typing.List[_typing.Type] = []
 
 
-def add_element(ElementClass):
+def add_element(element_class: _typing.Type):
     """Add an element to Symfem.
 
     Parameters
     ----------
-    ElementClass : type
+    element_class : type
         The class defining the element.
     """
     global _elementlist
     global _elementmap
-    if not isinstance(ElementClass, type):
+    if not isinstance(element_class, type):
         raise TypeError("Element must be defined by a class.")
-    if not issubclass(ElementClass, _FiniteElement):
+    if not issubclass(element_class, _FiniteElement):
         raise TypeError("Element must inherit from the FiniteElement class.")
-    if ElementClass == _FiniteElement:
+    if element_class == _FiniteElement:
         raise TypeError("Cannot add the FiniteElement class itself.")
-    if len(ElementClass.names) == 0:
+    if len(element_class.names) == 0:
         raise TypeError("An element with no names cannot be added")
 
-    if ElementClass not in _elementlist:
-        _elementlist.append(ElementClass)
-    for _n in ElementClass.names:
-        for _r in ElementClass.references:
+    if element_class not in _elementlist:
+        _elementlist.append(element_class)
+    for _n in element_class.names:
+        for _r in element_class.references:
             if _n not in _elementmap:
                 _elementmap[_n] = {}
             if _r in _elementmap[_n]:
-                assert ElementClass == _elementmap[_n][_r]
-            _elementmap[_n][_r] = ElementClass
+                assert element_class == _elementmap[_n][_r]
+            _elementmap[_n][_r] = element_class
 
 
 for _file in _os.listdir(_os.path.join(_folder, "elements")):
@@ -56,7 +59,9 @@ for _file in _os.listdir(_os.path.join(_folder, "elements")):
                 add_element(_element)
 
 
-def create_reference(cell_type, vertices=None):
+def create_reference(
+    cell_type: str, vertices: _SetOfPoints = None
+) -> _references.Reference:
     """Make a reference cell.
 
     Parameters
@@ -97,7 +102,9 @@ def create_reference(cell_type, vertices=None):
         raise ValueError(f"Unknown cell type: {cell_type}")
 
 
-def create_element(cell_type, element_type, order, **kwargs):
+def create_element(
+    cell_type: str, element_type: str, order: int, **kwargs: _typing.Any
+) -> _FiniteElement:
     """Make a finite element.
 
     Parameters
@@ -186,7 +193,9 @@ def create_element(cell_type, element_type, order, **kwargs):
     raise ValueError(f"Unsupported element type: {element_type}")
 
 
-def _order_is_allowed(element_class, ref, order):
+def _order_is_allowed(
+    element_class: _typing.Type, ref: str, order: int
+) -> bool:
     if hasattr(element_class, "min_order"):
         if isinstance(element_class.min_order, dict):
             if ref in element_class.min_order:

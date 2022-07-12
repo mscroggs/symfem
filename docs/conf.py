@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
-#
-# Configuration file for the Sphinx documentation builder.
-#
-# This file does only contain a selection of the most common options. For a
-# full list see the documentation:
-# http://www.sphinx-doc.org/en/master/config
+"""
+Configuration file for the Sphinx documentation builder.
+
+This file does only contain a selection of the most common options. For a
+full list see the documentation:
+http://www.sphinx-doc.org/en/master/config
+"""
 
 # -- Path setup --------------------------------------------------------------
 
@@ -119,7 +119,7 @@ htmlhelp_basename = "Symfemdoc"
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
-    # 'papersize': 'letterpaper',
+    'papersize': 'a4paper',
     # The font size ('10pt', '11pt' or '12pt').
     #
     # 'pointsize': '10pt',

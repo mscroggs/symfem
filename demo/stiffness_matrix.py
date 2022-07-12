@@ -1,6 +1,4 @@
-"""
-This demo shows how Symfem can be used to compute a stiffness matrix.
-"""
+"""Demo showing how Symfem can be used to compute a stiffness matrix."""
 
 import symfem
 from symfem.vectors import vdot
@@ -19,7 +17,7 @@ element = symfem.create_element("triangle", "Lagrange", 1)
 
 for triangle in triangles:
     # Get the vertices of the triangle
-    vs = [vertices[i] for i in triangle]
+    vs = tuple(vertices[i] for i in triangle)
     # Create a reference cell with these vertices: this will be used
     # to compute the integral over the triangle
     ref = symfem.create_reference("triangle", vertices=vs)

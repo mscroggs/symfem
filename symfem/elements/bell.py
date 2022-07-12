@@ -3,9 +3,12 @@
 This element's definition is given in https://doi.org/10.1002/nme.1620010108 (Bell, 1969)
 """
 
+import typing
+from ..references import Reference
+from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
-from ..polynomials import polynomial_set
+from ..polynomials import polynomial_set_1d
 from ..functionals import (PointEvaluation, NormalDerivativeIntegralMoment,
                            DerivativePointEvaluation)
 from .lagrange import Lagrange
@@ -14,10 +17,10 @@ from .lagrange import Lagrange
 class Bell(CiarletElement):
     """Bell finite element."""
 
-    def __init__(self, reference, order, variant="equispaced"):
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         assert reference.name == "triangle"
         assert order == 5
-        dofs = []
+        dofs: ListOfFunctionals = []
         for v_n, v in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(reference, v, (1, 0), entity=(0, v_n)))
@@ -32,10 +35,10 @@ class Bell(CiarletElement):
         self.variant = variant
 
         super().__init__(
-            reference, order, polynomial_set(reference.tdim, 1, order), dofs, reference.tdim, 1
+            reference, order, polynomial_set_1d(reference.tdim, order), dofs, reference.tdim, 1
         )
 
-    def init_kwargs(self):
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
         return {"variant": self.variant}
 

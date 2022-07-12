@@ -6,16 +6,20 @@ https://doi.org/10.1137/11082539X (Ainsworth, Andriamaro, Davydov, 2011)
 """
 
 import sympy
-from ..symbolic import x, t, subs, to_sympy
+import typing
+from ..references import Reference
+from ..functionals import ListOfFunctionals
+from ..symbolic import (x, t, subs, PointType, AnyFunction, ScalarValue, ListOfScalarFunctions,
+                        AxisVariables)
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set
-from ..functionals import BaseFunctional, PointEvaluation
+from ..polynomials import polynomial_set_1d
+from ..functionals import BaseFunctional, PointEvaluation, ScalarValueOrFloat
 from ..polynomials import orthogonal_basis
 
 
-def single_choose(n, k):
+def single_choose(n: int, k: int) -> ScalarValue:
     """Calculate choose function of a set of powers."""
-    out = to_sympy(1)
+    out = sympy.Integer(1)
     for i in range(k + 1, n + 1):
         out *= i
     for i in range(1, n - k + 1):
@@ -23,16 +27,18 @@ def single_choose(n, k):
     return out
 
 
-def choose(n, powers):
+def choose(n: int, powers: typing.List[int]) -> ScalarValue:
     """Calculate choose function of a set of powers."""
-    out = to_sympy(1)
+    out = sympy.Integer(1)
     for p in powers:
         out *= single_choose(n, p)
         n -= p
     return out
 
 
-def bernstein_polynomials(n, d, vars=x):
+def bernstein_polynomials(
+    n: int, d: int, vars: AxisVariables = x
+) -> ListOfScalarFunctions:
     """
     Return a list of Bernstein polynomials.
 
@@ -73,7 +79,8 @@ def bernstein_polynomials(n, d, vars=x):
 class BernsteinFunctional(BaseFunctional):
     """Functional for a Bernstein element."""
 
-    def __init__(self, reference, integral_domain, index, degree, entity):
+    def __init__(self, reference: Reference, integral_domain: Reference, index: int,
+                 degree: int, entity: typing.Tuple[int, int]):
         super().__init__(reference, entity, "identity")
         orth = [
             o / sympy.sqrt(integral_domain.integral(o * o))
@@ -91,24 +98,26 @@ class BernsteinFunctional(BaseFunctional):
 
         self.moment = sum(i * j for i, j in zip(alpha, orth))
 
-    def dof_point(self):
+    def dof_point(self) -> PointType:
         """Get the location of the DOF in the cell."""
         return self.ref.sub_entity(*self.entity).midpoint()
 
-    def dof_direction(self):
-        """Get the direction of the DOF."""
-        return None
-
-    def eval(self, function, symbolic=True):
+    def eval(self, function: AnyFunction, symbolic: bool = True) -> ScalarValueOrFloat:
         """Apply the functional to a function."""
         point = [i for i in self.ref.origin]
         for i, a in enumerate(zip(*self.ref.axes)):
             for j, k in zip(a, t):
                 point[i] += j * k
 
-        return self.ref.integral(subs(function, x, point) * self.moment)
+        integrand = subs(function, x, point) * self.moment
+        assert isinstance(integrand, (int, sympy.core.expr.Expr))
+        value = self.ref.integral(integrand)
+        if symbolic:
+            return value
+        else:
+            return float(value)
 
-    def get_tex(self):
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         if self.reference.tdim == self.ref.tdim:
             return f"v\\mapsto c_{{{self.index}}}", [
@@ -129,11 +138,13 @@ class BernsteinFunctional(BaseFunctional):
 class Bernstein(CiarletElement):
     """Bernstein finite element."""
 
-    def __init__(self, reference, order):
-        poly = polynomial_set(reference.tdim, 1, order)
+    def __init__(self, reference: Reference, order: int):
+        poly = polynomial_set_1d(reference.tdim, order)
 
+        dofs: ListOfFunctionals = []
         if order == 0:
-            dofs = [PointEvaluation(reference, reference.midpoint(), (reference.tdim, 0))]
+            dofs = [
+                PointEvaluation(reference, reference.midpoint(), (reference.tdim, 0))]
         else:
             def index(x, y=0, z=0):
                 return (
@@ -142,7 +153,6 @@ class Bernstein(CiarletElement):
                     + x
                 )
 
-            dofs = []
             for vn, v in enumerate(reference.vertices):
                 dofs.append(PointEvaluation(reference, v, (0, vn)))
 
