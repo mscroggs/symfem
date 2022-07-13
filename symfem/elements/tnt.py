@@ -173,7 +173,7 @@ class TNTcurl(CiarletElement):
                             reference, reference, curl(curl(f)), entity=(3, 0),
                             mapping="covariant"))
 
-                        f = (0, x[1] ** k * x[0] ** i * (1 - x[0]) * x[2] ** j * (1 - x[2]), 0, 0)
+                        f = (0, x[1] ** k * x[0] ** i * (1 - x[0]) * x[2] ** j * (1 - x[2]), 0)
                         dofs.append(IntegralAgainst(
                             reference, reference, curl(curl(f)), entity=(3, 0),
                             mapping="covariant"))
