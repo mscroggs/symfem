@@ -4,7 +4,7 @@ import sympy
 import typing
 from .symbolic import (subs, x, MatrixFunction, ScalarFunction, VectorFunction, PointType,
                        AnyFunction)
-from .vectors import vdot, vcross, vnorm
+from .vectors import vdot, vcross3d, vnorm
 from .calculus import diff
 
 
@@ -13,7 +13,7 @@ def _det(M: MatrixFunction) -> ScalarFunction:
     if M.rows == M.cols:
         return M.det()
     if M.rows == 3 and M.cols == 2:
-        crossed = vcross(M.col(0), M.col(1))
+        crossed = vcross3d(M.col(0), M.col(1))
         assert isinstance(crossed, tuple)
         return vnorm(crossed)
     raise ValueError(f"Cannot find determinant of {M.rows}x{M.cols} matrix.")
