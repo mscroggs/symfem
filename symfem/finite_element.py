@@ -10,15 +10,22 @@ from abc import ABC, abstractmethod
 from itertools import product
 from .symbolic import (
     x, subs, _subs_scalar, PiecewiseFunction, symequal, sym_product,
-    AnyFunction, SetOfPoints, ListOfAnyFunctions, ListOfScalarFunctions, ListOfVectorFunctions,
-    ScalarFunction, VectorFunction, MatrixFunction,
-    ListOfMatrixFunctions, ListOfPiecewiseFunctions, PointType, ListOfAnyFunctionsInput,
+    SetOfPoints, ListOfPiecewiseFunctions, PointType, ListOfAnyFunctionsInput,
     parse_any_function_input, PFunctionPieces, make_single_function_type)
 from .calculus import diff
 from .vectors import vsub, vnorm, vdiv, vadd
 from .functionals import ListOfFunctionals
 from .basis_function import BasisFunction
 from .references import Reference
+
+from .functions import ScalarFunction, VectorFunction, MatrixFunction, parse_function_list_input
+ListOfScalarFunctions = typing.List[ScalarFunction]
+ListOfVectorFunctions = typing.List[VectorFunction]
+ListOfMatrixFunctions = typing.List[MatrixFunction]
+ListOfAnyFunctions = typing.Union[
+    ListOfScalarFunctions, ListOfVectorFunctions, ListOfMatrixFunctions,
+    ListOfPiecewiseFunctions]
+AnyFunction = typing.Union[ScalarFunction, VectorFunction, MatrixFunction, PiecewiseFunction]
 
 TabulatedBasis = typing.Union[
     typing.List[typing.Union[sympy.core.expr.Expr, int]],
@@ -88,10 +95,7 @@ class FiniteElement(ABC):
             for p in points:
                 row = []
                 for b in self.get_basis_functions(False):
-                    if isinstance(b, PiecewiseFunction):
-                        b = b.get_piece(p)
-                    assert isinstance(b, (int, sympy.core.expr.Expr))
-                    row.append(_subs_scalar(b, x, p))
+                    row.append(b.subs(x, p))
                 output.append(tuple(row))
             return output
 
@@ -224,8 +228,8 @@ class FiniteElement(ABC):
                     f = get_piece(f, (0, sympy.Rational(1, 3), sympy.Rational(1, 3)))
                     g = get_piece(g, (0, sympy.Rational(1, 3), sympy.Rational(1, 3)))
 
-                f = subs(f, [x[0]], [0])
-                g = subs(g, [x[0]], [0])
+                f = f.subs(x[0], 0)
+                g = g.subs(x[0], 0)
 
                 if continuity[0] == "C":
                     order = int(continuity[1:])
@@ -270,7 +274,11 @@ class FiniteElement(ABC):
                 else:
                     raise ValueError(f"Unknown continuity: {continuity}")
 
-                assert symequal(f, g)
+                print(f)
+                print(g)
+                for i, j in zip(f, g):
+                    print(i, type(i), j, type(j), i == j)
+                    assert i == j
 
     def get_tensor_factorisation(
         self
@@ -312,7 +320,7 @@ class CiarletElement(FiniteElement):
     ):
         super().__init__(reference, order, len(dofs), domain_dim, range_dim, range_shape)
         assert len(basis) == len(dofs)
-        self._basis: ListOfAnyFunctions = parse_any_function_input(basis)
+        self._basis: ListOfAnyFunctions = parse_function_list_input(basis)
         self.dofs = dofs
         self._basis_functions: typing.Union[ListOfAnyFunctions, None] = None
         self._dual_inv: typing.Union[numpy.typing.NDArray[numpy.float64], None] = None
@@ -825,14 +833,14 @@ class CiarletElement(FiniteElement):
                     dofs_by_type[t].append(d)
                 for ds in dofs_by_type.values():
                     mapped_dofs = self.dofs[ds[0]].perform_mapping(
-                        make_single_function_type([basis[d] for d in ds]),
+                        [basis[d] for d in ds],
                         forward_map, inverse_map, self.reference.tdim)
                     for d_n, mdof in zip(ds, mapped_dofs):
                         functions[d_n] = mdof
 
         for fun in functions:
             assert fun is not None
-        return make_single_function_type(functions)
+        return functions
 
     def test(self):
         """Run tests for this element."""
@@ -867,9 +875,9 @@ class CiarletElement(FiniteElement):
         for i, f in enumerate(self.get_basis_functions()):
             for j, d in enumerate(self.dofs):
                 if i == j:
-                    assert d.eval(f).expand().simplify() == 1
+                    assert d.eval(f) == 1
                 else:
-                    assert d.eval(f).expand().simplify() == 0
+                    assert d.eval(f) == 0
                 assert d.entity_dim() is not None
 
 

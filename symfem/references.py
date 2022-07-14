@@ -241,9 +241,7 @@ class Point(Reference):
         self, f: ScalarFunction, vars: AxisVariables = t
     ) -> sympy.core.expr.Expr:
         """Calculate the integral over the element."""
-        out = subs(f, vars, self.vertices[0])
-        assert isinstance(out, sympy.core.expr.Expr)
-        return out
+        return f.subs(vars, self.vertices[0])
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -305,7 +303,6 @@ class Interval(Reference):
         integrand = f * self.jacobian()
         if isinstance(integrand, int):
             integrand = sympy.Integer(integrand)
-        assert isinstance(integrand, sympy.core.expr.Expr)
         return integrand.integrate((vars[0], 0, 1))
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
@@ -373,7 +370,6 @@ class Triangle(Reference):
         integrand = f * self.jacobian()
         if isinstance(integrand, int):
             integrand = sympy.Integer(integrand)
-        assert isinstance(integrand, sympy.core.expr.Expr)
         return integrand.integrate((vars[1], 0, 1 - vars[0]), (vars[0], 0, 1))
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
@@ -466,7 +462,6 @@ class Tetrahedron(Reference):
         integrand = f * self.jacobian()
         if isinstance(integrand, int):
             integrand = sympy.Integer(integrand)
-        assert isinstance(integrand, sympy.core.expr.Expr)
         return integrand.integrate(
             (vars[0], 0, 1 - vars[1] - vars[2]), (vars[1], 0, 1 - vars[2]), (vars[2], 0, 1))
 
@@ -548,7 +543,6 @@ class Quadrilateral(Reference):
         integrand = f * self.jacobian()
         if isinstance(integrand, int):
             integrand = sympy.Integer(integrand)
-        assert isinstance(integrand, sympy.core.expr.Expr)
         return integrand.integrate((vars[1], 0, 1), (vars[0], 0, 1))
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
@@ -670,7 +664,6 @@ class Hexahedron(Reference):
         integrand = f * self.jacobian()
         if isinstance(integrand, int):
             integrand = sympy.Integer(integrand)
-        assert isinstance(integrand, sympy.core.expr.Expr)
         return integrand.integrate(
             (vars[2], 0, 1), (vars[1], 0, 1), (vars[0], 0, 1))
 
@@ -790,7 +783,6 @@ class Prism(Reference):
         integrand = f * self.jacobian()
         if isinstance(integrand, int):
             integrand = sympy.Integer(integrand)
-        assert isinstance(integrand, sympy.core.expr.Expr)
         return integrand.integrate(
             (vars[2], 0, 1), (vars[1], 0, 1 - vars[0]), (vars[0], 0, 1))
 
@@ -907,7 +899,6 @@ class Pyramid(Reference):
         integrand = f * self.jacobian()
         if isinstance(integrand, int):
             integrand = sympy.Integer(integrand)
-        assert isinstance(integrand, sympy.core.expr.Expr)
         return integrand.integrate(
             (vars[0], 0, 1 - vars[2]), (vars[1], 0, 1 - vars[2]), (vars[2], 0, 1))
 

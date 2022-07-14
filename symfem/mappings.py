@@ -23,7 +23,7 @@ def identity(
     f: AnyFunction, map: PointType, inverse_map: PointType, tdim: int
 ) -> AnyFunction:
     """Map functions."""
-    g = subs(f, x, inverse_map)
+    g = f.subs(x, inverse_map)
     return g
 
 
@@ -31,7 +31,7 @@ def covariant(
     f: VectorFunction, map: PointType, inverse_map: PointType, tdim: int
 ) -> VectorFunction:
     """Map H(curl) functions."""
-    g = subs(f, x, inverse_map)
+    g = f.subs(x, inverse_map)
     assert isinstance(g, tuple)
     j_inv = sympy.Matrix([[diff(i, x[j]) for j in range(len(map))]
                           for i in inverse_map]).transpose()
@@ -42,7 +42,7 @@ def contravariant(
     f: VectorFunction, map: PointType, inverse_map: PointType, tdim: int
 ) -> VectorFunction:
     """Map H(div) functions."""
-    g = subs(f, x, inverse_map)
+    g = f.subs(x, inverse_map)
     assert isinstance(g, tuple)
     jacobian = sympy.Matrix([[diff(i, x[j]) for j in range(tdim)] for i in map])
     jacobian /= _det(jacobian)
@@ -54,7 +54,7 @@ def double_covariant(
     inverse_map: PointType, tdim: int
 ) -> VectorFunction:
     """Map matrix functions."""
-    g = subs(f, x, inverse_map)
+    g = f.subs(x, inverse_map)
     if isinstance(g, tuple):
         g_mat = sympy.Matrix([g[i * tdim: (i + 1) * tdim] for i in range(tdim)])
     else:
@@ -70,7 +70,7 @@ def double_contravariant(
     f: VectorFunction, map: PointType, inverse_map: PointType, tdim: int
 ) -> VectorFunction:
     """Map matrix functions."""
-    g = subs(f, x, inverse_map)
+    g = f.subs(x, inverse_map)
     if isinstance(g, tuple):
         g_mat = sympy.Matrix([g[i * tdim: (i + 1) * tdim] for i in range(tdim)])
     else:

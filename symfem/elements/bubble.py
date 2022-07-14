@@ -24,7 +24,6 @@ class Bubble(CiarletElement):
         p1 = create_element(reference.name, "Lagrange", 1)
         bubble = 1
         for f in p1.get_basis_functions():
-            assert isinstance(f, (int, sympy.core.expr.Expr))
             bubble *= f
         # TODO: variants
         if reference.name == "interval":

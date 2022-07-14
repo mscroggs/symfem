@@ -2,6 +2,7 @@
 
 import sympy
 import typing
+from warnings import warn
 
 # Types
 ScalarFunction = typing.Union[sympy.core.expr.Expr, int]
@@ -225,6 +226,7 @@ def subs(
     values: typing.Union[ScalarValue, typing.List[ScalarValue], typing.Tuple[ScalarValue, ...]]
 ) -> AnyFunction:
     """Substitute values into a function expression."""
+    warn('This is deprecated', DeprecationWarning, stacklevel=2)
     if isinstance(f, PiecewiseFunction):
         if isinstance(values, (int, sympy.core.expr.Expr)):
             return f.evaluate((values, ))
@@ -245,6 +247,7 @@ def _subs_scalar(
     values: typing.Union[ScalarValue, typing.List[ScalarValue], typing.Tuple[ScalarValue, ...]]
 ) -> ScalarFunction:
     """Substitute values into a scalar expression."""
+    warn('This is deprecated', DeprecationWarning, stacklevel=2)
     if isinstance(f, int):
         return f
     if isinstance(vars, sympy.Symbol):
@@ -287,6 +290,7 @@ def symequal(
     b: typing.Union[typing.List, typing.Tuple, AnyFunction]
 ) -> bool:
     """Check if two symbolic numbers or vectors are equal."""
+    warn('This is deprecated', DeprecationWarning, stacklevel=2)
     if isinstance(a, (list, tuple)):
         assert isinstance(b, (list, tuple))
         for i, j in zip(a, b):
@@ -301,6 +305,7 @@ def symequal(
 
 def make_single_function_type(functions: typing.List[AnyFunction]) -> ListOfAnyFunctions:
     """Make a list containing a single function type."""
+    warn('This is deprecated', DeprecationWarning, stacklevel=2)
     if isinstance(functions[0], tuple):
         vfs: ListOfVectorFunctions = []
         for fun in functions:
