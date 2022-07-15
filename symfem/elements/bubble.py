@@ -78,7 +78,6 @@ class BubbleEnrichedLagrange(CiarletElement):
         poly = []
         for e in [lagrange, bubble]:
             for p in e._basis:
-                assert isinstance(p, (int, sympy.core.expr.Expr))
                 poly.append(p)
 
         self.variant = variant
@@ -108,7 +107,6 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
         poly = []
         for e in [lagrange, bubble]:
             for p in e._basis:
-                assert isinstance(p, (int, sympy.core.expr.Expr))
                 poly.append((p, 0))
                 poly.append((0, p))
 

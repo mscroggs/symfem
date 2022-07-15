@@ -3,7 +3,6 @@
 from __future__ import annotations
 import sympy
 import typing
-from abc import ABC, abstractmethod
 from .symbols import x
 from .functions import AnyFunction, ScalarFunction, _to_sympy_format
 
@@ -189,6 +188,34 @@ class PiecewiseScalarFunction(PiecewiseFunction):
     def as_sympy(self) -> SympyFormat:
         """Convert to a sympy expression."""
         return tuple((tuple(shape), f) for shape, f in self._pieces)
+
+    def as_tex(self) -> str:
+        """Convert to a TeX expression."""
+        out = "\\begin{cases}\n"
+        joiner = ""
+        for shape, f in self._pieces:
+            out += joiner
+            joiner = "\\\\"
+            out += _to_tex(func, True)
+            out += "&\\text{in }\\operatorname{"
+            if self.tdim == 2:
+                if len(shape) == 3:
+                    out += "Triangle"
+                elif len(shape) == 4:
+                    out += "Quadrilateral"
+                else:
+                    raise ValueError("Unsupported shape")
+            elif self.tdim == 3:
+                if len(shape) == 4:
+                    out += "Tetrahedron"
+                else:
+                    raise ValueError("Unsupported shape")
+            else:
+                raise ValueError("Unsupported shape")
+            out += "}"
+            out += f"({points})"
+        out += "\\end{cases}"
+        return out
 
     def subs(self, vars: AxisVariables, values: ValuesToSubstitute) -> typing.Union(PiecewiseScalarFunction, ScalarFunction):
         """Substitute values into the function."""

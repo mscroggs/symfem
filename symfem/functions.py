@@ -5,6 +5,7 @@ import sympy
 import typing
 from abc import ABC, abstractmethod
 from .symbols import x
+from .geometry import PointType
 
 SympyFormat = typing.Union[
     sympy.core.expr.Expr,
@@ -61,7 +62,11 @@ def _check_equal(first: SympyFormat, second: SympyFormat) -> bool:
                 return False
         return True
 
-    if isinstance(first, sympy.matrices.dense.MutableDenseMatrix) and isinstance(second, sympy.matrices.dense.MutableDenseMatrix):
+    if isinstance(
+        first, sympy.matrices.dense.MutableDenseMatrix
+    ) and isinstance(
+        second, sympy.matrices.dense.MutableDenseMatrix
+    ):
         if first.rows != second.rows:
             return False
         if first.cols != second.cols:
@@ -132,6 +137,11 @@ class AnyFunction(ABC):
         pass
 
     @abstractmethod
+    def as_tex(self) -> str:
+        """Convert to a TeX expression."""
+        pass
+
+    @abstractmethod
     def subs(self, vars: AxisVariables, values: ValuesToSubstitute):
         """Substitute values into the function."""
         pass
@@ -177,7 +187,11 @@ class AnyFunction(ABC):
         pass
 
     @abstractmethod
-    def integrate(self, *limits: typing.Tuple[sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr], typing.Union[int, sympy.core.expr.Expr]]):
+    def integrate(
+        self, *limits: typing.Tuple[
+            sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr],
+            typing.Union[int, sympy.core.expr.Expr]]
+    ):
         """Compute the integral of the function."""
         pass
 
@@ -275,6 +289,13 @@ class ScalarFunction(AnyFunction):
         """Convert to a sympy expression."""
         return self._f
 
+    def as_tex(self) -> str:
+        """Convert to a TeX expression."""
+        out = sympy.latex(sympy.simplify(sympy.expand(self._f)))
+        out = out.replace("\\left[", "\\left(")
+        out = out.replace("\\right]", "\\right)")
+        return out
+
     def subs(self, vars: AxisVariables, values: ValuesToSubstitute) -> ScalarFunction:
         """Substitute values into the function."""
         subbed = self._f
@@ -329,7 +350,11 @@ class ScalarFunction(AnyFunction):
         """Compute the curl of the function."""
         raise ValueError("Cannot compute the curl of a scalar-valued function.")
 
-    def integrate(self, *limits: typing.Tuple[sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr], typing.Union[int, sympy.core.expr.Expr]]) -> ScalarFunction:
+    def integrate(
+        self, *limits: typing.Tuple[
+            sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr],
+            typing.Union[int, sympy.core.expr.Expr]]
+    ) -> ScalarFunction:
         """Compute the integral of the function."""
         return ScalarFunction(self._f.integrate(*limits))
 
@@ -418,6 +443,12 @@ class VectorFunction(AnyFunction):
         """Convert to a sympy expression."""
         return tuple(i._f for i in self._vec)
 
+    def as_tex(self) -> str:
+        """Convert to a TeX expression."""
+        return "\\left(\\begin{array}{c}" + "\\\\".join([
+            "\\displaystyle " + i.as_tex() for i in self._vec
+        ]) + "\\end{array}\\right)"
+
     def subs(self, vars: AxisVariables, values: ValuesToSubstitute) -> VectorFunction:
         """Substitute values into the function."""
         subbed = tuple(i.subs(vars, values) for i in self._vec)
@@ -448,7 +479,7 @@ class VectorFunction(AnyFunction):
                 out += i._f * j._f
             return ScalarFunction(out)
 
-        #TODO: remove
+        # TODO: remove
         if isinstance(other, tuple):
             assert len(self._vec) == len(other)
             out = 0
@@ -476,7 +507,11 @@ class VectorFunction(AnyFunction):
             self._vec[1].diff(x[0]) - self._vec[0].diff(x[1])
         ])
 
-    def integrate(self, *limits: typing.Tuple[sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr], typing.Union[int, sympy.core.expr.Expr]]):
+    def integrate(
+        self, *limits: typing.Tuple[
+            sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr],
+            typing.Union[int, sympy.core.expr.Expr]]
+    ):
         """Compute the integral of the function."""
         raise NotImplementedError()
 
@@ -617,6 +652,18 @@ class MatrixFunction(AnyFunction):
         """Convert to a sympy expression."""
         return sympy.Matrix([[j._f for j in i] for i in self._mat])
 
+    def as_tex(self) -> str:
+        """Convert to a TeX expression."""
+        out = "\\left(\\begin{array}{"
+        out += "c" * self.shape[1]
+        out += "}"
+        out += "\\\\".join([
+            "&".join(["\\displaystyle" + j.as_tex() for j in i])
+            for i in self._mat
+        ])
+        out += "\\end{array}\\right)"
+        return out
+
     def subs(self, vars: AxisVariables, values: ValuesToSubstitute) -> MatrixFunction:
         """Substitute values into the function."""
         subbed = tuple(tuple(j.subs(vars, values) for j in i) for i in self._mat)
@@ -662,7 +709,11 @@ class MatrixFunction(AnyFunction):
         """Compute the curl of the function."""
         raise ValueError("Cannot compute the curl of a matrix-valued function.")
 
-    def integrate(self, *limits: typing.Tuple[sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr], typing.Union[int, sympy.core.expr.Expr]]):
+    def integrate(
+        self, *limits: typing.Tuple[
+            sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr],
+            typing.Union[int, sympy.core.expr.Expr]]
+    ):
         """Compute the integral of the function."""
         raise NotImplementedError()
 

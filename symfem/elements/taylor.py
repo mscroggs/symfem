@@ -18,11 +18,10 @@ class Taylor(CiarletElement):
             reference,
             cells=(IntegralMoment, Lagrange, 0, {"variant": "equispaced"}),
         )
-        midpoint = tuple(sum(i) / len(i) for i in zip(*reference.vertices))
         for i in product(range(order + 1), repeat=reference.tdim):
             if 1 <= sum(i) <= order:
                 dofs.append(DerivativePointEvaluation(
-                    reference, midpoint, i, entity=(reference.tdim, 0)))
+                    reference, reference.midpoint(), i, entity=(reference.tdim, 0)))
 
         poly = polynomial_set_1d(reference.tdim, order)
 

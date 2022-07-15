@@ -13,13 +13,13 @@ from .vectors import vsub, vnorm, vdiv, vadd
 from .functionals import ListOfFunctionals
 from .basis_function import BasisFunction
 from .references import Reference
-from .functions import ScalarFunction, VectorFunction, MatrixFunction, parse_function_list_input, AnyFunction
+from .functions import (ScalarFunction, VectorFunction, MatrixFunction, parse_function_list_input,
+                        AnyFunction)
 from .piecewise_functions import PiecewiseFunction
 
 ListOfScalarFunctions = typing.List[ScalarFunction]
 ListOfVectorFunctions = typing.List[VectorFunction]
 ListOfMatrixFunctions = typing.List[MatrixFunction]
-PiecewiseFunction = None
 ListOfPiecewiseFunctions = None
 SetOfPoints = None
 PointType = None
@@ -27,7 +27,6 @@ ListOfAnyFunctionsInput = None
 ListOfAnyFunctions = typing.Union[
     ListOfScalarFunctions, ListOfVectorFunctions, ListOfMatrixFunctions,
     ListOfPiecewiseFunctions]
-AnyFunction = typing.Union[ScalarFunction, VectorFunction, MatrixFunction, PiecewiseFunction]
 
 TabulatedBasis = typing.Union[
     typing.List[typing.Union[sympy.core.expr.Expr, int]],
@@ -66,7 +65,7 @@ class FiniteElement(ABC):
 
     @abstractmethod
     def get_basis_functions(
-        self, reshape: bool = True, symbolic: bool = True, use_tensor_factorisation: bool = False
+        self, symbolic: bool = True, use_tensor_factorisation: bool = False
     ) -> typing.List[AnyFunction]:
         """Get the basis functions of the element."""
         pass
@@ -92,7 +91,7 @@ class FiniteElement(ABC):
             return numpy.array([to_float(self.tabulate_basis(points, order=order,
                                                              symbolic=True))])
 
-        tabbed = [[b.subs(x, p).as_sympy() for b in self.get_basis_functions()] for p in points]
+        tabbed = [tuple(b.subs(x, p).as_sympy() for b in self.get_basis_functions()) for p in points]
         if self.range_dim == 1:
             return tabbed
 
@@ -101,12 +100,12 @@ class FiniteElement(ABC):
         elif order == "xxyyzz":
             output = []
             for row in tabbed:
-                output.append([j for i in zip(*row) for j in i])
+                output.append(tuple(j for i in zip(*row) for j in i))
             return output
         elif order == "xyzxyz":
             output = []
             for row in tabbed:
-                output.append([j for i in row for j in i])
+                output.append(tuple(j for i in row for j in i))
             return output
         else:
             raise ValueError(f"Unknown order: {order}")
@@ -120,9 +119,7 @@ class FiniteElement(ABC):
         pass
 
     @abstractmethod
-    def get_polynomial_basis(
-        self, reshape: bool = True
-    ) -> typing.List[AnyFunction]:
+    def get_polynomial_basis(self) -> typing.List[AnyFunction]:
         """Get the symbolic polynomial basis for the element."""
         pass
 
@@ -263,10 +260,12 @@ class FiniteElement(ABC):
         basis = {}
         for t_type, factors, perm in factorisation:
             if t_type == "scalar":
-                tensor_bases = [[subs(i, x[0], x_i) for i in f.get_basis_functions()]
+                tensor_bases = [[i.subs(x[0], x_i) for i in f.get_basis_functions()]
                                 for x_i, f in zip(x, factors)]
                 for p, k in zip(perm, product(*tensor_bases)):
-                    basis[p] = sym_product(k)
+                    basis[p] = ScalarFunction(1)
+                    for i in k:
+                        basis[p] *= i
             else:
                 raise ValueError(f"Unknown tensor product type: {t_type}")
         return [basis[i] for i in range(len(basis))]
@@ -300,22 +299,9 @@ class CiarletElement(FiniteElement):
         return [i for i, j in enumerate(self.dofs) if j.entity == (entity_dim, entity_number)]
 
     def get_polynomial_basis(
-        self, reshape: bool = True
+        self
     ) -> typing.List[AnyFunction]:
         """Get the symbolic polynomial basis for the element."""
-        if reshape and self.range_shape is not None:
-            basis = [i for i in self._basis]
-            if len(self.range_shape) != 2:
-                raise NotImplementedError
-            assert self.range_shape[0] * self.range_shape[1] == self.range_dim
-            out: ListOfMatrixFunctions = []
-            for b in basis:
-                assert isinstance(b, tuple)
-                out.append(sympy.Matrix([
-                    b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
-                    for i in range(self.range_shape[0])]))
-            return out
-
         return self._basis
 
     def get_tabulated_polynomial_basis(
@@ -347,8 +333,7 @@ class CiarletElement(FiniteElement):
                 for p in points:
                     vrow = []
                     for b in basis:
-                        vitem = subs(b, x, p)
-                        assert isinstance(vitem, tuple)
+                        vitem = b.subs(x, p)
                         vrow.append(vitem)
                     vout.append(vrow)
                 return vout
@@ -357,8 +342,7 @@ class CiarletElement(FiniteElement):
                 for p in points:
                     mrow = []
                     for b in basis:
-                        mitem = subs(b, x, p)
-                        assert isinstance(mitem, sympy.Matrix)
+                        mitem = b.subs(x, p)
                         mrow.append(mitem)
                     mout.append(mrow)
                 return mout
@@ -367,8 +351,7 @@ class CiarletElement(FiniteElement):
         for p in points:
             srow = []
             for b in basis:
-                assert isinstance(b, (int, sympy.core.expr.Expr))
-                srow.append(_subs_scalar(b, x, p))
+                srow.append(b.subs(x, p))
             sout.append(srow)
         return sout
 
@@ -400,52 +383,6 @@ class CiarletElement(FiniteElement):
         return numpy.array([
             [subs_nonsymbolic(f, x, p) for f in self.get_polynomial_basis()]
             for p in points], dtype=numpy.float64)
-
-    def tabulate_basis(
-        self, points: SetOfPoints, order: str = "xyzxyz", symbolic: bool = True
-    ) -> TabulatedBasis:
-        """Evaluate the basis functions of the element at the given points."""
-        if symbolic:
-            return super().tabulate_basis(points, order, symbolic=True)
-
-        assert not symbolic
-
-        tabulated_polyset = self._get_tabulated_polynomial_basis_nonsymbolic(
-            points)
-
-        if self._dual_inv is None:
-            dual_mat = self.get_dual_matrix(symbolic=False)
-            self._dual_inv = numpy.linalg.inv(dual_mat)
-        dual_inv = self._dual_inv
-
-        if self.range_dim == 1:
-            return numpy.dot(tabulated_polyset, dual_inv.transpose())
-
-        results = numpy.array([
-            numpy.dot(tabulated_polyset[:, :, i], dual_inv.transpose())
-            for i in range(tabulated_polyset.shape[2])
-        ])
-        # results[xyz][point][function]
-
-        if order == "xxyyzz":
-            return numpy.array([
-                [results[xyz, point, function] for xyz in range(results.shape[0])
-                 for function in range(results.shape[2])]
-                for point in range(results.shape[1])
-            ])
-        if order == "xyzxyz":
-            return numpy.array([
-                [results[xyz, point, function] for function in range(results.shape[2])
-                 for xyz in range(results.shape[0])]
-                for point in range(results.shape[1])
-            ])
-        if order == "xyz,xyz":
-            return numpy.array([
-                [[results[xyz, point, function] for xyz in range(results.shape[0])]
-                 for function in range(results.shape[2])]
-                for point in range(results.shape[1])
-            ])
-        raise ValueError(f"Unknown order: {order}")
 
     def get_dual_matrix(
         self, symbolic: bool = True
@@ -488,7 +425,7 @@ class CiarletElement(FiniteElement):
         return {}
 
     def get_basis_functions(
-        self, reshape: bool = True, symbolic: bool = True, use_tensor_factorisation: bool = False
+        self, symbolic: bool = True, use_tensor_factorisation: bool = False
     ) -> typing.List[AnyFunction]:
         """Get the basis functions of the element."""
         if self._basis_functions is None:
@@ -499,7 +436,6 @@ class CiarletElement(FiniteElement):
                 assert isinstance(m, sympy.Matrix)
                 minv = m.inv("LU")
 
-                pb = self.get_polynomial_basis()
                 sfs = []
                 for i, dof in enumerate(self.dofs):
                     sf = None
@@ -513,19 +449,6 @@ class CiarletElement(FiniteElement):
                 self._basis_functions = sfs
 
         assert isinstance(self._basis_functions, list)
-
-        if reshape and self.range_shape is not None:
-            assert isinstance(self._basis_functions[0], tuple)
-            if len(self.range_shape) != 2:
-                raise NotImplementedError
-            assert self.range_shape[0] * self.range_shape[1] == self.range_dim
-            mfs: ListOfMatrixFunctions = []
-            for f in self._basis_functions:
-                assert isinstance(f, tuple)
-                mfs.append(sympy.Matrix(
-                    [f[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
-                     for i in range(self.range_shape[0])]))
-            return mfs
 
         return self._basis_functions
 
@@ -835,23 +758,11 @@ class DirectElement(FiniteElement):
         return [i for i, j in enumerate(self._basis_entities) if j == (entity_dim, entity_number)]
 
     def get_basis_functions(
-        self, reshape: bool = True, symbolic: bool = True, use_tensor_factorisation: bool = False
+        self, symbolic: bool = True, use_tensor_factorisation: bool = False
     ) -> typing.List[AnyFunction]:
         """Get the basis functions of the element."""
         if use_tensor_factorisation:
             return self._get_basis_functions_tensor()
-
-        if reshape and self.range_shape is not None:
-            if len(self.range_shape) != 2:
-                raise NotImplementedError
-            assert self.range_shape[0] * self.range_shape[1] == self.range_dim
-            matrices: ListOfMatrixFunctions = []
-            for b in self._basis_functions:
-                assert isinstance(b, tuple)
-                matrices.append(sympy.Matrix(
-                    [b[i * self.range_shape[1]: (i + 1) * self.range_shape[1]]
-                     for i in range(self.range_shape[0])]))
-            return matrices
 
         return self._basis_functions
 
@@ -862,9 +773,7 @@ class DirectElement(FiniteElement):
         """Map the basis onto a cell using the appropriate mapping for the element."""
         raise NotImplementedError()
 
-    def get_polynomial_basis(
-        self, reshape: bool = True
-    ) -> typing.List[AnyFunction]:
+    def get_polynomial_basis(self) -> typing.List[AnyFunction]:
         """Get the symbolic polynomial basis for the element."""
         raise NotImplementedError()
 

@@ -8,37 +8,30 @@ from .symbols import x, t
 from .vectors import vdot
 from .basis_function import BasisFunction
 from .references import Reference, Interval
+from .functions import ScalarFunction, VectorFunction, AnyFunction
 from . import mappings
 
 ScalarValueOrFloat = typing.Union[sympy.core.expr.Expr, float]
 
 ListOfAnyFunctions = None
 PointType = None
-AnyFunction = None
-ScalarFunction = None
-VectorFunction = None
 MatrixFunction = None
 SetOfPoints = None
 
 
 def _to_tex(f: typing.Any, tfrac: bool = False) -> str:
-    """Concert an expresson to tex."""
-    if isinstance(f, (list, tuple)):
-        return "\\left(\\begin{array}{c}" + "\\\\".join(
-            ["\\displaystyle " + _to_tex(i) for i in f]) + "\\end{array}\\right)"
-    if isinstance(f, PiecewiseFunction):
-        out = "\\begin{cases}\n"
-        joiner = ""
-        for points, func in f.pieces:
-            out += joiner
-            joiner = "\\\\"
-            out += _to_tex(func, True)
-            out += f"&\\text{{in }}\\operatorname{{Triangle}}({points})"
-        out += "\\end{cases}"
-        return out
-    out = sympy.latex(sympy.simplify(sympy.expand(f)))
-    out = out.replace("\\left[", "\\left(")
-    out = out.replace("\\right]", "\\right)")
+    """Convert an expresson to tex."""
+    if isinstance(f, AnyFunction):
+        out = f.as_tex()
+
+    elif isinstance(f, (int, sympy.core.expr.Expr)):
+        out = _to_tex(ScalarFunction(f))
+    elif isinstance(f, (list, tuple)):
+        out = _to_tex(VectorFunction(f))
+
+    else:
+        from IPython import embed; embed()
+        raise NotImplementedError()
 
     if tfrac:
         return out.replace("\\frac", "\\tfrac")
@@ -402,7 +395,10 @@ class DotPointEvaluation(BaseFunctional):
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
         super().__init__(reference, entity, mapping)
         self.point = point
-        self.vector = vector
+        if isinstance(vector, VectorFunction):
+            self.vector = vector
+        else:
+            self.vector = VectorFunction(vector)
 
     def _eval_symbolic(self, function: AnyFunction) -> sympy.core.expr.Expr:
         """Apply the functional to a function."""
@@ -629,7 +625,11 @@ class IntegralMoment(BaseFunctional):
 
         if isinstance(f, BasisFunction):
             f = f.get_function()
-        f = f.subs(x, tuple(t))
+        if isinstance(f, (int, sympy.core.expr.Expr)):
+            f = ScalarFunction(f)
+        if isinstance(f, (list, tuple)):
+            f = VectorFunction(f)
+        f = f.subs(x, t)
 
         self.f: AnyFunction = 0
 

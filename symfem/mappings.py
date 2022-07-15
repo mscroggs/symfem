@@ -33,10 +33,10 @@ def covariant(
 ) -> VectorFunction:
     """Map H(curl) functions."""
     g = f.subs(x, inverse_map)
-    assert isinstance(g, tuple)
+    assert isinstance(g, VectorFunction)
     j_inv = sympy.Matrix([[i.diff(x[j]) for j in range(len(map))]
                           for i in inverse_map]).transpose()
-    return tuple(vdot(j_inv.row(i), g) for i in range(j_inv.rows))
+    return tuple(vdot(j_inv.row(i), g.as_sympy()) for i in range(j_inv.rows))
 
 
 def contravariant(
@@ -44,7 +44,7 @@ def contravariant(
 ) -> VectorFunction:
     """Map H(div) functions."""
     g = f.subs(x, inverse_map)
-    assert isinstance(g, tuple)
+    assert isinstance(g, VectorFunction)
     jacobian = sympy.Matrix([[i.diff(x[j]) for j in range(tdim)] for i in map])
     jacobian /= _det(jacobian)
     return tuple(vdot(jacobian.row(i), g) for i in range(jacobian.rows))

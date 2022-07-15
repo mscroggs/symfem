@@ -14,6 +14,7 @@ from ..symbols import x, t
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_1d
 from ..functionals import BaseFunctional, PointEvaluation, ScalarValueOrFloat
+from ..functions import ScalarFunction
 from ..polynomials import orthogonal_basis
 
 PointType = None
@@ -109,7 +110,7 @@ class BernsteinFunctional(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return self.ref.sub_entity(*self.entity).midpoint()
 
-    def eval(self, function: AnyFunction, symbolic: bool = True) -> ScalarValueOrFloat:
+    def _eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
         """Apply the functional to a function."""
         point = [i for i in self.ref.origin]
         for i, a in enumerate(zip(*self.ref.axes)):
@@ -117,12 +118,7 @@ class BernsteinFunctional(BaseFunctional):
                 point[i] += j * k
 
         integrand = function.subs(x, point) * self.moment
-        assert isinstance(integrand, (int, sympy.core.expr.Expr))
-        value = self.ref.integral(integrand)
-        if symbolic:
-            return value
-        else:
-            return float(value)
+        return self.ref.integral(integrand)
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""

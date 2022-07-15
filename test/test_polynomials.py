@@ -68,7 +68,10 @@ def test_BDFM_space(reference, order):
     "tetrahedron", "hexahedron", "prism",
     "pyramid"])
 @pytest.mark.parametrize("order", range(5))
-def test_orthogonal_polynomials(reference, order):
+def test_orthogonal_polynomials(reference, order, speed):
+    if speed == "fast" and order > 2:
+        pytest.skip()
+
     polynomials = orthogonal_basis(reference, order, 0)[0]
     ref = create_reference(reference)
     if len(polynomials) <= 5:
@@ -109,7 +112,7 @@ def test_orthogonal_polynomial_derivatives(reference, order):
 
     for i, j in first_d:
         for p, q in zip(polynomials[0], polynomials[i]):
-            assert (p.diff(x[j]) - q).simplify() == 0
+            assert p.diff(x[j]) == q
     for i, j, k in second_d:
         for p, q in zip(polynomials[0], polynomials[i]):
-            assert (p.diff(x[j]).diff(x[k]) - q).simplify() == 0
+            assert p.diff(x[j]).diff(x[k]) == q

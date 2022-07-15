@@ -62,7 +62,6 @@ class Regge(CiarletElement):
                 tangent = tuple((b - a) / edge_e.jacobian()
                                 for a, b in zip(edge_e.vertices[0], edge_e.vertices[1]))
                 for f, dof in zip(basis, space.dofs):
-                    assert isinstance(f, (int, sympy.core.expr.Expr))
                     dofs.append(InnerProductIntegralMoment(
                         reference, edge_e, f, tangent, tangent, dof, entity=(1, e_n),
                         mapping="double_covariant"))
@@ -154,7 +153,6 @@ class ReggeTP(CiarletElement):
                 tangent = tuple((b - a) / edge.jacobian()
                                 for a, b in zip(edge.vertices[0], edge.vertices[1]))
                 for f, dof in zip(basis, space.dofs):
-                    assert isinstance(f, (int, sympy.core.expr.Expr))
                     dofs.append(InnerProductIntegralMoment(
                         reference, edge, f, tangent, tangent, dof, entity=(1, e_n),
                         mapping="double_covariant"))

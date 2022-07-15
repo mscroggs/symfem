@@ -50,7 +50,6 @@ class ArnoldWinther(CiarletElement):
             sub_e = Lagrange(sub_ref.default_reference(), order - 2, variant)
             for dof_n, dof in enumerate(sub_e.dofs):
                 p = sub_e.get_basis_function(dof_n).get_function()
-                assert isinstance(p, (int, sympy.core.expr.Expr))
                 for component in [sub_ref.normal(), sub_ref.tangent()]:
                     InnerProductIntegralMoment(
                         reference, sub_ref, p, component, sub_ref.normal(), dof,
@@ -62,7 +61,6 @@ class ArnoldWinther(CiarletElement):
         sub_e = Lagrange(reference, order - 3, variant)
         for dof_n, dof in enumerate(sub_e.dofs):
             p = sub_e.get_basis_function(dof_n).get_function()
-            assert isinstance(p, (int, sympy.core.expr.Expr))
             for component in [(1, 0, 0, 0), (0, 1, 0, 0),
                               (0, 0, 0, 1)]:
                 dofs.append(VecIntegralMoment(
@@ -74,7 +72,7 @@ class ArnoldWinther(CiarletElement):
                 if sympy.Poly(p, x[:2]).degree() != order - 4:
                     continue
                 f = p * x[0] ** 2 * x[1] ** 2 * (1 - x[0] - x[1]) ** 2
-                J = tuple(f.diff(x[i], x[j]) for i in range(2) for j in range(2))
+                J = tuple(f.diff(x[i]).diff(x[j]) for i in range(2) for j in range(2))
                 dofs.append(IntegralMoment(reference, reference, J, dof, entity=(2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
@@ -119,7 +117,6 @@ class NonConformingArnoldWinther(CiarletElement):
             sub_e = Lagrange(sub_ref.default_reference(), 1, variant)
             for dof_n, dof in enumerate(sub_e.dofs):
                 p = sub_e.get_basis_function(dof_n).get_function()
-                assert isinstance(p, (int, sympy.core.expr.Expr))
                 for component in [sub_ref.normal(), sub_ref.tangent()]:
                     dofs.append(
                         InnerProductIntegralMoment(
@@ -128,7 +125,6 @@ class NonConformingArnoldWinther(CiarletElement):
         sub_e = Lagrange(reference, 0, variant)
         for dof_n, dof in enumerate(sub_e.dofs):
             p = sub_e.get_basis_function(dof_n).get_function()
-            assert isinstance(p, (int, sympy.core.expr.Expr))
             for component in [(1, 0, 0, 0), (0, 1, 0, 0),
                               (0, 0, 0, 1)]:
                 dofs.append(VecIntegralMoment(

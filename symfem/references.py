@@ -54,8 +54,11 @@ class Reference:
     def get_point(self, reference_coords: PointType) -> typing.Tuple[sympy.core.expr.Expr, ...]:
         """Get a point in the reference from reference coordinates."""
         assert len(reference_coords) == len(self.axes)
-        return tuple(o + sym_sum(a[i] * b for a, b in zip(self.axes, reference_coords))
-                     for i, o in enumerate(self.origin))
+        pt = [i for i in self.origin]
+        for a, b in zip(self.axes, reference_coords):
+            for i, ai in enumerate(a):
+                pt[i] += ai * b
+        return tuple(pt)
 
     def integral(
         self, f: ScalarFunction, vars: AxisVariables = t
