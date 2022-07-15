@@ -9,7 +9,7 @@ from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_1d
 from ..functionals import PointEvaluation
 from ..quadrature import get_quadrature
-from ..symbolic import x, subs
+from ..symbols import x
 from .lagrange import Lagrange
 
 
@@ -81,7 +81,7 @@ class Transition(CiarletElement):
                             i += 1
                         used.append(i)
                         variables.append(origin[i] + (p[i] - origin[i]) * x[i])
-                    poly += [subs(f, x, variables) * bubble for f in space.get_basis_functions()]
+                    poly += [f.subs(x, variables) * bubble for f in space.get_basis_functions()]
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1

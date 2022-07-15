@@ -8,9 +8,13 @@ import sympy
 import numpy
 import typing
 from ..references import DualPolygon
-from ..symbolic import (PiecewiseFunction, ScalarValue, ListOfAnyFunctions,
-                        ListOfPiecewiseFunctions, PFunctionPieces)
+from ..piecewise_functions import PiecewiseScalarFunction
 from ..finite_element import FiniteElement, CiarletElement
+
+ScalarValue = None
+ListOfAnyFunctions = None
+ListOfPiecewiseFunctions = None
+PFunctionPieces = None
 
 
 class DualCiarletElement(FiniteElement):
@@ -74,7 +78,7 @@ class DualCiarletElement(FiniteElement):
                             sf_list.append(sf_item)
                         sub_fun = tuple(sf_list)
                     pieces.append(((v0, v1, v2), sub_fun))
-                bfs.append(PiecewiseFunction(pieces, "triangle"))
+                bfs.append(PiecewiseScalarFunction(pieces, 2))
             self._basis_functions = bfs
         return self._basis_functions
 

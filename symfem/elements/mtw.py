@@ -11,8 +11,7 @@ from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
-from ..symbolic import x, ListOfVectorFunctions
-from ..calculus import curl
+from ..symbols import x
 from ..functionals import NormalIntegralMoment, TangentIntegralMoment, IntegralMoment
 from .lagrange import Lagrange
 from .nedelec import NedelecFirstKind
@@ -28,7 +27,7 @@ class MardalTaiWinther(CiarletElement):
             reference, facets=(NormalIntegralMoment, Lagrange, 1,
                                "contravariant", {"variant": variant}))
 
-        poly: ListOfVectorFunctions = []
+        poly = []
         if reference.name == "triangle":
             poly = [(1, 0), (x[0], 0), (x[1], 0),
                     (0, 1), (0, x[0]), (0, x[1]),
@@ -49,8 +48,9 @@ class MardalTaiWinther(CiarletElement):
 
             poly = polynomial_set_vector(reference.tdim, reference.tdim, 1)
             for p in polynomial_set_vector(reference.tdim, reference.tdim, 1):
-                poly.append(curl(tuple(i * x[0] * x[1] * x[2] * (1 - x[0] - x[1] - x[2])
-                                       for i in p)))
+                poly.append(VectoFunction(tuple(
+                    i * x[0] * x[1] * x[2] * (1 - x[0] - x[1] - x[2])
+                    for i in p)).curl())
 
             dofs += make_integral_moment_dofs(
                 reference, facets=(IntegralMoment, NedelecFirstKind, 1, "contravariant",

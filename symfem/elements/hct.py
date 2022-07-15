@@ -11,7 +11,7 @@ from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement, ElementBasisFunction
 from ..functionals import (PointEvaluation, PointNormalDerivativeEvaluation,
                            DerivativePointEvaluation)
-from ..symbolic import sym_sum, PiecewiseFunction, ListOfVectorFunctions
+from ..piecewise_functions import PiecewiseFunction
 from ..basis_function import BasisFunction
 from .hermite import Hermite
 

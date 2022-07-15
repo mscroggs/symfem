@@ -12,11 +12,18 @@ from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_vector
 from ..functionals import (IntegralMoment, TangentIntegralMoment, IntegralAgainst,
                            NormalIntegralMoment)
-from ..symbolic import x, t, subs
-from ..calculus import grad, curl
+from ..symbols import x, t
+from ..functions import VectorFunction, ScalarFunction
 from ..vectors import vcross3d
 from ..moments import make_integral_moment_dofs
 from .dpc import DPC, VectorDPC
+
+
+def curl(item):
+    return VectorFunction(item).curl()
+
+def grad(item, dim):
+    return ScalarFunction(item).grad(dim)
 
 
 class TrimmedSerendipityHcurl(CiarletElement):
@@ -46,7 +53,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
                             poly.append(p)
 
             if order == 1:
-                poly += [grad(x[0] * x[1] * x[2] ** order, 3)]
+                poly += [ScalarFunction(x[0] * x[1] * x[2] ** order).grad(3)]
             else:
                 poly += [grad(x[0] * x[1] * x[2] ** order, 3),
                          grad(x[0] * x[1] ** order * x[2], 3),
@@ -79,7 +86,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
                 face = reference.sub_entity(2, f_n)
                 for i in range(order):
                     f = grad(x[0] ** (order - 1 - i) * x[1] ** i, 2)
-                    f2 = subs((f[1], -f[0]), x, tuple(t))
+                    f2 = VectorFunction((f[1], -f[0])).subs(x, tuple(t))
                     dofs.append(IntegralAgainst(
                         reference, face, f2, entity=(2, f_n), mapping="contravariant"))
 
@@ -141,7 +148,7 @@ class TrimmedSerendipityHdiv(CiarletElement):
                 fs = [grad(x[0] ** (order - 1 - i - j) * x[1] ** i * x[2] ** j, 3)
                       for i in range(order) for j in range(order - i)]
             for f in fs:
-                f2 = subs(f, x, tuple(t))
+                f2 = f.subs(x, tuple(t))
                 dofs.append(IntegralAgainst(reference, reference, f2, entity=(reference.tdim, 0),
                                             mapping="covariant"))
 

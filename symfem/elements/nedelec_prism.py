@@ -8,7 +8,7 @@ from ..moments import make_integral_moment_dofs
 from ..polynomials import (Hcurl_polynomials, polynomial_set_1d,
                            polynomial_set_vector)
 from ..functionals import TangentIntegralMoment, IntegralMoment, IntegralAgainst
-from ..symbolic import x, ListOfVectorFunctions
+from ..symbols import x
 from .lagrange import Lagrange, VectorLagrange
 from .q import RaviartThomas as QRT
 
@@ -19,7 +19,7 @@ class Nedelec(CiarletElement):
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         from .. import create_reference
 
-        poly: ListOfVectorFunctions = [
+        poly = [
             (i[0] * j, i[1] * j, 0)
             for i in polynomial_set_vector(2, 2, order - 1) + Hcurl_polynomials(2, 2, order)
             for j in polynomial_set_1d(1, order, x[2:])]

@@ -11,7 +11,6 @@ from ..polynomials import polynomial_set_1d
 from ..functionals import (PointEvaluation, PointDirectionalDerivativeEvaluation,
                            PointNormalDerivativeEvaluation,
                            PointComponentSecondDerivativeEvaluation)
-from ..symbolic import sym_sum
 
 
 class Argyris(CiarletElement):

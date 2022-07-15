@@ -10,7 +10,6 @@ from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_1d
 from ..functionals import (PointEvaluation, IntegralOfDirectionalMultiderivative,
                            IntegralAgainst)
-from ..symbolic import ListOfVectorFunctions
 
 
 class MorleyWangXu(CiarletElement):
@@ -55,7 +54,7 @@ class MorleyWangXu(CiarletElement):
             for e_n, vs in enumerate(reference.sub_entities(1)):
                 subentity = reference.sub_entity(1, e_n)
                 volume = subentity.jacobian()
-                normals: ListOfVectorFunctions = []
+                normals = []
                 for f_n, f_vs in enumerate(reference.sub_entities(2)):
                     if vs[0] in f_vs and vs[1] in f_vs:
                         face = reference.sub_entity(2, f_n)

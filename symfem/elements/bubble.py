@@ -12,7 +12,6 @@ from itertools import product
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_1d, quolynomial_set_1d
 from ..functionals import PointEvaluation, DotPointEvaluation
-from ..symbolic import ListOfScalarFunctions, ListOfVectorFunctions
 from .lagrange import Lagrange
 
 
@@ -76,7 +75,7 @@ class BubbleEnrichedLagrange(CiarletElement):
         lagrange = Lagrange(reference, order, variant)
         bubble = Bubble(reference, order + 2, variant)
 
-        poly: ListOfScalarFunctions = []
+        poly = []
         for e in [lagrange, bubble]:
             for p in e._basis:
                 assert isinstance(p, (int, sympy.core.expr.Expr))
@@ -106,7 +105,7 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
         lagrange = Lagrange(reference, order, variant)
         bubble = Bubble(reference, order + 2, variant)
 
-        poly: ListOfVectorFunctions = []
+        poly = []
         for e in [lagrange, bubble]:
             for p in e._basis:
                 assert isinstance(p, (int, sympy.core.expr.Expr))

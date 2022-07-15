@@ -11,16 +11,16 @@ from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector, polynomial_set_1d
-from ..symbolic import x, ListOfVectorFunctions
+from ..symbols import x
 from ..functionals import NormalIntegralMoment, IntegralMoment
 from .lagrange import Lagrange, VectorLagrange
 from .dpc import DPC, VectorDPC
 
 
-def bdfm_polyset(reference: Reference, order: int) -> ListOfVectorFunctions:
+def bdfm_polyset(reference: Reference, order: int):
     """Create the polynomial basis for a BDFM element."""
     dim = reference.tdim
-    pset: ListOfVectorFunctions = []
+    pset = []
     if reference.name == "quadrilateral":
         for i in polynomial_set_1d(dim, order):
             assert isinstance(i, (int, sympy.core.expr.Expr))

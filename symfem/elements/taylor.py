@@ -6,7 +6,6 @@ from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_1d
 from ..functionals import IntegralMoment, DerivativePointEvaluation
-from ..symbolic import sym_sum
 from .lagrange import Lagrange
 from itertools import product
 
@@ -19,7 +18,7 @@ class Taylor(CiarletElement):
             reference,
             cells=(IntegralMoment, Lagrange, 0, {"variant": "equispaced"}),
         )
-        midpoint = tuple(sym_sum(i) / len(i) for i in zip(*reference.vertices))
+        midpoint = tuple(sum(i) / len(i) for i in zip(*reference.vertices))
         for i in product(range(order + 1), repeat=reference.tdim):
             if 1 <= sum(i) <= order:
                 dofs.append(DerivativePointEvaluation(

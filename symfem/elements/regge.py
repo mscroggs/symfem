@@ -17,7 +17,7 @@ from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
 from ..functionals import (PointInnerProduct, InnerProductIntegralMoment, IntegralMoment,
                            IntegralAgainst)
-from ..symbolic import x, t, subs, ListOfVectorFunctions
+from ..symbols import x, t
 from .lagrange import Lagrange
 
 
@@ -26,7 +26,7 @@ class Regge(CiarletElement):
 
     def __init__(self, reference: Reference, order: int, variant: str = "point"):
         from symfem import create_reference
-        poly: ListOfVectorFunctions = []
+        poly = []
         if reference.tdim == 2:
             poly = [(p[0], p[1], p[1], p[2])
                     for p in polynomial_set_vector(reference.tdim, 3, order)]
@@ -56,7 +56,7 @@ class Regge(CiarletElement):
 
         elif variant == "integral":
             space = Lagrange(create_reference("interval"), order, "equispaced")
-            basis = [subs(f, x, tuple(t)) for f in space.get_basis_functions()]
+            basis = [f.subs(x, tuple(t)) for f in space.get_basis_functions()]
             for e_n, vs in enumerate(reference.sub_entities(1)):
                 edge_e = reference.sub_entity(1, e_n)
                 tangent = tuple((b - a) / edge_e.jacobian()
@@ -78,7 +78,7 @@ class Regge(CiarletElement):
             elif reference.tdim == 3:
                 if order > 0:
                     rspace = Regge(create_reference("triangle"), order - 1, "integral")
-                    basis = [subs(f, x, tuple(t)) for f in rspace.get_basis_functions()]
+                    basis = [f.subs(x, tuple(t)) for f in rspace.get_basis_functions()]
                     for f_n, vs in enumerate(reference.sub_entities(2)):
                         face = reference.sub_entity(2, f_n)
                         for f, dof in zip(basis, rspace.dofs):
@@ -118,7 +118,7 @@ class ReggeTP(CiarletElement):
     def __init__(self, reference: Reference, order: int, variant: str = "integral"):
         from symfem import create_reference
 
-        poly: ListOfVectorFunctions = []
+        poly = []
         if reference.tdim == 2:
             for i in range(order + 1):
                 for j in range(order + 2):
@@ -148,7 +148,7 @@ class ReggeTP(CiarletElement):
         if variant == "integral":
             # DOFs on edges
             space = Lagrange(create_reference("interval"), order, "equispaced")
-            basis = [subs(f, x, tuple(t)) for f in space.get_basis_functions()]
+            basis = [f.subs(x, tuple(t)) for f in space.get_basis_functions()]
             for e_n, vs in enumerate(reference.sub_entities(1)):
                 edge = reference.sub_entity(1, e_n)
                 tangent = tuple((b - a) / edge.jacobian()

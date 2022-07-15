@@ -2,8 +2,8 @@ import pytest
 import symfem
 import sympy
 from itertools import combinations
-from symfem.calculus import div
-from symfem.symbolic import subs, x
+# from symfem.calculus import div
+from symfem.symbols import x
 from symfem.elements.guzman_neilan import make_piecewise_lagrange
 
 
@@ -25,7 +25,7 @@ def test_guzman_neilan_tetrahedron(order):
         for piece in p.pieces:
             float(div(piece[1]).expand())
 
-        assert subs(p, x, mid) == (0, 0, 0)
+        assert p.subs(x, mid) == (0, 0, 0)
 
 
 @pytest.mark.parametrize("order", [1])
@@ -40,8 +40,8 @@ def test_basis_continuity_triangle(order):
             for p in f.pieces:
                 if pt in p[0]:
                     if value is None:
-                        value = symfem.symbolic.subs(p[1], symfem.symbolic.x, pt)
-                    assert value == symfem.symbolic.subs(p[1], symfem.symbolic.x, pt)
+                        value = p[1].subs(x, pt)
+                    assert value == p[1].subs(x, pt)
     for pts in combinations([(0, 0), (1, 0), (1, 0), (third, third)], 2):
         for i in range(N + 1):
             pt = tuple(a + (b - a) * i * one / N for a, b in zip(*pts))
@@ -50,8 +50,8 @@ def test_basis_continuity_triangle(order):
                 for p in f.pieces:
                     if pts[0] in p[0] and pts[1] in p[0]:
                         if value is None:
-                            value = symfem.symbolic.subs(p[1], symfem.symbolic.x, pt)
-                        assert value == symfem.symbolic.subs(p[1], symfem.symbolic.x, pt)
+                            value = p[1].subs(x, pt)
+                        assert value == p[1].subs(x, pt)
 
 
 @pytest.mark.parametrize("order", [1, 2])
@@ -66,8 +66,8 @@ def test_basis_continuity_tetrahedron(order):
             for p in f.pieces:
                 if pt in p[0]:
                     if value is None:
-                        value = symfem.symbolic.subs(p[1], symfem.symbolic.x, pt)
-                    assert value == symfem.symbolic.subs(p[1], symfem.symbolic.x, pt)
+                        value = p[1].subs(x, pt)
+                    assert value == p[1].subs(x, pt)
     for pts in combinations([(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1),
                              (quarter, quarter, quarter)], 2):
         for i in range(N + 1):
@@ -77,8 +77,8 @@ def test_basis_continuity_tetrahedron(order):
                 for p in f.pieces:
                     if pts[0] in p[0] and pts[1] in p[0]:
                         if value is None:
-                            value = symfem.symbolic.subs(p[1], symfem.symbolic.x, pt)
-                        assert value == symfem.symbolic.subs(p[1], symfem.symbolic.x, pt)
+                            value = p[1].subs(x, pt)
+                        assert value == p[1].subs(x, pt)
     for pts in combinations([(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1),
                              (quarter, quarter, quarter)], 3):
         for i in range(N + 1):
@@ -90,8 +90,8 @@ def test_basis_continuity_tetrahedron(order):
                     for p in f.pieces:
                         if pts[0] in p[0] and pts[1] in p[0] and pts[2] in p[0]:
                             if value is None:
-                                value = symfem.symbolic.subs(p[1], symfem.symbolic.x, pt)
-                            assert value == symfem.symbolic.subs(p[1], symfem.symbolic.x, pt)
+                                value = p[1].subs(x, pt)
+                            assert value == p[1].subs(x, pt)
 
 
 @pytest.mark.parametrize("order", [1, 2])
@@ -110,11 +110,11 @@ def test_piecewise_lagrange_triangle(order):
         for i in range(N + 1):
             point = edge.get_point((sympy.Rational(i, N), ))
             for f in fs:
-                assert subs(f, x, point) == (0, 0)
+                assert f.subs(x, point) == (0, 0)
 
     fs = make_piecewise_lagrange(sub_tris, "triangle", order, zero_at_centre=True)
     for f in fs:
-        assert subs(f, x, mid) == (0, 0)
+        assert f.subs(x, mid) == (0, 0)
 
 
 @pytest.mark.parametrize("order", [1, 2, 3])
@@ -136,8 +136,8 @@ def test_piecewise_lagrange_tetrahedron(order):
                 point = face.get_point((sympy.Rational(i, N),
                                         sympy.Rational(j, N)))
                 for f in fs:
-                    assert subs(f, x, point) == (0, 0, 0)
+                    assert f.subs(x, point) == (0, 0, 0)
 
     fs = make_piecewise_lagrange(sub_tets, "tetrahedron", order, zero_at_centre=True)
     for f in fs:
-        assert subs(f, x, mid) == (0, 0, 0)
+        assert f.subs(x, mid) == (0, 0, 0)

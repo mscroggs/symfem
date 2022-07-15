@@ -1,5 +1,5 @@
 import symfem
-from symfem.symbolic import subs, x
+from symfem.symbols import x
 import sympy
 import pytest
 
@@ -22,5 +22,5 @@ def test_polyset(cell):
             for piece in f.pieces:
                 if p in piece[0]:
                     if value is None:
-                        value = subs(piece[1], x, p)
-                    assert subs(piece[1], x, p) == value
+                        value = piece[1].subs(x, p)
+                    assert piece[1].subs(x, p) == value

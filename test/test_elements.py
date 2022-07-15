@@ -1,8 +1,8 @@
 import pytest
 import symfem
 from symfem import create_element
-from symfem.symbolic import subs, x, symequal
-from .utils import test_elements
+from symfem.symbols import x
+from .utils import test_elements, allequal
 
 
 def test_all_tested():
@@ -73,8 +73,8 @@ def test_dual_elements(elements_to_test, cells_to_test, n_tri, order):
         for piece, coeffs in zip(f.pieces, coeff_list):
             map = sub_e.reference.get_map_to(piece[0])
             for dof, value in zip(sub_e.dofs, coeffs):
-                point = subs(map, x, dof.point)
-                assert symequal(value, subs(piece[1], x, point))
+                point = map.subs(x, dof.point)
+                assert allequal(value, piece[1].subs(x, point))
 
 
 @pytest.mark.parametrize("n_tri", [3, 4])

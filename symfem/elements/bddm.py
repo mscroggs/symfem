@@ -10,16 +10,19 @@ from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
-from ..symbolic import x, ListOfVectorFunctions
-from ..calculus import curl
+from ..symbols import x
+from ..functions import VectorFunction
 from ..functionals import NormalIntegralMoment, IntegralMoment
 from .dpc import DPC, VectorDPC
 
+def curl(item):
+    return VectorFunction(item).curl()
 
-def bddf_polyset(reference: Reference, order: int) -> ListOfVectorFunctions:
+
+def bddf_polyset(reference: Reference, order: int):
     """Create the polynomial basis for a BDDF element."""
     dim = reference.tdim
-    pset: ListOfVectorFunctions = []
+    pset = []
     assert reference.name == "hexahedron"
     for p in polynomial_set_vector(dim, dim, order):
         assert isinstance(p, tuple)

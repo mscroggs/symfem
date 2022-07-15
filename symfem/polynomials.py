@@ -2,9 +2,44 @@
 
 import sympy
 import typing
-from .symbolic import x, ListOfScalarFunctions, ListOfVectorFunctions, AxisVariables
-from .calculus import curl, diff
+from .symbols import x
 from itertools import product
+
+AnyFunction = None
+VectorFunction = None
+ListOfScalarFunctions = None
+ListOfVectorFunctions = None
+
+AxisVariables = typing.Union[
+    typing.Tuple[sympy.core.symbol.Symbol, ...],
+    typing.List[sympy.core.symbol.Symbol],
+    sympy.core.symbol.Symbol,
+    ]
+
+
+def curl(f: AnyFunction) -> VectorFunction:
+    """Find the curl of a 3D vector function."""
+    assert isinstance(f, tuple)
+    assert len(f) == 3
+    return (
+        diff(f[2], x[1]) - diff(f[1], x[2]),
+        diff(f[0], x[2]) - diff(f[2], x[0]),
+        diff(f[1], x[0]) - diff(f[0], x[1])
+    )
+
+
+def diff(
+    f: AnyFunction, *vars: sympy.core.symbol.Symbol
+) -> sympy.core.expr.Expr:
+    """Calculate the derivative of a function."""
+    assert isinstance(f, (int, sympy.core.expr.Expr))
+    if isinstance(f, int):
+        out = sympy.Integer(f)
+    else:
+        out = f
+    for i in vars:
+        out = out.diff(i)
+    return out
 
 
 def polynomial_set_1d(

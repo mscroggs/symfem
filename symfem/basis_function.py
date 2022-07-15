@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 import sympy
 import typing
-from .symbolic import subs, ScalarFunction, AnyFunction, PiecewiseFunction
+from .functions import AnyFunction, ScalarFunction
 
 
 class BasisFunction(ABC):

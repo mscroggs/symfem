@@ -1,6 +1,6 @@
 import sympy
 from symfem import create_element
-from symfem.symbolic import x
+from symfem.symbols import x
 from symfem.vectors import vdot
 
 

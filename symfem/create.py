@@ -5,7 +5,8 @@ import os as _os
 import importlib as _il
 from . import references as _references
 from .finite_element import FiniteElement as _FiniteElement
-from .symbolic import SetOfPoints as _SetOfPoints
+
+_SetOfPoints = None
 
 _folder = _os.path.dirname(_os.path.realpath(__file__))
 

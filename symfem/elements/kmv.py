@@ -10,10 +10,10 @@ from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_1d
 from ..functionals import WeightedPointEvaluation
-from ..symbolic import x, ListOfScalarFunctions
+from ..symbols import x
 
 
-def kmv_tri_polyset(m: int, mf: int) -> ListOfScalarFunctions:
+def kmv_tri_polyset(m: int, mf: int):
     """Create the polynomial set for a KMV space on a triangle."""
     poly = polynomial_set_1d(2, m)
 
@@ -24,7 +24,7 @@ def kmv_tri_polyset(m: int, mf: int) -> ListOfScalarFunctions:
     return poly
 
 
-def kmv_tet_polyset(m: int, mf: int, mi: int) -> ListOfScalarFunctions:
+def kmv_tet_polyset(m: int, mf: int, mi: int):
     """Create the polynomial set for a KMV space on a tetrahedron."""
     poly = polynomial_set_1d(3, m)
 

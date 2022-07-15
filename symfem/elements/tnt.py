@@ -14,8 +14,8 @@ from ..polynomials import quolynomial_set_1d, quolynomial_set_vector, orthogonal
 from ..functionals import (TangentIntegralMoment, IntegralAgainst,
                            NormalIntegralMoment, PointEvaluation,
                            DerivativeIntegralMoment)
-from ..symbolic import x, t, subs, ScalarFunction, ListOfVectorFunctions
-from ..calculus import grad, curl
+from ..functions import ScalarFunction, VectorFunction
+from ..symbols import x, t
 from ..moments import make_integral_moment_dofs
 from ..vectors import vcross3d
 from .q import Q
@@ -81,7 +81,7 @@ class TNT(CiarletElement):
                 f = sympy.Integer(1)
                 for j, k in zip(ii, x):
                     f *= k ** j * (k - 1)
-                grad_f = tuple(sympy.S(j).expand() for j in grad(f, 3))
+                grad_f = tuple(sympy.S(j).expand() for j in ScalarFunction(f).grad(3))
                 dofs.append(DerivativeIntegralMoment(
                     reference, reference, 1, grad_f, dummy_dof, entity=(3, 0), mapping="identity"))
 
@@ -123,7 +123,7 @@ class TNTcurl(CiarletElement):
                            (0, 0, x[2]), (0, 0, 1 - x[2])]:
                 variables = tuple(i for i, j in enumerate(lamb_n) if j == 0)
                 for pf in face_poly:
-                    psub = subs(pf, t[:2], [x[j] for j in variables])
+                    psub = pf.subs(t[:2], [x[j] for j in variables])
                     assert isinstance(psub, tuple)
                     pc = vcross3d(lamb_n, tuple(
                         psub[variables.index(i)] if i in variables else 0 for i in range(3)
@@ -138,13 +138,12 @@ class TNTcurl(CiarletElement):
         )
 
         # Face moments
-        face_moments: ListOfVectorFunctions = []
+        face_moments = []
         for ii in product(range(order + 1), repeat=2):
             if sum(ii) > 0:
                 f = x[0] ** ii[0] * x[1] ** ii[1]
-                grad_f = grad(f, 2)
-                grad_f2 = subs((grad_f[1], -grad_f[0]), x[:2], tuple(t[:2]))
-                assert isinstance(grad_f2, tuple)
+                grad_f = ScalarFunction(f).grad(2)
+                grad_f2 = VectorFunction((grad_f[1], -grad_f[0])).subs(x[:2], tuple(t[:2]))
                 face_moments.append(grad_f2)
 
         for i in range(2, order + 1):
@@ -170,18 +169,18 @@ class TNTcurl(CiarletElement):
                     for k in range(order + 1):
                         f = (x[0] ** k * x[1] ** i * (1 - x[1]) * x[2] ** j * (1 - x[2]), 0, 0)
                         dofs.append(IntegralAgainst(
-                            reference, reference, curl(curl(f)), entity=(3, 0),
+                            reference, reference, VectorFunction(f).curl().curl(), entity=(3, 0),
                             mapping="covariant"))
 
                         f = (0, x[1] ** k * x[0] ** i * (1 - x[0]) * x[2] ** j * (1 - x[2]), 0)
                         dofs.append(IntegralAgainst(
-                            reference, reference, curl(curl(f)), entity=(3, 0),
+                            reference, reference, VectorFunction(f).curl().curl(), entity=(3, 0),
                             mapping="covariant"))
 
                         if k in [0, 2]:
                             f = (0, 0,  x[2] ** k * x[0] ** i * (1 - x[0]) * x[1] ** j * (1 - x[1]))
                             dofs.append(IntegralAgainst(
-                                reference, reference, curl(curl(f)), entity=(3, 0),
+                                reference, reference, VectorFunction(f).curl().curl(), entity=(3, 0),
                                 mapping="covariant"))
 
             for i in range(2, order + 1):
@@ -190,7 +189,7 @@ class TNTcurl(CiarletElement):
                         f = x[0] ** (i - 1) * x[0] ** i
                         f *= x[1] ** (j - 1) * x[1] ** j
                         f *= x[2] ** (k - 1) * x[2] ** k
-                        grad_f = grad(f, 3)
+                        grad_f = ScalarFunction(f).grad(3)
                         dofs.append(IntegralAgainst(
                             reference, reference, grad_f, entity=(3, 0), mapping="contravariant"))
 
@@ -245,7 +244,7 @@ class TNTdiv(CiarletElement):
                     f = x[0] ** ii[0] * x[1] ** ii[1]
                 else:
                     f = x[0] ** ii[0] * x[1] ** ii[1] * x[2] ** ii[2]
-                grad_f = grad(f, reference.tdim)
+                grad_f = ScalarFunction(f).grad(reference.tdim)
                 dofs.append(IntegralAgainst(
                     reference, reference, grad_f, entity=(reference.tdim, 0), mapping="covariant"))
 

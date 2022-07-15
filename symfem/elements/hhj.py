@@ -10,7 +10,6 @@ from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
-from ..symbolic import ListOfVectorFunctions
 from ..functionals import NormalInnerProductIntegralMoment, IntegralMoment
 from .lagrange import Lagrange, SymmetricMatrixLagrange
 
@@ -22,7 +21,7 @@ class HellanHerrmannJohnson(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NotImplementedError()
         assert reference.name == "triangle"
-        poly: ListOfVectorFunctions = [
+        poly = [
             (p[0], p[1], p[1], p[2]) for p in polynomial_set_vector(reference.tdim, 3, order)]
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(

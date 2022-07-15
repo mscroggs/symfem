@@ -13,8 +13,7 @@ from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_vector
 from ..functionals import (PointInnerProduct, InnerProductIntegralMoment,
                            VecIntegralMoment, IntegralMoment)
-from ..symbolic import x, ListOfVectorFunctions
-from ..calculus import diff
+from ..symbols import x
 from .lagrange import Lagrange
 
 
@@ -25,7 +24,7 @@ class ArnoldWinther(CiarletElement):
         from symfem import create_reference
         assert reference.name == "triangle"
         self.variant = variant
-        poly: ListOfVectorFunctions = [
+        poly = [
             (p[0], p[1], p[1], p[2])
             for p in polynomial_set_vector(reference.tdim, 3, order - 1)]
         poly += [((order - k + 1) * (order - k + 2) * x[0] ** k * x[1] ** (order - k),
@@ -75,7 +74,7 @@ class ArnoldWinther(CiarletElement):
                 if sympy.Poly(p, x[:2]).degree() != order - 4:
                     continue
                 f = p * x[0] ** 2 * x[1] ** 2 * (1 - x[0] - x[1]) ** 2
-                J = tuple(diff(f, x[i], x[j]) for i in range(2) for j in range(2))
+                J = tuple(f.diff(x[i], x[j]) for i in range(2) for j in range(2))
                 dofs.append(IntegralMoment(reference, reference, J, dof, entity=(2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
@@ -98,7 +97,7 @@ class NonConformingArnoldWinther(CiarletElement):
         from symfem import create_reference
         assert reference.name == "triangle"
         self.variant = variant
-        poly: ListOfVectorFunctions = [
+        poly = [
             (p[0], p[1], p[1], p[2])
             for p in polynomial_set_vector(reference.tdim, 3, order - 1)]
 

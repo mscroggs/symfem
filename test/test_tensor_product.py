@@ -2,8 +2,7 @@ import pytest
 import symfem
 import sympy
 from symfem import create_element
-from symfem.symbolic import symequal
-from .utils import test_elements
+from .utils import test_elements, allequal
 
 
 def make_lattice(cell, N=3):
@@ -64,4 +63,4 @@ def test_element(
     print("---")
 
     for i, j in zip(basis, factorised_basis):
-        assert symequal(i, j)
+        assert allequal(i, j)

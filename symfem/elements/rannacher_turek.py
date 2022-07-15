@@ -9,7 +9,7 @@ from ..references import Reference
 from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..functionals import PointEvaluation
-from ..symbolic import x
+from ..symbols import x
 
 
 class RannacherTurek(CiarletElement):

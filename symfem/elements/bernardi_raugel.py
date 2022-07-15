@@ -12,7 +12,7 @@ from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
 from ..functionals import (NormalIntegralMoment, DotPointEvaluation,
                            DivergenceIntegralMoment)
-from ..symbolic import x
+from ..symbols import x
 from .lagrange import Lagrange
 
 

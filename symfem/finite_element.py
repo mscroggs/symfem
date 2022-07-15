@@ -8,20 +8,22 @@ import numpy.typing
 import math
 from abc import ABC, abstractmethod
 from itertools import product
-from .symbolic import (
-    x, subs, _subs_scalar, PiecewiseFunction, symequal, sym_product,
-    SetOfPoints, ListOfPiecewiseFunctions, PointType, ListOfAnyFunctionsInput,
-    parse_any_function_input, PFunctionPieces, make_single_function_type)
-from .calculus import diff
+from .symbols import x
 from .vectors import vsub, vnorm, vdiv, vadd
 from .functionals import ListOfFunctionals
 from .basis_function import BasisFunction
 from .references import Reference
+from .functions import ScalarFunction, VectorFunction, MatrixFunction, parse_function_list_input, AnyFunction
+from .piecewise_functions import PiecewiseFunction
 
-from .functions import ScalarFunction, VectorFunction, MatrixFunction, parse_function_list_input
 ListOfScalarFunctions = typing.List[ScalarFunction]
 ListOfVectorFunctions = typing.List[VectorFunction]
 ListOfMatrixFunctions = typing.List[MatrixFunction]
+PiecewiseFunction = None
+ListOfPiecewiseFunctions = None
+SetOfPoints = None
+PointType = None
+ListOfAnyFunctionsInput = None
 ListOfAnyFunctions = typing.Union[
     ListOfScalarFunctions, ListOfVectorFunctions, ListOfMatrixFunctions,
     ListOfPiecewiseFunctions]
@@ -65,7 +67,7 @@ class FiniteElement(ABC):
     @abstractmethod
     def get_basis_functions(
         self, reshape: bool = True, symbolic: bool = True, use_tensor_factorisation: bool = False
-    ) -> ListOfAnyFunctions:
+    ) -> typing.List[AnyFunction]:
         """Get the basis functions of the element."""
         pass
 
@@ -90,66 +92,37 @@ class FiniteElement(ABC):
             return numpy.array([to_float(self.tabulate_basis(points, order=order,
                                                              symbolic=True))])
 
+        tabbed = [[b.subs(x, p).as_sympy() for b in self.get_basis_functions()] for p in points]
         if self.range_dim == 1:
-            output = []
-            for p in points:
-                row = []
-                for b in self.get_basis_functions(False):
-                    row.append(b.subs(x, p))
-                output.append(tuple(row))
-            return output
+            return tabbed
 
-        if order == "xxyyzz":
-            output = []
-            for p in points:
-                row = []
-                for d in range(self.range_dim):
-                    for b in self.get_basis_functions(False):
-                        if isinstance(b, PiecewiseFunction):
-                            b = b.get_piece(p)
-                        assert isinstance(b, tuple)
-                        row.append(_subs_scalar(b[d], x, p))
-                output.append(tuple(row))
-            return output
-        if order == "xyzxyz":
-            output = []
-            for p in points:
-                row = []
-                for b in self.get_basis_functions(False):
-                    if isinstance(b, PiecewiseFunction):
-                        b = b.get_piece(p)
-                    assert isinstance(b, tuple)
-                    for b_i in b:
-                        row.append(_subs_scalar(b_i, x, p))
-                output.append(tuple(row))
-            return output
         if order == "xyz,xyz":
-            voutput = []
-            for p in points:
-                vrow = []
-                for b in self.get_basis_functions(False):
-                    if isinstance(b, PiecewiseFunction):
-                        b = b.get_piece(p)
-                    assert isinstance(b, tuple)
-                    item = subs(b, x, p)
-                    assert isinstance(item, tuple)
-                    vrow.append(item)
-                voutput.append(tuple(vrow))
-            return voutput
-        raise ValueError(f"Unknown order: {order}")
+            return tabbed
+        elif order == "xxyyzz":
+            output = []
+            for row in tabbed:
+                output.append([j for i in zip(*row) for j in i])
+            return output
+        elif order == "xyzxyz":
+            output = []
+            for row in tabbed:
+                output.append([j for i in row for j in i])
+            return output
+        else:
+            raise ValueError(f"Unknown order: {order}")
 
     @abstractmethod
     def map_to_cell(
-        self, vertices: SetOfPoints, basis: ListOfAnyFunctions = None,
+        self, vertices: SetOfPoints, basis: typing.List[AnyFunction] = None,
         forward_map: PointType = None, inverse_map: PointType = None
-    ) -> ListOfAnyFunctions:
+    ) -> typing.List[AnyFunction]:
         """Map the basis onto a cell using the appropriate mapping for the element."""
         pass
 
     @abstractmethod
     def get_polynomial_basis(
         self, reshape: bool = True
-    ) -> ListOfAnyFunctions:
+    ) -> typing.List[AnyFunction]:
         """Get the symbolic polynomial basis for the element."""
         pass
 
@@ -238,9 +211,9 @@ class FiniteElement(ABC):
                     f = [f]
                     g = [g]
                     for _ in range(order):
-                        deriv_f = [diff(d, i) for d in deriv_f for i in x[:self.reference.tdim]]
+                        deriv_f = [d.diff(i) for d in deriv_f for i in x[:self.reference.tdim]]
                         f += deriv_f
-                        deriv_g = [diff(d, i) for d in deriv_g for i in x[:self.reference.tdim]]
+                        deriv_g = [d.diff(i) for d in deriv_g for i in x[:self.reference.tdim]]
                         g += deriv_g
                 elif continuity == "H(div)" or continuity == "inner H(div)":
                     f = f[0]
@@ -274,10 +247,7 @@ class FiniteElement(ABC):
                 else:
                     raise ValueError(f"Unknown continuity: {continuity}")
 
-                print(f)
-                print(g)
                 for i, j in zip(f, g):
-                    print(i, type(i), j, type(j), i == j)
                     assert i == j
 
     def get_tensor_factorisation(
@@ -320,9 +290,9 @@ class CiarletElement(FiniteElement):
     ):
         super().__init__(reference, order, len(dofs), domain_dim, range_dim, range_shape)
         assert len(basis) == len(dofs)
-        self._basis: ListOfAnyFunctions = parse_function_list_input(basis)
+        self._basis: typing.List[AnyFunction] = parse_function_list_input(basis)
         self.dofs = dofs
-        self._basis_functions: typing.Union[ListOfAnyFunctions, None] = None
+        self._basis_functions: typing.Union[typing.List[AnyFunction], None] = None
         self._dual_inv: typing.Union[numpy.typing.NDArray[numpy.float64], None] = None
 
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
@@ -331,7 +301,7 @@ class CiarletElement(FiniteElement):
 
     def get_polynomial_basis(
         self, reshape: bool = True
-    ) -> ListOfAnyFunctions:
+    ) -> typing.List[AnyFunction]:
         """Get the symbolic polynomial basis for the element."""
         if reshape and self.range_shape is not None:
             basis = [i for i in self._basis]
@@ -519,7 +489,7 @@ class CiarletElement(FiniteElement):
 
     def get_basis_functions(
         self, reshape: bool = True, symbolic: bool = True, use_tensor_factorisation: bool = False
-    ) -> ListOfAnyFunctions:
+    ) -> typing.List[AnyFunction]:
         """Get the basis functions of the element."""
         if self._basis_functions is None:
             if use_tensor_factorisation:
@@ -528,53 +498,19 @@ class CiarletElement(FiniteElement):
                 m = self.get_dual_matrix()
                 assert isinstance(m, sympy.Matrix)
                 minv = m.inv("LU")
-                if self.range_dim == 1:
-                    # Scalar space
-                    sfs: ListOfScalarFunctions = []
-                    pb = self.get_polynomial_basis()
-                    for i, dof in enumerate(self.dofs):
-                        sf = 0
-                        for c, d in zip(minv.row(i), self.get_polynomial_basis()):
-                            sf += c * d
-                        sfs.append(sf)
 
-                    self._basis_functions = sfs
-                elif isinstance(self.get_polynomial_basis()[0], PiecewiseFunction):
-                    # Piecewise vectors
-                    pfs: ListOfPiecewiseFunctions = []
-                    pb = self.get_polynomial_basis()
-                    for i, dof in enumerate(self.dofs):
-                        assert isinstance(pb[0], PiecewiseFunction)
-                        pieces_ls = [pi for pi, _ in pb[0].pieces]
-                        pieces_fs = [[sympy.Integer(0) for _ in range(self.range_dim)]
-                                     for _ in pb[0].pieces]
-                        for c, d in zip(minv.row(i), pb):
-                            assert isinstance(d, PiecewiseFunction)
-                            for n, (pi, pj) in enumerate(d.pieces):
-                                assert pi == pieces_ls[n]
-                                assert isinstance(pj, tuple)
-                                for j, d_j in enumerate(pj):
-                                    pieces_fs[n][j] += c * d_j
-                        pfs.append(PiecewiseFunction(
-                            [(pi, tuple(pj)) for pi, pj in zip(pieces_ls, pieces_fs)],
-                            pb[0].cell))
-                    self._basis_functions = pfs
-                else:
-                    # Vector or matrix space
-                    bfs: ListOfVectorFunctions = []
-                    for i, dof in enumerate(self.dofs):
-                        b = [sympy.Integer(0) for i in range(self.range_dim)]
-                        for c, d in zip(minv.row(i), self.get_polynomial_basis()):
-                            if isinstance(d, tuple):
-                                for j, d_j in enumerate(d):
-                                    b[j] += c * d_j
-                            else:
-                                assert isinstance(d, sympy.Matrix)
-                                for j1 in range(d.rows):
-                                    for j2 in range(d.cols):
-                                        b[j1 * d.cols + j2] += c * d[j1, j2]
-                        bfs.append(tuple(b))
-                    self._basis_functions = bfs
+                pb = self.get_polynomial_basis()
+                sfs = []
+                for i, dof in enumerate(self.dofs):
+                    sf = None
+                    for c, d in zip(minv.row(i), self.get_polynomial_basis()):
+                        if sf is None:
+                            sf = c * d
+                        else:
+                            sf += c * d
+                    sfs.append(sf)
+
+                self._basis_functions = sfs
 
         assert isinstance(self._basis_functions, list)
 
@@ -766,9 +702,9 @@ class CiarletElement(FiniteElement):
             svg2png(bytestring=img.tostring(), write_to=filename)
 
     def map_to_cell(
-        self, vertices: SetOfPoints, basis: ListOfAnyFunctions = None,
+        self, vertices: SetOfPoints, basis: typing.List[AnyFunction] = None,
         forward_map: PointType = None, inverse_map: PointType = None
-    ) -> ListOfAnyFunctions:
+    ) -> typing.List[AnyFunction]:
         """Map the basis onto a cell using the appropriate mapping for the element."""
         if basis is None:
             basis = self.get_basis_functions()
@@ -777,46 +713,46 @@ class CiarletElement(FiniteElement):
         if inverse_map is None:
             inverse_map = self.reference.get_inverse_map_to(vertices)
 
-        if isinstance(basis[0], PiecewiseFunction):
-            pieces: typing.List[PFunctionPieces] = [[] for i in basis]
-            for i, j in enumerate(basis[0].pieces):
-                new_i: typing.List[PointType] = []
-                for k in j[0]:
-                    subbed = subs(forward_map, x, k)
-                    assert isinstance(subbed, tuple)
-                    new_i.append(subbed)
-                ps: typing.List[typing.Union[ScalarFunction, VectorFunction, MatrixFunction]] = []
-                for b in basis:
-                    assert isinstance(b, PiecewiseFunction)
-                    ps.append(b.pieces[i][1])
-                if isinstance(ps[0], (int, sympy.core.expr.Expr)):
-                    sps: ListOfScalarFunctions = []
-                    for p in ps:
-                        assert isinstance(p, (int, sympy.core.expr.Expr))
-                        sps.append(p)
-                    for n, sf in enumerate(self.map_to_cell(vertices, sps)):
-                        assert not isinstance(sf, PiecewiseFunction)
-                        pieces[n].append((tuple(new_i), sf))
-                elif isinstance(ps[0], sympy.Matrix):
-                    mps: ListOfMatrixFunctions = []
-                    for p in ps:
-                        assert isinstance(p, sympy.Matrix)
-                        mps.append(p)
-                    for n, mf in enumerate(self.map_to_cell(vertices, mps)):
-                        assert not isinstance(mf, PiecewiseFunction)
-                        pieces[n].append((tuple(new_i), mf))
-                else:
-                    vps: ListOfVectorFunctions = []
-                    for p in ps:
-                        assert isinstance(p, tuple)
-                        vps.append(p)
-                    for n, vf in enumerate(self.map_to_cell(vertices, vps)):
-                        assert not isinstance(vf, PiecewiseFunction)
-                        pieces[n].append((tuple(new_i), vf))
-            return [PiecewiseFunction(p, basis[0].cell) for p in pieces]
+        #if isinstance(basis[0], PiecewiseFunction):
+        #    pieces: typing.List[PFunctionPieces] = [[] for i in basis]
+        #    for i, j in enumerate(basis[0].pieces):
+        #        new_i: typing.List[PointType] = []
+        #        for k in j[0]:
+        #            subbed = subs(forward_map, x, k)
+        #            assert isinstance(subbed, tuple)
+        #            new_i.append(subbed)
+        #        ps: typing.List[typing.Union[ScalarFunction, VectorFunction, MatrixFunction]] = []
+        #        for b in basis:
+        #            assert isinstance(b, PiecewiseFunction)
+        #            ps.append(b.pieces[i][1])
+        #        if isinstance(ps[0], (int, sympy.core.expr.Expr)):
+        #            sps: ListOfScalarFunctions = []
+        #            for p in ps:
+        #                assert isinstance(p, (int, sympy.core.expr.Expr))
+        #                sps.append(p)
+        #            for n, sf in enumerate(self.map_to_cell(vertices, sps)):
+        #                assert not isinstance(sf, PiecewiseFunction)
+        #                pieces[n].append((tuple(new_i), sf))
+        #        elif isinstance(ps[0], sympy.Matrix):
+        #            mps: ListOfMatrixFunctions = []
+        #            for p in ps:
+        #                assert isinstance(p, sympy.Matrix)
+        #                mps.append(p)
+        #            for n, mf in enumerate(self.map_to_cell(vertices, mps)):
+        #                assert not isinstance(mf, PiecewiseFunction)
+        #                pieces[n].append((tuple(new_i), mf))
+        #        else:
+        #            vps: ListOfVectorFunctions = []
+        #            for p in ps:
+        #                assert isinstance(p, tuple)
+        #                vps.append(p)
+        #            for n, vf in enumerate(self.map_to_cell(vertices, vps)):
+        #                assert not isinstance(vf, PiecewiseFunction)
+        #                pieces[n].append((tuple(new_i), vf))
+        #    return [PiecewiseFunction(p, basis[0].cell) for p in pieces]
 
-        if isinstance(basis[0], (list, tuple)) and isinstance(basis[0][0], PiecewiseFunction):
-            raise NotImplementedError()
+        #if isinstance(basis[0], (list, tuple)) and isinstance(basis[0][0], PiecewiseFunction):
+        #    raise NotImplementedError()
 
         functions: typing.List[AnyFunction] = [0 for f in basis]
         for dim in range(self.reference.tdim + 1):
@@ -885,7 +821,7 @@ class DirectElement(FiniteElement):
     """Finite element defined directly."""
 
     def __init__(
-        self, reference: Reference, order: int, basis_functions: ListOfAnyFunctions,
+        self, reference: Reference, order: int, basis_functions: typing.List[AnyFunction],
         basis_entities: typing.List[typing.Tuple[int, int]],
         domain_dim: int, range_dim: int, range_shape: typing.Tuple[int, ...] = None
     ):
@@ -900,7 +836,7 @@ class DirectElement(FiniteElement):
 
     def get_basis_functions(
         self, reshape: bool = True, symbolic: bool = True, use_tensor_factorisation: bool = False
-    ) -> ListOfAnyFunctions:
+    ) -> typing.List[AnyFunction]:
         """Get the basis functions of the element."""
         if use_tensor_factorisation:
             return self._get_basis_functions_tensor()
@@ -920,15 +856,15 @@ class DirectElement(FiniteElement):
         return self._basis_functions
 
     def map_to_cell(
-        self, vertices: SetOfPoints, basis: ListOfAnyFunctions = None,
+        self, vertices: SetOfPoints, basis: typing.List[AnyFunction] = None,
         forward_map: PointType = None, inverse_map: PointType = None
-    ) -> ListOfAnyFunctions:
+    ) -> typing.List[AnyFunction]:
         """Map the basis onto a cell using the appropriate mapping for the element."""
         raise NotImplementedError()
 
     def get_polynomial_basis(
         self, reshape: bool = True
-    ) -> ListOfAnyFunctions:
+    ) -> typing.List[AnyFunction]:
         """Get the symbolic polynomial basis for the element."""
         raise NotImplementedError()
 

@@ -2,10 +2,11 @@
 
 import sympy
 import typing
-from .symbolic import (subs, x, MatrixFunction, ScalarFunction, VectorFunction, PointType,
-                       AnyFunction)
+from .symbols import x
+from .functions import ScalarFunction, MatrixFunction, VectorFunction, AnyFunction
 from .vectors import vdot, vcross3d, vnorm
-from .calculus import diff
+
+PointType = None
 
 
 def _det(M: MatrixFunction) -> ScalarFunction:
@@ -33,7 +34,7 @@ def covariant(
     """Map H(curl) functions."""
     g = f.subs(x, inverse_map)
     assert isinstance(g, tuple)
-    j_inv = sympy.Matrix([[diff(i, x[j]) for j in range(len(map))]
+    j_inv = sympy.Matrix([[i.diff(x[j]) for j in range(len(map))]
                           for i in inverse_map]).transpose()
     return tuple(vdot(j_inv.row(i), g) for i in range(j_inv.rows))
 
@@ -44,7 +45,7 @@ def contravariant(
     """Map H(div) functions."""
     g = f.subs(x, inverse_map)
     assert isinstance(g, tuple)
-    jacobian = sympy.Matrix([[diff(i, x[j]) for j in range(tdim)] for i in map])
+    jacobian = sympy.Matrix([[i.diff(x[j]) for j in range(tdim)] for i in map])
     jacobian /= _det(jacobian)
     return tuple(vdot(jacobian.row(i), g) for i in range(jacobian.rows))
 
@@ -60,7 +61,7 @@ def double_covariant(
     else:
         assert isinstance(g, sympy.Matrix)
         g_mat = g
-    j_inv = sympy.Matrix([[diff(i, x[j]) for j in range(len(map))]
+    j_inv = sympy.Matrix([[i.diff(x[j]) for j in range(len(map))]
                           for i in inverse_map]).transpose()
     out = j_inv * g_mat * j_inv.transpose()
     return tuple(out[i] for i in range(out.rows * out.cols))
@@ -76,7 +77,7 @@ def double_contravariant(
     else:
         assert isinstance(g, sympy.Matrix)
         g_mat = g
-    jacobian = sympy.Matrix([[diff(i, x[j]) for j in range(tdim)] for i in map])
+    jacobian = sympy.Matrix([[i.diff(x[j]) for j in range(tdim)] for i in map])
     jacobian /= _det(jacobian)
 
     out = jacobian * g_mat * jacobian.transpose()

@@ -9,7 +9,6 @@ from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_1d
 from ..functionals import PointEvaluation, DerivativePointEvaluation
-from ..symbolic import sym_sum
 
 
 class Hermite(CiarletElement):
@@ -25,7 +24,7 @@ class Hermite(CiarletElement):
                     reference, vs, tuple(1 if i == j else 0 for j in range(reference.tdim)),
                     entity=(0, v_n)))
         for e_n, vs in enumerate(reference.sub_entities(2)):
-            midpoint = tuple(sym_sum(i) / len(i)
+            midpoint = tuple(sum(i) / len(i)
                              for i in zip(*[reference.vertices[i] for i in vs]))
             dofs.append(PointEvaluation(reference, midpoint, entity=(2, e_n)))
 

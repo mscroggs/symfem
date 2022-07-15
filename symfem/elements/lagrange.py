@@ -9,7 +9,6 @@ from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_1d, polynomial_set_vector
 from ..functionals import PointEvaluation, DotPointEvaluation
 from ..quadrature import get_quadrature
-from ..symbolic import ListOfVectorFunctions
 
 
 class Lagrange(CiarletElement):
@@ -136,7 +135,7 @@ class SymmetricMatrixLagrange(CiarletElement):
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         if reference.tdim == 1:
-            poly: ListOfVectorFunctions = polynomial_set_vector(1, 1, order)
+            poly = polynomial_set_vector(1, 1, order)
             directions: typing.List[typing.Tuple[int, ...]] = [(1, )]
         elif reference.tdim == 2:
             poly = [(a[0], a[1], a[1], a[2]) for a in polynomial_set_vector(2, 3, order)]

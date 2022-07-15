@@ -9,15 +9,22 @@ import sympy
 import typing
 from ..references import Reference
 from ..functionals import ListOfFunctionals
-from ..symbolic import (x, t, subs, PointType, AnyFunction, ScalarValue, ListOfScalarFunctions,
-                        AxisVariables)
+from ..functions import AnyFunction
+from ..symbols import x, t
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_1d
 from ..functionals import BaseFunctional, PointEvaluation, ScalarValueOrFloat
 from ..polynomials import orthogonal_basis
 
+PointType = None
+AxisVariables = typing.Union[
+    typing.Tuple[sympy.core.symbol.Symbol, ...],
+    typing.List[sympy.core.symbol.Symbol],
+    sympy.core.symbol.Symbol,
+    ]
 
-def single_choose(n: int, k: int) -> ScalarValue:
+
+def single_choose(n: int, k: int) -> sympy.core.expr.Expr:
     """Calculate choose function of a set of powers."""
     out = sympy.Integer(1)
     for i in range(k + 1, n + 1):
@@ -27,7 +34,7 @@ def single_choose(n: int, k: int) -> ScalarValue:
     return out
 
 
-def choose(n: int, powers: typing.List[int]) -> ScalarValue:
+def choose(n: int, powers: typing.List[int]) -> sympy.core.expr.Expr:
     """Calculate choose function of a set of powers."""
     out = sympy.Integer(1)
     for p in powers:
@@ -38,7 +45,7 @@ def choose(n: int, powers: typing.List[int]) -> ScalarValue:
 
 def bernstein_polynomials(
     n: int, d: int, vars: AxisVariables = x
-) -> ListOfScalarFunctions:
+) -> typing.List[sympy.core.expr.Expr]:
     """
     Return a list of Bernstein polynomials.
 
@@ -109,7 +116,7 @@ class BernsteinFunctional(BaseFunctional):
             for j, k in zip(a, t):
                 point[i] += j * k
 
-        integrand = subs(function, x, point) * self.moment
+        integrand = function.subs(x, point) * self.moment
         assert isinstance(integrand, (int, sympy.core.expr.Expr))
         value = self.ref.integral(integrand)
         if symbolic:

@@ -10,7 +10,7 @@ from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_1d
 from ..functionals import PointEvaluation
-from ..symbolic import x
+from ..symbols import x
 
 
 class ConformingCrouzeixRaviart(CiarletElement):

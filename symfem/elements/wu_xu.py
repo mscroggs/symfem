@@ -11,7 +11,7 @@ from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_1d
 from ..functionals import (PointEvaluation, DerivativePointEvaluation,
                            IntegralOfDirectionalMultiderivative)
-from ..symbolic import x, ListOfVectorFunctions
+from ..symbols import x
 
 
 def derivatives(dim: int, order: int) -> typing.List[typing.Tuple[int, ...]]:
@@ -54,7 +54,7 @@ class WuXu(CiarletElement):
             for e_n, vs in enumerate(reference.sub_entities(codim=codim)):
                 subentity = reference.sub_entity(dim, e_n)
                 volume = subentity.jacobian()
-                normals: ListOfVectorFunctions = []
+                normals = []
                 if codim == 1:
                     normals = [subentity.normal()]
                 elif codim == 2 and reference.tdim == 3:

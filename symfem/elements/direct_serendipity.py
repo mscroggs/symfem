@@ -6,7 +6,7 @@ This element's definition appears in https://arxiv.org/abs/1809.02192
 
 from ..references import Reference
 from ..finite_element import DirectElement
-from ..symbolic import x
+from ..symbols import x
 from .dpc import DPC
 
 

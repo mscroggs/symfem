@@ -2,8 +2,7 @@ import pytest
 import sympy
 from symfem.polynomials import Hdiv_polynomials, Hcurl_polynomials, orthogonal_basis
 from symfem.vectors import vdot
-from symfem.symbolic import x, t, subs
-from symfem.calculus import div
+from symfem.symbols import x, t
 from symfem import create_reference, create_element
 from random import choice
 
@@ -32,12 +31,12 @@ def test_MTW_space(reference):
     e = create_element(reference, "MTW", 3)
     polynomials = e.get_polynomial_basis()
     for p in polynomials:
-        assert div(p).is_real
+        assert p.div().as_sympy().is_real
         for vs in e.reference.sub_entities(1):
             sub_ref = create_reference(e.reference.sub_entity_types[1],
                                        [e.reference.vertices[i] for i in vs])
-            p_edge = subs(p, x, [i + t[0] * j
-                                 for i, j in zip(sub_ref.origin, sub_ref.axes[0])])
+            p_edge = p.subs(x, [i + t[0] * j
+                                for i, j in zip(sub_ref.origin, sub_ref.axes[0])])
             poly = vdot(p_edge, sub_ref.normal()).expand().simplify()
             assert poly.is_real or sympy.Poly(poly).degree() <= 1
 
@@ -54,12 +53,12 @@ def test_BDFM_space(reference, order):
             sub_ref = create_reference(e.reference.sub_entity_types[tdim - 1],
                                        [e.reference.vertices[i] for i in vs])
             if tdim == 2:
-                p_edge = subs(p, x, [i + t[0] * j
-                                     for i, j in zip(sub_ref.origin, sub_ref.axes[0])])
+                p_edge = p.subs(x, [i + t[0] * j
+                                    for i, j in zip(sub_ref.origin, sub_ref.axes[0])])
             else:
-                p_edge = subs(p, x, [i + t[0] * j + t[1] * k
-                                     for i, j, k in zip(sub_ref.origin, sub_ref.axes[0],
-                                                        sub_ref.axes[1])])
+                p_edge = p.subs(x, [i + t[0] * j + t[1] * k
+                                    for i, j, k in zip(sub_ref.origin, sub_ref.axes[0],
+                                                       sub_ref.axes[1])])
             poly = vdot(p_edge, sub_ref.normal()).expand().simplify()
             assert poly.is_real or sympy.Poly(poly).degree() <= order - 1
 

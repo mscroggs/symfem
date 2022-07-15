@@ -12,7 +12,7 @@ from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector, Hdiv_serendipity
 from ..functionals import NormalIntegralMoment, IntegralAgainst
 from .dpc import DPC
-from ..symbolic import x
+from ..symbols import x
 
 
 class AC(CiarletElement):

@@ -2,10 +2,16 @@
 
 import typing
 import sympy
-from .symbolic import (
-    t, x, subs, sym_sum, SetOfPoints, PointType, PointTypeInput, ScalarFunction, ScalarValue,
-    SetOfPointsInput, parse_set_of_points_input, AxisVariables, parse_point_input)
+from .symbols import t, x
 from .vectors import vsub, vnorm, vdot, vcross3d, vcross2d, vnormalise, vadd
+from .geometry import PointType, PointTypeInput, SetOfPoints, SetOfPointsInput, parse_set_of_points_input, parse_point_input
+
+ScalarFunction = None
+AxisVariables = typing.Union[
+    typing.Tuple[sympy.core.symbol.Symbol, ...],
+    typing.List[sympy.core.symbol.Symbol],
+    sympy.core.symbol.Symbol,
+    ]
 
 
 class Reference:
@@ -87,7 +93,7 @@ class Reference:
         """Compute the inverse map from the canonical reference to this reference."""
         raise NotImplementedError()
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
         raise NotImplementedError()
 
@@ -95,7 +101,7 @@ class Reference:
         """Calculate the midpoint."""
         return tuple(sum(i) * sympy.Integer(1) / len(i) for i in zip(*self.vertices))
 
-    def jacobian(self) -> ScalarValue:
+    def jacobian(self) -> sympy.core.expr.Expr:
         """Calculate the jacobian."""
         assert len(self.axes) == self.tdim
         if self.tdim == 1:
@@ -261,7 +267,7 @@ class Point(Reference):
         """Compute the inverse map from the canonical reference to this reference."""
         return self.reference_vertices[0]
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
         return 0
 
@@ -328,7 +334,7 @@ class Interval(Reference):
         v = vsub(self.vertices[1], self.vertices[0])
         return (vdot(p, v) * sympy.Integer(1) / vdot(v, v), )
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
         return self.jacobian()
 
@@ -408,7 +414,7 @@ class Triangle(Reference):
             vdot(vsub(tuple(x), self.origin), a) * sympy.Integer(1) / vnorm(a) for a in self.axes
         )
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
         return sympy.Rational(1, 2) * self.jacobian()
 
@@ -501,7 +507,7 @@ class Tetrahedron(Reference):
                             [v1[2], v2[2], v3[2]]]).inv()
         return (vdot(mat.row(0), p), vdot(mat.row(1), p), vdot(mat.row(2), p))
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
         return sympy.Rational(1, 6) * self.jacobian()
 
@@ -601,7 +607,7 @@ class Quadrilateral(Reference):
 
         return (vdot(mat.row(0), p), vdot(mat.row(1), p))
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
         return self.jacobian()
 
@@ -717,7 +723,7 @@ class Hexahedron(Reference):
                             [v1[2], v2[2], v3[2]]]).inv()
         return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
         return self.jacobian()
 
@@ -832,7 +838,7 @@ class Prism(Reference):
                             [v1[2], v2[2], v3[2]]]).inv()
         return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
         return sympy.Rational(1, 2) * self.jacobian()
 
@@ -952,7 +958,7 @@ class Pyramid(Reference):
                             [v1[2], v2[2], v3[2]]]).inv()
         return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
         return sympy.Rational(1, 3) * self.jacobian()
 

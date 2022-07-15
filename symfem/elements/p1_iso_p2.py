@@ -9,8 +9,8 @@ from ..references import Reference
 from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..functionals import PointEvaluation
-from ..symbolic import PiecewiseFunction
-from ..symbolic import x as x_variables
+from ..piecewise_functions import PiecewiseScalarFunction
+from ..symbols import x as x_variables
 
 
 class P1IsoP2Tri(CiarletElement):
@@ -36,7 +36,7 @@ class P1IsoP2Tri(CiarletElement):
             {0: 2 * y, 2: 2 * c, 3: 1 - 2 * x},
             {1: 2 * y, 2: 2 * x, 3: 1 - 2 * c},
         ]:
-            poly.append(PiecewiseFunction([
+            poly.append(PiecewiseScalarFunction([
                 (t, pieces[i]) if i in pieces else (t, 0) for i, t in enumerate(tris)], "triangle"))
 
         dofs: ListOfFunctionals = []
@@ -82,7 +82,7 @@ class P1IsoP2Quad(CiarletElement):
             {2: 2 * x * (2 * y - 1), 3: 2 * (1 - x) * (2 * y - 1)},
             {0: 4 * x * y, 1: 4 * (1 - x) * y, 2: 4 * x * (1 - y), 3: 4 * (1 - x) * (1 - y)},
         ]:
-            poly.append(PiecewiseFunction([
+            poly.append(PiecewiseScalarFunction([
                 (q, pieces[i]) if i in pieces else (q, 0) for i, q in enumerate(quads)],
                 "quadrilateral"))
 

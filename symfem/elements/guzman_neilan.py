@@ -11,10 +11,11 @@ from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..functionals import NormalIntegralMoment, DotPointEvaluation
-from ..symbolic import (PiecewiseFunction, SetOfPoints, ListOfPiecewiseFunctions,
-                        VectorFunction, ListOfVectorFunctions)
 from .lagrange import Lagrange, VectorLagrange
 from .bernardi_raugel import BernardiRaugel
+
+SetOfPoints = None
+ListOfPiecewiseFunctions = None
 
 
 class GuzmanNeilan(CiarletElement):

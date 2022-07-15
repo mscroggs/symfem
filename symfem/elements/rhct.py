@@ -11,13 +11,14 @@ from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..functionals import PointEvaluation, DerivativePointEvaluation
 from ..polynomials import polynomial_set_1d
-from ..symbolic import PiecewiseFunction, x, ListOfScalarFunctions, ListOfVectorFunctions
+from ..piecewise_functions import PiecewiseFunction
+from ..symbols import x
 
 
 class P1Hermite(CiarletElement):
     """P1Hermite finite element."""
 
-    def __init__(self, reference: Reference, order: int, poly: ListOfScalarFunctions):
+    def __init__(self, reference: Reference, order: int, poly):
         assert order == 3
         dofs: ListOfFunctionals = []
         for v_n, vs in enumerate(reference.vertices):
@@ -62,7 +63,7 @@ class ReducedHsiehCloughTocher(CiarletElement):
 
         refs = [create_reference("triangle", vs) for vs in subs]
 
-        polys: typing.List[ListOfScalarFunctions] = [
+        polys = [
             polynomial_set_1d(reference.tdim, order),
             [],
             polynomial_set_1d(reference.tdim, order),
@@ -73,7 +74,7 @@ class ReducedHsiehCloughTocher(CiarletElement):
                     x[0] ** 3 - x[1] ** 3, x[0] ** 3 + 3 * x[0] * x[1] ** 2]
         polys[2].remove(x[0] * x[1] ** 2)
 
-        bases: typing.List[ListOfScalarFunctions] = []
+        bases = []
         for r, p in zip(refs, polys):
             bf = []
             for f in P1Hermite(r, 3, p).get_basis_functions():
@@ -81,7 +82,7 @@ class ReducedHsiehCloughTocher(CiarletElement):
                 bf.append(f)
             bases.append(bf)
 
-        piece_list: ListOfVectorFunctions = []
+        piece_list = []
         piece_list.append((bases[0][0], 0, bases[2][3]))
         piece_list.append((bases[0][1], 0, bases[2][4]))
         piece_list.append((bases[0][2], 0, bases[2][5]))

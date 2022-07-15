@@ -162,3 +162,12 @@ test_elements: typing.Dict[str, typing.Dict[
         "Lagrange": [({"variant": "equispaced"}, range(4))],
     }
 }
+
+
+def allequal(a: typing.Any, b: typing.Any) -> bool:
+    if isinstance(a, (tuple, list)) and isinstance(b, (tuple, list)):
+        for i, j in zip(a, b):
+            if not allequal(i, j):
+                return False
+        return True
+    return a == b

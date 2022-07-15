@@ -3,10 +3,10 @@
 import sympy
 import typing
 import numpy
-from .symbolic import (PointType, ScalarValue, SetOfPoints, PointTypeInput, parse_point_input,
-                       AnyFunction)
+from .geometry import parse_point_input, PointType, SetOfPoints, PointTypeInput
 
-VecInput = typing.Union[PointTypeInput, AnyFunction]
+VecInput = typing.Union[
+    PointTypeInput]
 
 
 def _parse_vec_input(v: VecInput) -> PointType:
@@ -24,7 +24,7 @@ def vadd(v: VecInput, w: VecInput) -> PointType:
     return tuple(i + j for i, j in zip(_parse_vec_input(v), _parse_vec_input(w)))
 
 
-def vdiv(v: VecInput, a: ScalarValue) -> PointType:
+def vdiv(v: VecInput, a: sympy.core.expr.Expr) -> PointType:
     """Divide a vector by a scalar."""
     if isinstance(a, int):
         a = sympy.Integer(a)
@@ -32,17 +32,17 @@ def vdiv(v: VecInput, a: ScalarValue) -> PointType:
     return tuple(i / a for i in _parse_vec_input(v))
 
 
-def vnorm(v: VecInput) -> ScalarValue:
+def vnorm(v: VecInput) -> sympy.core.expr.Expr:
     """Find the norm of a vector."""
     return sympy.sqrt(sum(a ** 2 for a in _parse_vec_input(v)))
 
 
-def vdot(v: VecInput, w: VecInput) -> ScalarValue:
+def vdot(v: VecInput, w: VecInput) -> sympy.core.expr.Expr:
     """Find the dot product of two vectors."""
     return sum(a * b for a, b in zip(_parse_vec_input(v), _parse_vec_input(w)))
 
 
-def vcross2d(v: VecInput, w: VecInput) -> ScalarValue:
+def vcross2d(v: VecInput, w: VecInput) -> sympy.core.expr.Expr:
     """Find the cross product of two 2D vectors."""
     v2 = _parse_vec_input(v)
     w2 = _parse_vec_input(w)
