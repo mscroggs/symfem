@@ -18,10 +18,10 @@ def polynomial_set_1d(
 ) -> typing.List[ScalarFunction]:
     """One dimensional polynomial set."""
     if dim == 1:
-        return [ScalarFunction[variables[0] ** i] for i in range(order + 1)]
+        return [ScalarFunction(variables[0] ** i) for i in range(order + 1)]
     if dim == 2:
         return [
-            ScalarFunction[variables[0] ** i * variables[1] ** j]
+            ScalarFunction(variables[0] ** i * variables[1] ** j)
             for j in range(order + 1)
             for i in range(order + 1 - j)
         ]

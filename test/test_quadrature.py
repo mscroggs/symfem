@@ -1,6 +1,7 @@
 import pytest
 import sympy
 from symfem import quadrature
+from symfem.functions import ScalarFunction
 from symfem.utils import allequal
 
 
@@ -9,7 +10,7 @@ def test_equispaced(order):
     points, weights = quadrature.equispaced(order + 1)
 
     x = sympy.Symbol("x")
-    poly = x
+    poly = ScalarFunction(x)
 
     assert allequal(
         poly.integrate((x, 0, 1)),
@@ -21,7 +22,7 @@ def test_lobatto(order):
     points, weights = quadrature.lobatto(order + 1)
 
     x = sympy.Symbol("x")
-    poly = x ** (2 * order - 1)
+    poly = ScalarFunction(x ** (2 * order - 1))
 
     assert allequal(
         poly.integrate((x, 0, 1)),
@@ -33,7 +34,7 @@ def test_radau(order):
     points, weights = quadrature.radau(order + 1)
 
     x = sympy.Symbol("x")
-    poly = x ** (2 * order - 1)
+    poly = ScalarFunction(x ** (2 * order - 1))
 
     assert allequal(
         poly.integrate((x, 0, 1)),
@@ -45,7 +46,7 @@ def test_legendre(order):
     points, weights = quadrature.legendre(order)
 
     x = sympy.Symbol("x")
-    poly = x ** (2 * order - 1)
+    poly = ScalarFunction(x ** (2 * order - 1))
 
     assert allequal(
         poly.integrate((x, 0, 1)),
