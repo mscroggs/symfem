@@ -7,10 +7,14 @@ from abc import ABC, abstractmethod
 from .symbols import x
 from .geometry import PointType
 
-SympyFormat = typing.Union[
+SingleSympyFormat = typing.Union[
     sympy.core.expr.Expr,
     typing.Tuple[sympy.core.expr.Expr, ...],
     sympy.matrices.dense.MutableDenseMatrix
+]
+SympyFormat = typing.Union[
+    SingleSympyFormat,
+    typing.Dict[typing.Tuple[typing.Tuple[int, ...], ...], SingleSympyFormat]
 ]
 AxisVariables = typing.Union[
     typing.Tuple[sympy.core.symbol.Symbol, ...],
@@ -379,11 +383,11 @@ class VectorFunction(AnyFunction):
         self._vec = tuple(i if isinstance(i, ScalarFunction) else ScalarFunction(i) for i in vec)
 
     def __len__(self):
-        """The length of the vector."""
+        """Get the length of the vector."""
         return len(self._vec)
 
     def __getitem__(self, key) -> typing.Union[ScalarFunction, VectorFunction]:
-        """Get a component or slice of the vector"""
+        """Get a component or slice of the vector."""
         fs = self._vec[key]
         if isinstance(fs, ScalarFunction):
             return fs
@@ -770,6 +774,7 @@ FunctionInput = typing.Union[
 
 
 def parse_function_input(f: FunctionInput) -> AnyFunction:
+    """Parse a function."""
     if isinstance(f, AnyFunction):
         return f
     if isinstance(f, (sympy.core.expr.Expr, int)):
@@ -787,4 +792,3 @@ def parse_function_list_input(
 ) -> typing.List[AnyFunction]:
     """Parse a list of functions."""
     return [parse_function_input(f) for f in functions]
-

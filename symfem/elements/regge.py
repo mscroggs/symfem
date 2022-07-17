@@ -17,7 +17,6 @@ from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
 from ..functionals import (PointInnerProduct, InnerProductIntegralMoment, IntegralMoment,
                            IntegralAgainst)
-from ..functions import MatrixFunction
 from ..symbols import x, t
 from .lagrange import Lagrange
 

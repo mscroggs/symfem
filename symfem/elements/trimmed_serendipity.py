@@ -19,13 +19,6 @@ from ..moments import make_integral_moment_dofs
 from .dpc import DPC, VectorDPC
 
 
-def curl(item):
-    return VectorFunction(item).curl()
-
-def grad(item, dim):
-    return ScalarFunction(item).grad(dim)
-
-
 class TrimmedSerendipityHcurl(CiarletElement):
     """Trimmed serendipity Hcurl finite element."""
 
@@ -55,14 +48,17 @@ class TrimmedSerendipityHcurl(CiarletElement):
             if order == 1:
                 poly += [ScalarFunction(x[0] * x[1] * x[2] ** order).grad(3)]
             else:
-                poly += [grad(x[0] * x[1] * x[2] ** order, 3),
-                         grad(x[0] * x[1] ** order * x[2], 3),
-                         grad(x[0] ** order * x[1] * x[2], 3)]
-            poly += [grad(x[0] * x[1] ** i * x[2] ** (order - i), 3) for i in range(order + 1)]
-            poly += [grad(x[1] * x[0] ** i * x[2] ** (order - i), 3) for i in range(order + 1)
-                     if i != 1]
-            poly += [grad(x[2] * x[0] ** i * x[1] ** (order - i), 3) for i in range(order + 1)
-                     if i != 1 and order - i != 1]
+                poly += [ScalarFunction(x[0] * x[1] * x[2] ** order).grad(3),
+                         ScalarFunction(x[0] * x[1] ** order * x[2]).grad(3),
+                         ScalarFunction(x[0] ** order * x[1] * x[2]).grad(3)]
+            for i in range(order + 1):
+                poly.append(ScalarFunction(x[0] * x[1] ** i * x[2] ** (order - i)).grad(3))
+                if i != 1:
+                    poly.append(
+                        ScalarFunction(x[1] * x[0] ** i * x[2] ** (order - i)).grad(3))
+                    if order - i != 1:
+                        poly.append(
+                            ScalarFunction(x[2] * x[0] ** i * x[1] ** (order - i)).grad(3))
             for i in range(order):
                 p = x[0] * x[1] ** i * x[2] ** (order - 1 - i)
                 poly.append((0, -x[2] * p, x[1] * p))
@@ -85,7 +81,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
             for f_n in range(reference.sub_entity_count(2)):
                 face = reference.sub_entity(2, f_n)
                 for i in range(order):
-                    f = grad(x[0] ** (order - 1 - i) * x[1] ** i, 2)
+                    f = ScalarFunction(x[0] ** (order - 1 - i) * x[1] ** i).grad(2)
                     f2 = VectorFunction((f[1], -f[0])).subs(x, tuple(t))
                     dofs.append(IntegralAgainst(
                         reference, face, f2, entity=(2, f_n), mapping="contravariant"))
@@ -126,12 +122,15 @@ class TrimmedSerendipityHdiv(CiarletElement):
                     poly.append((x[0] * p, x[1] * p, x[2] * p))
             for i in range(order):
                 p = x[0] * x[1] ** i * x[2] ** (order - 1 - i)
-                poly.append(curl((0, -x[2] * p, x[1] * p)))
+                poly.append(
+                    VectorFunction((0, -x[2] * p, x[1] * p)).curl())
                 p = x[1] * x[0] ** i * x[2] ** (order - 1 - i)
-                poly.append(curl((-x[2] * p, 0, x[0] * p)))
+                poly.append(
+                    VectorFunction((-x[2] * p, 0, x[0] * p)).curl())
                 if order > 1:
                     p = x[2] * x[0] ** i * x[1] ** (order - 1 - i)
-                    poly.append(curl((-x[1] * p, x[0] * p, 0)))
+                    poly.append(
+                        VectorFunction((-x[1] * p, x[0] * p, 0)).curl())
 
         dofs: ListOfFunctionals = []
         dofs += make_integral_moment_dofs(
@@ -142,10 +141,10 @@ class TrimmedSerendipityHdiv(CiarletElement):
         )
         if order >= 2:
             if reference.tdim == 2:
-                fs = [grad(x[0] ** (order - 1 - i) * x[1] ** i, 2)
+                fs = [ScalarFunction(x[0] ** (order - 1 - i) * x[1] ** i).grad(2)
                       for i in range(order)]
             else:
-                fs = [grad(x[0] ** (order - 1 - i - j) * x[1] ** i * x[2] ** j, 3)
+                fs = [ScalarFunction(x[0] ** (order - 1 - i - j) * x[1] ** i * x[2] ** j).grad(3)
                       for i in range(order) for j in range(order - i)]
             for f in fs:
                 f2 = f.subs(x, tuple(t))

@@ -91,7 +91,8 @@ class FiniteElement(ABC):
             return numpy.array([to_float(self.tabulate_basis(points, order=order,
                                                              symbolic=True))])
 
-        tabbed = [tuple(b.subs(x, p).as_sympy() for b in self.get_basis_functions()) for p in points]
+        tabbed = [tuple(b.subs(x, p).as_sympy() for b in self.get_basis_functions())
+                  for p in points]
         if self.range_dim == 1:
             return tabbed
 
@@ -637,47 +638,6 @@ class CiarletElement(FiniteElement):
             forward_map = self.reference.get_map_to(vertices)
         if inverse_map is None:
             inverse_map = self.reference.get_inverse_map_to(vertices)
-
-        #if isinstance(basis[0], PiecewiseFunction):
-        #    pieces: typing.List[PFunctionPieces] = [[] for i in basis]
-        #    for i, j in enumerate(basis[0].pieces):
-        #        new_i: typing.List[PointType] = []
-        #        for k in j[0]:
-        #            subbed = subs(forward_map, x, k)
-        #            assert isinstance(subbed, tuple)
-        #            new_i.append(subbed)
-        #        ps: typing.List[typing.Union[ScalarFunction, VectorFunction, MatrixFunction]] = []
-        #        for b in basis:
-        #            assert isinstance(b, PiecewiseFunction)
-        #            ps.append(b.pieces[i][1])
-        #        if isinstance(ps[0], (int, sympy.core.expr.Expr)):
-        #            sps: ListOfScalarFunctions = []
-        #            for p in ps:
-        #                assert isinstance(p, (int, sympy.core.expr.Expr))
-        #                sps.append(p)
-        #            for n, sf in enumerate(self.map_to_cell(vertices, sps)):
-        #                assert not isinstance(sf, PiecewiseFunction)
-        #                pieces[n].append((tuple(new_i), sf))
-        #        elif isinstance(ps[0], sympy.Matrix):
-        #            mps: ListOfMatrixFunctions = []
-        #            for p in ps:
-        #                assert isinstance(p, sympy.Matrix)
-        #                mps.append(p)
-        #            for n, mf in enumerate(self.map_to_cell(vertices, mps)):
-        #                assert not isinstance(mf, PiecewiseFunction)
-        #                pieces[n].append((tuple(new_i), mf))
-        #        else:
-        #            vps: ListOfVectorFunctions = []
-        #            for p in ps:
-        #                assert isinstance(p, tuple)
-        #                vps.append(p)
-        #            for n, vf in enumerate(self.map_to_cell(vertices, vps)):
-        #                assert not isinstance(vf, PiecewiseFunction)
-        #                pieces[n].append((tuple(new_i), vf))
-        #    return [PiecewiseFunction(p, basis[0].cell) for p in pieces]
-
-        #if isinstance(basis[0], (list, tuple)) and isinstance(basis[0][0], PiecewiseFunction):
-        #    raise NotImplementedError()
 
         functions: typing.List[AnyFunction] = [0 for f in basis]
         for dim in range(self.reference.tdim + 1):

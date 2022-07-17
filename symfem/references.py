@@ -4,7 +4,8 @@ import typing
 import sympy
 from .symbols import t, x
 from .vectors import vsub, vnorm, vdot, vcross3d, vcross2d, vnormalise, vadd
-from .geometry import PointType, PointTypeInput, SetOfPoints, SetOfPointsInput, parse_set_of_points_input, parse_point_input
+from .geometry import (PointType, PointTypeInput, SetOfPoints, SetOfPointsInput,
+                       parse_set_of_points_input, parse_point_input)
 
 ScalarFunction = None
 AxisVariables = typing.Union[

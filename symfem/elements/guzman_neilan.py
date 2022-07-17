@@ -155,13 +155,13 @@ class GuzmanNeilan(CiarletElement):
 def make_piecewise_lagrange(
     sub_cells: typing.List[SetOfPoints], cell_name, order: int, zero_on_boundary: bool = False,
     zero_at_centre: bool = False
-) -> ListOfPiecewiseFunctions:
+) -> typing.List[PiecewiseFunction]:
     """Make the basis functions of a piecewise Lagrange space."""
     from symfem import create_reference
     lagrange_space = VectorLagrange(create_reference(cell_name), order)
-    lagrange_bases: typing.List[ListOfVectorFunctions] = []
+    lagrange_bases: typing.List[typing.List[VectorFunction]] = []
     for c in sub_cells:
-        row: ListOfVectorFunctions = []
+        row: typing.List[VectorFunction] = []
         c_basis = lagrange_space.map_to_cell(c)
         for cb in c_basis:
             assert isinstance(cb, VectorFunction)

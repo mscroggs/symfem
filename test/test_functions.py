@@ -1,6 +1,6 @@
 import sympy
 from symfem.functions import ScalarFunction, VectorFunction, MatrixFunction
-from symfem.piecewise_functions import PiecewiseScalarFunction, PiecewiseVectorFunction, PiecewiseMatrixFunction
+from symfem.piecewise_functions import PiecewiseFunction
 from symfem.symbols import x
 
 
@@ -138,23 +138,23 @@ def test_matrix_function_subs():
 
 
 def test_piecewise_scalar_function_add_sub():
-    f1 = PiecewiseScalarFunction([
+    f1 = PiecewiseFunction([
         ([(0, 0), (1, 0), (0, 1)], x[0]),
         ([(1, 0), (1, 1), (0, 1)], x[1])
     ], 2)
-    f2 = PiecewiseScalarFunction([
+    f2 = PiecewiseFunction([
         ([(0, 0), (1, 0), (0, 1)], 0),
         ([(1, 0), (1, 1), (0, 1)], x[0])
     ], 2)
-    f3 = PiecewiseScalarFunction([
+    f3 = PiecewiseFunction([
         ([(0, 0), (1, 0), (0, 1)], x[0]),
         ([(1, 0), (1, 1), (0, 1)], x[0] + x[1])
     ], 2)
-    f4 = PiecewiseScalarFunction([
+    f4 = PiecewiseFunction([
         ([(0, 0), (1, 0), (0, 1)], x[1]),
         ([(1, 0), (1, 1), (0, 1)], x[0] + x[1])
     ], 2)
-    x1_pw = PiecewiseScalarFunction([
+    x1_pw = PiecewiseFunction([
         ([(0, 0), (1, 0), (0, 1)], x[1]),
         ([(1, 0), (1, 1), (0, 1)], x[1])
     ], 2)
@@ -168,17 +168,18 @@ def test_piecewise_scalar_function_add_sub():
 
         assert f4 - x1 == f2
 
+
 def test_piecewise_scalar_function_mult_div():
-    f2 = PiecewiseScalarFunction([
+    f2 = PiecewiseFunction([
         ([(0, 0), (1, 0), (0, 1)], 0),
         ([(1, 0), (1, 1), (0, 1)], x[0])
     ], 2)
-    f5 = PiecewiseScalarFunction([
+    f5 = PiecewiseFunction([
         ([(0, 0), (1, 0), (0, 1)], 0),
         ([(1, 0), (1, 1), (0, 1)], 2 * x[0])
     ], 2)
 
-    two_pw = PiecewiseScalarFunction([
+    two_pw = PiecewiseFunction([
         ([(0, 0), (1, 0), (0, 1)], 2),
         ([(1, 0), (1, 1), (0, 1)], 2)
     ], 2)
@@ -187,24 +188,26 @@ def test_piecewise_scalar_function_mult_div():
         assert f2 * two == f5
         assert f5 / two == f2
 
+
 def test_piecewise_scalar_function_neg():
-    f2 = PiecewiseScalarFunction([
+    f2 = PiecewiseFunction([
         ([(0, 0), (1, 0), (0, 1)], 0),
         ([(1, 0), (1, 1), (0, 1)], x[0])
     ], 2)
-    f6 = PiecewiseScalarFunction([
+    f6 = PiecewiseFunction([
         ([(0, 0), (1, 0), (0, 1)], 0),
         ([(1, 0), (1, 1), (0, 1)], -x[0])
     ], 2)
 
     assert f6 == -f2
 
+
 def test_piecewise_scalar_function_subs():
-    f2 = PiecewiseScalarFunction([
+    f2 = PiecewiseFunction([
         ([(0, 0), (1, 0), (0, 1)], 0),
         ([(1, 0), (1, 1), (0, 1)], x[0])
     ], 2)
-    f7 = PiecewiseScalarFunction([
+    f7 = PiecewiseFunction([
         ([(0, 0), (1, 0), (0, 1)], 0),
         ([(1, 0), (1, 1), (0, 1)], 2)
     ], 2)

@@ -1,3 +1,5 @@
+"""Geometry."""
+
 import typing
 import sympy
 

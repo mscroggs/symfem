@@ -15,9 +15,6 @@ from ..functions import VectorFunction
 from ..functionals import NormalIntegralMoment, IntegralMoment
 from .dpc import DPC, VectorDPC
 
-def curl(item):
-    return VectorFunction(item).curl()
-
 
 def bddf_polyset(reference: Reference, order: int):
     """Create the polynomial basis for a BDDF element."""
@@ -27,13 +24,13 @@ def bddf_polyset(reference: Reference, order: int):
     for p in polynomial_set_vector(dim, dim, order):
         assert isinstance(p, tuple)
         pset.append(p)
-    pset.append(curl((0, 0, x[0] ** (order + 1) * x[1])))
-    pset.append(curl((0, x[0] * x[2] ** (order + 1), 0)))
-    pset.append(curl((x[1] ** (order + 1) * x[2], 0, 0)))
+    pset.append(VectorFunction((0, 0, x[0] ** (order + 1) * x[1])).curl())
+    pset.append(VectorFunction((0, x[0] * x[2] ** (order + 1), 0)).curl())
+    pset.append(VectorFunction((x[1] ** (order + 1) * x[2], 0, 0)).curl())
     for i in range(1, order + 1):
-        pset.append(curl((0, 0, x[0] * x[1] ** (i + 1) * x[2] ** (order - i))))
-        pset.append(curl((0, x[0] ** (i + 1) * x[1] ** (order - i) * x[2], 0)))
-        pset.append(curl((x[0] ** (order - i) * x[1] * x[2] ** (i + 1), 0, 0)))
+        pset.append(VectorFunction((0, 0, x[0] * x[1] ** (i + 1) * x[2] ** (order - i))).curl())
+        pset.append(VectorFunction((0, x[0] ** (i + 1) * x[1] ** (order - i) * x[2], 0)).curl())
+        pset.append(VectorFunction((x[0] ** (order - i) * x[1] * x[2] ** (i + 1), 0, 0)).curl())
 
     return pset
 

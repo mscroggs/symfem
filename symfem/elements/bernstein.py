@@ -13,7 +13,7 @@ from ..functions import AnyFunction
 from ..symbols import x, t
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_1d
-from ..functionals import BaseFunctional, PointEvaluation, ScalarValueOrFloat
+from ..functionals import BaseFunctional, PointEvaluation
 from ..functions import ScalarFunction
 from ..polynomials import orthogonal_basis
 

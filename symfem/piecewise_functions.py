@@ -3,10 +3,8 @@
 from __future__ import annotations
 import sympy
 import typing
-from .symbols import x
-from .functions import (AnyFunction, ScalarFunction, VectorFunction, _to_sympy_format,
-                        AxisVariables, ValuesToSubstitute, SympyFormat, FunctionInput,
-                        parse_function_input)
+from .functions import (AnyFunction, _to_sympy_format, AxisVariables, ValuesToSubstitute,
+                        SympyFormat, FunctionInput, parse_function_input)
 from .geometry import PointType
 
 
@@ -67,7 +65,7 @@ class PiecewiseFunction(AnyFunction):
         out += "\\end{cases}"
         return out
 
-    def get_piece(self, point: PointType):
+    def get_piece(self, point: PointType) -> AnyFunction:
         """Get a pieces of the function."""
         if self.tdim == 2:
             from .vectors import point_in_triangle, point_in_quadrilateral
@@ -105,7 +103,9 @@ class PiecewiseFunction(AnyFunction):
         return True
 
     @property
-    def pieces(self):
+    def pieces(self) -> typing.List[
+        typing.Tuple[typing.List[typing.Tuple[int, ...]], AnyFunction]
+    ]:
         """Get the pieces of the function."""
         return self._pieces
 
@@ -203,7 +203,7 @@ class PiecewiseFunction(AnyFunction):
 
     def subs(
         self, vars: AxisVariables, values: ValuesToSubstitute
-    ) -> typing.Union(PiecewiseFunction, ScalarFunction):
+    ) -> PiecewiseFunction:
         """Substitute values into the function."""
         if isinstance(values, (tuple, list)) and len(values) == self.tdim:
             for i in values:
@@ -240,17 +240,17 @@ class PiecewiseFunction(AnyFunction):
         return PiecewiseFunction([
             (shape, f.dot(other)) for shape, f in self._pieces], self.tdim)
 
-    def div(self):
+    def div(self) -> PiecewiseFunction:
         """Compute the div of the function."""
         return PiecewiseFunction([
             (shape, f.div()) for shape, f in self._pieces], self.tdim)
 
-    def grad(self, dim: int) -> PiecewiseVectorFunction:
+    def grad(self, dim: int) -> PiecewiseFunction:
         """Compute the grad of the function."""
         return PiecewiseFunction([
             (shape, f.grad(dim)) for shape, f in self._pieces], self.tdim)
 
-    def curl(self):
+    def curl(self) -> PiecewiseFunction:
         """Compute the curl of the function."""
         return PiecewiseFunction([
             (shape, f.curl()) for shape, f in self._pieces], self.tdim)

@@ -1,7 +1,6 @@
 """Functions to map functions between cells."""
 
 import sympy
-import typing
 from .symbols import x
 from .functions import (ScalarFunction, MatrixFunction, VectorFunction, AnyFunction,
                         FunctionInput, parse_function_input)
@@ -31,7 +30,7 @@ def identity(
 
 
 def covariant(
-    f: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
+    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
 ) -> VectorFunction:
     """Map H(curl) functions."""
     f = parse_function_input(f_in)

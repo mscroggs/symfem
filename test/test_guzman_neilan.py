@@ -2,7 +2,6 @@ import pytest
 import symfem
 import sympy
 from itertools import combinations
-# from symfem.calculus import div
 from symfem.symbols import x
 from symfem.elements.guzman_neilan import make_piecewise_lagrange
 
@@ -13,7 +12,7 @@ def test_guzman_neilan_triangle(order):
 
     for p in e._basis[-3:]:
         for piece in p.pieces:
-            float(div(piece[1]).expand())
+            float(piece[1].div().as_sympy().expand())
 
 
 @pytest.mark.parametrize("order", [1, 2])
@@ -23,7 +22,7 @@ def test_guzman_neilan_tetrahedron(order):
     mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*e.reference.vertices))
     for p in e._basis[-4:]:
         for piece in p.pieces:
-            float(div(piece[1]).expand())
+            float(piece[1].div().as_sympy().expand())
 
         assert p.subs(x, mid) == (0, 0, 0)
 

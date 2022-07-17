@@ -207,7 +207,7 @@ class DerivativePointEvaluation(BaseFunctional):
                     f += a * b
                 out.append(f)
 
-        out2: ListOfScalarFunctions = []
+        out2: typing.List[ScalarFunction] = []
         for b in out:
             item = b.subs(x, inverse_map)
             out2.append(item)

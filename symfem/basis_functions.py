@@ -1,10 +1,11 @@
 """Abstract basis function classes and functions."""
 
 from __future__ import annotations
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 import sympy
 import typing
-from .functions import AnyFunction, ScalarFunction
+from .functions import AnyFunction, SympyFormat, AxisVariables, ValuesToSubstitute
+from .geometry import PointType
 
 
 class BasisFunction(AnyFunction):
@@ -36,7 +37,7 @@ class BasisFunction(AnyFunction):
 
     def __neg__(self) -> AnyFunction:
         """Negate."""
-        return self.get_function().__neg__(other)
+        return self.get_function().__neg__()
 
     def __truediv__(self, other: typing.Any) -> AnyFunction:
         """Divide."""

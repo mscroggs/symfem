@@ -179,8 +179,8 @@ class TNTcurl(CiarletElement):
                         if k in [0, 2]:
                             f = (0, 0,  x[2] ** k * x[0] ** i * (1 - x[0]) * x[1] ** j * (1 - x[1]))
                             dofs.append(IntegralAgainst(
-                                reference, reference, VectorFunction(f).curl().curl(), entity=(3, 0),
-                                mapping="covariant"))
+                                reference, reference, VectorFunction(f).curl().curl(),
+                                entity=(3, 0), mapping="covariant"))
 
             for i in range(2, order + 1):
                 for j in range(2, order + 1):

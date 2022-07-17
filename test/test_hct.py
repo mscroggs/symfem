@@ -72,6 +72,6 @@ def test_rhct():
         f2 = f.get_piece((half, half))
         f2 = (f2.diff(x[0]) + f2.diff(x[1])).subs(x[1], 1 - x[0])
         f3 = f.get_piece((0, half)).diff(x[0]).subs(x[0], 0)
-        assert diff(f1, x[0], x[0]) == 0
-        assert diff(f2, x[0], x[0]) == 0
-        assert diff(f3, x[1], x[1]) == 0
+        assert f1.diff(x[0]).diff(x[0]) == 0
+        assert f2.diff(x[0]).diff(x[0]) == 0
+        assert f3.diff(x[1]).diff(x[1]) == 0
