@@ -11,6 +11,8 @@ from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..functionals import NormalIntegralMoment, DotPointEvaluation
+from ..functions import VectorFunction
+from ..piecewise_functions import PiecewiseFunction
 from .lagrange import Lagrange, VectorLagrange
 from .bernardi_raugel import BernardiRaugel
 
@@ -96,7 +98,7 @@ class GuzmanNeilan(CiarletElement):
         sub_basis = make_piecewise_lagrange(sub_tris, "triangle", reference.tdim, True)
         fs = BernardiRaugel(reference, 1).get_basis_functions()[-3:]
         for c, f in zip(coeffs, fs):
-            assert isinstance(f, tuple)
+            assert isinstance(f, VectorFunction)
             fun = []
             for i, _ in enumerate(sub_tris):
                 function = []
@@ -104,7 +106,6 @@ class GuzmanNeilan(CiarletElement):
                     component = f[j]
                     for k, b in zip(c, sub_basis):
                         bpi = b.pieces[i][1]
-                        assert isinstance(bpi, tuple)
                         component -= k * bpi[j]
                     function.append(component)
                 fun.append(tuple(function))
@@ -130,7 +131,7 @@ class GuzmanNeilan(CiarletElement):
         sub_basis = make_piecewise_lagrange(sub_tets, "tetrahedron", reference.tdim, True)
         fs = BernardiRaugel(reference, 1).get_basis_functions()[-4:]
         for c, f in zip(coeffs, fs):
-            assert isinstance(f, tuple)
+            assert isinstance(f, VectorFunction)
             fun = []
             for i, _ in enumerate(sub_tets):
                 function = []
@@ -138,7 +139,6 @@ class GuzmanNeilan(CiarletElement):
                     component = f[j]
                     for k, b in zip(c, sub_basis):
                         bpi = b.pieces[i][1]
-                        assert isinstance(bpi, tuple)
                         component -= k * bpi[j]
                     function.append(component)
                 fun.append(tuple(function))
@@ -164,7 +164,7 @@ def make_piecewise_lagrange(
         row: ListOfVectorFunctions = []
         c_basis = lagrange_space.map_to_cell(c)
         for cb in c_basis:
-            assert isinstance(cb, tuple)
+            assert isinstance(cb, VectorFunction)
             row.append(cb)
         lagrange_bases.append(row)
 

@@ -36,10 +36,8 @@ class Argyris(CiarletElement):
             sub_ref = create_reference(
                 reference.sub_entity_types[1],
                 vertices=tuple(reference.vertices[v] for v in vs))
-            midpoint = tuple(sym_sum(i) / len(i)
-                             for i in zip(*[reference.vertices[i] for i in vs]))
             dofs.append(PointNormalDerivativeEvaluation(
-                reference, midpoint, sub_ref, entity=(1, e_n)))
+                reference, sub_ref.midpoint(), sub_ref, entity=(1, e_n)))
 
         super().__init__(
             reference, order, polynomial_set_1d(reference.tdim, order), dofs, reference.tdim, 1

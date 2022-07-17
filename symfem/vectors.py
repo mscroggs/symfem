@@ -4,12 +4,15 @@ import sympy
 import typing
 import numpy
 from .geometry import parse_point_input, PointType, SetOfPoints, PointTypeInput
+from .functions import VectorFunction
 
 VecInput = typing.Union[
     PointTypeInput]
 
 
 def _parse_vec_input(v: VecInput) -> PointType:
+    if isinstance(v, VectorFunction):
+        v = v._vec
     assert isinstance(v, (list, tuple, sympy.Matrix))
     return parse_point_input(v)
 

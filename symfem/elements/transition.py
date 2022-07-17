@@ -56,19 +56,16 @@ class Transition(CiarletElement):
                     if edim == reference.tdim:
                         bubble = sympy.Integer(1)
                         for f in bubble_space.get_basis_functions():
-                            assert isinstance(f, (int, sympy.core.expr.Expr))
                             bubble *= f
                     elif edim == reference.tdim - 1:
                         bubble = sympy.Integer(1)
                         for i, f in enumerate(bubble_space.get_basis_functions()):
-                            assert isinstance(f, (int, sympy.core.expr.Expr))
                             if i != e_n:
                                 bubble *= f
                     else:
                         assert edim == 1 and reference.tdim == 3
                         bubble = sympy.Integer(1)
                         for i, f in enumerate(bubble_space.get_basis_functions()):
-                            assert isinstance(f, (int, sympy.core.expr.Expr))
                             if i in reference.edges[e_n]:
                                 bubble *= f
                     space = Lagrange(entity, entity_order - edim - 1, variant=variant)

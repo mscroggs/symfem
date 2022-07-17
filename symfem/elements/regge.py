@@ -17,6 +17,7 @@ from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
 from ..functionals import (PointInnerProduct, InnerProductIntegralMoment, IntegralMoment,
                            IntegralAgainst)
+from ..functions import MatrixFunction
 from ..symbols import x, t
 from .lagrange import Lagrange
 
@@ -28,10 +29,10 @@ class Regge(CiarletElement):
         from symfem import create_reference
         poly = []
         if reference.tdim == 2:
-            poly = [(p[0], p[1], p[1], p[2])
+            poly = [((p[0], p[1]), (p[1], p[2]))
                     for p in polynomial_set_vector(reference.tdim, 3, order)]
         if reference.tdim == 3:
-            poly = [(p[0], p[1], p[3], p[1], p[2], p[4], p[3], p[4], p[5])
+            poly = [((p[0], p[1], p[3]), (p[1], p[2], p[4]), (p[3], p[4], p[5]))
                     for p in polynomial_set_vector(reference.tdim, 6, order)]
 
         dofs: ListOfFunctionals = []
@@ -81,10 +82,8 @@ class Regge(CiarletElement):
                     for f_n, vs in enumerate(reference.sub_entities(2)):
                         face = reference.sub_entity(2, f_n)
                         for f, dof in zip(basis, rspace.dofs):
-                            assert isinstance(f, sympy.Matrix)
-                            ft = tuple(f[i, j] for i in range(f.rows) for j in range(f.cols))
                             dofs.append(IntegralMoment(
-                                reference, face, tuple(i * face.jacobian() for i in ft), dof,
+                                reference, face, f * face.jacobian(), dof,
                                 entity=(2, f_n), mapping="double_covariant"))
 
                 if order > 1:

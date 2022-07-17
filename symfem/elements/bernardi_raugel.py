@@ -51,10 +51,6 @@ class BernardiRaugel(CiarletElement):
 
             for i in range(reference.tdim):
                 bf = p.get_basis_functions()
-                assert isinstance(bf[0], (int, sympy.core.expr.Expr))
-                assert isinstance(bf[1], (int, sympy.core.expr.Expr))
-                assert isinstance(bf[2], (int, sympy.core.expr.Expr))
-                assert isinstance(bf[3], (int, sympy.core.expr.Expr))
                 poly.append(tuple(
                     bf[0] * bf[1] * bf[2] * bf[3] if j == i else 0 for j in range(reference.tdim)))
 

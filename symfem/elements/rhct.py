@@ -78,7 +78,6 @@ class ReducedHsiehCloughTocher(CiarletElement):
         for r, p in zip(refs, polys):
             bf = []
             for f in P1Hermite(r, 3, p).get_basis_functions():
-                assert isinstance(f, (int, sympy.core.expr.Expr))
                 bf.append(f)
             bases.append(bf)
 

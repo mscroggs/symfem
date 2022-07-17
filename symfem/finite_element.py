@@ -11,11 +11,11 @@ from itertools import product
 from .symbols import x
 from .vectors import vsub, vnorm, vdiv, vadd
 from .functionals import ListOfFunctionals
-from .basis_function import BasisFunction
 from .references import Reference
 from .functions import (ScalarFunction, VectorFunction, MatrixFunction, parse_function_list_input,
-                        AnyFunction)
+                        AnyFunction, FunctionInput)
 from .piecewise_functions import PiecewiseFunction
+from .basis_functions import BasisFunction
 
 ListOfScalarFunctions = typing.List[ScalarFunction]
 ListOfVectorFunctions = typing.List[VectorFunction]
@@ -283,13 +283,13 @@ class CiarletElement(FiniteElement):
     """Finite element defined using the Ciarlet definition."""
 
     def __init__(
-        self, reference: Reference, order: int, basis: ListOfAnyFunctionsInput,
+        self, reference: Reference, order: int, basis: typing.List[FunctionInput],
         dofs: ListOfFunctionals, domain_dim: int, range_dim: int,
         range_shape: typing.Tuple[int, ...] = None
     ):
         super().__init__(reference, order, len(dofs), domain_dim, range_dim, range_shape)
         assert len(basis) == len(dofs)
-        self._basis: typing.List[AnyFunction] = parse_function_list_input(basis)
+        self._basis = parse_function_list_input(basis)
         self.dofs = dofs
         self._basis_functions: typing.Union[typing.List[AnyFunction], None] = None
         self._dual_inv: typing.Union[numpy.typing.NDArray[numpy.float64], None] = None
@@ -399,7 +399,9 @@ class CiarletElement(FiniteElement):
         for b in self.get_polynomial_basis():
             row = []
             for d in self.dofs:
-                row.append(d.eval(b, symbolic=True))
+                entry = d.eval_symbolic(b).as_sympy()
+                assert entry.is_constant()
+                row.append(entry)
             mat.append(row)
         return sympy.Matrix(mat)
 
@@ -823,6 +825,14 @@ class ElementBasisFunction(BasisFunction):
     """A basis function of a finite element."""
 
     def __init__(self, element: FiniteElement, n: int):
+        if element.range_dim == 1:
+            super().__init__(scalar=True)
+        else:
+            if element.range_shape is None or len(element.range_shape) == 1:
+                super().__init__(vector=True)
+            else:
+                assert len(element.range_shape) == 2
+                super().__init__(matrix=True)
         self.element = element
         self.n = n
 

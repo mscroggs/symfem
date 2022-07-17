@@ -83,8 +83,11 @@ def _check_equal(first: SympyFormat, second: SympyFormat) -> bool:
 class AnyFunction(ABC):
     """A function."""
 
-    def __init__(self):
-        pass
+    def __init__(self, scalar=False, vector=False, matrix=False):
+        assert len([i for i in [scalar, vector, matrix] if i]) == 1
+        self.is_scalar = scalar
+        self.is_vector = vector
+        self.is_matrix = matrix
 
     @abstractmethod
     def __add__(self, other: typing.Any):
@@ -210,7 +213,7 @@ class ScalarFunction(AnyFunction):
     _f: sympy.core.expr.Expr
 
     def __init__(self, f: typing.Union[int, sympy.core.expr.Expr]):
-        super().__init__()
+        super().__init__(scalar=True)
         if isinstance(f, int):
             self._f = sympy.Integer(f)
         else:
@@ -336,6 +339,10 @@ class ScalarFunction(AnyFunction):
         """Compute the dot product with another function."""
         if isinstance(other, ScalarFunction):
             return self * other
+
+        if isinstance(other, AnyFunction) and other.is_scalar:
+            return other.dot(self)
+
         raise NotImplementedError()
 
     def div(self):
@@ -368,8 +375,19 @@ class VectorFunction(AnyFunction):
         typing.Tuple[typing.Union[ScalarFunction, int, sympy.core.expr.Expr], ...],
         typing.List[typing.Union[ScalarFunction, int, sympy.core.expr.Expr]]
     ]):
-        super().__init__()
+        super().__init__(vector=True)
         self._vec = tuple(i if isinstance(i, ScalarFunction) else ScalarFunction(i) for i in vec)
+
+    def __len__(self):
+        """The length of the vector."""
+        return len(self._vec)
+
+    def __getitem__(self, key) -> typing.Union[ScalarFunction, VectorFunction]:
+        """Get a component or slice of the vector"""
+        fs = self._vec[key]
+        if isinstance(fs, ScalarFunction):
+            return fs
+        return VectorFunction(fs)
 
     def __add__(self, other: typing.Any) -> VectorFunction:
         """Add."""
@@ -437,6 +455,9 @@ class VectorFunction(AnyFunction):
             return VectorFunction(tuple(other._f * i._f for i in self._vec))
         if isinstance(other, (int, sympy.core.expr.Expr)):
             return VectorFunction(tuple(other * i._f for i in self._vec))
+        if isinstance(other, MatrixFunction):
+            assert other.shape[1] == len(self)
+            return VectorFunction([other.row(i).dot(self) for i in range(other.shape[0])])
         return NotImplemented
 
     def as_sympy(self) -> SympyFormat:
@@ -479,6 +500,9 @@ class VectorFunction(AnyFunction):
                 out += i._f * j._f
             return ScalarFunction(out)
 
+        if isinstance(other, AnyFunction) and other.is_vector:
+            return other.dot(self)
+
         # TODO: remove
         if isinstance(other, tuple):
             assert len(self._vec) == len(other)
@@ -486,6 +510,8 @@ class VectorFunction(AnyFunction):
             for i, j in zip(self._vec, other):
                 out += i._f * j
             return ScalarFunction(out)
+
+        raise NotImplementedError()
 
     def div(self) -> ScalarFunction:
         """Compute the div of the function."""
@@ -530,7 +556,7 @@ class MatrixFunction(AnyFunction):
         typing.List[typing.List[typing.Union[ScalarFunction, int, sympy.core.expr.Expr]]],
         sympy.matrices.dense.MutableDenseMatrix
     ]):
-        super().__init__()
+        super().__init__(matrix=True)
         if isinstance(mat, sympy.matrices.dense.MutableDenseMatrix):
             mat = tuple(tuple(mat[i, j] for j in range(mat.cols)) for i in range(mat.rows))
         assert isinstance(mat, (list, tuple))
@@ -539,6 +565,14 @@ class MatrixFunction(AnyFunction):
         self.shape = (len(self._mat), 0 if len(self._mat) == 0 else len(self._mat[0]))
         for i in self._mat:
             assert len(i) == self.shape[0]
+
+    def row(self, n: int) -> VectorFunction:
+        """Get a row of the matrix."""
+        return VectorFunction([self._mat[n][i] for i in range(self.shape[1])])
+
+    def col(self, n: int) -> VectorFunction:
+        """Get a colunm of the matrix."""
+        return VectorFunction([self._mat[i][n] for i in range(self.shape[0])])
 
     def __add__(self, other: typing.Any) -> MatrixFunction:
         """Add."""
@@ -697,6 +731,11 @@ class MatrixFunction(AnyFunction):
                     out += self._mat[i][j] * other._mat[i][j]
             return out
 
+        if isinstance(other, AnyFunction) and other.is_matrix:
+            return other.dot(self)
+
+        raise NotImplementedError()
+
     def div(self):
         """Compute the div of the function."""
         raise ValueError("Cannot compute the div of a matrix-valued function.")
@@ -718,22 +757,34 @@ class MatrixFunction(AnyFunction):
         raise NotImplementedError()
 
 
+FunctionInput = typing.Union[
+    AnyFunction,
+    sympy.core.expr.Expr, int,
+    typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...],
+    typing.List[typing.Union[sympy.core.expr.Expr, int]],
+    typing.Tuple[typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...], ...],
+    typing.Tuple[typing.List[typing.Union[sympy.core.expr.Expr, int]], ...],
+    typing.List[typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...]],
+    typing.List[typing.List[typing.Union[sympy.core.expr.Expr, int]]],
+    sympy.matrices.dense.MutableDenseMatrix]
+
+
+def parse_function_input(f: FunctionInput) -> AnyFunction:
+    if isinstance(f, AnyFunction):
+        return f
+    if isinstance(f, (sympy.core.expr.Expr, int)):
+        return ScalarFunction(f)
+    if isinstance(f, (list, tuple)):
+        if isinstance(f[0], (list, tuple)):
+            return MatrixFunction(f)
+        else:
+            return VectorFunction(f)
+    raise ValueError(f"Could not parse input function: {f}")
+
+
 def parse_function_list_input(
-    functions: typing.Union[typing.List[typing.Any], typing.Tuple[typing.Any, ...]]
+    functions: typing.Union[typing.List[FunctionInput], typing.Tuple[FunctionInput, ...]]
 ) -> typing.List[AnyFunction]:
     """Parse a list of functions."""
-    out = []
-    for f in functions:
-        if isinstance(f, AnyFunction):
-            out.append(f)
-        elif isinstance(f, (int, sympy.core.expr.Expr)):
-            out.append(ScalarFunction(f))
-        elif isinstance(f, (tuple, list)):
-            if isinstance(f[0], (tuple, list)):
-                out.append(MatrixFunction(f))
-            else:
-                out.append(VectorFunction(f))
-        else:
-            raise NotImplementedError()
+    return [parse_function_input(f) for f in functions]
 
-    return out

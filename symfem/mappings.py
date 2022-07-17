@@ -3,7 +3,8 @@
 import sympy
 import typing
 from .symbols import x
-from .functions import ScalarFunction, MatrixFunction, VectorFunction, AnyFunction
+from .functions import (ScalarFunction, MatrixFunction, VectorFunction, AnyFunction,
+                        FunctionInput, parse_function_input)
 from .vectors import vdot, vcross3d, vnorm
 
 PointType = None
@@ -21,64 +22,62 @@ def _det(M: MatrixFunction) -> ScalarFunction:
 
 
 def identity(
-    f: AnyFunction, map: PointType, inverse_map: PointType, tdim: int
+    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
 ) -> AnyFunction:
     """Map functions."""
+    f = parse_function_input(f_in)
     g = f.subs(x, inverse_map)
     return g
 
 
 def covariant(
-    f: VectorFunction, map: PointType, inverse_map: PointType, tdim: int
+    f: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
 ) -> VectorFunction:
     """Map H(curl) functions."""
+    f = parse_function_input(f_in)
+    assert f.is_vector
     g = f.subs(x, inverse_map)
     assert isinstance(g, VectorFunction)
     j_inv = sympy.Matrix([[i.diff(x[j]) for j in range(len(map))]
                           for i in inverse_map]).transpose()
-    return tuple(vdot(j_inv.row(i), g.as_sympy()) for i in range(j_inv.rows))
+    return VectorFunction([vdot(j_inv.row(i), g.as_sympy()) for i in range(j_inv.rows)])
 
 
 def contravariant(
-    f: VectorFunction, map: PointType, inverse_map: PointType, tdim: int
+    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
 ) -> VectorFunction:
     """Map H(div) functions."""
+    f = parse_function_input(f_in)
+    assert f.is_vector
     g = f.subs(x, inverse_map)
     assert isinstance(g, VectorFunction)
     jacobian = sympy.Matrix([[i.diff(x[j]) for j in range(tdim)] for i in map])
     jacobian /= _det(jacobian)
-    return tuple(vdot(jacobian.row(i), g) for i in range(jacobian.rows))
+    return VectorFunction([vdot(jacobian.row(i), g) for i in range(jacobian.rows)])
 
 
 def double_covariant(
-    f: typing.Union[MatrixFunction, VectorFunction], map: PointType,
-    inverse_map: PointType, tdim: int
-) -> VectorFunction:
+    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
+) -> MatrixFunction:
     """Map matrix functions."""
-    g = f.subs(x, inverse_map)
-    if isinstance(g, tuple):
-        g_mat = sympy.Matrix([g[i * tdim: (i + 1) * tdim] for i in range(tdim)])
-    else:
-        assert isinstance(g, sympy.Matrix)
-        g_mat = g
+    f = parse_function_input(f_in)
+    assert f.is_matrix
+    g = f.subs(x, inverse_map).as_sympy()
     j_inv = sympy.Matrix([[i.diff(x[j]) for j in range(len(map))]
                           for i in inverse_map]).transpose()
-    out = j_inv * g_mat * j_inv.transpose()
-    return tuple(out[i] for i in range(out.rows * out.cols))
+    out = j_inv * g * j_inv.transpose()
+    return MatrixFunction(out)
 
 
 def double_contravariant(
-    f: VectorFunction, map: PointType, inverse_map: PointType, tdim: int
-) -> VectorFunction:
+    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
+) -> MatrixFunction:
     """Map matrix functions."""
-    g = f.subs(x, inverse_map)
-    if isinstance(g, tuple):
-        g_mat = sympy.Matrix([g[i * tdim: (i + 1) * tdim] for i in range(tdim)])
-    else:
-        assert isinstance(g, sympy.Matrix)
-        g_mat = g
+    f = parse_function_input(f_in)
+    assert f.is_matrix
+    g = f.subs(x, inverse_map).as_sympy()
     jacobian = sympy.Matrix([[i.diff(x[j]) for j in range(tdim)] for i in map])
     jacobian /= _det(jacobian)
 
-    out = jacobian * g_mat * jacobian.transpose()
-    return tuple(out[i] for i in range(out.rows * out.cols))
+    out = jacobian * g * jacobian.transpose()
+    return MatrixFunction(out)

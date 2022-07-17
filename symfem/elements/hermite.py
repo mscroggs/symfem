@@ -24,9 +24,8 @@ class Hermite(CiarletElement):
                     reference, vs, tuple(1 if i == j else 0 for j in range(reference.tdim)),
                     entity=(0, v_n)))
         for e_n, vs in enumerate(reference.sub_entities(2)):
-            midpoint = tuple(sum(i) / len(i)
-                             for i in zip(*[reference.vertices[i] for i in vs]))
-            dofs.append(PointEvaluation(reference, midpoint, entity=(2, e_n)))
+            sub_entity = reference.sub_entity(2, e_n)
+            dofs.append(PointEvaluation(reference, sub_entity.midpoint(), entity=(2, e_n)))
 
         super().__init__(
             reference, order, polynomial_set_1d(reference.tdim, order), dofs, reference.tdim, 1

@@ -110,7 +110,7 @@ class BernsteinFunctional(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return self.ref.sub_entity(*self.entity).midpoint()
 
-    def _eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+    def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
         """Apply the functional to a function."""
         point = [i for i in self.ref.origin]
         for i, a in enumerate(zip(*self.ref.axes)):

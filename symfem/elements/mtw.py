@@ -13,6 +13,7 @@ from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
 from ..symbols import x
 from ..functionals import NormalIntegralMoment, TangentIntegralMoment, IntegralMoment
+from ..functions import VectorFunction
 from .lagrange import Lagrange
 from .nedelec import NedelecFirstKind
 
@@ -48,7 +49,7 @@ class MardalTaiWinther(CiarletElement):
 
             poly = polynomial_set_vector(reference.tdim, reference.tdim, 1)
             for p in polynomial_set_vector(reference.tdim, reference.tdim, 1):
-                poly.append(VectoFunction(tuple(
+                poly.append(VectorFunction(tuple(
                     i * x[0] * x[1] * x[2] * (1 - x[0] - x[1] - x[2])
                     for i in p)).curl())
 

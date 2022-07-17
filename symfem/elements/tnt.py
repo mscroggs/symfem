@@ -123,8 +123,7 @@ class TNTcurl(CiarletElement):
                            (0, 0, x[2]), (0, 0, 1 - x[2])]:
                 variables = tuple(i for i, j in enumerate(lamb_n) if j == 0)
                 for pf in face_poly:
-                    psub = pf.subs(t[:2], [x[j] for j in variables])
-                    assert isinstance(psub, tuple)
+                    psub = VectorFunction(pf).subs(t[:2], [x[j] for j in variables])
                     pc = vcross3d(lamb_n, tuple(
                         psub[variables.index(i)] if i in variables else 0 for i in range(3)
                     ))
