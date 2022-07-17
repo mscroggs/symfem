@@ -668,7 +668,9 @@ class CiarletElement(FiniteElement):
                         functions[d_n] = mdof
 
         for fun in functions:
-            assert fun is not None
+            if isinstance(fun, PiecewiseFunction):
+                fun.map_pieces(forward_map)
+
         return functions
 
     def test(self):

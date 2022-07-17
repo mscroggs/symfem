@@ -4,9 +4,10 @@ from __future__ import annotations
 import sympy
 import typing
 from .functions import (AnyFunction, _to_sympy_format, AxisVariables, ValuesToSubstitute,
-                        SympyFormat, FunctionInput, parse_function_input)
+                        SympyFormat, FunctionInput, parse_function_input, VectorFunction)
 from .geometry import PointType
 from .references import Reference
+from .symbols import x
 
 
 class PiecewiseFunction(AnyFunction):
@@ -332,3 +333,11 @@ class PiecewiseFunction(AnyFunction):
             raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'transpose'")
         return PiecewiseFunction([
             (shape, f.transpose()) for shape, f in self._pieces], self.tdim)
+
+    def map_pieces(self, fwd_map: PointType):
+        """Map the function's pieces."""
+        print(*[i[0] for i in self._pieces])
+        self._pieces = [
+            (tuple(VectorFunction(fwd_map).subs(x, v).as_sympy() for v in shape), f)
+            for shape, f in self._pieces]
+        print(*[i[0] for i in self._pieces])
