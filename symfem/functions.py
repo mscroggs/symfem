@@ -3,7 +3,6 @@
 from __future__ import annotations
 import sympy
 import typing
-from warnings import warn
 from abc import ABC, abstractmethod
 from .symbols import x, t
 from .geometry import PointType
@@ -213,16 +212,6 @@ class AnyFunction(ABC):
     @abstractmethod
     def norm(self):
         """Compute the norm of the function."""
-        pass
-
-    @abstractmethod
-    def integrate(
-        self, *limits: typing.Tuple[
-            sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr],
-            typing.Union[int, sympy.core.expr.Expr]]
-    ):
-        warn('This is deprecated', DeprecationWarning, stacklevel=2)
-        """Compute the integral of the function."""
         pass
 
     @abstractmethod
@@ -443,15 +432,6 @@ class ScalarFunction(AnyFunction):
         """Compute the norm of the function."""
         return ScalarFunction(abs(self._f))
 
-    def integrate(
-        self, *limits: typing.Tuple[
-            sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr],
-            typing.Union[int, sympy.core.expr.Expr]]
-    ) -> ScalarFunction:
-        """Compute the integral of the function."""
-        warn('This is deprecated', DeprecationWarning, stacklevel=2)
-        return ScalarFunction(self._f.integrate(*limits))
-
     def integral(self, domain: Reference) -> ScalarFunction:
         """Compute the integral of the function."""
         limits = domain.integration_limits()
@@ -663,15 +643,6 @@ class VectorFunction(AnyFunction):
         for i in self._vec:
             a += i.as_sympy() ** 2
         return ScalarFunction(sympy.sqrt(a))
-
-    def integrate(
-        self, *limits: typing.Tuple[
-            sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr],
-            typing.Union[int, sympy.core.expr.Expr]]
-    ):
-        """Compute the integral of the function."""
-        warn('This is deprecated', DeprecationWarning, stacklevel=2)
-        raise NotImplementedError()
 
     def integral(self, domain: Reference):
         """Compute the integral of the function."""
@@ -921,18 +892,17 @@ class MatrixFunction(AnyFunction):
         """Compute the norm of the function."""
         raise NotImplementedError()
 
-    def integrate(
-        self, *limits: typing.Tuple[
-            sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr],
-            typing.Union[int, sympy.core.expr.Expr]]
-    ):
-        """Compute the integral of the function."""
-        warn('This is deprecated', DeprecationWarning, stacklevel=2)
-        raise NotImplementedError()
-
     def integral(self, domain: Reference):
         """Compute the integral of the function."""
         raise NotImplementedError()
+
+    def det(self) -> ScalarFunction:
+        """Compute the determinant."""
+        return ScalarFunction(self.as_sympy().det())
+
+    def transpose(self) -> MatrixFunction:
+        """Compute the transpose."""
+        return MatrixFunction(self.as_sympy().transpose())
 
 
 FunctionInput = typing.Union[

@@ -6,6 +6,7 @@ import sympy
 import typing
 from .functions import AnyFunction, SympyFormat, AxisVariables, ValuesToSubstitute, ScalarFunction
 from .geometry import PointType
+from .references import Reference
 
 
 class BasisFunction(AnyFunction):
@@ -111,14 +112,6 @@ class BasisFunction(AnyFunction):
         """Compute the norm of the function."""
         raise self.get_function().norm()
 
-    def integrate(
-        self, *limits: typing.Tuple[
-            sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr],
-            typing.Union[int, sympy.core.expr.Expr]]
-    ) -> AnyFunction:
-        """Compute the integral of the function."""
-        return self.get_function().integrate(*limits)
-
     def integral(self, domain: Reference) -> AnyFunction:
         """Compute the integral of the function."""
         return self.get_function().integral(domain)
@@ -134,6 +127,18 @@ class BasisFunction(AnyFunction):
     def __len__(self) -> int:
         """Get length."""
         return self.get_function().__len__()
+
+    def det(self) -> ScalarFunction:
+        """Compute the determinant."""
+        if not self.is_matrix:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'det'")
+        return self.get_function().det()
+
+    def transpose(self) -> ScalarFunction:
+        """Compute the transpose."""
+        if not self.is_matrix:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'transpose'")
+        return self.get_function().transpose()
 
 
 class SubbedBasisFunction(BasisFunction):

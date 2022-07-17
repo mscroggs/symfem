@@ -9,8 +9,7 @@ from .functions import ScalarFunction, VectorFunction
 AxisVariables = typing.Union[
     typing.Tuple[sympy.core.symbol.Symbol, ...],
     typing.List[sympy.core.symbol.Symbol],
-    sympy.core.symbol.Symbol,
-    ]
+    sympy.core.symbol.Symbol]
 
 
 def polynomial_set_1d(
@@ -54,7 +53,7 @@ def Hdiv_polynomials(domain_dim: int, range_dim: int, order: int) -> typing.List
         return [VectorFunction((
             x[0] * x[0] ** (order - 1 - j) * x[1] ** j,
             x[1] * x[0] ** (order - 1 - j) * x[1] ** j,
-        )) for j in range(order) ]
+        )) for j in range(order)]
     if domain_dim == 3:
         basis: typing.List[VectorFunction] = []
         for j in range(order):

@@ -4,7 +4,6 @@ from __future__ import annotations
 import typing
 import sympy
 from abc import ABC, abstractmethod
-from warnings import warn
 from .symbols import t, x
 from .vectors import vsub, vnorm, vdot, vcross3d, vcross2d, vnormalise, vadd
 from .geometry import (PointType, PointTypeInput, SetOfPoints, SetOfPointsInput,

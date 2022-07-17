@@ -6,6 +6,7 @@ import typing
 from .functions import (AnyFunction, _to_sympy_format, AxisVariables, ValuesToSubstitute,
                         SympyFormat, FunctionInput, parse_function_input)
 from .geometry import PointType
+from .references import Reference
 
 
 class PiecewiseFunction(AnyFunction):
@@ -32,6 +33,12 @@ class PiecewiseFunction(AnyFunction):
             for _, f in self._pieces:
                 assert f.is_matrix
             super().__init__(matrix=True)
+
+    def __len__(self):
+        """Get the length of the vector."""
+        if not self.is_vector:
+            raise TypeError(f"object of type '{self.__class__.__name__}' has no len()")
+        return len(self._pieces[0][1])
 
     def as_sympy(self) -> SympyFormat:
         """Convert to a sympy expression."""
@@ -307,18 +314,21 @@ class PiecewiseFunction(AnyFunction):
         return PiecewiseFunction([
             (shape, f.norm()) for shape, f in self._pieces], self.tdim)
 
-    def integrate(
-        self, *limits: typing.Tuple[
-            sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr],
-            typing.Union[int, sympy.core.expr.Expr]]
-    ):
-        """Compute the integral of the function."""
-
-        from IPython import embed; embed()
-
-        raise NotImplementedError()
-
     def integral(self, domain: Reference):
         """Compute the integral of the function."""
         p = self.get_piece(domain.midpoint())
         return p.integral(domain)
+
+    def det(self) -> PiecewiseFunction:
+        """Compute the determinant."""
+        if not self.is_matrix:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'det'")
+        return PiecewiseFunction([
+            (shape, f.det()) for shape, f in self._pieces], self.tdim)
+
+    def transpose(self) -> PiecewiseFunction:
+        """Compute the transpose."""
+        if not self.is_matrix:
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'transpose'")
+        return PiecewiseFunction([
+            (shape, f.transpose()) for shape, f in self._pieces], self.tdim)

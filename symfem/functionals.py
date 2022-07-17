@@ -177,7 +177,8 @@ class WeightedPointEvaluation(BaseFunctional):
 class DerivativePointEvaluation(BaseFunctional):
     """A point evaluation of a given derivative."""
 
-    def __init__(self, reference: Reference, point_in: FunctionInput, derivative: typing.Tuple[int, ...],
+    def __init__(self, reference: Reference, point_in: FunctionInput,
+                 derivative: typing.Tuple[int, ...],
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = None):
         super().__init__(reference, entity, mapping)
         self.point = parse_function_input(point_in)
@@ -283,7 +284,7 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
     def __init__(self, reference: Reference, point_in: FunctionInput, edge: Reference,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
         assert isinstance(edge, Interval)
-        super().__init__(reference, point, edge.normal(), entity=entity, mapping=mapping)
+        super().__init__(reference, point_in, edge.normal(), entity=entity, mapping=mapping)
         self.reference = edge
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
@@ -302,7 +303,8 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
 class PointComponentSecondDerivativeEvaluation(BaseFunctional):
     """A point evaluation of a component of a second derivative."""
 
-    def __init__(self, reference: Reference, point_in: FunctionInput, component: typing.Tuple[int, int],
+    def __init__(self, reference: Reference, point_in: FunctionInput,
+                 component: typing.Tuple[int, int],
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
         super().__init__(reference, entity, mapping)
         self.point = parse_function_input(point_in)
