@@ -1,7 +1,6 @@
 import pytest
 import sympy
 from symfem.polynomials import Hdiv_polynomials, Hcurl_polynomials, orthogonal_basis
-from symfem.vectors import vdot
 from symfem.symbols import x, t
 from symfem import create_reference, create_element
 from random import choice
@@ -23,7 +22,7 @@ def test_Hcurl_space(reference, order):
     ref = create_reference(reference)
     polynomials = Hcurl_polynomials(ref.tdim, ref.tdim, order)
     for p in polynomials:
-        assert vdot(p, x) == 0
+        assert p.dot(x) == 0
 
 
 @pytest.mark.parametrize("reference", ["triangle"])
@@ -37,7 +36,7 @@ def test_MTW_space(reference):
                                        [e.reference.vertices[i] for i in vs])
             p_edge = p.subs(x, [i + t[0] * j
                                 for i, j in zip(sub_ref.origin, sub_ref.axes[0])])
-            poly = vdot(p_edge, sub_ref.normal()).expand().simplify()
+            poly = p_edge.dot(sub_ref.normal()).as_sympy().expand().simplify()
             assert poly.is_real or sympy.Poly(poly).degree() <= 1
 
 
@@ -59,7 +58,7 @@ def test_BDFM_space(reference, order):
                 p_edge = p.subs(x, [i + t[0] * j + t[1] * k
                                     for i, j, k in zip(sub_ref.origin, sub_ref.axes[0],
                                                        sub_ref.axes[1])])
-            poly = vdot(p_edge, sub_ref.normal()).expand().simplify()
+            poly = p_edge.dot(sub_ref.normal()).as_sympy().expand().simplify()
             assert poly.is_real or sympy.Poly(poly).degree() <= order - 1
 
 
