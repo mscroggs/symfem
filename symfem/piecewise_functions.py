@@ -5,7 +5,7 @@ import sympy
 import typing
 from .functions import (AnyFunction, _to_sympy_format, AxisVariables, ValuesToSubstitute,
                         SympyFormat, FunctionInput, parse_function_input, VectorFunction)
-from .geometry import PointType
+from .geometry import PointType, point_in_triangle, point_in_quadrilateral, point_in_tetrahedron
 from .references import Reference
 from .symbols import x
 
@@ -82,7 +82,6 @@ class PiecewiseFunction(AnyFunction):
     def get_piece(self, point: PointType) -> AnyFunction:
         """Get a pieces of the function."""
         if self.tdim == 2:
-            from .vectors import point_in_triangle, point_in_quadrilateral
             for cell, value in self._pieces:
                 if len(cell) == 3:
                     if point_in_triangle(point[:2], cell):
@@ -93,7 +92,6 @@ class PiecewiseFunction(AnyFunction):
                 else:
                     raise ValueError("Unsupported cell")
         if self.tdim == 3:
-            from .vectors import point_in_tetrahedron
             for cell, value in self._pieces:
                 if len(cell) == 4:
                     if point_in_tetrahedron(point, cell):
