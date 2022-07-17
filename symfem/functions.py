@@ -93,10 +93,6 @@ class AnyFunction(ABC):
         self.is_vector = vector
         self.is_matrix = matrix
 
-    def __getitem__(self, key) -> AnyFunction:
-        """Get a component or slice of the function."""
-        raise ValueError(f"'{self.__class__.__name__}' object is not subscriptable")
-
     @abstractmethod
     def __add__(self, other: typing.Any):
         """Add."""
@@ -225,6 +221,13 @@ class AnyFunction(ABC):
     ):
         """Compute the integral of the function."""
         pass
+
+    def __getitem__(self, key) -> AnyFunction:
+        """Get a component or slice of the function."""
+        raise ValueError(f"'{self.__class__.__name__}' object is not subscriptable")
+
+    def _sympy_(self) -> SympyFormat:
+        return self.as_sympy()
 
     def __float__(self) -> float:
         """Convert to a float."""
