@@ -3,87 +3,30 @@
 import sympy
 import typing
 import numpy
-from .geometry import parse_point_input, PointType, SetOfPoints, PointTypeInput
-#from .functions import VectorFunction
-
-VecInput = typing.Union[
-    PointTypeInput]
+from .geometry import PointType, SetOfPoints
 
 
-def _parse_vec_input(v: VecInput) -> PointType:
-    #if isinstance(v, VectorFunction):
-    #    v = v._vec
-    assert isinstance(v, (list, tuple, sympy.Matrix))
-    return parse_point_input(v)
-
-
-def vsub(v: VecInput, w: VecInput) -> PointType:
+def _vsub(v: PointType, w: PointType) -> PointType:
     """Subtract a vector from another."""
-    return tuple(i - j for i, j in zip(_parse_vec_input(v), _parse_vec_input(w)))
+    return tuple(i - j for i, j in zip(v, w))
 
 
-def vadd(v: VecInput, w: VecInput) -> PointType:
-    """Add two vectors."""
-    return tuple(i + j for i, j in zip(_parse_vec_input(v), _parse_vec_input(w)))
-
-
-def vdiv(v: VecInput, a: sympy.core.expr.Expr) -> PointType:
-    """Divide a vector by a scalar."""
-    if isinstance(a, int):
-        a = sympy.Integer(a)
-    assert isinstance(a, sympy.core.expr.Expr)
-    return tuple(i / a for i in _parse_vec_input(v))
-
-
-def vnorm(v: VecInput) -> sympy.core.expr.Expr:
-    """Find the norm of a vector."""
-    return sympy.sqrt(sum(a ** 2 for a in _parse_vec_input(v)))
-
-
-def vdot(v: VecInput, w: VecInput) -> sympy.core.expr.Expr:
+def _vdot(v: PointType, w: PointType) -> sympy.core.expr.Expr:
     """Find the dot product of two vectors."""
-    return sum(a * b for a, b in zip(_parse_vec_input(v), _parse_vec_input(w)))
+    return sum(a * b for a, b in zip(v, w))
 
 
-def vcross2d(v: VecInput, w: VecInput) -> sympy.core.expr.Expr:
-    """Find the cross product of two 2D vectors."""
-    v2 = _parse_vec_input(v)
-    w2 = _parse_vec_input(w)
-    assert len(v2) == 2
-    assert len(w2) == 2
-    return v2[0] * w2[1] - v2[1] * w2[0]
-
-
-def vcross3d(v: VecInput, w: VecInput) -> PointType:
-    """Find the cross product of two 3D vectors."""
-    v2 = _parse_vec_input(v)
-    w2 = _parse_vec_input(w)
-    assert len(v2) == 3
-    assert len(w2) == 3
-    return (
-        v2[1] * w2[2] - v2[2] * w2[1],
-        v2[2] * w2[0] - v2[0] * w2[2],
-        v2[0] * w2[1] - v2[1] * w2[0],
-    )
-
-
-def vnormalise(v: VecInput) -> PointType:
-    """Normalise a vector."""
-    v2 = _parse_vec_input(v)
-    return vdiv(v2, vnorm(v2))
-
-
-def point_in_triangle(point: VecInput, triangle: SetOfPoints) -> bool:
+def point_in_triangle(point: PointType, triangle: SetOfPoints) -> bool:
     """Check if a point is inside a triangle."""
-    v0 = vsub(triangle[2], triangle[0])
-    v1 = vsub(triangle[1], triangle[0])
-    v2 = vsub(_parse_vec_input(point), triangle[0])
+    v0 = _vsub(triangle[2], triangle[0])
+    v1 = _vsub(triangle[1], triangle[0])
+    v2 = _vsub(point, triangle[0])
 
-    dot00 = vdot(v0, v0)
-    dot01 = vdot(v0, v1)
-    dot02 = vdot(v0, v2)
-    dot11 = vdot(v1, v1)
-    dot12 = vdot(v1, v2)
+    dot00 = _vdot(v0, v0)
+    dot01 = _vdot(v0, v1)
+    dot02 = _vdot(v0, v2)
+    dot11 = _vdot(v1, v1)
+    dot12 = _vdot(v1, v2)
 
     det = (dot00 * dot11 - dot01 * dot01)
     u = (dot11 * dot02 - dot01 * dot12) / det
@@ -99,24 +42,23 @@ def point_in_triangle(point: VecInput, triangle: SetOfPoints) -> bool:
     return u >= 0 and v >= 0 and u + v <= 1
 
 
-def point_in_quadrilateral(point: VecInput, quad: SetOfPoints) -> bool:
+def point_in_quadrilateral(point: PointType, quad: SetOfPoints) -> bool:
     """Check if a point is inside a quadrilateral."""
-    point2 = _parse_vec_input(point)
 
-    e0 = vsub(quad[1], quad[0])
-    e1 = vsub(quad[0], quad[2])
-    e2 = vsub(quad[3], quad[1])
-    e3 = vsub(quad[2], quad[3])
+    e0 = _vsub(quad[1], quad[0])
+    e1 = _vsub(quad[0], quad[2])
+    e2 = _vsub(quad[3], quad[1])
+    e3 = _vsub(quad[2], quad[3])
 
     n0 = (-e0[1], e0[0])
     n1 = (-e1[1], e1[0])
     n2 = (-e2[1], e2[0])
     n3 = (-e3[1], e3[0])
 
-    d0 = vdot(n0, vsub(point2, quad[0]))
-    d1 = vdot(n1, vsub(point2, quad[2]))
-    d2 = vdot(n2, vsub(point2, quad[1]))
-    d3 = vdot(n3, vsub(point2, quad[3]))
+    d0 = _vdot(n0, _vsub(point, quad[0]))
+    d1 = _vdot(n1, _vsub(point, quad[2]))
+    d2 = _vdot(n2, _vsub(point, quad[1]))
+    d3 = _vdot(n3, _vsub(point, quad[3]))
 
     if numpy.isclose(float(d0), 0):
         d0 = 0
@@ -130,22 +72,22 @@ def point_in_quadrilateral(point: VecInput, quad: SetOfPoints) -> bool:
     return d0 >= 0 and d1 >= 0 and d2 >= 0 and d3 >= 0
 
 
-def point_in_tetrahedron(point: VecInput, tetrahedron: SetOfPoints) -> bool:
+def point_in_tetrahedron(point: PointType, tetrahedron: SetOfPoints) -> bool:
     """Check if a point is inside a tetrahedron."""
-    v0 = vsub(tetrahedron[3], tetrahedron[0])
-    v1 = vsub(tetrahedron[2], tetrahedron[0])
-    v2 = vsub(tetrahedron[1], tetrahedron[0])
-    v3 = vsub(_parse_vec_input(point), tetrahedron[0])
+    v0 = _vsub(tetrahedron[3], tetrahedron[0])
+    v1 = _vsub(tetrahedron[2], tetrahedron[0])
+    v2 = _vsub(tetrahedron[1], tetrahedron[0])
+    v3 = _vsub(point, tetrahedron[0])
 
-    dot00 = vdot(v0, v0)
-    dot01 = vdot(v0, v1)
-    dot02 = vdot(v0, v2)
-    dot03 = vdot(v0, v3)
-    dot11 = vdot(v1, v1)
-    dot12 = vdot(v1, v2)
-    dot13 = vdot(v1, v3)
-    dot22 = vdot(v2, v2)
-    dot23 = vdot(v2, v3)
+    dot00 = _vdot(v0, v0)
+    dot01 = _vdot(v0, v1)
+    dot02 = _vdot(v0, v2)
+    dot03 = _vdot(v0, v3)
+    dot11 = _vdot(v1, v1)
+    dot12 = _vdot(v1, v2)
+    dot13 = _vdot(v1, v3)
+    dot22 = _vdot(v2, v2)
+    dot23 = _vdot(v2, v3)
 
     det = dot00 * (dot11 * dot22 - dot12 * dot12)
     det += dot01 * (dot02 * dot12 - dot01 * dot22)
