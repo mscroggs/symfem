@@ -195,6 +195,11 @@ class AnyFunction(ABC):
         pass
 
     @abstractmethod
+    def cross(self, other: AnyFunction):
+        """Compute the cross product with another function."""
+        pass
+
+    @abstractmethod
     def div(self):
         """Compute the div of the function."""
         pass
@@ -416,6 +421,10 @@ class ScalarFunction(AnyFunction):
 
         raise NotImplementedError()
 
+    def cross(self, other: AnyFunction):
+        """Compute the cross product with another function."""
+        raise ValueError("Cannot cross a scalar-valued function.")
+
     def div(self):
         """Compute the div of the function."""
         raise ValueError("Cannot compute the div of a scalar-valued function.")
@@ -616,6 +625,17 @@ class VectorFunction(AnyFunction):
             return ScalarFunction(out)
 
         raise NotImplementedError()
+
+    def cross(self, other: AnyFunction) -> typing.Union[VectorFunction, ScalarFunction]:
+        """Compute the cross product with another function."""
+        assert other.is_vector and len(self) == len(other)
+        if len(self) == 2:
+            return self[0] * other[1] - self[1] * other[0]
+        else:
+            assert len(self) == 3
+            return VectorFunction([self[1] * other[2] - self[2] * other[1],
+                                   self[2] * other[0] - self[0] * other[2],
+                                   self[0] * other[1] - self[1] * other[0]])
 
     def div(self) -> ScalarFunction:
         """Compute the div of the function."""
@@ -875,6 +895,10 @@ class MatrixFunction(AnyFunction):
             return other.dot(self)
 
         raise NotImplementedError()
+
+    def cross(self, other: AnyFunction):
+        """Compute the cross product with another function."""
+        raise ValueError("Cannot cross a matrix-valued function.")
 
     def div(self):
         """Compute the div of the function."""

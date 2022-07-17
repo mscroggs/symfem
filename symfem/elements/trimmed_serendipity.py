@@ -14,7 +14,6 @@ from ..functionals import (IntegralMoment, TangentIntegralMoment, IntegralAgains
                            NormalIntegralMoment)
 from ..symbols import x, t
 from ..functions import VectorFunction, ScalarFunction
-from ..vectors import vcross3d
 from ..moments import make_integral_moment_dofs
 from .dpc import DPC, VectorDPC
 
@@ -38,11 +37,10 @@ class TrimmedSerendipityHcurl(CiarletElement):
                 for j in range(order - i):
                     for dim in range(3):
                         if i == 0 or dim != 0:
-                            p = vcross3d(tuple(x), tuple(
+                            p = VectorFunction(x).cross(VectorFunction([
                                 x[0] ** i * x[1] ** j * x[2] ** (order - 1 - i - j)
                                 if d == dim else 0
-                                for d in range(3)))
-                            assert isinstance(p, tuple)
+                                for d in range(3)]))
                             poly.append(p)
 
             if order == 1:

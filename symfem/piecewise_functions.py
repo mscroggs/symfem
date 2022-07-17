@@ -295,6 +295,11 @@ class PiecewiseFunction(AnyFunction):
         return PiecewiseFunction([
             (shape, f.dot(other)) for shape, f in self._pieces], self.tdim)
 
+    def cross(self, other: AnyFunction) -> PiecewiseFunction:
+        """Compute the cross product with another function."""
+        return PiecewiseFunction([
+            (shape, f.cross(other)) for shape, f in self._pieces], self.tdim)
+
     def div(self) -> PiecewiseFunction:
         """Compute the div of the function."""
         return PiecewiseFunction([

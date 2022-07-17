@@ -17,7 +17,6 @@ from ..functionals import (TangentIntegralMoment, IntegralAgainst,
 from ..functions import ScalarFunction, VectorFunction
 from ..symbols import x, t
 from ..moments import make_integral_moment_dofs
-from ..vectors import vcross3d
 from .q import Q
 
 
@@ -124,9 +123,8 @@ class TNTcurl(CiarletElement):
                 variables = tuple(i for i, j in enumerate(lamb_n) if j == 0)
                 for pf in face_poly:
                     psub = VectorFunction(pf).subs(t[:2], [x[j] for j in variables])
-                    pc = vcross3d(lamb_n, tuple(
-                        psub[variables.index(i)] if i in variables else 0 for i in range(3)
-                    ))
+                    pc = VectorFunction(lamb_n).cross(VectorFunction([
+                        psub[variables.index(i)] if i in variables else 0 for i in range(3)]))
                     assert isinstance(pc, tuple)
                     poly.append(pc)
 

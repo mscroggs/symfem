@@ -5,15 +5,47 @@ import typing
 import sympy
 from abc import ABC, abstractmethod
 from .symbols import t, x
-from .vectors import vsub, vnorm, vdot, vcross3d, vcross2d, vnormalise, vadd
 from .geometry import (PointType, PointTypeInput, SetOfPoints, SetOfPointsInput,
                        parse_set_of_points_input, parse_point_input)
 
 AxisVariables = typing.Union[
     typing.Tuple[sympy.core.symbol.Symbol, ...],
     typing.List[sympy.core.symbol.Symbol],
-    sympy.core.symbol.Symbol,
-    ]
+    sympy.core.symbol.Symbol]
+
+
+def _vsub(v: PointType, w: PointType) -> PointType:
+    """Subtract."""
+    return tuple(i - j for i, j in zip(v, w))
+
+
+def _vadd(v: PointType, w: PointType) -> PointType:
+    """Add."""
+    return tuple(i + j for i, j in zip(v, w))
+
+
+def _vdot(v: PointType, w: PointType) -> sympy.core.expr.Expr:
+    """Compute dot product."""
+    out = sympy.Integer(0)
+    for i, j in zip(v, w):
+        out += i * j
+    return out
+
+
+def _vcross(v: PointType, w: PointType) -> PointType:
+    """Compute cross product."""
+    assert len(v) == len(w) == 3
+    return (v[1] * w[2] - v[2] * w[1], v[2] * w[0] - v[0] * w[2], v[0] * w[1] - v[1] * w[0])
+
+
+def _vnorm(v: PointType) -> sympy.core.expr.Expr:
+    """Find the norm of a vector."""
+    return sympy.sqrt(_vdot(v, v))
+
+def _vnormalise(v: PointType) -> PointType:
+    """Normalise a vector."""
+    n = _vnorm(v)
+    return tuple(i / n for i in v)
 
 
 class Reference(ABC):
@@ -115,30 +147,26 @@ class Reference(ABC):
 
     def jacobian(self) -> sympy.core.expr.Expr:
         """Calculate the jacobian."""
+        from .functions import VectorFunction
         assert len(self.axes) == self.tdim
+        vaxes = [VectorFunction(a) for a in self.axes]
         if self.tdim == 1:
-            return vnorm(self.axes[0])
+            return vaxes[0].notm()
         if self.tdim == 2:
-            if self.gdim == 2:
-                crossed = vcross2d(self.axes[0], self.axes[1])
-                return abs(crossed)
-            elif self.gdim == 3:
-                crossed3 = vcross3d(self.axes[0], self.axes[1])
-                return vnorm(crossed3)
+            return vaxes[0].cross(vaxes[1]).norm()
         if self.tdim == 3:
-            crossed3 = vcross3d(self.axes[0], self.axes[1])
-            return abs(vdot(crossed3, self.axes[2]))
+            return vaxes[0].cross(vaxes[1]).dot(vaxes[2]).norm()
         raise ValueError(f"Unsupported tdim: {self.tdim}")
 
     def scaled_axes(self) -> SetOfPoints:
         """Return the unit axes of the reference."""
-        return tuple(vnormalise(a) for a in self.axes)
+        return tuple(_vnormalise(a) for a in self.axes)
 
     def tangent(self) -> PointType:
         """Calculate the tangent to the element."""
         if self.tdim == 1:
             norm = sympy.sqrt(sum(i ** 2 for i in self.axes[0]))
-            return vnormalise(tuple(i / norm for i in self.axes[0]))
+            return _vnormalise(tuple(i / norm for i in self.axes[0]))
 
         raise RuntimeError
 
@@ -146,12 +174,12 @@ class Reference(ABC):
         """Calculate the normal to the element."""
         if self.tdim == 1:
             if self.gdim == 2:
-                return vnormalise((-self.axes[0][1], self.axes[0][0]))
+                return _vnormalise((-self.axes[0][1], self.axes[0][0]))
         if self.tdim == 2:
             if self.gdim == 3:
-                crossed = vcross3d(self.axes[0], self.axes[1])
+                crossed = _vcross(self.axes[0], self.axes[1])
                 assert isinstance(crossed, tuple)
-                return vnormalise(crossed)
+                return _vnormalise(crossed)
         raise RuntimeError
 
     def sub_entities(
@@ -202,27 +230,27 @@ class Reference(ABC):
                 return True
         return False
 
-    def on_edge(self, point: PointType) -> bool:
+    def on_edge(self, point_in: PointType) -> bool:
         """Check if a point is on an edge of the reference."""
+        from .functions import VectorFunction
+        point = VectorFunction(point_in)
         for e in self.edges:
-            v0 = self.vertices[e[0]]
-            v1 = self.vertices[e[1]]
-            if len(v0) == 3:
-                crossed = vnorm(vcross3d(vsub(v0, point), vsub(v1, point)))
-            else:
-                crossed = vcross2d(vsub(v0, point), vsub(v1, point))
+            v0 = VectorFunction(self.vertices[e[0]])
+            v1 = VectorFunction(self.vertices[e[1]])
+            crossed = (v0 - point).cross(v1 - point).norm()
             if crossed == 0:
                 return True
         return False
 
-    def on_face(self, point: PointType) -> bool:
+    def on_face(self, point_in: PointType) -> bool:
         """Check if a point is on a face of the reference."""
+        point = VectorFunction(point_in)
         for f in self.faces:
-            v0 = self.vertices[f[0]]
-            v1 = self.vertices[f[1]]
-            v2 = self.vertices[f[2]]
-            crossed = vcross3d(vsub(v0, point), vsub(v1, point))
-            if vdot(crossed, vsub(v2, point)):
+            v0 = VectorFunction(self.vertices[f[0]])
+            v1 = VectorFunction(self.vertices[f[1]])
+            v2 = VectorFunction(self.vertices[f[2]])
+            crossed = (v0 - point).cross(v1 - point)
+            if crossed.dot(v2 - point):
                 return True
         return False
 
@@ -303,7 +331,7 @@ class Interval(Reference):
             tdim=1,
             name="interval",
             origin=vertices[0],
-            axes=(vsub(vertices[1], vertices[0]),),
+            axes=(_vsub(vertices[1], vertices[0]),),
             reference_vertices=((0,), (1,)),
             vertices=vertices,
             edges=((0, 1),),
@@ -332,9 +360,9 @@ class Interval(Reference):
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
         vertices = parse_set_of_points_input(vertices_in)
-        p = vsub(tuple(x), vertices[0])
-        v = vsub(vertices[1], vertices[0])
-        return (vdot(p, v) * sympy.Integer(1) / vdot(v, v), )
+        p = _vsub(tuple(x), vertices[0])
+        v = _vsub(vertices[1], vertices[0])
+        return (_vdot(p, v) * sympy.Integer(1) / _vdot(v, v), )
 
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference."""
@@ -342,9 +370,9 @@ class Interval(Reference):
 
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference."""
-        p = vsub(tuple(x), self.vertices[0])
-        v = vsub(self.vertices[1], self.vertices[0])
-        return (vdot(p, v) * sympy.Integer(1) / vdot(v, v), )
+        p = _vsub(tuple(x), self.vertices[0])
+        v = _vsub(self.vertices[1], self.vertices[0])
+        return (_vdot(p, v) * sympy.Integer(1) / _vdot(v, v), )
 
     def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
@@ -368,7 +396,7 @@ class Triangle(Reference):
             tdim=2,
             name="triangle",
             origin=vertices[0],
-            axes=(vsub(vertices[1], vertices[0]), vsub(vertices[2], vertices[0])),
+            axes=(_vsub(vertices[1], vertices[0]), _vsub(vertices[2], vertices[0])),
             reference_vertices=((0, 0), (1, 0), (0, 1)),
             vertices=vertices,
             edges=((1, 2), (0, 2), (0, 1)),
@@ -398,12 +426,12 @@ class Triangle(Reference):
         assert self.vertices == self.reference_vertices
         vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 2
-        p = vsub(tuple(x), vertices[0])
-        v1 = vsub(vertices[1], vertices[0])
-        v2 = vsub(vertices[2], vertices[0])
+        p = _vsub(tuple(x), vertices[0])
+        v1 = _vsub(vertices[1], vertices[0])
+        v2 = _vsub(vertices[2], vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0]],
                             [v1[1], v2[1]]]).inv()
-        return (vdot(mat.row(0), p), vdot(mat.row(1), p))
+        return (_vdot(mat.row(0), p), _vdot(mat.row(1), p))
 
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference."""
@@ -413,15 +441,15 @@ class Triangle(Reference):
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference."""
         if len(self.vertices[0]) == 2:
-            p = vsub(tuple(x), self.vertices[0])
-            v1 = vsub(self.vertices[1], self.vertices[0])
-            v2 = vsub(self.vertices[2], self.vertices[0])
+            p = _vsub(tuple(x), self.vertices[0])
+            v1 = _vsub(self.vertices[1], self.vertices[0])
+            v2 = _vsub(self.vertices[2], self.vertices[0])
             mat = sympy.Matrix([[v1[0], v2[0]],
                                 [v1[1], v2[1]]]).inv()
-            return (vdot(mat.row(0), p), vdot(mat.row(1), p))
+            return (_vdot(mat.row(0), p), _vdot(mat.row(1), p))
 
         return tuple(
-            vdot(vsub(tuple(x), self.origin), a) * sympy.Integer(1) / vnorm(a) for a in self.axes
+            _vdot(_vsub(tuple(x), self.origin), a) * sympy.Integer(1) / _vnorm(a) for a in self.axes
         )
 
     def volume(self) -> sympy.core.expr.Expr:
@@ -447,9 +475,9 @@ class Tetrahedron(Reference):
             name="tetrahedron",
             origin=vertices[0],
             axes=(
-                vsub(vertices[1], vertices[0]),
-                vsub(vertices[2], vertices[0]),
-                vsub(vertices[3], vertices[0]),
+                _vsub(vertices[1], vertices[0]),
+                _vsub(vertices[2], vertices[0]),
+                _vsub(vertices[3], vertices[0]),
             ),
             reference_vertices=((0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1)),
             vertices=vertices,
@@ -489,14 +517,14 @@ class Tetrahedron(Reference):
         assert self.vertices == self.reference_vertices
         vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 3
-        p = vsub(tuple(x), vertices[0])
-        v1 = vsub(vertices[1], vertices[0])
-        v2 = vsub(vertices[2], vertices[0])
-        v3 = vsub(vertices[3], vertices[0])
+        p = _vsub(tuple(x), vertices[0])
+        v1 = _vsub(vertices[1], vertices[0])
+        v2 = _vsub(vertices[2], vertices[0])
+        v3 = _vsub(vertices[3], vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
-        return (vdot(mat.row(0), p), vdot(mat.row(1), p), vdot(mat.row(2), p))
+        return (_vdot(mat.row(0), p), _vdot(mat.row(1), p), _vdot(mat.row(2), p))
 
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference."""
@@ -505,14 +533,14 @@ class Tetrahedron(Reference):
 
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference."""
-        p = vsub(tuple(x), self.vertices[0])
-        v1 = vsub(self.vertices[1], self.vertices[0])
-        v2 = vsub(self.vertices[2], self.vertices[0])
-        v3 = vsub(self.vertices[3], self.vertices[0])
+        p = _vsub(tuple(x), self.vertices[0])
+        v1 = _vsub(self.vertices[1], self.vertices[0])
+        v2 = _vsub(self.vertices[2], self.vertices[0])
+        v3 = _vsub(self.vertices[3], self.vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
-        return (vdot(mat.row(0), p), vdot(mat.row(1), p), vdot(mat.row(2), p))
+        return (_vdot(mat.row(0), p), _vdot(mat.row(1), p), _vdot(mat.row(2), p))
 
     def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
@@ -536,7 +564,7 @@ class Quadrilateral(Reference):
             tdim=2,
             name="quadrilateral",
             origin=vertices[0],
-            axes=(vsub(vertices[1], vertices[0]), vsub(vertices[2], vertices[0])),
+            axes=(_vsub(vertices[1], vertices[0]), _vsub(vertices[2], vertices[0])),
             reference_vertices=((0, 0), (1, 0), (0, 1), (1, 1)),
             vertices=vertices,
             edges=((0, 1), (0, 2), (1, 3), (2, 3)),
@@ -567,23 +595,23 @@ class Quadrilateral(Reference):
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
         vertices = parse_set_of_points_input(vertices_in)
-        assert vadd(vertices[0], vertices[3]) == vadd(vertices[1], vertices[2])
-        p = vsub(tuple(x), vertices[0])
-        v1 = vsub(vertices[1], vertices[0])
-        v2 = vsub(vertices[2], vertices[0])
+        assert _vadd(vertices[0], vertices[3]) == _vadd(vertices[1], vertices[2])
+        p = _vsub(tuple(x), vertices[0])
+        v1 = _vsub(vertices[1], vertices[0])
+        v2 = _vsub(vertices[2], vertices[0])
 
         if len(self.vertices[0]) == 2:
             mat = sympy.Matrix([[v1[0], v2[0]],
                                 [v1[1], v2[1]]]).inv()
         elif len(self.vertices[0]) == 3:
-            v3 = vcross3d(v1, v2)
+            v3 = _vcross(v1, v2)
             mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                                 [v1[1], v2[1], v3[1]],
                                 [v1[2], v2[2], v3[2]]]).inv()
         else:
             raise RuntimeError("Cannot get inverse map.")
 
-        return (vdot(mat.row(0), p), vdot(mat.row(1), p))
+        return (_vdot(mat.row(0), p), _vdot(mat.row(1), p))
 
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference."""
@@ -593,24 +621,24 @@ class Quadrilateral(Reference):
 
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference."""
-        assert vadd(self.vertices[0], self.vertices[3]) == vadd(self.vertices[1],
+        assert _vadd(self.vertices[0], self.vertices[3]) == _vadd(self.vertices[1],
                                                                 self.vertices[2])
-        p = vsub(tuple(x), self.vertices[0])
-        v1 = vsub(self.vertices[1], self.vertices[0])
-        v2 = vsub(self.vertices[2], self.vertices[0])
+        p = _vsub(tuple(x), self.vertices[0])
+        v1 = _vsub(self.vertices[1], self.vertices[0])
+        v2 = _vsub(self.vertices[2], self.vertices[0])
 
         if len(self.vertices[0]) == 2:
             mat = sympy.Matrix([[v1[0], v2[0]],
                                 [v1[1], v2[1]]]).inv()
         elif len(self.vertices[0]) == 3:
-            v3 = vcross3d(v1, v2)
+            v3 = _vcross(v1, v2)
             mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                                 [v1[1], v2[1], v3[1]],
                                 [v1[2], v2[2], v3[2]]]).inv()
         else:
             raise RuntimeError("Cannot get inverse map.")
 
-        return (vdot(mat.row(0), p), vdot(mat.row(1), p))
+        return (_vdot(mat.row(0), p), _vdot(mat.row(1), p))
 
     def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
@@ -636,9 +664,9 @@ class Hexahedron(Reference):
             name="hexahedron",
             origin=vertices[0],
             axes=(
-                vsub(vertices[1], vertices[0]),
-                vsub(vertices[2], vertices[0]),
-                vsub(vertices[4], vertices[0]),
+                _vsub(vertices[1], vertices[0]),
+                _vsub(vertices[2], vertices[0]),
+                _vsub(vertices[4], vertices[0]),
             ),
             reference_vertices=(
                 (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0),
@@ -691,15 +719,15 @@ class Hexahedron(Reference):
         vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 3
         for a, b, c, d in self.faces:
-            assert vadd(vertices[a], vertices[d]) == vadd(vertices[b], vertices[c])
-        p = vsub(tuple(x), vertices[0])
-        v1 = vsub(vertices[1], vertices[0])
-        v2 = vsub(vertices[2], vertices[0])
-        v3 = vsub(vertices[4], vertices[0])
+            assert _vadd(vertices[a], vertices[d]) == _vadd(vertices[b], vertices[c])
+        p = _vsub(tuple(x), vertices[0])
+        v1 = _vsub(vertices[1], vertices[0])
+        v2 = _vsub(vertices[2], vertices[0])
+        v3 = _vsub(vertices[4], vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
-        return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
+        return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference."""
@@ -714,16 +742,16 @@ class Hexahedron(Reference):
         """Compute the inverse map from the canonical reference to this reference."""
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces:
-            assert vadd(self.vertices[a], self.vertices[d]) == vadd(self.vertices[b],
+            assert _vadd(self.vertices[a], self.vertices[d]) == _vadd(self.vertices[b],
                                                                     self.vertices[c])
-        p = vsub(tuple(x), self.vertices[0])
-        v1 = vsub(self.vertices[1], self.vertices[0])
-        v2 = vsub(self.vertices[2], self.vertices[0])
-        v3 = vsub(self.vertices[4], self.vertices[0])
+        p = _vsub(tuple(x), self.vertices[0])
+        v1 = _vsub(self.vertices[1], self.vertices[0])
+        v2 = _vsub(self.vertices[2], self.vertices[0])
+        v3 = _vsub(self.vertices[4], self.vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
-        return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
+        return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
@@ -749,9 +777,9 @@ class Prism(Reference):
             name="prism",
             origin=vertices[0],
             axes=(
-                vsub(vertices[1], vertices[0]),
-                vsub(vertices[2], vertices[0]),
-                vsub(vertices[3], vertices[0]),
+                _vsub(vertices[1], vertices[0]),
+                _vsub(vertices[2], vertices[0]),
+                _vsub(vertices[3], vertices[0]),
             ),
             reference_vertices=(
                 (0, 0, 0), (1, 0, 0), (0, 1, 0),
@@ -805,15 +833,15 @@ class Prism(Reference):
         vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 3
         for a, b, c, d in self.faces[1:4]:
-            assert vadd(vertices[a], vertices[d]) == vadd(vertices[b], vertices[c])
-        p = vsub(tuple(x), vertices[0])
-        v1 = vsub(vertices[1], vertices[0])
-        v2 = vsub(vertices[2], vertices[0])
-        v3 = vsub(vertices[3], vertices[0])
+            assert _vadd(vertices[a], vertices[d]) == _vadd(vertices[b], vertices[c])
+        p = _vsub(tuple(x), vertices[0])
+        v1 = _vsub(vertices[1], vertices[0])
+        v2 = _vsub(vertices[2], vertices[0])
+        v3 = _vsub(vertices[3], vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
-        return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
+        return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference."""
@@ -826,16 +854,16 @@ class Prism(Reference):
         """Compute the inverse map from the canonical reference to this reference."""
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces[1:4]:
-            assert vadd(self.vertices[a], self.vertices[d]) == vadd(self.vertices[b],
+            assert _vadd(self.vertices[a], self.vertices[d]) == _vadd(self.vertices[b],
                                                                     self.vertices[c])
-        p = vsub(tuple(x), self.vertices[0])
-        v1 = vsub(self.vertices[1], self.vertices[0])
-        v2 = vsub(self.vertices[2], self.vertices[0])
-        v3 = vsub(self.vertices[3], self.vertices[0])
+        p = _vsub(tuple(x), self.vertices[0])
+        v1 = _vsub(self.vertices[1], self.vertices[0])
+        v2 = _vsub(self.vertices[2], self.vertices[0])
+        v3 = _vsub(self.vertices[3], self.vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
-        return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
+        return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
@@ -862,9 +890,9 @@ class Pyramid(Reference):
             name="pyramid",
             origin=vertices[0],
             axes=(
-                vsub(vertices[1], vertices[0]),
-                vsub(vertices[2], vertices[0]),
-                vsub(vertices[4], vertices[0]),
+                _vsub(vertices[1], vertices[0]),
+                _vsub(vertices[2], vertices[0]),
+                _vsub(vertices[4], vertices[0]),
             ),
             reference_vertices=(
                 (0, 0, 0), (1, 0, 0), (0, 1, 0),
@@ -920,15 +948,15 @@ class Pyramid(Reference):
         vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 3
         for a, b, c, d in self.faces[:1]:
-            assert vadd(vertices[a], vertices[d]) == vadd(vertices[b], vertices[c])
-        p = vsub(tuple(x), vertices[0])
-        v1 = vsub(vertices[1], vertices[0])
-        v2 = vsub(vertices[2], vertices[0])
-        v3 = vsub(vertices[4], vertices[0])
+            assert _vadd(vertices[a], vertices[d]) == _vadd(vertices[b], vertices[c])
+        p = _vsub(tuple(x), vertices[0])
+        v1 = _vsub(vertices[1], vertices[0])
+        v2 = _vsub(vertices[2], vertices[0])
+        v3 = _vsub(vertices[4], vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
-        return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
+        return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference."""
@@ -943,16 +971,16 @@ class Pyramid(Reference):
         """Compute the inverse map from the canonical reference to this reference."""
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces[:1]:
-            assert vadd(self.vertices[a], self.vertices[d]) == vadd(self.vertices[b],
+            assert _vadd(self.vertices[a], self.vertices[d]) == _vadd(self.vertices[b],
                                                                     self.vertices[c])
-        p = vsub(tuple(x), self.vertices[0])
-        v1 = vsub(self.vertices[1], self.vertices[0])
-        v2 = vsub(self.vertices[2], self.vertices[0])
-        v3 = vsub(self.vertices[4], self.vertices[0])
+        p = _vsub(tuple(x), self.vertices[0])
+        v1 = _vsub(self.vertices[1], self.vertices[0])
+        v2 = _vsub(self.vertices[2], self.vertices[0])
+        v3 = _vsub(self.vertices[4], self.vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
-        return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
+        return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""

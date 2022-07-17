@@ -5,7 +5,6 @@ import sympy
 import numpy
 from abc import ABC, abstractmethod
 from .symbols import x, t
-from .vectors import vdot
 from .references import Reference, Interval
 from .functions import (ScalarFunction, VectorFunction, MatrixFunction, AnyFunction,
                         FunctionInput, parse_function_input)
@@ -731,7 +730,7 @@ class DerivativeIntegralMoment(IntegralMoment):
         """Dot a function with the moment function."""
         assert isinstance(function, tuple)
         assert isinstance(self.f, (int, sympy.core.expr.Expr))
-        return vdot(function, self.dot_with) * self.f
+        return function.dot(self.dot_with) * self.f
 
     def dof_direction(self) -> typing.Union[PointType, None]:
         """Get the direction of the DOF."""
