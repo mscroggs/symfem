@@ -2,7 +2,9 @@ import pytest
 import symfem
 from symfem import create_element
 from symfem.symbols import x
-from .utils import test_elements, allequal
+from symfem.utils import allequal
+from symfem.functions import VectorFunction
+from .utils import test_elements
 
 
 def test_all_tested():
@@ -71,9 +73,9 @@ def test_dual_elements(elements_to_test, cells_to_test, n_tri, order):
     sub_e = create_element("triangle", space.fine_space, space.order)
     for f, coeff_list in zip(space.get_basis_functions(), space.dual_coefficients):
         for piece, coeffs in zip(f.pieces, coeff_list):
-            map = sub_e.reference.get_map_to(piece[0])
+            fwd_map = VectorFunction(sub_e.reference.get_map_to(piece[0]))
             for dof, value in zip(sub_e.dofs, coeffs):
-                point = map.subs(x, dof.point)
+                point = fwd_map.subs(x, dof.point)
                 assert allequal(value, piece[1].subs(x, point))
 
 

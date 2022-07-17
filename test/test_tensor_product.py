@@ -2,7 +2,8 @@ import pytest
 import symfem
 import sympy
 from symfem import create_element
-from .utils import test_elements, allequal
+from symfem.utils import allequal
+from .utils import test_elements
 
 
 def make_lattice(cell, N=3):

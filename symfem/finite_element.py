@@ -9,13 +9,13 @@ import math
 from abc import ABC, abstractmethod
 from itertools import product
 from .symbols import x
-from .vectors import vsub, vnorm, vdiv, vadd
 from .functionals import ListOfFunctionals
 from .references import Reference
 from .functions import (ScalarFunction, VectorFunction, MatrixFunction, parse_function_list_input,
                         AnyFunction, FunctionInput)
 from .piecewise_functions import PiecewiseFunction
 from .basis_functions import BasisFunction
+from .utils import allequal
 
 ListOfScalarFunctions = typing.List[ScalarFunction]
 ListOfVectorFunctions = typing.List[VectorFunction]
@@ -213,40 +213,42 @@ class FiniteElement(ABC):
                         f += deriv_f
                         deriv_g = [d.diff(i) for d in deriv_g for i in x[:self.reference.tdim]]
                         g += deriv_g
-                elif continuity == "H(div)" or continuity == "inner H(div)":
+                elif continuity == "H(div)":
                     f = f[0]
                     g = g[0]
+                elif continuity == "inner H(div)":
+                    f = f[0, 0]
+                    g = g[0, 0]
                 elif continuity == "H(curl)":
                     f = f[1:]
                     g = g[1:]
                 elif continuity == "inner H(curl)":
                     if len(vertices[0]) == 2:
-                        f = f[3]
-                        g = g[3]
+                        f = f[1, 1]
+                        g = g[1, 1]
                     if len(vertices[0]) == 3:
                         if dim == 1:
                             vs = self.reference.sub_entities(1)[entities[0]]
                             v0 = self.reference.vertices[vs[0]]
                             v1 = self.reference.vertices[vs[1]]
-                            tangent = vsub(v1, v0)
-                            f = sum(i * f[ni * len(tangent) + nj] * j
+                            tangent = VectorFunction(v1) - VectorFunction(v0)
+                            f = sum(i * f[ni, nj] * j
                                     for ni, i in enumerate(tangent)
                                     for nj, j in enumerate(tangent))
-                            g = sum(i * g[ni * len(tangent) + nj] * j
+                            g = sum(i * g[ni, nj] * j
                                     for ni, i in enumerate(tangent)
                                     for nj, j in enumerate(tangent))
                         else:
                             assert dim == 2
-                            f = [f[4], f[8]]
-                            g = [g[4], g[8]]
+                            f = [f[1, 1], f[2, 2]]
+                            g = [g[1, 1], g[2, 2]]
                 elif continuity == "integral inner H(div)":
                     f = f[0].integrate((x[1], 0, 1))
                     g = g[0].integrate((x[1], 0, 1))
                 else:
                     raise ValueError(f"Unknown continuity: {continuity}")
 
-                for i, j in zip(f, g):
-                    assert i == j
+                assert allequal(f, g)
 
     def get_tensor_factorisation(
         self
@@ -401,6 +403,7 @@ class CiarletElement(FiniteElement):
             row = []
             for d in self.dofs:
                 entry = d.eval_symbolic(b).as_sympy()
+                assert isinstance(entry, sympy.core.expr.Expr)
                 assert entry.is_constant()
                 row.append(entry)
             mat.append(row)
@@ -467,13 +470,14 @@ class CiarletElement(FiniteElement):
 
         def to_2d(p):
             if len(p) == 0:
-                return (0., 0.)
+                return (0, 0)
             if len(p) == 1:
-                return (float(p[0]), 0.)
+                return (p[0], 0)
             if len(p) == 2:
-                return (float(p[0]), float(p[1]))
+                return (p[0], p[1])
             if len(p) == 3:
-                return (float(p[0] + p[1] / 2), float(p[2] - 2 * p[0] / 25 + p[1] / 5))
+                return (p[0] + p[1] * sympy.Integer(1) / 2,
+                        p[2] - 2 * p[0] * sympy.Integer(1) / 25 + p[1] * sympy.Integer(1) / 5)
             raise ValueError("Unsupported gdim")
 
         def z(p):
@@ -520,16 +524,17 @@ class CiarletElement(FiniteElement):
                 for d in dofs:
                     direction = d.dof_direction()
                     if direction is not None:
-                        direction = vdiv(direction, vnorm(direction))
-                        direction = vdiv(direction, 8)
-                        start = d.dof_point()
+                        direction = VectorFunction(direction)
+                        direction /= direction.norm()
+                        direction /= 8
+                        start = VectorFunction(d.dof_point())
                         for d2 in self.dofs:
                             if d != d2 and d.dof_point() == d2.dof_point():
-                                start = vadd(start, vdiv(direction, 3))
+                                start += direction / 3
                                 break
                         ddata.append((
                             "arrow",
-                            (to_2d(start), to_2d(vadd(start, direction)), colors[d.entity[0]])))
+                            (to_2d(start), to_2d(start + direction), colors[d.entity[0]])))
                         ddata.append((
                             "ncircle", (to_2d(start), self.dofs.index(d), colors[d.entity[0]])))
                     else:
@@ -570,12 +575,12 @@ class CiarletElement(FiniteElement):
         height = 50 + (maxy - miny) * scale
 
         if filename.endswith(".svg"):
-            img = svgwrite.Drawing(filename, size=(width, height))
+            img = svgwrite.Drawing(filename, size=(float(width), float(height)))
         else:
-            img = svgwrite.Drawing(None, size=(width, height))
+            img = svgwrite.Drawing(None, size=(float(width), float(height)))
 
         def map_pt(p):
-            return (25 + (p[0] - minx) * scale, height - 25 - (p[1] - miny) * scale)
+            return (float(25 + (p[0] - minx) * scale), float(height - 25 - (p[1] - miny) * scale))
 
         for t, info in ddata:
             if t == "line":
@@ -588,15 +593,16 @@ class CiarletElement(FiniteElement):
                     map_pt(s), map_pt(e), stroke=c, stroke_width=4, stroke_linecap="round"))
                 assert isinstance(e, tuple)
                 assert isinstance(s, tuple)
-                direction = vsub(e, s)
-                direction = vdiv(direction, vnorm(direction))
-                direction = vdiv(direction, 30)
-                perp: PointType = (-direction[1], direction[0])
-                perp = vdiv(perp, sympy.Rational(5, 2))
-                for f in [vadd, vsub]:
-                    a_end = tuple(float(i) for i in f(vsub(e, direction), perp))
+                e = VectorFunction(e)
+                direction = e - s
+                direction /= direction.norm()
+                direction /= 30
+                perp = VectorFunction((-direction[1], direction[0]))
+                perp /= sympy.Rational(5, 2)
+                for pt in [e - direction + perp, e - direction - perp]:
                     img.add(img.line(
-                        map_pt(a_end), map_pt(e), stroke=c, stroke_width=4, stroke_linecap="round"))
+                        map_pt(pt.as_sympy()), map_pt(e), stroke=c, stroke_width=4,
+                        stroke_linecap="round"))
             elif t == "ncircle":
                 p, n, c = info
                 img.add(img.circle(map_pt(p), 20, stroke=c, stroke_width=4, fill=white))

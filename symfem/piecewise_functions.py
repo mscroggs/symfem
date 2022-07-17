@@ -35,6 +35,12 @@ class PiecewiseFunction(AnyFunction):
 
     def as_sympy(self) -> SympyFormat:
         """Convert to a sympy expression."""
+        p = self._pieces[0][1]
+        for _, f in self._pieces:
+            if f != p:
+                break
+        else:
+            return p.as_sympy()
         return {tuple(shape): f for shape, f in self._pieces}
 
     def as_tex(self) -> str:
@@ -88,6 +94,11 @@ class PiecewiseFunction(AnyFunction):
                     raise ValueError("Unsupported cell")
 
         raise NotImplementedError("Evaluation of piecewise functions outside domain not supported.")
+
+    def __getitem__(self, key) -> PiecewiseFunction:
+        """Get a component or slice of the function."""
+        return PiecewiseFunction(
+            [(shape, f.__getitem__(key)) for shape, f in self._pieces], self.tdim)
 
     def __eq__(self, other: typing.Any) -> bool:
         """Check if two functions are equal."""
@@ -197,6 +208,39 @@ class PiecewiseFunction(AnyFunction):
         return PiecewiseFunction([
             (shape, other * f) for shape, f in self._pieces], self.tdim)
 
+    def __matmul__(self, other: typing.Any) -> PiecewiseFunction:
+        """Multiply."""
+        if isinstance(other, PiecewiseFunction):
+            new_pieces = []
+            for (shape0, f0), (shape1, f1) in zip(self._pieces, other._pieces):
+                assert shape0 == shape1
+                new_pieces.append((shape0, f0 @ f1))
+            return PiecewiseFunction(new_pieces, self.tdim)
+        return PiecewiseFunction([
+            (shape, f @ other) for shape, f in self._pieces], self.tdim)
+
+    def __rmatmul__(self, other: typing.Any) -> PiecewiseFunction:
+        """Multiply."""
+        if isinstance(other, PiecewiseFunction):
+            new_pieces = []
+            for (shape0, f0), (shape1, f1) in zip(self._pieces, other._pieces):
+                assert shape0 == shape1
+                new_pieces.append((shape0, f1 @ f0))
+            return PiecewiseFunction(new_pieces, self.tdim)
+        return PiecewiseFunction([
+            (shape, other @ f) for shape, f in self._pieces], self.tdim)
+
+    def __pow__(self, other: typing.Any) -> PiecewiseFunction:
+        """Raise to a power."""
+        if isinstance(other, PiecewiseFunction):
+            new_pieces = []
+            for (shape0, f0), (shape1, f1) in zip(self._pieces, other._pieces):
+                assert shape0 == shape1
+                new_pieces.append((shape0, f0 ** f1))
+            return PiecewiseFunction(new_pieces, self.tdim)
+        return PiecewiseFunction([
+            (shape, f ** other) for shape, f in self._pieces], self.tdim)
+
     def __neg__(self) -> PiecewiseFunction:
         """Negate."""
         return PiecewiseFunction([(shape, -f) for shape, f in self._pieces], self.tdim)
@@ -205,7 +249,17 @@ class PiecewiseFunction(AnyFunction):
         self, vars: AxisVariables, values: ValuesToSubstitute
     ) -> PiecewiseFunction:
         """Substitute values into the function."""
+        if isinstance(values, AnyFunction):
+            values = values.as_sympy()
+
+        print(self)
+        print(vars)
+        print(values)
+        print(type(values))
+        print(self.tdim)
+
         if isinstance(values, (tuple, list)) and len(values) == self.tdim:
+            print("HERE")
             for i in values:
                 if not _to_sympy_format(i).is_constant():
                     break
@@ -254,6 +308,11 @@ class PiecewiseFunction(AnyFunction):
         """Compute the curl of the function."""
         return PiecewiseFunction([
             (shape, f.curl()) for shape, f in self._pieces], self.tdim)
+
+    def norm(self) -> PiecewiseFunction:
+        """Compute the norm of the function."""
+        return PiecewiseFunction([
+            (shape, f.norm()) for shape, f in self._pieces], self.tdim)
 
     def integrate(
         self, *limits: typing.Tuple[

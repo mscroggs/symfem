@@ -37,7 +37,7 @@ class P1IsoP2Tri(CiarletElement):
             {1: 2 * y, 2: 2 * x, 3: 1 - 2 * c},
         ]:
             poly.append(PiecewiseFunction([
-                (t, pieces[i]) if i in pieces else (t, 0) for i, t in enumerate(tris)], "triangle"))
+                (t, pieces[i]) if i in pieces else (t, 0) for i, t in enumerate(tris)], 2))
 
         dofs: ListOfFunctionals = []
         for v_n, v in enumerate(reference.reference_vertices):
@@ -84,7 +84,7 @@ class P1IsoP2Quad(CiarletElement):
         ]:
             poly.append(PiecewiseFunction([
                 (q, pieces[i]) if i in pieces else (q, 0) for i, q in enumerate(quads)],
-                "quadrilateral"))
+                2))
 
         dofs: ListOfFunctionals = []
         for v_n, v in enumerate(reference.reference_vertices):

@@ -4,7 +4,7 @@ from __future__ import annotations
 from abc import abstractmethod
 import sympy
 import typing
-from .functions import AnyFunction, SympyFormat, AxisVariables, ValuesToSubstitute
+from .functions import AnyFunction, SympyFormat, AxisVariables, ValuesToSubstitute, ScalarFunction
 from .geometry import PointType
 
 
@@ -55,6 +55,18 @@ class BasisFunction(AnyFunction):
         """Multiply."""
         return self.get_function().__rmul__(other)
 
+    def __matmul__(self, other: typing.Any) -> AnyFunction:
+        """Multiply."""
+        return self.get_function().__matmul__(other)
+
+    def __rmatmul__(self, other: typing.Any) -> AnyFunction:
+        """Multiply."""
+        return self.get_function().__rmatmul__(other)
+
+    def __pow__(self, other: typing.Any) -> AnyFunction:
+        """Raise to a power."""
+        return self.get_function().__pow__(other)
+
     def as_sympy(self) -> SympyFormat:
         """Convert to a sympy expression."""
         return self.get_function().as_sympy()
@@ -94,6 +106,10 @@ class BasisFunction(AnyFunction):
     def curl(self) -> AnyFunction:
         """Compute the curl of the function."""
         return self.get_function().curl()
+
+    def norm(self) -> ScalarFunction:
+        """Compute the norm of the function."""
+        raise self.get_function().norm()
 
     def integrate(
         self, *limits: typing.Tuple[

@@ -22,7 +22,7 @@ class HellanHerrmannJohnson(CiarletElement):
             raise NotImplementedError()
         assert reference.name == "triangle"
         poly = [
-            (p[0], p[1], p[1], p[2]) for p in polynomial_set_vector(reference.tdim, 3, order)]
+            ((p[0], p[1]), (p[1], p[2])) for p in polynomial_set_vector(reference.tdim, 3, order)]
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,

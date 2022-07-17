@@ -327,30 +327,21 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
 class PointInnerProduct(BaseFunctional):
     """An evaluation of an inner product at a point."""
 
-    def __init__(self, reference: Reference, point: PointType, lvec: PointType, rvec: PointType,
+    def __init__(self, reference: Reference, point: PointType, lvec: FunctionInput,
+                 rvec: FunctionInput,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
         super().__init__(reference, entity, mapping)
         self.point = point
-        self.lvec = lvec
-        self.rvec = rvec
+        self.lvec = parse_function_input(lvec)
+        self.rvec = parse_function_input(rvec)
+        assert self.lvec.is_vector
+        assert self.rvec.is_vector
 
     def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
         """Apply the functional to a function."""
-        # TODO
         v = function.subs(x, self.point)
-        if isinstance(function, sympy.Matrix):
-            function = tuple(function[i, j]
-                             for i in range(function.rows) for j in range(function.cols))
-        assert isinstance(function, tuple)
-        if isinstance(v, sympy.Matrix):
-            v = tuple(v[i, j] for i in range(v.rows) for j in range(v.cols))
-        assert isinstance(v, tuple)
-        tdim = len(self.lvec)
-        assert len(function) == tdim ** 2
-        value = vdot(self.lvec,
-                     tuple(vdot(v[tdim * i: tdim * (i + 1)], self.rvec)
-                           for i in range(0, tdim)))
-        return ScalarFunction(value)
+
+        return self.lvec.dot(v @ self.rvec)
 
     def dof_point(self) -> PointType:
         """Get the location of the DOF in the cell."""
@@ -431,16 +422,17 @@ class IntegralAgainst(BaseFunctional):
         f = parse_function_input(f_in)
         f = f.subs(x, t)
 
-        if isinstance(f, tuple):
-            if len(f) == self.integral_domain.tdim:
-                self.f = mappings.contravariant(
-                    f, integral_domain.get_map_to_self(), integral_domain.get_inverse_map_to_self(),
-                    integral_domain.tdim)
-            else:
-                assert len(f) == self.integral_domain.tdim ** 2
-                self.f = mappings.double_contravariant(
-                    f, integral_domain.get_map_to_self(), integral_domain.get_inverse_map_to_self(),
-                    integral_domain.tdim)
+        if f.is_vector:
+            assert len(f) == self.integral_domain.tdim
+            self.f = mappings.contravariant(
+                f, integral_domain.get_map_to_self(), integral_domain.get_inverse_map_to_self(),
+                integral_domain.tdim)
+        elif f.is_matrix:
+            assert f.shape[0] == self.integral_domain.tdim
+            assert f.shape[1] == self.integral_domain.tdim
+            self.f = mappings.double_contravariant(
+                f, integral_domain.get_map_to_self(), integral_domain.get_inverse_map_to_self(),
+                integral_domain.tdim)
         else:
             self.f = f
 
@@ -460,15 +452,7 @@ class IntegralAgainst(BaseFunctional):
 
     def dot(self, function: AnyFunction) -> sympy.core.expr.Expr:
         """Dot a function with the moment function."""
-        if isinstance(self.f, tuple):
-            if isinstance(function, sympy.Matrix):
-                function = tuple(function[i, j]
-                                 for i in range(function.rows) for j in range(function.cols))
-            assert isinstance(function, tuple)
-            return vdot(function, self.f)
-        assert isinstance(self.f, (int, sympy.core.expr.Expr))
-        assert isinstance(function, (int, sympy.core.expr.Expr))
-        return function * self.f
+        return function.dot(self.f)
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
@@ -908,7 +892,7 @@ class InnerProductIntegralMoment(IntegralMoment):
         """Take the inner product of a function with the moment direction."""
         assert function.is_matrix
         return self.inner_with_left.dot(
-            function * self.inner_with_right) * self.f * self.integral_domain.jacobian()
+            function @ self.inner_with_right) * self.f * self.integral_domain.jacobian()
 
     def dof_direction(self) -> typing.Union[PointType, None]:
         """Get the direction of the DOF."""

@@ -21,7 +21,7 @@ AxisVariables = typing.Union[
     typing.List[sympy.core.symbol.Symbol],
     sympy.core.symbol.Symbol,
     ]
-ValuesToSubstitute = typing.Union[
+_ValuesToSubstitute = typing.Union[
     typing.Tuple[typing.Any, ...],
     typing.List[typing.Any],
     typing.Any]
@@ -93,6 +93,10 @@ class AnyFunction(ABC):
         self.is_vector = vector
         self.is_matrix = matrix
 
+    def __getitem__(self, key) -> AnyFunction:
+        """Get a component or slice of the function."""
+        raise ValueError(f"'{self.__class__.__name__}' object is not subscriptable")
+
     @abstractmethod
     def __add__(self, other: typing.Any):
         """Add."""
@@ -139,6 +143,21 @@ class AnyFunction(ABC):
         pass
 
     @abstractmethod
+    def __matmul__(self, other: typing.Any):
+        """Multiply."""
+        pass
+
+    @abstractmethod
+    def __rmatmul__(self, other: typing.Any):
+        """Multiply."""
+        pass
+
+    @abstractmethod
+    def __pow__(self, other: typing.Any):
+        """Raise to a power."""
+        pass
+
+    @abstractmethod
     def as_sympy(self) -> SympyFormat:
         """Convert to a sympy expression."""
         pass
@@ -149,7 +168,7 @@ class AnyFunction(ABC):
         pass
 
     @abstractmethod
-    def subs(self, vars: AxisVariables, values: ValuesToSubstitute):
+    def subs(self, vars: AxisVariables, values: typing.Union[AnyFunction, _ValuesToSubstitute]):
         """Substitute values into the function."""
         pass
 
@@ -194,6 +213,11 @@ class AnyFunction(ABC):
         pass
 
     @abstractmethod
+    def norm(self):
+        """Compute the norm of the function."""
+        pass
+
+    @abstractmethod
     def integrate(
         self, *limits: typing.Tuple[
             sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr],
@@ -202,6 +226,28 @@ class AnyFunction(ABC):
         """Compute the integral of the function."""
         pass
 
+    def __float__(self) -> float:
+        """Convert to a float."""
+        if self.is_scalar:
+            return float(self.as_sympy())
+        raise TypeError("Cannot convert function to a float.")
+
+    def __lt__(self, other: typing.Any) -> bool:
+        """Check inequality."""
+        return self.as_sympy() < other
+
+    def __gt__(self, other: typing.Any) -> bool:
+        """Check inequality."""
+        return self.as_sympy() > other
+
+    def __le_(self, other: typing.Any) -> bool:
+        """Check inequality."""
+        return self.as_sympy() <= other
+
+    def __ge__(self, other: typing.Any) -> bool:
+        """Check inequality."""
+        return self.as_sympy() >= other
+
     def __repr__(self) -> str:
         """Representation."""
         return self.as_sympy().__repr__()
@@ -209,6 +255,9 @@ class AnyFunction(ABC):
     def __eq__(self, other: typing.Any) -> bool:
         """Check if two functions are equal."""
         return _check_equal(_to_sympy_format(self), _to_sympy_format(other))
+
+
+ValuesToSubstitute = typing.Union[AnyFunction, _ValuesToSubstitute]
 
 
 class ScalarFunction(AnyFunction):
@@ -288,6 +337,18 @@ class ScalarFunction(AnyFunction):
             return ScalarFunction(other * self._f)
         return NotImplemented
 
+    def __matmul__(self, other: typing.Any):
+        """Multiply."""
+        return NotImplemented
+
+    def __rmatmul__(self, other: typing.Any):
+        """Multiply."""
+        return NotImplemented
+
+    def __pow__(self, other: typing.Any) -> ScalarFunction:
+        """Raise to a power."""
+        return ScalarFunction(self._f ** other)
+
     def __neg__(self) -> ScalarFunction:
         """Negate."""
         return ScalarFunction(-self._f)
@@ -306,6 +367,8 @@ class ScalarFunction(AnyFunction):
     def subs(self, vars: AxisVariables, values: ValuesToSubstitute) -> ScalarFunction:
         """Substitute values into the function."""
         subbed = self._f
+        if isinstance(values, AnyFunction):
+            values = values.as_sympy()
         if isinstance(vars, (list, tuple)):
             assert isinstance(values, (list, tuple))
             dummy = [sympy.Symbol(f"DUMMY_{i}") for i, _ in enumerate(values)]
@@ -361,6 +424,10 @@ class ScalarFunction(AnyFunction):
         """Compute the curl of the function."""
         raise ValueError("Cannot compute the curl of a scalar-valued function.")
 
+    def norm(self) -> ScalarFunction:
+        """Compute the norm of the function."""
+        return ScalarFunction(abs(self._f))
+
     def integrate(
         self, *limits: typing.Tuple[
             sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr],
@@ -387,7 +454,7 @@ class VectorFunction(AnyFunction):
         return len(self._vec)
 
     def __getitem__(self, key) -> typing.Union[ScalarFunction, VectorFunction]:
-        """Get a component or slice of the vector."""
+        """Get a component or slice of the function."""
         fs = self._vec[key]
         if isinstance(fs, ScalarFunction):
             return fs
@@ -459,9 +526,28 @@ class VectorFunction(AnyFunction):
             return VectorFunction(tuple(other._f * i._f for i in self._vec))
         if isinstance(other, (int, sympy.core.expr.Expr)):
             return VectorFunction(tuple(other * i._f for i in self._vec))
+        return NotImplemented
+
+    def __matmul__(self, other: typing.Any) -> VectorFunction:
+        """Multiply."""
         if isinstance(other, MatrixFunction):
             assert other.shape[1] == len(self)
             return VectorFunction([other.row(i).dot(self) for i in range(other.shape[0])])
+        return NotImplemented
+
+    def __rmatmul__(self, other: typing.Any) -> VectorFunction:
+        """Multiply."""
+        if isinstance(other, MatrixFunction):
+            assert other.shape[1] == len(self)
+            return VectorFunction([other.col(i).dot(self) for i in range(other.shape[0])])
+        return NotImplemented
+
+    def __pow__(self, other: typing.Any) -> VectorFunction:
+        """Raise to a power."""
+        if isinstance(other, ScalarFunction):
+            return VectorFunction(tuple(i._f ** other._f for i in self._vec))
+        if isinstance(other, (int, sympy.core.expr.Expr)):
+            return VectorFunction(tuple(i._f ** other for i in self._vec))
         return NotImplemented
 
     def as_sympy(self) -> SympyFormat:
@@ -537,6 +623,13 @@ class VectorFunction(AnyFunction):
             self._vec[1].diff(x[0]) - self._vec[0].diff(x[1])
         ])
 
+    def norm(self) -> ScalarFunction:
+        """Compute the norm of the function."""
+        a = sympy.Integer(0)
+        for i in self._vec:
+            a += i.as_sympy() ** 2
+        return ScalarFunction(sympy.sqrt(a))
+
     def integrate(
         self, *limits: typing.Tuple[
             sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr],
@@ -569,6 +662,13 @@ class MatrixFunction(AnyFunction):
         self.shape = (len(self._mat), 0 if len(self._mat) == 0 else len(self._mat[0]))
         for i in self._mat:
             assert len(i) == self.shape[0]
+
+    def __getitem__(self, key) -> typing.Union[ScalarFunction, VectorFunction]:
+        """Get a component or slice of the function."""
+        if isinstance(key, tuple):
+            assert len(key) == 2
+            return self._mat[key[0]][key[1]]
+        return self.row(key)
 
     def row(self, n: int) -> VectorFunction:
         """Get a row of the matrix."""
@@ -686,6 +786,32 @@ class MatrixFunction(AnyFunction):
             return MatrixFunction(tuple(tuple(other * j._f for j in i) for i in self._mat))
         return NotImplemented
 
+    def __matmul__(self, other: typing.Any) -> MatrixFunction:
+        """Multiply."""
+        if isinstance(other, MatrixFunction):
+            assert other.shape[0] == self.shape[1]
+            return MatrixFunction([
+                [self.row(i).dot(other.col(j)) for j in range(other.shape[1])]
+                for i in range(self.shape[0])])
+        return NotImplemented
+
+    def __rmatmul__(self, other: typing.Any) -> MatrixFunction:
+        """Multiply."""
+        if isinstance(other, MatrixFunction):
+            assert self.shape[0] == other.shape[1]
+            return MatrixFunction([
+                [other.row(i).dot(self.col(j)) for j in range(self.shape[1])]
+                for i in range(other.shape[0])])
+        return NotImplemented
+
+    def __pow__(self, other: typing.Any) -> MatrixFunction:
+        """Raise to a power."""
+        if isinstance(other, ScalarFunction):
+            return MatrixFunction(tuple(tuple(j._f ** other._f for j in i) for i in self._mat))
+        if isinstance(other, (int, sympy.core.expr.Expr)):
+            return MatrixFunction(tuple(tuple(j._f ** other for j in i) for i in self._mat))
+        return NotImplemented
+
     def as_sympy(self) -> SympyFormat:
         """Convert to a sympy expression."""
         return sympy.Matrix([[j._f for j in i] for i in self._mat])
@@ -751,6 +877,10 @@ class MatrixFunction(AnyFunction):
     def curl(self):
         """Compute the curl of the function."""
         raise ValueError("Cannot compute the curl of a matrix-valued function.")
+
+    def norm(self) -> ScalarFunction:
+        """Compute the norm of the function."""
+        raise NotImplementedError()
 
     def integrate(
         self, *limits: typing.Tuple[

@@ -1,7 +1,7 @@
 import symfem
 import sympy
 from symfem.symbols import x, t
-from .utils import allequal
+from symfem.utils import allequal
 
 half = sympy.Rational(1, 2)
 

@@ -1,7 +1,7 @@
 import pytest
 import sympy
 from symfem import quadrature
-from .utils import allequal
+from symfem.utils import allequal
 
 
 @pytest.mark.parametrize("order", range(1, 7))
