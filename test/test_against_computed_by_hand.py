@@ -1,6 +1,7 @@
 import sympy
 from symfem import create_element
 from symfem.symbols import x
+from symfem.functions import ScalarFunction
 from symfem.utils import allequal
 
 
@@ -63,16 +64,12 @@ def test_lagrange_pyramid():
     x_i = x[0] / (1 - x[2])
     y_i = x[1] / (1 - x[2])
     z_i = x[2] / (1 - x[2])
-    basis = [(1 - x_i) * (1 - y_i) / (1 + z_i),
-             x_i * (1 - y_i) / (1 + z_i),
-             (1 - x_i) * y_i / (1 + z_i),
-             x_i * y_i / (1 + z_i),
-             z_i / (1 + z_i)]
+    basis = [ScalarFunction(f) for f in [
+        (1 - x_i) * (1 - y_i) / (1 + z_i), x_i * (1 - y_i) / (1 + z_i),
+        (1 - x_i) * y_i / (1 + z_i), x_i * y_i / (1 + z_i), z_i / (1 + z_i)]]
     assert allequal(basis, space.get_basis_functions())
 
-    basis = [(1 - x[0] - x[2]) * (1 - x[1] - x[2]) / (1 - x[2]),
-             x[0] * (1 - x[1] - x[2]) / (1 - x[2]),
-             (1 - x[0] - x[2]) * x[1] / (1 - x[2]),
-             x[0] * x[1] / (1 - x[2]),
-             x[2]]
+    basis = [ScalarFunction(f) for f in [
+        (1 - x[0] - x[2]) * (1 - x[1] - x[2]) / (1 - x[2]), x[0] * (1 - x[1] - x[2]) / (1 - x[2]),
+        (1 - x[0] - x[2]) * x[1] / (1 - x[2]), x[0] * x[1] / (1 - x[2]), x[2]]]
     assert allequal(basis, space.get_basis_functions())

@@ -313,4 +313,12 @@ class PiecewiseFunction(AnyFunction):
             typing.Union[int, sympy.core.expr.Expr]]
     ):
         """Compute the integral of the function."""
+
+        from IPython import embed; embed()
+
         raise NotImplementedError()
+
+    def integral(self, domain: Reference):
+        """Compute the integral of the function."""
+        p = self.get_piece(domain.midpoint())
+        return p.integral(domain)

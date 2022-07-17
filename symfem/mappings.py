@@ -36,7 +36,7 @@ def covariant(
     f = parse_function_input(f_in)
     assert f.is_vector
     g = f.subs(x, inverse_map)
-    assert isinstance(g, VectorFunction)
+    assert g.is_vector
     j_inv = sympy.Matrix([[i.diff(x[j]) for j in range(len(map))]
                           for i in inverse_map]).transpose()
     return VectorFunction([vdot(j_inv.row(i), g.as_sympy()) for i in range(j_inv.rows)])
@@ -49,7 +49,7 @@ def contravariant(
     f = parse_function_input(f_in)
     assert f.is_vector
     g = f.subs(x, inverse_map)
-    assert isinstance(g, VectorFunction)
+    assert g.is_vector
     jacobian = sympy.Matrix([[i.diff(x[j]) for j in range(tdim)] for i in map])
     jacobian /= _det(jacobian)
     return VectorFunction([vdot(jacobian.row(i), g) for i in range(jacobian.rows)])

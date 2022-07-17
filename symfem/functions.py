@@ -3,9 +3,11 @@
 from __future__ import annotations
 import sympy
 import typing
+from warnings import warn
 from abc import ABC, abstractmethod
-from .symbols import x
+from .symbols import x, t
 from .geometry import PointType
+from .references import Reference
 
 SingleSympyFormat = typing.Union[
     sympy.core.expr.Expr,
@@ -219,6 +221,12 @@ class AnyFunction(ABC):
             sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr],
             typing.Union[int, sympy.core.expr.Expr]]
     ):
+        warn('This is deprecated', DeprecationWarning, stacklevel=2)
+        """Compute the integral of the function."""
+        pass
+
+    @abstractmethod
+    def integral(self, domain: Reference):
         """Compute the integral of the function."""
         pass
 
@@ -441,7 +449,26 @@ class ScalarFunction(AnyFunction):
             typing.Union[int, sympy.core.expr.Expr]]
     ) -> ScalarFunction:
         """Compute the integral of the function."""
+        warn('This is deprecated', DeprecationWarning, stacklevel=2)
         return ScalarFunction(self._f.integrate(*limits))
+
+    def integral(self, domain: Reference) -> ScalarFunction:
+        """Compute the integral of the function."""
+        limits = domain.integration_limits()
+
+        point = VectorFunction(domain.origin)
+        for ti, a in zip(t, domain.axes):
+            point += ti * VectorFunction(a)
+        out = self._f.subs(x, point)
+
+        if len(limits[0]) == 2:
+            for i in limits:
+                assert len(i) == 2
+                out = out.subs(*i)
+            return i
+
+        out *= domain.jacobian()
+        return ScalarFunction(out.integrate(*limits))
 
 
 class VectorFunction(AnyFunction):
@@ -642,6 +669,11 @@ class VectorFunction(AnyFunction):
             sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr],
             typing.Union[int, sympy.core.expr.Expr]]
     ):
+        """Compute the integral of the function."""
+        warn('This is deprecated', DeprecationWarning, stacklevel=2)
+        raise NotImplementedError()
+
+    def integral(self, domain: Reference):
         """Compute the integral of the function."""
         raise NotImplementedError()
 
@@ -894,6 +926,11 @@ class MatrixFunction(AnyFunction):
             sympy.core.symbol.Symbol, typing.Union[int, sympy.core.expr.Expr],
             typing.Union[int, sympy.core.expr.Expr]]
     ):
+        """Compute the integral of the function."""
+        warn('This is deprecated', DeprecationWarning, stacklevel=2)
+        raise NotImplementedError()
+
+    def integral(self, domain: Reference):
         """Compute the integral of the function."""
         raise NotImplementedError()
 

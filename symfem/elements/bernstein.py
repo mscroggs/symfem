@@ -91,7 +91,7 @@ class BernsteinFunctional(BaseFunctional):
                  degree: int, entity: typing.Tuple[int, int]):
         super().__init__(reference, entity, "identity")
         orth = [
-            o / sympy.sqrt(integral_domain.integral(o * o))
+            o / sympy.sqrt((o * o).integral(integral_domain))
             for o in orthogonal_basis(integral_domain.name, degree, 0, t[:integral_domain.tdim])[0]
         ]
         self.ref = integral_domain
@@ -100,7 +100,7 @@ class BernsteinFunctional(BaseFunctional):
 
         bern = bernstein_polynomials(degree, integral_domain.tdim, t)
         mat = sympy.Matrix(
-            [[integral_domain.integral(o * b) for b in bern] for o in orth])
+            [[(o * b).integral(integral_domain) for b in bern] for o in orth])
         minv = mat.inv()
         alpha = minv.row(index)
 
@@ -118,7 +118,7 @@ class BernsteinFunctional(BaseFunctional):
                 point[i] += j * k
 
         integrand = function.subs(x, point) * self.moment
-        return self.ref.integral(integrand)
+        return integrand.integral(self.ref)
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""

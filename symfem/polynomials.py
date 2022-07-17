@@ -73,7 +73,7 @@ def Hcurl_polynomials(domain_dim: int, range_dim: int, order: int) -> typing.Lis
         return [VectorFunction((
             x[0] ** (order - 1 - j) * x[1] ** (j + 1),
             -x[0] ** (order - j) * x[1] ** j,
-        ) for j in range(order))]
+        )) for j in range(order)]
     if domain_dim == 3:
         poly: typing.List[VectorFunction] = []
         poly += [VectorFunction((
@@ -84,7 +84,7 @@ def Hcurl_polynomials(domain_dim: int, range_dim: int, order: int) -> typing.Lis
             0, x[0] ** m * x[1] ** (n - 1) * x[2] ** (order - m - n + 1),
             -x[0] ** m * x[1] ** n * x[2] ** (order - m - n)
         )) for m in range(order) for n in range(1, order + 1 - m)]
-        poly += [VectoFunction((
+        poly += [VectorFunction((
             x[0] ** (order - n) * x[1] ** n,
             -x[0] ** (order + 1 - n) * x[1] ** (n - 1), 0
         )) for n in range(1, order + 1)]
@@ -99,7 +99,7 @@ def quolynomial_set_1d(dim: int, order: int) -> typing.List[ScalarFunction]:
         poly = ScalarFunction(1)
         for a, b in zip(x, j):
             poly *= a ** b
-        basis.append(ScalarFunction(poly))
+        basis.append(poly)
     return basis
 
 

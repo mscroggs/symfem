@@ -452,7 +452,7 @@ class IntegralAgainst(BaseFunctional):
                 point[i] += j * k
         v1 = function.subs(x, point)
         integrand = self.dot(v1)
-        return self.integral_domain.integral(integrand)
+        return integrand.integral(self.integral_domain)
 
     def dot(self, function: AnyFunction) -> sympy.core.expr.Expr:
         """Dot a function with the moment function."""
@@ -501,7 +501,7 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
                 point[i] += j * k
         v1 = function.div().subs(x, point)
         integrand = self.dot(v1)
-        return self.integral_domain.integral(integrand)
+        return integrand.integral(self.integral_domain)
 
     def dot(self, function: ScalarFunction) -> sympy.core.expr.Expr:
         """Dot a function with the moment function."""
@@ -547,7 +547,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
             for j, k in zip(a, t):
                 point[i] += j * k
         integrand = self.scale * function.subs(x, point)
-        value = self.integral_domain.integral(integrand)
+        value = integrand.integral(self.integral_domain)
         return value
 
     def perform_mapping(
@@ -621,7 +621,7 @@ class IntegralMoment(BaseFunctional):
 
         v1 = function.subs(x, point)
         integrand = self.dot(v1)
-        return self.integral_domain.integral(integrand)
+        return integrand.integral(self.integral_domain)
 
     def dot(self, function: AnyFunction) -> sympy.core.expr.Expr:
         """Dot a function with the moment function."""
@@ -742,7 +742,7 @@ class DerivativeIntegralMoment(IntegralMoment):
             for j, k in zip(a, t):
                 point[i] += j * k
         integrand = self.dot(function.grad(self.integral_domain.gdim).subs(x, point))
-        value = self.integral_domain.integral(integrand)
+        value = integrand.integral(self.integral_domain)
         return value
 
     name = "Derivative integral moment"
@@ -766,7 +766,7 @@ class DivergenceIntegralMoment(IntegralMoment):
                 point[i] += j * k
         assert isinstance(function, tuple)
         integrand = self.dot(function.div().subs(x, point))
-        value = self.integral_domain.integral(integrand)
+        value = integrand.integral(self.integral_domain)
         assert isinstance(value, (int, sympy.core.expr.Expr))
         return value
 

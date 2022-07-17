@@ -119,6 +119,10 @@ class BasisFunction(AnyFunction):
         """Compute the integral of the function."""
         return self.get_function().integrate(*limits)
 
+    def integral(self, domain: Reference) -> AnyFunction:
+        """Compute the integral of the function."""
+        return self.get_function().integral(domain)
+
     def subs(self, vars: AxisVariables, values: ValuesToSubstitute) -> BasisFunction:
         """Substitute values into the function."""
         return SubbedBasisFunction(self, vars, values)

@@ -17,7 +17,6 @@ from .lagrange import Lagrange, VectorLagrange
 from .bernardi_raugel import BernardiRaugel
 
 SetOfPoints = None
-ListOfPiecewiseFunctions = None
 
 
 class GuzmanNeilan(CiarletElement):
@@ -109,7 +108,7 @@ class GuzmanNeilan(CiarletElement):
                         component -= k * bpi[j]
                     function.append(component)
                 fun.append(tuple(function))
-            basis.append(PiecewiseFunction(list(zip(sub_tris, fun)), "triangle"))
+            basis.append(PiecewiseFunction(list(zip(sub_tris, fun)), 2))
         return basis
 
     def _make_polyset_tetrahedron(self, reference: Reference, order: int):
@@ -142,7 +141,7 @@ class GuzmanNeilan(CiarletElement):
                         component -= k * bpi[j]
                     function.append(component)
                 fun.append(tuple(function))
-            basis.append(PiecewiseFunction(list(zip(sub_tets, fun)), "tetrahedron"))
+            basis.append(PiecewiseFunction(list(zip(sub_tets, fun)), 3))
         return basis
 
     names = ["Guzman-Neilan"]
@@ -171,6 +170,7 @@ def make_piecewise_lagrange(
     basis_dofs: typing.List[typing.Tuple[int, ...]] = []
     zero: typing.Tuple[int, ...] = (0, )
     if cell_name == "triangle":
+        cell_tdim = 2
         for dim, tri_entities in enumerate([
             [(0, 0, -1), (1, -1, 0), (-1, 1, 1), (2, 2, 2)],
             [(0, -1, 1), (1, 1, -1), (-1, 0, 0),
@@ -196,6 +196,7 @@ def make_piecewise_lagrange(
         zero = (0, 0)
 
     elif cell_name == "tetrahedron":
+        cell_tdim = 3
         for dim, tet_entities in enumerate([
             [(0, 0, 0, -1), (1, 1, -1, 0), (2, -1, 1, 1), (-1, 2, 2, 2), (3, 3, 3, 3)],
             [(2, -1, -1, 5), (5, 5, -1, -1), (4, -1, 5, -1), (-1, 2, -1, 4),
@@ -226,13 +227,13 @@ def make_piecewise_lagrange(
                     basis_dofs.append(dofs)
         zero = (0, 0, 0)
 
-    basis: ListOfPiecewiseFunctions = []
+    basis: typing.List[PiecewiseFunction] = []
     for i in basis_dofs:
         basis.append(
             PiecewiseFunction(list(zip(sub_cells, [
                 zero if j == -1 else s[j]
                 for s, j in zip(lagrange_bases, i)
-            ])), cell_name)
+            ])), cell_tdim)
         )
 
     return basis

@@ -1,5 +1,6 @@
 """Abstract finite element classes and functions."""
 
+from __future__ import annotations
 import sympy
 import typing
 import warnings
@@ -252,8 +253,7 @@ class FiniteElement(ABC):
 
     def get_tensor_factorisation(
         self
-        # ) -> typing.List[typing.Tuple[str, typing.List[FiniteElement]]]:
-    ) -> typing.List[typing.Tuple[str, typing.List[typing.Any], typing.List[int]]]:
+    ) -> typing.List[typing.Tuple[str, typing.List[FiniteElement], typing.List[int]]]:
         """Get the representation of the element as a tensor product."""
         raise NoTensorProduct()
 
