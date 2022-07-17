@@ -336,8 +336,6 @@ class PiecewiseFunction(AnyFunction):
 
     def map_pieces(self, fwd_map: PointType):
         """Map the function's pieces."""
-        print(*[i[0] for i in self._pieces])
         self._pieces = [
             (tuple(VectorFunction(fwd_map).subs(x, v).as_sympy() for v in shape), f)
             for shape, f in self._pieces]
-        print(*[i[0] for i in self._pieces])
