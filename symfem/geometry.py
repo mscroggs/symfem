@@ -64,7 +64,6 @@ def point_in_triangle(point: PointType, triangle: SetOfPoints) -> bool:
 
 def point_in_quadrilateral(point: PointType, quad: SetOfPoints) -> bool:
     """Check if a point is inside a quadrilateral."""
-
     e0 = _vsub(quad[1], quad[0])
     e1 = _vsub(quad[0], quad[2])
     e2 = _vsub(quad[3], quad[1])

@@ -96,7 +96,7 @@ class BasisFunction(AnyFunction):
         """Compute the dot product with another function."""
         return self.get_function().dot(other)
 
-    def cross(self, other: AnyFunction) -> PiecewiseFunction:
+    def cross(self, other: AnyFunction) -> AnyFunction:
         """Compute the cross product with another function."""
         return self.get_function().cross(other)
 

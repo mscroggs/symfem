@@ -42,6 +42,7 @@ def _vnorm(v: PointType) -> sympy.core.expr.Expr:
     """Find the norm of a vector."""
     return sympy.sqrt(_vdot(v, v))
 
+
 def _vnormalise(v: PointType) -> PointType:
     """Normalise a vector."""
     n = _vnorm(v)
@@ -244,6 +245,7 @@ class Reference(ABC):
 
     def on_face(self, point_in: PointType) -> bool:
         """Check if a point is on a face of the reference."""
+        from .functions import VectorFunction
         point = VectorFunction(point_in)
         for f in self.faces:
             v0 = VectorFunction(self.vertices[f[0]])
@@ -621,8 +623,8 @@ class Quadrilateral(Reference):
 
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference."""
-        assert _vadd(self.vertices[0], self.vertices[3]) == _vadd(self.vertices[1],
-                                                                self.vertices[2])
+        assert _vadd(
+            self.vertices[0], self.vertices[3]) == _vadd(self.vertices[1], self.vertices[2])
         p = _vsub(tuple(x), self.vertices[0])
         v1 = _vsub(self.vertices[1], self.vertices[0])
         v2 = _vsub(self.vertices[2], self.vertices[0])
@@ -742,8 +744,8 @@ class Hexahedron(Reference):
         """Compute the inverse map from the canonical reference to this reference."""
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces:
-            assert _vadd(self.vertices[a], self.vertices[d]) == _vadd(self.vertices[b],
-                                                                    self.vertices[c])
+            assert _vadd(
+                self.vertices[a], self.vertices[d]) == _vadd(self.vertices[b], self.vertices[c])
         p = _vsub(tuple(x), self.vertices[0])
         v1 = _vsub(self.vertices[1], self.vertices[0])
         v2 = _vsub(self.vertices[2], self.vertices[0])
@@ -854,8 +856,8 @@ class Prism(Reference):
         """Compute the inverse map from the canonical reference to this reference."""
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces[1:4]:
-            assert _vadd(self.vertices[a], self.vertices[d]) == _vadd(self.vertices[b],
-                                                                    self.vertices[c])
+            assert _vadd(
+                self.vertices[a], self.vertices[d]) == _vadd(self.vertices[b], self.vertices[c])
         p = _vsub(tuple(x), self.vertices[0])
         v1 = _vsub(self.vertices[1], self.vertices[0])
         v2 = _vsub(self.vertices[2], self.vertices[0])
@@ -971,8 +973,8 @@ class Pyramid(Reference):
         """Compute the inverse map from the canonical reference to this reference."""
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces[:1]:
-            assert _vadd(self.vertices[a], self.vertices[d]) == _vadd(self.vertices[b],
-                                                                    self.vertices[c])
+            assert _vadd(
+                self.vertices[a], self.vertices[d]) == _vadd(self.vertices[b], self.vertices[c])
         p = _vsub(tuple(x), self.vertices[0])
         v1 = _vsub(self.vertices[1], self.vertices[0])
         v2 = _vsub(self.vertices[2], self.vertices[0])
