@@ -239,13 +239,13 @@ class AnyFunction(ABC):
         """Check inequality."""
         return self.as_sympy() < other
 
+    def __le__(self, other: typing.Any) -> bool:
+        """Check inequality."""
+        return self.as_sympy() <= other
+
     def __gt__(self, other: typing.Any) -> bool:
         """Check inequality."""
         return self.as_sympy() > other
-
-    def __le_(self, other: typing.Any) -> bool:
-        """Check inequality."""
-        return self.as_sympy() <= other
 
     def __ge__(self, other: typing.Any) -> bool:
         """Check inequality."""
@@ -258,6 +258,10 @@ class AnyFunction(ABC):
     def __eq__(self, other: typing.Any) -> bool:
         """Check if two functions are equal."""
         return _check_equal(_to_sympy_format(self), _to_sympy_format(other))
+
+    def __ne__(self, other: typing.Any) -> bool:
+        """Check if two functions are not equal."""
+        return not self.__eq__(other)
 
 
 ValuesToSubstitute = typing.Union[AnyFunction, _ValuesToSubstitute]

@@ -115,10 +115,11 @@ class BaseFunctional(ABC):
 class PointEvaluation(BaseFunctional):
     """A point evaluation."""
 
-    def __init__(self, reference: Reference, point: PointType, entity: typing.Tuple[int, int],
-                 mapping: typing.Union[str, None] = "identity"):
+    def __init__(self, reference: Reference, point_in: FunctionInput,
+                 entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
         super().__init__(reference, entity, mapping)
-        self.point = point
+        self.point = parse_function_input(point_in)
+        assert self.point.is_vector
 
     def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
         """Apply the functional to a function."""
@@ -144,10 +145,11 @@ class PointEvaluation(BaseFunctional):
 class WeightedPointEvaluation(BaseFunctional):
     """A point evaluation."""
 
-    def __init__(self, reference: Reference, point: PointType, weight: sympy.core.expr.Expr,
+    def __init__(self, reference: Reference, point_in: FunctionInput, weight: sympy.core.expr.Expr,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
         super().__init__(reference, entity, mapping)
-        self.point = point
+        self.point = parse_function_input(point_in)
+        assert self.point.is_vector
         self.weight = weight
 
     def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
@@ -175,10 +177,11 @@ class WeightedPointEvaluation(BaseFunctional):
 class DerivativePointEvaluation(BaseFunctional):
     """A point evaluation of a given derivative."""
 
-    def __init__(self, reference: Reference, point: PointType, derivative: typing.Tuple[int, ...],
+    def __init__(self, reference: Reference, point_in: FunctionInput, derivative: typing.Tuple[int, ...],
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = None):
         super().__init__(reference, entity, mapping)
-        self.point = point
+        self.point = parse_function_input(point_in)
+        assert self.point.is_vector
         self.derivative = derivative
 
     def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
@@ -239,10 +242,11 @@ class DerivativePointEvaluation(BaseFunctional):
 class PointDirectionalDerivativeEvaluation(BaseFunctional):
     """A point evaluation of a derivative in a fixed direction."""
 
-    def __init__(self, reference: Reference, point: PointType, direction: PointType,
+    def __init__(self, reference: Reference, point_in: FunctionInput, direction: PointType,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
         super().__init__(reference, entity, mapping)
-        self.point = point
+        self.point = parse_function_input(point_in)
+        assert self.point.is_vector
         self.dir = direction
 
     def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
@@ -276,7 +280,7 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
 class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
     """A point evaluation of a normal derivative."""
 
-    def __init__(self, reference: Reference, point: PointType, edge: Reference,
+    def __init__(self, reference: Reference, point_in: FunctionInput, edge: Reference,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
         assert isinstance(edge, Interval)
         super().__init__(reference, point, edge.normal(), entity=entity, mapping=mapping)
@@ -298,10 +302,11 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
 class PointComponentSecondDerivativeEvaluation(BaseFunctional):
     """A point evaluation of a component of a second derivative."""
 
-    def __init__(self, reference: Reference, point: PointType, component: typing.Tuple[int, int],
+    def __init__(self, reference: Reference, point_in: FunctionInput, component: typing.Tuple[int, int],
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
         super().__init__(reference, entity, mapping)
-        self.point = point
+        self.point = parse_function_input(point_in)
+        assert self.point.is_vector
         self.component = component
 
     def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
@@ -327,11 +332,12 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
 class PointInnerProduct(BaseFunctional):
     """An evaluation of an inner product at a point."""
 
-    def __init__(self, reference: Reference, point: PointType, lvec: FunctionInput,
+    def __init__(self, reference: Reference, point_in: FunctionInput, lvec: FunctionInput,
                  rvec: FunctionInput,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
         super().__init__(reference, entity, mapping)
-        self.point = point
+        self.point = parse_function_input(point_in)
+        assert self.point.is_vector
         self.lvec = parse_function_input(lvec)
         self.rvec = parse_function_input(rvec)
         assert self.lvec.is_vector
@@ -371,14 +377,12 @@ class PointInnerProduct(BaseFunctional):
 class DotPointEvaluation(BaseFunctional):
     """A point evaluation in a given direction."""
 
-    def __init__(self, reference: Reference, point: PointType, vector: PointType,
+    def __init__(self, reference: Reference, point_in: FunctionInput, vector_in: FunctionInput,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
         super().__init__(reference, entity, mapping)
-        self.point = point
-        if isinstance(vector, VectorFunction):
-            self.vector = vector
-        else:
-            self.vector = VectorFunction(vector)
+        self.point = parse_function_input(point_in)
+        assert self.point.is_vector
+        self.vector = parse_function_input(vector_in)
 
     def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
         """Apply the functional to a function."""

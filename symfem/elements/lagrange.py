@@ -138,20 +138,20 @@ class SymmetricMatrixLagrange(CiarletElement):
             poly = polynomial_set_vector(1, 1, order)
             directions: typing.List[typing.Tuple[int, ...]] = [(1, )]
         elif reference.tdim == 2:
-            poly = [(a[0], a[1], a[1], a[2]) for a in polynomial_set_vector(2, 3, order)]
-            directions = [(1, 0, 0, 0), (0, 1, 0, 0),
-                          (0, 0, 0, 1)]
+            poly = [((a[0], a[1]), (a[1], a[2])) for a in polynomial_set_vector(2, 3, order)]
+            directions = [((1, 0), (0, 0)), ((0, 1), (0, 0)),
+                          ((0, 0), (0, 1))]
         else:
             assert reference.tdim == 3
-            poly = [(a[0], a[1], a[2],
-                     a[1], a[3], a[4],
-                     a[2], a[4], a[5]) for a in polynomial_set_vector(3, 6, order)]
-            directions = [(1, 0, 0, 0, 0, 0, 0, 0, 0),
-                          (0, 1, 0, 0, 0, 0, 0, 0, 0),
-                          (0, 0, 1, 0, 0, 0, 0, 0, 0),
-                          (0, 0, 0, 0, 1, 0, 0, 0, 0),
-                          (0, 0, 0, 0, 0, 1, 0, 0, 0),
-                          (0, 0, 0, 0, 0, 0, 0, 0, 1)]
+            poly = [((a[0], a[1], a[2]),
+                     (a[1], a[3], a[4]),
+                     (a[2], a[4], a[5])) for a in polynomial_set_vector(3, 6, order)]
+            directions = [((1, 0, 0), (0, 0, 0), (0, 0, 0)),
+                          ((0, 1, 0), (0, 0, 0), (0, 0, 0)),
+                          ((0, 0, 1), (0, 0, 0), (0, 0, 0)),
+                          ((0, 0, 0), (0, 1, 0), (0, 0, 0)),
+                          ((0, 0, 0), (0, 0, 1), (0, 0, 0)),
+                          ((0, 0, 0), (0, 0, 0), (0, 0, 1))]
 
         scalar_space = Lagrange(reference, order, variant)
         dofs: ListOfFunctionals = []

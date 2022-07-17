@@ -293,6 +293,8 @@ class CiarletElement(FiniteElement):
         super().__init__(reference, order, len(dofs), domain_dim, range_dim, range_shape)
         assert len(basis) == len(dofs)
         self._basis = parse_function_list_input(basis)
+        for b in self._basis:
+            assert isinstance(b, AnyFunction)
         self.dofs = dofs
         self._basis_functions: typing.Union[typing.List[AnyFunction], None] = None
         self._dual_inv: typing.Union[numpy.typing.NDArray[numpy.float64], None] = None
@@ -444,12 +446,12 @@ class CiarletElement(FiniteElement):
 
                 sfs = []
                 for i, dof in enumerate(self.dofs):
-                    sf = None
+                    sf: AnyFunction = None
                     for c, d in zip(minv.row(i), self.get_polynomial_basis()):
                         if sf is None:
-                            sf = c * d
+                            sf = ScalarFunction(c) * d
                         else:
-                            sf += c * d
+                            sf += ScalarFunction(c) * d
                     sfs.append(sf)
 
                 self._basis_functions = sfs

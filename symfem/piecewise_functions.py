@@ -252,14 +252,7 @@ class PiecewiseFunction(AnyFunction):
         if isinstance(values, AnyFunction):
             values = values.as_sympy()
 
-        print(self)
-        print(vars)
-        print(values)
-        print(type(values))
-        print(self.tdim)
-
         if isinstance(values, (tuple, list)) and len(values) == self.tdim:
-            print("HERE")
             for i in values:
                 if not _to_sympy_format(i).is_constant():
                     break
