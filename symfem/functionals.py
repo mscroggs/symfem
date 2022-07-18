@@ -584,9 +584,8 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         for i, a in enumerate(zip(*self.integral_domain.axes)):
             for j, k in zip(a, t):
                 point[i] += j * k
-        integrand = self.scale * function.subs(x, point)
-        value = integrand.integral(self.integral_domain)
-        return value
+        integrand = ScalarFunction(self.scale) * function.subs(x, point)
+        return integrand.integral(self.integral_domain)
 
     def perform_mapping(
         self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType, tdim: int
@@ -770,8 +769,8 @@ class DerivativeIntegralMoment(IntegralMoment):
 
     def dot(self, function: AnyFunction) -> ScalarFunction:
         """Dot a function with the moment function."""
-        assert isinstance(function, tuple)
-        assert isinstance(self.f, (int, sympy.core.expr.Expr))
+        assert function.is_vector
+        assert self.f.is_scalar
         return function.dot(self.dot_with) * self.f
 
     def dof_direction(self) -> typing.Union[PointType, None]:
@@ -809,11 +808,9 @@ class DivergenceIntegralMoment(IntegralMoment):
         for i, a in enumerate(zip(*self.integral_domain.axes)):
             for j, k in zip(a, t):
                 point[i] += j * k
-        assert isinstance(function, tuple)
+        assert function.is_vector
         integrand = self.dot(function.div().subs(x, point))
-        value = integrand.integral(self.integral_domain)
-        assert isinstance(value, (int, sympy.core.expr.Expr))
-        return value
+        return integrand.integral(self.integral_domain)
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""

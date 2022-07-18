@@ -24,7 +24,7 @@ def test_Hcurl_space(reference, order):
     ref = create_reference(reference)
     polynomials = Hcurl_polynomials(ref.tdim, ref.tdim, order)
     for p in polynomials:
-        assert p.dot(x) == 0
+        assert p.dot(VectorFunction(x[:ref.tdim])) == 0
 
 
 @pytest.mark.parametrize("reference", ["triangle"])

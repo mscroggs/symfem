@@ -235,8 +235,8 @@ class FiniteElement(ABC):
                             f = [f[1, 1], f[2, 2]]
                             g = [g[1, 1], g[2, 2]]
                 elif continuity == "integral inner H(div)":
-                    f = f[0].integrate((x[1], 0, 1))
-                    g = g[0].integrate((x[1], 0, 1))
+                    f = f[0, 0].integrate((x[1], 0, 1))
+                    g = g[0, 0].integrate((x[1], 0, 1))
                 else:
                     raise ValueError(f"Unknown continuity: {continuity}")
 
@@ -704,15 +704,17 @@ class CiarletElement(FiniteElement):
 class DirectElement(FiniteElement):
     """Finite element defined directly."""
 
+    _basis_functions: typing.List[AnyFunction]
+
     def __init__(
-        self, reference: Reference, order: int, basis_functions: typing.List[AnyFunction],
+        self, reference: Reference, order: int, basis_functions: typing.List[FunctionInput],
         basis_entities: typing.List[typing.Tuple[int, int]],
         domain_dim: int, range_dim: int, range_shape: typing.Tuple[int, ...] = None
     ):
         super().__init__(reference, order, len(basis_functions), domain_dim, range_dim,
                          range_shape)
         self._basis_entities = basis_entities
-        self._basis_functions = basis_functions
+        self._basis_functions = [parse_function_input(f) for f in basis_functions]
 
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
         """Get the numbers of the DOFs associated with the given entity."""
@@ -748,31 +750,35 @@ class DirectElement(FiniteElement):
         basis = self.get_basis_functions()
         all_terms = set()
 
-        try:
-            basis[0].as_coefficients_dict()
-            scalar = True
-        except AttributeError:
-            scalar = False
+        scalar = basis[0].is_scalar
 
         if scalar:
             for f in basis:
-                for term in f.as_coefficients_dict():
+                f_s = f.as_sympy()
+                assert isinstance(f_s, sympy.core.expr.Expr)
+                for term in f_s.as_coefficients_dict():
                     all_terms.add(term)
             mat = [[0 for i in all_terms] for j in basis]
             for i, t in enumerate(all_terms):
                 for j, f in enumerate(basis):
-                    fd = f.as_coefficients_dict()
+                    f_s = f.as_sympy()
+                    assert isinstance(f_s, sympy.core.expr.Expr)
+                    fd = f_s.as_coefficients_dict()
                     if t in fd:
                         mat[j][i] = fd[t]
         else:
             for f in basis:
                 for fi, fpart in enumerate(f):
-                    for term in fpart.as_coefficients_dict():
+                    fpart_s = fpart.as_sympy()
+                    assert isinstance(fpart_s, sympy.core.expr.Expr)
+                    for term in fpart_s.as_coefficients_dict():
                         all_terms.add((fi, term))
             mat = [[0 for i in all_terms] for j in basis]
             for i, (fi, t) in enumerate(all_terms):
                 for j, f in enumerate(basis):
-                    fd = f[fi].as_coefficients_dict()
+                    ffi_s = f[fi].as_sympy()
+                    assert isinstance(ffi_s, sympy.core.expr.Expr)
+                    fd = ffi_s.as_coefficients_dict()
                     if t in fd:
                         mat[j][i] = fd[t]
         mat = sympy.Matrix(mat)

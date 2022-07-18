@@ -13,8 +13,8 @@ def test_guzman_neilan_triangle(order):
     e = symfem.create_element("triangle", "Guzman-Neilan", order)
 
     for p in e._basis[-3:]:
-        for piece in p.pieces:
-            float(piece[1].div().as_sympy().expand())
+        for piece in p.pieces.values():
+            float(piece.div().as_sympy().expand())
 
 
 @pytest.mark.parametrize("order", [1, 2])
@@ -23,8 +23,8 @@ def test_guzman_neilan_tetrahedron(order):
 
     mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*e.reference.vertices))
     for p in e._basis[-4:]:
-        for piece in p.pieces:
-            float(piece[1].div().as_sympy().expand())
+        for piece in p.pieces.values():
+            float(piece.div().as_sympy().expand())
 
         assert p.subs(x, mid) == (0, 0, 0)
 
@@ -38,7 +38,7 @@ def test_basis_continuity_triangle(order):
     for pt in [(0, 0), (1, 0), (0, 1), (third, third)]:
         for f in e.get_polynomial_basis():
             value = None
-            for p in f.pieces:
+            for p in f.pieces.items():
                 if pt in p[0]:
                     if value is None:
                         value = p[1].subs(x, pt)
@@ -48,7 +48,7 @@ def test_basis_continuity_triangle(order):
             pt = tuple(a + (b - a) * i * one / N for a, b in zip(*pts))
             for f in e.get_polynomial_basis():
                 value = None
-                for p in f.pieces:
+                for p in f.pieces.items():
                     if pts[0] in p[0] and pts[1] in p[0]:
                         if value is None:
                             value = p[1].subs(x, pt)
@@ -64,7 +64,7 @@ def test_basis_continuity_tetrahedron(order):
     for pt in [(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (quarter, quarter, quarter)]:
         for f in e.get_polynomial_basis():
             value = None
-            for p in f.pieces:
+            for p in f.pieces.items():
                 if pt in p[0]:
                     if value is None:
                         value = p[1].subs(x, pt)
@@ -75,7 +75,7 @@ def test_basis_continuity_tetrahedron(order):
             pt = tuple(a + (b - a) * i * one / N for a, b in zip(*pts))
             for f in e.get_polynomial_basis():
                 value = None
-                for p in f.pieces:
+                for p in f.pieces.items():
                     if pts[0] in p[0] and pts[1] in p[0]:
                         if value is None:
                             value = p[1].subs(x, pt)
@@ -88,7 +88,7 @@ def test_basis_continuity_tetrahedron(order):
                            for a, b, c in zip(*pts))
                 for f in e.get_polynomial_basis():
                     value = None
-                    for p in f.pieces:
+                    for p in f.pieces.items():
                         if pts[0] in p[0] and pts[1] in p[0] and pts[2] in p[0]:
                             if value is None:
                                 value = p[1].subs(x, pt)

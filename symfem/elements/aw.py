@@ -93,16 +93,16 @@ class NonConformingArnoldWinther(CiarletElement):
         self.variant = variant
         poly: typing.List[FunctionInput] = []
         poly += [
-            (p[0], p[1], p[1], p[2])
+            ((p[0], p[1]), (p[1], p[2]))
             for p in polynomial_set_vector(reference.tdim, 3, order - 1)]
 
         poly += [
-            (0, x[1] ** 2, x[1] ** 2, -2 * x[1] ** 2),
-            (-2 * x[0] ** 2, x[0] ** 2, x[0] ** 2, 0),
-            (-2 * x[0] * x[1], x[0] * x[1], x[0] * x[1], 0),
-            (x[0] * (x[0] - x[1]), 0, 0, 0),
-            (x[0] ** 2, 0, 0, x[0] * x[1]),
-            (x[0] ** 2, 0, 0, x[1] ** 2)
+            ((0, x[1] ** 2), (x[1] ** 2, -2 * x[1] ** 2)),
+            ((-2 * x[0] ** 2, x[0] ** 2), (x[0] ** 2, 0)),
+            ((-2 * x[0] * x[1], x[0] * x[1]), (x[0] * x[1], 0)),
+            ((x[0] * (x[0] - x[1]), 0), (0, 0)),
+            ((x[0] ** 2, 0), (0, x[0] * x[1])),
+            ((x[0] ** 2, 0), (0, x[1] ** 2))
         ]
 
         dofs: ListOfFunctionals = []
