@@ -5,7 +5,8 @@ import os as _os
 import typing as _typing
 from . import references as _references
 from .finite_element import FiniteElement as _FiniteElement
-from .geometry import SetOfPoints as _SetOfPoints
+from .geometry import SetOfPointsInput as _SetOfPointsInput
+from .geometry import parse_set_of_points_input as _parse_set_of_points_input
 
 _folder = _os.path.dirname(_os.path.realpath(__file__))
 
@@ -60,7 +61,7 @@ for _file in _os.listdir(_os.path.join(_folder, "elements")):
 
 
 def create_reference(
-    cell_type: str, vertices: _SetOfPoints = None
+    cell_type: str, vertices: _SetOfPointsInput = None
 ) -> _references.Reference:
     """Make a reference cell.
 
@@ -77,7 +78,7 @@ def create_reference(
     """
     args = []
     if vertices is not None:
-        args.append(vertices)
+        args.append(_parse_set_of_points_input(vertices))
 
     if cell_type == "point":
         return _references.Point(*args)

@@ -31,6 +31,6 @@ for triangle in triangles:
             # symfem which variables to use in the integral.
             integrand = vdot(grad(test_f, 2), grad(trial_f, 2))
             print(integrand)
-            matrix[test_i][trial_i] += ref.integral(integrand, x)
+            matrix[test_i][trial_i] += integrand.integral(ref, x)
 
 print(matrix)

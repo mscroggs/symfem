@@ -13,7 +13,7 @@ from .basis_functions import BasisFunction
 from .functionals import ListOfFunctionals
 from .functions import (ScalarFunction, VectorFunction, MatrixFunction, parse_function_input,
                         AnyFunction, FunctionInput)
-from .geometry import PointType, SetOfPoints
+from .geometry import PointType, SetOfPoints, SetOfPointsInput, parse_set_of_points_input
 from .piecewise_functions import PiecewiseFunction
 from .references import Reference
 from .symbols import x
@@ -66,9 +66,10 @@ class FiniteElement(ABC):
         return ElementBasisFunction(self, n)
 
     def tabulate_basis(
-        self, points: SetOfPoints, order: str = "xyzxyz", symbolic: bool = True
+        self, points_in: SetOfPointsInput, order: str = "xyzxyz", symbolic: bool = True
     ) -> TabulatedBasis:
         """Evaluate the basis functions of the element at the given points."""
+        points = parse_set_of_points_input(points_in)
         if not symbolic:
             warnings.warn("Converting from symbolic to float. This may be slow.")
 
@@ -104,7 +105,7 @@ class FiniteElement(ABC):
 
     @abstractmethod
     def map_to_cell(
-        self, vertices: SetOfPoints, basis: typing.List[AnyFunction] = None,
+        self, vertices_in: SetOfPointsInput, basis: typing.List[AnyFunction] = None,
         forward_map: PointType = None, inverse_map: PointType = None
     ) -> typing.List[AnyFunction]:
         """Map the basis onto a cell using the appropriate mapping for the element."""
@@ -395,8 +396,6 @@ class CiarletElement(FiniteElement):
             row = []
             for d in self.dofs:
                 entry = d.eval_symbolic(b).as_sympy()
-                assert isinstance(entry, sympy.core.expr.Expr)
-                assert entry.is_constant()
                 row.append(entry)
             mat.append(row)
         return sympy.Matrix(mat)
@@ -434,14 +433,12 @@ class CiarletElement(FiniteElement):
                 assert isinstance(m, sympy.Matrix)
                 minv = m.inv("LU")
 
-                sfs = []
+                sfs: typing.List[AnyFunction] = []
+                pb = self.get_polynomial_basis()
                 for i, dof in enumerate(self.dofs):
-                    sf: AnyFunction = None
-                    for c, d in zip(minv.row(i), self.get_polynomial_basis()):
-                        if sf is None:
-                            sf = ScalarFunction(c) * d
-                        else:
-                            sf += ScalarFunction(c) * d
+                    sf = ScalarFunction(minv[i, 0]) * pb[0]
+                    for c, d in zip(minv.row(i)[1:], pb[1:]):
+                        sf += ScalarFunction(c) * d
                     sfs.append(sf)
 
                 self._basis_functions = sfs
@@ -516,17 +513,17 @@ class CiarletElement(FiniteElement):
                 for d in dofs:
                     direction = d.dof_direction()
                     if direction is not None:
-                        direction = VectorFunction(direction)
-                        direction /= direction.norm()
-                        direction /= 8
+                        vdirection = VectorFunction(direction)
+                        vdirection /= vdirection.norm()
+                        vdirection /= 8
                         start = VectorFunction(d.dof_point())
                         for d2 in self.dofs:
                             if d != d2 and d.dof_point() == d2.dof_point():
-                                start += direction / 3
+                                start += vdirection / 3
                                 break
                         ddata.append((
                             "arrow",
-                            (to_2d(start), to_2d(start + direction), colors[d.entity[0]])))
+                            (to_2d(start), to_2d(start + vdirection), colors[d.entity[0]])))
                         ddata.append((
                             "ncircle", (to_2d(start), self.dofs.index(d), colors[d.entity[0]])))
                     else:
@@ -585,15 +582,16 @@ class CiarletElement(FiniteElement):
                     map_pt(s), map_pt(e), stroke=c, stroke_width=4, stroke_linecap="round"))
                 assert isinstance(e, tuple)
                 assert isinstance(s, tuple)
-                e = VectorFunction(e)
-                direction = e - s
-                direction /= direction.norm()
-                direction /= 30
-                perp = VectorFunction((-direction[1], direction[0]))
+                ve = VectorFunction(e)
+                vs = VectorFunction(s)
+                vdirection = ve - vs
+                vdirection /= vdirection.norm()
+                vdirection /= 30
+                perp = VectorFunction((-vdirection[1], vdirection[0]))
                 perp /= sympy.Rational(5, 2)
-                for pt in [e - direction + perp, e - direction - perp]:
+                for pt in [ve - vdirection + perp, ve - vdirection - perp]:
                     img.add(img.line(
-                        map_pt(pt.as_sympy()), map_pt(e), stroke=c, stroke_width=4,
+                        map_pt(pt.as_sympy()), map_pt(ve), stroke=c, stroke_width=4,
                         stroke_linecap="round"))
             elif t == "ncircle":
                 p, n, c = info
@@ -626,10 +624,11 @@ class CiarletElement(FiniteElement):
             svg2png(bytestring=img.tostring(), write_to=filename)
 
     def map_to_cell(
-        self, vertices: SetOfPoints, basis: typing.List[AnyFunction] = None,
+        self, vertices_in: SetOfPointsInput, basis: typing.List[AnyFunction] = None,
         forward_map: PointType = None, inverse_map: PointType = None
     ) -> typing.List[AnyFunction]:
         """Map the basis onto a cell using the appropriate mapping for the element."""
+        vertices = parse_set_of_points_input(vertices_in)
         if basis is None:
             basis = self.get_basis_functions()
         if forward_map is None:
@@ -637,7 +636,7 @@ class CiarletElement(FiniteElement):
         if inverse_map is None:
             inverse_map = self.reference.get_inverse_map_to(vertices)
 
-        functions: typing.List[AnyFunction] = [0 for f in basis]
+        functions: typing.List[AnyFunction] = [ScalarFunction(0) for f in basis]
         for dim in range(self.reference.tdim + 1):
             for e in range(self.reference.sub_entity_count(dim)):
                 entity_dofs = self.entity_dofs(dim, e)
@@ -729,7 +728,7 @@ class DirectElement(FiniteElement):
         return self._basis_functions
 
     def map_to_cell(
-        self, vertices: SetOfPoints, basis: typing.List[AnyFunction] = None,
+        self, vertices_in: SetOfPointsInput, basis: typing.List[AnyFunction] = None,
         forward_map: PointType = None, inverse_map: PointType = None
     ) -> typing.List[AnyFunction]:
         """Map the basis onto a cell using the appropriate mapping for the element."""

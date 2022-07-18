@@ -9,7 +9,7 @@ import typing
 from ..functionals import NormalIntegralMoment, DotPointEvaluation, ListOfFunctionals
 from ..functions import VectorFunction, FunctionInput
 from ..finite_element import CiarletElement
-from ..geometry import SetOfPoints
+from ..geometry import SetOfPoints, SetOfPointsInput
 from ..moments import make_integral_moment_dofs
 from ..piecewise_functions import PiecewiseFunction
 from ..references import Reference
@@ -98,17 +98,18 @@ class GuzmanNeilan(CiarletElement):
         fs = BernardiRaugel(reference, 1).get_basis_functions()[-3:]
         for c, f in zip(coeffs, fs):
             assert isinstance(f, VectorFunction)
-            fun = []
-            for i, _ in enumerate(sub_tris):
-                function = []
+            pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+            for tri in sub_tris:
+                function: typing.List[sympy.core.expr.Expr] = []
                 for j in range(reference.tdim):
                     component = f[j]
                     for k, b in zip(c, sub_basis):
-                        bpi = b.pieces[i][1]
-                        component -= k * bpi[j]
-                    function.append(component)
-                fun.append(tuple(function))
-            basis.append(PiecewiseFunction(list(zip(sub_tris, fun)), 2))
+                        component -= k * b.pieces[tri][j]
+                    c_sym = component.as_sympy()
+                    assert isinstance(c_sym, sympy.core.expr.Expr)
+                    function.append(c_sym)
+                pieces[tri] = VectorFunction(tuple(function))
+            basis.append(PiecewiseFunction(pieces, 2))
         return basis
 
     def _make_polyset_tetrahedron(
@@ -133,17 +134,18 @@ class GuzmanNeilan(CiarletElement):
         fs = BernardiRaugel(reference, 1).get_basis_functions()[-4:]
         for c, f in zip(coeffs, fs):
             assert isinstance(f, VectorFunction)
-            fun = []
-            for i, _ in enumerate(sub_tets):
-                function = []
+            pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+            for tet in sub_tets:
+                function: typing.List[sympy.core.expr.Expr] = []
                 for j in range(reference.tdim):
                     component = f[j]
                     for k, b in zip(c, sub_basis):
-                        bpi = b.pieces[i][1]
-                        component -= k * bpi[j]
-                    function.append(component)
-                fun.append(tuple(function))
-            basis.append(PiecewiseFunction(list(zip(sub_tets, fun)), 3))
+                        component -= k * b.pieces[tet][j]
+                    c_sym = component.as_sympy()
+                    assert isinstance(c_sym, sympy.core.expr.Expr)
+                    function.append(c_sym)
+                pieces[tet] = VectorFunction(tuple(function))
+            basis.append(PiecewiseFunction(pieces, 3))
         return basis
 
     names = ["Guzman-Neilan"]
@@ -231,11 +233,10 @@ def make_piecewise_lagrange(
 
     basis: typing.List[PiecewiseFunction] = []
     for i in basis_dofs:
-        basis.append(
-            PiecewiseFunction(list(zip(sub_cells, [
-                zero if j == -1 else s[j]
-                for s, j in zip(lagrange_bases, i)
-            ])), cell_tdim)
-        )
+        pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {i: zero for i in sub_cells}
+        for c, s, j in zip(sub_cells, lagrange_bases, i):
+            if j != -1:
+                pieces[c] = s[j]
+        basis.append(PiecewiseFunction(pieces, cell_tdim))
 
     return basis

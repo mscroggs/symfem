@@ -80,7 +80,7 @@ class ReducedHsiehCloughTocher(CiarletElement):
                 bf.append(f)
             bases.append(bf)
 
-        piece_list = []
+        piece_list: typing.List[typing.Tuple[FunctionInput, ...]] = []
         piece_list.append((bases[0][0], 0, bases[2][3]))
         piece_list.append((bases[0][1], 0, bases[2][4]))
         piece_list.append((bases[0][2], 0, bases[2][5]))
@@ -97,7 +97,7 @@ class ReducedHsiehCloughTocher(CiarletElement):
 
         poly: typing.List[FunctionInput] = []
         poly += [
-            PiecewiseFunction(list(zip(subs, p)), "triangle")
+            PiecewiseFunction({i: j for i, j in zip(subs, p)}, 2)
             for p in piece_list
         ]
 

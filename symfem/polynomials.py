@@ -4,11 +4,11 @@ import sympy
 import typing
 from itertools import product
 from .functions import ScalarFunction, VectorFunction
-from .symbols import x, AxisVariables
+from .symbols import x, AxisVariablesNotSingle
 
 
 def polynomial_set_1d(
-    dim: int, order: int, variables: AxisVariables = x
+    dim: int, order: int, variables: AxisVariablesNotSingle = x
 ) -> typing.List[ScalarFunction]:
     """One dimensional polynomial set."""
     if dim == 1:
@@ -237,7 +237,7 @@ def Hcurl_serendipity(domain_dim: int, range_dim: int, order: int) -> typing.Lis
                 out.append(VectorFunction((x[1] * x[2] * p, -x[0] * x[2] * p, 0)))
 
         for p in serendipity_set_1d(domain_dim, order + 1):
-            out.append(tuple(p.diff(i) for i in x))
+            out.append(VectorFunction(tuple(p.diff(i) for i in x)))
         return out
 
     raise NotImplementedError()
@@ -309,7 +309,7 @@ def _jrc(a, n) -> typing.Tuple[
 
 
 def orthogonal_basis_interval(
-    order: int, derivs: int, variables: AxisVariables = [x[0]]
+    order: int, derivs: int, variables: AxisVariablesNotSingle = [x[0]]
 ) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     assert len(variables) == 1
@@ -327,12 +327,13 @@ def orthogonal_basis_interval(
 
 
 def orthogonal_basis_triangle(
-    order: int, derivs: int, variables: AxisVariables = [x[0], x[1]]
+    order: int, derivs: int, variables: AxisVariablesNotSingle = [x[0], x[1]]
 ) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     assert len(variables) == 2
 
-    def index(p, q):
+    def index(p: int, q: int) -> int:
+        """Get the index."""
         return (p + q + 1) * (p + q) // 2 + q
 
     d_index = index
@@ -394,17 +395,19 @@ def orthogonal_basis_triangle(
 
 
 def orthogonal_basis_quadrilateral(
-    order: int, derivs: int, variables: AxisVariables = [x[0], x[1]]
+    order: int, derivs: int, variables: AxisVariablesNotSingle = [x[0], x[1]]
 ) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     assert len(variables) == 2
 
-    def d_index(p, q):
+    def d_index(p: int, q: int) -> int:
+        """Get the derivative index."""
         return (p + q + 1) * (p + q) // 2 + q
 
     p0 = orthogonal_basis_interval(order, derivs, [variables[0]])
     p1 = orthogonal_basis_interval(order, derivs, [variables[1]])
-    poly = [ScalarFunction(0) for d in range((derivs + 1) * (derivs + 2) // 2)]
+    poly = [[ScalarFunction(0) for i in range((order + 1) ** 2)]
+            for d in range((derivs + 1) * (derivs + 2) // 2)]
     for i in range(derivs + 1):
         for j in range(derivs + 1 - i):
             poly[d_index(i, j)] = [a * b for a in p0[i] for b in p1[j]]
@@ -412,12 +415,13 @@ def orthogonal_basis_quadrilateral(
 
 
 def orthogonal_basis_tetrahedron(
-    order: int, derivs: int, variables: AxisVariables = x
+    order: int, derivs: int, variables: AxisVariablesNotSingle = x
 ) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     assert len(variables) == 3
 
-    def index(p, q, r):
+    def index(p: int, q: int, r: int) -> int:
+        """Get the index."""
         return (p + q + r) * (p + q + r + 1) * (p + q + r + 2) // 6 + (q + r) * (q + r + 1) // 2 + r
 
     d_index = index
@@ -536,20 +540,22 @@ def orthogonal_basis_tetrahedron(
 
 
 def orthogonal_basis_hexahedron(
-    order: int, derivs: int, variables: AxisVariables = x
+    order: int, derivs: int, variables: AxisVariablesNotSingle = x
 ) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     if variables is None:
         variables = x
     assert len(variables) == 3
 
-    def d_index(p, q, r):
+    def d_index(p: int, q: int, r: int) -> int:
+        """Get the derivative index."""
         return (p + q + r) * (p + q + r + 1) * (p + q + r + 2) // 6 + (q + r) * (q + r + 1) // 2 + r
 
     p0 = orthogonal_basis_interval(order, derivs, [variables[0]])
     p1 = orthogonal_basis_interval(order, derivs, [variables[1]])
     p2 = orthogonal_basis_interval(order, derivs, [variables[2]])
-    poly = [ScalarFunction(0) for d in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
+    poly = [[ScalarFunction(0) for i in range((order + 1) ** 3)]
+            for d in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
     for i in range(derivs + 1):
         for j in range(derivs + 1 - i):
             for k in range(derivs + 1 - i - j):
@@ -558,22 +564,25 @@ def orthogonal_basis_hexahedron(
 
 
 def orthogonal_basis_prism(
-    order: int, derivs: int, variables: AxisVariables = x
+    order: int, derivs: int, variables: AxisVariablesNotSingle = x
 ) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     if variables is None:
         variables = x
     assert len(variables) == 3
 
-    def d_index_tri(p, q):
+    def d_index_tri(p: int, q: int) -> int:
+        """Get the derivative index for a triangle."""
         return (p + q + 1) * (p + q) // 2 + q
 
-    def d_index(p, q, r):
+    def d_index(p: int, q: int, r: int) -> int:
+        """Get the derivative index."""
         return (p + q + r) * (p + q + r + 1) * (p + q + r + 2) // 6 + (q + r) * (q + r + 1) // 2 + r
 
     p01 = orthogonal_basis_triangle(order, derivs, [variables[0], variables[1]])
     p2 = orthogonal_basis_interval(order, derivs, [variables[2]])
-    poly = [ScalarFunction(0) for d in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
+    poly = [[ScalarFunction(0) for i in range((order + 1) * (order + 1) * (order + 2) // 2)]
+            for d in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
     for i in range(derivs + 1):
         for j in range(derivs + 1 - i):
             for k in range(derivs + 1 - i - j):
@@ -582,12 +591,13 @@ def orthogonal_basis_prism(
 
 
 def orthogonal_basis_pyramid(
-    order: int, derivs: int, variables: AxisVariables = x
+    order: int, derivs: int, variables: AxisVariablesNotSingle = x
 ) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     assert len(variables) == 3
 
-    def index(i, j, k):
+    def index(i: int, j: int, k: int) -> int:
+        """Get the index."""
         out = k + j * (order + 1) + i * (order + 1) * (order + 2) // 2 - i * (i ** 2 + 5) // 6
         if i > j:
             out -= i * (j - 1)
@@ -595,10 +605,12 @@ def orthogonal_basis_pyramid(
             out -= j * (j - 1) // 2 + i * (i - 1) // 2
         return out
 
-    def d_index(p, q, r):
+    def d_index(p: int, q: int, r: int) -> int:
+        """Get the derivative index."""
         return (p + q + r) * (p + q + r + 1) * (p + q + r + 2) // 6 + (q + r) * (q + r + 1) // 2 + r
 
-    def combinations(n, k):
+    def combinations(n: int, k: int) -> int:
+        """Get the number of combinations."""
         out = 1
         for i in range(n, n - k, -1):
             out *= i
@@ -742,7 +754,7 @@ def orthogonal_basis_pyramid(
 
 
 def orthogonal_basis(
-    cell, order: int, derivs: int, variables: AxisVariables = None
+    cell, order: int, derivs: int, variables: AxisVariablesNotSingle = None
 ) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     args: typing.List[typing.Any] = [order, derivs]

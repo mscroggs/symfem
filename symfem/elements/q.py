@@ -42,12 +42,12 @@ class Q(CiarletElement):
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_1d(reference.tdim, order)
 
-        super().__init__(reference, order, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant
 
     def get_tensor_factorisation(
         self
-    ) -> typing.List[typing.Tuple[str, typing.List[FiniteElement]]]:
+    ) -> typing.List[typing.Tuple[str, typing.List[FiniteElement], typing.List[int]]]:
         """Get the representation of the element as a tensor product."""
         from symfem import create_element
         interval_q = create_element("interval", "Lagrange", self.order)

@@ -9,7 +9,7 @@ import sympy
 import typing
 from ..finite_element import FiniteElement, CiarletElement
 from ..functions import AnyFunction, FunctionInput
-from ..geometry import SetOfPoints
+from ..geometry import SetOfPointsInput
 from ..piecewise_functions import PiecewiseFunction
 from ..references import DualPolygon
 
@@ -29,7 +29,7 @@ class DualCiarletElement(FiniteElement):
         self.fine_space = fine_space
         super().__init__(reference, order, len(dual_coefficients), domain_dim, range_dim,
                          range_shape=range_shape)
-        self._basis_functions: typing.Union[typing.List[FunctionInput], None] = None
+        self._basis_functions: typing.Union[typing.List[AnyFunction], None] = None
 
     def get_polynomial_basis(
         self, reshape: bool = True
@@ -44,7 +44,7 @@ class DualCiarletElement(FiniteElement):
         raise ValueError("Dual matrix not supported for barycentric dual elements.")
 
     def get_basis_functions(
-        self, reshape: bool = True, symbolic: bool = True, use_tensor_factorisation: bool = False
+        self, symbolic: bool = True, use_tensor_factorisation: bool = False
     ) -> typing.List[AnyFunction]:
         """Get the basis functions of the element."""
         assert not use_tensor_factorisation
@@ -52,10 +52,10 @@ class DualCiarletElement(FiniteElement):
         if self._basis_functions is None:
             from symfem import create_element
 
-            bfs: typing.List[PiecewiseFunction] = []
+            bfs: typing.List[AnyFunction] = []
             for coeff_list in self.dual_coefficients:
                 v0 = self.reference.origin
-                pieces: typing.List[typing.Tuple[SetOfPoints, FunctionInput]] = []
+                pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
                 for coeffs, v1, v2 in zip(
                     coeff_list, self.reference.vertices,
                     self.reference.vertices[1:] + self.reference.vertices[:1]
@@ -77,9 +77,11 @@ class DualCiarletElement(FiniteElement):
                                 sf_item += a * b[i]
                             sf_list.append(sf_item)
                         sub_fun = tuple(sf_list)
-                    pieces.append(((v0, v1, v2), sub_fun))
+                    pieces[(v0, v1, v2)] = sub_fun
                 bfs.append(PiecewiseFunction(pieces, 2))
             self._basis_functions = bfs
+
+        assert self._basis_functions is not None
         return self._basis_functions
 
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:

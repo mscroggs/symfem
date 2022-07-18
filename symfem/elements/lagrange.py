@@ -107,9 +107,9 @@ class MatrixLagrange(CiarletElement):
                 dofs.append(DotPointEvaluation(reference, p.dof_point(), d, entity=p.entity))
 
         poly: typing.List[FunctionInput] = []
-        poly += polynomial_set_vector(reference.tdim, reference.tdim ** 2, order),
+        poly += polynomial_set_vector(reference.tdim, reference.tdim ** 2, order)
 
-        super().__init__(reference, order, dofs, reference.tdim, reference.tdim ** 2,
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))
         self.variant = variant
 
@@ -128,35 +128,42 @@ class SymmetricMatrixLagrange(CiarletElement):
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         poly: typing.List[FunctionInput] = []
-        if reference.tdim == 1:
-            poly += polynomial_set_vector(1, 1, order)
-            directions: typing.List[typing.Tuple[int, ...]] = [(1, )]
-        elif reference.tdim == 2:
-            poly += [((a[0], a[1]), (a[1], a[2])) for a in polynomial_set_vector(2, 3, order)]
-            directions = [((1, 0), (0, 0)), ((0, 1), (0, 0)),
-                          ((0, 0), (0, 1))]
-        else:
-            assert reference.tdim == 3
-            poly += [((a[0], a[1], a[2]),
-                      (a[1], a[3], a[4]),
-                      (a[2], a[4], a[5])) for a in polynomial_set_vector(3, 6, order)]
-            directions = [((1, 0, 0), (0, 0, 0), (0, 0, 0)),
-                          ((0, 1, 0), (0, 0, 0), (0, 0, 0)),
-                          ((0, 0, 1), (0, 0, 0), (0, 0, 0)),
-                          ((0, 0, 0), (0, 1, 0), (0, 0, 0)),
-                          ((0, 0, 0), (0, 0, 1), (0, 0, 0)),
-                          ((0, 0, 0), (0, 0, 0), (0, 0, 1))]
-
-        scalar_space = Lagrange(reference, order, variant)
         dofs: ListOfFunctionals = []
-        for p in scalar_space.dofs:
-            for d in directions:
-                dofs.append(DotPointEvaluation(reference, p.dof_point(), d, entity=p.entity))
+        scalar_space = Lagrange(reference, order, variant)
+        if reference.tdim == 1:
+            poly += polynomial_set_1d(1, order)
+            for p in scalar_space.dofs:
+                dofs.append(PointEvaluation(reference, p.dof_point(), entity=p.entity))
+            super().__init__(
+                reference, order, poly, dofs,
+                reference.tdim, reference.tdim ** 2,
+            )
+        else:
+            directions: typing.List[typing.Tuple[typing.Tuple[int, ...], ...]] = []
+            if reference.tdim == 2:
+                poly += [((a[0], a[1]), (a[1], a[2])) for a in polynomial_set_vector(2, 3, order)]
+                directions = [((1, 0), (0, 0)), ((0, 1), (0, 0)),
+                              ((0, 0), (0, 1))]
+            else:
+                assert reference.tdim == 3
+                poly += [((a[0], a[1], a[2]),
+                          (a[1], a[3], a[4]),
+                          (a[2], a[4], a[5])) for a in polynomial_set_vector(3, 6, order)]
+                directions = [((1, 0, 0), (0, 0, 0), (0, 0, 0)),
+                              ((0, 1, 0), (0, 0, 0), (0, 0, 0)),
+                              ((0, 0, 1), (0, 0, 0), (0, 0, 0)),
+                              ((0, 0, 0), (0, 1, 0), (0, 0, 0)),
+                              ((0, 0, 0), (0, 0, 1), (0, 0, 0)),
+                              ((0, 0, 0), (0, 0, 0), (0, 0, 1))]
 
-        super().__init__(
-            reference, order, poly, dofs,
-            reference.tdim, reference.tdim ** 2, (reference.tdim, reference.tdim),
-        )
+            for p in scalar_space.dofs:
+                for d in directions:
+                    dofs.append(DotPointEvaluation(reference, p.dof_point(), d, entity=p.entity))
+
+            super().__init__(
+                reference, order, poly, dofs,
+                reference.tdim, reference.tdim ** 2, (reference.tdim, reference.tdim),
+            )
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:

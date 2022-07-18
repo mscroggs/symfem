@@ -6,7 +6,8 @@ import typing
 from abc import ABC, abstractmethod
 from . import mappings
 from .geometry import PointType, SetOfPoints
-from .functions import ScalarFunction, AnyFunction, FunctionInput, parse_function_input
+from .functions import (ScalarFunction, VectorFunction, AnyFunction, FunctionInput,
+                        parse_function_input)
 from .references import Reference, Interval
 from .symbols import x, t
 
@@ -91,8 +92,17 @@ class BaseFunctional(ABC):
         """Get the location of the DOF in the cell."""
         pass
 
-    @abstractmethod
     def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+        """Apply to the functional to a function."""
+        e = self._eval_symbolic(function)
+        assert isinstance(e, ScalarFunction)
+        es = e.as_sympy()
+        assert isinstance(es, sympy.core.expr.Expr)
+        assert es.is_constant()
+        return e
+
+    @abstractmethod
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply to the functional to a function."""
         pass
 
@@ -119,13 +129,15 @@ class PointEvaluation(BaseFunctional):
         self.point = parse_function_input(point_in)
         assert self.point.is_vector
 
-    def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply the functional to a function."""
         return function.subs(x, self.point)
 
     def dof_point(self) -> PointType:
         """Get the location of the DOF in the cell."""
-        return self.point
+        pt = self.point.as_sympy()
+        assert isinstance(pt, tuple)
+        return pt
 
     def get_points_and_weights(
         self, max_order: int = None
@@ -135,6 +147,7 @@ class PointEvaluation(BaseFunctional):
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
+        assert isinstance(self.point, VectorFunction)
         return f"v\\mapsto v({','.join([_to_tex(i, True) for i in self.point])})", []
 
     name = "Point evaluation"
@@ -150,13 +163,15 @@ class WeightedPointEvaluation(BaseFunctional):
         assert self.point.is_vector
         self.weight = weight
 
-    def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply the functional to a function."""
         return function.subs(x, self.point) * self.weight
 
     def dof_point(self) -> PointType:
         """Get the location of the DOF in the cell."""
-        return self.point
+        pt = self.point.as_sympy()
+        assert isinstance(pt, tuple)
+        return pt
 
     def get_points_and_weights(
         self, max_order: int = None
@@ -166,6 +181,7 @@ class WeightedPointEvaluation(BaseFunctional):
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
+        assert isinstance(self.point, VectorFunction)
         return (f"v\\mapsto {_to_tex(self.weight)} "
                 f"v({','.join([_to_tex(i, True) for i in self.point])})"), []
 
@@ -183,7 +199,7 @@ class DerivativePointEvaluation(BaseFunctional):
         assert self.point.is_vector
         self.derivative = derivative
 
-    def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply the functional to a function."""
         for i, j in zip(x, self.derivative):
             for k in range(j):
@@ -192,7 +208,9 @@ class DerivativePointEvaluation(BaseFunctional):
 
     def dof_point(self) -> PointType:
         """Get the location of the DOF in the cell."""
-        return self.point
+        pt = self.point.as_sympy()
+        assert isinstance(pt, tuple)
+        return pt
 
     def perform_mapping(
         self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType, tdim: int
@@ -209,7 +227,7 @@ class DerivativePointEvaluation(BaseFunctional):
                     f += a * b
                 out.append(f)
 
-        out2: typing.List[ScalarFunction] = []
+        out2: typing.List[AnyFunction] = []
         for b in out:
             item = b.subs(x, inverse_map)
             out2.append(item)
@@ -217,6 +235,7 @@ class DerivativePointEvaluation(BaseFunctional):
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
+        assert isinstance(self.point, VectorFunction)
         if len(self.point) == 1:
             desc = "v\\mapsto "
             desc += f"v'({','.join([_to_tex(i, True) for i in self.point])})"
@@ -248,20 +267,28 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
         assert self.point.is_vector
         self.dir = parse_function_input(direction_in)
 
-    def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply the functional to a function."""
-        return function.directional_derivative(self.dir).subs(x, self.point)
+        d = self.dir.as_sympy()
+        assert isinstance(d, tuple)
+        return function.directional_derivative(d).subs(x, self.dof_point())
 
     def dof_point(self) -> PointType:
         """Get the location of the DOF in the cell."""
-        return self.point
+        pt = self.point.as_sympy()
+        assert isinstance(pt, tuple)
+        return pt
 
     def dof_direction(self) -> typing.Union[PointType, None]:
         """Get the direction of the DOF."""
-        return self.dir
+        d = self.dir.as_sympy()
+        assert isinstance(d, tuple)
+        return d
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
+        assert isinstance(self.point, VectorFunction)
+        assert isinstance(self.dir, VectorFunction)
         if len(self.point) == 1:
             desc = "v\\mapsto "
             desc += f"v'({','.join([_to_tex(i, True) for i in self.point])})"
@@ -309,13 +336,15 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
         assert self.point.is_vector
         self.component = component
 
-    def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply the functional to a function."""
         return function.jacobian_component(self.component).subs(x, self.point)
 
     def dof_point(self) -> PointType:
         """Get the location of the DOF in the cell."""
-        return self.point
+        pt = self.point.as_sympy()
+        assert isinstance(pt, tuple)
+        return pt
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
@@ -343,7 +372,7 @@ class PointInnerProduct(BaseFunctional):
         assert self.lvec.is_vector
         assert self.rvec.is_vector
 
-    def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply the functional to a function."""
         v = function.subs(x, self.point)
 
@@ -351,16 +380,22 @@ class PointInnerProduct(BaseFunctional):
 
     def dof_point(self) -> PointType:
         """Get the location of the DOF in the cell."""
-        return self.point
+        pt = self.point.as_sympy()
+        assert isinstance(pt, tuple)
+        return pt
 
     def dof_direction(self) -> typing.Union[PointType, None]:
         """Get the direction of the DOF."""
         if self.rvec != self.lvec:
             return None
-        return self.lvec
+        lv = self.lvec.as_sympy()
+        assert isinstance(lv, tuple)
+        return lv
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
+        assert isinstance(self.lvec, VectorFunction)
+        assert isinstance(self.rvec, VectorFunction)
         desc = "\\mathbf{V}\\mapsto"
         desc += "\\left(\\begin{array}{c}"
         desc += "\\\\".join([_to_tex(i) for i in self.lvec])
@@ -384,7 +419,7 @@ class DotPointEvaluation(BaseFunctional):
         assert self.point.is_vector
         self.vector = parse_function_input(vector_in)
 
-    def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply the functional to a function."""
         v1 = function.subs(x, self.point)
         v2 = self.vector.subs(x, self.point)
@@ -392,11 +427,15 @@ class DotPointEvaluation(BaseFunctional):
 
     def dof_point(self) -> PointType:
         """Get the location of the DOF in the cell."""
-        return self.point
+        pt = self.point.as_sympy()
+        assert isinstance(pt, tuple)
+        return pt
 
     def dof_direction(self) -> typing.Union[PointType, None]:
         """Get the direction of the DOF."""
-        return self.vector
+        v = self.vector.as_sympy()
+        assert isinstance(v, tuple)
+        return v
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
@@ -444,7 +483,7 @@ class IntegralAgainst(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.integral_domain.vertices))
 
-    def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply the functional to a function."""
         point = [i for i in self.integral_domain.origin]
         for i, a in enumerate(zip(*self.integral_domain.axes)):
@@ -454,7 +493,7 @@ class IntegralAgainst(BaseFunctional):
         integrand = self.dot(v1)
         return integrand.integral(self.integral_domain)
 
-    def dot(self, function: AnyFunction) -> sympy.core.expr.Expr:
+    def dot(self, function: AnyFunction) -> ScalarFunction:
         """Dot a function with the moment function."""
         return function.dot(self.f)
 
@@ -493,7 +532,7 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.integral_domain.vertices))
 
-    def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply the functional to a function."""
         point = [i for i in self.integral_domain.origin]
         for i, a in enumerate(zip(*self.integral_domain.axes)):
@@ -503,7 +542,7 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
         integrand = self.dot(v1)
         return integrand.integral(self.integral_domain)
 
-    def dot(self, function: ScalarFunction) -> sympy.core.expr.Expr:
+    def dot(self, function: ScalarFunction) -> ScalarFunction:
         """Dot a function with the moment function."""
         return function * self.f
 
@@ -537,11 +576,10 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.integral_domain.vertices))
 
-    def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply the functional to a function."""
         for dir, o in zip(self.directions, self.orders):
-            for i in range(o):
-                function = sum(d * function.diff(x[j]) for j, d in enumerate(dir))
+            function = function.grad(len(dir)).dot(VectorFunction(dir))
         point = [i for i in self.integral_domain.origin]
         for i, a in enumerate(zip(*self.integral_domain.axes)):
             for j, k in zip(a, t):
@@ -586,6 +624,8 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
 class IntegralMoment(BaseFunctional):
     """An integral moment."""
 
+    f: AnyFunction
+
     def __init__(self, reference: Reference, integral_domain: Reference,
                  f_in: FunctionInput, dof: BaseFunctional,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
@@ -595,8 +635,6 @@ class IntegralMoment(BaseFunctional):
 
         f = parse_function_input(f_in)
         f = f.subs(x, t)
-
-        self.f: AnyFunction = 0
 
         if f.is_vector:
             assert len(f) == self.integral_domain.tdim
@@ -612,7 +650,7 @@ class IntegralMoment(BaseFunctional):
         else:
             self.f = f
 
-    def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply the functional to a function."""
         point = [i for i in self.integral_domain.origin]
         for i, a in enumerate(zip(*self.integral_domain.axes)):
@@ -623,7 +661,7 @@ class IntegralMoment(BaseFunctional):
         integrand = self.dot(v1)
         return integrand.integral(self.integral_domain)
 
-    def dot(self, function: AnyFunction) -> sympy.core.expr.Expr:
+    def dot(self, function: AnyFunction) -> ScalarFunction:
         """Dot a function with the moment function."""
         return function.dot(self.f)
 
@@ -640,10 +678,13 @@ class IntegralMoment(BaseFunctional):
         p = self.dof.dof_direction()
         if p is None:
             return None
-        return tuple(
-            sum(self.integral_domain.axes[j][i] * c for j, c in enumerate(p))
-            for i in range(self.integral_domain.gdim)
-        )
+        vp = VectorFunction(p)
+        out = []
+        for i in range(self.integral_domain.gdim):
+            entry = vp.dot(VectorFunction([a[i] for a in self.integral_domain.axes])).as_sympy()
+            assert isinstance(entry, sympy.core.expr.Expr)
+            out.append(entry)
+        return tuple(out)
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
@@ -693,13 +734,15 @@ class VecIntegralMoment(IntegralMoment):
         super().__init__(reference, integral_domain, f, dof, entity=entity, mapping=mapping)
         self.dot_with = parse_function_input(dot_with_in)
 
-    def dot(self, function: AnyFunction) -> sympy.core.expr.Expr:
+    def dot(self, function: AnyFunction) -> ScalarFunction:
         """Dot a function with the moment function."""
         return function.dot(self.dot_with) * self.f
 
     def dof_direction(self) -> typing.Union[PointType, None]:
         """Get the direction of the DOF."""
-        return self.dot_with
+        dw = self.dot_with.as_sympy()
+        assert isinstance(dw, tuple)
+        return dw
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
@@ -725,7 +768,7 @@ class DerivativeIntegralMoment(IntegralMoment):
         super().__init__(reference, integral_domain, f, dof, entity=entity, mapping=mapping)
         self.dot_with = parse_function_input(dot_with_in)
 
-    def dot(self, function: AnyFunction) -> sympy.core.expr.Expr:
+    def dot(self, function: AnyFunction) -> ScalarFunction:
         """Dot a function with the moment function."""
         assert isinstance(function, tuple)
         assert isinstance(self.f, (int, sympy.core.expr.Expr))
@@ -733,9 +776,11 @@ class DerivativeIntegralMoment(IntegralMoment):
 
     def dof_direction(self) -> typing.Union[PointType, None]:
         """Get the direction of the DOF."""
-        return self.dot_with
+        dw = self.dot_with.as_sympy()
+        assert isinstance(dw, tuple)
+        return dw
 
-    def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply the functional to a function."""
         point = [i for i in self.integral_domain.origin]
         for i, a in enumerate(zip(*self.integral_domain.axes)):
@@ -758,7 +803,7 @@ class DivergenceIntegralMoment(IntegralMoment):
         assert f.is_scalar
         super().__init__(reference, integral_domain, f, dof, entity=entity, mapping=mapping)
 
-    def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply the functional to a function."""
         point = [i for i in self.integral_domain.origin]
         for i, a in enumerate(zip(*self.integral_domain.axes)):
@@ -892,7 +937,7 @@ class InnerProductIntegralMoment(IntegralMoment):
         self.inner_with_left = inner_with_left
         self.inner_with_right = inner_with_right
 
-    def dot(self, function: AnyFunction) -> sympy.core.expr.Expr:
+    def dot(self, function: AnyFunction) -> ScalarFunction:
         """Take the inner product of a function with the moment direction."""
         assert function.is_matrix
         return self.inner_with_left.dot(
@@ -902,7 +947,9 @@ class InnerProductIntegralMoment(IntegralMoment):
         """Get the direction of the DOF."""
         if self.inner_with_left != self.inner_with_right:
             return None
-        return self.inner_with_left
+        il = self.inner_with_left.as_sympy()
+        assert isinstance(il, tuple)
+        return il
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""

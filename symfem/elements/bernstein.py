@@ -8,7 +8,7 @@ https://doi.org/10.1137/11082539X (Ainsworth, Andriamaro, Davydov, 2011)
 import sympy
 import typing
 from ..functionals import BaseFunctional, PointEvaluation, ListOfFunctionals
-from ..functions import AnyFunction, FunctionInput, ScalarFunction
+from ..functions import AnyFunction, FunctionInput
 from ..finite_element import CiarletElement
 from ..geometry import PointType
 from ..polynomials import polynomial_set_1d, orthogonal_basis
@@ -101,7 +101,7 @@ class BernsteinFunctional(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return self.ref.sub_entity(*self.entity).midpoint()
 
-    def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply the functional to a function."""
         point = [i for i in self.ref.origin]
         for i, a in enumerate(zip(*self.ref.axes)):

@@ -6,40 +6,44 @@ import sympy
 from abc import ABC, abstractmethod
 from .geometry import (PointType, PointTypeInput, SetOfPoints, SetOfPointsInput,
                        parse_set_of_points_input, parse_point_input)
-from .symbols import t, x
+from .symbols import t, x, AxisVariablesNotSingle
 
 
-def _vsub(v: PointType, w: PointType) -> PointType:
+def _vsub(v: PointTypeInput, w: PointTypeInput) -> PointType:
     """Subtract."""
-    return tuple(i - j for i, j in zip(v, w))
+    return tuple(i - j for i, j in zip(parse_point_input(v), parse_point_input(w)))
 
 
-def _vadd(v: PointType, w: PointType) -> PointType:
+def _vadd(v: PointTypeInput, w: PointTypeInput) -> PointType:
     """Add."""
-    return tuple(i + j for i, j in zip(v, w))
+    return tuple(i + j for i, j in zip(parse_point_input(v), parse_point_input(w)))
 
 
-def _vdot(v: PointType, w: PointType) -> sympy.core.expr.Expr:
+def _vdot(v: PointTypeInput, w: PointTypeInput) -> sympy.core.expr.Expr:
     """Compute dot product."""
     out = sympy.Integer(0)
-    for i, j in zip(v, w):
+    for i, j in zip(parse_point_input(v), parse_point_input(w)):
         out += i * j
     return out
 
 
-def _vcross(v: PointType, w: PointType) -> PointType:
+def _vcross(v_in: PointTypeInput, w_in: PointTypeInput) -> PointType:
     """Compute cross product."""
+    v = parse_point_input(v_in)
+    w = parse_point_input(w_in)
     assert len(v) == len(w) == 3
     return (v[1] * w[2] - v[2] * w[1], v[2] * w[0] - v[0] * w[2], v[0] * w[1] - v[1] * w[0])
 
 
-def _vnorm(v: PointType) -> sympy.core.expr.Expr:
+def _vnorm(v_in: PointTypeInput) -> sympy.core.expr.Expr:
     """Find the norm of a vector."""
+    v = parse_point_input(v_in)
     return sympy.sqrt(_vdot(v, v))
 
 
-def _vnormalise(v: PointType) -> PointType:
+def _vnormalise(v_in: PointTypeInput) -> PointType:
     """Normalise a vector."""
+    v = parse_point_input(v_in)
     n = _vnorm(v)
     return tuple(i / n for i in v)
 
@@ -91,7 +95,7 @@ class Reference(ABC):
         return tuple(pt)
 
     @abstractmethod
-    def integration_limits(self) -> typing.List[typing.Union[
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
@@ -147,12 +151,15 @@ class Reference(ABC):
         assert len(self.axes) == self.tdim
         vaxes = [VectorFunction(a) for a in self.axes]
         if self.tdim == 1:
-            return vaxes[0].norm()
-        if self.tdim == 2:
-            return vaxes[0].cross(vaxes[1]).norm()
-        if self.tdim == 3:
-            return vaxes[0].cross(vaxes[1]).dot(vaxes[2]).norm()
-        raise ValueError(f"Unsupported tdim: {self.tdim}")
+            out = vaxes[0].norm().as_sympy()
+        elif self.tdim == 2:
+            out = vaxes[0].cross(vaxes[1]).norm().as_sympy()
+        elif self.tdim == 3:
+            out = vaxes[0].cross(vaxes[1]).dot(vaxes[2]).norm().as_sympy()
+        else:
+            raise ValueError(f"Unsupported tdim: {self.tdim}")
+        assert isinstance(out, sympy.core.expr.Expr)
+        return out
 
     def scaled_axes(self) -> SetOfPoints:
         """Return the unit axes of the reference."""
@@ -281,12 +288,12 @@ class Point(Reference):
         """Get the default reference for this cell type."""
         return Point(self.reference_vertices)
 
-    def integration_limits(self) -> typing.List[typing.Union[
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
         """Get the limits for an integral over this reference."""
-        return list(zip(t, self.vertices[0]))
+        return list(zip(vars, self.vertices[0]))
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -308,7 +315,7 @@ class Point(Reference):
 
     def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
-        return 0
+        return sympy.Integer(0)
 
     def contains(self, point: PointType) -> bool:
         """Check is a point is contained in the reference."""
@@ -341,12 +348,12 @@ class Interval(Reference):
         """Get the default reference for this cell type."""
         return Interval(self.reference_vertices)
 
-    def integration_limits(self) -> typing.List[typing.Union[
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
         """Get the limits for an integral over this reference."""
-        return [(t[0], 0, 1)]
+        return [(vars[0], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -406,12 +413,13 @@ class Triangle(Reference):
         """Get the default reference for this cell type."""
         return Triangle(self.reference_vertices)
 
-    def integration_limits(self) -> typing.List[typing.Union[
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
         """Get the limits for an integral over this reference."""
-        return [(t[1], 0, 1 - t[0]), (t[0], 0, 1)]
+        return [(vars[1], sympy.Integer(0), 1 - vars[0]),
+                (vars[0], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -496,12 +504,14 @@ class Tetrahedron(Reference):
         """Get the default reference for this cell type."""
         return Tetrahedron(self.reference_vertices)
 
-    def integration_limits(self) -> typing.List[typing.Union[
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
         """Get the limits for an integral over this reference."""
-        return [(t[0], 0, 1 - t[1] - t[2]), (t[1], 0, 1 - t[2]), (t[2], 0, 1)]
+        return [(vars[0], sympy.Integer(0), 1 - vars[1] - vars[2]),
+                (vars[1], sympy.Integer(0), 1 - vars[2]),
+                (vars[2], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -574,12 +584,13 @@ class Quadrilateral(Reference):
         """Get the default reference for this cell type."""
         return Quadrilateral(self.reference_vertices)
 
-    def integration_limits(self) -> typing.List[typing.Union[
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
         """Get the limits for an integral over this reference."""
-        return [(t[1], 0, 1), (t[0], 0, 1)]
+        return [(vars[1], sympy.Integer(0), sympy.Integer(1)),
+                (vars[0], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -693,12 +704,14 @@ class Hexahedron(Reference):
         """Get the default reference for this cell type."""
         return Hexahedron(self.reference_vertices)
 
-    def integration_limits(self) -> typing.List[typing.Union[
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
         """Get the limits for an integral over this reference."""
-        return [(t[2], 0, 1), (t[1], 0, 1), (t[0], 0, 1)]
+        return [(vars[2], sympy.Integer(0), sympy.Integer(1)),
+                (vars[1], sympy.Integer(0), sympy.Integer(1)),
+                (vars[0], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -809,12 +822,14 @@ class Prism(Reference):
         """Get the default reference for this cell type."""
         return Prism(self.reference_vertices)
 
-    def integration_limits(self) -> typing.List[typing.Union[
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
         """Get the limits for an integral over this reference."""
-        return [(t[2], 0, 1), (t[1], 0, 1 - t[0]), (t[0], 0, 1)]
+        return [(vars[2], sympy.Integer(0), sympy.Integer(1)),
+                (vars[1], sympy.Integer(0), sympy.Integer(1) - vars[0]),
+                (vars[0], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -922,12 +937,14 @@ class Pyramid(Reference):
         """Get the default reference for this cell type."""
         return Pyramid(self.reference_vertices)
 
-    def integration_limits(self) -> typing.List[typing.Union[
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
         """Get the limits for an integral over this reference."""
-        return [(t[0], 0, 1 - t[2]), (t[1], 0, 1 - t[2]), (t[2], 0, 1)]
+        return [(vars[0], sympy.Integer(0), 1 - vars[2]),
+                (vars[1], sympy.Integer(0), 1 - vars[2]),
+                (vars[2], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -994,12 +1011,14 @@ class Pyramid(Reference):
 class DualPolygon(Reference):
     """A polygon on a barycentric dual grid."""
 
+    reference_origin: PointType
+
     def __init__(
         self, number_of_triangles: int,
         vertices: SetOfPointsInput = None
     ):
         self.number_of_triangles = number_of_triangles
-        self.reference_origin = (0, 0)
+        self.reference_origin = (sympy.Integer(0), sympy.Integer(0))
         reference_vertices = []
         for tri in range(number_of_triangles):
             angle = sympy.pi * 2 * tri / number_of_triangles
@@ -1010,8 +1029,8 @@ class DualPolygon(Reference):
                 ((sympy.cos(next_angle) + sympy.cos(angle)) / 2,
                  (sympy.sin(next_angle) + sympy.sin(angle)) / 2))
 
+        origin: PointType = self.reference_origin
         if vertices is None:
-            origin: PointType = self.reference_origin
             vertices = tuple(reference_vertices)
         else:
             assert len(vertices) == 1 + len(reference_vertices)
@@ -1037,7 +1056,7 @@ class DualPolygon(Reference):
         """Check is a point is contained in the reference."""
         raise NotImplementedError()
 
-    def integration_limits(self) -> typing.List[typing.Union[
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:

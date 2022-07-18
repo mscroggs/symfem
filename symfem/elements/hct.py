@@ -84,7 +84,7 @@ class HsiehCloughTocher(CiarletElement):
 
         poly: typing.List[FunctionInput] = []
         poly += [
-            PiecewiseFunction(list(zip(subs, p)), 2)
+            PiecewiseFunction({i: j for i, j in zip(subs, p)}, 2)
             for p in piece_list2]
 
         super().__init__(

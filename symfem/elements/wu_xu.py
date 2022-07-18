@@ -43,11 +43,11 @@ class WuXu(CiarletElement):
         poly += [bubble * i for i in polynomial_set_1d(reference.tdim, 1)[1:]]
 
         dofs: ListOfFunctionals = []
-        for v_n, vs in enumerate(reference.vertices):
-            dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
+        for v_n, v in enumerate(reference.vertices):
+            dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
             for i in range(reference.tdim):
                 dofs.append(DerivativePointEvaluation(
-                    reference, vs, tuple(1 if i == j else 0 for j in range(reference.tdim)),
+                    reference, v, tuple(1 if i == j else 0 for j in range(reference.tdim)),
                     entity=(0, v_n)))
         for codim in range(1, reference.tdim):
             dim = reference.tdim - codim

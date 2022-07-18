@@ -6,7 +6,7 @@ import typing
 from abc import ABC, abstractmethod
 from .geometry import PointType
 from .references import Reference
-from .symbols import x, t, AxisVariables
+from .symbols import x, t, AxisVariables, AxisVariablesNoSingle
 
 SingleSympyFormat = typing.Union[
     sympy.core.expr.Expr,
@@ -15,7 +15,7 @@ SingleSympyFormat = typing.Union[
 ]
 SympyFormat = typing.Union[
     SingleSympyFormat,
-    typing.Dict[typing.Tuple[typing.Tuple[int, ...], ...], SingleSympyFormat]
+    typing.Dict[typing.Tuple[typing.Tuple[sympy.core.expr.Expr, ...], ...], SingleSympyFormat]
 ]
 _ValuesToSubstitute = typing.Union[
     typing.Tuple[typing.Any, ...],
@@ -215,7 +215,7 @@ class AnyFunction(ABC):
         pass
 
     @abstractmethod
-    def integral(self, domain: Reference):
+    def integral(self, domain: Reference, vars: AxisVariablesNoSingle = t):
         """Compute the integral of the function."""
         pass
 
@@ -226,6 +226,23 @@ class AnyFunction(ABC):
     ]):
         """Integrate the function."""
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'integrate'")
+
+    def det(self):
+        """Compute the determinant."""
+        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'det'")
+
+    def transpose(self):
+        """Compute the transpose."""
+        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'transpose'")
+
+    @property
+    def shape(self) -> typing.Tuple[int, ...]:
+        """Get the value shape of the function."""
+        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'shape'")
+
+    def __len__(self):
+        """Compute the determinant."""
+        raise TypeError(f"object of type '{self.__class__.__name__}' has no len()")
 
     def __getitem__(self, key) -> AnyFunction:
         """Get a component or slice of the function."""
@@ -444,9 +461,9 @@ class ScalarFunction(AnyFunction):
         """Compute the norm of the function."""
         return ScalarFunction(abs(self._f))
 
-    def integral(self, domain: Reference) -> ScalarFunction:
+    def integral(self, domain: Reference, vars: AxisVariablesNoSingle = t) -> ScalarFunction:
         """Compute the integral of the function."""
-        limits = domain.integration_limits()
+        limits = domain.integration_limits(vars)
 
         point = VectorFunction(domain.origin)
         for ti, a in zip(t, domain.axes):
@@ -488,6 +505,11 @@ class VectorFunction(AnyFunction):
     def __len__(self):
         """Get the length of the vector."""
         return len(self._vec)
+
+    @property
+    def shape(self) -> typing.Tuple[int, ...]:
+        """Get the value shape of the function."""
+        return (len(self), )
 
     def __getitem__(self, key) -> typing.Union[ScalarFunction, VectorFunction]:
         """Get a component or slice of the function."""
@@ -677,7 +699,7 @@ class VectorFunction(AnyFunction):
             a += i.as_sympy() ** 2
         return ScalarFunction(sympy.sqrt(a))
 
-    def integral(self, domain: Reference):
+    def integral(self, domain: Reference, vars: AxisVariablesNoSingle = t):
         """Compute the integral of the function."""
         raise NotImplementedError()
 
@@ -715,11 +737,16 @@ class MatrixFunction(AnyFunction):
         assert isinstance(mat, (list, tuple))
         self._mat = tuple(tuple(j if isinstance(j, AnyFunction) else ScalarFunction(j)
                                 for j in i) for i in mat)
-        self.shape = (len(self._mat), 0 if len(self._mat) == 0 else len(self._mat[0]))
+        self._shape = (len(self._mat), 0 if len(self._mat) == 0 else len(self._mat[0]))
         for i in self._mat:
             assert len(i) == self.shape[1]
             for j in i:
                 assert j.is_scalar
+
+    @property
+    def shape(self) -> typing.Tuple[int, ...]:
+        """Get the value shape of the function."""
+        return self._shape
 
     def __getitem__(self, key) -> typing.Union[ScalarFunction, VectorFunction]:
         """Get a component or slice of the function."""
@@ -944,7 +971,7 @@ class MatrixFunction(AnyFunction):
         """Compute the norm of the function."""
         raise NotImplementedError()
 
-    def integral(self, domain: Reference):
+    def integral(self, domain: Reference, vars: AxisVariablesNoSingle = t):
         """Compute the integral of the function."""
         raise NotImplementedError()
 

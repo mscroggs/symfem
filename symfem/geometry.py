@@ -27,7 +27,7 @@ def parse_point_input(point: PointTypeInput) -> PointType:
             return tuple(point[0, i] for i in range(point.cols))
         else:
             return tuple(point[i, 0] for i in range(point.rows))
-    return tuple(point)
+    return tuple(sympy.S(i) for i in point)
 
 
 def _vsub(v: PointType, w: PointType) -> PointType:

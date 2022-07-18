@@ -7,7 +7,7 @@ from abc import abstractmethod
 from .functions import AnyFunction, SympyFormat, ValuesToSubstitute, ScalarFunction
 from .geometry import PointType
 from .references import Reference
-from .symbols import AxisVariables
+from .symbols import AxisVariables, AxisVariablesNotSingle, t
 
 
 class BasisFunction(AnyFunction):
@@ -117,9 +117,9 @@ class BasisFunction(AnyFunction):
         """Compute the norm of the function."""
         raise self.get_function().norm()
 
-    def integral(self, domain: Reference) -> AnyFunction:
+    def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t) -> AnyFunction:
         """Compute the integral of the function."""
-        return self.get_function().integral(domain)
+        return self.get_function().integral(domain, vars)
 
     def subs(self, vars: AxisVariables, values: ValuesToSubstitute) -> BasisFunction:
         """Substitute values into the function."""
@@ -160,3 +160,8 @@ class SubbedBasisFunction(BasisFunction):
     def get_function(self) -> AnyFunction:
         """Return the symbolic function."""
         return self.f.get_function().subs(self._vars, self._values)
+
+    @property
+    def shape(self) -> typing.Tuple[int, ...]:
+        """Get the value shape of the function."""
+        return self.f.get_function().shape

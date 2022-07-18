@@ -88,7 +88,7 @@ class VectorLagrange(CiarletElement):
             for p in scalar_space.dofs:
                 dofs.append(PointEvaluation(reference, p.dof_point(), entity=p.entity))
 
-            poly += prism_polynomial_set_1d(reference.tdim, order),
+            poly += prism_polynomial_set_1d(reference.tdim, order)
         else:
             directions = [
                 tuple(1 if i == j else 0 for j in range(reference.tdim))
@@ -98,7 +98,7 @@ class VectorLagrange(CiarletElement):
                 for d in directions:
                     dofs.append(DotPointEvaluation(reference, p.dof_point(), d, entity=p.entity))
 
-            poly += prism_polynomial_set_vector(reference.tdim, reference.tdim, order),
+            poly += prism_polynomial_set_vector(reference.tdim, reference.tdim, order)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
