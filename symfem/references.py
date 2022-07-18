@@ -4,14 +4,9 @@ from __future__ import annotations
 import typing
 import sympy
 from abc import ABC, abstractmethod
-from .symbols import t, x
 from .geometry import (PointType, PointTypeInput, SetOfPoints, SetOfPointsInput,
                        parse_set_of_points_input, parse_point_input)
-
-AxisVariables = typing.Union[
-    typing.Tuple[sympy.core.symbol.Symbol, ...],
-    typing.List[sympy.core.symbol.Symbol],
-    sympy.core.symbol.Symbol]
+from .symbols import t, x
 
 
 def _vsub(v: PointType, w: PointType) -> PointType:

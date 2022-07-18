@@ -10,16 +10,10 @@ import typing
 from ..functionals import BaseFunctional, PointEvaluation, ListOfFunctionals
 from ..functions import AnyFunction, FunctionInput, ScalarFunction
 from ..finite_element import CiarletElement
+from ..geometry import PointType
 from ..polynomials import polynomial_set_1d, orthogonal_basis
 from ..references import Reference
-from ..symbols import x, t
-
-PointType = None
-AxisVariables = typing.Union[
-    typing.Tuple[sympy.core.symbol.Symbol, ...],
-    typing.List[sympy.core.symbol.Symbol],
-    sympy.core.symbol.Symbol,
-    ]
+from ..symbols import x, t, AxisVariablesNotSingle
 
 
 def single_choose(n: int, k: int) -> sympy.core.expr.Expr:
@@ -42,7 +36,7 @@ def choose(n: int, powers: typing.List[int]) -> sympy.core.expr.Expr:
 
 
 def bernstein_polynomials(
-    n: int, d: int, vars: AxisVariables = x
+    n: int, d: int, vars: AxisVariablesNotSingle = x
 ) -> typing.List[sympy.core.expr.Expr]:
     """
     Return a list of Bernstein polynomials.

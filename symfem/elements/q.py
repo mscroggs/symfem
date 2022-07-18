@@ -18,8 +18,6 @@ class Q(CiarletElement):
     """A Q element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        from symfem import create_reference
-
         dofs: ListOfFunctionals = []
         if order == 0:
             dofs = [PointEvaluation(
@@ -31,11 +29,8 @@ class Q(CiarletElement):
             for v_n, v in enumerate(reference.vertices):
                 dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
             for edim in range(1, 4):
-                et = reference.sub_entity_types[edim]
-                for e_n, vs in enumerate(reference.sub_entities(edim)):
-                    assert isinstance(et, str)
-                    entity = create_reference(
-                        et, vertices=tuple(reference.vertices[i] for i in vs))
+                for e_n in range(reference.sub_entity_count(edim)):
+                    entity = reference.sub_entity(edim, e_n)
                     for i in product(range(1, order), repeat=edim):
                         dofs.append(
                             PointEvaluation(

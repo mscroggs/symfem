@@ -18,7 +18,6 @@ class Argyris(CiarletElement):
     """Argyris finite element."""
 
     def __init__(self, reference: Reference, order: int):
-        from symfem import create_reference
         assert order == 5
         assert reference.name == "triangle"
         dofs: ListOfFunctionals = []
@@ -32,11 +31,9 @@ class Argyris(CiarletElement):
                 for j in range(i + 1):
                     dofs.append(PointComponentSecondDerivativeEvaluation(
                         reference, vs, (i, j), entity=(0, v_n)))
-        for e_n, vs in enumerate(reference.sub_entities(1)):
+        for e_n in range(reference.sub_entity_count(1)):
             assert isinstance(reference.sub_entity_types[1], str)
-            sub_ref = create_reference(
-                reference.sub_entity_types[1],
-                vertices=tuple(reference.vertices[v] for v in vs))
+            sub_ref = reference.sub_entity(1, e_n)
             dofs.append(PointNormalDerivativeEvaluation(
                 reference, sub_ref.midpoint(), sub_ref, entity=(1, e_n)))
         poly: typing.List[FunctionInput] = []

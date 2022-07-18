@@ -1,12 +1,13 @@
 """Abstract basis function classes and functions."""
 
 from __future__ import annotations
-from abc import abstractmethod
 import sympy
 import typing
-from .functions import AnyFunction, SympyFormat, AxisVariables, ValuesToSubstitute, ScalarFunction
+from abc import abstractmethod
+from .functions import AnyFunction, SympyFormat, ValuesToSubstitute, ScalarFunction
 from .geometry import PointType
 from .references import Reference
+from .symbols import AxisVariables
 
 
 class BasisFunction(AnyFunction):

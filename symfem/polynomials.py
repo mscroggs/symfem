@@ -2,14 +2,9 @@
 
 import sympy
 import typing
-from .symbols import x
 from itertools import product
 from .functions import ScalarFunction, VectorFunction
-
-AxisVariables = typing.Union[
-    typing.Tuple[sympy.core.symbol.Symbol, ...],
-    typing.List[sympy.core.symbol.Symbol],
-    sympy.core.symbol.Symbol]
+from .symbols import x, AxisVariables
 
 
 def polynomial_set_1d(

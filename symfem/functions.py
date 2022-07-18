@@ -4,9 +4,9 @@ from __future__ import annotations
 import sympy
 import typing
 from abc import ABC, abstractmethod
-from .symbols import x, t
 from .geometry import PointType
 from .references import Reference
+from .symbols import x, t, AxisVariables
 
 SingleSympyFormat = typing.Union[
     sympy.core.expr.Expr,
@@ -17,11 +17,6 @@ SympyFormat = typing.Union[
     SingleSympyFormat,
     typing.Dict[typing.Tuple[typing.Tuple[int, ...], ...], SingleSympyFormat]
 ]
-AxisVariables = typing.Union[
-    typing.Tuple[sympy.core.symbol.Symbol, ...],
-    typing.List[sympy.core.symbol.Symbol],
-    sympy.core.symbol.Symbol,
-    ]
 _ValuesToSubstitute = typing.Union[
     typing.Tuple[typing.Any, ...],
     typing.List[typing.Any],

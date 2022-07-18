@@ -3,12 +3,12 @@
 from __future__ import annotations
 import sympy
 import typing
-from .functions import (AnyFunction, _to_sympy_format, AxisVariables, ValuesToSubstitute,
+from .functions import (AnyFunction, _to_sympy_format, ValuesToSubstitute,
                         SympyFormat, FunctionInput, parse_function_input, VectorFunction)
 from .geometry import (PointType, SetOfPoints, point_in_triangle, point_in_quadrilateral,
                        point_in_tetrahedron)
 from .references import Reference
-from .symbols import x
+from .symbols import x, AxisVariables
 
 
 class PiecewiseFunction(AnyFunction):

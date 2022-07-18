@@ -1,7 +1,7 @@
 """Utility functions."""
 
-import typing
 import sympy
+import typing
 from .functions import ScalarFunction
 
 

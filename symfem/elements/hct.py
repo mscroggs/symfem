@@ -10,7 +10,7 @@ from ..basis_functions import BasisFunction
 from ..finite_element import CiarletElement
 from ..functionals import (PointEvaluation, PointNormalDerivativeEvaluation,
                            DerivativePointEvaluation, ListOfFunctionals)
-from ..functions import VectorFunction, AnyFunction, FunctionInput
+from ..functions import VectorFunction, FunctionInput
 from ..piecewise_functions import PiecewiseFunction
 from ..references import Reference
 from .hermite import Hermite
@@ -28,7 +28,7 @@ class HsiehCloughTocher(CiarletElement):
             dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(reference, vs, (1, 0), entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(reference, vs, (0, 1), entity=(0, v_n)))
-        for e_n, vs in enumerate(reference.sub_entities(1)):
+        for e_n in range(reference.sub_entity_count(1)):
             sub_ref = reference.sub_entity(1, e_n)
             dofs.append(PointNormalDerivativeEvaluation(
                 reference, sub_ref.midpoint(), sub_ref, entity=(1, e_n)))
@@ -80,19 +80,12 @@ class HsiehCloughTocher(CiarletElement):
 
         piece_list2: typing.List[VectorFunction] = []
         for i in piece_list:
-            t: tuple[typing.Union[sympy.core.expr.Expr, int]] = []
-            for j in i:
-                if isinstance(j, AnyFunction):
-                    j = j.as_sympy()
-                assert isinstance(j, (int, sympy.core.expr.Expr))
-                t.append(j)
-            piece_list2.append(VectorFunction(t))
+            piece_list2.append(VectorFunction(i))
 
         poly: typing.List[FunctionInput] = []
         poly += [
-            PiecewiseFunction(list(zip(subs, p)), "triangle")
-            for p in piece_list2
-        ]
+            PiecewiseFunction(list(zip(subs, p)), 2)
+            for p in piece_list2]
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1

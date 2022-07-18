@@ -1,9 +1,9 @@
 """Functions to map functions between cells."""
 
-from .symbols import x
 from .functions import (MatrixFunction, VectorFunction, AnyFunction,
                         FunctionInput, parse_function_input)
 from .geometry import PointType
+from .symbols import x
 
 
 def identity(

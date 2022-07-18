@@ -1,14 +1,14 @@
 """Functionals used to define the dual sets."""
 
-import typing
-import sympy
 import numpy
+import sympy
+import typing
 from abc import ABC, abstractmethod
-from .symbols import x, t
-from .references import Reference, Interval
-from .functions import ScalarFunction, AnyFunction, FunctionInput, parse_function_input
-from .geometry import PointType, SetOfPoints
 from . import mappings
+from .geometry import PointType, SetOfPoints
+from .functions import ScalarFunction, AnyFunction, FunctionInput, parse_function_input
+from .references import Reference, Interval
+from .symbols import x, t
 
 ScalarValueOrFloat = typing.Union[sympy.core.expr.Expr, float]
 
@@ -241,12 +241,12 @@ class DerivativePointEvaluation(BaseFunctional):
 class PointDirectionalDerivativeEvaluation(BaseFunctional):
     """A point evaluation of a derivative in a fixed direction."""
 
-    def __init__(self, reference: Reference, point_in: FunctionInput, direction: PointType,
+    def __init__(self, reference: Reference, point_in: FunctionInput, direction_in: FunctionInput,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
         super().__init__(reference, entity, mapping)
         self.point = parse_function_input(point_in)
         assert self.point.is_vector
-        self.dir = direction
+        self.dir = parse_function_input(direction_in)
 
     def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
         """Apply the functional to a function."""

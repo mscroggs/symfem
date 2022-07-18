@@ -30,8 +30,8 @@ def b(k: int, v: sympy.core.symbol.Symbol) -> ScalarFunction:
     https://doi.org/10.1090/S0025-5718-2013-02729-9 (Cockburn, Qiu, 2013).
     """
     if k == 1:
-        return 0
-    return (p(k, v) - p(k - 2, v)) * sympy.Integer(1) / (4 + k - 2)
+        return ScalarFunction(0)
+    return (p(k, v) - p(k - 2, v)) / (4 + k - 2)
 
 
 class TNT(CiarletElement):
@@ -144,9 +144,9 @@ class TNTcurl(CiarletElement):
 
         for i in range(2, order + 1):
             for j in range(2, order + 1):
-                face_moments.append((
+                face_moments.append(VectorFunction((
                     t[1] ** (j - 1) * (1 - t[1]) * t[0] ** (i - 2) * (i * t[0] - i + 1),
-                    -t[0] ** (i - 1) * (1 - t[0]) * t[1] ** (j - 2) * (j - 1 - j * t[1])))
+                    -t[0] ** (i - 1) * (1 - t[0]) * t[1] ** (j - 2) * (j - 1 - j * t[1]))))
         if reference.tdim == 2:
             for f in face_moments:
                 dofs.append(IntegralAgainst(

@@ -37,10 +37,9 @@ class TrimmedSerendipityHcurl(CiarletElement):
                 for j in range(order - i):
                     for dim in range(3):
                         if i == 0 or dim != 0:
-                            p = VectorFunction(x).cross(VectorFunction([
+                            p = VectorFunction(tuple(x)).cross(VectorFunction([
                                 x[0] ** i * x[1] ** j * x[2] ** (order - 1 - i - j)
-                                if d == dim else 0
-                                for d in range(3)]))
+                                if d == dim else 0 for d in range(3)]))
                             poly.append(p)
 
             if order == 1:

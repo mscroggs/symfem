@@ -1,7 +1,7 @@
 """Geometry."""
 
-import typing
 import sympy
+import typing
 
 PointType = typing.Tuple[sympy.core.expr.Expr, ...]
 SetOfPoints = typing.Tuple[PointType, ...]

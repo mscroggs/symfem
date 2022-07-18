@@ -1,12 +1,11 @@
 """Create elements and references."""
 
-import typing as _typing
-import os as _os
 import importlib as _il
+import os as _os
+import typing as _typing
 from . import references as _references
 from .finite_element import FiniteElement as _FiniteElement
-
-_SetOfPoints = None
+from .geometry import SetOfPoints as _SetOfPoints
 
 _folder = _os.path.dirname(_os.path.realpath(__file__))
 

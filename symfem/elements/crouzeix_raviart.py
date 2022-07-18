@@ -18,7 +18,6 @@ class CrouzeixRaviart(CiarletElement):
     """Crouzeix-Raviart finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        from symfem import create_reference
         assert reference.name in ["triangle", "tetrahedron"]
 
         if order > 1:
@@ -28,11 +27,8 @@ class CrouzeixRaviart(CiarletElement):
 
         dofs: ListOfFunctionals = []
 
-        for e_n, vs in enumerate(reference.sub_entities(reference.tdim - 1)):
-            et = reference.sub_entity_types[reference.tdim - 1]
-            assert isinstance(et, str)
-            entity = create_reference(
-                et, vertices=tuple(reference.vertices[i] for i in vs))
+        for e_n in range(reference.sub_entity_count(reference.tdim - 1)):
+            entity = reference.sub_entity(reference.tdim - 1, e_n)
             for i in product(range(1, order + 1), repeat=reference.tdim - 1):
                 if sum(i) < order + reference.tdim - 1:
                     dofs.append(

@@ -1,33 +1,23 @@
 """Abstract finite element classes and functions."""
 
 from __future__ import annotations
+import math
+import numpy
+import numpy.typing
 import sympy
 import typing
 import warnings
-import numpy
-import numpy.typing
-import math
 from abc import ABC, abstractmethod
 from itertools import product
-from .symbols import x
+from .basis_functions import BasisFunction
 from .functionals import ListOfFunctionals
-from .references import Reference
 from .functions import (ScalarFunction, VectorFunction, MatrixFunction, parse_function_input,
                         AnyFunction, FunctionInput)
+from .geometry import PointType, SetOfPoints
 from .piecewise_functions import PiecewiseFunction
-from .basis_functions import BasisFunction
+from .references import Reference
+from .symbols import x
 from .utils import allequal
-
-ListOfScalarFunctions = typing.List[ScalarFunction]
-ListOfVectorFunctions = typing.List[VectorFunction]
-ListOfMatrixFunctions = typing.List[MatrixFunction]
-ListOfPiecewiseFunctions = None
-SetOfPoints = None
-PointType = None
-ListOfAnyFunctionsInput = None
-ListOfAnyFunctions = typing.Union[
-    ListOfScalarFunctions, ListOfVectorFunctions, ListOfMatrixFunctions,
-    ListOfPiecewiseFunctions]
 
 TabulatedBasis = typing.Union[
     typing.List[typing.Union[sympy.core.expr.Expr, int]],
@@ -257,7 +247,7 @@ class FiniteElement(ABC):
         """Get the representation of the element as a tensor product."""
         raise NoTensorProduct()
 
-    def _get_basis_functions_tensor(self) -> ListOfScalarFunctions:
+    def _get_basis_functions_tensor(self) -> typing.List[AnyFunction]:
         """Compute the basis functions using the space's tensor product factorisation."""
         factorisation = self.get_tensor_factorisation()
         basis = {}
