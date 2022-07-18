@@ -185,7 +185,7 @@ class AnyFunction(ABC):
         pass
 
     @abstractmethod
-    def dot(self, other: AnyFunction) -> ScalarFunction:
+    def dot(self, other: AnyFunction):
         """Compute the dot product with another function."""
         pass
 

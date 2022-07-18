@@ -4,6 +4,7 @@ import pytest
 import sympy
 from random import choice
 from symfem import create_reference, create_element
+from symfem.functions import VectorFunction
 from symfem.polynomials import Hdiv_polynomials, Hcurl_polynomials, orthogonal_basis
 from symfem.symbols import x, t
 
