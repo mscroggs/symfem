@@ -6,7 +6,7 @@ import typing
 from abc import ABC, abstractmethod
 from .geometry import PointType
 from .references import Reference
-from .symbols import x, t, AxisVariables, AxisVariablesNoSingle
+from .symbols import x, t, AxisVariables, AxisVariablesNotSingle
 
 SingleSympyFormat = typing.Union[
     sympy.core.expr.Expr,
@@ -71,9 +71,9 @@ def _check_equal(first: SympyFormat, second: SympyFormat) -> bool:
             return False
         if first.cols != second.cols:
             return False
-        for i in range(first.rows):
-            for j in range(first.cols):
-                if not _check_equal(first[i, j], second[i, j]):
+        for ii in range(first.rows):
+            for jj in range(first.cols):
+                if not _check_equal(first[ii, jj], second[ii, jj]):
                     return False
         return True
 
@@ -215,7 +215,7 @@ class AnyFunction(ABC):
         pass
 
     @abstractmethod
-    def integral(self, domain: Reference, vars: AxisVariablesNoSingle = t):
+    def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t):
         """Compute the integral of the function."""
         pass
 
@@ -254,7 +254,9 @@ class AnyFunction(ABC):
     def __float__(self) -> float:
         """Convert to a float."""
         if self.is_scalar:
-            return float(self.as_sympy())
+            a_s = self.as_sympy()
+            assert isinstance(a_s, sympy.core.expr.Expr)
+            return float(a_s)
         raise TypeError("Cannot convert function to a float.")
 
     def __lt__(self, other: typing.Any) -> bool:
@@ -427,9 +429,9 @@ class ScalarFunction(AnyFunction):
 
     def jacobian(self, dim: int) -> MatrixFunction:
         """Compute the jacobian."""
-        return MatrixFunction([
-            [self.jacobian_component((i, j)).as_sympy() for j in range(dim)]
-            for i in range(dim)])
+        return MatrixFunction(tuple(
+            tuple(self.jacobian_component((i, j)) for j in range(dim))
+            for i in range(dim)))
 
     def dot(self, other: AnyFunction) -> ScalarFunction:
         """Compute the dot product with another function."""
@@ -461,7 +463,7 @@ class ScalarFunction(AnyFunction):
         """Compute the norm of the function."""
         return ScalarFunction(abs(self._f))
 
-    def integral(self, domain: Reference, vars: AxisVariablesNoSingle = t) -> ScalarFunction:
+    def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t) -> ScalarFunction:
         """Compute the integral of the function."""
         limits = domain.integration_limits(vars)
 
@@ -474,7 +476,7 @@ class ScalarFunction(AnyFunction):
             for i in limits:
                 assert len(i) == 2
                 out = out.subs(*i)
-            return i
+            return out
 
         out *= domain.jacobian()
         return ScalarFunction(out.integrate(*limits))
@@ -485,7 +487,7 @@ class ScalarFunction(AnyFunction):
         typing.Union[int, sympy.core.expr.Expr]
     ]):
         """Integrate the function."""
-        return ScalarFunction(self.as_sympy().integrate(*limits))
+        return ScalarFunction(self._f.integrate(*limits))
 
 
 class VectorFunction(AnyFunction):
@@ -497,8 +499,18 @@ class VectorFunction(AnyFunction):
         typing.Tuple[typing.Union[AnyFunction, int, sympy.core.expr.Expr], ...],
         typing.List[typing.Union[AnyFunction, int, sympy.core.expr.Expr]]
     ]):
+        from .basis_functions import BasisFunction
         super().__init__(vector=True)
-        self._vec = tuple(i if isinstance(i, AnyFunction) else ScalarFunction(i) for i in vec)
+        vec_l = []
+        for i in vec:
+            if isinstance(i, AnyFunction):
+                if isinstance(i, BasisFunction):
+                    i = i.get_function()
+                assert isinstance(i, ScalarFunction)
+                vec_l.append(i)
+            else:
+                vec_l.append(ScalarFunction(i))
+        self._vec = tuple(vec_l)
         for i in self._vec:
             assert i.is_scalar
 
@@ -696,10 +708,10 @@ class VectorFunction(AnyFunction):
         """Compute the norm of the function."""
         a = sympy.Integer(0)
         for i in self._vec:
-            a += i.as_sympy() ** 2
+            a += i._f ** 2
         return ScalarFunction(sympy.sqrt(a))
 
-    def integral(self, domain: Reference, vars: AxisVariablesNoSingle = t):
+    def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t):
         """Compute the integral of the function."""
         raise NotImplementedError()
 
@@ -721,7 +733,6 @@ class MatrixFunction(AnyFunction):
     """A matrix-valued function."""
 
     _mat: typing.Tuple[typing.Tuple[ScalarFunction, ...], ...]
-    shape: typing.Tuple[int, int]
 
     def __init__(self, mat: typing.Union[
         typing.Tuple[typing.Tuple[typing.Union[AnyFunction, int, sympy.core.expr.Expr],
@@ -731,15 +742,28 @@ class MatrixFunction(AnyFunction):
         typing.List[typing.List[typing.Union[AnyFunction, int, sympy.core.expr.Expr]]],
         sympy.matrices.dense.MutableDenseMatrix
     ]):
+        from .basis_functions import BasisFunction
         super().__init__(matrix=True)
         if isinstance(mat, sympy.matrices.dense.MutableDenseMatrix):
             mat = tuple(tuple(mat[i, j] for j in range(mat.cols)) for i in range(mat.rows))
         assert isinstance(mat, (list, tuple))
-        self._mat = tuple(tuple(j if isinstance(j, AnyFunction) else ScalarFunction(j)
-                                for j in i) for i in mat)
+        mat_l = []
+        for i in mat:
+            row = []
+            for j in i:
+                if isinstance(j, AnyFunction):
+                    if isinstance(j, BasisFunction):
+                        j = j.get_function()
+                    assert isinstance(j, ScalarFunction)
+                    row.append(j)
+                else:
+                    row.append(ScalarFunction(j))
+            mat_l.append(tuple(row))
+
+        self._mat = tuple(mat_l)
         self._shape = (len(self._mat), 0 if len(self._mat) == 0 else len(self._mat[0]))
         for i in self._mat:
-            assert len(i) == self.shape[1]
+            assert len(i) == self._shape[1]
             for j in i:
                 assert j.is_scalar
 
@@ -875,18 +899,18 @@ class MatrixFunction(AnyFunction):
         """Multiply."""
         if isinstance(other, MatrixFunction):
             assert other.shape[0] == self.shape[1]
-            return MatrixFunction([
-                [self.row(i).dot(other.col(j)) for j in range(other.shape[1])]
-                for i in range(self.shape[0])])
+            return MatrixFunction(tuple(
+                tuple(self.row(i).dot(other.col(j)) for j in range(other.shape[1]))
+                for i in range(self.shape[0])))
         return NotImplemented
 
     def __rmatmul__(self, other: typing.Any) -> MatrixFunction:
         """Multiply."""
         if isinstance(other, MatrixFunction):
             assert self.shape[0] == other.shape[1]
-            return MatrixFunction([
-                [other.row(i).dot(self.col(j)) for j in range(self.shape[1])]
-                for i in range(other.shape[0])])
+            return MatrixFunction(tuple(
+                tuple(other.row(i).dot(self.col(j)) for j in range(self.shape[1]))
+                for i in range(other.shape[0])))
         return NotImplemented
 
     def __pow__(self, other: typing.Any) -> MatrixFunction:
@@ -920,9 +944,9 @@ class MatrixFunction(AnyFunction):
 
     def diff(self, variable: sympy.core.symbol.Symbol) -> MatrixFunction:
         """Differentiate the function."""
-        return MatrixFunction([
-            [self._mat[i][j].diff(variable) for j in range(self.shape[1])]
-            for i in range(self.shape[0])])
+        return MatrixFunction(tuple(
+            tuple(self._mat[i][j].diff(variable) for j in range(self.shape[1]))
+            for i in range(self.shape[0])))
 
     def directional_derivative(self, direction: PointType):
         """Compute a directional derivative."""
@@ -971,21 +995,25 @@ class MatrixFunction(AnyFunction):
         """Compute the norm of the function."""
         raise NotImplementedError()
 
-    def integral(self, domain: Reference, vars: AxisVariablesNoSingle = t):
+    def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t):
         """Compute the integral of the function."""
         raise NotImplementedError()
 
     def det(self) -> ScalarFunction:
         """Compute the determinant."""
         if self.shape[0] == self.shape[1]:
-            return ScalarFunction(self.as_sympy().det())
+            mat = self.as_sympy()
+            assert isinstance(mat, sympy.matrices.dense.MutableDenseMatrix)
+            return ScalarFunction(mat.det())
         if self.shape[0] == 3 and self.shape[1] == 2:
             return self.col(0).cross(self.col(1)).norm()
         raise ValueError(f"Cannot find determinant of {self.shape[0]}x{self.shape[1]} matrix.")
 
     def transpose(self) -> MatrixFunction:
         """Compute the transpose."""
-        return MatrixFunction(self.as_sympy().transpose())
+        mat = self.as_sympy()
+        assert isinstance(mat, sympy.matrices.dense.MutableDenseMatrix)
+        return MatrixFunction(mat.transpose())
 
 
 FunctionInput = typing.Union[
@@ -1008,9 +1036,17 @@ def parse_function_input(f: FunctionInput) -> AnyFunction:
         return ScalarFunction(f)
     if isinstance(f, (list, tuple)):
         if isinstance(f[0], (list, tuple)):
-            return MatrixFunction(f)
+            mat = []
+            for i in f:
+                assert isinstance(i, (tuple, list))
+                mat.append(tuple(i))
+            return MatrixFunction(tuple(mat))
         else:
-            return VectorFunction(f)
+            vec = []
+            for i in f:
+                assert not isinstance(i, (tuple, list))
+                vec.append(i)
+            return VectorFunction(tuple(vec))
     raise ValueError(f"Could not parse input function: {f}")
 
 
