@@ -10,6 +10,9 @@ jobs:
   coveralls:
     name: Run coverage checks
     runs-on: ubuntu-latest
+    env:
+      CC: gcc-10
+      CXX: g++-10
     steps:
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -25,7 +28,7 @@ jobs:
       - run: pip install .[test] pytest-xdist
         name: Install Symfem
       - run: pip install git+https://github.com/FEniCS/basix.git
-        name: Install basix
+        name: Install Basix
       - run: python3 -m pytest -n=auto --cov=symfem test/ > .coveralls_output
         name: Run unit tests
         continue-on-error: true
