@@ -224,6 +224,14 @@ class AnyFunction(ABC):
         """Compute the integral of the function."""
         pass
 
+    def integrate(self, *limits: typing.Tuple[
+        sympy.core.symbol.Symbol,
+        typing.Union[int, sympy.core.expr.Expr],
+        typing.Union[int, sympy.core.expr.Expr]
+    ]):
+        """Integrate the function."""
+        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'integrate'")
+
     def __getitem__(self, key) -> AnyFunction:
         """Get a component or slice of the function."""
         raise ValueError(f"'{self.__class__.__name__}' object is not subscriptable")
@@ -458,6 +466,14 @@ class ScalarFunction(AnyFunction):
 
         out *= domain.jacobian()
         return ScalarFunction(out.integrate(*limits))
+
+    def integrate(self, *limits: typing.Tuple[
+        sympy.core.symbol.Symbol,
+        typing.Union[int, sympy.core.expr.Expr],
+        typing.Union[int, sympy.core.expr.Expr]
+    ]):
+        """Integrate the function."""
+        return ScalarFunction(self.as_sympy().integrate(*limits))
 
 
 class VectorFunction(AnyFunction):

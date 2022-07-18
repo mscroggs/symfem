@@ -152,7 +152,7 @@ class Reference(ABC):
         assert len(self.axes) == self.tdim
         vaxes = [VectorFunction(a) for a in self.axes]
         if self.tdim == 1:
-            return vaxes[0].notm()
+            return vaxes[0].norm()
         if self.tdim == 2:
             return vaxes[0].cross(vaxes[1]).norm()
         if self.tdim == 3:
