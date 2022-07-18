@@ -125,7 +125,6 @@ class TNTcurl(CiarletElement):
                     psub = VectorFunction(pf).subs(t[:2], [x[j] for j in variables])
                     pc = VectorFunction(lamb_n).cross(VectorFunction([
                         psub[variables.index(i)] if i in variables else 0 for i in range(3)]))
-                    assert isinstance(pc, tuple)
                     poly.append(pc)
 
         dofs: ListOfFunctionals = []

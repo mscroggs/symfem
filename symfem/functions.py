@@ -571,14 +571,14 @@ class VectorFunction(AnyFunction):
         """Multiply."""
         if isinstance(other, MatrixFunction):
             assert other.shape[1] == len(self)
-            return VectorFunction([other.row(i).dot(self) for i in range(other.shape[0])])
+            return VectorFunction([other.col(i).dot(self) for i in range(other.shape[0])])
         return NotImplemented
 
     def __rmatmul__(self, other: typing.Any) -> VectorFunction:
         """Multiply."""
         if isinstance(other, MatrixFunction):
             assert other.shape[1] == len(self)
-            return VectorFunction([other.col(i).dot(self) for i in range(other.shape[0])])
+            return VectorFunction([other.row(i).dot(self) for i in range(other.shape[0])])
         return NotImplemented
 
     def __pow__(self, other: typing.Any) -> VectorFunction:
@@ -707,7 +707,7 @@ class MatrixFunction(AnyFunction):
                                 for j in i) for i in mat)
         self.shape = (len(self._mat), 0 if len(self._mat) == 0 else len(self._mat[0]))
         for i in self._mat:
-            assert len(i) == self.shape[0]
+            assert len(i) == self.shape[1]
 
     def __getitem__(self, key) -> typing.Union[ScalarFunction, VectorFunction]:
         """Get a component or slice of the function."""
@@ -938,7 +938,11 @@ class MatrixFunction(AnyFunction):
 
     def det(self) -> ScalarFunction:
         """Compute the determinant."""
-        return ScalarFunction(self.as_sympy().det())
+        if self.shape[0] == self.shape[1]:
+            return ScalarFunction(self.as_sympy().det())
+        if self.shape[0] == 3 and self.shape[1] == 2:
+            return self.col(0).cross(self.col(1)).norm()
+        raise ValueError(f"Cannot find determinant of {self.shape[0]}x{self.shape[1]} matrix.")
 
     def transpose(self) -> MatrixFunction:
         """Compute the transpose."""

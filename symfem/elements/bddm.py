@@ -19,11 +19,8 @@ from .dpc import DPC, VectorDPC
 def bddf_polyset(reference: Reference, order: int):
     """Create the polynomial basis for a BDDF element."""
     dim = reference.tdim
-    pset = []
     assert reference.name == "hexahedron"
-    for p in polynomial_set_vector(dim, dim, order):
-        assert isinstance(p, tuple)
-        pset.append(p)
+    pset = polynomial_set_vector(dim, dim, order)
     pset.append(VectorFunction((0, 0, x[0] ** (order + 1) * x[1])).curl())
     pset.append(VectorFunction((0, x[0] * x[2] ** (order + 1), 0)).curl())
     pset.append(VectorFunction((x[1] ** (order + 1) * x[2], 0, 0)).curl())
