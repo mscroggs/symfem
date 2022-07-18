@@ -1,5 +1,7 @@
-import symfem
+"""Test Bernstein elements."""
+
 import pytest
+import symfem
 
 
 @pytest.mark.parametrize("celltype, degree", [(c, i) for c, n in [

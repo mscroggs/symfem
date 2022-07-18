@@ -1,3 +1,5 @@
+"""Test quadrature rules."""
+
 import pytest
 import sympy
 from symfem import quadrature

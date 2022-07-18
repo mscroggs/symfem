@@ -1,9 +1,11 @@
+"""Test polynomials."""
+
 import pytest
 import sympy
+from random import choice
+from symfem import create_reference, create_element
 from symfem.polynomials import Hdiv_polynomials, Hcurl_polynomials, orthogonal_basis
 from symfem.symbols import x, t
-from symfem import create_reference, create_element
-from random import choice
 
 
 @pytest.mark.parametrize("reference", ["triangle", "tetrahedron"])
@@ -76,13 +78,13 @@ def test_orthogonal_polynomials(reference, order, speed):
     if len(polynomials) <= 5:
         for i, p in enumerate(polynomials):
             for q in polynomials[:i]:
-                assert ref.integral(p * q, x) == 0
+                assert (p * q).integral(ref, x) == 0
     else:
         for _ in range(15):
             p = choice(polynomials)
             q = choice(polynomials)
             if p != q:
-                assert ref.integral(p * q, x) == 0
+                assert (p * q).integral(ref, x) == 0
 
 
 @pytest.mark.parametrize("reference", [

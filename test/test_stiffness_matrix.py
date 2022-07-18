@@ -1,5 +1,7 @@
-import symfem
+"""Test assembly of a stiffness matrix."""
+
 import sympy
+import symfem
 
 
 def test_stiffness_matrix():

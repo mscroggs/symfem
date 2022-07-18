@@ -1,5 +1,7 @@
-import symfem
+"""Test Hsieh-Clough-Tocher elements."""
+
 import sympy
+import symfem
 from symfem.symbols import x, t
 from symfem.utils import allequal
 

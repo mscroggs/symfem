@@ -352,7 +352,7 @@ class PiecewiseFunction(AnyFunction):
     def map_pieces(self, fwd_map: PointType):
         """Map the function's pieces."""
         new_pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
-        for shape, f in self._pieces:
+        for shape, f in self._pieces.items():
             nshape = []
             for v in shape:
                 pt = VectorFunction(fwd_map).subs(x, v).as_sympy()

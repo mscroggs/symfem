@@ -1,5 +1,7 @@
-from symfem import references
+"""Test reference elements."""
+
 import pytest
+from symfem import references
 
 
 @pytest.mark.parametrize(

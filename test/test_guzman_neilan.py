@@ -1,9 +1,11 @@
+"""Test Guzman-Neilan elements."""
+
 import pytest
-import symfem
 import sympy
 from itertools import combinations
-from symfem.symbols import x
+import symfem
 from symfem.elements.guzman_neilan import make_piecewise_lagrange
+from symfem.symbols import x
 
 
 @pytest.mark.parametrize("order", [1])

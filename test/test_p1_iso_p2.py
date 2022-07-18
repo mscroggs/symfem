@@ -1,7 +1,9 @@
+"""Test P1-iso-P2 elements."""
+
+import pytest
+import sympy
 import symfem
 from symfem.symbols import x
-import sympy
-import pytest
 
 
 @pytest.mark.parametrize("cell", ["triangle", "quadrilateral"])
