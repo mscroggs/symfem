@@ -19,7 +19,6 @@ def covariant(
     """Map H(curl) functions."""
     f = parse_function_input(f_in).subs(x, inverse_map)
     assert f.is_vector
-    tdim = len(f)
 
     j_inv = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
     return j_inv @ f
@@ -31,7 +30,6 @@ def contravariant(
     """Map H(div) functions."""
     f = parse_function_input(f_in).subs(x, inverse_map)
     assert f.is_vector
-    tdim = len(f)
 
     jacobian = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
     jacobian /= jacobian.det()
