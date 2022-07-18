@@ -71,17 +71,7 @@ class FiniteElement(ABC):
         """Evaluate the basis functions of the element at the given points."""
         points = parse_set_of_points_input(points_in)
         if not symbolic:
-            warnings.warn("Converting from symbolic to float. This may be slow.")
-
-            def to_float(values):
-                if isinstance(values, tuple):
-                    return tuple(to_float(i) for i in values)
-                if isinstance(values, list):
-                    return [to_float(i) for i in values]
-                return float(values)
-
-            return numpy.array([to_float(self.tabulate_basis(points, order=order,
-                                                             symbolic=True))])
+            raise NotImplementedError()
 
         tabbed = [tuple(b.subs(x, p).as_sympy() for b in self.get_basis_functions())
                   for p in points]
@@ -294,9 +284,7 @@ class CiarletElement(FiniteElement):
         """Get the numbers of the DOFs associated with the given entity."""
         return [i for i, j in enumerate(self.dofs) if j.entity == (entity_dim, entity_number)]
 
-    def get_polynomial_basis(
-        self
-    ) -> typing.List[AnyFunction]:
+    def get_polynomial_basis(self) -> typing.List[AnyFunction]:
         """Get the symbolic polynomial basis for the element."""
         return self._basis
 
@@ -312,7 +300,7 @@ class CiarletElement(FiniteElement):
         if symbolic:
             return self._get_tabulated_polynomial_basis_symbolic(points)
         else:
-            return self._get_tabulated_polynomial_basis_nonsymbolic(points)
+            raise NotImplementedError()
 
     def _get_tabulated_polynomial_basis_symbolic(
         self, points: SetOfPoints
@@ -351,35 +339,6 @@ class CiarletElement(FiniteElement):
             sout.append(srow)
         return sout
 
-    def _get_tabulated_polynomial_basis_nonsymbolic(
-        self, points: typing.Union[SetOfPoints, numpy.typing.NDArray[numpy.float64]]
-    ) -> numpy.typing.NDArray[numpy.float64]:
-        """Get the value of the polynomial basis at the given points."""
-
-        def to_float(values):
-            if isinstance(values, tuple):
-                return tuple(to_float(i) for i in values)
-            if isinstance(values, list):
-                return [to_float(i) for i in values]
-            return float(values)
-
-        def subs_nonsymbolic(f, x, p):
-            if isinstance(f, tuple):
-                out = []
-                for item in f:
-                    for i, j in zip(x, p):
-                        item = sympy.S(item).subs(i, j)
-                    out.append(float(item))
-                return numpy.asarray(out)
-
-            for i, j in zip(x, p):
-                f = f.subs(i, j)
-            return float(f)
-
-        return numpy.array([
-            [subs_nonsymbolic(f, x, p) for f in self.get_polynomial_basis()]
-            for p in points], dtype=numpy.float64)
-
     def get_dual_matrix(
         self, symbolic: bool = True
     ) -> typing.Union[sympy.matrices.dense.MutableDenseMatrix, numpy.typing.NDArray[numpy.float64]]:
@@ -387,7 +346,7 @@ class CiarletElement(FiniteElement):
         if symbolic:
             return self._get_dual_matrix_symbolic()
         else:
-            return self._get_dual_matrix_nonsymbolic()
+            raise NotImplementedError()
 
     def _get_dual_matrix_symbolic(self) -> sympy.matrices.dense.MutableDenseMatrix:
         """Get the dual matrix."""
@@ -399,23 +358,6 @@ class CiarletElement(FiniteElement):
                 row.append(entry)
             mat.append(row)
         return sympy.Matrix(mat)
-
-    def _get_dual_matrix_nonsymbolic(self) -> numpy.typing.NDArray[numpy.float64]:
-        for d in self.dofs:
-            if d.get_points_and_weights() is None:
-                warnings.warn("Cannot numerically evaluate all the DOFs in this element. "
-                              "Converting symbolic evaluations instead (this may be slow).")
-                smat = self._get_dual_matrix_symbolic()
-                return numpy.array(
-                    [[float(j) for j in smat.row(i)] for i in range(smat.rows)]
-                )
-        mat = numpy.empty((len(self.dofs), len(self.dofs)))
-        for i, d in enumerate(self.dofs):
-            pw = d.get_points_and_weights()
-            assert pw is not None
-            p, w = pw
-            mat[:, i] = numpy.dot(w, self._get_tabulated_polynomial_basis_nonsymbolic(p))
-        return mat
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""

@@ -55,5 +55,5 @@ jobs:
         name: Install Symfem
       - run: pip install git+https://github.com/FEniCS/basix.git
         name: Install Basix
-      - run: python3 -m pytest -n=auto --durations=50 test/test_against_basix.py --has-basix 1
+      - run: python3 -m pytest -n=auto --durations=50 test/test_against_basix.py --has-basix 1 -W error
         name: Run unit tests

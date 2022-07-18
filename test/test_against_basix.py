@@ -68,6 +68,13 @@ def to_float(a):
         return [to_float(i) for i in a]
 
 
+def to_nparray(a):
+    try:
+        return float(a)
+    except:  # noqa: E722
+        return np.array([to_float(i) for i in a])
+
+
 def make_lattice(cell, N=3):
     if cell == "interval":
         return np.array([[i / N] for i in range(N + 1)])
@@ -135,8 +142,10 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
     result = space.tabulate(0, points)[0]
 
     element = create_element(cell, symfem_type, order)
-    sym_result = element.tabulate_basis(points, "xyz,xyz", symbolic=False)
+    sym_result = to_nparray(element.tabulate_basis(points, "xyz,xyz"))
 
+    print(result.shape)
+    print(sym_result.shape)
     if len(result.shape) != len(sym_result.shape):
         sym_result = sym_result.reshape(result.shape)
 
