@@ -1,6 +1,5 @@
 """Functionals used to define the dual sets."""
 
-import numpy
 import sympy
 import typing
 from abc import ABC, abstractmethod
@@ -111,12 +110,6 @@ class BaseFunctional(ABC):
         """Get a representation of the functional as TeX, and list of terms involved."""
         pass
 
-    def get_points_and_weights(self, max_order: int = None) -> typing.Union[
-        typing.Tuple[numpy.typing.NDArray, numpy.typing.NDArray], None
-    ]:
-        """Get points and weights that can be used to numerically evaluate functional."""
-        return None
-
     name = "Base functional"
 
 
@@ -138,12 +131,6 @@ class PointEvaluation(BaseFunctional):
         pt = self.point.as_sympy()
         assert isinstance(pt, tuple)
         return pt
-
-    def get_points_and_weights(
-        self, max_order: int = None
-    ) -> typing.Tuple[numpy.typing.NDArray, numpy.typing.NDArray]:
-        """Get points and weights that can be used to numerically evaluate functional."""
-        return numpy.array([self.point]), numpy.array([1])
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
@@ -172,12 +159,6 @@ class WeightedPointEvaluation(BaseFunctional):
         pt = self.point.as_sympy()
         assert isinstance(pt, tuple)
         return pt
-
-    def get_points_and_weights(
-        self, max_order: int = None
-    ) -> typing.Tuple[numpy.typing.NDArray, numpy.typing.NDArray]:
-        """Get points and weights that can be used to numerically evaluate functional."""
-        return numpy.array([self.point]), numpy.array([self.weight])
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""

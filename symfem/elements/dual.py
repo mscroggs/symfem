@@ -4,7 +4,6 @@ These elements' definitions appear in https://doi.org/10.1016/j.crma.2004.12.022
 (Buffa, Christiansen, 2005)
 """
 
-import numpy
 import sympy
 import typing
 from ..finite_element import FiniteElement, CiarletElement
@@ -37,14 +36,12 @@ class DualCiarletElement(FiniteElement):
         """Get the symbolic polynomial basis for the element."""
         raise ValueError("Polynomial basis not supported for barycentric dual elements.")
 
-    def get_dual_matrix(
-        self, symbolic: bool = True
-    ) -> typing.Union[sympy.matrices.dense.MutableDenseMatrix, numpy.typing.NDArray[numpy.float64]]:
+    def get_dual_matrix(self) -> sympy.matrices.dense.MutableDenseMatrix:
         """Get the dual matrix."""
         raise ValueError("Dual matrix not supported for barycentric dual elements.")
 
     def get_basis_functions(
-        self, symbolic: bool = True, use_tensor_factorisation: bool = False
+        self, use_tensor_factorisation: bool = False
     ) -> typing.List[AnyFunction]:
         """Get the basis functions of the element."""
         assert not use_tensor_factorisation

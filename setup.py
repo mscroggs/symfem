@@ -37,7 +37,7 @@ if __name__ == "__main__":
         package_data={"symfem": ["py.typed"]},
         include_package_data=True,
         data_files=data_files,
-        install_requires=["sympy>=1.10", "numpy>=1.20"],
+        install_requires=["sympy>=1.10"],
         extras_require={
             "style": ["flake8", "pydocstyle", "mypy"],
             "optional": ["svgwrite", "CairoSVG"],

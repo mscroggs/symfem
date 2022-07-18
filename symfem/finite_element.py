@@ -2,18 +2,15 @@
 
 from __future__ import annotations
 import math
-import numpy
-import numpy.typing
 import sympy
 import typing
-import warnings
 from abc import ABC, abstractmethod
 from itertools import product
 from .basis_functions import BasisFunction
 from .functionals import ListOfFunctionals
-from .functions import (ScalarFunction, VectorFunction, MatrixFunction, parse_function_input,
+from .functions import (ScalarFunction, VectorFunction, parse_function_input,
                         AnyFunction, FunctionInput)
-from .geometry import PointType, SetOfPoints, SetOfPointsInput, parse_set_of_points_input
+from .geometry import PointType, SetOfPointsInput, parse_set_of_points_input
 from .piecewise_functions import PiecewiseFunction
 from .references import Reference
 from .symbols import x
@@ -24,7 +21,6 @@ TabulatedBasis = typing.Union[
     typing.List[typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...]],
     typing.List[typing.Tuple[typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...], ...]],
     typing.List[sympy.matrices.dense.MutableDenseMatrix],
-    numpy.typing.NDArray[numpy.float64]
 ]
 
 
@@ -56,7 +52,7 @@ class FiniteElement(ABC):
 
     @abstractmethod
     def get_basis_functions(
-        self, symbolic: bool = True, use_tensor_factorisation: bool = False
+        self, use_tensor_factorisation: bool = False
     ) -> typing.List[AnyFunction]:
         """Get the basis functions of the element."""
         pass
@@ -66,13 +62,10 @@ class FiniteElement(ABC):
         return ElementBasisFunction(self, n)
 
     def tabulate_basis(
-        self, points_in: SetOfPointsInput, order: str = "xyzxyz", symbolic: bool = True
+        self, points_in: SetOfPointsInput, order: str = "xyzxyz",
     ) -> TabulatedBasis:
         """Evaluate the basis functions of the element at the given points."""
         points = parse_set_of_points_input(points_in)
-        if not symbolic:
-            raise NotImplementedError()
-
         tabbed = [tuple(b.subs(x, p).as_sympy() for b in self.get_basis_functions())
                   for p in points]
         if self.range_dim == 1:
@@ -278,7 +271,6 @@ class CiarletElement(FiniteElement):
             assert isinstance(b, AnyFunction)
         self.dofs = dofs
         self._basis_functions: typing.Union[typing.List[AnyFunction], None] = None
-        self._dual_inv: typing.Union[numpy.typing.NDArray[numpy.float64], None] = None
 
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
         """Get the numbers of the DOFs associated with the given entity."""
@@ -288,67 +280,7 @@ class CiarletElement(FiniteElement):
         """Get the symbolic polynomial basis for the element."""
         return self._basis
 
-    def get_tabulated_polynomial_basis(
-        self, points: SetOfPoints, symbolic: bool = True
-    ) -> typing.Union[
-        typing.List[typing.List[ScalarFunction]],
-        typing.List[typing.List[MatrixFunction]],
-        typing.List[typing.List[VectorFunction]],
-        numpy.typing.NDArray[numpy.float64]
-    ]:
-        """Get the value of the polynomial basis at the given points."""
-        if symbolic:
-            return self._get_tabulated_polynomial_basis_symbolic(points)
-        else:
-            raise NotImplementedError()
-
-    def _get_tabulated_polynomial_basis_symbolic(
-        self, points: SetOfPoints
-    ) -> typing.Union[
-        typing.List[typing.List[ScalarFunction]],
-        typing.List[typing.List[MatrixFunction]],
-        typing.List[typing.List[VectorFunction]],
-    ]:
-        """Get the value of the polynomial basis at the given points."""
-        basis = self.get_polynomial_basis()
-        if len(basis) > 0:
-            if isinstance(basis[0], tuple):
-                vout = []
-                for p in points:
-                    vrow = []
-                    for b in basis:
-                        vitem = b.subs(x, p)
-                        vrow.append(vitem)
-                    vout.append(vrow)
-                return vout
-            if isinstance(basis[0], sympy.Matrix):
-                mout = []
-                for p in points:
-                    mrow = []
-                    for b in basis:
-                        mitem = b.subs(x, p)
-                        mrow.append(mitem)
-                    mout.append(mrow)
-                return mout
-
-        sout = []
-        for p in points:
-            srow = []
-            for b in basis:
-                srow.append(b.subs(x, p))
-            sout.append(srow)
-        return sout
-
-    def get_dual_matrix(
-        self, symbolic: bool = True
-    ) -> typing.Union[sympy.matrices.dense.MutableDenseMatrix, numpy.typing.NDArray[numpy.float64]]:
-        """Get the dual matrix."""
-        if symbolic:
-            return self._get_dual_matrix_symbolic()
-        else:
-            raise NotImplementedError()
-
-    def _get_dual_matrix_symbolic(self) -> sympy.matrices.dense.MutableDenseMatrix:
+    def get_dual_matrix(self) -> sympy.matrices.dense.MutableDenseMatrix:
         """Get the dual matrix."""
         mat = []
         for b in self.get_polynomial_basis():
@@ -364,7 +296,7 @@ class CiarletElement(FiniteElement):
         return {}
 
     def get_basis_functions(
-        self, symbolic: bool = True, use_tensor_factorisation: bool = False
+        self, use_tensor_factorisation: bool = False
     ) -> typing.List[AnyFunction]:
         """Get the basis functions of the element."""
         if self._basis_functions is None:
@@ -663,7 +595,7 @@ class DirectElement(FiniteElement):
         return [i for i, j in enumerate(self._basis_entities) if j == (entity_dim, entity_number)]
 
     def get_basis_functions(
-        self, symbolic: bool = True, use_tensor_factorisation: bool = False
+        self, use_tensor_factorisation: bool = False
     ) -> typing.List[AnyFunction]:
         """Get the basis functions of the element."""
         if use_tensor_factorisation:

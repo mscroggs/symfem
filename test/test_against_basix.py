@@ -1,6 +1,5 @@
 """Test that basis functions agree with Basix."""
 
-import numpy as np
 import pytest
 import typing
 from symfem import create_element
@@ -69,6 +68,7 @@ def to_float(a):
 
 
 def to_nparray(a):
+    import numpy as np
     try:
         return float(a)
     except:  # noqa: E722
@@ -76,6 +76,7 @@ def to_nparray(a):
 
 
 def make_lattice(cell, N=3):
+    import numpy as np
     if cell == "interval":
         return np.array([[i / N] for i in range(N + 1)])
     if cell == "triangle":
@@ -124,6 +125,8 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
             import basix
         except ImportError:
             pytest.skip("Basix must be installed to run this test.")
+
+    import numpy as np
 
     points = make_lattice(cell, 2)
     parsed_args = []
