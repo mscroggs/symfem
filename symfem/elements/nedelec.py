@@ -5,12 +5,12 @@ These elements' definitions appear in https://doi.org/10.1007/BF01396415
 """
 
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
+from ..functionals import TangentIntegralMoment, IntegralMoment, ListOfFunctionals
+from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector, Hcurl_polynomials
-from ..functionals import TangentIntegralMoment, IntegralMoment
+from ..references import Reference
 from .lagrange import Lagrange, VectorLagrange
 from .rt import RaviartThomas
 
@@ -19,7 +19,8 @@ class NedelecFirstKind(CiarletElement):
     """Nedelec first kind Hcurl finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        poly = polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
         poly += Hcurl_polynomials(reference.tdim, reference.tdim, order)
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
@@ -48,7 +49,8 @@ class NedelecSecondKind(CiarletElement):
     """Nedelec second kind Hcurl finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        poly = polynomial_set_vector(reference.tdim, reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,

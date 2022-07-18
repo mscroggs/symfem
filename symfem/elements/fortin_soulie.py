@@ -5,12 +5,13 @@ This element's definition appears in https://doi.org/10.1002/nme.1620190405
 """
 
 import sympy
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+import typing
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set_1d
-from ..functionals import PointEvaluation, IntegralMoment
+from ..functionals import PointEvaluation, IntegralMoment, ListOfFunctionals
+from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
+from ..polynomials import polynomial_set_1d
+from ..references import Reference
 from .lagrange import Lagrange
 
 
@@ -29,7 +30,8 @@ class FortinSoulie(CiarletElement):
         dofs[-1] = PointEvaluation(reference, (sympy.Rational(1, 3), sympy.Rational(1, 3)),
                                    entity=(2, 0))
 
-        poly = polynomial_set_1d(reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, order)
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     names = ["Fortin-Soulie", "FS"]

@@ -6,14 +6,13 @@ This element's definition appears in https://doi.org/10.2307/2006147
 
 import sympy
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+from ..basis_functions import BasisFunction
 from ..finite_element import CiarletElement
 from ..functionals import (PointEvaluation, PointNormalDerivativeEvaluation,
-                           DerivativePointEvaluation)
+                           DerivativePointEvaluation, ListOfFunctionals)
+from ..functions import VectorFunction, AnyFunction, FunctionInput
 from ..piecewise_functions import PiecewiseFunction
-from ..basis_functions import BasisFunction
-from ..functions import VectorFunction, AnyFunction
+from ..references import Reference
 from .hermite import Hermite
 
 
@@ -89,7 +88,8 @@ class HsiehCloughTocher(CiarletElement):
                 t.append(j)
             piece_list2.append(VectorFunction(t))
 
-        poly = [
+        poly: typing.List[FunctionInput] = []
+        poly += [
             PiecewiseFunction(list(zip(subs, p)), "triangle")
             for p in piece_list2
         ]

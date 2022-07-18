@@ -5,12 +5,12 @@ This element's definition appears in https://doi.org/10.1090/mcom/3361
 """
 
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set_1d
 from ..functionals import (PointEvaluation, DerivativePointEvaluation,
-                           IntegralOfDirectionalMultiderivative)
+                           IntegralOfDirectionalMultiderivative, ListOfFunctionals)
+from ..functions import FunctionInput
+from ..polynomials import polynomial_set_1d
+from ..references import Reference
 from ..symbols import x
 
 
@@ -30,7 +30,8 @@ class WuXu(CiarletElement):
 
     def __init__(self, reference: Reference, order: int):
         assert order == reference.tdim + 1
-        poly = polynomial_set_1d(reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, order)
 
         if reference.name == "interval":
             bubble = x[0] * (1 - x[0])
@@ -42,7 +43,6 @@ class WuXu(CiarletElement):
         poly += [bubble * i for i in polynomial_set_1d(reference.tdim, 1)[1:]]
 
         dofs: ListOfFunctionals = []
-
         for v_n, vs in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
             for i in range(reference.tdim):

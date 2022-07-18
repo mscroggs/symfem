@@ -4,11 +4,12 @@ This element's definition appears in https://doi.org/10.1017/S0001925900004546
 (Morley, 1968)
 """
 
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+import typing
 from ..finite_element import CiarletElement
+from ..functionals import PointEvaluation, PointNormalDerivativeEvaluation, ListOfFunctionals
+from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
-from ..functionals import PointEvaluation, PointNormalDerivativeEvaluation
+from ..references import Reference
 
 
 class Morley(CiarletElement):
@@ -28,9 +29,10 @@ class Morley(CiarletElement):
             dofs.append(
                 PointNormalDerivativeEvaluation(reference, midpoint, sub_ref, entity=(1, e_n)))
 
-        super().__init__(
-            reference, order, polynomial_set_1d(reference.tdim, order), dofs, reference.tdim, 1
-        )
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, order)
+
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     names = ["Morley"]
     references = ["triangle"]

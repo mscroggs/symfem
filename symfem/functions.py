@@ -482,11 +482,13 @@ class VectorFunction(AnyFunction):
     _vec: tuple[ScalarFunction, ...]
 
     def __init__(self, vec: typing.Union[
-        typing.Tuple[typing.Union[ScalarFunction, int, sympy.core.expr.Expr], ...],
-        typing.List[typing.Union[ScalarFunction, int, sympy.core.expr.Expr]]
+        typing.Tuple[typing.Union[AnyFunction, int, sympy.core.expr.Expr], ...],
+        typing.List[typing.Union[AnyFunction, int, sympy.core.expr.Expr]]
     ]):
         super().__init__(vector=True)
-        self._vec = tuple(i if isinstance(i, ScalarFunction) else ScalarFunction(i) for i in vec)
+        self._vec = tuple(i if isinstance(i, AnyFunction) else ScalarFunction(i) for i in vec)
+        for i in self._vec:
+            assert i.is_scalar
 
     def __len__(self):
         """Get the length of the vector."""
@@ -684,6 +686,19 @@ class VectorFunction(AnyFunction):
         """Compute the integral of the function."""
         raise NotImplementedError()
 
+    def __iter__(self):
+        """Get iterable."""
+        self.iter_n = 0
+        return self
+
+    def __next__(self):
+        """Get next item."""
+        if self.iter_n <= len(self._vec):
+            self.iter_n += 1
+            return self._vec[self.iter_n - 1]
+        else:
+            raise StopIteration
+
 
 class MatrixFunction(AnyFunction):
     """A matrix-valued function."""
@@ -692,22 +707,24 @@ class MatrixFunction(AnyFunction):
     shape: typing.Tuple[int, int]
 
     def __init__(self, mat: typing.Union[
-        typing.Tuple[typing.Tuple[typing.Union[ScalarFunction, int, sympy.core.expr.Expr],
+        typing.Tuple[typing.Tuple[typing.Union[AnyFunction, int, sympy.core.expr.Expr],
                                   ...], ...],
-        typing.Tuple[typing.List[typing.Union[ScalarFunction, int, sympy.core.expr.Expr]], ...],
-        typing.List[typing.Tuple[typing.Union[ScalarFunction, int, sympy.core.expr.Expr], ...]],
-        typing.List[typing.List[typing.Union[ScalarFunction, int, sympy.core.expr.Expr]]],
+        typing.Tuple[typing.List[typing.Union[AnyFunction, int, sympy.core.expr.Expr]], ...],
+        typing.List[typing.Tuple[typing.Union[AnyFunction, int, sympy.core.expr.Expr], ...]],
+        typing.List[typing.List[typing.Union[AnyFunction, int, sympy.core.expr.Expr]]],
         sympy.matrices.dense.MutableDenseMatrix
     ]):
         super().__init__(matrix=True)
         if isinstance(mat, sympy.matrices.dense.MutableDenseMatrix):
             mat = tuple(tuple(mat[i, j] for j in range(mat.cols)) for i in range(mat.rows))
         assert isinstance(mat, (list, tuple))
-        self._mat = tuple(tuple(j if isinstance(j, ScalarFunction) else ScalarFunction(j)
+        self._mat = tuple(tuple(j if isinstance(j, AnyFunction) else ScalarFunction(j)
                                 for j in i) for i in mat)
         self.shape = (len(self._mat), 0 if len(self._mat) == 0 else len(self._mat[0]))
         for i in self._mat:
             assert len(i) == self.shape[1]
+            for j in i:
+                assert j.is_scalar
 
     def __getitem__(self, key) -> typing.Union[ScalarFunction, VectorFunction]:
         """Get a component or slice of the function."""
@@ -952,12 +969,12 @@ class MatrixFunction(AnyFunction):
 FunctionInput = typing.Union[
     AnyFunction,
     sympy.core.expr.Expr, int,
-    typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...],
-    typing.List[typing.Union[sympy.core.expr.Expr, int]],
-    typing.Tuple[typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...], ...],
-    typing.Tuple[typing.List[typing.Union[sympy.core.expr.Expr, int]], ...],
-    typing.List[typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...]],
-    typing.List[typing.List[typing.Union[sympy.core.expr.Expr, int]]],
+    typing.Tuple[typing.Union[sympy.core.expr.Expr, int, AnyFunction], ...],
+    typing.List[typing.Union[sympy.core.expr.Expr, int, AnyFunction]],
+    typing.Tuple[typing.Tuple[typing.Union[sympy.core.expr.Expr, int, AnyFunction], ...], ...],
+    typing.Tuple[typing.List[typing.Union[sympy.core.expr.Expr, int, AnyFunction]], ...],
+    typing.List[typing.Tuple[typing.Union[sympy.core.expr.Expr, int, AnyFunction], ...]],
+    typing.List[typing.List[typing.Union[sympy.core.expr.Expr, int, AnyFunction]]],
     sympy.matrices.dense.MutableDenseMatrix]
 
 

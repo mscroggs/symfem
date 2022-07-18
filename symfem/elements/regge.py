@@ -9,14 +9,14 @@ http://aurora.asc.tuwien.ac.at/~mneunteu/thesis/doctorthesis_neunteufel.pdf
 
 import sympy
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from itertools import product
 from ..finite_element import CiarletElement
+from ..functionals import (PointInnerProduct, InnerProductIntegralMoment, IntegralMoment,
+                           IntegralAgainst, ListOfFunctionals)
+from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
-from ..functionals import (PointInnerProduct, InnerProductIntegralMoment, IntegralMoment,
-                           IntegralAgainst)
+from ..references import Reference
 from ..symbols import x, t
 from .lagrange import Lagrange
 
@@ -26,7 +26,7 @@ class Regge(CiarletElement):
 
     def __init__(self, reference: Reference, order: int, variant: str = "point"):
         from symfem import create_reference
-        poly = []
+        poly: typing.List[FunctionInput] = []
         if reference.tdim == 2:
             poly = [((p[0], p[1]), (p[1], p[2]))
                     for p in polynomial_set_vector(reference.tdim, 3, order)]
@@ -115,7 +115,7 @@ class ReggeTP(CiarletElement):
     def __init__(self, reference: Reference, order: int, variant: str = "integral"):
         from symfem import create_reference
 
-        poly = []
+        poly: typing.List[FunctionInput] = []
         if reference.tdim == 2:
             for i in range(order + 1):
                 for j in range(order + 2):

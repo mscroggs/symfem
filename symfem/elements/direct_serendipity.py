@@ -4,8 +4,8 @@ This element's definition appears in https://arxiv.org/abs/1809.02192
 (Arbogast, Tao, 2018)
 """
 
-from ..references import Reference
 from ..finite_element import DirectElement
+from ..references import Reference
 from ..symbols import x
 from .dpc import DPC
 

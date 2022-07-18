@@ -4,11 +4,12 @@ This element's definition appears in http://contrails.iit.edu/reports/8569
 (Bogner, Fox, Schmit, 1966)
 """
 
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+import typing
 from ..finite_element import CiarletElement
+from ..functionals import PointEvaluation, DerivativePointEvaluation, ListOfFunctionals
+from ..functions import FunctionInput
 from ..polynomials import quolynomial_set_1d
-from ..functionals import PointEvaluation, DerivativePointEvaluation
+from ..references import Reference
 
 
 class BognerFoxSchmit(CiarletElement):
@@ -28,9 +29,9 @@ class BognerFoxSchmit(CiarletElement):
                 dofs.append(DerivativePointEvaluation(reference, vs, (1, 1), entity=(0, v_n),
                                                       mapping="identity"))
 
-        super().__init__(
-            reference, order, quolynomial_set_1d(reference.tdim, order), dofs, reference.tdim, 1
-        )
+        poly: typing.List[FunctionInput] = []
+        poly += quolynomial_set_1d(reference.tdim, order)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     names = ["Bogner-Fox-Schmit", "BFS"]
     references = ["quadrilateral"]

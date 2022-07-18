@@ -5,22 +5,22 @@ This element's definition appears in https://doi.org/10.1007/BF01396752
 """
 
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+from ..functionals import NormalIntegralMoment, IntegralMoment, ListOfFunctionals
+from ..functions import VectorFunction, FunctionInput
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
+from ..references import Reference
 from ..symbols import x
-from ..functions import VectorFunction
-from ..functionals import NormalIntegralMoment, IntegralMoment
 from .dpc import DPC, VectorDPC
 
 
-def bddf_polyset(reference: Reference, order: int):
+def bddf_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]:
     """Create the polynomial basis for a BDDF element."""
     dim = reference.tdim
     assert reference.name == "hexahedron"
-    pset = polynomial_set_vector(dim, dim, order)
+    pset: typing.List[FunctionInput] = []
+    pset += polynomial_set_vector(dim, dim, order)
     pset.append(VectorFunction((0, 0, x[0] ** (order + 1) * x[1])).curl())
     pset.append(VectorFunction((0, x[0] * x[2] ** (order + 1), 0)).curl())
     pset.append(VectorFunction((x[1] ** (order + 1) * x[2], 0, 0)).curl())

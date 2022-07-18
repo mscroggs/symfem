@@ -4,11 +4,12 @@ This element's definition appears in https://doi.org/10.1016/0045-7825(72)90006-
 (Ciarlet, Raviart, 1972)
 """
 
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+import typing
+from ..functionals import PointEvaluation, DerivativePointEvaluation, ListOfFunctionals
+from ..functions import FunctionInput
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_1d
-from ..functionals import PointEvaluation, DerivativePointEvaluation
+from ..references import Reference
 
 
 class Hermite(CiarletElement):
@@ -27,9 +28,10 @@ class Hermite(CiarletElement):
             sub_entity = reference.sub_entity(2, e_n)
             dofs.append(PointEvaluation(reference, sub_entity.midpoint(), entity=(2, e_n)))
 
-        super().__init__(
-            reference, order, polynomial_set_1d(reference.tdim, order), dofs, reference.tdim, 1
-        )
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, order)
+
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     names = ["Hermite"]
     references = ["interval", "triangle", "tetrahedron"]

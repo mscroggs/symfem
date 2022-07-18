@@ -5,13 +5,14 @@ This element's definition appears in https://doi.org/10.2307/2007793
 """
 
 import sympy
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+import typing
 from ..finite_element import CiarletElement
+from ..functionals import (NormalIntegralMoment, DotPointEvaluation,
+                           DivergenceIntegralMoment, ListOfFunctionals)
+from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
-from ..functionals import (NormalIntegralMoment, DotPointEvaluation,
-                           DivergenceIntegralMoment)
+from ..references import Reference
 from ..symbols import x
 from .lagrange import Lagrange
 
@@ -20,7 +21,8 @@ class BernardiRaugel(CiarletElement):
     """Bernardi-Raugel Hdiv finite element."""
 
     def __init__(self, reference: Reference, order: int):
-        poly = polynomial_set_vector(reference.tdim, reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
 
         p = Lagrange(reference, 1, variant="equispaced")
 

@@ -4,17 +4,14 @@ These elements' definitions appear in https://doi.org/10.1016/j.crma.2004.12.022
 (Buffa, Christiansen, 2005)
 """
 
-import sympy
 import numpy
+import sympy
 import typing
-from ..references import DualPolygon
-from ..piecewise_functions import PiecewiseFunction
 from ..finite_element import FiniteElement, CiarletElement
-
-ScalarValue = None
-ListOfAnyFunctions = None
-ListOfPiecewiseFunctions = None
-PFunctionPieces = None
+from ..functions import AnyFunction, FunctionInput
+from ..geometry import SetOfPoints
+from ..piecewise_functions import PiecewiseFunction
+from ..references import DualPolygon
 
 
 class DualCiarletElement(FiniteElement):
@@ -22,18 +19,21 @@ class DualCiarletElement(FiniteElement):
 
     map_to_cell = CiarletElement.map_to_cell
 
-    def __init__(self, dual_coefficients: typing.List[typing.List[typing.List[ScalarValue]]],
-                 fine_space: str, reference: DualPolygon, order: int,
-                 domain_dim: int, range_dim: int, range_shape: typing.Tuple[int, ...] = None):
+    def __init__(
+        self, dual_coefficients: typing.List[typing.List[typing.List[
+            typing.Union[int, sympy.core.expr.Expr]]]],
+        fine_space: str, reference: DualPolygon, order: int,
+        domain_dim: int, range_dim: int, range_shape: typing.Tuple[int, ...] = None
+    ):
         self.dual_coefficients = dual_coefficients
         self.fine_space = fine_space
         super().__init__(reference, order, len(dual_coefficients), domain_dim, range_dim,
                          range_shape=range_shape)
-        self._basis_functions: typing.Union[ListOfAnyFunctions, None] = None
+        self._basis_functions: typing.Union[typing.List[FunctionInput], None] = None
 
     def get_polynomial_basis(
         self, reshape: bool = True
-    ) -> ListOfAnyFunctions:
+    ) -> typing.List[AnyFunction]:
         """Get the symbolic polynomial basis for the element."""
         raise ValueError("Polynomial basis not supported for barycentric dual elements.")
 
@@ -45,17 +45,17 @@ class DualCiarletElement(FiniteElement):
 
     def get_basis_functions(
         self, reshape: bool = True, symbolic: bool = True, use_tensor_factorisation: bool = False
-    ) -> ListOfAnyFunctions:
+    ) -> typing.List[AnyFunction]:
         """Get the basis functions of the element."""
         assert not use_tensor_factorisation
 
         if self._basis_functions is None:
             from symfem import create_element
 
-            bfs: ListOfPiecewiseFunctions = []
+            bfs: typing.List[PiecewiseFunction] = []
             for coeff_list in self.dual_coefficients:
                 v0 = self.reference.origin
-                pieces: PFunctionPieces = []
+                pieces: typing.List[typing.Tuple[SetOfPoints, FunctionInput]] = []
                 for coeffs, v1, v2 in zip(
                     coeff_list, self.reference.vertices,
                     self.reference.vertices[1:] + self.reference.vertices[:1]
@@ -92,7 +92,8 @@ class Dual(DualCiarletElement):
 
     def __init__(self, reference: DualPolygon, order: int):
 
-        dual_coefficients: typing.List[typing.List[typing.List[ScalarValue]]] = []
+        dual_coefficients: typing.List[typing.List[typing.List[
+            typing.Union[int, sympy.core.expr.Expr]]]] = []
         if order == 0:
             dual_coefficients = [
                 [[1] for i in range(2 * reference.number_of_triangles)]
@@ -134,7 +135,8 @@ class BuffaChristiansen(DualCiarletElement):
 
     def __init__(self, reference: DualPolygon, order: int):
         assert order == 1
-        dual_coefficients: typing.List[typing.List[typing.List[ScalarValue]]] = [
+        dual_coefficients: typing.List[typing.List[typing.List[
+            typing.Union[int, sympy.core.expr.Expr]]]] = [
             [[0, 0, 0]
              for i in range(2 * reference.number_of_triangles)]
             for j in range(reference.number_of_triangles)
@@ -164,7 +166,8 @@ class RotatedBuffaChristiansen(DualCiarletElement):
 
     def __init__(self, reference: DualPolygon, order: int):
         assert order == 1
-        dual_coefficients: typing.List[typing.List[typing.List[ScalarValue]]] = [
+        dual_coefficients: typing.List[typing.List[typing.List[
+            typing.Union[int, sympy.core.expr.Expr]]]] = [
             [[0, 0, 0]
              for i in range(2 * reference.number_of_triangles)]
             for j in range(reference.number_of_triangles)

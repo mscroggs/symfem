@@ -6,12 +6,12 @@ This element's definition appears in https://doi.org/10.1007/978-3-642-23099-8_3
 
 import sympy
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from itertools import product
 from ..finite_element import CiarletElement
+from ..functionals import PointEvaluation, DotPointEvaluation, ListOfFunctionals
+from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d, quolynomial_set_1d
-from ..functionals import PointEvaluation, DotPointEvaluation
+from ..references import Reference
 from .lagrange import Lagrange
 
 
@@ -24,22 +24,22 @@ class Bubble(CiarletElement):
         bubble = 1
         for f in p1.get_basis_functions():
             bubble *= f
+
+        poly: typing.List[FunctionInput] = []
+
         # TODO: variants
         if reference.name == "interval":
-            poly = [bubble * p for p in polynomial_set_1d(reference.tdim, order - 2)]
+            poly += [bubble * p for p in polynomial_set_1d(reference.tdim, order - 2)]
         elif reference.name == "triangle":
-            poly = [bubble * p
-                    for p in polynomial_set_1d(reference.tdim, order - 3)]
+            poly += [bubble * p for p in polynomial_set_1d(reference.tdim, order - 3)]
         elif reference.name == "tetrahedron":
-            poly = [bubble * p
-                    for p in polynomial_set_1d(reference.tdim, order - 4)]
+            poly += [bubble * p for p in polynomial_set_1d(reference.tdim, order - 4)]
         elif reference.name == "quadrilateral":
-            poly = [bubble * p
-                    for p in quolynomial_set_1d(reference.tdim, order - 2)]
+            poly += [bubble * p for p in quolynomial_set_1d(reference.tdim, order - 2)]
+        elif reference.name == "hexahedron":
+            poly += [bubble * p for p in quolynomial_set_1d(reference.tdim, order - 2)]
         else:
-            assert reference.name == "hexahedron"
-            poly = [bubble * p
-                    for p in quolynomial_set_1d(reference.tdim, order - 2)]
+            raise ValueError(f"Unsupported reference: {reference.name}")
 
         dofs: ListOfFunctionals = []
         if reference.name in ["interval", "triangle", "tetrahedron"]:
@@ -75,7 +75,7 @@ class BubbleEnrichedLagrange(CiarletElement):
         lagrange = Lagrange(reference, order, variant)
         bubble = Bubble(reference, order + 2, variant)
 
-        poly = []
+        poly: typing.List[FunctionInput] = []
         for e in [lagrange, bubble]:
             for p in e._basis:
                 poly.append(p)
@@ -104,7 +104,7 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
         lagrange = Lagrange(reference, order, variant)
         bubble = Bubble(reference, order + 2, variant)
 
-        poly = []
+        poly: typing.List[FunctionInput] = []
         for e in [lagrange, bubble]:
             for p in e._basis:
                 poly.append((p, 0))

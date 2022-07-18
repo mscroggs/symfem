@@ -5,7 +5,8 @@ import sympy
 import typing
 from .functions import (AnyFunction, _to_sympy_format, AxisVariables, ValuesToSubstitute,
                         SympyFormat, FunctionInput, parse_function_input, VectorFunction)
-from .geometry import PointType, point_in_triangle, point_in_quadrilateral, point_in_tetrahedron
+from .geometry import (PointType, SetOfPoints, point_in_triangle, point_in_quadrilateral,
+                       point_in_tetrahedron)
 from .references import Reference
 from .symbols import x
 
@@ -15,9 +16,9 @@ class PiecewiseFunction(AnyFunction):
 
     _pieces: typing.List[AnyFunction]
 
-    def __init__(self, pieces: typing.List[
-        typing.Tuple[typing.List[typing.Tuple[int, ...]], FunctionInput]
-    ], tdim: int):
+    def __init__(
+        self, pieces: typing.List[typing.Tuple[SetOfPoints, FunctionInput]], tdim: int
+    ):
         self._pieces = [(shape, parse_function_input(f)) for shape, f in pieces]
         self.tdim = tdim
 

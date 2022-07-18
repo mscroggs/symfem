@@ -6,17 +6,15 @@ This element's definition appears in https://doi.org/10.1137/17M1153467
 
 import sympy
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+from ..functionals import NormalIntegralMoment, DotPointEvaluation, ListOfFunctionals
+from ..functions import VectorFunction, FunctionInput
 from ..finite_element import CiarletElement
+from ..geometry import SetOfPoints
 from ..moments import make_integral_moment_dofs
-from ..functionals import NormalIntegralMoment, DotPointEvaluation
-from ..functions import VectorFunction
 from ..piecewise_functions import PiecewiseFunction
+from ..references import Reference
 from .lagrange import Lagrange, VectorLagrange
 from .bernardi_raugel import BernardiRaugel
-
-SetOfPoints = None
 
 
 class GuzmanNeilan(CiarletElement):
@@ -70,7 +68,7 @@ class GuzmanNeilan(CiarletElement):
             facets=(NormalIntegralMoment, Lagrange, 0, "contravariant"),
         )
 
-        mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
+        mid = reference.midpoint()
         for i in range(reference.tdim):
             direction = tuple(1 if i == j else 0 for j in range(reference.tdim))
             dofs.append(DotPointEvaluation(reference, mid, direction, entity=(reference.tdim, 0),
@@ -78,21 +76,23 @@ class GuzmanNeilan(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
-    def _make_polyset_triangle(self, reference: Reference, order: int):
+    def _make_polyset_triangle(
+        self, reference: Reference, order: int
+    ) -> typing.List[FunctionInput]:
         """Make the polyset for a triangle."""
         assert order == 1
 
         from ._guzman_neilan_triangle import coeffs
 
-        mid: VectorFunction = tuple(
-            sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
+        mid = reference.midpoint()
 
         sub_tris: typing.List[SetOfPoints] = [
             (reference.vertices[0], reference.vertices[1], mid),
             (reference.vertices[0], reference.vertices[2], mid),
             (reference.vertices[1], reference.vertices[2], mid)]
 
-        basis = make_piecewise_lagrange(sub_tris, "triangle", order)
+        basis: typing.List[FunctionInput] = []
+        basis += make_piecewise_lagrange(sub_tris, "triangle", order)
 
         sub_basis = make_piecewise_lagrange(sub_tris, "triangle", reference.tdim, True)
         fs = BernardiRaugel(reference, 1).get_basis_functions()[-3:]
@@ -111,13 +111,14 @@ class GuzmanNeilan(CiarletElement):
             basis.append(PiecewiseFunction(list(zip(sub_tris, fun)), 2))
         return basis
 
-    def _make_polyset_tetrahedron(self, reference: Reference, order: int):
+    def _make_polyset_tetrahedron(
+        self, reference: Reference, order: int
+    ) -> typing.List[FunctionInput]:
         """Make the polyset for a tetrahedron."""
         assert order in [1, 2]
         from ._guzman_neilan_tetrahedron import coeffs
 
-        mid: VectorFunction = tuple(
-            sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
+        mid = reference.midpoint()
 
         sub_tets: typing.List[SetOfPoints] = [
             (reference.vertices[0], reference.vertices[1], reference.vertices[2], mid),
@@ -125,7 +126,8 @@ class GuzmanNeilan(CiarletElement):
             (reference.vertices[0], reference.vertices[2], reference.vertices[3], mid),
             (reference.vertices[1], reference.vertices[2], reference.vertices[3], mid)]
 
-        basis = make_piecewise_lagrange(sub_tets, "tetrahedron", order)
+        basis: typing.List[FunctionInput] = []
+        basis += make_piecewise_lagrange(sub_tets, "tetrahedron", order)
 
         sub_basis = make_piecewise_lagrange(sub_tets, "tetrahedron", reference.tdim, True)
         fs = BernardiRaugel(reference, 1).get_basis_functions()[-4:]

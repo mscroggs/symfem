@@ -5,11 +5,12 @@ This element's definition appears in https://doi.org/10.1007/BF01399555
 """
 
 import sympy
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+import typing
 from ..finite_element import CiarletElement
-from ..functionals import PointEvaluation
+from ..functionals import PointEvaluation, ListOfFunctionals
+from ..functions import FunctionInput
 from ..piecewise_functions import PiecewiseFunction
+from ..references import Reference
 from ..symbols import x as x_variables
 
 
@@ -24,7 +25,7 @@ class P1IsoP2Tri(CiarletElement):
             ((0, 1), (0, half), (half, half)),
             ((0, half), (half, half), (half, 0)),
         ]
-        poly = []
+        poly: typing.List[FunctionInput] = []
         x = x_variables[0]
         y = x_variables[1]
         c = 1 - x - y
@@ -68,7 +69,7 @@ class P1IsoP2Quad(CiarletElement):
             ((0, half), (half, half), (0, 1), (half, 1)),
             ((half, half), (1, half), (half, 1), (1, 1)),
         ]
-        poly = []
+        poly: typing.List[FunctionInput] = []
         x = x_variables[0]
         y = x_variables[1]
         for pieces in [

@@ -2,13 +2,13 @@
 
 import sympy
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from itertools import product
 from ..finite_element import CiarletElement
+from ..functionals import PointEvaluation, DotPointEvaluation, ListOfFunctionals
+from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d, polynomial_set_vector
-from ..functionals import PointEvaluation, DotPointEvaluation
 from ..quadrature import get_quadrature
+from ..references import Reference
 
 
 class Lagrange(CiarletElement):
@@ -39,9 +39,9 @@ class Lagrange(CiarletElement):
                             point = entity.get_point([sympy.Rational(j, order) for j in i[::-1]])
                             dofs.append(PointEvaluation(reference, point, entity=(edim, e_n)))
 
-        super().__init__(
-            reference, order, polynomial_set_1d(reference.tdim, order), dofs, reference.tdim, 1
-        )
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, order)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -60,14 +60,12 @@ class VectorLagrange(CiarletElement):
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         scalar_space = Lagrange(reference, order, variant)
         dofs: ListOfFunctionals = []
+        poly: typing.List[FunctionInput] = []
         if reference.tdim == 1:
             for p in scalar_space.dofs:
                 dofs.append(PointEvaluation(reference, p.dof_point(), entity=p.entity))
 
-            super().__init__(
-                reference, order, polynomial_set_1d(reference.tdim, order),
-                dofs, reference.tdim, reference.tdim,
-            )
+            poly += polynomial_set_1d(reference.tdim, order)
         else:
             directions = [
                 tuple(1 if i == j else 0 for j in range(reference.tdim))
@@ -77,10 +75,8 @@ class VectorLagrange(CiarletElement):
                 for d in directions:
                     dofs.append(DotPointEvaluation(reference, p.dof_point(), d, entity=p.entity))
 
-            super().__init__(
-                reference, order, polynomial_set_vector(reference.tdim, reference.tdim, order),
-                dofs, reference.tdim, reference.tdim,
-            )
+            poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -110,14 +106,11 @@ class MatrixLagrange(CiarletElement):
             for d in directions:
                 dofs.append(DotPointEvaluation(reference, p.dof_point(), d, entity=p.entity))
 
-        super().__init__(
-            reference, order,
-            polynomial_set_vector(reference.tdim, reference.tdim ** 2, order),
-            dofs,
-            reference.tdim,
-            reference.tdim ** 2,
-            (reference.tdim, reference.tdim),
-        )
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_vector(reference.tdim, reference.tdim ** 2, order),
+
+        super().__init__(reference, order, dofs, reference.tdim, reference.tdim ** 2,
+                         (reference.tdim, reference.tdim))
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -134,18 +127,19 @@ class SymmetricMatrixLagrange(CiarletElement):
     """Symmetric matrix Lagrange finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        poly: typing.List[FunctionInput] = []
         if reference.tdim == 1:
-            poly = polynomial_set_vector(1, 1, order)
+            poly += polynomial_set_vector(1, 1, order)
             directions: typing.List[typing.Tuple[int, ...]] = [(1, )]
         elif reference.tdim == 2:
-            poly = [((a[0], a[1]), (a[1], a[2])) for a in polynomial_set_vector(2, 3, order)]
+            poly += [((a[0], a[1]), (a[1], a[2])) for a in polynomial_set_vector(2, 3, order)]
             directions = [((1, 0), (0, 0)), ((0, 1), (0, 0)),
                           ((0, 0), (0, 1))]
         else:
             assert reference.tdim == 3
-            poly = [((a[0], a[1], a[2]),
-                     (a[1], a[3], a[4]),
-                     (a[2], a[4], a[5])) for a in polynomial_set_vector(3, 6, order)]
+            poly += [((a[0], a[1], a[2]),
+                      (a[1], a[3], a[4]),
+                      (a[2], a[4], a[5])) for a in polynomial_set_vector(3, 6, order)]
             directions = [((1, 0, 0), (0, 0, 0), (0, 0, 0)),
                           ((0, 1, 0), (0, 0, 0), (0, 0, 0)),
                           ((0, 0, 1), (0, 0, 0), (0, 0, 0)),

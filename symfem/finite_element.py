@@ -12,7 +12,7 @@ from itertools import product
 from .symbols import x
 from .functionals import ListOfFunctionals
 from .references import Reference
-from .functions import (ScalarFunction, VectorFunction, MatrixFunction, parse_function_list_input,
+from .functions import (ScalarFunction, VectorFunction, MatrixFunction, parse_function_input,
                         AnyFunction, FunctionInput)
 from .piecewise_functions import PiecewiseFunction
 from .basis_functions import BasisFunction
@@ -292,7 +292,7 @@ class CiarletElement(FiniteElement):
     ):
         super().__init__(reference, order, len(dofs), domain_dim, range_dim, range_shape)
         assert len(basis) == len(dofs)
-        self._basis = parse_function_list_input(basis)
+        self._basis = [parse_function_input(b) for b in basis]
         for b in self._basis:
             assert isinstance(b, AnyFunction)
         self.dofs = dofs

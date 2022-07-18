@@ -5,12 +5,12 @@ This element's definition appears in https://doi.org/10.1007/BF01396415
 """
 
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
+from ..functionals import NormalIntegralMoment, IntegralMoment, ListOfFunctionals
+from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector, Hdiv_polynomials
-from ..functionals import NormalIntegralMoment, IntegralMoment
+from ..references import Reference
 from .lagrange import Lagrange, VectorLagrange
 
 
@@ -18,7 +18,8 @@ class RaviartThomas(CiarletElement):
     """Raviart-Thomas Hdiv finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        poly = polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
         poly += Hdiv_polynomials(reference.tdim, reference.tdim, order)
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(

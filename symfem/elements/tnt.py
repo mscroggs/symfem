@@ -6,17 +6,15 @@ These elements' definitions appear in https://doi.org/10.1090/S0025-5718-2013-02
 
 import sympy
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from itertools import product
 from ..finite_element import CiarletElement
-from ..polynomials import quolynomial_set_1d, quolynomial_set_vector, orthogonal_basis
-from ..functionals import (TangentIntegralMoment, IntegralAgainst,
-                           NormalIntegralMoment, PointEvaluation,
-                           DerivativeIntegralMoment)
-from ..functions import ScalarFunction, VectorFunction
-from ..symbols import x, t
+from ..functionals import (TangentIntegralMoment, IntegralAgainst, NormalIntegralMoment,
+                           PointEvaluation, DerivativeIntegralMoment, ListOfFunctionals)
+from ..functions import ScalarFunction, VectorFunction, FunctionInput
 from ..moments import make_integral_moment_dofs
+from ..polynomials import quolynomial_set_1d, quolynomial_set_vector, orthogonal_basis
+from ..references import Reference
+from ..symbols import x, t
 from .q import Q
 
 
@@ -40,7 +38,8 @@ class TNT(CiarletElement):
     """TiNiest Tensor scalar finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        poly = quolynomial_set_1d(reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += quolynomial_set_1d(reference.tdim, order)
         if reference.tdim == 2:
             for i in range(2):
                 variables = [x[j] for j in range(2) if j != i]
@@ -103,7 +102,8 @@ class TNTcurl(CiarletElement):
     """TiNiest Tensor Hcurl finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        poly = quolynomial_set_vector(reference.tdim, reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
         if reference.tdim == 2:
             for ii in product([0, 1], repeat=2):
                 if sum(ii) != 0:
@@ -208,7 +208,8 @@ class TNTdiv(CiarletElement):
     """TiNiest Tensor Hdiv finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        poly = quolynomial_set_vector(reference.tdim, reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
         if reference.tdim == 2:
             for ii in product([0, 1], repeat=2):
                 if sum(ii) != 0:

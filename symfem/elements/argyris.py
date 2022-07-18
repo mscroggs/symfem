@@ -4,13 +4,14 @@ This element's definition appears in https://doi.org/10.1017/S000192400008489X
 (Arygris, Fried, Scharpf, 1968)
 """
 
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+import typing
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set_1d
 from ..functionals import (PointEvaluation, PointDirectionalDerivativeEvaluation,
                            PointNormalDerivativeEvaluation,
-                           PointComponentSecondDerivativeEvaluation)
+                           PointComponentSecondDerivativeEvaluation, ListOfFunctionals)
+from ..functions import FunctionInput
+from ..polynomials import polynomial_set_1d
+from ..references import Reference
 
 
 class Argyris(CiarletElement):
@@ -38,10 +39,10 @@ class Argyris(CiarletElement):
                 vertices=tuple(reference.vertices[v] for v in vs))
             dofs.append(PointNormalDerivativeEvaluation(
                 reference, sub_ref.midpoint(), sub_ref, entity=(1, e_n)))
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, order)
 
-        super().__init__(
-            reference, order, polynomial_set_1d(reference.tdim, order), dofs, reference.tdim, 1
-        )
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     names = ["Argyris"]
     references = ["triangle"]

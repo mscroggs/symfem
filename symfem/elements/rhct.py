@@ -6,19 +6,18 @@ This element's definition appears in https://doi.org/10.2307/2006147
 
 import sympy
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
-from ..functionals import PointEvaluation, DerivativePointEvaluation
-from ..polynomials import polynomial_set_1d
+from ..functionals import PointEvaluation, DerivativePointEvaluation, ListOfFunctionals
+from ..functions import FunctionInput
 from ..piecewise_functions import PiecewiseFunction
+from ..references import Reference
 from ..symbols import x
 
 
 class P1Hermite(CiarletElement):
     """P1Hermite finite element."""
 
-    def __init__(self, reference: Reference, order: int, poly):
+    def __init__(self, reference: Reference, order: int, poly: typing.List[FunctionInput]):
         assert order == 3
         dofs: ListOfFunctionals = []
         for v_n, vs in enumerate(reference.vertices):
@@ -26,9 +25,7 @@ class P1Hermite(CiarletElement):
             dofs.append(DerivativePointEvaluation(reference, vs, (1, 0), entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(reference, vs, (0, 1), entity=(0, v_n)))
 
-        super().__init__(
-            reference, order, poly, dofs, reference.tdim, 1
-        )
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
@@ -63,16 +60,18 @@ class ReducedHsiehCloughTocher(CiarletElement):
 
         refs = [create_reference("triangle", vs) for vs in subs]
 
-        polys = [
-            polynomial_set_1d(reference.tdim, order),
-            [],
-            polynomial_set_1d(reference.tdim, order),
-        ]
-        polys[0].remove(x[0] ** 2 * x[1])
-        polys[1] = [1, x[0], x[0] ** 2, x[1], x[0] * x[1], x[1] ** 2,
-                    x[0] * x[1] ** 2 - x[0] ** 2 * x[1],
-                    x[0] ** 3 - x[1] ** 3, x[0] ** 3 + 3 * x[0] * x[1] ** 2]
-        polys[2].remove(x[0] * x[1] ** 2)
+        polys: typing.List[typing.List[FunctionInput]] = [[], [], []]
+        for i in range(order + 1):
+            for j in range(order + 1 - i):
+                if i != 2 or j != 1:
+                    polys[0].append(x[0] ** i * x[1] ** j)
+        polys[1] += [1, x[0], x[0] ** 2, x[1], x[0] * x[1], x[1] ** 2,
+                     x[0] * x[1] ** 2 - x[0] ** 2 * x[1],
+                     x[0] ** 3 - x[1] ** 3, x[0] ** 3 + 3 * x[0] * x[1] ** 2]
+        for i in range(order + 1):
+            for j in range(order + 1 - i):
+                if i != 1 or j != 2:
+                    polys[2].append(x[0] ** i * x[1] ** j)
 
         bases = []
         for r, p in zip(refs, polys):
@@ -96,7 +95,8 @@ class ReducedHsiehCloughTocher(CiarletElement):
         piece_list.append((0, bases[1][4], bases[2][1]))
         piece_list.append((0, bases[1][5], bases[2][2]))
 
-        poly = [
+        poly: typing.List[FunctionInput] = []
+        poly += [
             PiecewiseFunction(list(zip(subs, p)), "triangle")
             for p in piece_list
         ]

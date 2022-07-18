@@ -2,12 +2,12 @@
 
 import sympy
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from itertools import product
+from ..functionals import PointEvaluation, DotPointEvaluation, ListOfFunctionals
+from ..functions import FunctionInput
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_1d, polynomial_set_vector
-from ..functionals import PointEvaluation, DotPointEvaluation
+from ..references import Reference
 from .lagrange import Lagrange
 
 
@@ -29,8 +29,10 @@ class DPC(CiarletElement):
         dofs: ListOfFunctionals = [
             PointEvaluation(reference, d, entity=(reference.tdim, 0)) for d in points]
 
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, order)
         super().__init__(
-            reference, order, polynomial_set_1d(reference.tdim, order), dofs, reference.tdim, 1
+            reference, order, poly, dofs, reference.tdim, 1
         )
         self.variant = variant
 
@@ -61,13 +63,10 @@ class VectorDPC(CiarletElement):
             for d in directions:
                 dofs.append(DotPointEvaluation(reference, p.dof_point(), d, entity=p.entity))
 
-        super().__init__(
-            reference, order,
-            polynomial_set_vector(reference.tdim, reference.tdim, order),
-            dofs,
-            reference.tdim,
-            reference.tdim,
-        )
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
+
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:

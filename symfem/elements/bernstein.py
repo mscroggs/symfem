@@ -7,15 +7,12 @@ https://doi.org/10.1137/11082539X (Ainsworth, Andriamaro, Davydov, 2011)
 
 import sympy
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
-from ..functions import AnyFunction
-from ..symbols import x, t
+from ..functionals import BaseFunctional, PointEvaluation, ListOfFunctionals
+from ..functions import AnyFunction, FunctionInput, ScalarFunction
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set_1d
-from ..functionals import BaseFunctional, PointEvaluation
-from ..functions import ScalarFunction
-from ..polynomials import orthogonal_basis
+from ..polynomials import polynomial_set_1d, orthogonal_basis
+from ..references import Reference
+from ..symbols import x, t
 
 PointType = None
 AxisVariables = typing.Union[
@@ -142,14 +139,16 @@ class Bernstein(CiarletElement):
     """Bernstein finite element."""
 
     def __init__(self, reference: Reference, order: int):
-        poly = polynomial_set_1d(reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, order)
 
         dofs: ListOfFunctionals = []
         if order == 0:
             dofs = [
                 PointEvaluation(reference, reference.midpoint(), (reference.tdim, 0))]
         else:
-            def index(x, y=0, z=0):
+            def index(x: int, y: int = 0, z: int = 0) -> int:
+                """Compute the 1D index."""
                 return (
                     z * (z ** 2 - 3 * z * order - 6 * z + 3 * order ** 2 + 12 * order + 11) // 6
                     + y * (2 * (order - z) + 3 - y) // 2

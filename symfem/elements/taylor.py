@@ -1,13 +1,14 @@
 """Taylor element on an interval, triangle or tetrahedron."""
 
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+import typing
+from itertools import product
 from ..finite_element import CiarletElement
+from ..functionals import IntegralMoment, DerivativePointEvaluation, ListOfFunctionals
+from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_1d
-from ..functionals import IntegralMoment, DerivativePointEvaluation
+from ..references import Reference
 from .lagrange import Lagrange
-from itertools import product
 
 
 class Taylor(CiarletElement):
@@ -23,7 +24,8 @@ class Taylor(CiarletElement):
                 dofs.append(DerivativePointEvaluation(
                     reference, reference.midpoint(), i, entity=(reference.tdim, 0)))
 
-        poly = polynomial_set_1d(reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, order)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 

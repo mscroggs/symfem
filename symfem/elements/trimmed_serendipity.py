@@ -6,15 +6,14 @@ These elements' definitions appear in https://doi.org/10.1137/16M1073352
 """
 
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_vector
 from ..functionals import (IntegralMoment, TangentIntegralMoment, IntegralAgainst,
-                           NormalIntegralMoment)
-from ..symbols import x, t
-from ..functions import VectorFunction, ScalarFunction
+                           NormalIntegralMoment, ListOfFunctionals)
+from ..functions import VectorFunction, ScalarFunction, FunctionInput
 from ..moments import make_integral_moment_dofs
+from ..references import Reference
+from ..symbols import x, t
 from .dpc import DPC, VectorDPC
 
 
@@ -22,7 +21,8 @@ class TrimmedSerendipityHcurl(CiarletElement):
     """Trimmed serendipity Hcurl finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        poly = polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
         if reference.tdim == 2:
             poly += [
                 (x[0] ** j * x[1] ** (order - j), -x[0] ** (j + 1) * x[1] ** (order - 1 - j))
@@ -103,7 +103,8 @@ class TrimmedSerendipityHdiv(CiarletElement):
     """Trimmed serendipity Hdiv finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        poly = polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
         if reference.tdim == 2:
             poly += [
                 (x[0] ** (j + 1) * x[1] ** (order - 1 - j), x[0] ** j * x[1] ** (order - j))

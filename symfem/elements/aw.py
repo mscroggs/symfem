@@ -7,12 +7,12 @@ Thse elements definitions appear in https://doi.org/10.1007/s002110100348
 
 import sympy
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set_vector
 from ..functionals import (PointInnerProduct, InnerProductIntegralMoment,
-                           VecIntegralMoment, IntegralMoment)
+                           VecIntegralMoment, IntegralMoment, ListOfFunctionals)
+from ..functions import FunctionInput
+from ..polynomials import polynomial_set_vector
+from ..references import Reference
 from ..symbols import x
 from .lagrange import Lagrange
 
@@ -24,7 +24,8 @@ class ArnoldWinther(CiarletElement):
         from symfem import create_reference
         assert reference.name == "triangle"
         self.variant = variant
-        poly = [
+        poly: typing.List[FunctionInput] = []
+        poly += [
             ((p[0], p[1]), (p[1], p[2]))
             for p in polynomial_set_vector(reference.tdim, 3, order - 1)]
         poly += [(((order - k + 1) * (order - k + 2) * x[0] ** k * x[1] ** (order - k),
@@ -96,7 +97,8 @@ class NonConformingArnoldWinther(CiarletElement):
         from symfem import create_reference
         assert reference.name == "triangle"
         self.variant = variant
-        poly = [
+        poly: typing.List[FunctionInput] = []
+        poly += [
             (p[0], p[1], p[1], p[2])
             for p in polynomial_set_vector(reference.tdim, 3, order - 1)]
 

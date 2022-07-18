@@ -4,14 +4,14 @@ This element's definition appears in https://doi.org/10.1051/m2an/197307R300331
 (Crouzeix, Raviart, 1973)
 """
 
-from itertools import product
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+from itertools import product
+from ..functionals import PointEvaluation, ListOfFunctionals
+from ..functions import FunctionInput
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_1d
-from ..functionals import PointEvaluation
 from ..quadrature import get_quadrature
+from ..references import Reference
 
 
 class CrouzeixRaviart(CiarletElement):
@@ -54,7 +54,9 @@ class CrouzeixRaviart(CiarletElement):
                               for j, o in enumerate(reference.origin)),
                         entity=(reference.tdim, 0)))
 
-        poly = polynomial_set_1d(reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, order)
+
         self.variant = variant
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
