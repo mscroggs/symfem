@@ -1,5 +1,8 @@
 """Utility functions."""
+
 import typing
+import sympy
+from .functions import ScalarFunction
 
 
 def allequal(a: typing.Any, b: typing.Any) -> bool:
@@ -9,4 +12,8 @@ def allequal(a: typing.Any, b: typing.Any) -> bool:
             if not allequal(i, j):
                 return False
         return True
+    if isinstance(a, sympy.core.expr.Expr):
+        a = ScalarFunction(a)
+    if isinstance(b, sympy.core.expr.Expr):
+        a = ScalarFunction(b)
     return a == b

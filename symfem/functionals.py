@@ -599,12 +599,12 @@ class IntegralMoment(BaseFunctional):
 
         self.f: AnyFunction = 0
 
-        if isinstance(f, VectorFunction):
+        if f.is_vector:
             assert len(f) == self.integral_domain.tdim
             self.f = mappings.contravariant(
                 f, integral_domain.get_map_to_self(), integral_domain.get_inverse_map_to_self(),
                 integral_domain.tdim)
-        elif isinstance(f, MatrixFunction):
+        elif f.is_matrix:
             assert f.shape[0] == self.integral_domain.tdim
             assert f.shape[1] == self.integral_domain.tdim
             self.f = mappings.double_contravariant(
