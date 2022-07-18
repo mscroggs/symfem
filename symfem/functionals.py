@@ -579,7 +579,8 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
     def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply the functional to a function."""
         for dir, o in zip(self.directions, self.orders):
-            function = function.grad(len(dir)).dot(VectorFunction(dir))
+            for i in range(o):
+                function = function.grad(len(dir)).dot(VectorFunction(dir))
         point = [i for i in self.integral_domain.origin]
         for i, a in enumerate(zip(*self.integral_domain.axes)):
             for j, k in zip(a, t):
