@@ -722,7 +722,7 @@ class VectorFunction(AnyFunction):
 
     def __next__(self):
         """Get next item."""
-        if self.iter_n <= len(self._vec):
+        if self.iter_n < len(self._vec):
             self.iter_n += 1
             return self._vec[self.iter_n - 1]
         else:
