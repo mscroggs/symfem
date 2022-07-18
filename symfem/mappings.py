@@ -46,8 +46,7 @@ def double_covariant(
     assert f.is_matrix
 
     j_inv = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
-    out = j_inv @ f @ j_inv.transpose()
-    return MatrixFunction(out)
+    return j_inv @ f @ j_inv.transpose()
 
 
 def double_contravariant(

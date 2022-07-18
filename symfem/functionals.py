@@ -6,8 +6,7 @@ import numpy
 from abc import ABC, abstractmethod
 from .symbols import x, t
 from .references import Reference, Interval
-from .functions import (ScalarFunction, VectorFunction, MatrixFunction, AnyFunction,
-                        FunctionInput, parse_function_input)
+from .functions import ScalarFunction, AnyFunction, FunctionInput, parse_function_input
 from .geometry import PointType, SetOfPoints
 from . import mappings
 
