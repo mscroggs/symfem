@@ -1,0 +1,32 @@
+name: 📙 DefElement
+
+on:
+  pull_request
+
+jobs:
+  defelement:
+    name: Test DefElement build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - uses: actions/checkout@v2
+      - run: pip install .[optional]
+        name: Install Symfem
+
+      - name: Clone DefElement
+        uses: actions/checkout@v2
+        with:
+          path: ./defelement
+          repository: mscroggs/defelement.com
+          ref: main
+      - name: Install requirements
+        run: |
+          cd defelement
+          sudo pip3 install -r requirements.txt
+      - name: Test DefElement build
+        run: |
+          cd defelement
+          python3 build.py ../_test_html --test auto
