@@ -5,21 +5,22 @@ This element's definition appears in https://dx.doi.org/10.1137/15M1013705
 """
 
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
+from ..functionals import NormalIntegralMoment, IntegralAgainst, ListOfFunctionals
+from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector, Hdiv_serendipity
-from ..functionals import NormalIntegralMoment, IntegralAgainst
+from ..references import Reference
+from ..symbols import x
 from .dpc import DPC
-from ..symbolic import x
 
 
 class AC(CiarletElement):
     """Arbogast-Correa Hdiv finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        poly = polynomial_set_vector(reference.tdim, reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
         if order == 0:
             poly += [(x[0], 0), (0, x[1])]
         else:

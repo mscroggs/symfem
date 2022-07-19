@@ -4,12 +4,12 @@ This element's definition appears in https://doi.org/10.1016/0045-7825(72)90006-
 (Ciarlet, Raviart, 1972)
 """
 
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+import typing
+from ..functionals import PointEvaluation, DerivativePointEvaluation, ListOfFunctionals
+from ..functions import FunctionInput
 from ..finite_element import CiarletElement
 from ..polynomials import polynomial_set_1d
-from ..functionals import PointEvaluation, DerivativePointEvaluation
-from ..symbolic import sym_sum
+from ..references import Reference
 
 
 class Hermite(CiarletElement):
@@ -18,20 +18,20 @@ class Hermite(CiarletElement):
     def __init__(self, reference: Reference, order: int):
         assert order == 3
         dofs: ListOfFunctionals = []
-        for v_n, vs in enumerate(reference.vertices):
-            dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
+        for v_n, v in enumerate(reference.vertices):
+            dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
             for i in range(reference.tdim):
                 dofs.append(DerivativePointEvaluation(
-                    reference, vs, tuple(1 if i == j else 0 for j in range(reference.tdim)),
+                    reference, v, tuple(1 if i == j else 0 for j in range(reference.tdim)),
                     entity=(0, v_n)))
-        for e_n, vs in enumerate(reference.sub_entities(2)):
-            midpoint = tuple(sym_sum(i) / len(i)
-                             for i in zip(*[reference.vertices[i] for i in vs]))
-            dofs.append(PointEvaluation(reference, midpoint, entity=(2, e_n)))
+        for e_n in range(reference.sub_entity_count(2)):
+            sub_entity = reference.sub_entity(2, e_n)
+            dofs.append(PointEvaluation(reference, sub_entity.midpoint(), entity=(2, e_n)))
 
-        super().__init__(
-            reference, order, polynomial_set_1d(reference.tdim, order), dofs, reference.tdim, 1
-        )
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, order)
+
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     names = ["Hermite"]
     references = ["interval", "triangle", "tetrahedron"]

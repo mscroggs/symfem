@@ -5,12 +5,14 @@ This element's definition appears in https://doi.org/10.1007/BF01399555
 """
 
 import sympy
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+import typing
 from ..finite_element import CiarletElement
-from ..functionals import PointEvaluation
-from ..symbolic import PiecewiseFunction
-from ..symbolic import x as x_variables
+from ..functionals import PointEvaluation, ListOfFunctionals
+from ..functions import FunctionInput
+from ..geometry import SetOfPoints
+from ..piecewise_functions import PiecewiseFunction
+from ..references import Reference
+from ..symbols import x as x_variables
 
 
 class P1IsoP2Tri(CiarletElement):
@@ -18,13 +20,15 @@ class P1IsoP2Tri(CiarletElement):
 
     def __init__(self, reference: Reference, order: int):
         half = sympy.Rational(1, 2)
-        tris = [
-            ((0, 0), (half, 0), (0, half)),
-            ((1, 0), (half, half), (half, 0)),
-            ((0, 1), (0, half), (half, half)),
-            ((0, half), (half, half), (half, 0)),
+        zero = sympy.Integer(0)
+        one = sympy.Integer(1)
+        tris: typing.List[SetOfPoints] = [
+            ((zero, zero), (half, zero), (zero, half)),
+            ((one, zero), (half, half), (half, zero)),
+            ((zero, one), (zero, half), (half, half)),
+            ((zero, half), (half, half), (half, zero)),
         ]
-        poly = []
+        poly: typing.List[FunctionInput] = []
         x = x_variables[0]
         y = x_variables[1]
         c = 1 - x - y
@@ -36,8 +40,8 @@ class P1IsoP2Tri(CiarletElement):
             {0: 2 * y, 2: 2 * c, 3: 1 - 2 * x},
             {1: 2 * y, 2: 2 * x, 3: 1 - 2 * c},
         ]:
-            poly.append(PiecewiseFunction([
-                (t, pieces[i]) if i in pieces else (t, 0) for i, t in enumerate(tris)], "triangle"))
+            poly.append(PiecewiseFunction(
+                {q: pieces[i] if i in pieces else 0 for i, q in enumerate(tris)}, 2))
 
         dofs: ListOfFunctionals = []
         for v_n, v in enumerate(reference.reference_vertices):
@@ -62,13 +66,15 @@ class P1IsoP2Quad(CiarletElement):
 
     def __init__(self, reference: Reference, order: int):
         half = sympy.Rational(1, 2)
-        quads = [
-            ((0, 0), (half, 0), (0, half), (half, half)),
-            ((half, 0), (1, 0), (half, half), (1, half)),
-            ((0, half), (half, half), (0, 1), (half, 1)),
-            ((half, half), (1, half), (half, 1), (1, 1)),
+        zero = sympy.Integer(0)
+        one = sympy.Integer(1)
+        quads: typing.List[SetOfPoints] = [
+            ((zero, zero), (half, zero), (zero, half), (half, half)),
+            ((half, zero), (one, zero), (half, half), (one, half)),
+            ((zero, half), (half, half), (zero, one), (half, one)),
+            ((half, half), (one, half), (half, one), (one, one)),
         ]
-        poly = []
+        poly: typing.List[FunctionInput] = []
         x = x_variables[0]
         y = x_variables[1]
         for pieces in [
@@ -82,9 +88,8 @@ class P1IsoP2Quad(CiarletElement):
             {2: 2 * x * (2 * y - 1), 3: 2 * (1 - x) * (2 * y - 1)},
             {0: 4 * x * y, 1: 4 * (1 - x) * y, 2: 4 * x * (1 - y), 3: 4 * (1 - x) * (1 - y)},
         ]:
-            poly.append(PiecewiseFunction([
-                (q, pieces[i]) if i in pieces else (q, 0) for i, q in enumerate(quads)],
-                "quadrilateral"))
+            poly.append(PiecewiseFunction(
+                {q: pieces[i] if i in pieces else 0 for i, q in enumerate(quads)}, 2))
 
         dofs: ListOfFunctionals = []
         for v_n, v in enumerate(reference.reference_vertices):

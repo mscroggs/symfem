@@ -5,11 +5,11 @@ This element's definition appears in https://doi.org/10.1002/num.1690080202
 """
 
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
-from ..functionals import PointEvaluation
-from ..symbolic import x
+from ..functionals import PointEvaluation, ListOfFunctionals
+from ..functions import FunctionInput
+from ..references import Reference
+from ..symbols import x
 
 
 class RannacherTurek(CiarletElement):
@@ -23,10 +23,12 @@ class RannacherTurek(CiarletElement):
             pt = reference.sub_entity(reference.tdim - 1, e_n).midpoint()
             dofs.append(PointEvaluation(reference, pt, entity=(reference.tdim - 1, e_n)))
 
+        poly: typing.List[FunctionInput] = []
         if reference.name == "quadrilateral":
-            poly = [1, x[0], x[1], x[0]**2 - x[1]**2]
+            poly += [1, x[0], x[1], x[0]**2 - x[1]**2]
         else:
-            poly = [1, x[0], x[1], x[2], x[0]**2 - x[1]**2, x[1]**2 - x[2]**2]
+            poly += [1, x[0], x[1], x[2], x[0]**2 - x[1]**2, x[1]**2 - x[2]**2]
+
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:

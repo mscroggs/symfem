@@ -1,7 +1,8 @@
+"""Test Nedelec elements."""
+
 import sympy
 from symfem import create_element
-from symfem.symbolic import x
-from symfem.vectors import vdot
+from symfem.symbols import x
 
 
 def test_nedelec_2d():
@@ -21,7 +22,7 @@ def test_nedelec_2d():
             line = sympy.Curve([(1 - k) * edge[0][i] + k * edge[1][i] for i in range(tdim)],
                                (k, 0, 1))
 
-            result = sympy.line_integrate(vdot(f, tangent), line, x[:tdim])
+            result = sympy.line_integrate(f.dot(tangent), line, x[:tdim])
             if i == j:
                 assert result == 1
             else:

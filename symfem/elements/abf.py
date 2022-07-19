@@ -5,12 +5,13 @@ Thse elements definitions appear in https://dx.doi.org/10.1137/S0036142903431924
 """
 
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
-from ..functionals import NormalIntegralMoment, IntegralMoment, IntegralOfDivergenceAgainst
+from ..functionals import (NormalIntegralMoment, IntegralMoment, IntegralOfDivergenceAgainst,
+                           ListOfFunctionals)
+from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
-from ..symbolic import x, ListOfVectorFunctions
+from ..references import Reference
+from ..symbols import x
 from .lagrange import Lagrange
 from .q import Nedelec
 
@@ -20,7 +21,8 @@ class ArnoldBoffiFalk(CiarletElement):
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         assert reference.name == "quadrilateral"
-        poly: ListOfVectorFunctions = [
+        poly: typing.List[FunctionInput] = []
+        poly += [
             (x[0] ** i * x[1] ** j, 0)
             for i in range(order + 3) for j in range(order + 1)]
         poly += [(0, x[0] ** i * x[1] ** j)

@@ -1,8 +1,10 @@
+"""Test tensor product factorisations."""
+
 import pytest
-import symfem
 import sympy
+import symfem
 from symfem import create_element
-from symfem.symbolic import symequal
+from symfem.utils import allequal
 from .utils import test_elements
 
 
@@ -56,12 +58,5 @@ def test_element(
         pytest.skip("This element does not have a tensor product representation.")
     basis = element.get_basis_functions()
 
-    for i in basis:
-        print(i.expand())
-    print("---")
-    for i in factorised_basis:
-        print(i.expand())
-    print("---")
-
     for i, j in zip(basis, factorised_basis):
-        assert symequal(i, j)
+        assert allequal(i, j)

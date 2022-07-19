@@ -2,24 +2,22 @@
 
 import sympy
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from itertools import product
-from ..finite_element import CiarletElement
+from ..finite_element import CiarletElement, FiniteElement
+from ..functionals import (PointEvaluation, DotPointEvaluation, IntegralMoment,
+                           TangentIntegralMoment, NormalIntegralMoment, ListOfFunctionals)
+from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import (quolynomial_set_1d, quolynomial_set_vector, Hdiv_quolynomials,
                            Hcurl_quolynomials)
 from ..quadrature import get_quadrature
-from ..functionals import (PointEvaluation, DotPointEvaluation, IntegralMoment,
-                           TangentIntegralMoment, NormalIntegralMoment)
+from ..references import Reference
 
 
 class Q(CiarletElement):
     """A Q element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        from symfem import create_reference
-
         dofs: ListOfFunctionals = []
         if order == 0:
             dofs = [PointEvaluation(
@@ -31,11 +29,8 @@ class Q(CiarletElement):
             for v_n, v in enumerate(reference.vertices):
                 dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
             for edim in range(1, 4):
-                et = reference.sub_entity_types[edim]
-                for e_n, vs in enumerate(reference.sub_entities(edim)):
-                    assert isinstance(et, str)
-                    entity = create_reference(
-                        et, vertices=tuple(reference.vertices[i] for i in vs))
+                for e_n in range(reference.sub_entity_count(edim)):
+                    entity = reference.sub_entity(edim, e_n)
                     for i in product(range(1, order), repeat=edim):
                         dofs.append(
                             PointEvaluation(
@@ -44,18 +39,15 @@ class Q(CiarletElement):
                                                  for j, o in enumerate(entity.origin)),
                                 entity=(edim, e_n)))
 
-        super().__init__(
-            reference, order,
-            quolynomial_set_1d(reference.tdim, order),
-            dofs,
-            reference.tdim,
-            1)
+        poly: typing.List[FunctionInput] = []
+        poly += quolynomial_set_1d(reference.tdim, order)
+
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant
 
     def get_tensor_factorisation(
         self
-        # ) -> typing.List[typing.Tuple[str, typing.List[FiniteElement]]]:
-    ) -> typing.List[typing.Tuple[str, typing.List[typing.Any], typing.List[int]]]:
+    ) -> typing.List[typing.Tuple[str, typing.List[FiniteElement], typing.List[int]]]:
         """Get the representation of the element as a tensor product."""
         from symfem import create_element
         interval_q = create_element("interval", "Lagrange", self.order)
@@ -107,14 +99,12 @@ class VectorQ(CiarletElement):
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         scalar_space = Q(reference, order, variant)
         dofs: ListOfFunctionals = []
+        poly: typing.List[FunctionInput] = []
         if reference.tdim == 1:
             for p in scalar_space.dofs:
                 dofs.append(PointEvaluation(reference, p.dof_point(), entity=p.entity))
 
-            super().__init__(
-                reference, order, quolynomial_set_1d(reference.tdim, order),
-                dofs, reference.tdim, reference.tdim,
-            )
+            poly += quolynomial_set_1d(reference.tdim, order)
         else:
             directions = [
                 tuple(1 if i == j else 0 for j in range(reference.tdim))
@@ -124,11 +114,10 @@ class VectorQ(CiarletElement):
                 for d in directions:
                     dofs.append(DotPointEvaluation(reference, p.dof_point(), d, entity=p.entity))
 
-            super().__init__(
-                reference, order, quolynomial_set_vector(reference.tdim, reference.tdim, order),
-                dofs, reference.tdim, reference.tdim,
-            )
-            self.variant = variant
+            poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
+
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element."""
@@ -144,7 +133,8 @@ class Nedelec(CiarletElement):
     """Nedelec Hcurl finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        poly = quolynomial_set_vector(reference.tdim, reference.tdim, order - 1)
+        poly: typing.List[FunctionInput] = []
+        poly += quolynomial_set_vector(reference.tdim, reference.tdim, order - 1)
         poly += Hcurl_quolynomials(reference.tdim, reference.tdim, order)
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
@@ -171,7 +161,8 @@ class RaviartThomas(CiarletElement):
     """Raviart-Thomas Hdiv finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        poly = quolynomial_set_vector(reference.tdim, reference.tdim, order - 1)
+        poly: typing.List[FunctionInput] = []
+        poly += quolynomial_set_vector(reference.tdim, reference.tdim, order - 1)
         poly += Hdiv_quolynomials(reference.tdim, reference.tdim, order)
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(

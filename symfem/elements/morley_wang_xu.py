@@ -4,13 +4,13 @@ This element's definition appears in https://doi.org/10.1090/S0025-5718-2012-026
 (Wang, Xu, 2013)
 """
 
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+import typing
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set_1d
 from ..functionals import (PointEvaluation, IntegralOfDirectionalMultiderivative,
-                           IntegralAgainst)
-from ..symbolic import ListOfVectorFunctions
+                           IntegralAgainst, ListOfFunctionals)
+from ..functions import FunctionInput
+from ..polynomials import polynomial_set_1d
+from ..references import Reference
 
 
 class MorleyWangXu(CiarletElement):
@@ -18,7 +18,8 @@ class MorleyWangXu(CiarletElement):
 
     def __init__(self, reference: Reference, order: int):
         assert order <= reference.tdim
-        poly = polynomial_set_1d(reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, order)
 
         dofs: ListOfFunctionals = []
 
@@ -55,7 +56,7 @@ class MorleyWangXu(CiarletElement):
             for e_n, vs in enumerate(reference.sub_entities(1)):
                 subentity = reference.sub_entity(1, e_n)
                 volume = subentity.jacobian()
-                normals: ListOfVectorFunctions = []
+                normals = []
                 for f_n, f_vs in enumerate(reference.sub_entities(2)):
                     if vs[0] in f_vs and vs[1] in f_vs:
                         face = reference.sub_entity(2, f_n)

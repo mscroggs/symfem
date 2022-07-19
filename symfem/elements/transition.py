@@ -2,14 +2,14 @@
 
 import sympy
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from itertools import product
 from ..finite_element import CiarletElement
+from ..functionals import PointEvaluation, ListOfFunctionals
+from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
-from ..functionals import PointEvaluation
 from ..quadrature import get_quadrature
-from ..symbolic import x, subs
+from ..references import Reference
+from ..symbols import x
 from .lagrange import Lagrange
 
 
@@ -28,9 +28,11 @@ class Transition(CiarletElement):
         bubble_space = Lagrange(reference, 1)
 
         dofs: ListOfFunctionals = []
-        poly = polynomial_set_1d(reference.tdim, 1)
         for v_n, v in enumerate(reference.reference_vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
+
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, 1)
 
         for edim in range(1, 4):
             for e_n in range(reference.sub_entity_count(edim)):
@@ -56,19 +58,16 @@ class Transition(CiarletElement):
                     if edim == reference.tdim:
                         bubble = sympy.Integer(1)
                         for f in bubble_space.get_basis_functions():
-                            assert isinstance(f, (int, sympy.core.expr.Expr))
                             bubble *= f
                     elif edim == reference.tdim - 1:
                         bubble = sympy.Integer(1)
                         for i, f in enumerate(bubble_space.get_basis_functions()):
-                            assert isinstance(f, (int, sympy.core.expr.Expr))
                             if i != e_n:
                                 bubble *= f
                     else:
                         assert edim == 1 and reference.tdim == 3
                         bubble = sympy.Integer(1)
                         for i, f in enumerate(bubble_space.get_basis_functions()):
-                            assert isinstance(f, (int, sympy.core.expr.Expr))
                             if i in reference.edges[e_n]:
                                 bubble *= f
                     space = Lagrange(entity, entity_order - edim - 1, variant=variant)
@@ -81,11 +80,9 @@ class Transition(CiarletElement):
                             i += 1
                         used.append(i)
                         variables.append(origin[i] + (p[i] - origin[i]) * x[i])
-                    poly += [subs(f, x, variables) * bubble for f in space.get_basis_functions()]
+                    poly += [f.subs(x, variables) * bubble for f in space.get_basis_functions()]
 
-        super().__init__(
-            reference, order, poly, dofs, reference.tdim, 1
-        )
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant
         self.face_orders = face_orders
         self.edge_orders = edge_orders

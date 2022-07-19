@@ -1,14 +1,54 @@
 """Reference elements."""
 
+from __future__ import annotations
 import typing
 import sympy
-from .symbolic import (
-    t, x, subs, sym_sum, SetOfPoints, PointType, PointTypeInput, ScalarFunction, ScalarValue,
-    SetOfPointsInput, parse_set_of_points_input, AxisVariables, parse_point_input)
-from .vectors import vsub, vnorm, vdot, vcross3d, vcross2d, vnormalise, vadd
+from abc import ABC, abstractmethod
+from .geometry import (PointType, PointTypeInput, SetOfPoints, SetOfPointsInput,
+                       parse_set_of_points_input, parse_point_input)
+from .symbols import t, x, AxisVariablesNotSingle
 
 
-class Reference:
+def _vsub(v: PointTypeInput, w: PointTypeInput) -> PointType:
+    """Subtract."""
+    return tuple(i - j for i, j in zip(parse_point_input(v), parse_point_input(w)))
+
+
+def _vadd(v: PointTypeInput, w: PointTypeInput) -> PointType:
+    """Add."""
+    return tuple(i + j for i, j in zip(parse_point_input(v), parse_point_input(w)))
+
+
+def _vdot(v: PointTypeInput, w: PointTypeInput) -> sympy.core.expr.Expr:
+    """Compute dot product."""
+    out = sympy.Integer(0)
+    for i, j in zip(parse_point_input(v), parse_point_input(w)):
+        out += i * j
+    return out
+
+
+def _vcross(v_in: PointTypeInput, w_in: PointTypeInput) -> PointType:
+    """Compute cross product."""
+    v = parse_point_input(v_in)
+    w = parse_point_input(w_in)
+    assert len(v) == len(w) == 3
+    return (v[1] * w[2] - v[2] * w[1], v[2] * w[0] - v[0] * w[2], v[0] * w[1] - v[1] * w[0])
+
+
+def _vnorm(v_in: PointTypeInput) -> sympy.core.expr.Expr:
+    """Find the norm of a vector."""
+    v = parse_point_input(v_in)
+    return sympy.sqrt(_vdot(v, v))
+
+
+def _vnormalise(v_in: PointTypeInput) -> PointType:
+    """Normalise a vector."""
+    v = parse_point_input(v_in)
+    n = _vnorm(v)
+    return tuple(i / n for i in v)
+
+
+class Reference(ABC):
     """A reference cell on which a finite element can be defined."""
 
     def __init__(
@@ -36,10 +76,10 @@ class Reference:
         self._inverse_map_to_self: typing.Union[PointType, None] = None
         self._map_to_self: typing.Union[PointType, None] = None
 
-    def default_reference(self) -> typing.Any:
-        # def default_reference(self) -> Reference:
+    @abstractmethod
+    def default_reference(self) -> Reference:
         """Get the default reference for this cell type."""
-        raise NotImplementedError()
+        pass
 
     def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
         """Get the subentities of the cell in back-to-front plotting order."""
@@ -48,22 +88,29 @@ class Reference:
     def get_point(self, reference_coords: PointType) -> typing.Tuple[sympy.core.expr.Expr, ...]:
         """Get a point in the reference from reference coordinates."""
         assert len(reference_coords) == len(self.axes)
-        return tuple(o + sym_sum(a[i] * b for a, b in zip(self.axes, reference_coords))
-                     for i, o in enumerate(self.origin))
+        pt = [i for i in self.origin]
+        for a, b in zip(self.axes, reference_coords):
+            for i, ai in enumerate(a):
+                pt[i] += ai * b
+        return tuple(pt)
 
-    def integral(
-        self, f: ScalarFunction, vars: AxisVariables = t
-    ) -> sympy.core.expr.Expr:
-        """Calculate the integral over the element."""
-        raise NotImplementedError()
+    @abstractmethod
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
+    ]]:
+        """Get the limits for an integral over this reference."""
+        pass
 
+    @abstractmethod
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
-        raise NotImplementedError()
+        pass
 
+    @abstractmethod
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference."""
-        raise NotImplementedError()
+        pass
 
     def get_map_to_self(self) -> PointType:
         """Get the map from the canonical reference to this reference."""
@@ -72,9 +119,10 @@ class Reference:
         assert self._map_to_self is not None
         return self._map_to_self
 
+    @abstractmethod
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference."""
-        raise NotImplementedError()
+        pass
 
     def get_inverse_map_to_self(self) -> PointType:
         """Get the inverse map from the canonical reference to this reference."""
@@ -83,44 +131,45 @@ class Reference:
         assert self._inverse_map_to_self is not None
         return self._inverse_map_to_self
 
+    @abstractmethod
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference."""
-        raise NotImplementedError()
+        pass
 
-    def volume(self) -> ScalarValue:
+    @abstractmethod
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
-        raise NotImplementedError()
+        pass
 
     def midpoint(self) -> PointType:
         """Calculate the midpoint."""
         return tuple(sum(i) * sympy.Integer(1) / len(i) for i in zip(*self.vertices))
 
-    def jacobian(self) -> ScalarValue:
+    def jacobian(self) -> sympy.core.expr.Expr:
         """Calculate the jacobian."""
+        from .functions import VectorFunction
         assert len(self.axes) == self.tdim
+        vaxes = [VectorFunction(a) for a in self.axes]
         if self.tdim == 1:
-            return vnorm(self.axes[0])
-        if self.tdim == 2:
-            if self.gdim == 2:
-                crossed = vcross2d(self.axes[0], self.axes[1])
-                return abs(crossed)
-            elif self.gdim == 3:
-                crossed3 = vcross3d(self.axes[0], self.axes[1])
-                return vnorm(crossed3)
-        if self.tdim == 3:
-            crossed3 = vcross3d(self.axes[0], self.axes[1])
-            return abs(vdot(crossed3, self.axes[2]))
-        raise ValueError(f"Unsupported tdim: {self.tdim}")
+            out = vaxes[0].norm().as_sympy()
+        elif self.tdim == 2:
+            out = vaxes[0].cross(vaxes[1]).norm().as_sympy()
+        elif self.tdim == 3:
+            out = vaxes[0].cross(vaxes[1]).dot(vaxes[2]).norm().as_sympy()
+        else:
+            raise ValueError(f"Unsupported tdim: {self.tdim}")
+        assert isinstance(out, sympy.core.expr.Expr)
+        return out
 
     def scaled_axes(self) -> SetOfPoints:
         """Return the unit axes of the reference."""
-        return tuple(vnormalise(a) for a in self.axes)
+        return tuple(_vnormalise(a) for a in self.axes)
 
     def tangent(self) -> PointType:
         """Calculate the tangent to the element."""
         if self.tdim == 1:
             norm = sympy.sqrt(sum(i ** 2 for i in self.axes[0]))
-            return vnormalise(tuple(i / norm for i in self.axes[0]))
+            return _vnormalise(tuple(i / norm for i in self.axes[0]))
 
         raise RuntimeError
 
@@ -128,12 +177,12 @@ class Reference:
         """Calculate the normal to the element."""
         if self.tdim == 1:
             if self.gdim == 2:
-                return vnormalise((-self.axes[0][1], self.axes[0][0]))
+                return _vnormalise((-self.axes[0][1], self.axes[0][0]))
         if self.tdim == 2:
             if self.gdim == 3:
-                crossed = vcross3d(self.axes[0], self.axes[1])
+                crossed = _vcross(self.axes[0], self.axes[1])
                 assert isinstance(crossed, tuple)
-                return vnormalise(crossed)
+                return _vnormalise(crossed)
         raise RuntimeError
 
     def sub_entities(
@@ -184,33 +233,35 @@ class Reference:
                 return True
         return False
 
-    def on_edge(self, point: PointType) -> bool:
+    def on_edge(self, point_in: PointType) -> bool:
         """Check if a point is on an edge of the reference."""
+        from .functions import VectorFunction
+        point = VectorFunction(point_in)
         for e in self.edges:
-            v0 = self.vertices[e[0]]
-            v1 = self.vertices[e[1]]
-            if len(v0) == 3:
-                crossed = vnorm(vcross3d(vsub(v0, point), vsub(v1, point)))
-            else:
-                crossed = vcross2d(vsub(v0, point), vsub(v1, point))
+            v0 = VectorFunction(self.vertices[e[0]])
+            v1 = VectorFunction(self.vertices[e[1]])
+            crossed = (v0 - point).cross(v1 - point).norm()
             if crossed == 0:
                 return True
         return False
 
-    def on_face(self, point: PointType) -> bool:
+    def on_face(self, point_in: PointType) -> bool:
         """Check if a point is on a face of the reference."""
+        from .functions import VectorFunction
+        point = VectorFunction(point_in)
         for f in self.faces:
-            v0 = self.vertices[f[0]]
-            v1 = self.vertices[f[1]]
-            v2 = self.vertices[f[2]]
-            crossed = vcross3d(vsub(v0, point), vsub(v1, point))
-            if vdot(crossed, vsub(v2, point)):
+            v0 = VectorFunction(self.vertices[f[0]])
+            v1 = VectorFunction(self.vertices[f[1]])
+            v2 = VectorFunction(self.vertices[f[2]])
+            crossed = (v0 - point).cross(v1 - point)
+            if crossed.dot(v2 - point):
                 return True
         return False
 
+    @abstractmethod
     def contains(self, point: PointType) -> bool:
         """Check is a point is contained in the reference."""
-        raise NotImplementedError()
+        pass
 
 
 class Point(Reference):
@@ -237,13 +288,12 @@ class Point(Reference):
         """Get the default reference for this cell type."""
         return Point(self.reference_vertices)
 
-    def integral(
-        self, f: ScalarFunction, vars: AxisVariables = t
-    ) -> sympy.core.expr.Expr:
-        """Calculate the integral over the element."""
-        out = subs(f, vars, self.vertices[0])
-        assert isinstance(out, sympy.core.expr.Expr)
-        return out
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
+    ]]:
+        """Get the limits for an integral over this reference."""
+        return list(zip(vars, self.vertices[0]))
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -263,9 +313,9 @@ class Point(Reference):
         """Compute the inverse map from the canonical reference to this reference."""
         return self.reference_vertices[0]
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
-        return 0
+        return sympy.Integer(0)
 
     def contains(self, point: PointType) -> bool:
         """Check is a point is contained in the reference."""
@@ -285,7 +335,7 @@ class Interval(Reference):
             tdim=1,
             name="interval",
             origin=vertices[0],
-            axes=(vsub(vertices[1], vertices[0]),),
+            axes=(_vsub(vertices[1], vertices[0]),),
             reference_vertices=((0,), (1,)),
             vertices=vertices,
             edges=((0, 1),),
@@ -298,15 +348,12 @@ class Interval(Reference):
         """Get the default reference for this cell type."""
         return Interval(self.reference_vertices)
 
-    def integral(
-        self, f: ScalarFunction, vars: AxisVariables = t
-    ) -> sympy.core.expr.Expr:
-        """Calculate the integral over the element."""
-        integrand = f * self.jacobian()
-        if isinstance(integrand, int):
-            integrand = sympy.Integer(integrand)
-        assert isinstance(integrand, sympy.core.expr.Expr)
-        return integrand.integrate((vars[0], 0, 1))
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
+    ]]:
+        """Get the limits for an integral over this reference."""
+        return [(vars[0], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -317,9 +364,9 @@ class Interval(Reference):
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
         vertices = parse_set_of_points_input(vertices_in)
-        p = vsub(tuple(x), vertices[0])
-        v = vsub(vertices[1], vertices[0])
-        return (vdot(p, v) * sympy.Integer(1) / vdot(v, v), )
+        p = _vsub(tuple(x), vertices[0])
+        v = _vsub(vertices[1], vertices[0])
+        return (_vdot(p, v) * sympy.Integer(1) / _vdot(v, v), )
 
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference."""
@@ -327,11 +374,11 @@ class Interval(Reference):
 
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference."""
-        p = vsub(tuple(x), self.vertices[0])
-        v = vsub(self.vertices[1], self.vertices[0])
-        return (vdot(p, v) * sympy.Integer(1) / vdot(v, v), )
+        p = _vsub(tuple(x), self.vertices[0])
+        v = _vsub(self.vertices[1], self.vertices[0])
+        return (_vdot(p, v) * sympy.Integer(1) / _vdot(v, v), )
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
         return self.jacobian()
 
@@ -353,7 +400,7 @@ class Triangle(Reference):
             tdim=2,
             name="triangle",
             origin=vertices[0],
-            axes=(vsub(vertices[1], vertices[0]), vsub(vertices[2], vertices[0])),
+            axes=(_vsub(vertices[1], vertices[0]), _vsub(vertices[2], vertices[0])),
             reference_vertices=((0, 0), (1, 0), (0, 1)),
             vertices=vertices,
             edges=((1, 2), (0, 2), (0, 1)),
@@ -366,15 +413,13 @@ class Triangle(Reference):
         """Get the default reference for this cell type."""
         return Triangle(self.reference_vertices)
 
-    def integral(
-        self, f: ScalarFunction, vars: AxisVariables = t
-    ) -> sympy.core.expr.Expr:
-        """Calculate the integral over the element."""
-        integrand = f * self.jacobian()
-        if isinstance(integrand, int):
-            integrand = sympy.Integer(integrand)
-        assert isinstance(integrand, sympy.core.expr.Expr)
-        return integrand.integrate((vars[1], 0, 1 - vars[0]), (vars[0], 0, 1))
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
+    ]]:
+        """Get the limits for an integral over this reference."""
+        return [(vars[1], sympy.Integer(0), 1 - vars[0]),
+                (vars[0], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -386,12 +431,12 @@ class Triangle(Reference):
         assert self.vertices == self.reference_vertices
         vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 2
-        p = vsub(tuple(x), vertices[0])
-        v1 = vsub(vertices[1], vertices[0])
-        v2 = vsub(vertices[2], vertices[0])
+        p = _vsub(tuple(x), vertices[0])
+        v1 = _vsub(vertices[1], vertices[0])
+        v2 = _vsub(vertices[2], vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0]],
                             [v1[1], v2[1]]]).inv()
-        return (vdot(mat.row(0), p), vdot(mat.row(1), p))
+        return (_vdot(mat.row(0), p), _vdot(mat.row(1), p))
 
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference."""
@@ -401,18 +446,18 @@ class Triangle(Reference):
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference."""
         if len(self.vertices[0]) == 2:
-            p = vsub(tuple(x), self.vertices[0])
-            v1 = vsub(self.vertices[1], self.vertices[0])
-            v2 = vsub(self.vertices[2], self.vertices[0])
+            p = _vsub(tuple(x), self.vertices[0])
+            v1 = _vsub(self.vertices[1], self.vertices[0])
+            v2 = _vsub(self.vertices[2], self.vertices[0])
             mat = sympy.Matrix([[v1[0], v2[0]],
                                 [v1[1], v2[1]]]).inv()
-            return (vdot(mat.row(0), p), vdot(mat.row(1), p))
+            return (_vdot(mat.row(0), p), _vdot(mat.row(1), p))
 
         return tuple(
-            vdot(vsub(tuple(x), self.origin), a) * sympy.Integer(1) / vnorm(a) for a in self.axes
+            _vdot(_vsub(tuple(x), self.origin), a) * sympy.Integer(1) / _vnorm(a) for a in self.axes
         )
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
         return sympy.Rational(1, 2) * self.jacobian()
 
@@ -435,9 +480,9 @@ class Tetrahedron(Reference):
             name="tetrahedron",
             origin=vertices[0],
             axes=(
-                vsub(vertices[1], vertices[0]),
-                vsub(vertices[2], vertices[0]),
-                vsub(vertices[3], vertices[0]),
+                _vsub(vertices[1], vertices[0]),
+                _vsub(vertices[2], vertices[0]),
+                _vsub(vertices[3], vertices[0]),
             ),
             reference_vertices=((0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1)),
             vertices=vertices,
@@ -459,16 +504,14 @@ class Tetrahedron(Reference):
         """Get the default reference for this cell type."""
         return Tetrahedron(self.reference_vertices)
 
-    def integral(
-        self, f: ScalarFunction, vars: AxisVariables = t
-    ) -> sympy.core.expr.Expr:
-        """Calculate the integral over the element."""
-        integrand = f * self.jacobian()
-        if isinstance(integrand, int):
-            integrand = sympy.Integer(integrand)
-        assert isinstance(integrand, sympy.core.expr.Expr)
-        return integrand.integrate(
-            (vars[0], 0, 1 - vars[1] - vars[2]), (vars[1], 0, 1 - vars[2]), (vars[2], 0, 1))
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
+    ]]:
+        """Get the limits for an integral over this reference."""
+        return [(vars[0], sympy.Integer(0), 1 - vars[1] - vars[2]),
+                (vars[1], sympy.Integer(0), 1 - vars[2]),
+                (vars[2], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -481,14 +524,14 @@ class Tetrahedron(Reference):
         assert self.vertices == self.reference_vertices
         vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 3
-        p = vsub(tuple(x), vertices[0])
-        v1 = vsub(vertices[1], vertices[0])
-        v2 = vsub(vertices[2], vertices[0])
-        v3 = vsub(vertices[3], vertices[0])
+        p = _vsub(tuple(x), vertices[0])
+        v1 = _vsub(vertices[1], vertices[0])
+        v2 = _vsub(vertices[2], vertices[0])
+        v3 = _vsub(vertices[3], vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
-        return (vdot(mat.row(0), p), vdot(mat.row(1), p), vdot(mat.row(2), p))
+        return (_vdot(mat.row(0), p), _vdot(mat.row(1), p), _vdot(mat.row(2), p))
 
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference."""
@@ -497,16 +540,16 @@ class Tetrahedron(Reference):
 
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference."""
-        p = vsub(tuple(x), self.vertices[0])
-        v1 = vsub(self.vertices[1], self.vertices[0])
-        v2 = vsub(self.vertices[2], self.vertices[0])
-        v3 = vsub(self.vertices[3], self.vertices[0])
+        p = _vsub(tuple(x), self.vertices[0])
+        v1 = _vsub(self.vertices[1], self.vertices[0])
+        v2 = _vsub(self.vertices[2], self.vertices[0])
+        v3 = _vsub(self.vertices[3], self.vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
-        return (vdot(mat.row(0), p), vdot(mat.row(1), p), vdot(mat.row(2), p))
+        return (_vdot(mat.row(0), p), _vdot(mat.row(1), p), _vdot(mat.row(2), p))
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
         return sympy.Rational(1, 6) * self.jacobian()
 
@@ -528,7 +571,7 @@ class Quadrilateral(Reference):
             tdim=2,
             name="quadrilateral",
             origin=vertices[0],
-            axes=(vsub(vertices[1], vertices[0]), vsub(vertices[2], vertices[0])),
+            axes=(_vsub(vertices[1], vertices[0]), _vsub(vertices[2], vertices[0])),
             reference_vertices=((0, 0), (1, 0), (0, 1), (1, 1)),
             vertices=vertices,
             edges=((0, 1), (0, 2), (1, 3), (2, 3)),
@@ -541,15 +584,13 @@ class Quadrilateral(Reference):
         """Get the default reference for this cell type."""
         return Quadrilateral(self.reference_vertices)
 
-    def integral(
-        self, f: ScalarFunction, vars: AxisVariables = t
-    ) -> sympy.core.expr.Expr:
-        """Calculate the integral over the element."""
-        integrand = f * self.jacobian()
-        if isinstance(integrand, int):
-            integrand = sympy.Integer(integrand)
-        assert isinstance(integrand, sympy.core.expr.Expr)
-        return integrand.integrate((vars[1], 0, 1), (vars[0], 0, 1))
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
+    ]]:
+        """Get the limits for an integral over this reference."""
+        return [(vars[1], sympy.Integer(0), sympy.Integer(1)),
+                (vars[0], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -562,23 +603,23 @@ class Quadrilateral(Reference):
         """Get the inverse map from a cell to the reference."""
         assert self.vertices == self.reference_vertices
         vertices = parse_set_of_points_input(vertices_in)
-        assert vadd(vertices[0], vertices[3]) == vadd(vertices[1], vertices[2])
-        p = vsub(tuple(x), vertices[0])
-        v1 = vsub(vertices[1], vertices[0])
-        v2 = vsub(vertices[2], vertices[0])
+        assert _vadd(vertices[0], vertices[3]) == _vadd(vertices[1], vertices[2])
+        p = _vsub(tuple(x), vertices[0])
+        v1 = _vsub(vertices[1], vertices[0])
+        v2 = _vsub(vertices[2], vertices[0])
 
         if len(self.vertices[0]) == 2:
             mat = sympy.Matrix([[v1[0], v2[0]],
                                 [v1[1], v2[1]]]).inv()
         elif len(self.vertices[0]) == 3:
-            v3 = vcross3d(v1, v2)
+            v3 = _vcross(v1, v2)
             mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                                 [v1[1], v2[1], v3[1]],
                                 [v1[2], v2[2], v3[2]]]).inv()
         else:
             raise RuntimeError("Cannot get inverse map.")
 
-        return (vdot(mat.row(0), p), vdot(mat.row(1), p))
+        return (_vdot(mat.row(0), p), _vdot(mat.row(1), p))
 
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference."""
@@ -588,26 +629,26 @@ class Quadrilateral(Reference):
 
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference."""
-        assert vadd(self.vertices[0], self.vertices[3]) == vadd(self.vertices[1],
-                                                                self.vertices[2])
-        p = vsub(tuple(x), self.vertices[0])
-        v1 = vsub(self.vertices[1], self.vertices[0])
-        v2 = vsub(self.vertices[2], self.vertices[0])
+        assert _vadd(
+            self.vertices[0], self.vertices[3]) == _vadd(self.vertices[1], self.vertices[2])
+        p = _vsub(tuple(x), self.vertices[0])
+        v1 = _vsub(self.vertices[1], self.vertices[0])
+        v2 = _vsub(self.vertices[2], self.vertices[0])
 
         if len(self.vertices[0]) == 2:
             mat = sympy.Matrix([[v1[0], v2[0]],
                                 [v1[1], v2[1]]]).inv()
         elif len(self.vertices[0]) == 3:
-            v3 = vcross3d(v1, v2)
+            v3 = _vcross(v1, v2)
             mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                                 [v1[1], v2[1], v3[1]],
                                 [v1[2], v2[2], v3[2]]]).inv()
         else:
             raise RuntimeError("Cannot get inverse map.")
 
-        return (vdot(mat.row(0), p), vdot(mat.row(1), p))
+        return (_vdot(mat.row(0), p), _vdot(mat.row(1), p))
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
         return self.jacobian()
 
@@ -631,9 +672,9 @@ class Hexahedron(Reference):
             name="hexahedron",
             origin=vertices[0],
             axes=(
-                vsub(vertices[1], vertices[0]),
-                vsub(vertices[2], vertices[0]),
-                vsub(vertices[4], vertices[0]),
+                _vsub(vertices[1], vertices[0]),
+                _vsub(vertices[2], vertices[0]),
+                _vsub(vertices[4], vertices[0]),
             ),
             reference_vertices=(
                 (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0),
@@ -663,16 +704,14 @@ class Hexahedron(Reference):
         """Get the default reference for this cell type."""
         return Hexahedron(self.reference_vertices)
 
-    def integral(
-        self, f: ScalarFunction, vars: AxisVariables = t
-    ) -> sympy.core.expr.Expr:
-        """Calculate the integral over the element."""
-        integrand = f * self.jacobian()
-        if isinstance(integrand, int):
-            integrand = sympy.Integer(integrand)
-        assert isinstance(integrand, sympy.core.expr.Expr)
-        return integrand.integrate(
-            (vars[2], 0, 1), (vars[1], 0, 1), (vars[0], 0, 1))
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
+    ]]:
+        """Get the limits for an integral over this reference."""
+        return [(vars[2], sympy.Integer(0), sympy.Integer(1)),
+                (vars[1], sympy.Integer(0), sympy.Integer(1)),
+                (vars[0], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -690,15 +729,15 @@ class Hexahedron(Reference):
         vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 3
         for a, b, c, d in self.faces:
-            assert vadd(vertices[a], vertices[d]) == vadd(vertices[b], vertices[c])
-        p = vsub(tuple(x), vertices[0])
-        v1 = vsub(vertices[1], vertices[0])
-        v2 = vsub(vertices[2], vertices[0])
-        v3 = vsub(vertices[4], vertices[0])
+            assert _vadd(vertices[a], vertices[d]) == _vadd(vertices[b], vertices[c])
+        p = _vsub(tuple(x), vertices[0])
+        v1 = _vsub(vertices[1], vertices[0])
+        v2 = _vsub(vertices[2], vertices[0])
+        v3 = _vsub(vertices[4], vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
-        return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
+        return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference."""
@@ -713,18 +752,18 @@ class Hexahedron(Reference):
         """Compute the inverse map from the canonical reference to this reference."""
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces:
-            assert vadd(self.vertices[a], self.vertices[d]) == vadd(self.vertices[b],
-                                                                    self.vertices[c])
-        p = vsub(tuple(x), self.vertices[0])
-        v1 = vsub(self.vertices[1], self.vertices[0])
-        v2 = vsub(self.vertices[2], self.vertices[0])
-        v3 = vsub(self.vertices[4], self.vertices[0])
+            assert _vadd(
+                self.vertices[a], self.vertices[d]) == _vadd(self.vertices[b], self.vertices[c])
+        p = _vsub(tuple(x), self.vertices[0])
+        v1 = _vsub(self.vertices[1], self.vertices[0])
+        v2 = _vsub(self.vertices[2], self.vertices[0])
+        v3 = _vsub(self.vertices[4], self.vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
-        return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
+        return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
         return self.jacobian()
 
@@ -748,9 +787,9 @@ class Prism(Reference):
             name="prism",
             origin=vertices[0],
             axes=(
-                vsub(vertices[1], vertices[0]),
-                vsub(vertices[2], vertices[0]),
-                vsub(vertices[3], vertices[0]),
+                _vsub(vertices[1], vertices[0]),
+                _vsub(vertices[2], vertices[0]),
+                _vsub(vertices[3], vertices[0]),
             ),
             reference_vertices=(
                 (0, 0, 0), (1, 0, 0), (0, 1, 0),
@@ -783,16 +822,14 @@ class Prism(Reference):
         """Get the default reference for this cell type."""
         return Prism(self.reference_vertices)
 
-    def integral(
-        self, f: ScalarFunction, vars: AxisVariables = t
-    ) -> sympy.core.expr.Expr:
-        """Calculate the integral over the element."""
-        integrand = f * self.jacobian()
-        if isinstance(integrand, int):
-            integrand = sympy.Integer(integrand)
-        assert isinstance(integrand, sympy.core.expr.Expr)
-        return integrand.integrate(
-            (vars[2], 0, 1), (vars[1], 0, 1 - vars[0]), (vars[0], 0, 1))
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
+    ]]:
+        """Get the limits for an integral over this reference."""
+        return [(vars[2], sympy.Integer(0), sympy.Integer(1)),
+                (vars[1], sympy.Integer(0), sympy.Integer(1) - vars[0]),
+                (vars[0], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -808,15 +845,15 @@ class Prism(Reference):
         vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 3
         for a, b, c, d in self.faces[1:4]:
-            assert vadd(vertices[a], vertices[d]) == vadd(vertices[b], vertices[c])
-        p = vsub(tuple(x), vertices[0])
-        v1 = vsub(vertices[1], vertices[0])
-        v2 = vsub(vertices[2], vertices[0])
-        v3 = vsub(vertices[3], vertices[0])
+            assert _vadd(vertices[a], vertices[d]) == _vadd(vertices[b], vertices[c])
+        p = _vsub(tuple(x), vertices[0])
+        v1 = _vsub(vertices[1], vertices[0])
+        v2 = _vsub(vertices[2], vertices[0])
+        v3 = _vsub(vertices[3], vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
-        return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
+        return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference."""
@@ -829,18 +866,18 @@ class Prism(Reference):
         """Compute the inverse map from the canonical reference to this reference."""
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces[1:4]:
-            assert vadd(self.vertices[a], self.vertices[d]) == vadd(self.vertices[b],
-                                                                    self.vertices[c])
-        p = vsub(tuple(x), self.vertices[0])
-        v1 = vsub(self.vertices[1], self.vertices[0])
-        v2 = vsub(self.vertices[2], self.vertices[0])
-        v3 = vsub(self.vertices[3], self.vertices[0])
+            assert _vadd(
+                self.vertices[a], self.vertices[d]) == _vadd(self.vertices[b], self.vertices[c])
+        p = _vsub(tuple(x), self.vertices[0])
+        v1 = _vsub(self.vertices[1], self.vertices[0])
+        v2 = _vsub(self.vertices[2], self.vertices[0])
+        v3 = _vsub(self.vertices[3], self.vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
-        return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
+        return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
         return sympy.Rational(1, 2) * self.jacobian()
 
@@ -865,9 +902,9 @@ class Pyramid(Reference):
             name="pyramid",
             origin=vertices[0],
             axes=(
-                vsub(vertices[1], vertices[0]),
-                vsub(vertices[2], vertices[0]),
-                vsub(vertices[4], vertices[0]),
+                _vsub(vertices[1], vertices[0]),
+                _vsub(vertices[2], vertices[0]),
+                _vsub(vertices[4], vertices[0]),
             ),
             reference_vertices=(
                 (0, 0, 0), (1, 0, 0), (0, 1, 0),
@@ -900,16 +937,14 @@ class Pyramid(Reference):
         """Get the default reference for this cell type."""
         return Pyramid(self.reference_vertices)
 
-    def integral(
-        self, f: ScalarFunction, vars: AxisVariables = t
-    ) -> sympy.core.expr.Expr:
-        """Calculate the integral over the element."""
-        integrand = f * self.jacobian()
-        if isinstance(integrand, int):
-            integrand = sympy.Integer(integrand)
-        assert isinstance(integrand, sympy.core.expr.Expr)
-        return integrand.integrate(
-            (vars[0], 0, 1 - vars[2]), (vars[1], 0, 1 - vars[2]), (vars[2], 0, 1))
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
+    ]]:
+        """Get the limits for an integral over this reference."""
+        return [(vars[0], sympy.Integer(0), 1 - vars[2]),
+                (vars[1], sympy.Integer(0), 1 - vars[2]),
+                (vars[2], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell."""
@@ -927,15 +962,15 @@ class Pyramid(Reference):
         vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 3
         for a, b, c, d in self.faces[:1]:
-            assert vadd(vertices[a], vertices[d]) == vadd(vertices[b], vertices[c])
-        p = vsub(tuple(x), vertices[0])
-        v1 = vsub(vertices[1], vertices[0])
-        v2 = vsub(vertices[2], vertices[0])
-        v3 = vsub(vertices[4], vertices[0])
+            assert _vadd(vertices[a], vertices[d]) == _vadd(vertices[b], vertices[c])
+        p = _vsub(tuple(x), vertices[0])
+        v1 = _vsub(vertices[1], vertices[0])
+        v2 = _vsub(vertices[2], vertices[0])
+        v3 = _vsub(vertices[4], vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
-        return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
+        return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference."""
@@ -950,18 +985,18 @@ class Pyramid(Reference):
         """Compute the inverse map from the canonical reference to this reference."""
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces[:1]:
-            assert vadd(self.vertices[a], self.vertices[d]) == vadd(self.vertices[b],
-                                                                    self.vertices[c])
-        p = vsub(tuple(x), self.vertices[0])
-        v1 = vsub(self.vertices[1], self.vertices[0])
-        v2 = vsub(self.vertices[2], self.vertices[0])
-        v3 = vsub(self.vertices[4], self.vertices[0])
+            assert _vadd(
+                self.vertices[a], self.vertices[d]) == _vadd(self.vertices[b], self.vertices[c])
+        p = _vsub(tuple(x), self.vertices[0])
+        v1 = _vsub(self.vertices[1], self.vertices[0])
+        v2 = _vsub(self.vertices[2], self.vertices[0])
+        v3 = _vsub(self.vertices[4], self.vertices[0])
         mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
                             [v1[1], v2[1], v3[1]],
                             [v1[2], v2[2], v3[2]]]).inv()
-        return tuple(vdot(mat.row(i), p) for i in range(mat.rows))
+        return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
-    def volume(self) -> ScalarValue:
+    def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume."""
         return sympy.Rational(1, 3) * self.jacobian()
 
@@ -976,12 +1011,14 @@ class Pyramid(Reference):
 class DualPolygon(Reference):
     """A polygon on a barycentric dual grid."""
 
+    reference_origin: PointType
+
     def __init__(
         self, number_of_triangles: int,
         vertices: SetOfPointsInput = None
     ):
         self.number_of_triangles = number_of_triangles
-        self.reference_origin = (0, 0)
+        self.reference_origin = (sympy.Integer(0), sympy.Integer(0))
         reference_vertices = []
         for tri in range(number_of_triangles):
             angle = sympy.pi * 2 * tri / number_of_triangles
@@ -992,8 +1029,8 @@ class DualPolygon(Reference):
                 ((sympy.cos(next_angle) + sympy.cos(angle)) / 2,
                  (sympy.sin(next_angle) + sympy.sin(angle)) / 2))
 
+        origin: PointType = self.reference_origin
         if vertices is None:
-            origin: PointType = self.reference_origin
             vertices = tuple(reference_vertices)
         else:
             assert len(vertices) == 1 + len(reference_vertices)
@@ -1014,3 +1051,38 @@ class DualPolygon(Reference):
             sub_entity_types=["point", "interval", f"dual polygon({number_of_triangles})", None],
 
         )
+
+    def contains(self, point: PointType) -> bool:
+        """Check is a point is contained in the reference."""
+        raise NotImplementedError()
+
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
+    ]]:
+        """Get the limits for an integral over this reference."""
+        raise NotImplementedError()
+
+    def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
+        """Get the map from the reference to a cell."""
+        raise NotImplementedError()
+
+    def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
+        """Get the inverse map from a cell to the reference."""
+        raise NotImplementedError()
+
+    def _compute_map_to_self(self) -> PointType:
+        """Compute the map from the canonical reference to this reference."""
+        raise NotImplementedError()
+
+    def _compute_inverse_map_to_self(self) -> PointType:
+        """Compute the inverse map from the canonical reference to this reference."""
+        raise NotImplementedError()
+
+    def volume(self) -> sympy.core.expr.Expr:
+        """Calculate the volume."""
+        raise NotImplementedError()
+
+    def default_reference(self) -> Reference:
+        """Get the default reference for this cell type."""
+        raise NotImplementedError()

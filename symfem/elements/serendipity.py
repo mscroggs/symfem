@@ -5,14 +5,14 @@ This element's definition appears in https://doi.org/10.1007/s10208-011-9087-3
 """
 
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
+from ..functionals import (PointEvaluation, IntegralMoment, TangentIntegralMoment,
+                           NormalIntegralMoment, ListOfFunctionals)
+from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import (serendipity_set_1d, polynomial_set_1d, polynomial_set_vector,
                            Hdiv_serendipity, Hcurl_serendipity)
-from ..functionals import (
-    PointEvaluation, IntegralMoment, TangentIntegralMoment, NormalIntegralMoment)
+from ..references import Reference
 from .dpc import DPC, VectorDPC
 
 
@@ -20,7 +20,8 @@ class Serendipity(CiarletElement):
     """A serendipity element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        poly = polynomial_set_1d(reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, order)
         poly += serendipity_set_1d(reference.tdim, order)
 
         dofs: ListOfFunctionals = []
@@ -50,7 +51,8 @@ class SerendipityCurl(CiarletElement):
     """A serendipity Hcurl element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        poly = polynomial_set_vector(reference.tdim, reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
         poly += Hcurl_serendipity(reference.tdim, reference.tdim, order)
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
@@ -79,7 +81,8 @@ class SerendipityDiv(CiarletElement):
     """A serendipity Hdiv element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
-        poly = polynomial_set_vector(reference.tdim, reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
         poly += Hdiv_serendipity(reference.tdim, reference.tdim, order)
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(

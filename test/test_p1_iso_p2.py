@@ -1,7 +1,9 @@
-import symfem
-from symfem.symbolic import subs, x
-import sympy
+"""Test P1-iso-P2 elements."""
+
 import pytest
+import sympy
+import symfem
+from symfem.symbols import x
 
 
 @pytest.mark.parametrize("cell", ["triangle", "quadrilateral"])
@@ -22,5 +24,5 @@ def test_polyset(cell):
             for piece in f.pieces:
                 if p in piece[0]:
                     if value is None:
-                        value = subs(piece[1], x, p)
-                    assert subs(piece[1], x, p) == value
+                        value = piece[1].subs(x, p)
+                    assert piece[1].subs(x, p) == value

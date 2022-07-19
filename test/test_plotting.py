@@ -1,6 +1,8 @@
-import symfem
-import pytest
+"""Test plotting."""
+
 import os
+import pytest
+import symfem
 
 dir = os.path.dirname(os.path.realpath(__file__))
 

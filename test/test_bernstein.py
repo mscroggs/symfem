@@ -1,5 +1,7 @@
-import symfem
+"""Test Bernstein elements."""
+
 import pytest
+import symfem
 
 
 @pytest.mark.parametrize("celltype, degree", [(c, i) for c, n in [
@@ -11,7 +13,7 @@ def test_bernstein(celltype, degree):
 
     for f in b.get_basis_functions():
         for p in poly:
-            if (f - p).simplify() == 0:
+            if f == p:
                 poly.remove(p)
                 break
         else:

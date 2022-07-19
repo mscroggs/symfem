@@ -5,13 +5,13 @@ This element's definition appears in https://doi.org/10.1090/mcom/3361
 """
 
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set_1d
 from ..functionals import (PointEvaluation, DerivativePointEvaluation,
-                           IntegralOfDirectionalMultiderivative)
-from ..symbolic import x, ListOfVectorFunctions
+                           IntegralOfDirectionalMultiderivative, ListOfFunctionals)
+from ..functions import FunctionInput
+from ..polynomials import polynomial_set_1d
+from ..references import Reference
+from ..symbols import x
 
 
 def derivatives(dim: int, order: int) -> typing.List[typing.Tuple[int, ...]]:
@@ -30,7 +30,8 @@ class WuXu(CiarletElement):
 
     def __init__(self, reference: Reference, order: int):
         assert order == reference.tdim + 1
-        poly = polynomial_set_1d(reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, order)
 
         if reference.name == "interval":
             bubble = x[0] * (1 - x[0])
@@ -42,19 +43,18 @@ class WuXu(CiarletElement):
         poly += [bubble * i for i in polynomial_set_1d(reference.tdim, 1)[1:]]
 
         dofs: ListOfFunctionals = []
-
-        for v_n, vs in enumerate(reference.vertices):
-            dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
+        for v_n, v in enumerate(reference.vertices):
+            dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
             for i in range(reference.tdim):
                 dofs.append(DerivativePointEvaluation(
-                    reference, vs, tuple(1 if i == j else 0 for j in range(reference.tdim)),
+                    reference, v, tuple(1 if i == j else 0 for j in range(reference.tdim)),
                     entity=(0, v_n)))
         for codim in range(1, reference.tdim):
             dim = reference.tdim - codim
             for e_n, vs in enumerate(reference.sub_entities(codim=codim)):
                 subentity = reference.sub_entity(dim, e_n)
                 volume = subentity.jacobian()
-                normals: ListOfVectorFunctions = []
+                normals = []
                 if codim == 1:
                     normals = [subentity.normal()]
                 elif codim == 2 and reference.tdim == 3:

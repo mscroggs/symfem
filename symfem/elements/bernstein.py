@@ -7,17 +7,16 @@ https://doi.org/10.1137/11082539X (Ainsworth, Andriamaro, Davydov, 2011)
 
 import sympy
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
-from ..symbolic import (x, t, subs, PointType, AnyFunction, ScalarValue, ListOfScalarFunctions,
-                        AxisVariables)
+from ..functionals import BaseFunctional, PointEvaluation, ListOfFunctionals
+from ..functions import AnyFunction, FunctionInput
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set_1d
-from ..functionals import BaseFunctional, PointEvaluation, ScalarValueOrFloat
-from ..polynomials import orthogonal_basis
+from ..geometry import PointType
+from ..polynomials import polynomial_set_1d, orthogonal_basis
+from ..references import Reference
+from ..symbols import x, t, AxisVariablesNotSingle
 
 
-def single_choose(n: int, k: int) -> ScalarValue:
+def single_choose(n: int, k: int) -> sympy.core.expr.Expr:
     """Calculate choose function of a set of powers."""
     out = sympy.Integer(1)
     for i in range(k + 1, n + 1):
@@ -27,7 +26,7 @@ def single_choose(n: int, k: int) -> ScalarValue:
     return out
 
 
-def choose(n: int, powers: typing.List[int]) -> ScalarValue:
+def choose(n: int, powers: typing.List[int]) -> sympy.core.expr.Expr:
     """Calculate choose function of a set of powers."""
     out = sympy.Integer(1)
     for p in powers:
@@ -37,8 +36,8 @@ def choose(n: int, powers: typing.List[int]) -> ScalarValue:
 
 
 def bernstein_polynomials(
-    n: int, d: int, vars: AxisVariables = x
-) -> ListOfScalarFunctions:
+    n: int, d: int, vars: AxisVariablesNotSingle = x
+) -> typing.List[sympy.core.expr.Expr]:
     """
     Return a list of Bernstein polynomials.
 
@@ -83,7 +82,7 @@ class BernsteinFunctional(BaseFunctional):
                  degree: int, entity: typing.Tuple[int, int]):
         super().__init__(reference, entity, "identity")
         orth = [
-            o / sympy.sqrt(integral_domain.integral(o * o))
+            o / sympy.sqrt((o * o).integral(integral_domain))
             for o in orthogonal_basis(integral_domain.name, degree, 0, t[:integral_domain.tdim])[0]
         ]
         self.ref = integral_domain
@@ -92,7 +91,7 @@ class BernsteinFunctional(BaseFunctional):
 
         bern = bernstein_polynomials(degree, integral_domain.tdim, t)
         mat = sympy.Matrix(
-            [[integral_domain.integral(o * b) for b in bern] for o in orth])
+            [[(o * b).integral(integral_domain) for b in bern] for o in orth])
         minv = mat.inv()
         alpha = minv.row(index)
 
@@ -102,20 +101,15 @@ class BernsteinFunctional(BaseFunctional):
         """Get the location of the DOF in the cell."""
         return self.ref.sub_entity(*self.entity).midpoint()
 
-    def eval(self, function: AnyFunction, symbolic: bool = True) -> ScalarValueOrFloat:
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply the functional to a function."""
         point = [i for i in self.ref.origin]
         for i, a in enumerate(zip(*self.ref.axes)):
             for j, k in zip(a, t):
                 point[i] += j * k
 
-        integrand = subs(function, x, point) * self.moment
-        assert isinstance(integrand, (int, sympy.core.expr.Expr))
-        value = self.ref.integral(integrand)
-        if symbolic:
-            return value
-        else:
-            return float(value)
+        integrand = function.subs(x, point) * self.moment
+        return integrand.integral(self.ref)
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
@@ -139,14 +133,16 @@ class Bernstein(CiarletElement):
     """Bernstein finite element."""
 
     def __init__(self, reference: Reference, order: int):
-        poly = polynomial_set_1d(reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, order)
 
         dofs: ListOfFunctionals = []
         if order == 0:
             dofs = [
                 PointEvaluation(reference, reference.midpoint(), (reference.tdim, 0))]
         else:
-            def index(x, y=0, z=0):
+            def index(x: int, y: int = 0, z: int = 0) -> int:
+                """Compute the 1D index."""
                 return (
                     z * (z ** 2 - 3 * z * order - 6 * z + 3 * order ** 2 + 12 * order + 11) // 6
                     + y * (2 * (order - z) + 3 - y) // 2

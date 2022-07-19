@@ -6,13 +6,13 @@ This element's definition appears in https://doi.org/10.1007/s10915-009-9334-9
 
 import sympy
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
 from itertools import product
 from ..finite_element import CiarletElement
+from ..functionals import PointEvaluation, ListOfFunctionals
+from ..functions import FunctionInput
 from ..polynomials import pyramid_polynomial_set_1d
-from ..functionals import PointEvaluation
 from ..quadrature import get_quadrature
+from ..references import Reference
 
 
 class Lagrange(CiarletElement):
@@ -67,7 +67,8 @@ class Lagrange(CiarletElement):
                                              for j, o in enumerate(reference.origin)),
                             entity=(3, 0)))
 
-        poly = pyramid_polynomial_set_1d(reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += pyramid_polynomial_set_1d(reference.tdim, order)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant

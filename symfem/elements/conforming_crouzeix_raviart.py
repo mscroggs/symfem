@@ -5,12 +5,13 @@ This element's definition appears in https://doi.org/10.1051/m2an/197307R300331
 """
 
 import sympy
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+import typing
 from ..finite_element import CiarletElement
+from ..functionals import PointEvaluation, ListOfFunctionals
+from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
-from ..functionals import PointEvaluation
-from ..symbolic import x
+from ..references import Reference
+from ..symbols import x
 
 
 class ConformingCrouzeixRaviart(CiarletElement):
@@ -21,7 +22,8 @@ class ConformingCrouzeixRaviart(CiarletElement):
             raise NotImplementedError()
         assert reference.name == "triangle"
 
-        poly = polynomial_set_1d(reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_1d(reference.tdim, order)
 
         poly += [
             x[0] ** i * x[1] ** (order - i) * (x[0] + x[1])

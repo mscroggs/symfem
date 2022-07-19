@@ -2,26 +2,26 @@
 
 import sympy
 import typing
-from .symbolic import x, ListOfScalarFunctions, ListOfVectorFunctions, AxisVariables
-from .calculus import curl, diff
 from itertools import product
+from .functions import ScalarFunction, VectorFunction
+from .symbols import x, AxisVariablesNotSingle
 
 
 def polynomial_set_1d(
-    dim: int, order: int, variables: AxisVariables = x
-) -> ListOfScalarFunctions:
+    dim: int, order: int, variables: AxisVariablesNotSingle = x
+) -> typing.List[ScalarFunction]:
     """One dimensional polynomial set."""
     if dim == 1:
-        return [variables[0] ** i for i in range(order + 1)]
+        return [ScalarFunction(variables[0] ** i) for i in range(order + 1)]
     if dim == 2:
         return [
-            variables[0] ** i * variables[1] ** j
+            ScalarFunction(variables[0] ** i * variables[1] ** j)
             for j in range(order + 1)
             for i in range(order + 1 - j)
         ]
     if dim == 3:
         return [
-            variables[0] ** i * variables[1] ** j * variables[2] ** k
+            ScalarFunction(variables[0] ** i * variables[1] ** j * variables[2] ** k)
             for k in range(order + 1)
             for j in range(order + 1 - k)
             for i in range(order + 1 - k - j)
@@ -31,72 +31,66 @@ def polynomial_set_1d(
 
 def polynomial_set_vector(
     domain_dim: int, range_dim: int, order: int
-) -> ListOfVectorFunctions:
+) -> typing.List[VectorFunction]:
     """Polynomial set."""
     set1d = polynomial_set_1d(domain_dim, order)
     return [
-        tuple(p if i == j else 0 for j in range(range_dim))
+        VectorFunction([p if i == j else 0 for j in range(range_dim)])
         for p in set1d
         for i in range(range_dim)
     ]
 
 
-def Hdiv_polynomials(domain_dim: int, range_dim: int, order: int) -> ListOfVectorFunctions:
+def Hdiv_polynomials(domain_dim: int, range_dim: int, order: int) -> typing.List[VectorFunction]:
     """Hdiv conforming polynomial set."""
     assert domain_dim == range_dim
     if domain_dim == 2:
-        return [
-            (
-                x[0] * x[0] ** (order - 1 - j) * x[1] ** j,
-                x[1] * x[0] ** (order - 1 - j) * x[1] ** j,
-            )
-            for j in range(order)
-        ]
+        return [VectorFunction((
+            x[0] * x[0] ** (order - 1 - j) * x[1] ** j,
+            x[1] * x[0] ** (order - 1 - j) * x[1] ** j,
+        )) for j in range(order)]
     if domain_dim == 3:
-        basis: ListOfVectorFunctions = []
+        basis: typing.List[VectorFunction] = []
         for j in range(order):
             for k in range(order - j):
                 p = x[0] ** (order - 1 - j - k) * x[1] ** j * x[2] ** k
-                basis.append((x[0] * p, x[1] * p, x[2] * p))
+                basis.append(VectorFunction((x[0] * p, x[1] * p, x[2] * p)))
         return basis
 
     raise ValueError(f"Unsupported dimension: {domain_dim}")
 
 
-def Hcurl_polynomials(domain_dim: int, range_dim: int, order: int) -> ListOfVectorFunctions:
+def Hcurl_polynomials(domain_dim: int, range_dim: int, order: int) -> typing.List[VectorFunction]:
     """Hcurl conforming polynomial set."""
     assert domain_dim == range_dim
     if domain_dim == 2:
-        return [
-            (
-                x[0] ** (order - 1 - j) * x[1] ** (j + 1),
-                -x[0] ** (order - j) * x[1] ** j,
-            )
-            for j in range(order)
-        ]
+        return [VectorFunction((
+            x[0] ** (order - 1 - j) * x[1] ** (j + 1),
+            -x[0] ** (order - j) * x[1] ** j,
+        )) for j in range(order)]
     if domain_dim == 3:
-        poly: ListOfVectorFunctions = []
-        poly += [(x[0] ** (m - 1) * x[1] ** n * x[2] ** (order - m - n + 1),
-                  0,
-                  -x[0] ** m * x[1] ** n * x[2] ** (order - m - n))
-                 for n in range(order) for m in range(1, order + 1 - n)]
-        poly += [(0,
-                  x[0] ** m * x[1] ** (n - 1) * x[2] ** (order - m - n + 1),
-                  -x[0] ** m * x[1] ** n * x[2] ** (order - m - n))
-                 for m in range(order) for n in range(1, order + 1 - m)]
-        poly += [(x[0] ** (order - n) * x[1] ** n,
-                  -x[0] ** (order + 1 - n) * x[1] ** (n - 1),
-                  0)
-                 for n in range(1, order + 1)]
+        poly: typing.List[VectorFunction] = []
+        poly += [VectorFunction((
+            x[0] ** (m - 1) * x[1] ** n * x[2] ** (order - m - n + 1),
+            0, -x[0] ** m * x[1] ** n * x[2] ** (order - m - n)
+        )) for n in range(order) for m in range(1, order + 1 - n)]
+        poly += [VectorFunction((
+            0, x[0] ** m * x[1] ** (n - 1) * x[2] ** (order - m - n + 1),
+            -x[0] ** m * x[1] ** n * x[2] ** (order - m - n)
+        )) for m in range(order) for n in range(1, order + 1 - m)]
+        poly += [VectorFunction((
+            x[0] ** (order - n) * x[1] ** n,
+            -x[0] ** (order + 1 - n) * x[1] ** (n - 1), 0
+        )) for n in range(1, order + 1)]
         return poly
     raise ValueError(f"Unsupported dimension: {domain_dim}")
 
 
-def quolynomial_set_1d(dim: int, order: int) -> ListOfScalarFunctions:
+def quolynomial_set_1d(dim: int, order: int) -> typing.List[ScalarFunction]:
     """One dimensional quolynomial set."""
     basis = []
     for j in product(range(order + 1), repeat=dim):
-        poly = sympy.Integer(1)
+        poly = ScalarFunction(1)
         for a, b in zip(x, j):
             poly *= a ** b
         basis.append(poly)
@@ -105,33 +99,33 @@ def quolynomial_set_1d(dim: int, order: int) -> ListOfScalarFunctions:
 
 def quolynomial_set_vector(
     domain_dim: int, range_dim: int, order: int
-) -> ListOfVectorFunctions:
+) -> typing.List[VectorFunction]:
     """Quolynomial set."""
     set1d = quolynomial_set_1d(domain_dim, order)
     return [
-        tuple(p if i == j else 0 for j in range(range_dim))
+        VectorFunction([p if i == j else 0 for j in range(range_dim)])
         for p in set1d
         for i in range(range_dim)
     ]
 
 
-def Hdiv_quolynomials(domain_dim: int, range_dim: int, order: int) -> ListOfVectorFunctions:
+def Hdiv_quolynomials(domain_dim: int, range_dim: int, order: int) -> typing.List[VectorFunction]:
     """Hdiv conforming quolynomial set."""
     assert domain_dim == range_dim
-    basis: ListOfVectorFunctions = []
+    basis: typing.List[VectorFunction] = []
     for d in range(domain_dim):
         for j in product(range(order), repeat=domain_dim - 1):
             poly = 1
             for a, b in zip(x, j[:d] + (order,) + j[d:]):
                 poly *= a ** b
-            basis.append(tuple(poly if i == d else 0 for i in range(domain_dim)))
+            basis.append(VectorFunction([poly if i == d else 0 for i in range(domain_dim)]))
     return basis
 
 
-def Hcurl_quolynomials(domain_dim: int, range_dim: int, order: int) -> ListOfVectorFunctions:
+def Hcurl_quolynomials(domain_dim: int, range_dim: int, order: int) -> typing.List[VectorFunction]:
     """Hcurl conforming quolynomial set."""
     assert domain_dim == range_dim
-    basis: ListOfVectorFunctions = []
+    basis: typing.List[VectorFunction] = []
     for d in range(domain_dim):
         for j in product(
             *[range(order) if i == d else range(order + 1) for i in range(domain_dim)]
@@ -141,7 +135,7 @@ def Hcurl_quolynomials(domain_dim: int, range_dim: int, order: int) -> ListOfVec
             poly = 1
             for a, b in zip(x, j):
                 poly *= a ** b
-            basis.append(tuple(poly if i == d else 0 for i in range(domain_dim)))
+            basis.append(VectorFunction([poly if i == d else 0 for i in range(domain_dim)]))
     return basis
 
 
@@ -163,97 +157,97 @@ def serendipity_indices(
     return out
 
 
-def serendipity_set_1d(dim: int, order: int) -> ListOfScalarFunctions:
+def serendipity_set_1d(dim: int, order: int) -> typing.List[ScalarFunction]:
     """One dimensional serendipity set."""
-    basis: ListOfScalarFunctions = []
+    basis: typing.List[ScalarFunction] = []
     for s in range(order + 1, order + dim + 1):
         for i in serendipity_indices(s, s - order, dim):
             p = 1
             for j, k in zip(x, i):
                 p *= j ** k
-            basis.append(p)
+            basis.append(ScalarFunction(p))
     return basis
 
 
 def serendipity_set_vector(
     domain_dim: int, range_dim: int, order: int
-) -> ListOfVectorFunctions:
+) -> typing.List[VectorFunction]:
     """Serendipity set."""
     set1d = serendipity_set_1d(domain_dim, order)
     return [
-        tuple(p if i == j else 0 for j in range(range_dim))
+        VectorFunction([p if i == j else 0 for j in range(range_dim)])
         for p in set1d
         for i in range(range_dim)
     ]
 
 
-def Hdiv_serendipity(domain_dim: int, range_dim: int, order: int) -> ListOfVectorFunctions:
+def Hdiv_serendipity(domain_dim: int, range_dim: int, order: int) -> typing.List[VectorFunction]:
     """Hdiv conforming serendipity set."""
     assert domain_dim == range_dim
     if domain_dim == 2:
         return [
-            (x[0] ** (order + 1), (order + 1) * x[0] ** order * x[1]),
-            ((order + 1) * x[0] * x[1] ** order, x[1] ** (order + 1)),
+            VectorFunction((x[0] ** (order + 1), (order + 1) * x[0] ** order * x[1])),
+            VectorFunction(((order + 1) * x[0] * x[1] ** order, x[1] ** (order + 1))),
         ]
     if domain_dim == 3:
         a = []
         if order == 0:
-            a.append((0, x[0] * x[2], -x[0] * x[1]))
-            a.append((x[1] * x[2], 0, -x[0] * x[1]))
+            a.append(VectorFunction((0, x[0] * x[2], -x[0] * x[1])))
+            a.append(VectorFunction((x[1] * x[2], 0, -x[0] * x[1])))
         else:
             for i in range(order + 1):
                 p = x[1] ** i * x[2] ** (order - i)
-                a.append((0, x[0] * x[2] * p, -x[0] * x[1] * p))
+                a.append(VectorFunction((0, x[0] * x[2] * p, -x[0] * x[1] * p)))
 
                 p = x[0] ** i * x[2] ** (order - i)
-                a.append((x[1] * x[2] * p, 0, -x[0] * x[1] * p))
+                a.append(VectorFunction((x[1] * x[2] * p, 0, -x[0] * x[1] * p)))
 
                 p = x[0] ** i * x[1] ** (order - i)
-                a.append((x[1] * x[2] * p, -x[0] * x[2] * p, 0))
+                a.append(VectorFunction((x[1] * x[2] * p, -x[0] * x[2] * p, 0)))
 
-        return [curl(i) for i in a]
+        return [i.curl() for i in a]
 
     raise NotImplementedError()
 
 
-def Hcurl_serendipity(domain_dim: int, range_dim: int, order: int) -> ListOfVectorFunctions:
+def Hcurl_serendipity(domain_dim: int, range_dim: int, order: int) -> typing.List[VectorFunction]:
     """Hcurl conforming serendipity set."""
     assert domain_dim == range_dim
     if domain_dim == 2:
         return [
-            ((order + 1) * x[0] ** order * x[1], -x[0] ** (order + 1)),
-            (x[1] ** (order + 1), -(order + 1) * x[0] * x[1] ** order),
+            VectorFunction(((order + 1) * x[0] ** order * x[1], -x[0] ** (order + 1))),
+            VectorFunction((x[1] ** (order + 1), -(order + 1) * x[0] * x[1] ** order)),
         ]
     if domain_dim == 3:
-        out: ListOfVectorFunctions = []
+        out: typing.List[VectorFunction] = []
         if order == 1:
             out += [
-                (0, x[0] * x[2], -x[0] * x[1]),
-                (x[1] * x[2], 0, -x[0] * x[1]),
+                VectorFunction((0, x[0] * x[2], -x[0] * x[1])),
+                VectorFunction((x[1] * x[2], 0, -x[0] * x[1])),
             ]
         else:
             for i in range(order):
                 p = x[0] ** i * x[2] ** (order - 1 - i)
-                out.append((x[1] * x[2] * p, 0, -x[0] * x[1] * p))
+                out.append(VectorFunction((x[1] * x[2] * p, 0, -x[0] * x[1] * p)))
 
                 p = x[1] ** i * x[2] ** (order - 1 - i)
-                out.append((0, x[0] * x[2] * p, -x[0] * x[1] * p))
+                out.append(VectorFunction((0, x[0] * x[2] * p, -x[0] * x[1] * p)))
 
                 p = x[0] ** i * x[1] ** (order - 1 - i)
-                out.append((x[1] * x[2] * p, -x[0] * x[2] * p, 0))
+                out.append(VectorFunction((x[1] * x[2] * p, -x[0] * x[2] * p, 0)))
 
         for p in serendipity_set_1d(domain_dim, order + 1):
-            out.append(tuple(diff(p, i) for i in x))
+            out.append(VectorFunction(tuple(p.diff(i) for i in x)))
         return out
 
     raise NotImplementedError()
 
 
-def prism_polynomial_set_1d(dim: int, order: int) -> ListOfScalarFunctions:
+def prism_polynomial_set_1d(dim: int, order: int) -> typing.List[ScalarFunction]:
     """One dimensional polynomial set."""
     assert dim == 3
     return [
-        x[0] ** i * x[1] ** j * x[2] ** k
+        ScalarFunction(x[0] ** i * x[1] ** j * x[2] ** k)
         for k in range(order + 1)
         for j in range(order + 1)
         for i in range(order + 1 - j)
@@ -262,21 +256,21 @@ def prism_polynomial_set_1d(dim: int, order: int) -> ListOfScalarFunctions:
 
 def prism_polynomial_set_vector(
     domain_dim: int, range_dim: int, order: int
-) -> ListOfVectorFunctions:
+) -> typing.List[VectorFunction]:
     """Polynomial set for a prism."""
     set1d = prism_polynomial_set_1d(domain_dim, order)
     return [
-        tuple(p if i == j else 0 for j in range(range_dim))
+        VectorFunction([p if i == j else 0 for j in range(range_dim)])
         for p in set1d
         for i in range(range_dim)
     ]
 
 
-def pyramid_polynomial_set_1d(dim: int, order: int) -> ListOfScalarFunctions:
+def pyramid_polynomial_set_1d(dim: int, order: int) -> typing.List[ScalarFunction]:
     """One dimensional polynomial set."""
     assert dim == 3
     if order == 0:
-        return [sympy.Integer(1)]
+        return [ScalarFunction(1)]
 
     poly = polynomial_set_1d(3, order)
     for d in range(order):
@@ -284,18 +278,18 @@ def pyramid_polynomial_set_1d(dim: int, order: int) -> ListOfScalarFunctions:
             for j in range(d + 1 - i):
                 p = x[0] ** i * x[1] ** j * x[2] ** (d - i - j)
                 p *= (x[0] * x[1] / (1 - x[2])) ** (order - d)
-                poly.append(p)
+                poly.append(ScalarFunction(p))
 
     return poly
 
 
 def pyramid_polynomial_set_vector(
     domain_dim: int, range_dim: int, order: int
-) -> ListOfVectorFunctions:
+) -> typing.List[VectorFunction]:
     """Polynomial set for a pyramid."""
     set1d = pyramid_polynomial_set_1d(domain_dim, order)
     return [
-        tuple(p if i == j else 0 for j in range(range_dim))
+        VectorFunction([p if i == j else 0 for j in range(range_dim)])
         for p in set1d
         for i in range(range_dim)
     ]
@@ -315,14 +309,14 @@ def _jrc(a, n) -> typing.Tuple[
 
 
 def orthogonal_basis_interval(
-    order: int, derivs: int, variables: AxisVariables = [x[0]]
-) -> typing.List[ListOfScalarFunctions]:
+    order: int, derivs: int, variables: AxisVariablesNotSingle = [x[0]]
+) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     assert len(variables) == 1
 
-    poly = [[sympy.Integer(0) for i in range(order + 1)] for d in range(derivs + 1)]
+    poly = [[ScalarFunction(1 if d == 0 else 0) for i in range(order + 1)]
+            for d in range(derivs + 1)]
     for dx in range(derivs + 1):
-        poly[dx][0] = sympy.Integer(1 if dx == 0 else 0)
         for i in range(1, order + 1):
             poly[dx][i] = poly[dx][i - 1] * (2 * variables[0] - 1) * (2 * i - 1) / i
             if dx > 0:
@@ -333,17 +327,18 @@ def orthogonal_basis_interval(
 
 
 def orthogonal_basis_triangle(
-    order: int, derivs: int, variables: AxisVariables = [x[0], x[1]]
-) -> typing.List[ListOfScalarFunctions]:
+    order: int, derivs: int, variables: AxisVariablesNotSingle = [x[0], x[1]]
+) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     assert len(variables) == 2
 
-    def index(p, q):
+    def index(p: int, q: int) -> int:
+        """Get the index."""
         return (p + q + 1) * (p + q) // 2 + q
 
     d_index = index
 
-    poly = [[sympy.Integer(0) for i in range((order + 1) * (order + 2) // 2)]
+    poly = [[ScalarFunction(0) for i in range((order + 1) * (order + 2) // 2)]
             for d in range((derivs + 1) * (derivs + 2) // 2)]
 
     for dx in range(derivs + 1):
@@ -351,7 +346,7 @@ def orthogonal_basis_triangle(
 
             for p in range(order + 1):
                 if p == 0:
-                    poly[d_index(dx, dy)][index(0, p)] = sympy.Integer(1 if dx == dy == 0 else 0)
+                    poly[d_index(dx, dy)][index(0, p)] = ScalarFunction(1 if dx == dy == 0 else 0)
                 else:
                     pinv = sympy.Rational(1, p)
 
@@ -396,22 +391,23 @@ def orthogonal_basis_triangle(
                         poly[d_index(dx, dy)][index(q, p)] += (
                             poly[d_index(dx, dy - 1)][index(q - 1, p)] * 2 * dy * a
                         )
-
     return poly
 
 
 def orthogonal_basis_quadrilateral(
-    order: int, derivs: int, variables: AxisVariables = [x[0], x[1]]
-) -> typing.List[ListOfScalarFunctions]:
+    order: int, derivs: int, variables: AxisVariablesNotSingle = [x[0], x[1]]
+) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     assert len(variables) == 2
 
-    def d_index(p, q):
+    def d_index(p: int, q: int) -> int:
+        """Get the derivative index."""
         return (p + q + 1) * (p + q) // 2 + q
 
     p0 = orthogonal_basis_interval(order, derivs, [variables[0]])
     p1 = orthogonal_basis_interval(order, derivs, [variables[1]])
-    poly = [sympy.Integer(0) for d in range((derivs + 1) * (derivs + 2) // 2)]
+    poly = [[ScalarFunction(0) for i in range((order + 1) ** 2)]
+            for d in range((derivs + 1) * (derivs + 2) // 2)]
     for i in range(derivs + 1):
         for j in range(derivs + 1 - i):
             poly[d_index(i, j)] = [a * b for a in p0[i] for b in p1[j]]
@@ -419,17 +415,18 @@ def orthogonal_basis_quadrilateral(
 
 
 def orthogonal_basis_tetrahedron(
-    order: int, derivs: int, variables: AxisVariables = x
-) -> typing.List[ListOfScalarFunctions]:
+    order: int, derivs: int, variables: AxisVariablesNotSingle = x
+) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     assert len(variables) == 3
 
-    def index(p, q, r):
+    def index(p: int, q: int, r: int) -> int:
+        """Get the index."""
         return (p + q + r) * (p + q + r + 1) * (p + q + r + 2) // 6 + (q + r) * (q + r + 1) // 2 + r
 
     d_index = index
 
-    poly = [[sympy.Integer(0) for i in range((order + 1) * (order + 2) * (order + 3) // 6)]
+    poly = [[ScalarFunction(0) for i in range((order + 1) * (order + 2) * (order + 3) // 6)]
             for d in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
     for dx in range(derivs + 1):
         for dy in range(derivs + 1 - dx):
@@ -437,7 +434,7 @@ def orthogonal_basis_tetrahedron(
 
                 for p in range(order + 1):
                     if p == 0:
-                        poly[d_index(dx, dy, dz)][index(0, 0, p)] = sympy.Integer(
+                        poly[d_index(dx, dy, dz)][index(0, 0, p)] = ScalarFunction(
                             1 if dx == dy == dz == 0 else 0)
                     if p > 0:
                         invp = sympy.Rational(1, p)
@@ -543,20 +540,22 @@ def orthogonal_basis_tetrahedron(
 
 
 def orthogonal_basis_hexahedron(
-    order: int, derivs: int, variables: AxisVariables = x
-) -> typing.List[ListOfScalarFunctions]:
+    order: int, derivs: int, variables: AxisVariablesNotSingle = x
+) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     if variables is None:
         variables = x
     assert len(variables) == 3
 
-    def d_index(p, q, r):
+    def d_index(p: int, q: int, r: int) -> int:
+        """Get the derivative index."""
         return (p + q + r) * (p + q + r + 1) * (p + q + r + 2) // 6 + (q + r) * (q + r + 1) // 2 + r
 
     p0 = orthogonal_basis_interval(order, derivs, [variables[0]])
     p1 = orthogonal_basis_interval(order, derivs, [variables[1]])
     p2 = orthogonal_basis_interval(order, derivs, [variables[2]])
-    poly = [sympy.Integer(0) for d in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
+    poly = [[ScalarFunction(0) for i in range((order + 1) ** 3)]
+            for d in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
     for i in range(derivs + 1):
         for j in range(derivs + 1 - i):
             for k in range(derivs + 1 - i - j):
@@ -565,22 +564,25 @@ def orthogonal_basis_hexahedron(
 
 
 def orthogonal_basis_prism(
-    order: int, derivs: int, variables: AxisVariables = x
-) -> typing.List[ListOfScalarFunctions]:
+    order: int, derivs: int, variables: AxisVariablesNotSingle = x
+) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     if variables is None:
         variables = x
     assert len(variables) == 3
 
-    def d_index_tri(p, q):
+    def d_index_tri(p: int, q: int) -> int:
+        """Get the derivative index for a triangle."""
         return (p + q + 1) * (p + q) // 2 + q
 
-    def d_index(p, q, r):
+    def d_index(p: int, q: int, r: int) -> int:
+        """Get the derivative index."""
         return (p + q + r) * (p + q + r + 1) * (p + q + r + 2) // 6 + (q + r) * (q + r + 1) // 2 + r
 
     p01 = orthogonal_basis_triangle(order, derivs, [variables[0], variables[1]])
     p2 = orthogonal_basis_interval(order, derivs, [variables[2]])
-    poly = [sympy.Integer(0) for d in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
+    poly = [[ScalarFunction(0) for i in range((order + 1) * (order + 1) * (order + 2) // 2)]
+            for d in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
     for i in range(derivs + 1):
         for j in range(derivs + 1 - i):
             for k in range(derivs + 1 - i - j):
@@ -589,12 +591,13 @@ def orthogonal_basis_prism(
 
 
 def orthogonal_basis_pyramid(
-    order: int, derivs: int, variables: AxisVariables = x
-) -> typing.List[ListOfScalarFunctions]:
+    order: int, derivs: int, variables: AxisVariablesNotSingle = x
+) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     assert len(variables) == 3
 
-    def index(i, j, k):
+    def index(i: int, j: int, k: int) -> int:
+        """Get the index."""
         out = k + j * (order + 1) + i * (order + 1) * (order + 2) // 2 - i * (i ** 2 + 5) // 6
         if i > j:
             out -= i * (j - 1)
@@ -602,21 +605,23 @@ def orthogonal_basis_pyramid(
             out -= j * (j - 1) // 2 + i * (i - 1) // 2
         return out
 
-    def d_index(p, q, r):
+    def d_index(p: int, q: int, r: int) -> int:
+        """Get the derivative index."""
         return (p + q + r) * (p + q + r + 1) * (p + q + r + 2) // 6 + (q + r) * (q + r + 1) // 2 + r
 
-    def combinations(n, k):
+    def combinations(n: int, k: int) -> int:
+        """Get the number of combinations."""
         out = 1
         for i in range(n, n - k, -1):
             out *= i
         return out
 
-    poly = [[sympy.Integer(0) for i in range((2 * order + 3) * (order + 2) * (order + 1) // 6)]
+    poly = [[ScalarFunction(0) for i in range((2 * order + 3) * (order + 2) * (order + 1) // 6)]
             for d in range((derivs + 1) * (derivs + 2) * (derivs + 3) // 6)]
     for dx in range(derivs + 1):
         for dy in range(derivs + 1 - dx):
             for dz in range(derivs + 1 - dx - dy):
-                poly[d_index(dx, dy, dz)][0] = sympy.Integer(1 if dx == dy == dz == 0 else 0)
+                poly[d_index(dx, dy, dz)][0] = ScalarFunction(1 if dx == dy == dz == 0 else 0)
 
                 for i in range(order + 1):
                     if i > 0:
@@ -749,8 +754,8 @@ def orthogonal_basis_pyramid(
 
 
 def orthogonal_basis(
-    cell, order: int, derivs: int, variables: AxisVariables = None
-) -> typing.List[ListOfScalarFunctions]:
+    cell, order: int, derivs: int, variables: AxisVariablesNotSingle = None
+) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     args: typing.List[typing.Any] = [order, derivs]
     if variables is not None:

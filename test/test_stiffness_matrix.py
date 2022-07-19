@@ -1,7 +1,7 @@
-import symfem
+"""Test assembly of a stiffness matrix."""
+
 import sympy
-from symfem.vectors import vdot
-from symfem.calculus import grad
+import symfem
 
 
 def test_stiffness_matrix():
@@ -17,8 +17,8 @@ def test_stiffness_matrix():
         basis = element.map_to_cell(vs)
         for test_i, test_f in zip(triangle, basis):
             for trial_i, trial_f in zip(triangle, basis):
-                integrand = vdot(grad(test_f, 2), grad(trial_f, 2))
-                matrix[test_i][trial_i] += ref.integral(integrand)
+                integrand = test_f.grad(2).dot(trial_f.grad(2))
+                matrix[test_i][trial_i] += integrand.integral(ref)
 
     half = sympy.Rational(1, 2)
     actual_matrix = [

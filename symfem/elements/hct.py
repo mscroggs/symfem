@@ -6,13 +6,13 @@ This element's definition appears in https://doi.org/10.2307/2006147
 
 import sympy
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
-from ..finite_element import CiarletElement, ElementBasisFunction
+from ..basis_functions import BasisFunction
+from ..finite_element import CiarletElement
 from ..functionals import (PointEvaluation, PointNormalDerivativeEvaluation,
-                           DerivativePointEvaluation)
-from ..symbolic import sym_sum, PiecewiseFunction, ListOfVectorFunctions
-from ..basis_function import BasisFunction
+                           DerivativePointEvaluation, ListOfFunctionals)
+from ..functions import VectorFunction, FunctionInput
+from ..piecewise_functions import PiecewiseFunction
+from ..references import Reference
 from .hermite import Hermite
 
 
@@ -28,15 +28,10 @@ class HsiehCloughTocher(CiarletElement):
             dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(reference, vs, (1, 0), entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(reference, vs, (0, 1), entity=(0, v_n)))
-        for e_n, vs in enumerate(reference.sub_entities(1)):
-            assert isinstance(reference.sub_entity_types[1], str)
-            sub_ref = create_reference(
-                reference.sub_entity_types[1],
-                vertices=tuple(reference.vertices[v] for v in vs))
-            midpoint = tuple(sym_sum(i) / len(i)
-                             for i in zip(*[reference.vertices[i] for i in vs]))
-            dofs.append(
-                PointNormalDerivativeEvaluation(reference, midpoint, sub_ref, entity=(1, e_n)))
+        for e_n in range(reference.sub_entity_count(1)):
+            sub_ref = reference.sub_entity(1, e_n)
+            dofs.append(PointNormalDerivativeEvaluation(
+                reference, sub_ref.midpoint(), sub_ref, entity=(1, e_n)))
 
         mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
 
@@ -83,23 +78,14 @@ class HsiehCloughTocher(CiarletElement):
         # piece_list.append((0, hermite_spaces[1].get_basis_function(9), 0))
         # piece_list.append((0, 0, hermite_spaces[2].get_basis_function(9)))
 
-        piece_list2: ListOfVectorFunctions = []
+        piece_list2: typing.List[VectorFunction] = []
         for i in piece_list:
-            t = []
-            for j in i:
-                if isinstance(j, ElementBasisFunction):
-                    j_f = j.get_function()
-                    assert isinstance(j_f, (int, sympy.core.expr.Expr))
-                    t.append(j_f)
-                else:
-                    assert isinstance(j, int)
-                    t.append(j)
-            piece_list2.append(tuple(t))
+            piece_list2.append(VectorFunction(i))
 
-        poly = [
-            PiecewiseFunction(list(zip(subs, p)), "triangle")
-            for p in piece_list2
-        ]
+        poly: typing.List[FunctionInput] = []
+        poly += [
+            PiecewiseFunction({i: j for i, j in zip(subs, p)}, 2)
+            for p in piece_list2]
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1

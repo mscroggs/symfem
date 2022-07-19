@@ -1,7 +1,8 @@
-from symfem import create_element
-import numpy as np
+"""Test that basis functions agree with Basix."""
+
 import pytest
 import typing
+from symfem import create_element
 
 elements: typing.Dict[str, typing.List[typing.Tuple[
     str, str, typing.Iterable, typing.List[typing.Tuple[str, typing.Any]]
@@ -66,7 +67,16 @@ def to_float(a):
         return [to_float(i) for i in a]
 
 
+def to_nparray(a):
+    import numpy as np
+    try:
+        return float(a)
+    except:  # noqa: E722
+        return np.array([to_float(i) for i in a])
+
+
 def make_lattice(cell, N=3):
+    import numpy as np
     if cell == "interval":
         return np.array([[i / N] for i in range(N + 1)])
     if cell == "triangle":
@@ -116,6 +126,8 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
         except ImportError:
             pytest.skip("Basix must be installed to run this test.")
 
+    import numpy as np
+
     points = make_lattice(cell, 2)
     parsed_args = []
     for a in args:
@@ -133,8 +145,10 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
     result = space.tabulate(0, points)[0]
 
     element = create_element(cell, symfem_type, order)
-    sym_result = element.tabulate_basis(points, "xyz,xyz", symbolic=False)
+    sym_result = to_nparray(element.tabulate_basis(points, "xyz,xyz"))
 
+    print(result.shape)
+    print(sym_result.shape)
     if len(result.shape) != len(sym_result.shape):
         sym_result = sym_result.reshape(result.shape)
 

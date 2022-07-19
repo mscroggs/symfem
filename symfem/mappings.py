@@ -1,83 +1,59 @@
 """Functions to map functions between cells."""
 
-import sympy
-import typing
-from .symbolic import (subs, x, MatrixFunction, ScalarFunction, VectorFunction, PointType,
-                       AnyFunction)
-from .vectors import vdot, vcross3d, vnorm
-from .calculus import diff
-
-
-def _det(M: MatrixFunction) -> ScalarFunction:
-    """Find the determinant."""
-    if M.rows == M.cols:
-        return M.det()
-    if M.rows == 3 and M.cols == 2:
-        crossed = vcross3d(M.col(0), M.col(1))
-        assert isinstance(crossed, tuple)
-        return vnorm(crossed)
-    raise ValueError(f"Cannot find determinant of {M.rows}x{M.cols} matrix.")
+from .functions import (MatrixFunction, VectorFunction, AnyFunction,
+                        FunctionInput, parse_function_input)
+from .geometry import PointType
+from .symbols import x
 
 
 def identity(
-    f: AnyFunction, map: PointType, inverse_map: PointType, tdim: int
+    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
 ) -> AnyFunction:
     """Map functions."""
-    g = subs(f, x, inverse_map)
-    return g
+    return parse_function_input(f_in).subs(x, inverse_map)
 
 
 def covariant(
-    f: VectorFunction, map: PointType, inverse_map: PointType, tdim: int
+    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
 ) -> VectorFunction:
     """Map H(curl) functions."""
-    g = subs(f, x, inverse_map)
-    assert isinstance(g, tuple)
-    j_inv = sympy.Matrix([[diff(i, x[j]) for j in range(len(map))]
-                          for i in inverse_map]).transpose()
-    return tuple(vdot(j_inv.row(i), g) for i in range(j_inv.rows))
+    f = parse_function_input(f_in).subs(x, inverse_map)
+    assert f.is_vector
+
+    j_inv = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
+    return j_inv @ f
 
 
 def contravariant(
-    f: VectorFunction, map: PointType, inverse_map: PointType, tdim: int
+    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
 ) -> VectorFunction:
     """Map H(div) functions."""
-    g = subs(f, x, inverse_map)
-    assert isinstance(g, tuple)
-    jacobian = sympy.Matrix([[diff(i, x[j]) for j in range(tdim)] for i in map])
-    jacobian /= _det(jacobian)
-    return tuple(vdot(jacobian.row(i), g) for i in range(jacobian.rows))
+    f = parse_function_input(f_in).subs(x, inverse_map)
+    assert f.is_vector
+
+    jacobian = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
+    jacobian /= jacobian.det()
+    return jacobian @ f
 
 
 def double_covariant(
-    f: typing.Union[MatrixFunction, VectorFunction], map: PointType,
-    inverse_map: PointType, tdim: int
-) -> VectorFunction:
+    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
+) -> MatrixFunction:
     """Map matrix functions."""
-    g = subs(f, x, inverse_map)
-    if isinstance(g, tuple):
-        g_mat = sympy.Matrix([g[i * tdim: (i + 1) * tdim] for i in range(tdim)])
-    else:
-        assert isinstance(g, sympy.Matrix)
-        g_mat = g
-    j_inv = sympy.Matrix([[diff(i, x[j]) for j in range(len(map))]
-                          for i in inverse_map]).transpose()
-    out = j_inv * g_mat * j_inv.transpose()
-    return tuple(out[i] for i in range(out.rows * out.cols))
+    f = parse_function_input(f_in).subs(x, inverse_map)
+    assert f.is_matrix
+
+    j_inv = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
+    return j_inv @ f @ j_inv.transpose()
 
 
 def double_contravariant(
-    f: VectorFunction, map: PointType, inverse_map: PointType, tdim: int
-) -> VectorFunction:
+    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
+) -> MatrixFunction:
     """Map matrix functions."""
-    g = subs(f, x, inverse_map)
-    if isinstance(g, tuple):
-        g_mat = sympy.Matrix([g[i * tdim: (i + 1) * tdim] for i in range(tdim)])
-    else:
-        assert isinstance(g, sympy.Matrix)
-        g_mat = g
-    jacobian = sympy.Matrix([[diff(i, x[j]) for j in range(tdim)] for i in map])
-    jacobian /= _det(jacobian)
+    f = parse_function_input(f_in).subs(x, inverse_map)
+    assert f.is_matrix
 
-    out = jacobian * g_mat * jacobian.transpose()
-    return tuple(out[i] for i in range(out.rows * out.cols))
+    jacobian = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
+    jacobian /= jacobian.det()
+    return jacobian @ f @ jacobian.transpose()

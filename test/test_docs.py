@@ -1,11 +1,13 @@
-import symfem
-from io import StringIO
+"""Test documentation."""
+
 import json
-import sys
 import os
-import re
 import pytest
+import re
+import sys
 import typing
+from io import StringIO
+import symfem
 
 code = False
 output = False

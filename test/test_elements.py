@@ -1,7 +1,11 @@
+"""Test every element."""
+
 import pytest
 import symfem
 from symfem import create_element
-from symfem.symbolic import subs, x, symequal
+from symfem.symbols import x
+from symfem.utils import allequal
+from symfem.functions import VectorFunction
 from .utils import test_elements
 
 
@@ -70,11 +74,11 @@ def test_dual_elements(elements_to_test, cells_to_test, n_tri, order):
     space = create_element(f"dual polygon({n_tri})", "dual", order)
     sub_e = create_element("triangle", space.fine_space, space.order)
     for f, coeff_list in zip(space.get_basis_functions(), space.dual_coefficients):
-        for piece, coeffs in zip(f.pieces, coeff_list):
-            map = sub_e.reference.get_map_to(piece[0])
+        for piece, coeffs in zip(f.pieces.items(), coeff_list):
+            fwd_map = VectorFunction(sub_e.reference.get_map_to(piece[0]))
             for dof, value in zip(sub_e.dofs, coeffs):
-                point = subs(map, x, dof.point)
-                assert symequal(value, subs(piece[1], x, point))
+                point = fwd_map.subs(x, dof.point)
+                assert allequal(value, piece[1].subs(x, point))
 
 
 @pytest.mark.parametrize("n_tri", [3, 4])

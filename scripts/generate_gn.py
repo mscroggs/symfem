@@ -83,9 +83,10 @@ for ref in ["triangle", "tetrahedron"]:
     for f in fs:
         assert isinstance(f, tuple)
         output += "    [\n"
-        integrand = subs(div(f), x, tuple(t))
-        assert isinstance(integrand, (int, sympy.core.expr.Expr))
-        fun = (div(f) - reference.integral(integrand) / reference.volume()).as_coefficients_dict()
+        integrand = f.div().subs(x, t)
+        fun = (
+            f.div() - integrand.integral(reference) / reference.volume()
+        ).as_sympy().as_coefficients_dict()
 
         for term in fun:
             assert term in terms

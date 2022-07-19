@@ -5,14 +5,15 @@ This element's definition appears in https://doi.org/10.2307/2007793
 """
 
 import sympy
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+import typing
 from ..finite_element import CiarletElement
+from ..functionals import (NormalIntegralMoment, DotPointEvaluation,
+                           DivergenceIntegralMoment, ListOfFunctionals)
+from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
-from ..functionals import (NormalIntegralMoment, DotPointEvaluation,
-                           DivergenceIntegralMoment)
-from ..symbolic import x
+from ..references import Reference
+from ..symbols import x
 from .lagrange import Lagrange
 
 
@@ -20,7 +21,8 @@ class BernardiRaugel(CiarletElement):
     """Bernardi-Raugel Hdiv finite element."""
 
     def __init__(self, reference: Reference, order: int):
-        poly = polynomial_set_vector(reference.tdim, reference.tdim, order)
+        poly: typing.List[FunctionInput] = []
+        poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
 
         p = Lagrange(reference, 1, variant="equispaced")
 
@@ -51,10 +53,6 @@ class BernardiRaugel(CiarletElement):
 
             for i in range(reference.tdim):
                 bf = p.get_basis_functions()
-                assert isinstance(bf[0], (int, sympy.core.expr.Expr))
-                assert isinstance(bf[1], (int, sympy.core.expr.Expr))
-                assert isinstance(bf[2], (int, sympy.core.expr.Expr))
-                assert isinstance(bf[3], (int, sympy.core.expr.Expr))
                 poly.append(tuple(
                     bf[0] * bf[1] * bf[2] * bf[3] if j == i else 0 for j in range(reference.tdim)))
 

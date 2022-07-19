@@ -1,8 +1,8 @@
 """Functions to create integral moments."""
 
 import typing
-from .references import Reference
 from .functionals import BaseFunctional
+from .references import Reference
 
 MomentType = typing.Tuple[typing.Type, typing.Type, int, typing.Union[str, None],
                           typing.Dict[str, typing.Any]]

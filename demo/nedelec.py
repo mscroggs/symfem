@@ -13,12 +13,8 @@ space on a triangle.
 
 import symfem
 from symfem.polynomials import polynomial_set_vector
-from symfem.symbolic import x, subs, symequal
-
-# In this demo, we use the function vdot to compute the dot product of two vectors.
-# The module symfem.vectors contains many functions that can be used to manipulate
-# vectors.
-from symfem.vectors import vdot
+from symfem.symbols import x
+from symfem.utils import allequal
 
 element = symfem.create_element("triangle", "Nedelec1", 4)
 polys = element.get_polynomial_basis()
@@ -33,15 +29,15 @@ for i, j in zip(p3, polys[:20]):
 # Check that the rest of the polynomials in the polynomial basis
 # satisfy p DOT x = 0
 for p in polys[20:]:
-    assert vdot(p, tuple(x)) == 0
+    assert p.dot(x[:2]) == 0
 
 # Get the basis functions associated with the interior of the triangle
 basis = element.get_basis_functions()
 functions = [basis[d] for d in element.entity_dofs(2, 0)]
 
 # Check that these functions have 0 tangential component on each edge
-# symequal will simplify the expressions then check that they are equal
+# allequal will simplify the expressions then check that they are equal
 for f in functions:
-    assert symequal(vdot(subs(f, x[0], 1 - x[1]), (1, -1)), 0)
-    assert symequal(vdot(subs(f, x[0], 0), (0, 1)), 0)
-    assert symequal(vdot(subs(f, x[1], 0), (1, 0)), 0)
+    assert allequal(f.subs(x[0], 1 - x[1]).dot((1, -1)), 0)
+    assert allequal(f.subs(x[0], 0).dot((0, 1)), 0)
+    assert allequal(f.subs(x[1], 0).dot((1, 0)), 0)

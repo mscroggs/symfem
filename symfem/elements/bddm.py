@@ -5,32 +5,29 @@ This element's definition appears in https://doi.org/10.1007/BF01396752
 """
 
 import typing
-from ..references import Reference
-from ..functionals import ListOfFunctionals
+from ..functionals import NormalIntegralMoment, IntegralMoment, ListOfFunctionals
+from ..functions import VectorFunction, FunctionInput
 from ..finite_element import CiarletElement
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
-from ..symbolic import x, ListOfVectorFunctions
-from ..calculus import curl
-from ..functionals import NormalIntegralMoment, IntegralMoment
+from ..references import Reference
+from ..symbols import x
 from .dpc import DPC, VectorDPC
 
 
-def bddf_polyset(reference: Reference, order: int) -> ListOfVectorFunctions:
+def bddf_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]:
     """Create the polynomial basis for a BDDF element."""
     dim = reference.tdim
-    pset: ListOfVectorFunctions = []
     assert reference.name == "hexahedron"
-    for p in polynomial_set_vector(dim, dim, order):
-        assert isinstance(p, tuple)
-        pset.append(p)
-    pset.append(curl((0, 0, x[0] ** (order + 1) * x[1])))
-    pset.append(curl((0, x[0] * x[2] ** (order + 1), 0)))
-    pset.append(curl((x[1] ** (order + 1) * x[2], 0, 0)))
+    pset: typing.List[FunctionInput] = []
+    pset += polynomial_set_vector(dim, dim, order)
+    pset.append(VectorFunction((0, 0, x[0] ** (order + 1) * x[1])).curl())
+    pset.append(VectorFunction((0, x[0] * x[2] ** (order + 1), 0)).curl())
+    pset.append(VectorFunction((x[1] ** (order + 1) * x[2], 0, 0)).curl())
     for i in range(1, order + 1):
-        pset.append(curl((0, 0, x[0] * x[1] ** (i + 1) * x[2] ** (order - i))))
-        pset.append(curl((0, x[0] ** (i + 1) * x[1] ** (order - i) * x[2], 0)))
-        pset.append(curl((x[0] ** (order - i) * x[1] * x[2] ** (i + 1), 0, 0)))
+        pset.append(VectorFunction((0, 0, x[0] * x[1] ** (i + 1) * x[2] ** (order - i))).curl())
+        pset.append(VectorFunction((0, x[0] ** (i + 1) * x[1] ** (order - i) * x[2], 0)).curl())
+        pset.append(VectorFunction((x[0] ** (order - i) * x[1] * x[2] ** (i + 1), 0, 0)).curl())
 
     return pset
 
