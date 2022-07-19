@@ -80,7 +80,7 @@ class Line(PictureElement):
 
     def __init__(
         self, start: PointType, end: PointType, color: str,
-        width: int
+        width: float
     ):
         super().__init__()
         self.start = start
@@ -118,7 +118,7 @@ class Bezier(PictureElement):
 
     def __init__(
         self, start: PointType, mid1: PointType, mid2: PointType, end: PointType, color: str,
-        width: int
+        width: float
     ):
         super().__init__()
         self.start = start
@@ -164,7 +164,7 @@ class Arrow(PictureElement):
 
     def __init__(
         self, start: PointType, end: PointType, color: str,
-        width: int
+        width: float
     ):
         super().__init__()
         self.start = start
@@ -218,7 +218,7 @@ class NCircle(PictureElement):
 
     def __init__(
         self, center: PointType, number: int, color: str, text_color: str, fill_color: str,
-        radius: float, font_size: typing.Union[int, None], width: int
+        radius: float, font_size: typing.Union[int, None], width: float
     ):
         self.center = center
         self.number = number

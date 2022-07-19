@@ -248,13 +248,13 @@ class AnyFunction(ABC):
         """Plot the function."""
         from .plotting import Picture, colors
 
-        extra = tuple()
+        extra: typing.Tuple[int, ...] = tuple()
         if self.is_scalar:
             extra = (0, )
 
         img = Picture()
 
-        if dof_entity[0] > 1:
+        if dof_entity is not None and dof_entity[0] > 1:
             sub_e = reference.sub_entity(*dof_entity)
             img.add_fill([i + extra for i in sub_e.clockwise_vertices], colors.BLUE, 0.5)
 
@@ -269,7 +269,7 @@ class AnyFunction(ABC):
                         reference.vertices[reference.edges[entity][1]] + extra, c)
 
                 if dim == reference.tdim:
-                    self.plot_values(img, scale)
+                    self.plot_values(reference, img, scale)
 
                 if (dim, entity) == dof_entity:
                     if dof_direction is not None:
@@ -283,7 +283,7 @@ class AnyFunction(ABC):
         img.save(filename)
 
     def plot_values(
-        self, img: typing.Any, scale: sympy.core.expr.Expr = sympy.Integer(1)
+        self, reference: Reference, img: typing.Any, scale: sympy.core.expr.Expr = sympy.Integer(1)
     ):
         """Plot the function's values."""
         raise ValueError(f"Cannot plot function of type '{self.__class__.__name__}'")
@@ -538,67 +538,35 @@ class ScalarFunction(AnyFunction):
         """Integrate the function."""
         return ScalarFunction(self._f.integrate(*limits))
 
-    def plot(
-        self, reference: Reference, filename: str, dof_point: PointType = None,
-        dof_direction: PointType = None, dof_entity: typing.Tuple[int, int] = None,
-        dof_n: int = None, scale: sympy.core.expr.Expr = sympy.Integer(1)
+    def plot_values(
+        self, reference: Reference, img: typing.Any, scale: sympy.core.expr.Expr = sympy.Integer(1)
     ):
-        """Plot the function."""
-        if reference.tdim not in [1, 2]:
-            raise ValueError(f"Cannot plot scalar function on cell type {reference.name}'")
-
+        """Plot the function's values."""
         from .plotting import Picture, colors
+        assert isinstance(img, Picture)
 
-        img = Picture()
+        pts, pairs = reference.make_lattice_with_lines(6)
 
-        if dof_entity[0] > 1:
-            sub_e = reference.sub_entity(*dof_entity)
-            img.add_fill([i + (0, ) for i in sub_e.clockwise_vertices], colors.BLUE, 0.5)
+        deriv = self.grad(reference.tdim)
+        evals = []
+        for p in pts:
+            value = self.subs(x, p).as_sympy() * scale
+            assert isinstance(value, sympy.core.expr.Expr)
+            evals.append(value)
 
-        for ze in reference.z_ordered_entities_extra_dim():
-            for dim, entity in ze:
-                if dim == 1:
-                    c = colors.GRAY
-                    if dof_entity == (1, entity):
-                        c = colors.BLUE
-                    img.add_line(
-                        reference.vertices[reference.edges[entity][0]] + (0, ),
-                        reference.vertices[reference.edges[entity][1]] + (0, ), c)
-
-                if dim == reference.tdim:
-                    pts, pairs = reference.make_lattice_with_lines(6)
-
-                    deriv = self.grad(reference.tdim)
-                    evals = []
-                    for p in pts:
-                        value = self.subs(x, p).as_sympy() * scale
-                        assert isinstance(value, sympy.core.expr.Expr)
-                        evals.append(value)
-
-                    for i, j in pairs:
-                        pi = VectorFunction(pts[i])
-                        pj = VectorFunction(pts[j])
-                        d_pi = (2 * pi + pj) / 3
-                        d_pj = (2 * pj + pi) / 3
-                        di = deriv.subs(x, pi).dot(d_pi - pts[i]).as_sympy()
-                        dj = deriv.subs(x, pj).dot(d_pj - pts[j]).as_sympy()
-                        assert isinstance(di, sympy.core.expr.Expr)
-                        assert isinstance(dj, sympy.core.expr.Expr)
-                        img.add_bezier(
-                            tuple(pi) + (evals[i], ), tuple(d_pi) + (evals[i] + di, ),
-                            tuple(d_pj) + (evals[j] + dj, ), tuple(pj) + (evals[j], ),
-                            colors.ORANGE)
-
-                if (dim, entity) == dof_entity:
-                    if dof_direction is not None:
-                        assert dof_point is not None and dof_n is not None
-                        img.add_dof_arrow(dof_point + (0, ), dof_direction + (0, ), dof_n,
-                                          colors.PURPLE, bold=False)
-                    elif dof_point is not None:
-                        assert dof_n is not None
-                        img.add_dof_marker(dof_point + (0, ), dof_n, colors.PURPLE, bold=False)
-
-        img.save(filename)
+        for i, j in pairs:
+            pi = VectorFunction(pts[i])
+            pj = VectorFunction(pts[j])
+            d_pi = (2 * pi + pj) / 3
+            d_pj = (2 * pj + pi) / 3
+            di = deriv.subs(x, pi).dot(d_pi - pts[i]).as_sympy()
+            dj = deriv.subs(x, pj).dot(d_pj - pts[j]).as_sympy()
+            assert isinstance(di, sympy.core.expr.Expr)
+            assert isinstance(dj, sympy.core.expr.Expr)
+            img.add_bezier(
+                tuple(pi) + (evals[i], ), tuple(d_pi) + (evals[i] + di, ),
+                tuple(d_pj) + (evals[j] + dj, ), tuple(pj) + (evals[j], ),
+                colors.ORANGE)
 
 
 class VectorFunction(AnyFunction):
@@ -833,49 +801,19 @@ class VectorFunction(AnyFunction):
         else:
             raise StopIteration
 
-    def plot(
-        self, reference: Reference, filename: str, dof_point: PointType = None,
-        dof_direction: PointType = None, dof_entity: typing.Tuple[int, int] = None,
-        dof_n: int = None, scale: sympy.core.expr.Expr = sympy.Integer(1)
+    def plot_values(
+        self, reference: Reference, img: typing.Any, scale: sympy.core.expr.Expr = sympy.Integer(1)
     ):
-        """Plot the function."""
+        """Plot the function's values."""
         from .plotting import Picture, colors
+        assert isinstance(img, Picture)
 
-        img = Picture()
+        pts = reference.make_lattice(6)
 
-        if dof_entity[0] > 1:
-            sub_e = reference.sub_entity(*dof_entity)
-            img.add_fill([i for i in sub_e.clockwise_vertices], colors.BLUE, 0.5)
-
-        for ze in reference.z_ordered_entities():
-            for dim, entity in ze:
-                if dim == 1:
-                    c = colors.GRAY
-                    if dof_entity == (1, entity):
-                        c = colors.BLUE
-                    img.add_line(
-                        reference.vertices[reference.edges[entity][0]],
-                        reference.vertices[reference.edges[entity][1]], c)
-
-                if dim == reference.tdim:
-                    pts = reference.make_lattice(6)
-
-                    evals = []
-                    for p in pts:
-                        value = self.subs(x, p) * scale / 4
-                        size = float(value.norm() * 40)
-                        img.add_arrow(p, VectorFunction(p) + value, colors.ORANGE, size)
-
-                if (dim, entity) == dof_entity:
-                    if dof_direction is not None:
-                        assert dof_point is not None and dof_n is not None
-                        img.add_dof_arrow(dof_point, dof_direction, dof_n,
-                                          colors.PURPLE, bold=False)
-                    elif dof_point is not None:
-                        assert dof_n is not None
-                        img.add_dof_marker(dof_point, dof_n, colors.PURPLE, bold=False)
-
-        img.save(filename)
+        for p in pts:
+            value = self.subs(x, p) * scale / 4
+            size = float(value.norm() * 40)
+            img.add_arrow(p, VectorFunction(p) + value, colors.ORANGE, size)
 
 
 class MatrixFunction(AnyFunction):
