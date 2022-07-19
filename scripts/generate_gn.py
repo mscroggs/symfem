@@ -6,8 +6,7 @@ import symfem
 import sympy
 import sys
 import os
-from symfem.calculus import div
-from symfem.symbolic import subs, x, t
+from symfem.symbols import x, t
 from symfem.elements.guzman_neilan import make_piecewise_lagrange
 
 TESTING = "test" in sys.argv
@@ -96,9 +95,9 @@ for ref in ["triangle", "tetrahedron"]:
             [] for t in terms for p in sub_basis[0].pieces]
         for b in sub_basis:
             i = 0
-            for _, p in b.pieces:
+            for p in b.pieces.values():
                 assert isinstance(p, tuple)
-                d = div(p).expand().as_coefficients_dict()
+                d = p.div().expand().as_coefficients_dict()
                 for term in d:
                     assert term == 0 or term in terms
                 for term in terms:
@@ -115,7 +114,7 @@ for ref in ["triangle", "tetrahedron"]:
                 row: typing.List[symfem.symbolic.ScalarFunction] = [0] * 45
                 row[i] = 1
                 mat.append(row)
-            subf = subs(f, x, mid)
+            subf = f.subs(x, mid)
             assert isinstance(subf, tuple)
             aim += [i for i in subf]
             aim += [0, 0]
