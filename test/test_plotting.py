@@ -2,9 +2,40 @@
 
 import os
 import pytest
+import sympy
 import symfem
+import symfem.plotting
 
 dir = os.path.dirname(os.path.realpath(__file__))
+
+
+def test_plot_line():
+    p = symfem.plotting.Picture()
+    p.add_line((sympy.Integer(0), sympy.Integer(0)),
+               (sympy.Integer(1), sympy.Integer(1)), "blue")
+    p.as_svg(os.path.join(dir, "test-output-test_plot_line.svg"))
+
+
+def test_plot_arrow():
+    p = symfem.plotting.Picture()
+    p.add_arrow((sympy.Integer(0), sympy.Integer(0)),
+                (sympy.Integer(1), sympy.Integer(1)), "orange")
+    p.as_svg(os.path.join(dir, "test-output-test_plot_arrow.svg"))
+
+
+def test_plot_ncircle():
+    p = symfem.plotting.Picture()
+    p.add_ncircle((sympy.Integer(0), sympy.Integer(0)), 5, "green")
+    p.as_svg(os.path.join(dir, "test-output-test_plot_ncircle.svg"))
+
+
+def test_plot_fill():
+    p = symfem.plotting.Picture()
+    p.add_fill((
+        (sympy.Integer(0), sympy.Integer(0)), (sympy.Integer(1), sympy.Integer(1)),
+        (sympy.Integer(1), sympy.Rational(1, 2)), (sympy.Rational(1, 2), sympy.Integer(0))
+    ), "purple", 0.5)
+    p.as_svg(os.path.join(dir, "test-output-test_plot_fill.svg"))
 
 
 @pytest.mark.parametrize("reference", [
