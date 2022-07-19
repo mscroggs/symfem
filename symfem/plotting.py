@@ -3,7 +3,7 @@
 import sympy
 import typing
 from abc import ABC, abstractmethod
-from .geometry import PointType, SetOfPoints
+from .geometry import PointType, SetOfPoints, SetOfPointsInput, parse_set_of_points_input
 from .functions import VectorFunction
 
 
@@ -266,10 +266,10 @@ class Picture:
         self.elements.append(NCircle(center, number, color, radius, font_size, width))
 
     def add_fill(
-        self, vertices: SetOfPoints, color: str = "red", opacity: float = 1.0
+        self, vertices: SetOfPointsInput, color: str = "red", opacity: float = 1.0
     ):
         """Add a filled polygon to the picture."""
-        self.elements.append(Fill(vertices, color, opacity))
+        self.elements.append(Fill(parse_set_of_points_input(vertices), color, opacity))
 
     def as_svg(self, filename: str = None) -> str:
         """Convert to an SVG."""
