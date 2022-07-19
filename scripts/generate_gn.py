@@ -6,6 +6,7 @@ import symfem
 import sympy
 import sys
 import os
+from symfem.functions import VectorFunction, MatrixFunction
 from symfem.symbols import x, t
 from symfem.elements.guzman_neilan import make_piecewise_lagrange
 
@@ -34,7 +35,7 @@ def find_solution(mat, aim):
         assert np.isclose(float(frac), i)
         fractions.append(frac)
 
-    assert sympy.Matrix(mat) * sympy.Matrix(fractions) == sympy.Matrix(aim)
+    assert MatrixFunction(mat) @ VectorFunction(fractions) == VectorFunction(aim)
 
     return fractions
 
@@ -80,7 +81,7 @@ for ref in ["triangle", "tetrahedron"]:
         "coeffs = [\n")
 
     for f in fs:
-        assert isinstance(f, tuple)
+        assert isinstance(f, VectorFunction)
         output += "    [\n"
         integrand = f.div().subs(x, t)
         fun = (
@@ -96,8 +97,10 @@ for ref in ["triangle", "tetrahedron"]:
         for b in sub_basis:
             i = 0
             for p in b.pieces.values():
-                assert isinstance(p, tuple)
-                d = p.div().expand().as_coefficients_dict()
+                assert isinstance(p, VectorFunction)
+                d_s = p.div().as_sympy()
+                assert isinstance(d_s, sympy.core.expr.Expr)
+                d = d_s.expand().as_coefficients_dict()
                 for term in d:
                     assert term == 0 or term in terms
                 for term in terms:
@@ -115,7 +118,7 @@ for ref in ["triangle", "tetrahedron"]:
                 row[i] = sympy.Integer(1)
                 mat.append(row)
             subf = f.subs(x, mid)
-            assert isinstance(subf, tuple)
+            assert isinstance(subf, VectorFunction)
             aim += [i for i in subf]
             aim += [0, 0]
 
