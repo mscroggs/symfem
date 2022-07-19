@@ -49,7 +49,7 @@ for ref in ["triangle", "tetrahedron"]:
     br = symfem.create_element(ref, "Bernardi-Raugel", 1)
     mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
 
-    sub_cells: typing.List[symfem.symbolic.SetOfPoints] = []
+    sub_cells: typing.List[symfem.geometry.SetOfPoints] = []
 
     if ref == "triangle":
         fs = br.get_basis_functions()[-3:]
@@ -91,7 +91,7 @@ for ref in ["triangle", "tetrahedron"]:
             assert term in terms
         aim = [fun[term] if term in fun else 0 for term in terms] * (br.reference.tdim + 1)
 
-        mat: typing.List[typing.List[symfem.symbolic.ScalarFunction]] = [
+        mat: typing.List[typing.List[symfem.functions.ScalarFunction]] = [
             [] for t in terms for p in sub_basis[0].pieces]
         for b in sub_basis:
             i = 0
@@ -111,7 +111,7 @@ for ref in ["triangle", "tetrahedron"]:
             fractions = find_solution(mat, aim)
         if ref == "tetrahedron":
             for i in range(3):
-                row: typing.List[symfem.symbolic.ScalarFunction] = [0] * 45
+                row: typing.List[symfem.functions.ScalarFunction] = [0] * 45
                 row[i] = 1
                 mat.append(row)
             subf = f.subs(x, mid)
