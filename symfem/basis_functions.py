@@ -4,7 +4,7 @@ from __future__ import annotations
 import sympy
 import typing
 from abc import abstractmethod
-from .functions import AnyFunction, SympyFormat, ValuesToSubstitute, ScalarFunction
+from .functions import AnyFunction, SympyFormat, ValuesToSubstitute, ScalarFunction, FunctionInput
 from .geometry import PointType
 from .references import Reference
 from .symbols import AxisVariables, AxisVariablesNotSingle, t
@@ -93,13 +93,13 @@ class BasisFunction(AnyFunction):
         """Compute the jacobian."""
         return self.get_function().jacobian(dim)
 
-    def dot(self, other: AnyFunction) -> AnyFunction:
+    def dot(self, other_in: FunctionInput) -> AnyFunction:
         """Compute the dot product with another function."""
-        return self.get_function().dot(other)
+        return self.get_function().dot(other_in)
 
-    def cross(self, other: AnyFunction) -> AnyFunction:
+    def cross(self, other_in: FunctionInput) -> AnyFunction:
         """Compute the cross product with another function."""
-        return self.get_function().cross(other)
+        return self.get_function().cross(other_in)
 
     def div(self) -> AnyFunction:
         """Compute the div of the function."""

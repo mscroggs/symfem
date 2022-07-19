@@ -298,15 +298,15 @@ class PiecewiseFunction(AnyFunction):
         return PiecewiseFunction(
             {shape: f.jacobian(dim) for shape, f in self._pieces.items()}, self.tdim)
 
-    def dot(self, other: AnyFunction) -> PiecewiseFunction:
+    def dot(self, other_in: FunctionInput) -> PiecewiseFunction:
         """Compute the dot product with another function."""
         return PiecewiseFunction(
-            {shape: f.dot(other) for shape, f in self._pieces.items()}, self.tdim)
+            {shape: f.dot(other_in) for shape, f in self._pieces.items()}, self.tdim)
 
-    def cross(self, other: AnyFunction) -> PiecewiseFunction:
+    def cross(self, other_in: FunctionInput) -> PiecewiseFunction:
         """Compute the cross product with another function."""
         return PiecewiseFunction(
-            {shape: f.cross(other) for shape, f in self._pieces.items()}, self.tdim)
+            {shape: f.cross(other_in) for shape, f in self._pieces.items()}, self.tdim)
 
     def div(self) -> PiecewiseFunction:
         """Compute the div of the function."""

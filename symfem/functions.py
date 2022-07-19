@@ -185,12 +185,12 @@ class AnyFunction(ABC):
         pass
 
     @abstractmethod
-    def dot(self, other: AnyFunction):
+    def dot(self, other_in: FunctionInput):
         """Compute the dot product with another function."""
         pass
 
     @abstractmethod
-    def cross(self, other: AnyFunction):
+    def cross(self, other_in: FunctionInput):
         """Compute the cross product with another function."""
         pass
 
@@ -433,8 +433,9 @@ class ScalarFunction(AnyFunction):
             tuple(self.jacobian_component((i, j)) for j in range(dim))
             for i in range(dim)))
 
-    def dot(self, other: AnyFunction) -> ScalarFunction:
+    def dot(self, other_in: FunctionInput) -> ScalarFunction:
         """Compute the dot product with another function."""
+        other = parse_function_input(other_in)
         if isinstance(other, ScalarFunction):
             return self * other
 
@@ -443,7 +444,7 @@ class ScalarFunction(AnyFunction):
 
         raise NotImplementedError()
 
-    def cross(self, other: AnyFunction):
+    def cross(self, other_in: FunctionInput):
         """Compute the cross product with another function."""
         raise ValueError("Cannot cross a scalar-valued function.")
 
@@ -651,8 +652,9 @@ class VectorFunction(AnyFunction):
         """Compute the jacobian."""
         raise NotImplementedError()
 
-    def dot(self, other: AnyFunction) -> ScalarFunction:
+    def dot(self, other_in: FunctionInput) -> ScalarFunction:
         """Compute the dot product with another function."""
+        other = parse_function_input(other_in)
         if isinstance(other, VectorFunction):
             assert len(self._vec) == len(other._vec)
             out = 0
@@ -673,8 +675,9 @@ class VectorFunction(AnyFunction):
 
         raise NotImplementedError()
 
-    def cross(self, other: AnyFunction) -> typing.Union[VectorFunction, ScalarFunction]:
+    def cross(self, other_in: FunctionInput) -> typing.Union[VectorFunction, ScalarFunction]:
         """Compute the cross product with another function."""
+        other = parse_function_input(other_in)
         assert other.is_vector and len(self) == len(other)
         if len(self) == 2:
             return self[0] * other[1] - self[1] * other[0]
@@ -960,8 +963,9 @@ class MatrixFunction(AnyFunction):
         """Compute the jacobian."""
         raise NotImplementedError()
 
-    def dot(self, other: AnyFunction) -> ScalarFunction:
+    def dot(self, other_in: FunctionInput) -> ScalarFunction:
         """Compute the dot product with another function."""
+        other = parse_function_input(other_in)
         if isinstance(other, MatrixFunction):
             assert self.shape == other.shape
             out = ScalarFunction(0)
@@ -975,7 +979,7 @@ class MatrixFunction(AnyFunction):
 
         raise NotImplementedError()
 
-    def cross(self, other: AnyFunction):
+    def cross(self, other_in: FunctionInput):
         """Compute the cross product with another function."""
         raise ValueError("Cannot cross a matrix-valued function.")
 
