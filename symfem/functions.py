@@ -240,6 +240,13 @@ class AnyFunction(ABC):
         """Get the value shape of the function."""
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'shape'")
 
+    def plot(
+        self, reference: Reference, filename: str, dof_point: PointType = None,
+        dof_direction: PointType = None, dof_n: int = None
+    ):
+        """Plot the function."""
+        raise ValueError(f"Cannot plot function of type '{self.__class__.__name__}'")
+
     def __len__(self):
         """Compute the determinant."""
         raise TypeError(f"object of type '{self.__class__.__name__}' has no len()")
@@ -489,6 +496,90 @@ class ScalarFunction(AnyFunction):
     ]):
         """Integrate the function."""
         return ScalarFunction(self._f.integrate(*limits))
+
+    def plot(
+        self, reference: Reference, filename: str, dof_point: PointType = None,
+        dof_direction: PointType = None, dof_n: int = None
+    ):
+        """Plot the function."""
+        if reference.tdim not in [1, 2]:
+            raise ValueError(f"Cannot plot scalar function on cell type {reference.name}'")
+
+        from .plotting import Picture, colors
+
+        img = Picture()
+
+        for e in reference.edges:
+            img.add_line(reference.vertices[e[0]] + (0, ),
+                         reference.vertices[e[1]] + (0, ), colors.GRAY)
+
+        # TODO: move these to references.py
+        n = 6
+        pts: typing.List[PointType] = []
+        pairs = []
+        if reference.name == "interval":
+            pts = [(sympy.Rational(i, n - 1), ) for i in range(n)]
+            pairs = [(i, i + 1) for i, _ in enumerate(pts[:-1])]
+        elif reference.name == "quadrilateral":
+            pts = [(sympy.Rational(i, n - 1), sympy.Rational(j, n - 1))
+                   for i in range(n) for j in range(n)]
+            for i in range(n):
+                for j in range(n):
+                    node = i * n + j
+                    if j != n - 1:
+                        pairs += [(node, node + 1)]
+                    if i != n - 1:
+                        pairs += [(node, node + n)]
+                        if j != 0:
+                            pairs += [(node, node + n - 1)]
+        elif reference.name == "triangle":
+            pts = [(sympy.Rational(i, n - 1), sympy.Rational(j, n - 1))
+                   for i in range(n) for j in range(n - i)]
+            s = 0
+            for j in range(n-1, 0, -1):
+                pairs += [(i, i + 1) for i in range(s, s + j)]
+                s += j + 1
+            for k in range(n + 1):
+                s = k
+                for i in range(n, k, -1):
+                    if i != k + 1:
+                        pairs += [(s, s + i)]
+                    if k != 0:
+                        pairs += [(s, s + i - 1)]
+                    s += i
+        else:
+            raise ValueError(f"Unsupported reference: {reference.name}")
+
+        deriv = self.grad(reference.tdim)
+        evals = []
+        for p in pts:
+            value = self.subs(x, p).as_sympy()
+            assert isinstance(value, sympy.core.expr.Expr)
+            evals.append(value)
+
+        for i, j in pairs:
+            pi = VectorFunction(pts[i])
+            pj = VectorFunction(pts[j])
+            d_pi = (2 * pi + pj) / 3
+            d_pj = (2 * pj + pi) / 3
+            di = deriv.subs(x, pi).dot(d_pi - pts[i]).as_sympy()
+            dj = deriv.subs(x, pj).dot(d_pj - pts[j]).as_sympy()
+            assert isinstance(di, sympy.core.expr.Expr)
+            assert isinstance(dj, sympy.core.expr.Expr)
+            img.add_bezier(
+                tuple(pi) + (evals[i], ), tuple(d_pi) + (evals[i] + di, ),
+                tuple(d_pj) + (evals[j] + dj, ), tuple(pj) + (evals[j], ),
+                colors.ORANGE)
+
+        if dof_direction is not None:
+            assert dof_point is not None and dof_n is not None
+            img.add_dof_arrow(dof_point + (0, ), dof_direction + (0, ), dof_n,
+                              colors.PURPLE, bold=False)
+        elif dof_point is not None:
+            assert dof_n is not None
+            img.add_dof_marker(dof_point + (0, ), dof_n, colors.PURPLE, bold=False)
+
+        img.save(filename)
 
 
 class VectorFunction(AnyFunction):

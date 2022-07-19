@@ -322,6 +322,12 @@ class CiarletElement(FiniteElement):
 
         return self._basis_functions
 
+    def plot_basis_function(self, n: int, filename: str):
+        """Plot a diagram showing a basis function."""
+        f = self.get_basis_functions()[n]
+        d = self.dofs[n]
+        f.plot(self.reference, filename, d.dof_point(), d.dof_direction(), n)
+
     def plot_dof_diagram(self, filename: str):
         """Plot a diagram showing the DOFs of the element."""
         assert filename.endswith(".svg") or filename.endswith(".png")
@@ -352,20 +358,15 @@ class CiarletElement(FiniteElement):
                 for d in dofs:
                     direction = d.dof_direction()
                     if direction is not None:
-                        vdirection = VectorFunction(direction)
-                        vdirection /= vdirection.norm()
-                        vdirection /= 8
-                        start = VectorFunction(d.dof_point())
+                        shifted = False
                         for d2 in self.dofs:
                             if d != d2 and d.dof_point() == d2.dof_point():
-                                start += vdirection / 3
+                                shifted = True
                                 break
-                        img.add_arrow(
-                            start, start + vdirection, colors.entity(d.entity[0]))
-                        img.add_ncircle(
-                            start, self.dofs.index(d), colors.entity(d.entity[0]))
+                        img.add_dof_arrow(d.dof_point(), direction, self.dofs.index(d),
+                                          colors.entity(d.entity[0]), shifted)
                     else:
-                        img.add_ncircle(
+                        img.add_dof_marker(
                             d.dof_point(), self.dofs.index(d), colors.entity(d.entity[0]))
 
         img.save(filename)

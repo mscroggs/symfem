@@ -23,6 +23,7 @@ class Colors:
     BLUE = "#44AAFF"
     GREEN = "#55FF00"
     PURPLE = "#DD2299"
+    GRAY = "#AAAAAA"
 
     def entity(self, n: int) -> str:
         """Get the color used for an entity of a given dimension."""
@@ -112,6 +113,52 @@ class Line(PictureElement):
         return max(self.start[1], self.end[1])
 
 
+class Bezier(PictureElement):
+    """A Bezier curve."""
+
+    def __init__(
+        self, start: PointType, mid1: PointType, mid2: PointType, end: PointType, color: str,
+        width: int
+    ):
+        super().__init__()
+        self.start = start
+        self.mid1 = mid1
+        self.mid2 = mid2
+        self.end = end
+        self.color = color
+        self.width = width
+
+    def as_svg(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> SVGFormat:
+        """Return SVG format."""
+        a = map_pt(self.start)
+        b = map_pt(self.mid1)
+        c = map_pt(self.mid2)
+        d = map_pt(self.end)
+        return [(
+            "path", tuple(),
+            {"d": (f"M{a[0]},{a[1]} C{b[0]},{b[1]}, {c[0]},{c[1]}, {d[0]},{d[1]}"),
+             "stroke": self.color, "stroke_width": self.width, "stroke_linecap": "round",
+             "fill": "none"})]
+
+    def minx(self) -> sympy.core.expr.Expr:
+        """Get the minimum x-coordinate."""
+        return min(self.start[0], self.end[0])
+
+    def miny(self) -> sympy.core.expr.Expr:
+        """Get the minimum y-coordinate."""
+        return min(self.start[1], self.end[1])
+
+    def maxx(self) -> sympy.core.expr.Expr:
+        """Get the maximum x-coordinate."""
+        return max(self.start[0], self.end[0])
+
+    def maxy(self) -> sympy.core.expr.Expr:
+        """Get the maximum y-coordinate."""
+        return max(self.start[1], self.end[1])
+
+
 class Arrow(PictureElement):
     """An arrow."""
 
@@ -170,12 +217,14 @@ class NCircle(PictureElement):
     """A circle containing a number."""
 
     def __init__(
-        self, center: PointType, number: int, color: str, radius: float,
-        font_size: typing.Union[int, None], width: int
+        self, center: PointType, number: int, color: str, text_color: str, fill_color: str,
+        radius: float, font_size: typing.Union[int, None], width: int
     ):
         self.center = center
         self.number = number
         self.color = color
+        self.text_color = text_color
+        self.fill_color = fill_color
         self.radius = radius
         if font_size is None:
             if number < 10:
@@ -196,11 +245,11 @@ class NCircle(PictureElement):
 
         out.append((
             "circle", (map_pt(self.center), self.radius),
-            {"stroke": self.color, "stroke_width": self.width, "fill": "white"}))
+            {"stroke": self.color, "stroke_width": self.width, "fill": self.fill_color}))
 
         out.append((
             "text", (f"{self.number}", map_pt(self.center)),
-            {"fill": "black", "font_size": self.font_size,
+            {"fill": self.text_color, "font_size": self.font_size,
              "style": "text-anchor:middle;dominant-baseline:middle;font-family:sans-serif"}))
 
         return out
@@ -310,26 +359,59 @@ class Picture:
         return self.to_2d(parse_point_input(p))
 
     def add_line(
-        self, start: PointOrFunction, end: PointOrFunction, color: str = "black",
+        self, start: PointOrFunction, end: PointOrFunction, color: str = colors.BLACK,
         width: int = 4
     ):
         """Add a line to the picture."""
         self.elements.append(Line(self.parse_point(start), self.parse_point(end), color, width))
 
+    def add_bezier(
+        self, start: PointOrFunction, mid1: PointOrFunction, mid2: PointOrFunction,
+        end: PointOrFunction, color: str = colors.BLACK, width: int = 4
+    ):
+        """Add a Bezier curve to the picture."""
+        self.elements.append(Bezier(
+            self.parse_point(start), self.parse_point(mid1), self.parse_point(mid2),
+            self.parse_point(end), color, width))
+
     def add_arrow(
-        self, start: PointOrFunction, end: PointOrFunction, color: str = "black",
+        self, start: PointOrFunction, end: PointOrFunction, color: str = colors.BLACK,
         width: int = 4
     ):
         """Add an arrow to the picture."""
         self.elements.append(Arrow(self.parse_point(start), self.parse_point(end), color, width))
 
+    def add_dof_marker(
+        self, point: PointOrFunction, number: int, color: str, bold: bool = True
+    ):
+        """Add a DOF marker."""
+        if bold:
+            self.add_ncircle(point, number, colors.BLACK, colors.BLACK, color)
+        else:
+            self.add_ncircle(point, number, color, color, colors.WHITE)
+
+    def add_dof_arrow(
+        self, point: PointOrFunction, direction: PointOrFunction, number: int,
+        color: str = colors.PURPLE, shifted: bool = False, bold: bool = True
+    ):
+        """Add a DOF arrow."""
+        vdirection = VectorFunction(self.parse_point(direction))
+        vdirection /= 8 * vdirection.norm()
+        start = VectorFunction(self.parse_point(point))
+        if shifted:
+            start += vdirection / 3
+        self.add_arrow(start, start + vdirection, color)
+        self.add_dof_marker(start, number, color, bold)
+
     def add_ncircle(
-        self, center: PointOrFunction, number: int, color: str = "red", radius: float = 20.0,
+        self, center: PointOrFunction, number: int, color: str = "red",
+        text_color: str = colors.BLACK, fill_color: str = colors.WHITE, radius: float = 20.0,
         font_size: int = None, width: int = 4
     ):
         """Add a numbered circle to the picture."""
         self.elements.append(NCircle(
-            self.parse_point(center), number, color, radius, font_size, width))
+            self.parse_point(center), number, color, text_color, fill_color, radius, font_size,
+            width))
 
     def add_fill(
         self, vertices: SetOfPointsOrFunctions, color: str = "red", opacity: float = 1.0
