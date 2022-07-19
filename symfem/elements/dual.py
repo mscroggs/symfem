@@ -7,7 +7,7 @@ These elements' definitions appear in https://doi.org/10.1016/j.crma.2004.12.022
 import sympy
 import typing
 from ..finite_element import FiniteElement, CiarletElement
-from ..functions import AnyFunction, FunctionInput, VectorElement
+from ..functions import AnyFunction, FunctionInput, VectorFunction
 from ..geometry import SetOfPointsInput
 from ..piecewise_functions import PiecewiseFunction
 from ..references import DualPolygon
@@ -70,7 +70,7 @@ class DualCiarletElement(FiniteElement):
                         for i in range(self.range_dim):
                             sf_item = sympy.Integer(0)
                             for a, b in zip(coeffs, sub_basis):
-                                assert isinstance(b, VectorElement)
+                                assert isinstance(b, VectorFunction)
                                 sf_item += a * b[i]
                             sf_list.append(sf_item)
                         sub_fun = tuple(sf_list)
