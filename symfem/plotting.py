@@ -54,25 +54,27 @@ class PictureElement(ABC):
         """Return SVG format."""
         pass
 
+    @property
     @abstractmethod
+    def points(self) -> SetOfPoints:
+        """Get set of points used by this element."""
+        pass
+
     def minx(self) -> sympy.core.expr.Expr:
         """Get the minimum x-coordinate."""
-        pass
+        return min(p[0] for p in self.points)
 
-    @abstractmethod
     def miny(self) -> sympy.core.expr.Expr:
         """Get the minimum y-coordinate."""
-        pass
+        return min(p[1] for p in self.points)
 
-    @abstractmethod
     def maxx(self) -> sympy.core.expr.Expr:
         """Get the maximum x-coordinate."""
-        pass
+        return max(p[0] for p in self.points)
 
-    @abstractmethod
     def maxy(self) -> sympy.core.expr.Expr:
         """Get the maximum y-coordinate."""
-        pass
+        return max(p[1] for p in self.points)
 
 
 class Line(PictureElement):
@@ -96,21 +98,10 @@ class Line(PictureElement):
             "line", (map_pt(self.start), map_pt(self.end)),
             {"stroke": self.color, "stroke_width": self.width, "stroke_linecap": "round"})]
 
-    def minx(self) -> sympy.core.expr.Expr:
-        """Get the minimum x-coordinate."""
-        return min(self.start[0], self.end[0])
-
-    def miny(self) -> sympy.core.expr.Expr:
-        """Get the minimum y-coordinate."""
-        return min(self.start[1], self.end[1])
-
-    def maxx(self) -> sympy.core.expr.Expr:
-        """Get the maximum x-coordinate."""
-        return max(self.start[0], self.end[0])
-
-    def maxy(self) -> sympy.core.expr.Expr:
-        """Get the maximum y-coordinate."""
-        return max(self.start[1], self.end[1])
+    @property
+    def points(self) -> SetOfPoints:
+        """Get set of points used by this element."""
+        return (self.start, self.end)
 
 
 class Bezier(PictureElement):
@@ -142,21 +133,10 @@ class Bezier(PictureElement):
              "stroke": self.color, "stroke_width": self.width, "stroke_linecap": "round",
              "fill": "none"})]
 
-    def minx(self) -> sympy.core.expr.Expr:
-        """Get the minimum x-coordinate."""
-        return min(self.start[0], self.end[0])
-
-    def miny(self) -> sympy.core.expr.Expr:
-        """Get the minimum y-coordinate."""
-        return min(self.start[1], self.end[1])
-
-    def maxx(self) -> sympy.core.expr.Expr:
-        """Get the maximum x-coordinate."""
-        return max(self.start[0], self.end[0])
-
-    def maxy(self) -> sympy.core.expr.Expr:
-        """Get the maximum y-coordinate."""
-        return max(self.start[1], self.end[1])
+    @property
+    def points(self) -> SetOfPoints:
+        """Get set of points used by this element."""
+        return (self.start, self.end)
 
 
 class Arrow(PictureElement):
@@ -196,21 +176,10 @@ class Arrow(PictureElement):
                 {"stroke": self.color, "stroke_width": self.width, "stroke_linecap": "round"}))
         return out
 
-    def minx(self) -> sympy.core.expr.Expr:
-        """Get the minimum x-coordinate."""
-        return min(self.start[0], self.end[0])
-
-    def miny(self) -> sympy.core.expr.Expr:
-        """Get the minimum y-coordinate."""
-        return min(self.start[1], self.end[1])
-
-    def maxx(self) -> sympy.core.expr.Expr:
-        """Get the maximum x-coordinate."""
-        return max(self.start[0], self.end[0])
-
-    def maxy(self) -> sympy.core.expr.Expr:
-        """Get the maximum y-coordinate."""
-        return max(self.start[1], self.end[1])
+    @property
+    def points(self) -> SetOfPoints:
+        """Get set of points used by this element."""
+        return (self.start, self.end)
 
 
 class NCircle(PictureElement):
@@ -254,21 +223,10 @@ class NCircle(PictureElement):
 
         return out
 
-    def minx(self) -> sympy.core.expr.Expr:
-        """Get the minimum x-coordinate."""
-        return self.center[0]
-
-    def miny(self) -> sympy.core.expr.Expr:
-        """Get the minimum y-coordinate."""
-        return self.center[1]
-
-    def maxx(self) -> sympy.core.expr.Expr:
-        """Get the maximum x-coordinate."""
-        return self.center[0]
-
-    def maxy(self) -> sympy.core.expr.Expr:
-        """Get the maximum y-coordinate."""
-        return self.center[1]
+    @property
+    def points(self) -> SetOfPoints:
+        """Get set of points used by this element."""
+        return (self.center, )
 
 
 class Fill(PictureElement):
@@ -286,21 +244,10 @@ class Fill(PictureElement):
         return [("polygon", (tuple(map_pt(p) for p in self.vertices), ),
                 {"fill": self.color, "opacity": self.opacity})]
 
-    def minx(self) -> sympy.core.expr.Expr:
-        """Get the minimum x-coordinate."""
-        return min(v[0] for v in self.vertices)
-
-    def miny(self) -> sympy.core.expr.Expr:
-        """Get the minimum y-coordinate."""
-        return min(v[1] for v in self.vertices)
-
-    def maxx(self) -> sympy.core.expr.Expr:
-        """Get the maximum x-coordinate."""
-        return max(v[0] for v in self.vertices)
-
-    def maxy(self) -> sympy.core.expr.Expr:
-        """Get the maximum y-coordinate."""
-        return max(v[1] for v in self.vertices)
+    @property
+    def points(self) -> SetOfPoints:
+        """Get set of points used by this element."""
+        return self.vertices
 
 
 class Picture:
