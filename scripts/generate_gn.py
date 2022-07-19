@@ -111,8 +111,8 @@ for ref in ["triangle", "tetrahedron"]:
             fractions = find_solution(mat, aim)
         if ref == "tetrahedron":
             for i in range(3):
-                row: typing.List[symfem.functions.ScalarFunction] = [0] * 45
-                row[i] = 1
+                row: typing.List[symfem.functions.ScalarFunction] = [sympy.Integer(0)] * 45
+                row[i] = sympy.Integer(1)
                 mat.append(row)
             subf = f.subs(x, mid)
             assert isinstance(subf, tuple)
@@ -124,8 +124,8 @@ for ref in ["triangle", "tetrahedron"]:
                 for m in range(n + 1, 45):
                     mat2 = [i for i in mat]
                     for i in [n, m]:
-                        row = [0] * 45
-                        row[i] = 1
+                        row = [sympy.Integer(0)] * 45
+                        row[i] = sympy.Integer(1)
                         mat2.append(row)
                     try:
                         fractions = find_solution(mat2, aim)
