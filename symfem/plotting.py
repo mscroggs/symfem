@@ -360,14 +360,14 @@ class Picture:
 
     def add_line(
         self, start: PointOrFunction, end: PointOrFunction, color: str = colors.BLACK,
-        width: int = 4
+        width: float = 4.0
     ):
         """Add a line to the picture."""
         self.elements.append(Line(self.parse_point(start), self.parse_point(end), color, width))
 
     def add_bezier(
         self, start: PointOrFunction, mid1: PointOrFunction, mid2: PointOrFunction,
-        end: PointOrFunction, color: str = colors.BLACK, width: int = 4
+        end: PointOrFunction, color: str = colors.BLACK, width: float = 4.0
     ):
         """Add a Bezier curve to the picture."""
         self.elements.append(Bezier(
@@ -376,7 +376,7 @@ class Picture:
 
     def add_arrow(
         self, start: PointOrFunction, end: PointOrFunction, color: str = colors.BLACK,
-        width: int = 4
+        width: float = 4.0
     ):
         """Add an arrow to the picture."""
         self.elements.append(Arrow(self.parse_point(start), self.parse_point(end), color, width))
@@ -406,7 +406,7 @@ class Picture:
     def add_ncircle(
         self, center: PointOrFunction, number: int, color: str = "red",
         text_color: str = colors.BLACK, fill_color: str = colors.WHITE, radius: float = 20.0,
-        font_size: int = None, width: int = 4
+        font_size: int = None, width: float = 4.0
     ):
         """Add a numbered circle to the picture."""
         self.elements.append(NCircle(

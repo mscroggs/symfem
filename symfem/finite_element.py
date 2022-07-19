@@ -326,7 +326,9 @@ class CiarletElement(FiniteElement):
         """Plot a diagram showing a basis function."""
         f = self.get_basis_functions()[n]
         d = self.dofs[n]
-        f.plot(self.reference, filename, d.dof_point(), d.dof_direction(), n)
+        values = self.tabulate_basis(self.reference.make_lattice(6))
+        scale = 1 / max(max(abs(j) for j in i) for i in values)
+        f.plot(self.reference, filename, d.dof_point(), d.dof_direction(), d.entity, n, scale)
 
     def plot_dof_diagram(self, filename: str):
         """Plot a diagram showing the DOFs of the element."""

@@ -76,14 +76,35 @@ class Reference(ABC):
         self._inverse_map_to_self: typing.Union[PointType, None] = None
         self._map_to_self: typing.Union[PointType, None] = None
 
+    @property
+    def clockwise_vertices(self) -> SetOfPoints:
+        """Get list of vertices in clockwise order."""
+        return self.vertices
+
     @abstractmethod
     def default_reference(self) -> Reference:
         """Get the default reference for this cell type."""
         pass
 
+    @abstractmethod
+    def make_lattice(self, n: int) -> SetOfPoints:
+        """Make a lattice of points."""
+        pass
+
+    @abstractmethod
+    def make_lattice_with_lines(
+        self, n: int
+    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+        """Make a lattice of points, and a list of lines connecting them."""
+        pass
+
     def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
         """Get the subentities of the cell in back-to-front plotting order."""
         return [[(i, j) for i in range(self.tdim, -1, -1) for j in range(self.sub_entity_count(i))]]
+
+    def z_ordered_entities_extra_dim(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
+        """Get the subentities in back-to-front plotting order when using an extra dimension."""
+        return self.z_ordered_entities()
 
     def get_point(self, reference_coords: PointType) -> typing.Tuple[sympy.core.expr.Expr, ...]:
         """Get a point in the reference from reference coordinates."""
@@ -288,6 +309,16 @@ class Point(Reference):
         """Get the default reference for this cell type."""
         return Point(self.reference_vertices)
 
+    def make_lattice(self, n: int) -> SetOfPoints:
+        """Make a lattice of points."""
+        raise NotImplementedError()
+
+    def make_lattice_with_lines(
+        self, n: int
+    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+        """Make a lattice of points, and a list of lines connecting them."""
+        raise NotImplementedError()
+
     def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
@@ -347,6 +378,19 @@ class Interval(Reference):
     def default_reference(self) -> typing.Any:
         """Get the default reference for this cell type."""
         return Interval(self.reference_vertices)
+
+    def make_lattice(self, n: int) -> SetOfPoints:
+        """Make a lattice of points."""
+        return tuple((sympy.Rational(2 * i + 1, 2 * (n + 1)), ) for i in range(n))
+
+    def make_lattice_with_lines(
+        self, n: int
+    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+        """Make a lattice of points, and a list of lines connecting them."""
+        assert self.vertices == self.reference_vertices
+        pts = tuple((sympy.Rational(i, n - 1), ) for i in range(n))
+        pairs = [(i, i + 1) for i in range(n - 1)]
+        return pts, pairs
 
     def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
@@ -412,6 +456,39 @@ class Triangle(Reference):
     def default_reference(self) -> typing.Any:
         """Get the default reference for this cell type."""
         return Triangle(self.reference_vertices)
+
+    def make_lattice(self, n: int) -> SetOfPoints:
+        """Make a lattice of points."""
+        return tuple((
+            sympy.Rational(2 * i + 1, 2 * (n + 1)),
+            sympy.Rational(2 * j + 1, 2 * (n + 1))
+        ) for i in range(n) for j in range(n - i))
+
+    def make_lattice_with_lines(
+        self, n: int
+    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+        """Make a lattice of points, and a list of lines connecting them."""
+        assert self.vertices == self.reference_vertices
+        pts = tuple((sympy.Rational(i, n - 1), sympy.Rational(j, n - 1))
+                    for i in range(n) for j in range(n - i))
+        pairs = []
+        s = 0
+        for j in range(n-1, 0, -1):
+            pairs += [(i, i + 1) for i in range(s, s + j)]
+            s += j + 1
+        for k in range(n + 1):
+            s = k
+            for i in range(n, k, -1):
+                if i != k + 1:
+                    pairs += [(s, s + i)]
+                if k != 0:
+                    pairs += [(s, s + i - 1)]
+                s += i
+        return pts, pairs
+
+    def z_ordered_entities_extra_dim(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
+        """Get the subentities in back-to-front plotting order when using an extra dimension."""
+        return [[(1, 0), (1, 1)], [(0, 2)], [(2, 0), (1, 2), (0, 0), (0, 1)]]
 
     def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
@@ -492,6 +569,11 @@ class Tetrahedron(Reference):
             sub_entity_types=["point", "interval", "triangle", "tetrahedron"],
             simplex=True)
 
+    @property
+    def clockwise_vertices(self) -> SetOfPoints:
+        """Get list of vertices in clockwise order."""
+        return (self.vertices[0], self.vertices[1], self.vertices[3])
+
     def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
         """Get the subentities of the cell in back-to-front plotting order."""
         return [
@@ -503,6 +585,20 @@ class Tetrahedron(Reference):
     def default_reference(self) -> typing.Any:
         """Get the default reference for this cell type."""
         return Tetrahedron(self.reference_vertices)
+
+    def make_lattice(self, n: int) -> SetOfPoints:
+        """Make a lattice of points."""
+        return tuple((
+            sympy.Rational(2 * i + 1, 2 * (n + 1)),
+            sympy.Rational(2 * j + 1, 2 * (n + 1)),
+            sympy.Rational(2 * k + 1, 2 * (n + 1))
+        ) for i in range(n) for j in range(n - i) for k in range(n - i - j))
+
+    def make_lattice_with_lines(
+        self, n: int
+    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+        """Make a lattice of points, and a list of lines connecting them."""
+        raise NotImplementedError()
 
     def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
@@ -580,9 +676,44 @@ class Quadrilateral(Reference):
             sub_entity_types=["point", "interval", "quadrilateral", None],
             tp=True)
 
+    @property
+    def clockwise_vertices(self) -> SetOfPoints:
+        """Get list of vertices in clockwise order."""
+        return (self.vertices[0], self.vertices[1], self.vertices[3], self.vertices[2])
+
     def default_reference(self) -> typing.Any:
         """Get the default reference for this cell type."""
         return Quadrilateral(self.reference_vertices)
+
+    def make_lattice(self, n: int) -> SetOfPoints:
+        """Make a lattice of points."""
+        return tuple((
+            sympy.Rational(2 * i + 1, 2 * (n + 1)),
+            sympy.Rational(2 * j + 1, 2 * (n + 1))
+        ) for i in range(n + 1) for j in range(n + 1))
+
+    def make_lattice_with_lines(
+        self, n: int
+    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+        """Make a lattice of points, and a list of lines connecting them."""
+        assert self.vertices == self.reference_vertices
+        pts = tuple((sympy.Rational(i, n - 1), sympy.Rational(j, n - 1))
+                    for i in range(n) for j in range(n))
+        pairs = []
+        for i in range(n):
+            for j in range(n):
+                node = i * n + j
+                if j != n - 1:
+                    pairs += [(node, node + 1)]
+                if i != n - 1:
+                    pairs += [(node, node + n)]
+                    if j != 0:
+                        pairs += [(node, node + n - 1)]
+        return pts, pairs
+
+    def z_ordered_entities_extra_dim(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
+        """Get the subentities in back-to-front plotting order when using an extra dimension."""
+        return [[(1, 3), (1, 1), (0, 2)], [(2, 0)], [(1, 2), (0, 3), (1, 0), (0, 0), (0, 1)]]
 
     def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
@@ -690,6 +821,12 @@ class Hexahedron(Reference):
             sub_entity_types=["point", "interval", "quadrilateral", "hexahedron"],
             tp=True)
 
+    @property
+    def clockwise_vertices(self) -> SetOfPoints:
+        """Get list of vertices in clockwise order."""
+        return (self.vertices[0], self.vertices[1], self.vertices[3], self.vertices[7],
+                self.vertices[6], self.vertices[4])
+
     def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
         """Get the subentities of the cell in back-to-front plotting order."""
         return [
@@ -703,6 +840,20 @@ class Hexahedron(Reference):
     def default_reference(self) -> typing.Any:
         """Get the default reference for this cell type."""
         return Hexahedron(self.reference_vertices)
+
+    def make_lattice(self, n: int) -> SetOfPoints:
+        """Make a lattice of points."""
+        return tuple((
+            sympy.Rational(2 * i + 1, 2 * (n + 1)),
+            sympy.Rational(2 * j + 1, 2 * (n + 1)),
+            sympy.Rational(2 * k + 1, 2 * (n + 1))
+        ) for i in range(n + 1) for j in range(n + 1) for k in range(n + 1))
+
+    def make_lattice_with_lines(
+        self, n: int
+    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+        """Make a lattice of points, and a list of lines connecting them."""
+        raise NotImplementedError()
 
     def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
@@ -808,6 +959,12 @@ class Prism(Reference):
                 "prism"],
             tp=True)
 
+    @property
+    def clockwise_vertices(self) -> SetOfPoints:
+        """Get list of vertices in clockwise order."""
+        return (self.vertices[0], self.vertices[1], self.vertices[4], self.vertices[5],
+                self.vertices[3])
+
     def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
         """Get the subentities of the cell in back-to-front plotting order."""
         return [
@@ -821,6 +978,20 @@ class Prism(Reference):
     def default_reference(self) -> typing.Any:
         """Get the default reference for this cell type."""
         return Prism(self.reference_vertices)
+
+    def make_lattice(self, n: int) -> SetOfPoints:
+        """Make a lattice of points."""
+        return tuple((
+            sympy.Rational(2 * i + 1, 2 * (n + 1)),
+            sympy.Rational(2 * j + 1, 2 * (n + 1)),
+            sympy.Rational(2 * k + 1, 2 * (n + 1))
+        ) for i in range(n + 1) for j in range(n + 1 - i) for k in range(n + 1))
+
+    def make_lattice_with_lines(
+        self, n: int
+    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+        """Make a lattice of points, and a list of lines connecting them."""
+        raise NotImplementedError()
 
     def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
@@ -923,6 +1094,11 @@ class Pyramid(Reference):
                 "pyramid"],
             tp=True)
 
+    @property
+    def clockwise_vertices(self) -> SetOfPoints:
+        """Get list of vertices in clockwise order."""
+        return (self.vertices[0], self.vertices[1], self.vertices[3], self.vertices[4])
+
     def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
         """Get the subentities of the cell in back-to-front plotting order."""
         return [
@@ -936,6 +1112,16 @@ class Pyramid(Reference):
     def default_reference(self) -> typing.Any:
         """Get the default reference for this cell type."""
         return Pyramid(self.reference_vertices)
+
+    def make_lattice(self, n: int) -> SetOfPoints:
+        """Make a lattice of points."""
+        raise NotImplementedError()
+
+    def make_lattice_with_lines(
+        self, n: int
+    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+        """Make a lattice of points, and a list of lines connecting them."""
+        raise NotImplementedError()
 
     def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
@@ -1085,4 +1271,14 @@ class DualPolygon(Reference):
 
     def default_reference(self) -> Reference:
         """Get the default reference for this cell type."""
+        raise NotImplementedError()
+
+    def make_lattice(self, n: int) -> SetOfPoints:
+        """Make a lattice of points."""
+        raise NotImplementedError()
+
+    def make_lattice_with_lines(
+        self, n: int
+    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+        """Make a lattice of points, and a list of lines connecting them."""
         raise NotImplementedError()
