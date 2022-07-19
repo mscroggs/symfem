@@ -7,7 +7,7 @@ These elements' definitions appear in https://doi.org/10.1016/j.crma.2004.12.022
 import sympy
 import typing
 from ..finite_element import FiniteElement, CiarletElement
-from ..functions import AnyFunction, FunctionInput
+from ..functions import AnyFunction, FunctionInput, VectorElement
 from ..geometry import SetOfPointsInput
 from ..piecewise_functions import PiecewiseFunction
 from ..references import DualPolygon
