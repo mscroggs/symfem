@@ -21,7 +21,7 @@ jobs:
         with:
           path: ./defelement
           repository: mscroggs/defelement.com
-          ref: functions
+          ref: main
       - name: Install requirements
         run: |
           cd defelement
