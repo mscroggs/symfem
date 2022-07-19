@@ -236,8 +236,13 @@ class Fill(PictureElement):
 class Picture:
     """A picture."""
 
-    def __init__(self):
+    def __init__(
+        self, padding: sympy.core.expr.Expr = sympy.Integer(25), width=None, height=None
+    ):
         self.elements: typing.List[PictureElement] = []
+        self.padding = padding
+        self.height = height
+        self.width = width
 
     def add_line(
         self, start: PointType, end: PointType, color: str = "black",
@@ -266,10 +271,7 @@ class Picture:
         """Add a filled polygon to the picture."""
         self.elements.append(Fill(vertices, color, opacity))
 
-    def as_svg(
-        self, filename: str = None, padding: sympy.core.expr.Expr = sympy.Integer(25),
-        width=None, height=None
-    ):
+    def as_svg(self, filename: str = None) -> str:
         """Convert to an SVG."""
         try:
             import svgwrite
@@ -282,26 +284,26 @@ class Picture:
         maxx = max(i.maxx() for i in self.elements)
         maxy = max(i.maxy() for i in self.elements)
 
-        if width is not None:
-            assert height is None
-            scale = height / (maxy - miny)
-        elif height is not None:
-            assert width is None
-            scale = width / (maxx - minx)
+        if self.width is not None:
+            assert self.height is None
+            scale = self.width / (maxx - minx)
+        elif self.height is not None:
+            assert self.width is None
+            scale = self.height / (maxy - miny)
         else:
             scale = 450
 
-        width = 2 * padding + (maxx - minx) * scale
-        height = 2 * padding + (maxy - miny) * scale
+        width = 2 * self.padding + (maxx - minx) * scale
+        height = 2 * self.padding + (maxy - miny) * scale
 
-        assert filename is not None and filename.endswith(".svg")
+        assert filename is None or filename.endswith(".svg")
         img = svgwrite.Drawing(filename, size=(float(width), float(height)))
 
         def map_pt(pt: PointType) -> typing.Tuple[float, float]:
             """Map a point."""
             return (
-                float(padding + (pt[0] - minx) * scale),
-                float(height - padding - (pt[1] - miny) * scale))
+                float(self.padding + (pt[0] - minx) * scale),
+                float(height - self.padding - (pt[1] - miny) * scale))
 
         for e in self.elements:
             for f, args, kwargs in e.as_svg(map_pt):
@@ -309,3 +311,28 @@ class Picture:
 
         if filename is not None:
             img.save()
+
+        return img.tostring()
+
+    def as_png(self, filename: str):
+        """Convert to a PNG."""
+        try:
+            from cairosvg import svg2png
+        except ImportError:
+            raise ImportError("CairoSVG is needed for plotting PNGs"
+                              " (pip install CairoSVG)")
+
+        assert filename.endswith(".png")
+        svg2png(bytestring=self.as_svg(None), write_to=filename)
+
+    def save(self, filename: str):
+        if filename.endswith(".svg"):
+            self.as_svg(filename)
+        elif filename.endswith(".png"):
+            self.as_png(filename)
+        else:
+            if "." in filename:
+                ext = "." + filename.split(".")[-1]
+                raise ValueError("Unknown file extension: {ext}")
+            else:
+                raise ValueError("Unknown file extension: {filename}")
