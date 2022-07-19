@@ -270,7 +270,7 @@ class Picture:
         self.elements: typing.List[PictureElement] = []
         self.padding = padding
         self.height = height
-        self.width = parse_set_of_points_input(width)
+        self.width = width
 
         if axes_3d is None:
             self.axes_3d = self._default_axes
