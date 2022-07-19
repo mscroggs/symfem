@@ -12,7 +12,7 @@ from .functions import (ScalarFunction, VectorFunction, parse_function_input,
                         AnyFunction, FunctionInput)
 from .geometry import PointType, SetOfPointsInput, parse_set_of_points_input
 from .piecewise_functions import PiecewiseFunction
-from .plotting import Picture
+from .plotting import Picture, colors
 from .references import Reference
 from .symbols import x
 from .utils import allequal
@@ -328,27 +328,6 @@ class CiarletElement(FiniteElement):
 
         img = Picture()
 
-        def to_2d(p):
-            if len(p) == 0:
-                return (0, 0)
-            if len(p) == 1:
-                return (p[0], 0)
-            if len(p) == 2:
-                return (p[0], p[1])
-            if len(p) == 3:
-                return (p[0] + p[1] * sympy.Integer(1) / 2,
-                        p[2] - 2 * p[0] * sympy.Integer(1) / 25 + p[1] * sympy.Integer(1) / 5)
-            raise ValueError("Unsupported gdim")
-
-        def z(p):
-            if len(p) == 3:
-                return p[0] - 2 * p[1]
-            return 0
-
-        colors = ["#FF8800", "#44AAFF", "#55FF00", "#DD2299"]
-        black = "#000000"
-        white = "#FFFFFF"
-
         dofs_by_subentity: typing.Dict[int, typing.Dict[int, ListOfFunctionals]] = {
             i: {j: [] for j in range(self.reference.sub_entity_count(i))}
             for i in range(self.reference.tdim + 1)}
@@ -359,17 +338,17 @@ class CiarletElement(FiniteElement):
         for entities in self.reference.z_ordered_entities():
             for dim, e in entities:
                 if dim == 1:
-                    pts = [to_2d(self.reference.vertices[i]) for i in self.reference.edges[e]]
-                    img.add_line(pts[0], pts[1], black)
+                    pts = tuple(self.reference.vertices[i] for i in self.reference.edges[e])
+                    img.add_line(pts[0], pts[1], colors.BLACK)
                 if dim == 2:
-                    pts = [to_2d(self.reference.vertices[i]) for i in self.reference.faces[e]]
+                    pts = tuple(self.reference.vertices[i] for i in self.reference.faces[e])
                     if len(pts) == 4:
-                        pts = [pts[0], pts[1], pts[3], pts[2]]
-                    img.add_fill(pts, white, 0.5)
+                        pts = (pts[0], pts[1], pts[3], pts[2])
+                    img.add_fill(pts, colors.WHITE, 0.5)
 
             for dim, e in entities:
                 dofs = dofs_by_subentity[dim][e]
-                dofs.sort(key=lambda d: z(d.dof_point()))
+                dofs.sort(key=lambda d: img.z(d.dof_point()))
                 for d in dofs:
                     direction = d.dof_direction()
                     if direction is not None:
@@ -382,12 +361,12 @@ class CiarletElement(FiniteElement):
                                 start += vdirection / 3
                                 break
                         img.add_arrow(
-                            to_2d(start), to_2d(start + vdirection), colors[d.entity[0]])
+                            start, start + vdirection, colors.entity(d.entity[0]))
                         img.add_ncircle(
-                            to_2d(start), self.dofs.index(d), colors[d.entity[0]])
+                            start, self.dofs.index(d), colors.entity(d.entity[0]))
                     else:
                         img.add_ncircle(
-                            to_2d(d.dof_point()), self.dofs.index(d), colors[d.entity[0]])
+                            d.dof_point(), self.dofs.index(d), colors.entity(d.entity[0]))
 
         img.save(filename)
 

@@ -3,8 +3,41 @@
 import sympy
 import typing
 from abc import ABC, abstractmethod
-from .geometry import PointType, SetOfPoints, SetOfPointsInput, parse_set_of_points_input
-from .functions import VectorFunction
+from .geometry import (PointType, SetOfPoints, SetOfPointsInput, parse_set_of_points_input,
+                       PointTypeInput, parse_point_input)
+from .functions import VectorFunction, AnyFunction
+
+PointOrFunction = typing.Union[PointTypeInput, AnyFunction]
+SetOfPointsOrFunctions = typing.Union[
+    typing.List[PointOrFunction], typing.Tuple[PointOrFunction, ...]]
+SVGFormat = typing.List[typing.Tuple[
+    str, typing.Tuple[typing.Any, ...], typing.Dict[str, typing.Any]]]
+
+
+class Colors:
+    """Class storing colours used in diagrams."""
+
+    BLACK = "#000000"
+    WHITE = "#FFFFFF"
+    ORANGE = "#FF8800"
+    BLUE = "#44AAFF"
+    GREEN = "#55FF00"
+    PURPLE = "#DD2299"
+
+    def entity(self, n: int) -> str:
+        """Get the color used for an entity of a given dimension."""
+        if n == 0:
+            return self.ORANGE
+        if n == 1:
+            return self.BLUE
+        if n == 2:
+            return self.GREEN
+        if n == 3:
+            return self.PURPLE
+        raise ValueError(f"Unsupported dimension: {n}")
+
+
+colors = Colors()
 
 
 class PictureElement(ABC):
@@ -16,9 +49,7 @@ class PictureElement(ABC):
     @abstractmethod
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
-    ) -> typing.List[typing.Tuple[
-        str, typing.Tuple[typing.Any, ...], typing.Dict[str, typing.Any]
-    ]]:
+    ) -> SVGFormat:
         """Return SVG format."""
         pass
 
@@ -58,9 +89,7 @@ class Line(PictureElement):
 
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
-    ) -> typing.List[typing.Tuple[
-        str, typing.Tuple[typing.Any, ...], typing.Dict[str, typing.Any]
-    ]]:
+    ) -> SVGFormat:
         """Return SVG format."""
         return [(
             "line", (map_pt(self.start), map_pt(self.end)),
@@ -98,12 +127,9 @@ class Arrow(PictureElement):
 
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
-    ) -> typing.List[typing.Tuple[
-        str, typing.Tuple[typing.Any, ...], typing.Dict[str, typing.Any]
-    ]]:
+    ) -> SVGFormat:
         """Return SVG format."""
-        out: typing.List[typing.Tuple[
-            str, typing.Tuple[typing.Any, ...], typing.Dict[str, typing.Any]]] = []
+        out: SVGFormat = []
 
         out.append((
             "line", (map_pt(self.start), map_pt(self.end)),
@@ -164,12 +190,9 @@ class NCircle(PictureElement):
 
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
-    ) -> typing.List[typing.Tuple[
-        str, typing.Tuple[typing.Any, ...], typing.Dict[str, typing.Any]
-    ]]:
+    ) -> SVGFormat:
         """Return SVG format."""
-        out: typing.List[typing.Tuple[
-            str, typing.Tuple[typing.Any, ...], typing.Dict[str, typing.Any]]] = []
+        out: SVGFormat = []
 
         out.append((
             "circle", (map_pt(self.center), self.radius),
@@ -209,9 +232,7 @@ class Fill(PictureElement):
 
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
-    ) -> typing.List[typing.Tuple[
-        str, typing.Tuple[typing.Any, ...], typing.Dict[str, typing.Any]
-    ]]:
+    ) -> SVGFormat:
         """Return SVG format."""
         return [("polygon", (tuple(map_pt(p) for p in self.vertices), ),
                 {"fill": self.color, "opacity": self.opacity})]
@@ -236,40 +257,85 @@ class Fill(PictureElement):
 class Picture:
     """A picture."""
 
+    axes_3d: SetOfPoints
+
     def __init__(
-        self, padding: sympy.core.expr.Expr = sympy.Integer(25), width=None, height=None
+        self, padding: sympy.core.expr.Expr = sympy.Integer(25), width=None, height=None,
+        axes_3d: SetOfPointsInput = None
     ):
+        self._default_axes: SetOfPoints = (
+            (sympy.Integer(1), -sympy.Rational(2, 25)),
+            (sympy.Rational(1, 2), sympy.Rational(1, 5)),
+            (sympy.Integer(0), sympy.Integer(1)))
         self.elements: typing.List[PictureElement] = []
         self.padding = padding
         self.height = height
-        self.width = width
+        self.width = parse_set_of_points_input(width)
+
+        if axes_3d is None:
+            self.axes_3d = self._default_axes
+        else:
+            self.axes_3d = parse_set_of_points_input(axes_3d)
+
+    def z(self, p_in: PointOrFunction) -> sympy.core.expr.Expr:
+        """Get the into/out-of-the-page component of a point."""
+        p = self.parse_point(p_in)
+        if len(p) == 3:
+            assert self.axes_3d == self._default_axes
+            return p[0] - 2 * p[1]
+        return sympy.Integer(0)
+
+    def to_2d(self, p: PointType) -> PointType:
+        """Map a point to 2D."""
+        zero = sympy.Integer(0)
+        if len(p) == 0:
+            return (zero, zero)
+        if len(p) == 1:
+            return (p[0], zero)
+        if len(p) == 2:
+            return p
+        if len(p) == 3:
+            return (
+                self.axes_3d[0][0] * p[0] + self.axes_3d[1][0] * p[1] + self.axes_3d[2][0] * p[2],
+                self.axes_3d[0][1] * p[0] + self.axes_3d[1][1] * p[1] + self.axes_3d[2][1] * p[2])
+        raise ValueError(f"Unsupported gdim: {len(p)}")
+
+    def parse_point(self, p: PointOrFunction) -> PointType:
+        """Parse an input point."""
+        if isinstance(p, AnyFunction):
+            p_s = p.as_sympy()
+            assert isinstance(p_s, tuple)
+            p = p_s
+        assert isinstance(p, (tuple, list))
+        return self.to_2d(parse_point_input(p))
 
     def add_line(
-        self, start: PointType, end: PointType, color: str = "black",
+        self, start: PointOrFunction, end: PointOrFunction, color: str = "black",
         width: int = 4
     ):
         """Add a line to the picture."""
-        self.elements.append(Line(start, end, color, width))
+        self.elements.append(Line(self.parse_point(start), self.parse_point(end), color, width))
 
     def add_arrow(
-        self, start: PointType, end: PointType, color: str = "black",
+        self, start: PointOrFunction, end: PointOrFunction, color: str = "black",
         width: int = 4
     ):
         """Add an arrow to the picture."""
-        self.elements.append(Arrow(start, end, color, width))
+        self.elements.append(Arrow(self.parse_point(start), self.parse_point(end), color, width))
 
     def add_ncircle(
-        self, center: PointType, number: int, color: str = "red", radius: float = 20.0,
+        self, center: PointOrFunction, number: int, color: str = "red", radius: float = 20.0,
         font_size: int = None, width: int = 4
     ):
         """Add a numbered circle to the picture."""
-        self.elements.append(NCircle(center, number, color, radius, font_size, width))
+        self.elements.append(NCircle(
+            self.parse_point(center), number, color, radius, font_size, width))
 
     def add_fill(
-        self, vertices: SetOfPointsInput, color: str = "red", opacity: float = 1.0
+        self, vertices: SetOfPointsOrFunctions, color: str = "red", opacity: float = 1.0
     ):
         """Add a filled polygon to the picture."""
-        self.elements.append(Fill(parse_set_of_points_input(vertices), color, opacity))
+        self.elements.append(Fill(tuple(self.parse_point(p) for p in vertices), color, opacity))
 
     def as_svg(self, filename: str = None) -> str:
         """Convert to an SVG."""
