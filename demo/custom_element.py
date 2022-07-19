@@ -1,10 +1,10 @@
 """Demo showing how a custom element can be created in Symfem."""
 
-import symfem
 import sympy
+import symfem
 from symfem.finite_element import CiarletElement
-from symfem.symbolic import x
 from symfem.functionals import PointEvaluation
+from symfem.symbols import x
 
 
 class CustomElement(CiarletElement):
