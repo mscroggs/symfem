@@ -665,14 +665,6 @@ class VectorFunction(AnyFunction):
         if isinstance(other, AnyFunction) and other.is_vector:
             return other.dot(self)
 
-        # TODO: remove
-        if isinstance(other, tuple):
-            assert len(self._vec) == len(other)
-            out = 0
-            for i, j in zip(self._vec, other):
-                out += i._f * j
-            return ScalarFunction(out)
-
         raise NotImplementedError()
 
     def cross(self, other_in: FunctionInput) -> typing.Union[VectorFunction, ScalarFunction]:
