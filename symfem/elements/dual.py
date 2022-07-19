@@ -70,7 +70,7 @@ class DualCiarletElement(FiniteElement):
                         for i in range(self.range_dim):
                             sf_item = sympy.Integer(0)
                             for a, b in zip(coeffs, sub_basis):
-                                assert isinstance(b, tuple)
+                                assert isinstance(b, VectorElement)
                                 sf_item += a * b[i]
                             sf_list.append(sf_item)
                         sub_fun = tuple(sf_list)
