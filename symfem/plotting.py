@@ -326,6 +326,7 @@ class Picture:
         svg2png(bytestring=self.as_svg(None), write_to=filename)
 
     def save(self, filename: str):
+        """Save the picture as a file."""
         if filename.endswith(".svg"):
             self.as_svg(filename)
         elif filename.endswith(".png"):
@@ -333,6 +334,6 @@ class Picture:
         else:
             if "." in filename:
                 ext = "." + filename.split(".")[-1]
-                raise ValueError("Unknown file extension: {ext}")
+                raise ValueError(f"Unknown file extension: {ext}")
             else:
-                raise ValueError("Unknown file extension: {filename}")
+                raise ValueError(f"Unknown file extension: {filename}")
