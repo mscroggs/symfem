@@ -41,6 +41,6 @@ if __name__ == "__main__":
         extras_require={
             "style": ["flake8", "pydocstyle", "mypy"],
             "optional": ["svgwrite", "CairoSVG"],
-            "test": ["pytest", "symfem[optional]"],
+            "test": ["pytest", "symfem[optional]", "numpy"],
         }
     )
