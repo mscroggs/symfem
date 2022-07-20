@@ -12,6 +12,7 @@ from .functions import (ScalarFunction, VectorFunction, parse_function_input,
                         AnyFunction, FunctionInput)
 from .geometry import PointType, SetOfPointsInput, parse_set_of_points_input
 from .piecewise_functions import PiecewiseFunction
+from .plotting import Picture, colors
 from .references import Reference
 from .symbols import x
 from .utils import allequal
@@ -321,51 +322,28 @@ class CiarletElement(FiniteElement):
 
         return self._basis_functions
 
+    def plot_basis_function(self, n: int, filename: str):
+        """Plot a diagram showing a basis function."""
+        f = self.get_basis_functions()[n]
+        d = self.dofs[n]
+        values = self.tabulate_basis(self.reference.make_lattice(6), "xyz,xyz")
+        max_v = sympy.Integer(0)
+        for row in values:
+            assert isinstance(row, tuple)
+            for i in row:
+                max_v = max(max_v, parse_function_input(i).norm())
+        scale = 1 / max_v
+        f.plot(self.reference, filename, d.dof_point(), d.dof_direction(), d.entity, n, scale)
+
     def plot_dof_diagram(self, filename: str):
         """Plot a diagram showing the DOFs of the element."""
-        try:
-            import svgwrite
-        except ImportError:
-            raise ImportError("svgwrite is needed for plotting"
-                              " (pip install svgwrite)")
-
         assert filename.endswith(".svg") or filename.endswith(".png")
 
-        def to_2d(p):
-            if len(p) == 0:
-                return (0, 0)
-            if len(p) == 1:
-                return (p[0], 0)
-            if len(p) == 2:
-                return (p[0], p[1])
-            if len(p) == 3:
-                return (p[0] + p[1] * sympy.Integer(1) / 2,
-                        p[2] - 2 * p[0] * sympy.Integer(1) / 25 + p[1] * sympy.Integer(1) / 5)
-            raise ValueError("Unsupported gdim")
-
-        def z(p):
-            if len(p) == 3:
-                return p[0] - 2 * p[1]
-            return 0
-
-        colors = ["#FF8800", "#44AAFF", "#55FF00", "#DD2299"]
-        black = "#000000"
-        white = "#FFFFFF"
+        img = Picture()
 
         dofs_by_subentity: typing.Dict[int, typing.Dict[int, ListOfFunctionals]] = {
             i: {j: [] for j in range(self.reference.sub_entity_count(i))}
             for i in range(self.reference.tdim + 1)}
-
-        # Possible entries in ddata:
-        #   ("line", (start, end, color))
-        #       A line from start to end of the given color
-        #   ("arrow", (start, end, color))
-        #       An arrow from start to end of the given color
-        #   ("ncircle", (center, number, color))
-        #       A circle containing a number, drawn with the given color
-        #   ("fill", (vertices, color, opacity))
-        #       An polygon filled with the given color and opacity
-        ddata: typing.List[typing.Tuple[str, typing.Tuple[typing.Any, ...]]] = []
 
         for d in self.dofs:
             dofs_by_subentity[d.entity[0]][d.entity[1]].append(d)
@@ -373,129 +351,32 @@ class CiarletElement(FiniteElement):
         for entities in self.reference.z_ordered_entities():
             for dim, e in entities:
                 if dim == 1:
-                    pts = [to_2d(self.reference.vertices[i]) for i in self.reference.edges[e]]
-                    ddata.append(("line", (pts[0], pts[1], black)))
+                    pts = tuple(self.reference.vertices[i] for i in self.reference.edges[e])
+                    img.add_line(pts[0], pts[1], colors.BLACK)
                 if dim == 2:
-                    pts = [to_2d(self.reference.vertices[i]) for i in self.reference.faces[e]]
+                    pts = tuple(self.reference.vertices[i] for i in self.reference.faces[e])
                     if len(pts) == 4:
-                        pts = [pts[0], pts[1], pts[3], pts[2]]
-                    ddata.append(("fill", (pts, white, 0.5)))
+                        pts = (pts[0], pts[1], pts[3], pts[2])
+                    img.add_fill(pts, colors.WHITE, 0.5)
 
             for dim, e in entities:
                 dofs = dofs_by_subentity[dim][e]
-                dofs.sort(key=lambda d: z(d.dof_point()))
+                dofs.sort(key=lambda d: img.z(d.dof_point()))
                 for d in dofs:
                     direction = d.dof_direction()
                     if direction is not None:
-                        vdirection = VectorFunction(direction)
-                        vdirection /= vdirection.norm()
-                        vdirection /= 8
-                        start = VectorFunction(d.dof_point())
+                        shifted = False
                         for d2 in self.dofs:
                             if d != d2 and d.dof_point() == d2.dof_point():
-                                start += vdirection / 3
+                                shifted = True
                                 break
-                        ddata.append((
-                            "arrow",
-                            (to_2d(start), to_2d(start + vdirection), colors[d.entity[0]])))
-                        ddata.append((
-                            "ncircle", (to_2d(start), self.dofs.index(d), colors[d.entity[0]])))
+                        img.add_dof_arrow(d.dof_point(), direction, self.dofs.index(d),
+                                          colors.entity(d.entity[0]), shifted)
                     else:
-                        ddata.append((
-                            "ncircle",
-                            (to_2d(d.dof_point()), self.dofs.index(d), colors[d.entity[0]])))
+                        img.add_dof_marker(
+                            d.dof_point(), self.dofs.index(d), colors.entity(d.entity[0]))
 
-        minx, miny = 1000, 1000
-        maxx, maxy = -1000, -1000
-        for t, info in ddata:
-            if t == "line" or t == "arrow":
-                s, e, c = info
-                assert isinstance(s, tuple)
-                assert isinstance(e, tuple)
-                minx = min(s[0], e[0], minx)
-                miny = min(s[1], e[1], miny)
-                maxx = max(s[0], e[0], maxx)
-                maxy = max(s[1], e[1], maxy)
-            elif t == "ncircle":
-                p, n, c = info
-                assert isinstance(p, tuple)
-                minx = min(p[0], minx)
-                miny = min(p[1], miny)
-                maxx = max(p[0], maxx)
-                maxy = max(p[1], maxy)
-            elif t == "fill":
-                pts, c, o = info
-                assert isinstance(pts, list)
-                minx = min(*[p[0] for p in pts], minx)
-                miny = min(*[p[1] for p in pts], miny)
-                maxx = max(*[p[0] for p in pts], maxx)
-                maxy = max(*[p[1] for p in pts], maxy)
-            else:
-                raise ValueError(f"Unknown shape type: {t}")
-
-        scale = 450
-        width = 50 + (maxx - minx) * scale
-        height = 50 + (maxy - miny) * scale
-
-        if filename.endswith(".svg"):
-            img = svgwrite.Drawing(filename, size=(float(width), float(height)))
-        else:
-            img = svgwrite.Drawing(None, size=(float(width), float(height)))
-
-        def map_pt(p):
-            return (float(25 + (p[0] - minx) * scale), float(height - 25 - (p[1] - miny) * scale))
-
-        for t, info in ddata:
-            if t == "line":
-                s, e, c = info
-                img.add(img.line(
-                    map_pt(s), map_pt(e), stroke=c, stroke_width=6, stroke_linecap="round"))
-            elif t == "arrow":
-                s, e, c = info
-                img.add(img.line(
-                    map_pt(s), map_pt(e), stroke=c, stroke_width=4, stroke_linecap="round"))
-                assert isinstance(e, tuple)
-                assert isinstance(s, tuple)
-                ve = VectorFunction(e)
-                vs = VectorFunction(s)
-                vdirection = ve - vs
-                vdirection /= vdirection.norm()
-                vdirection /= 30
-                perp = VectorFunction((-vdirection[1], vdirection[0]))
-                perp /= sympy.Rational(5, 2)
-                for pt in [ve - vdirection + perp, ve - vdirection - perp]:
-                    img.add(img.line(
-                        map_pt(pt.as_sympy()), map_pt(ve), stroke=c, stroke_width=4,
-                        stroke_linecap="round"))
-            elif t == "ncircle":
-                p, n, c = info
-                img.add(img.circle(map_pt(p), 20, stroke=c, stroke_width=4, fill=white))
-                if n < 10:
-                    font_size = 25
-                elif n < 100:
-                    font_size = 20
-                else:
-                    font_size = 12
-                img.add(img.text(
-                    f"{n}", map_pt(p), fill=black, font_size=font_size,
-                    style=("text-anchor:middle;dominant-baseline:middle;"
-                           "font-family:sans-serif")
-                ))
-            elif t == "fill":
-                pts, c, o = info
-                img.add(img.polygon([map_pt(p) for p in pts], fill=c, opacity=o))
-            else:
-                raise ValueError(f"Unknown shape type: {t}")
-
-        if filename.endswith(".svg"):
-            img.save()
-        elif filename.endswith(".png"):
-            try:
-                from cairosvg import svg2png
-            except ImportError:
-                raise ImportError("CairoSVG must be installed to convert images to png"
-                                  " (pip install CairoSVG)")
-            svg2png(bytestring=img.tostring(), write_to=filename)
+        img.save(filename)
 
     def map_to_cell(
         self, vertices_in: SetOfPointsInput, basis: typing.List[AnyFunction] = None,
