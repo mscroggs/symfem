@@ -381,6 +381,7 @@ class Interval(Reference):
 
     def make_lattice(self, n: int) -> SetOfPoints:
         """Make a lattice of points."""
+        assert self.vertices == self.reference_vertices
         return tuple((sympy.Rational(2 * i + 1, 2 * (n + 1)), ) for i in range(n))
 
     def make_lattice_with_lines(
@@ -459,18 +460,19 @@ class Triangle(Reference):
 
     def make_lattice(self, n: int) -> SetOfPoints:
         """Make a lattice of points."""
-        return tuple((
-            sympy.Rational(2 * i + 1, 2 * (n + 1)),
-            sympy.Rational(2 * j + 1, 2 * (n + 1))
+        return tuple(tuple(
+            o + ((2 * i + 1) * a0 + (2 * j + 1) * a1) / 2 / (n + 1)
+            for o, a0, a1 in zip(self.origin, *self.axes)
         ) for i in range(n) for j in range(n - i))
 
     def make_lattice_with_lines(
         self, n: int
     ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
         """Make a lattice of points, and a list of lines connecting them."""
-        assert self.vertices == self.reference_vertices
-        pts = tuple((sympy.Rational(i, n - 1), sympy.Rational(j, n - 1))
-                    for i in range(n) for j in range(n - i))
+        pts = tuple(tuple(
+            o + (i * a0 + j * a1) / (n - 1)
+            for o, a0, a1 in zip(self.origin, *self.axes)
+        ) for i in range(n) for j in range(n - i))
         pairs = []
         s = 0
         for j in range(n-1, 0, -1):
@@ -588,6 +590,7 @@ class Tetrahedron(Reference):
 
     def make_lattice(self, n: int) -> SetOfPoints:
         """Make a lattice of points."""
+        assert self.vertices == self.reference_vertices
         return tuple((
             sympy.Rational(2 * i + 1, 2 * (n + 1)),
             sympy.Rational(2 * j + 1, 2 * (n + 1)),
@@ -687,18 +690,19 @@ class Quadrilateral(Reference):
 
     def make_lattice(self, n: int) -> SetOfPoints:
         """Make a lattice of points."""
-        return tuple((
-            sympy.Rational(2 * i + 1, 2 * (n + 1)),
-            sympy.Rational(2 * j + 1, 2 * (n + 1))
+        return tuple(tuple(
+            o + ((2 * i + 1) * a0 + (2 * j + 1) * a1) / 2 / (n + 1)
+            for o, a0, a1 in zip(self.origin, *self.axes)
         ) for i in range(n + 1) for j in range(n + 1))
 
     def make_lattice_with_lines(
         self, n: int
     ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
         """Make a lattice of points, and a list of lines connecting them."""
-        assert self.vertices == self.reference_vertices
-        pts = tuple((sympy.Rational(i, n - 1), sympy.Rational(j, n - 1))
-                    for i in range(n) for j in range(n))
+        pts = tuple(tuple(
+            o + (i * a0 + j * a1) / (n - 1)
+            for o, a0, a1 in zip(self.origin, *self.axes)
+        ) for i in range(n) for j in range(n))
         pairs = []
         for i in range(n):
             for j in range(n):
@@ -843,6 +847,7 @@ class Hexahedron(Reference):
 
     def make_lattice(self, n: int) -> SetOfPoints:
         """Make a lattice of points."""
+        assert self.vertices == self.reference_vertices
         return tuple((
             sympy.Rational(2 * i + 1, 2 * (n + 1)),
             sympy.Rational(2 * j + 1, 2 * (n + 1)),
@@ -981,6 +986,7 @@ class Prism(Reference):
 
     def make_lattice(self, n: int) -> SetOfPoints:
         """Make a lattice of points."""
+        assert self.vertices == self.reference_vertices
         return tuple((
             sympy.Rational(2 * i + 1, 2 * (n + 1)),
             sympy.Rational(2 * j + 1, 2 * (n + 1)),

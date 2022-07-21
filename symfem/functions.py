@@ -283,7 +283,8 @@ class AnyFunction(ABC):
         img.save(filename)
 
     def plot_values(
-        self, reference: Reference, img: typing.Any, scale: sympy.core.expr.Expr = sympy.Integer(1)
+        self, reference: Reference, img: typing.Any,
+        scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
         """Plot the function's values."""
         raise ValueError(f"Cannot plot function of type '{self.__class__.__name__}'")
@@ -539,13 +540,14 @@ class ScalarFunction(AnyFunction):
         return ScalarFunction(self._f.integrate(*limits))
 
     def plot_values(
-        self, reference: Reference, img: typing.Any, scale: sympy.core.expr.Expr = sympy.Integer(1)
+        self, reference: Reference, img: typing.Any,
+        scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
         """Plot the function's values."""
         from .plotting import Picture, colors
         assert isinstance(img, Picture)
 
-        pts, pairs = reference.make_lattice_with_lines(6)
+        pts, pairs = reference.make_lattice_with_lines(n)
 
         deriv = self.grad(reference.tdim)
         evals = []
@@ -802,13 +804,14 @@ class VectorFunction(AnyFunction):
             raise StopIteration
 
     def plot_values(
-        self, reference: Reference, img: typing.Any, scale: sympy.core.expr.Expr = sympy.Integer(1)
+        self, reference: Reference, img: typing.Any,
+        scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
         """Plot the function's values."""
         from .plotting import Picture, colors
         assert isinstance(img, Picture)
 
-        pts = reference.make_lattice(6)
+        pts = reference.make_lattice(n)
 
         for p in pts:
             value = self.subs(x, p) * scale / 4

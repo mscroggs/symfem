@@ -326,6 +326,8 @@ class CiarletElement(FiniteElement):
         """Plot a diagram showing a basis function."""
         f = self.get_basis_functions()[n]
         d = self.dofs[n]
+        print(self.reference)
+        print(self.reference.make_lattice(6))
         values = self.tabulate_basis(self.reference.make_lattice(6), "xyz,xyz")
         max_v = sympy.Integer(0)
         for row in values:

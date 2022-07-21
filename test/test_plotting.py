@@ -110,3 +110,13 @@ def test_function_plots_raviart_thomas(reference, degree, ext):
         e = symfem.create_element(reference, "RT", degree)
     e.plot_basis_function(0, os.path.join(
         dir, f"test-output-test_function_plots_raviart_thomas-{reference}-{degree}.{ext}"))
+
+
+@pytest.mark.parametrize("reference", [
+    "triangle", "quadrilateral",
+])
+@pytest.mark.parametrize("ext", ["svg", "png"])
+def test_function_plots_piecewise_scalar(reference, ext):
+    e = symfem.create_element(reference, "P1-iso-P2", 1)
+    e.plot_basis_function(0, os.path.join(
+        dir, f"test-output-test_function_plots_piecewise_scalar-{reference}.{ext}"))
