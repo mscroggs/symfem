@@ -590,11 +590,9 @@ class Tetrahedron(Reference):
 
     def make_lattice(self, n: int) -> SetOfPoints:
         """Make a lattice of points."""
-        assert self.vertices == self.reference_vertices
-        return tuple((
-            sympy.Rational(2 * i + 1, 2 * (n + 1)),
-            sympy.Rational(2 * j + 1, 2 * (n + 1)),
-            sympy.Rational(2 * k + 1, 2 * (n + 1))
+        return tuple(tuple(
+            o + ((2 * i + 1) * a0 + (2 * j + 1) * a1 + (2 * k + 1) * a2) / 2 / (n + 1)
+            for o, a0, a1, a2 in zip(self.origin, *self.axes)
         ) for i in range(n) for j in range(n - i) for k in range(n - i - j))
 
     def make_lattice_with_lines(

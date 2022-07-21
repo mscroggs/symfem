@@ -549,6 +549,8 @@ class ScalarFunction(AnyFunction):
 
         pts, pairs = reference.make_lattice_with_lines(n)
 
+        scale *= sympy.Rational(5, 8)
+
         deriv = self.grad(reference.tdim)
         evals = []
         for p in pts:
@@ -566,8 +568,8 @@ class ScalarFunction(AnyFunction):
             assert isinstance(di, sympy.core.expr.Expr)
             assert isinstance(dj, sympy.core.expr.Expr)
             img.add_bezier(
-                tuple(pi) + (evals[i], ), tuple(d_pi) + (evals[i] + di, ),
-                tuple(d_pj) + (evals[j] + dj, ), tuple(pj) + (evals[j], ),
+                tuple(pi) + (evals[i], ), tuple(d_pi) + (evals[i] + di * scale, ),
+                tuple(d_pj) + (evals[j] + dj * scale, ), tuple(pj) + (evals[j], ),
                 colors.ORANGE)
 
 

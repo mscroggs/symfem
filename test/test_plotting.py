@@ -120,3 +120,13 @@ def test_function_plots_piecewise_scalar(reference, ext):
     e = symfem.create_element(reference, "P1-iso-P2", 1)
     e.plot_basis_function(0, os.path.join(
         dir, f"test-output-test_function_plots_piecewise_scalar-{reference}.{ext}"))
+
+
+@pytest.mark.parametrize("reference", [
+    "triangle", "tetrahedron",
+])
+@pytest.mark.parametrize("ext", ["svg", "png"])
+def test_function_plots_piecewise_vector(reference, ext):
+    e = symfem.create_element(reference, "Guzman-Neilan", 1)
+    e.plot_basis_function(0, os.path.join(
+        dir, f"test-output-test_function_plots_piecewise_vector-{reference}.{ext}"))
