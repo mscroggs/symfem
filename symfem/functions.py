@@ -283,7 +283,8 @@ class AnyFunction(ABC):
         img.save(filename)
 
     def plot_values(
-        self, reference: Reference, img: typing.Any, scale: sympy.core.expr.Expr = sympy.Integer(1)
+        self, reference: Reference, img: typing.Any,
+        scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
         """Plot the function's values."""
         raise ValueError(f"Cannot plot function of type '{self.__class__.__name__}'")
@@ -539,13 +540,16 @@ class ScalarFunction(AnyFunction):
         return ScalarFunction(self._f.integrate(*limits))
 
     def plot_values(
-        self, reference: Reference, img: typing.Any, scale: sympy.core.expr.Expr = sympy.Integer(1)
+        self, reference: Reference, img: typing.Any,
+        scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
         """Plot the function's values."""
         from .plotting import Picture, colors
         assert isinstance(img, Picture)
 
-        pts, pairs = reference.make_lattice_with_lines(6)
+        pts, pairs = reference.make_lattice_with_lines(n)
+
+        scale *= sympy.Rational(5, 8)
 
         deriv = self.grad(reference.tdim)
         evals = []
@@ -564,8 +568,8 @@ class ScalarFunction(AnyFunction):
             assert isinstance(di, sympy.core.expr.Expr)
             assert isinstance(dj, sympy.core.expr.Expr)
             img.add_bezier(
-                tuple(pi) + (evals[i], ), tuple(d_pi) + (evals[i] + di, ),
-                tuple(d_pj) + (evals[j] + dj, ), tuple(pj) + (evals[j], ),
+                tuple(pi) + (evals[i], ), tuple(d_pi) + (evals[i] + di * scale, ),
+                tuple(d_pj) + (evals[j] + dj * scale, ), tuple(pj) + (evals[j], ),
                 colors.ORANGE)
 
 
@@ -802,13 +806,14 @@ class VectorFunction(AnyFunction):
             raise StopIteration
 
     def plot_values(
-        self, reference: Reference, img: typing.Any, scale: sympy.core.expr.Expr = sympy.Integer(1)
+        self, reference: Reference, img: typing.Any,
+        scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
         """Plot the function's values."""
         from .plotting import Picture, colors
         assert isinstance(img, Picture)
 
-        pts = reference.make_lattice(6)
+        pts = reference.make_lattice(n)
 
         for p in pts:
             value = self.subs(x, p) * scale / 4

@@ -87,6 +87,18 @@ class FiniteElement(ABC):
         else:
             raise ValueError(f"Unknown order: {order}")
 
+    def plot_basis_function(self, n: int, filename: str):
+        """Plot a diagram showing a basis function."""
+        f = self.get_basis_functions()[n]
+        values = self.tabulate_basis(self.reference.make_lattice(6), "xyz,xyz")
+        max_v = sympy.Integer(0)
+        for row in values:
+            assert isinstance(row, tuple)
+            for i in row:
+                max_v = max(max_v, parse_function_input(i).norm())
+        scale = 1 / max_v
+        f.plot(self.reference, filename, None, None, None, n, scale)
+
     @abstractmethod
     def map_to_cell(
         self, vertices_in: SetOfPointsInput, basis: typing.List[AnyFunction] = None,
