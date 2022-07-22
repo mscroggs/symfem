@@ -1279,7 +1279,13 @@ class DualPolygon(Reference):
 
     def make_lattice(self, n: int) -> SetOfPoints:
         """Make a lattice of points."""
-        raise NotImplementedError()
+        assert self.vertices == self.reference_vertices
+        from .create import create_reference
+        lattice: SetOfPoints = tuple()
+        for v1, v2 in zip(self.vertices, self.vertices[1:] + (self.vertices[0], )):
+            ref = create_reference("triangle", (self.origin, v1, v2))
+            lattice += ref.make_lattice(n // 2)
+        return lattice
 
     def make_lattice_with_lines(
         self, n: int
