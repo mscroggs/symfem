@@ -156,4 +156,5 @@ def test_function_plots_bc(n):
 def test_plot_reference(reference):
     r = symfem.create_reference(reference)
     for ext in ["svg", "png"]:
-        r.plot_entity_diagrams(f"test-output-test_plot_references-{reference}.{ext}")
+        r.plot_entity_diagrams(os.path.join(
+            dir, f"test-output-test_plot_references-{reference}.{ext}"))

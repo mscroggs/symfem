@@ -504,7 +504,59 @@ class Reference(ABC):
 
         img = Picture()
 
-        
+        if self.tdim == 1:
+            offset_unit: typing.Tuple[typing.Union[
+                sympy.core.expr.Expr, int], ...] = (sympy.Rational(4, 3), )
+            img.add_arrow((-sympy.Rational(1, 2), 0), (-sympy.Rational(1, 3), 0))
+            img.add_math((-sympy.Rational(8, 27), 0), "x")
+        elif self.tdim == 2:
+            if self.name.startswith("dual polygon"):
+                offset_unit = (sympy.Rational(9, 4), 0)
+                rt52 = sympy.sqrt(3) / 4
+                img.add_arrow((-sympy.Rational(3, 4), -rt52), (-sympy.Rational(7, 12), -rt52))
+                img.add_arrow((-sympy.Rational(3, 4), -rt52),
+                              (-sympy.Rational(3, 4), sympy.Rational(1, 6) - rt52))
+                img.add_math((-sympy.Rational(59, 108), -rt52), "x")
+                img.add_math((-sympy.Rational(3, 4), sympy.Rational(12, 54) - rt52), "y")
+            else:
+                offset_unit = (sympy.Rational(4, 3), 0)
+                img.add_arrow((-sympy.Rational(1, 2), 0), (-sympy.Rational(1, 3), 0))
+                img.add_arrow((-sympy.Rational(1, 2), 0),
+                              (-sympy.Rational(1, 2), sympy.Rational(1, 6)))
+                img.add_math((-sympy.Rational(8, 27), 0), "x")
+                img.add_math((-sympy.Rational(1, 2), sympy.Rational(12, 54)), "y")
+        elif self.tdim == 3:
+            if self.name == "pyramid":
+                offset_unit = (sympy.Rational(17, 12), sympy.Rational(17, 30), 0)
+            elif self.name == "hexahedron":
+                offset_unit = (sympy.Rational(3, 2), sympy.Rational(9, 15), 0)
+            else:
+                offset_unit = (1, sympy.Rational(2, 5), 0)
+            img.add_arrow((-sympy.Rational(3, 8), -sympy.Rational(3, 20), 0),
+                          (-sympy.Rational(5, 24), -sympy.Rational(3, 20), 0))
+            img.add_arrow((-sympy.Rational(3, 8), -sympy.Rational(3, 20), 0),
+                          (-sympy.Rational(3, 8), sympy.Rational(1, 60), 0))
+            img.add_arrow((-sympy.Rational(3, 8), -sympy.Rational(3, 20), 0),
+                          (-sympy.Rational(3, 8), -sympy.Rational(3, 20), sympy.Rational(1, 6)))
+            img.add_math((-sympy.Rational(7, 40), -sympy.Rational(3, 20), 0), "x")
+            img.add_math((-sympy.Rational(3, 8), sympy.Rational(1, 15), 0), "y")
+            img.add_math((-sympy.Rational(3, 8), -sympy.Rational(3, 20), sympy.Rational(1, 5)), "z")
+        else:
+            raise ValueError("Unsupported tdim")
+
+        def offset(point, cd):
+            return tuple((p + cd * a) / 2 for p, a in zip(point, offset_unit))
+
+        for current_dim in range(self.tdim + 1):
+            for entities in self.z_ordered_entities():
+                for dim, n in entities:
+                    if dim == 1:
+                        start, end = [offset(self.vertices[i], current_dim) for i in self.edges[n]]
+                        img.add_line(start, end)
+
+                    if dim == current_dim:
+                        ref = self.sub_entity(dim, n)
+                        img.add_ncircle(offset(ref.midpoint(), current_dim), n, colors.entity(dim))
 
         img.save(filename)
 
