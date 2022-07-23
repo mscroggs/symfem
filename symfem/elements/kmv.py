@@ -50,6 +50,12 @@ class KongMulderVeldhuizen(CiarletElement):
     """Kong-Mulder-Veldhuizen finite element."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+        """
         dofs: ListOfFunctionals = []
         if reference.name == "triangle":
             if order == 1:

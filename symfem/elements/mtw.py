@@ -22,6 +22,13 @@ class MardalTaiWinther(CiarletElement):
     """Mardal-Tai-Winther Hdiv finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         assert order == 3
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(

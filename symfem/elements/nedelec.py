@@ -19,6 +19,13 @@ class NedelecFirstKind(CiarletElement):
     """Nedelec first kind Hcurl finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
         poly += Hcurl_polynomials(reference.tdim, reference.tdim, order)
@@ -49,6 +56,13 @@ class NedelecSecondKind(CiarletElement):
     """Nedelec second kind Hcurl finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
 

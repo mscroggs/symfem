@@ -14,6 +14,12 @@ class DirectSerendipity(DirectElement):
     """A direct serendipity element."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+        """
         basis_functions = []
         basis_entities = []
 

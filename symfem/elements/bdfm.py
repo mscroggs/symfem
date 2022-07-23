@@ -49,6 +49,13 @@ class BDFM(CiarletElement):
     """Brezzi-Douglas-Fortin-Marini Hdiv finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         poly = bdfm_polyset(reference, order)
 
         dofs: ListOfFunctionals = []

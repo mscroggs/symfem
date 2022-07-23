@@ -18,6 +18,13 @@ class HellanHerrmannJohnson(CiarletElement):
     """A Hellan-Herrmann-Johnson element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         if reference.vertices != reference.reference_vertices:
             raise NotImplementedError()
         assert reference.name == "triangle"

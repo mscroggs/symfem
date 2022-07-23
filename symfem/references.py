@@ -10,17 +10,41 @@ from .symbols import t, x, AxisVariablesNotSingle
 
 
 def _vsub(v: PointTypeInput, w: PointTypeInput) -> PointType:
-    """Subtract."""
+    """Subtract.
+
+    Args:
+        v: A vector
+        w: A vector
+
+    Returns:
+        The vector v - w
+    """
     return tuple(i - j for i, j in zip(parse_point_input(v), parse_point_input(w)))
 
 
 def _vadd(v: PointTypeInput, w: PointTypeInput) -> PointType:
-    """Add."""
+    """Add.
+
+    Args:
+        v: A vector
+        w: A vector
+
+    Returns:
+        The vector v + w
+    """
     return tuple(i + j for i, j in zip(parse_point_input(v), parse_point_input(w)))
 
 
 def _vdot(v: PointTypeInput, w: PointTypeInput) -> sympy.core.expr.Expr:
-    """Compute dot product."""
+    """Compute the dot product.
+
+    Args:
+        v: A vector
+        w: A vector
+
+    Returns:
+        The scalar v.w
+    """
     out = sympy.Integer(0)
     for i, j in zip(parse_point_input(v), parse_point_input(w)):
         out += i * j
@@ -28,7 +52,15 @@ def _vdot(v: PointTypeInput, w: PointTypeInput) -> sympy.core.expr.Expr:
 
 
 def _vcross(v_in: PointTypeInput, w_in: PointTypeInput) -> PointType:
-    """Compute cross product."""
+    """Compute the cross product.
+
+    Args:
+        v: A vector
+        w: A vector
+
+    Returns:
+        The vector v x w
+    """
     v = parse_point_input(v_in)
     w = parse_point_input(w_in)
     assert len(v) == len(w) == 3
@@ -36,13 +68,27 @@ def _vcross(v_in: PointTypeInput, w_in: PointTypeInput) -> PointType:
 
 
 def _vnorm(v_in: PointTypeInput) -> sympy.core.expr.Expr:
-    """Find the norm of a vector."""
+    """Find the norm of a vector.
+
+    Args:
+        v_in: A vector
+
+    Returns:
+        The norm of v_in
+    """
     v = parse_point_input(v_in)
     return sympy.sqrt(_vdot(v, v))
 
 
 def _vnormalise(v_in: PointTypeInput) -> PointType:
-    """Normalise a vector."""
+    """Normalise a vector.
+
+    Args:
+        v_in: A vector
+
+    Returns:
+        A unit vector pointing in the same direction as v_in
+    """
     v = parse_point_input(v_in)
     n = _vnorm(v)
     return tuple(i / n for i in v)
@@ -60,6 +106,22 @@ class Reference(ABC):
         sub_entity_types: typing.List[typing.Union[typing.List[str], str, None]],
         simplex: bool = False, tp: bool = False
     ):
+        """Create a reference cell.
+
+        Args:
+            tdim: The topological dimension of the cell
+            name: The name of th cell
+            origin: The coordinates of the origin
+            axes: Vectors representing the axes of the cell
+            reference_vertices: The vertices of the default version of this cell
+            vertices: The vertices of this cell
+            edges: Pairs of vertex numbers that form the edges of the cell
+            faces: Tuples of vertex numbers that form the faces of the cell
+            volumes: Tuples of vertex numbers that form the volumes of the cell
+            sub_entity_types: The cell types of each sub-entity of the cell
+            simpex: Is the cell a simplex (interval/triangle/tetrahedron)?
+            tp: Is the cell a tensor product (interval/quadrilateral/hexahedron)?
+        """
         self.tdim = tdim
         self.origin: PointType = parse_point_input(origin)
         self.gdim = len(self.origin)
@@ -78,7 +140,11 @@ class Reference(ABC):
 
     @property
     def clockwise_vertices(self) -> SetOfPoints:
-        """Get list of vertices in clockwise order."""
+        """Get list of vertices in clockwise order.
+
+        Returns:
+            A list of vertices
+        """
         return self.vertices
 
     @abstractmethod

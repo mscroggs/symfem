@@ -36,6 +36,13 @@ class BDDF(CiarletElement):
     """Brezzi-Douglas-Duran-Fortin Hdiv finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         poly = bddf_polyset(reference, order)
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(

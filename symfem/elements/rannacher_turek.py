@@ -16,6 +16,12 @@ class RannacherTurek(CiarletElement):
     """Rannacher-Turek finite element."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+        """
         assert order == 1
 
         dofs: ListOfFunctionals = []

@@ -25,6 +25,13 @@ class Regge(CiarletElement):
     """A Regge element on a simplex."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "point"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         from symfem import create_reference
         poly: typing.List[FunctionInput] = []
         if reference.tdim == 2:
@@ -112,6 +119,13 @@ class ReggeTP(CiarletElement):
     """A Regge element on a tensor product cell."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "integral"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         from symfem import create_reference
 
         poly: typing.List[FunctionInput] = []

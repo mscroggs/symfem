@@ -17,7 +17,17 @@ class Transition(CiarletElement):
     """Transition finite element."""
 
     def __init__(self, reference: Reference, order: int,
-                 edge_orders=None, face_orders=None, variant: str = "equispaced"):
+                 edge_orders: typing.List[int] = None, face_orders: typing.List[int] = None,
+                variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            edge_orders: the polynomial order for each edge
+            face_orders: the polynomial order for each face
+            variant: the variant of the element
+        """
         if reference.name == "triangle":
             assert face_orders is None
             assert len(edge_orders) == 3

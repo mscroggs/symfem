@@ -1,5 +1,4 @@
-"""
-Demo showing how Symfem can be used to verify properties of a basis.
+"""Demo showing how Symfem can be used to verify properties of a basis.
 
 The basis functions of a Lagrange element, when restricted to an edge of a cell,
 should be equal to the basis functions of a Lagrange space on that edge (or equal to 0).

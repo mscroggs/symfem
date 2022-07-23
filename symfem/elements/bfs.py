@@ -16,6 +16,12 @@ class BognerFoxSchmit(CiarletElement):
     """Bogner-Fox-Schmit finite element."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+        """
         assert order == 3
         dofs: ListOfFunctionals = []
         for v_n, vs in enumerate(reference.vertices):

@@ -15,6 +15,13 @@ class DPC(CiarletElement):
     """A dPc element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         if reference.name == "interval":
             points = [d.dof_point() for d in Lagrange(reference, order, variant).dofs]
         elif order == 0:
@@ -50,6 +57,13 @@ class VectorDPC(CiarletElement):
     """Vector dPc finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         scalar_space = DPC(reference, order, variant)
         dofs: ListOfFunctionals = []
         if reference.tdim == 1:

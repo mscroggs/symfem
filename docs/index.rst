@@ -201,6 +201,7 @@ representing a subentity:
 
 Documentation index
 ===================
+
 .. toctree::
    :titlesonly:
 

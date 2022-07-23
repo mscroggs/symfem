@@ -18,6 +18,13 @@ class CrouzeixRaviart(CiarletElement):
     """Crouzeix-Raviart finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         assert reference.name in ["triangle", "tetrahedron"]
 
         if order > 1:

@@ -11,6 +11,12 @@ class CustomElement(CiarletElement):
     """Custom element on a quadrilateral."""
 
     def __init__(self, reference, order):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+        """
         zero = sympy.Integer(0)
         one = sympy.Integer(1)
         half = sympy.Rational(1, 2)

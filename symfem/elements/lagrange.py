@@ -15,6 +15,13 @@ class Lagrange(CiarletElement):
     """Lagrange finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         dofs: ListOfFunctionals = []
         if order == 0:
             dofs = [
@@ -58,6 +65,13 @@ class VectorLagrange(CiarletElement):
     """Vector Lagrange finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         scalar_space = Lagrange(reference, order, variant)
         dofs: ListOfFunctionals = []
         poly: typing.List[FunctionInput] = []
@@ -93,6 +107,13 @@ class MatrixLagrange(CiarletElement):
     """Matrix Lagrange finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         scalar_space = Lagrange(reference, order, variant)
         dofs: ListOfFunctionals = []
         if reference.tdim == 1:
@@ -127,6 +148,13 @@ class SymmetricMatrixLagrange(CiarletElement):
     """Symmetric matrix Lagrange finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         poly: typing.List[FunctionInput] = []
         dofs: ListOfFunctionals = []
         scalar_space = Lagrange(reference, order, variant)

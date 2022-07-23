@@ -19,6 +19,13 @@ class Bubble(CiarletElement):
     """Bubble finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         from .. import create_element
         p1 = create_element(reference.name, "Lagrange", 1)
         bubble = 1
@@ -72,6 +79,13 @@ class BubbleEnrichedLagrange(CiarletElement):
     """Bubble enriched Lagrange element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         lagrange = Lagrange(reference, order, variant)
         bubble = Bubble(reference, order + 2, variant)
 
@@ -101,6 +115,13 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
     """Bubble enriched Lagrange element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         lagrange = Lagrange(reference, order, variant)
         bubble = Bubble(reference, order + 2, variant)
 

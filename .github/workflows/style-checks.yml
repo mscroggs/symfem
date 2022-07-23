@@ -22,3 +22,7 @@ jobs:
         name: Run pydocstyle checks
       - run: python3 -m mypy .
         name: Run mypy checks
+      - run: |
+          cd docs
+          make html SPHINXOPTS="-W"
+        name: Test docs build

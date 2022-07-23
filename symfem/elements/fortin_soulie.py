@@ -19,6 +19,12 @@ class FortinSoulie(CiarletElement):
     """Fortin-Soulie finite element."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+        """
         assert reference.name == "triangle"
 
         assert order == 2

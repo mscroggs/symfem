@@ -29,6 +29,12 @@ class WuXu(CiarletElement):
     """Wu-Xu finite element."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+        """
         assert order == reference.tdim + 1
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)

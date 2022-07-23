@@ -20,6 +20,13 @@ class ArnoldBoffiFalk(CiarletElement):
     """An Arnold-Boffi-Falk element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         assert reference.name == "quadrilateral"
         poly: typing.List[FunctionInput] = []
         poly += [

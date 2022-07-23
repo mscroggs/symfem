@@ -18,6 +18,12 @@ class ConformingCrouzeixRaviart(CiarletElement):
     """Conforming Crouzeix-Raviart finite element."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+        """
         if reference.vertices != reference.reference_vertices:
             raise NotImplementedError()
         assert reference.name == "triangle"

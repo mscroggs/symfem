@@ -19,6 +19,13 @@ class Lagrange(CiarletElement):
     """Lagrange finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         dofs: ListOfFunctionals = []
         if order == 0:
             dofs = [

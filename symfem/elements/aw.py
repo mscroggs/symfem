@@ -21,6 +21,13 @@ class ArnoldWinther(CiarletElement):
     """An Arnold-Winther element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         assert reference.name == "triangle"
         self.variant = variant
         poly: typing.List[FunctionInput] = []
@@ -89,6 +96,13 @@ class NonConformingArnoldWinther(CiarletElement):
     """A nonconforming Arnold-Winther element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: the reference element
+            order: the polynomial order
+            variant: the variant of the element
+        """
         assert reference.name == "triangle"
         self.variant = variant
         poly: typing.List[FunctionInput] = []
