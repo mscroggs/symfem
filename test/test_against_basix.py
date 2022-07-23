@@ -147,8 +147,6 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
     element = create_element(cell, symfem_type, order)
     sym_result = to_nparray(element.tabulate_basis(points, "xyz,xyz"))
 
-    print(result.shape)
-    print(sym_result.shape)
     if len(result.shape) != len(sym_result.shape):
         sym_result = sym_result.reshape(result.shape)
 
