@@ -498,11 +498,11 @@ class Reference(ABC):
         """
         pass
 
-    def plot_entity_diagrams(self, filename: str):
+    def plot_entity_diagrams(self, filename: str, width: int = None, height: int = None):
         """Plot diagrams showing the entity numbering of the reference."""
         from .plotting import Picture, colors
 
-        img = Picture()
+        img = Picture(width=width, height=height)
 
         if self.tdim == 1:
             offset_unit: typing.Tuple[typing.Union[

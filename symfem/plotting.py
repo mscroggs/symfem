@@ -438,8 +438,8 @@ class Picture:
     axes_3d: SetOfPoints
 
     def __init__(
-        self, padding: sympy.core.expr.Expr = sympy.Integer(25), width=None, height=None,
-        axes_3d: SetOfPointsInput = None
+        self, padding: sympy.core.expr.Expr = sympy.Integer(25), width: int = None,
+        height: int = None, axes_3d: SetOfPointsInput = None
     ):
         """Create a picture.
 
