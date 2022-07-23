@@ -40,6 +40,7 @@ if __name__ == "__main__":
         install_requires=["sympy>=1.10"],
         extras_require={
             "style": ["flake8", "pydocstyle", "mypy"],
+            "docs": ["sphinx"],
             "optional": ["svgwrite", "CairoSVG"],
             "test": ["pytest", "symfem[optional]", "numpy"],
         }
