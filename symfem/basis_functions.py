@@ -187,3 +187,10 @@ class SubbedBasisFunction(BasisFunction):
     def shape(self) -> typing.Tuple[int, ...]:
         """Get the value shape of the function."""
         return self.f.get_function().shape
+
+    def plot_values(
+        self, reference: Reference, img: typing.Any,
+        scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
+    ):
+        """Plot the function's values."""
+        self.f.plot_values(reference, img, scale, n)

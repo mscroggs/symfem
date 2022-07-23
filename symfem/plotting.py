@@ -258,7 +258,8 @@ class Arrow(PictureElement):
         vdirection /= 30
         perp = VectorFunction((-vdirection[1], vdirection[0]))
         perp /= sympy.Rational(5, 2)
-        for pt in [ve - vdirection + perp, ve - vdirection - perp]:
+        for adir in [vdirection + perp, vdirection - perp]:
+            pt = ve - adir * sympy.S(self.width) / 4
             pt_s = pt.as_sympy()
             assert isinstance(pt_s, tuple)
             out.append((

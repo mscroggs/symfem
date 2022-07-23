@@ -372,3 +372,29 @@ class PiecewiseFunction(AnyFunction):
     def shape(self) -> typing.Tuple[int, ...]:
         """Get the value shape of the function."""
         return self.first_piece.shape
+
+    def plot_values(
+        self, reference: Reference, img: typing.Any,
+        scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
+    ):
+        """Plot the function's values."""
+        from .plotting import Picture
+        from .create import create_reference
+        assert isinstance(img, Picture)
+
+        for shape, f in self._pieces.items():
+            if self.tdim == 2:
+                if len(shape) == 3:
+                    ref = create_reference("triangle", shape)
+                elif len(shape) == 4:
+                    ref = create_reference("quadrilateral", shape)
+                else:
+                    raise ValueError("Unsupported cell type")
+            elif self.tdim == 3:
+                if len(shape) == 4:
+                    ref = create_reference("tetrahedron", shape)
+                else:
+                    raise ValueError("Unsupported cell type")
+            else:
+                raise ValueError("Unsupported tdim")
+            f.plot_values(ref, img, scale, n // 2)
