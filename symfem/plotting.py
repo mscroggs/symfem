@@ -69,6 +69,20 @@ class PictureElement(ABC):
         """
         pass
 
+    @abstractmethod
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> SVGFormat:
+        """Return Tikz format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A Tikz string
+        """
+        pass
+
     @property
     @abstractmethod
     def points(self) -> SetOfPoints:
@@ -147,6 +161,21 @@ class Line(PictureElement):
         return [(
             "line", (map_pt(self.start), map_pt(self.end)),
             {"stroke": self.color, "stroke_width": self.width, "stroke_linecap": "round"})]
+
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> SVGFormat:
+        """Return Tikz format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A Tikz string
+        """
+        s = map_pt(self.start)
+        e = map_pt(self.end)
+        return f"\\draw ({s[0]},{s[1]}) -- ({e[0]},{e[1]});\n"
 
     @property
     def points(self) -> SetOfPoints:
@@ -531,14 +560,11 @@ class Picture:
         """Add a filled polygon to the picture."""
         self.elements.append(Fill(tuple(self.parse_point(p) for p in vertices), color, opacity))
 
-    def as_svg(self, filename: str = None) -> str:
-        """Convert to an SVG."""
-        try:
-            import svgwrite
-        except ImportError:
-            raise ImportError("svgwrite is needed for plotting SVGs"
-                              " (pip install svgwrite)")
-
+    def compute_scale(self, unit: str = "px") -> typing.Tuple[
+        sympy.core.expr.Expr, sympy.core.expr.Expr, sympy.core.expr.Expr,
+        typing.Callable[[PointType], typing.Tuple[float, float]]
+    ]:
+        """Compute the scale and size of the picture."""
         minx = min(i.minx() for i in self.elements)
         miny = min(i.miny() for i in self.elements)
         maxx = max(i.maxx() for i in self.elements)
@@ -553,17 +579,38 @@ class Picture:
         else:
             scale = 450
 
+        if unit == "mm":
+            scale /= 20
+        elif unit == "cm":
+            scale /= 200
+        elif unit == "px":
+            pass
+        else:
+            raise ValueError(f"Unknown unit: {unit}")
+
         width = 2 * self.padding + (maxx - minx) * scale
         height = 2 * self.padding + (maxy - miny) * scale
-
-        assert filename is None or filename.endswith(".svg")
-        img = svgwrite.Drawing(filename, size=(float(width), float(height)))
 
         def map_pt(pt: PointType) -> typing.Tuple[float, float]:
             """Map a point."""
             return (
                 float(self.padding + (pt[0] - minx) * scale),
                 float(height - self.padding - (pt[1] - miny) * scale))
+
+        return scale, height, width, map_pt
+
+    def as_svg(self, filename: str = None) -> str:
+        """Convert to an SVG."""
+        try:
+            import svgwrite
+        except ImportError:
+            raise ImportError("svgwrite is needed for plotting SVGs"
+                              " (pip install svgwrite)")
+
+        scale, height, width, map_pt = self.compute_scale("px")
+
+        assert filename is None or filename.endswith(".svg")
+        img = svgwrite.Drawing(filename, size=(float(width), float(height)))
 
         for e in self.elements:
             for f, args, kwargs in e.as_svg(map_pt):
@@ -585,12 +632,30 @@ class Picture:
         assert filename.endswith(".png")
         svg2png(bytestring=self.as_svg(None), write_to=filename)
 
+    def as_tikz(self, filename: str = None) -> str:
+        """Convert to tikz."""
+        scale, height, width, map_pt = self.compute_scale("cm")
+        tikz = "\\begin{tikzpicture}[x=1cm,y=1cm]\n"
+
+        for e in self.elements:
+            tikz += e.as_tikz(map_pt)
+
+        tikz += "\\end{tikzpicture}"
+
+        if filename is not None:
+            with open(filename, "w") as f:
+                f.write(tikz)
+
+        return tikz
+
     def save(self, filename: str):
         """Save the picture as a file."""
         if filename.endswith(".svg"):
             self.as_svg(filename)
         elif filename.endswith(".png"):
             self.as_png(filename)
+        elif filename.endswith(".tex"):
+            self.as_tikz(filename)
         else:
             if "." in filename:
                 ext = "." + filename.split(".")[-1]
