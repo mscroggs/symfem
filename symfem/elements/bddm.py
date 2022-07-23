@@ -16,7 +16,15 @@ from .dpc import DPC, VectorDPC
 
 
 def bddf_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]:
-    """Create the polynomial basis for a BDDF element."""
+    """Create the polynomial basis for a BDDF element.
+
+    Args:
+        reference: The reference cell
+        order: The polynomial order
+
+    Returns:
+        The polynomial basis
+    """
     dim = reference.tdim
     assert reference.name == "hexahedron"
     pset: typing.List[FunctionInput] = []
@@ -39,9 +47,9 @@ class BDDF(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
-            variant: the variant of the element
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
         """
         poly = bddf_polyset(reference, order)
 
@@ -56,7 +64,11 @@ class BDDF(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["Brezzi-Douglas-Duran-Fortin", "BDDF"]

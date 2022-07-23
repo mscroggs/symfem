@@ -22,8 +22,8 @@ class P1IsoP2Tri(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
+            reference: The reference element
+            order: The polynomial order
         """
         half = sympy.Rational(1, 2)
         zero = sympy.Integer(0)
@@ -74,8 +74,8 @@ class P1IsoP2Quad(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
+            reference: The reference element
+            order: The polynomial order
         """
         half = sympy.Rational(1, 2)
         zero = sympy.Integer(0)

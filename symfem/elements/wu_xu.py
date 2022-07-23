@@ -15,7 +15,15 @@ from ..symbols import x
 
 
 def derivatives(dim: int, order: int) -> typing.List[typing.Tuple[int, ...]]:
-    """Return all the orders of a multidimensional derivative."""
+    """Return all the orders of a multidimensional derivative.
+
+    Args:
+        dim: The topological dimension
+        order: The total derivative order
+
+    Returns:
+        List of derivative order tuples
+    """
     if dim == 1:
         return [(order, )]
 
@@ -32,8 +40,8 @@ class WuXu(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
+            reference: The reference element
+            order: The polynomial order
         """
         assert order == reference.tdim + 1
         poly: typing.List[FunctionInput] = []

@@ -23,8 +23,8 @@ class HsiehCloughTocher(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
+            reference: The reference element
+            order: The polynomial order
         """
         from symfem import create_reference
         assert order == 3

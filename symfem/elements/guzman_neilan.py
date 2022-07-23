@@ -24,8 +24,8 @@ class GuzmanNeilan(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
+            reference: The reference element
+            order: The polynomial order
         """
         if reference.name == "triangle":
             poly = self._make_polyset_triangle(reference, order)

@@ -22,8 +22,8 @@ class FortinSoulie(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
+            reference: The reference element
+            order: The polynomial order
         """
         assert reference.name == "triangle"
 

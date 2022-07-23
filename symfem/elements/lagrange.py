@@ -18,9 +18,9 @@ class Lagrange(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
-            variant: the variant of the element
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
         """
         dofs: ListOfFunctionals = []
         if order == 0:
@@ -52,7 +52,11 @@ class Lagrange(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["Lagrange", "P"]
@@ -68,9 +72,9 @@ class VectorLagrange(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
-            variant: the variant of the element
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
         """
         scalar_space = Lagrange(reference, order, variant)
         dofs: ListOfFunctionals = []
@@ -94,7 +98,11 @@ class VectorLagrange(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["vector Lagrange", "vP"]
@@ -110,9 +118,9 @@ class MatrixLagrange(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
-            variant: the variant of the element
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
         """
         scalar_space = Lagrange(reference, order, variant)
         dofs: ListOfFunctionals = []
@@ -135,7 +143,11 @@ class MatrixLagrange(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["matrix Lagrange"]
@@ -151,9 +163,9 @@ class SymmetricMatrixLagrange(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
-            variant: the variant of the element
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
         """
         poly: typing.List[FunctionInput] = []
         dofs: ListOfFunctionals = []
@@ -195,7 +207,11 @@ class SymmetricMatrixLagrange(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["symmetric matrix Lagrange"]

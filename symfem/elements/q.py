@@ -21,9 +21,9 @@ class Q(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
-            variant: the variant of the element
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
         """
         dofs: ListOfFunctionals = []
         if order == 0:
@@ -91,7 +91,11 @@ class Q(CiarletElement):
         return [("scalar", [interval_q for i in range(self.reference.tdim)], perm)]
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["Q", "Lagrange", "P"]
@@ -107,9 +111,9 @@ class VectorQ(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
-            variant: the variant of the element
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
         """
         scalar_space = Q(reference, order, variant)
         dofs: ListOfFunctionals = []
@@ -134,7 +138,11 @@ class VectorQ(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["vector Q", "vQ"]
@@ -150,9 +158,9 @@ class Nedelec(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
-            variant: the variant of the element
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
         """
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_vector(reference.tdim, reference.tdim, order - 1)
@@ -169,7 +177,11 @@ class Nedelec(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["NCE", "RTCE", "Qcurl", "Nedelec", "Ncurl"]
@@ -185,9 +197,9 @@ class RaviartThomas(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
-            variant: the variant of the element
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
         """
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_vector(reference.tdim, reference.tdim, order - 1)
@@ -203,7 +215,11 @@ class RaviartThomas(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["NCF", "RTCF", "Qdiv"]

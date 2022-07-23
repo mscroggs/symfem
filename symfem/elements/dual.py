@@ -30,8 +30,8 @@ class DualCiarletElement(FiniteElement):
             dual_coefficients: the coefficients that define this element in terms of the basis
                                functions of the fine space
             fine_space: the family of the fine space
-            reference: the reference element
-            order: the polynomia order of the fine space
+            reference: The reference element
+            order: The polynomia order of the fine space
             domain_dim: the topological dimension of the domain
             range_dim: the dimension of the range
             range_shape: the shape of the range
@@ -105,8 +105,8 @@ class Dual(DualCiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
+            reference: The reference element
+            order: The polynomial order
         """
         dual_coefficients: typing.List[typing.List[typing.List[
             typing.Union[int, sympy.core.expr.Expr]]]] = []
@@ -153,8 +153,8 @@ class BuffaChristiansen(DualCiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
+            reference: The reference element
+            order: The polynomial order
         """
         assert order == 1
         dual_coefficients: typing.List[typing.List[typing.List[
@@ -190,8 +190,8 @@ class RotatedBuffaChristiansen(DualCiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
+            reference: The reference element
+            order: The polynomial order
         """
         assert order == 1
         dual_coefficients: typing.List[typing.List[typing.List[

@@ -18,8 +18,8 @@ class Taylor(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
+            reference: The reference element
+            order: The polynomial order
         """
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,

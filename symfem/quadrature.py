@@ -13,6 +13,9 @@ def equispaced(
 
     Args:
         n: Number of points
+
+    Returns:
+        Quadrature points and weights
     """
     return ([sympy.Rational(i, n - 1) for i in range(n)],
             [sympy.Rational(1, 2*(n-1)) if i == 0 or i == n - 1 else sympy.Rational(1, n-1)
@@ -26,6 +29,9 @@ def lobatto(
 
     Args:
         n: Number of points
+
+    Returns:
+        Quadrature points and weights
     """
     if n == 2:
         return ([0, 1],
@@ -76,6 +82,9 @@ def radau(
 
     Args:
         n: Number of points
+
+    Returns:
+        Quadrature points and weights
     """
     if n == 2:
         return ([0, sympy.Rational(2, 3)],
@@ -93,6 +102,9 @@ def legendre(
 
     Args:
         n: Number of points
+
+    Returns:
+        Quadrature points and weights
     """
     if n == 1:
         return ([sympy.Rational(1, 2)], [1])
@@ -115,6 +127,9 @@ def get_quadrature(
               Supported values: equispaced, lobatto, radau, legendre
 
         n: Number of points
+
+    Returns:
+        Quadrature points and weights
     """
     if rule == "equispaced":
         return equispaced(n)

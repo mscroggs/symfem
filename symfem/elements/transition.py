@@ -22,11 +22,11 @@ class Transition(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
+            reference: The reference element
+            order: The polynomial order
             edge_orders: the polynomial order for each edge
             face_orders: the polynomial order for each face
-            variant: the variant of the element
+            variant: The variant of the element
         """
         if reference.name == "triangle":
             assert face_orders is None
@@ -103,7 +103,11 @@ class Transition(CiarletElement):
         self.edge_orders = edge_orders
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant, "face_orders": self.face_orders,
                 "edge_orders": self.edge_orders}
 

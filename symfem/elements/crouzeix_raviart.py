@@ -21,9 +21,9 @@ class CrouzeixRaviart(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
-            variant: the variant of the element
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
         """
         assert reference.name in ["triangle", "tetrahedron"]
 
@@ -64,7 +64,11 @@ class CrouzeixRaviart(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["Crouzeix-Raviart", "CR", "Crouzeix-Falk", "CF"]

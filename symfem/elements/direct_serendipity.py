@@ -17,8 +17,8 @@ class DirectSerendipity(DirectElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
+            reference: The reference element
+            order: The polynomial order
         """
         basis_functions = []
         basis_entities = []

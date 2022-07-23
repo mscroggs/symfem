@@ -140,8 +140,8 @@ class Bernstein(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
+            reference: The reference element
+            order: The polynomial order
         """
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)

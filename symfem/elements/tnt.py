@@ -41,9 +41,9 @@ class TNT(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
-            variant: the variant of the element
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
         """
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_1d(reference.tdim, order)
@@ -96,7 +96,11 @@ class TNT(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["tiniest tensor", "TNT"]
@@ -112,9 +116,9 @@ class TNTcurl(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
-            variant: the variant of the element
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
         """
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
@@ -209,7 +213,11 @@ class TNTcurl(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["tiniest tensor Hcurl", "TNTcurl"]
@@ -225,9 +233,9 @@ class TNTdiv(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
-            variant: the variant of the element
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
         """
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
@@ -315,7 +323,11 @@ class TNTdiv(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["tiniest tensor Hdiv", "TNTdiv"]

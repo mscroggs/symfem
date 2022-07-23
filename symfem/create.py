@@ -183,6 +183,13 @@ def create_element(
 def _order_is_allowed(
     element_class: _typing.Type, ref: str, order: int
 ) -> bool:
+    """Check that an order is valid for an element.
+
+    Args:
+        element_class: The element class
+        ref: The reference cell
+        order: The polynomial order
+    """
     if hasattr(element_class, "min_order"):
         if isinstance(element_class.min_order, dict):
             if ref in element_class.min_order:

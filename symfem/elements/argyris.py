@@ -21,8 +21,8 @@ class Argyris(CiarletElement):
         """Create the element.
 
         Args:
-            reference: the reference element
-            order: the polynomial order
+            reference: The reference element
+            order: The polynomial order
         """
         assert order == 5
         assert reference.name == "triangle"
