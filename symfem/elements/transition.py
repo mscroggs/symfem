@@ -18,7 +18,7 @@ class Transition(CiarletElement):
 
     def __init__(self, reference: Reference, order: int,
                  edge_orders: typing.List[int] = None, face_orders: typing.List[int] = None,
-                variant: str = "equispaced"):
+                 variant: str = "equispaced"):
         """Create the element.
 
         Args:
@@ -30,8 +30,11 @@ class Transition(CiarletElement):
         """
         if reference.name == "triangle":
             assert face_orders is None
+            assert edge_orders is not None
             assert len(edge_orders) == 3
         elif reference.name == "tetrahedron":
+            assert face_orders is not None
+            assert edge_orders is not None
             assert len(face_orders) == 4
             assert len(edge_orders) == 6
 
@@ -50,8 +53,10 @@ class Transition(CiarletElement):
                 if edim == reference.tdim:
                     entity_order = order
                 elif edim == 1:
+                    assert edge_orders is not None
                     entity_order = edge_orders[e_n]
                 elif edim == 2:
+                    assert face_orders is not None
                     entity_order = face_orders[e_n]
                 else:
                     raise RuntimeError("Could not find order for this entity.")

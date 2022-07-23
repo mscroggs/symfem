@@ -110,7 +110,7 @@ class Reference(ABC):
 
         Args:
             tdim: The topological dimension of the cell
-            name: The name of th cell
+            name: The name of the cell
             origin: The coordinates of the origin
             axes: Vectors representing the axes of the cell
             reference_vertices: The vertices of the default version of this cell
@@ -119,7 +119,7 @@ class Reference(ABC):
             faces: Tuples of vertex numbers that form the faces of the cell
             volumes: Tuples of vertex numbers that form the volumes of the cell
             sub_entity_types: The cell types of each sub-entity of the cell
-            simpex: Is the cell a simplex (interval/triangle/tetrahedron)?
+            simplex: Is the cell a simplex (interval/triangle/tetrahedron)?
             tp: Is the cell a tensor product (interval/quadrilateral/hexahedron)?
         """
         self.tdim = tdim
@@ -149,31 +149,65 @@ class Reference(ABC):
 
     @abstractmethod
     def default_reference(self) -> Reference:
-        """Get the default reference for this cell type."""
+        """Get the default reference for this cell type.
+
+        Returns:
+            The default reference
+        """
         pass
 
     @abstractmethod
     def make_lattice(self, n: int) -> SetOfPoints:
-        """Make a lattice of points."""
+        """Make a lattice of points.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points offset from the edge of the cell
+        """
         pass
 
     @abstractmethod
     def make_lattice_with_lines(
         self, n: int
     ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
-        """Make a lattice of points, and a list of lines connecting them."""
+        """Make a lattice of points, and a list of lines connecting them.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points including the edges of the cell
+            Pairs of point numbers that make a mesh of lines across the cell
+        """
         pass
 
     def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
-        """Get the subentities of the cell in back-to-front plotting order."""
+        """Get the subentities of the cell in back-to-front plotting order.
+
+        Returns:
+            List of lists of subentity dimensions and numbers
+        """
         return [[(i, j) for i in range(self.tdim, -1, -1) for j in range(self.sub_entity_count(i))]]
 
     def z_ordered_entities_extra_dim(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
-        """Get the subentities in back-to-front plotting order when using an extra dimension."""
+        """Get the subentities in back-to-front plotting order when using an extra dimension.
+
+        Returns:
+            List of lists of subentity dimensions and numbers
+        """
         return self.z_ordered_entities()
 
     def get_point(self, reference_coords: PointType) -> typing.Tuple[sympy.core.expr.Expr, ...]:
-        """Get a point in the reference from reference coordinates."""
+        """Get a point in the reference from reference coordinates.
+
+        Args:
+            reference_coords: The reference coordinates
+
+        Returns:
+            A point in the cell
+        """
         assert len(reference_coords) == len(self.axes)
         pt = [i for i in self.origin]
         for a, b in zip(self.axes, reference_coords):
@@ -186,21 +220,46 @@ class Reference(ABC):
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
-        """Get the limits for an integral over this reference."""
+        """Get the limits for an integral over this reference.
+
+        Args:
+            vars: The variables to use for each direction
+
+        Returns:
+            Integration limits that can be passed into sympy.integrate
+        """
         pass
 
     @abstractmethod
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
-        """Get the map from the reference to a cell."""
+        """Get the map from the reference to a cell.
+
+        Args:
+            vertices: The vertices of a call
+
+        Returns:
+            The map
+        """
         pass
 
     @abstractmethod
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
-        """Get the inverse map from a cell to the reference."""
+        """Get the inverse map from a cell to the reference.
+
+        Args:
+            vertices_in: The vertices of a cell
+
+        Returns:
+            The inverse map
+        """
         pass
 
     def get_map_to_self(self) -> PointType:
-        """Get the map from the canonical reference to this reference."""
+        """Get the map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         if self._map_to_self is None:
             self._map_to_self = self._compute_map_to_self()
         assert self._map_to_self is not None
@@ -208,11 +267,19 @@ class Reference(ABC):
 
     @abstractmethod
     def _compute_map_to_self(self) -> PointType:
-        """Compute the map from the canonical reference to this reference."""
+        """Compute the map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         pass
 
     def get_inverse_map_to_self(self) -> PointType:
-        """Get the inverse map from the canonical reference to this reference."""
+        """Get the inverse map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         if self._inverse_map_to_self is None:
             self._inverse_map_to_self = self._compute_inverse_map_to_self()
         assert self._inverse_map_to_self is not None
@@ -220,20 +287,36 @@ class Reference(ABC):
 
     @abstractmethod
     def _compute_inverse_map_to_self(self) -> PointType:
-        """Compute the inverse map from the canonical reference to this reference."""
+        """Compute the inverse map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         pass
 
     @abstractmethod
     def volume(self) -> sympy.core.expr.Expr:
-        """Calculate the volume."""
+        """Calculate the volume.
+
+        Returns:
+            The volume of the cell
+        """
         pass
 
     def midpoint(self) -> PointType:
-        """Calculate the midpoint."""
+        """Calculate the midpoint.
+
+        Returns:
+            The midpoint of the cell
+        """
         return tuple(sum(i) * sympy.Integer(1) / len(i) for i in zip(*self.vertices))
 
     def jacobian(self) -> sympy.core.expr.Expr:
-        """Calculate the jacobian."""
+        """Calculate the Jacobian.
+
+        Returns:
+            The Jacobian
+        """
         from .functions import VectorFunction
         assert len(self.axes) == self.tdim
         vaxes = [VectorFunction(a) for a in self.axes]
@@ -249,11 +332,19 @@ class Reference(ABC):
         return out
 
     def scaled_axes(self) -> SetOfPoints:
-        """Return the unit axes of the reference."""
+        """Return the unit axes of the reference.
+
+        Returns:
+            The axes
+        """
         return tuple(_vnormalise(a) for a in self.axes)
 
     def tangent(self) -> PointType:
-        """Calculate the tangent to the element."""
+        """Calculate the tangent to the element.
+
+        Returns:
+            The tangent
+        """
         if self.tdim == 1:
             norm = sympy.sqrt(sum(i ** 2 for i in self.axes[0]))
             return _vnormalise(tuple(i / norm for i in self.axes[0]))
@@ -261,7 +352,11 @@ class Reference(ABC):
         raise RuntimeError
 
     def normal(self) -> PointType:
-        """Calculate the normal to the element."""
+        """Calculate the normal to the element.
+
+        Returns:
+            The normal
+        """
         if self.tdim == 1:
             if self.gdim == 2:
                 return _vnormalise((-self.axes[0][1], self.axes[0][0]))
@@ -275,7 +370,15 @@ class Reference(ABC):
     def sub_entities(
         self, dim: int = None, codim: int = None
     ) -> typing.Tuple[typing.Tuple[int, ...], ...]:
-        """Get the sub entities of a given dimension."""
+        """Get the sub-entities of a given dimension.
+
+        Args:
+            dim: The dimension of the sub-entity
+            codim: The co-dimension of the sub-entity
+
+        Returns:
+            A tuple of tuples of vertex numbers
+        """
         if dim is None:
             assert codim is not None
             dim = self.tdim - codim
@@ -289,13 +392,30 @@ class Reference(ABC):
             return self.volumes
         raise ValueError(f"Unsupported dimension: {dim}")
 
-    def sub_entity_count(self, dim: int) -> int:
-        """Get the number of sub entities of a given dimension."""
-        return len(self.sub_entities(dim))
+    def sub_entity_count(self, dim: int = None, codim: int = None) -> int:
+        """Get the number of sub-entities of a given dimension.
+
+        Args:
+            dim: the dimension of the sub-entity
+            codim: the codimension of the sub-entity
+
+        Returns:
+            The number of sub-entities
+        """
+        return len(self.sub_entities(dim, codim))
 
     def sub_entity(self, dim: int, n: int, reference_vertices: bool = False) -> typing.Any:
         # def sub_entity(self, dim: int, n: int, reference_vertices: bool = False) -> Reference:
-        """Get the sub entity of a given dimension and number."""
+        """Get the sub-entity of a given dimension and number.
+
+        Args:
+            dim: the dimension of the sub-entity
+            n: The sub-entity number
+            reference_vertices: Should the reference vertices be used?
+
+        Returns:
+            The sub-entity
+        """
         from symfem import create_reference
 
         entity_type = self.sub_entity_types[dim]
@@ -314,14 +434,28 @@ class Reference(ABC):
                     entity_type, tuple(self.vertices[i] for i in self.sub_entities(dim)[n]))
 
     def at_vertex(self, point: PointType) -> bool:
-        """Check if a point is a vertex of the reference."""
+        """Check if a point is a vertex of the reference.
+
+        Args:
+            point: The point
+
+        Returns:
+            Is the point a vertex?
+        """
         for v in self.vertices:
             if v == tuple(point):
                 return True
         return False
 
     def on_edge(self, point_in: PointType) -> bool:
-        """Check if a point is on an edge of the reference."""
+        """Check if a point is on an edge of the reference.
+
+        Args:
+            point_in: The point
+
+        Returns:
+            Is the point on an edge?
+        """
         from .functions import VectorFunction
         point = VectorFunction(point_in)
         for e in self.edges:
@@ -333,7 +467,14 @@ class Reference(ABC):
         return False
 
     def on_face(self, point_in: PointType) -> bool:
-        """Check if a point is on a face of the reference."""
+        """Check if a point is on a face of the reference.
+
+        Args:
+            point_in: The point
+
+        Returns:
+            Is the point on a face?
+        """
         from .functions import VectorFunction
         point = VectorFunction(point_in)
         for f in self.faces:
@@ -347,7 +488,14 @@ class Reference(ABC):
 
     @abstractmethod
     def contains(self, point: PointType) -> bool:
-        """Check is a point is contained in the reference."""
+        """Check if a point is contained in the reference.
+
+        Args:
+            point: The point
+
+        Returns:
+            Is the point contained in the reference?
+        """
         pass
 
 
@@ -357,6 +505,11 @@ class Point(Reference):
     def __init__(
         self, vertices: SetOfPointsInput = (tuple(), )
     ):
+        """Create a point.
+
+        Args:
+            vertices: The vertices of the point.
+        """
         assert len(vertices) == 1
         super().__init__(
             tdim=0,
@@ -371,51 +524,110 @@ class Point(Reference):
             sub_entity_types=["point", None, None, None],
             simplex=True, tp=True)
 
-    def default_reference(self) -> typing.Any:
-        """Get the default reference for this cell type."""
+    def default_reference(self) -> Reference:
+        """Get the default reference for this cell type.
+
+        Returns:
+            The default reference
+        """
         return Point(self.reference_vertices)
 
     def make_lattice(self, n: int) -> SetOfPoints:
-        """Make a lattice of points."""
+        """Make a lattice of points.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points offset from the edge of the cell
+        """
         raise NotImplementedError()
 
     def make_lattice_with_lines(
         self, n: int
     ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
-        """Make a lattice of points, and a list of lines connecting them."""
+        """Make a lattice of points, and a list of lines connecting them.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points including the edges of the cell
+            Pairs of point numbers that make a mesh of lines across the cell
+        """
         raise NotImplementedError()
 
     def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
-        """Get the limits for an integral over this reference."""
+        """Get the limits for an integral over this reference.
+
+        Args:
+            vars: The variables to use for each direction
+
+        Returns:
+            Integration limits that can be passed into sympy.integrate
+        """
         return list(zip(vars, self.vertices[0]))
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
-        """Get the map from the reference to a cell."""
+        """Get the map from the reference to a cell.
+
+        Args:
+            vertices: The vertices of a call
+
+        Returns:
+            The map
+        """
         assert self.vertices == self.reference_vertices
         return parse_point_input(vertices[0])
 
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
-        """Get the inverse map from a cell to the reference."""
+        """Get the inverse map from a cell to the reference.
+
+        Args:
+            vertices_in: The vertices of a cell
+
+        Returns:
+            The inverse map
+        """
         assert self.vertices == self.reference_vertices
         return self.vertices[0]
 
     def _compute_map_to_self(self) -> PointType:
-        """Compute the map from the canonical reference to this reference."""
+        """Compute the map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         return self.vertices[0]
 
     def _compute_inverse_map_to_self(self) -> PointType:
-        """Compute the inverse map from the canonical reference to this reference."""
+        """Compute the inverse map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         return self.reference_vertices[0]
 
     def volume(self) -> sympy.core.expr.Expr:
-        """Calculate the volume."""
+        """Calculate the volume.
+
+        Returns:
+            The volume of the cell
+        """
         return sympy.Integer(0)
 
     def contains(self, point: PointType) -> bool:
-        """Check is a point is contained in the reference."""
+        """Check if a point is contained in the reference.
+
+        Args:
+            point: The point
+
+        Returns:
+            Is the point contained in the reference?
+        """
         if self.tdim == 0:
             return point in self.vertices
         raise NotImplementedError()
@@ -427,6 +639,11 @@ class Interval(Reference):
     def __init__(
         self, vertices: SetOfPointsInput = ((0,), (1,))
     ):
+        """Create an interval.
+
+        Args:
+            vertices: The vertices of the interval.
+        """
         assert len(vertices) == 2
         super().__init__(
             tdim=1,
@@ -441,18 +658,37 @@ class Interval(Reference):
             sub_entity_types=["point", "interval", None, None],
             simplex=True, tp=True)
 
-    def default_reference(self) -> typing.Any:
-        """Get the default reference for this cell type."""
+    def default_reference(self) -> Reference:
+        """Get the default reference for this cell type.
+
+        Returns:
+            The default reference
+        """
         return Interval(self.reference_vertices)
 
     def make_lattice(self, n: int) -> SetOfPoints:
-        """Make a lattice of points."""
+        """Make a lattice of points.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points offset from the edge of the cell
+        """
         return tuple((sympy.Rational(2 * i + 1, 2 * (n + 1)), ) for i in range(n))
 
     def make_lattice_with_lines(
         self, n: int
     ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
-        """Make a lattice of points, and a list of lines connecting them."""
+        """Make a lattice of points, and a list of lines connecting them.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points including the edges of the cell
+            Pairs of point numbers that make a mesh of lines across the cell
+        """
         assert self.vertices == self.reference_vertices
         pts = tuple((sympy.Rational(i, n - 1), ) for i in range(n))
         pairs = [(i, i + 1) for i in range(n - 1)]
@@ -462,16 +698,37 @@ class Interval(Reference):
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
-        """Get the limits for an integral over this reference."""
+        """Get the limits for an integral over this reference.
+
+        Args:
+            vars: The variables to use for each direction
+
+        Returns:
+            Integration limits that can be passed into sympy.integrate
+        """
         return [(vars[0], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
-        """Get the map from the reference to a cell."""
+        """Get the map from the reference to a cell.
+
+        Args:
+            vertices: The vertices of a call
+
+        Returns:
+            The map
+        """
         assert self.vertices == self.reference_vertices
         return tuple(v0 + (v1 - v0) * x[0] for v0, v1 in zip(*vertices))
 
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
-        """Get the inverse map from a cell to the reference."""
+        """Get the inverse map from a cell to the reference.
+
+        Args:
+            vertices_in: The vertices of a cell
+
+        Returns:
+            The inverse map
+        """
         assert self.vertices == self.reference_vertices
         vertices = parse_set_of_points_input(vertices_in)
         p = _vsub(tuple(x), vertices[0])
@@ -479,21 +736,40 @@ class Interval(Reference):
         return (_vdot(p, v) * sympy.Integer(1) / _vdot(v, v), )
 
     def _compute_map_to_self(self) -> PointType:
-        """Compute the map from the canonical reference to this reference."""
+        """Compute the map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         return tuple(v0 + (v1 - v0) * x[0] for v0, v1 in zip(*self.vertices))
 
     def _compute_inverse_map_to_self(self) -> PointType:
-        """Compute the inverse map from the canonical reference to this reference."""
+        """Compute the inverse map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         p = _vsub(tuple(x), self.vertices[0])
         v = _vsub(self.vertices[1], self.vertices[0])
         return (_vdot(p, v) * sympy.Integer(1) / _vdot(v, v), )
 
     def volume(self) -> sympy.core.expr.Expr:
-        """Calculate the volume."""
+        """Calculate the volume.
+
+        Returns:
+            The volume of the cell
+        """
         return self.jacobian()
 
     def contains(self, point: PointType) -> bool:
-        """Check is a point is contained in the reference."""
+        """Check if a point is contained in the reference.
+
+        Args:
+            point: The point
+
+        Returns:
+            Is the point contained in the reference?
+        """
         if self.vertices != self.reference_vertices:
             raise NotImplementedError()
         return 0 <= point[0] <= 1
@@ -505,6 +781,11 @@ class Triangle(Reference):
     def __init__(
         self, vertices: SetOfPointsInput = ((0, 0), (1, 0), (0, 1))
     ):
+        """Create a triangle.
+
+        Args:
+            vertices: The vertices of the triangle.
+        """
         assert len(vertices) == 3
         super().__init__(
             tdim=2,
@@ -519,12 +800,23 @@ class Triangle(Reference):
             sub_entity_types=["point", "interval", "triangle", None],
             simplex=True)
 
-    def default_reference(self) -> typing.Any:
-        """Get the default reference for this cell type."""
+    def default_reference(self) -> Reference:
+        """Get the default reference for this cell type.
+
+        Returns:
+            The default reference
+        """
         return Triangle(self.reference_vertices)
 
     def make_lattice(self, n: int) -> SetOfPoints:
-        """Make a lattice of points."""
+        """Make a lattice of points.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points offset from the edge of the cell
+        """
         return tuple((
             sympy.Rational(2 * i + 1, 2 * (n + 1)),
             sympy.Rational(2 * j + 1, 2 * (n + 1))
@@ -533,7 +825,15 @@ class Triangle(Reference):
     def make_lattice_with_lines(
         self, n: int
     ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
-        """Make a lattice of points, and a list of lines connecting them."""
+        """Make a lattice of points, and a list of lines connecting them.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points including the edges of the cell
+            Pairs of point numbers that make a mesh of lines across the cell
+        """
         assert self.vertices == self.reference_vertices
         pts = tuple((sympy.Rational(i, n - 1), sympy.Rational(j, n - 1))
                     for i in range(n) for j in range(n - i))
@@ -553,24 +853,49 @@ class Triangle(Reference):
         return pts, pairs
 
     def z_ordered_entities_extra_dim(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
-        """Get the subentities in back-to-front plotting order when using an extra dimension."""
+        """Get the subentities in back-to-front plotting order when using an extra dimension.
+
+        Returns:
+            List of lists of subentity dimensions and numbers
+        """
         return [[(1, 0), (1, 1)], [(0, 2)], [(2, 0), (1, 2), (0, 0), (0, 1)]]
 
     def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
-        """Get the limits for an integral over this reference."""
+        """Get the limits for an integral over this reference.
+
+        Args:
+            vars: The variables to use for each direction
+
+        Returns:
+            Integration limits that can be passed into sympy.integrate
+        """
         return [(vars[1], sympy.Integer(0), 1 - vars[0]),
                 (vars[0], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
-        """Get the map from the reference to a cell."""
+        """Get the map from the reference to a cell.
+
+        Args:
+            vertices: The vertices of a call
+
+        Returns:
+            The map
+        """
         assert self.vertices == self.reference_vertices
         return tuple(v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1] for v0, v1, v2 in zip(*vertices))
 
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
-        """Get the inverse map from a cell to the reference."""
+        """Get the inverse map from a cell to the reference.
+
+        Args:
+            vertices_in: The vertices of a cell
+
+        Returns:
+            The inverse map
+        """
         assert self.vertices == self.reference_vertices
         vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 2
@@ -582,12 +907,20 @@ class Triangle(Reference):
         return (_vdot(mat.row(0), p), _vdot(mat.row(1), p))
 
     def _compute_map_to_self(self) -> PointType:
-        """Compute the map from the canonical reference to this reference."""
+        """Compute the map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         return tuple(v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1]
                      for v0, v1, v2 in zip(*self.vertices))
 
     def _compute_inverse_map_to_self(self) -> PointType:
-        """Compute the inverse map from the canonical reference to this reference."""
+        """Compute the inverse map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         if len(self.vertices[0]) == 2:
             p = _vsub(tuple(x), self.vertices[0])
             v1 = _vsub(self.vertices[1], self.vertices[0])
@@ -601,11 +934,22 @@ class Triangle(Reference):
         )
 
     def volume(self) -> sympy.core.expr.Expr:
-        """Calculate the volume."""
+        """Calculate the volume.
+
+        Returns:
+            The volume of the cell
+        """
         return sympy.Rational(1, 2) * self.jacobian()
 
     def contains(self, point: PointType) -> bool:
-        """Check is a point is contained in the reference."""
+        """Check if a point is contained in the reference.
+
+        Args:
+            point: The point
+
+        Returns:
+            Is the point contained in the reference?
+        """
         if self.vertices != self.reference_vertices:
             raise NotImplementedError()
         return 0 <= point[0] and 0 <= point[1] and sum(point) <= 1
@@ -617,6 +961,11 @@ class Tetrahedron(Reference):
     def __init__(
         self, vertices: SetOfPointsInput = ((0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1))
     ):
+        """Create a tetrahedron.
+
+        Args:
+            vertices: The vertices of the tetrahedron.
+        """
         assert len(vertices) == 4
         super().__init__(
             tdim=3,
@@ -637,23 +986,42 @@ class Tetrahedron(Reference):
 
     @property
     def clockwise_vertices(self) -> SetOfPoints:
-        """Get list of vertices in clockwise order."""
+        """Get list of vertices in clockwise order.
+
+        Returns:
+            A list of vertices
+        """
         return (self.vertices[0], self.vertices[1], self.vertices[3])
 
     def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
-        """Get the subentities of the cell in back-to-front plotting order."""
+        """Get the subentities of the cell in back-to-front plotting order.
+
+        Returns:
+            List of lists of subentity dimensions and numbers
+        """
         return [
             [(2, 0), (2, 1), (2, 3), (1, 0), (1, 2), (1, 4), (0, 2)],
             [(3, 0)],
             [(2, 2), (1, 1), (1, 3), (1, 5), (0, 0), (0, 1), (0, 3)]
         ]
 
-    def default_reference(self) -> typing.Any:
-        """Get the default reference for this cell type."""
+    def default_reference(self) -> Reference:
+        """Get the default reference for this cell type.
+
+        Returns:
+            The default reference
+        """
         return Tetrahedron(self.reference_vertices)
 
     def make_lattice(self, n: int) -> SetOfPoints:
-        """Make a lattice of points."""
+        """Make a lattice of points.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points offset from the edge of the cell
+        """
         return tuple((
             sympy.Rational(2 * i + 1, 2 * (n + 1)),
             sympy.Rational(2 * j + 1, 2 * (n + 1)),
@@ -663,26 +1031,55 @@ class Tetrahedron(Reference):
     def make_lattice_with_lines(
         self, n: int
     ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
-        """Make a lattice of points, and a list of lines connecting them."""
+        """Make a lattice of points, and a list of lines connecting them.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points including the edges of the cell
+            Pairs of point numbers that make a mesh of lines across the cell
+        """
         raise NotImplementedError()
 
     def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
-        """Get the limits for an integral over this reference."""
+        """Get the limits for an integral over this reference.
+
+        Args:
+            vars: The variables to use for each direction
+
+        Returns:
+            Integration limits that can be passed into sympy.integrate
+        """
         return [(vars[0], sympy.Integer(0), 1 - vars[1] - vars[2]),
                 (vars[1], sympy.Integer(0), 1 - vars[2]),
                 (vars[2], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
-        """Get the map from the reference to a cell."""
+        """Get the map from the reference to a cell.
+
+        Args:
+            vertices: The vertices of a call
+
+        Returns:
+            The map
+        """
         assert self.vertices == self.reference_vertices
         return tuple(v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1] + (v3 - v0) * x[2]
                      for v0, v1, v2, v3 in zip(*vertices))
 
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
-        """Get the inverse map from a cell to the reference."""
+        """Get the inverse map from a cell to the reference.
+
+        Args:
+            vertices_in: The vertices of a cell
+
+        Returns:
+            The inverse map
+        """
         assert self.vertices == self.reference_vertices
         vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 3
@@ -696,12 +1093,20 @@ class Tetrahedron(Reference):
         return (_vdot(mat.row(0), p), _vdot(mat.row(1), p), _vdot(mat.row(2), p))
 
     def _compute_map_to_self(self) -> PointType:
-        """Compute the map from the canonical reference to this reference."""
+        """Compute the map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         return tuple(v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1] + (v3 - v0) * x[2]
                      for v0, v1, v2, v3 in zip(*self.vertices))
 
     def _compute_inverse_map_to_self(self) -> PointType:
-        """Compute the inverse map from the canonical reference to this reference."""
+        """Compute the inverse map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         p = _vsub(tuple(x), self.vertices[0])
         v1 = _vsub(self.vertices[1], self.vertices[0])
         v2 = _vsub(self.vertices[2], self.vertices[0])
@@ -712,11 +1117,22 @@ class Tetrahedron(Reference):
         return (_vdot(mat.row(0), p), _vdot(mat.row(1), p), _vdot(mat.row(2), p))
 
     def volume(self) -> sympy.core.expr.Expr:
-        """Calculate the volume."""
+        """Calculate the volume.
+
+        Returns:
+            The volume of the cell
+        """
         return sympy.Rational(1, 6) * self.jacobian()
 
     def contains(self, point: PointType) -> bool:
-        """Check is a point is contained in the reference."""
+        """Check if a point is contained in the reference.
+
+        Args:
+            point: The point
+
+        Returns:
+            Is the point contained in the reference?
+        """
         if self.vertices != self.reference_vertices:
             raise NotImplementedError()
         return 0 <= point[0] and 0 <= point[1] and 0 <= point[2] and sum(point) <= 1
@@ -728,6 +1144,11 @@ class Quadrilateral(Reference):
     def __init__(
         self, vertices: SetOfPointsInput = ((0, 0), (1, 0), (0, 1), (1, 1))
     ):
+        """Create a quadrilateral.
+
+        Args:
+            vertices: The vertices of the quadrilateral.
+        """
         assert len(vertices) == 4
         super().__init__(
             tdim=2,
@@ -744,15 +1165,30 @@ class Quadrilateral(Reference):
 
     @property
     def clockwise_vertices(self) -> SetOfPoints:
-        """Get list of vertices in clockwise order."""
+        """Get list of vertices in clockwise order.
+
+        Returns:
+            A list of vertices
+        """
         return (self.vertices[0], self.vertices[1], self.vertices[3], self.vertices[2])
 
-    def default_reference(self) -> typing.Any:
-        """Get the default reference for this cell type."""
+    def default_reference(self) -> Reference:
+        """Get the default reference for this cell type.
+
+        Returns:
+            The default reference
+        """
         return Quadrilateral(self.reference_vertices)
 
     def make_lattice(self, n: int) -> SetOfPoints:
-        """Make a lattice of points."""
+        """Make a lattice of points.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points offset from the edge of the cell
+        """
         return tuple((
             sympy.Rational(2 * i + 1, 2 * (n + 1)),
             sympy.Rational(2 * j + 1, 2 * (n + 1))
@@ -761,7 +1197,15 @@ class Quadrilateral(Reference):
     def make_lattice_with_lines(
         self, n: int
     ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
-        """Make a lattice of points, and a list of lines connecting them."""
+        """Make a lattice of points, and a list of lines connecting them.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points including the edges of the cell
+            Pairs of point numbers that make a mesh of lines across the cell
+        """
         assert self.vertices == self.reference_vertices
         pts = tuple((sympy.Rational(i, n - 1), sympy.Rational(j, n - 1))
                     for i in range(n) for j in range(n))
@@ -778,26 +1222,51 @@ class Quadrilateral(Reference):
         return pts, pairs
 
     def z_ordered_entities_extra_dim(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
-        """Get the subentities in back-to-front plotting order when using an extra dimension."""
+        """Get the subentities in back-to-front plotting order when using an extra dimension.
+
+        Returns:
+            List of lists of subentity dimensions and numbers
+        """
         return [[(1, 3), (1, 1), (0, 2)], [(2, 0)], [(1, 2), (0, 3), (1, 0), (0, 0), (0, 1)]]
 
     def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
-        """Get the limits for an integral over this reference."""
+        """Get the limits for an integral over this reference.
+
+        Args:
+            vars: The variables to use for each direction
+
+        Returns:
+            Integration limits that can be passed into sympy.integrate
+        """
         return [(vars[1], sympy.Integer(0), sympy.Integer(1)),
                 (vars[0], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
-        """Get the map from the reference to a cell."""
+        """Get the map from the reference to a cell.
+
+        Args:
+            vertices: The vertices of a call
+
+        Returns:
+            The map
+        """
         assert self.vertices == self.reference_vertices
         return tuple(
             (1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1) + x[1] * ((1 - x[0]) * v2 + x[0] * v3)
             for v0, v1, v2, v3 in zip(*vertices))
 
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
-        """Get the inverse map from a cell to the reference."""
+        """Get the inverse map from a cell to the reference.
+
+        Args:
+            vertices_in: The vertices of a cell
+
+        Returns:
+            The inverse map
+        """
         assert self.vertices == self.reference_vertices
         vertices = parse_set_of_points_input(vertices_in)
         assert _vadd(vertices[0], vertices[3]) == _vadd(vertices[1], vertices[2])
@@ -819,13 +1288,21 @@ class Quadrilateral(Reference):
         return (_vdot(mat.row(0), p), _vdot(mat.row(1), p))
 
     def _compute_map_to_self(self) -> PointType:
-        """Compute the map from the canonical reference to this reference."""
+        """Compute the map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         return tuple(
             (1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1) + x[1] * ((1 - x[0]) * v2 + x[0] * v3)
             for v0, v1, v2, v3 in zip(*self.vertices))
 
     def _compute_inverse_map_to_self(self) -> PointType:
-        """Compute the inverse map from the canonical reference to this reference."""
+        """Compute the inverse map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         assert _vadd(
             self.vertices[0], self.vertices[3]) == _vadd(self.vertices[1], self.vertices[2])
         p = _vsub(tuple(x), self.vertices[0])
@@ -846,11 +1323,22 @@ class Quadrilateral(Reference):
         return (_vdot(mat.row(0), p), _vdot(mat.row(1), p))
 
     def volume(self) -> sympy.core.expr.Expr:
-        """Calculate the volume."""
+        """Calculate the volume.
+
+        Returns:
+            The volume of the cell
+        """
         return self.jacobian()
 
     def contains(self, point: PointType) -> bool:
-        """Check is a point is contained in the reference."""
+        """Check if a point is contained in the reference.
+
+        Args:
+            point: The point
+
+        Returns:
+            Is the point contained in the reference?
+        """
         if self.vertices != self.reference_vertices:
             raise NotImplementedError()
         return 0 <= point[0] <= 1 and 0 <= point[1] <= 1
@@ -863,6 +1351,11 @@ class Hexahedron(Reference):
         self, vertices: SetOfPointsInput = ((0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0),
                                             (0, 0, 1), (1, 0, 1), (0, 1, 1), (1, 1, 1))
     ):
+        """Create a hexahedron.
+
+        Args:
+            vertices: The vertices of the hexahedron.
+        """
         assert len(vertices) == 8
         super().__init__(
             tdim=3,
@@ -889,12 +1382,20 @@ class Hexahedron(Reference):
 
     @property
     def clockwise_vertices(self) -> SetOfPoints:
-        """Get list of vertices in clockwise order."""
+        """Get list of vertices in clockwise order.
+
+        Returns:
+            A list of vertices
+        """
         return (self.vertices[0], self.vertices[1], self.vertices[3], self.vertices[7],
                 self.vertices[6], self.vertices[4])
 
     def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
-        """Get the subentities of the cell in back-to-front plotting order."""
+        """Get the subentities of the cell in back-to-front plotting order.
+
+        Returns:
+            List of lists of subentity dimensions and numbers
+        """
         return [
             [(2, 4), (2, 0), (1, 5), (2, 2), (1, 6), (1, 1), (0, 2)],
             [(3, 0)],
@@ -903,12 +1404,23 @@ class Hexahedron(Reference):
             [(2, 5), (1, 8), (1, 9), (1, 10), (1, 11), (0, 4), (0, 5), (0, 6), (0, 7)]
         ]
 
-    def default_reference(self) -> typing.Any:
-        """Get the default reference for this cell type."""
+    def default_reference(self) -> Reference:
+        """Get the default reference for this cell type.
+
+        Returns:
+            The default reference
+        """
         return Hexahedron(self.reference_vertices)
 
     def make_lattice(self, n: int) -> SetOfPoints:
-        """Make a lattice of points."""
+        """Make a lattice of points.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points offset from the edge of the cell
+        """
         return tuple((
             sympy.Rational(2 * i + 1, 2 * (n + 1)),
             sympy.Rational(2 * j + 1, 2 * (n + 1)),
@@ -918,20 +1430,42 @@ class Hexahedron(Reference):
     def make_lattice_with_lines(
         self, n: int
     ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
-        """Make a lattice of points, and a list of lines connecting them."""
+        """Make a lattice of points, and a list of lines connecting them.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points including the edges of the cell
+            Pairs of point numbers that make a mesh of lines across the cell
+        """
         raise NotImplementedError()
 
     def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
-        """Get the limits for an integral over this reference."""
+        """Get the limits for an integral over this reference.
+
+        Args:
+            vars: The variables to use for each direction
+
+        Returns:
+            Integration limits that can be passed into sympy.integrate
+        """
         return [(vars[2], sympy.Integer(0), sympy.Integer(1)),
                 (vars[1], sympy.Integer(0), sympy.Integer(1)),
                 (vars[0], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
-        """Get the map from the reference to a cell."""
+        """Get the map from the reference to a cell.
+
+        Args:
+            vertices: The vertices of a call
+
+        Returns:
+            The map
+        """
         assert self.vertices == self.reference_vertices
         return tuple(
             (1 - x[2]) * ((1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1)
@@ -941,7 +1475,14 @@ class Hexahedron(Reference):
             for v0, v1, v2, v3, v4, v5, v6, v7 in zip(*vertices))
 
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
-        """Get the inverse map from a cell to the reference."""
+        """Get the inverse map from a cell to the reference.
+
+        Args:
+            vertices_in: The vertices of a cell
+
+        Returns:
+            The inverse map
+        """
         assert self.vertices == self.reference_vertices
         vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 3
@@ -957,7 +1498,11 @@ class Hexahedron(Reference):
         return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def _compute_map_to_self(self) -> PointType:
-        """Compute the map from the canonical reference to this reference."""
+        """Compute the map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         return tuple(
             (1 - x[2]) * ((1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1)
                           + x[1] * ((1 - x[0]) * v2 + x[0] * v3))
@@ -966,7 +1511,11 @@ class Hexahedron(Reference):
             for v0, v1, v2, v3, v4, v5, v6, v7 in zip(*self.vertices))
 
     def _compute_inverse_map_to_self(self) -> PointType:
-        """Compute the inverse map from the canonical reference to this reference."""
+        """Compute the inverse map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces:
             assert _vadd(
@@ -981,11 +1530,22 @@ class Hexahedron(Reference):
         return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def volume(self) -> sympy.core.expr.Expr:
-        """Calculate the volume."""
+        """Calculate the volume.
+
+        Returns:
+            The volume of the cell
+        """
         return self.jacobian()
 
     def contains(self, point: PointType) -> bool:
-        """Check is a point is contained in the reference."""
+        """Check if a point is contained in the reference.
+
+        Args:
+            point: The point
+
+        Returns:
+            Is the point contained in the reference?
+        """
         if self.vertices != self.reference_vertices:
             raise NotImplementedError()
         return 0 <= point[0] <= 1 and 0 <= point[1] <= 1 and 0 <= point[2] <= 1
@@ -998,6 +1558,11 @@ class Prism(Reference):
         self, vertices: SetOfPointsInput = ((0, 0, 0), (1, 0, 0), (0, 1, 0),
                                             (0, 0, 1), (1, 0, 1), (0, 1, 1))
     ):
+        """Create a prism.
+
+        Args:
+            vertices: The vertices of the prism.
+        """
         assert len(vertices) == 6
         super().__init__(
             tdim=3,
@@ -1027,12 +1592,20 @@ class Prism(Reference):
 
     @property
     def clockwise_vertices(self) -> SetOfPoints:
-        """Get list of vertices in clockwise order."""
+        """Get list of vertices in clockwise order.
+
+        Returns:
+            A list of vertices
+        """
         return (self.vertices[0], self.vertices[1], self.vertices[4], self.vertices[5],
                 self.vertices[3])
 
     def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
-        """Get the subentities of the cell in back-to-front plotting order."""
+        """Get the subentities of the cell in back-to-front plotting order.
+
+        Returns:
+            List of lists of subentity dimensions and numbers
+        """
         return [
             [(2, 0), (2, 3), (1, 3)],
             [(2, 2), (1, 1), (1, 5), (0, 2)],
@@ -1041,12 +1614,23 @@ class Prism(Reference):
             [(2, 4), (1, 6), (1, 7), (1, 8), (0, 3), (0, 4), (0, 5)]
         ]
 
-    def default_reference(self) -> typing.Any:
-        """Get the default reference for this cell type."""
+    def default_reference(self) -> Reference:
+        """Get the default reference for this cell type.
+
+        Returns:
+            The default reference
+        """
         return Prism(self.reference_vertices)
 
     def make_lattice(self, n: int) -> SetOfPoints:
-        """Make a lattice of points."""
+        """Make a lattice of points.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points offset from the edge of the cell
+        """
         return tuple((
             sympy.Rational(2 * i + 1, 2 * (n + 1)),
             sympy.Rational(2 * j + 1, 2 * (n + 1)),
@@ -1056,20 +1640,42 @@ class Prism(Reference):
     def make_lattice_with_lines(
         self, n: int
     ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
-        """Make a lattice of points, and a list of lines connecting them."""
+        """Make a lattice of points, and a list of lines connecting them.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points including the edges of the cell
+            Pairs of point numbers that make a mesh of lines across the cell
+        """
         raise NotImplementedError()
 
     def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
-        """Get the limits for an integral over this reference."""
+        """Get the limits for an integral over this reference.
+
+        Args:
+            vars: The variables to use for each direction
+
+        Returns:
+            Integration limits that can be passed into sympy.integrate
+        """
         return [(vars[2], sympy.Integer(0), sympy.Integer(1)),
                 (vars[1], sympy.Integer(0), sympy.Integer(1) - vars[0]),
                 (vars[0], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
-        """Get the map from the reference to a cell."""
+        """Get the map from the reference to a cell.
+
+        Args:
+            vertices: The vertices of a call
+
+        Returns:
+            The map
+        """
         assert self.vertices == self.reference_vertices
         return tuple(
             (1 - x[2]) * (v0 + x[0] * (v1 - v0) + x[1] * (v2 - v0))
@@ -1077,7 +1683,14 @@ class Prism(Reference):
             for v0, v1, v2, v3, v4, v5 in zip(*vertices))
 
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
-        """Get the inverse map from a cell to the reference."""
+        """Get the inverse map from a cell to the reference.
+
+        Args:
+            vertices_in: The vertices of a cell
+
+        Returns:
+            The inverse map
+        """
         assert self.vertices == self.reference_vertices
         vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 3
@@ -1093,14 +1706,22 @@ class Prism(Reference):
         return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def _compute_map_to_self(self) -> PointType:
-        """Compute the map from the canonical reference to this reference."""
+        """Compute the map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         return tuple(
             (1 - x[2]) * (v0 + x[0] * (v1 - v0) + x[1] * (v2 - v0))
             + x[2] * (v3 + x[0] * (v4 - v3) + x[1] * (v5 - v3))
             for v0, v1, v2, v3, v4, v5 in zip(*self.vertices))
 
     def _compute_inverse_map_to_self(self) -> PointType:
-        """Compute the inverse map from the canonical reference to this reference."""
+        """Compute the inverse map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces[1:4]:
             assert _vadd(
@@ -1115,11 +1736,22 @@ class Prism(Reference):
         return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def volume(self) -> sympy.core.expr.Expr:
-        """Calculate the volume."""
+        """Calculate the volume.
+
+        Returns:
+            The volume of the cell
+        """
         return sympy.Rational(1, 2) * self.jacobian()
 
     def contains(self, point: PointType) -> bool:
-        """Check is a point is contained in the reference."""
+        """Check if a point is contained in the reference.
+
+        Args:
+            point: The point
+
+        Returns:
+            Is the point contained in the reference?
+        """
         if self.vertices != self.reference_vertices:
             raise NotImplementedError()
         return (point[0] >= 0 and point[1] >= 0 and point[2] >= 0
@@ -1133,6 +1765,11 @@ class Pyramid(Reference):
         self, vertices: SetOfPointsInput = ((0, 0, 0), (1, 0, 0), (0, 1, 0),
                                             (1, 1, 0), (0, 0, 1))
     ):
+        """Create a pyramid.
+
+        Args:
+            vertices: The vertices of the pyramid.
+        """
         assert len(vertices) == 5
         super().__init__(
             tdim=3,
@@ -1162,11 +1799,19 @@ class Pyramid(Reference):
 
     @property
     def clockwise_vertices(self) -> SetOfPoints:
-        """Get list of vertices in clockwise order."""
+        """Get list of vertices in clockwise order.
+
+        Returns:
+            A list of vertices
+        """
         return (self.vertices[0], self.vertices[1], self.vertices[3], self.vertices[4])
 
     def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
-        """Get the subentities of the cell in back-to-front plotting order."""
+        """Get the subentities of the cell in back-to-front plotting order.
+
+        Returns:
+            List of lists of subentity dimensions and numbers
+        """
         return [
             [(2, 0), (2, 4), (1, 5)],
             [(2, 2), (1, 1), (1, 6), (0, 2)],
@@ -1175,31 +1820,64 @@ class Pyramid(Reference):
             [(2, 1), (1, 0), (1, 2), (1, 4), (0, 0), (0, 1), (0, 4)]
         ]
 
-    def default_reference(self) -> typing.Any:
-        """Get the default reference for this cell type."""
+    def default_reference(self) -> Reference:
+        """Get the default reference for this cell type.
+
+        Returns:
+            The default reference
+        """
         return Pyramid(self.reference_vertices)
 
     def make_lattice(self, n: int) -> SetOfPoints:
-        """Make a lattice of points."""
+        """Make a lattice of points.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points offset from the edge of the cell
+        """
         raise NotImplementedError()
 
     def make_lattice_with_lines(
         self, n: int
     ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
-        """Make a lattice of points, and a list of lines connecting them."""
+        """Make a lattice of points, and a list of lines connecting them.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points including the edges of the cell
+            Pairs of point numbers that make a mesh of lines across the cell
+        """
         raise NotImplementedError()
 
     def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
-        """Get the limits for an integral over this reference."""
+        """Get the limits for an integral over this reference.
+
+        Args:
+            vars: The variables to use for each direction
+
+        Returns:
+            Integration limits that can be passed into sympy.integrate
+        """
         return [(vars[0], sympy.Integer(0), 1 - vars[2]),
                 (vars[1], sympy.Integer(0), 1 - vars[2]),
                 (vars[2], sympy.Integer(0), sympy.Integer(1))]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
-        """Get the map from the reference to a cell."""
+        """Get the map from the reference to a cell.
+
+        Args:
+            vertices: The vertices of a call
+
+        Returns:
+            The map
+        """
         assert self.vertices == self.reference_vertices
         return tuple(
             (1 - x[2]) * (
@@ -1209,7 +1887,14 @@ class Pyramid(Reference):
             for v0, v1, v2, v3, v4 in zip(*vertices))
 
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
-        """Get the inverse map from a cell to the reference."""
+        """Get the inverse map from a cell to the reference.
+
+        Args:
+            vertices_in: The vertices of a cell
+
+        Returns:
+            The inverse map
+        """
         assert self.vertices == self.reference_vertices
         vertices = parse_set_of_points_input(vertices_in)
         assert len(vertices[0]) == 3
@@ -1225,7 +1910,11 @@ class Pyramid(Reference):
         return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def _compute_map_to_self(self) -> PointType:
-        """Compute the map from the canonical reference to this reference."""
+        """Compute the map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         return tuple(
             (1 - x[2]) * (
                 (1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1)
@@ -1234,7 +1923,11 @@ class Pyramid(Reference):
             for v0, v1, v2, v3, v4 in zip(*self.vertices))
 
     def _compute_inverse_map_to_self(self) -> PointType:
-        """Compute the inverse map from the canonical reference to this reference."""
+        """Compute the inverse map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces[:1]:
             assert _vadd(
@@ -1249,11 +1942,22 @@ class Pyramid(Reference):
         return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def volume(self) -> sympy.core.expr.Expr:
-        """Calculate the volume."""
+        """Calculate the volume.
+
+        Returns:
+            The volume of the cell
+        """
         return sympy.Rational(1, 3) * self.jacobian()
 
     def contains(self, point: PointType) -> bool:
-        """Check is a point is contained in the reference."""
+        """Check if a point is contained in the reference.
+
+        Args:
+            point: The point
+
+        Returns:
+            Is the point contained in the reference?
+        """
         if self.vertices != self.reference_vertices:
             raise NotImplementedError()
         return (point[0] >= 0 and point[1] >= 0 and point[2] >= 0
@@ -1269,6 +1973,12 @@ class DualPolygon(Reference):
         self, number_of_triangles: int,
         vertices: SetOfPointsInput = None
     ):
+        """Create a dual polygon.
+
+        Args:
+            number_of_triangles: The number of triangles that make up the dual polygon
+            vertices: The vertices of the dual polygon.
+        """
         self.number_of_triangles = number_of_triangles
         self.reference_origin = (sympy.Integer(0), sympy.Integer(0))
         reference_vertices = []
@@ -1305,46 +2015,105 @@ class DualPolygon(Reference):
         )
 
     def contains(self, point: PointType) -> bool:
-        """Check is a point is contained in the reference."""
+        """Check if a point is contained in the reference.
+
+        Args:
+            point: The point
+
+        Returns:
+            Is the point contained in the reference?
+        """
         raise NotImplementedError()
 
     def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
         typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
     ]]:
-        """Get the limits for an integral over this reference."""
+        """Get the limits for an integral over this reference.
+
+        Args:
+            vars: The variables to use for each direction
+
+        Returns:
+            Integration limits that can be passed into sympy.integrate
+        """
         raise NotImplementedError()
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
-        """Get the map from the reference to a cell."""
+        """Get the map from the reference to a cell.
+
+        Args:
+            vertices: The vertices of a call
+
+        Returns:
+            The map
+        """
         raise NotImplementedError()
 
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
-        """Get the inverse map from a cell to the reference."""
+        """Get the inverse map from a cell to the reference.
+
+        Args:
+            vertices_in: The vertices of a cell
+
+        Returns:
+            The inverse map
+        """
         raise NotImplementedError()
 
     def _compute_map_to_self(self) -> PointType:
-        """Compute the map from the canonical reference to this reference."""
+        """Compute the map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         raise NotImplementedError()
 
     def _compute_inverse_map_to_self(self) -> PointType:
-        """Compute the inverse map from the canonical reference to this reference."""
+        """Compute the inverse map from the canonical reference to this reference.
+
+        Returns:
+            The map
+        """
         raise NotImplementedError()
 
     def volume(self) -> sympy.core.expr.Expr:
-        """Calculate the volume."""
+        """Calculate the volume.
+
+        Returns:
+            The volume of the cell
+        """
         raise NotImplementedError()
 
     def default_reference(self) -> Reference:
-        """Get the default reference for this cell type."""
+        """Get the default reference for this cell type.
+
+        Returns:
+            The default reference
+        """
         raise NotImplementedError()
 
     def make_lattice(self, n: int) -> SetOfPoints:
-        """Make a lattice of points."""
+        """Make a lattice of points.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points offset from the edge of the cell
+        """
         raise NotImplementedError()
 
     def make_lattice_with_lines(
         self, n: int
     ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
-        """Make a lattice of points, and a list of lines connecting them."""
+        """Make a lattice of points, and a list of lines connecting them.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points including the edges of the cell
+            Pairs of point numbers that make a mesh of lines across the cell
+        """
         raise NotImplementedError()

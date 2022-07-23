@@ -19,6 +19,12 @@ class PiecewiseFunction(AnyFunction):
     def __init__(
         self, pieces: typing.Dict[SetOfPointsInput, FunctionInput], tdim: int
     ):
+        """Create a piecewise function.
+
+        Args:
+            pieces: The pieces of the function
+            tdim: The topological dimension
+        """
         self._pieces = {parse_set_of_points_input(shape): parse_function_input(f)
                         for shape, f in pieces.items()}
         self.tdim = tdim

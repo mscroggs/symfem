@@ -29,6 +29,7 @@ class NoTensorProduct(Exception):
     """Error for element without a tensor representation."""
 
     def __init__(self):
+        """Initialise."""
         super().__init__("This element does not have a tensor product representation.")
 
 
@@ -39,6 +40,7 @@ class FiniteElement(ABC):
         self, reference: Reference, order: int, space_dim: int, domain_dim: int, range_dim: int,
         range_shape: typing.Tuple[int, ...] = None
     ):
+        """Create a finite element."""
         self.reference = reference
         self.order = order
         self.space_dim = space_dim
@@ -265,6 +267,17 @@ class CiarletElement(FiniteElement):
         dofs: ListOfFunctionals, domain_dim: int, range_dim: int,
         range_shape: typing.Tuple[int, ...] = None
     ):
+        """Create a Ciarlet element.
+
+        Args:
+            reference: The reference cell
+            order: The polynomial order
+            basis: The polynomial basis
+            dofs: The DOF functionals
+            domain_dim: The topological dimension of the cell
+            range_dim: The dimension of the range
+            range_shape: The shape of the range
+        """
         super().__init__(reference, order, len(dofs), domain_dim, range_dim, range_shape)
         assert len(basis) == len(dofs)
         self._basis = [parse_function_input(b) for b in basis]
@@ -466,6 +479,17 @@ class DirectElement(FiniteElement):
         basis_entities: typing.List[typing.Tuple[int, int]],
         domain_dim: int, range_dim: int, range_shape: typing.Tuple[int, ...] = None
     ):
+        """Create a Ciarlet element.
+
+        Args:
+            reference: The reference cell
+            order: The polynomial order
+            basis_functions: The basis functions
+            basis_entities: The entitiy each basis function is associated with
+            domain_dim: The topological dimension of the cell
+            range_dim: The dimension of the range
+            range_shape: The shape of the range
+        """
         super().__init__(reference, order, len(basis_functions), domain_dim, range_dim,
                          range_shape)
         self._basis_entities = basis_entities
@@ -545,6 +569,12 @@ class ElementBasisFunction(BasisFunction):
     """A basis function of a finite element."""
 
     def __init__(self, element: FiniteElement, n: int):
+        """Create an element basis function.
+
+        Args:
+            element: The finite element
+            n: The basis function number
+        """
         if element.range_dim == 1:
             super().__init__(scalar=True)
         else:
@@ -557,5 +587,9 @@ class ElementBasisFunction(BasisFunction):
         self.n = n
 
     def get_function(self) -> AnyFunction:
-        """Return the symbolic function."""
+        """Get the actual basis function.
+
+        Returns:
+            The basis function
+        """
         return self.element.get_basis_functions()[self.n]

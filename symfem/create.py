@@ -17,10 +17,8 @@ _elementlist: _typing.List[_typing.Type] = []
 def add_element(element_class: _typing.Type):
     """Add an element to Symfem.
 
-    Parameters
-    ----------
-    element_class : type
-        The class defining the element.
+    Args:
+        element_class: The class defining the element.
     """
     global _elementlist
     global _elementmap
@@ -65,16 +63,11 @@ def create_reference(
 ) -> _references.Reference:
     """Make a reference cell.
 
-    Parameters
-    ----------
-    cell_type : str
-        The reference cell type.
-
-        Supported values:
-        point, interval, triangle, quadrilateral, tetrahedron, hexahedron,
-        prism, pyramid, dual polygon(number_of_triangles)
-    vertices : list
-        The vertices of the reference.
+    Args:
+        cell_type: The reference cell type.
+                   Supported values: point, interval, triangle, quadrilateral, tetrahedron,
+                   hexahedron, prism, pyramid, dual polygon(number_of_triangles)
+        vertices: The vertices of the reference.
     """
     args = []
     if vertices is not None:
@@ -108,78 +101,71 @@ def create_element(
 ) -> _FiniteElement:
     """Make a finite element.
 
-    Parameters
-    ----------
-    cell_type : str
-        The reference cell type.
-
-        Supported values:
-        point, interval, triangle, quadrilateral, tetrahedron, hexahedron,
-        prism, pyramid, dual polygon(number_of_triangles)
-    element_type : str
-        The type of the element.
-
-        Supported values:
-        Lagrange, P,
-        vector Lagrange, vP,
-        matrix Lagrange,
-        symmetric matrix Lagrange,
-        dPc,
-        vector dPc,
-        Crouzeix-Raviart, CR, Crouzeix-Falk, CF,
-        conforming Crouzeix-Raviart, conforming CR,
-        serendipity, S,
-        serendipity Hcurl, Scurl, BDMCE, AAE,
-        serendipity Hdiv, Sdiv, BDMCF, AAF,
-        direct serendipity,
-        Regge,
-        Nedelec, Nedelec1, N1curl, Ncurl,
-        Nedelec2, N2curl,
-        Raviart-Thomas, RT, N1div,
-        Brezzi-Douglas-Marini, BDM, N2div,
-        Q,
-        vector Q, vQ,
-        NCE, RTCE, Qcurl,
-        NCF, RTCF, Qdiv,
-        Morley,
-        Morley-Wang-Xu, MWX,
-        Hermite,
-        Mardal-Tai-Winther, MTW,
-        Argyris,
-        bubble,
-        dual polynomial, dual P, dual,
-        Buffa-Christiansen, BC,
-        rotated Buffa-Christiansen, RBC,
-        Brezzi-Douglas-Fortin-Marini, BDFM,
-        Brezzi-Douglas-Duran-Fortin, BDDF,
-        Hellan-Herrmann-Johnson, HHJ,
-        Arnold-Winther, AW, conforming Arnold-Winther,
-        Bell,
-        Kong-Mulder-Veldhuizen, KMV,
-        Bernstein, Bernstein-Bezier,
-        Hsieh-Clough-Tocher, Clough-Tocher, HCT, CT,
-        reduced Hsieh-Clough-Tocher, rHCT,
-        Taylor, discontinuous Taylor,
-        bubble enriched Lagrange,
-        bubble enriched vector Lagrange,
-        Bogner-Fox-Schmit, BFS,
-        Fortin-Soulie, FS,
-        Bernardi-Raugel,
-        Wu-Xu,
-        transition,
-        Guzman-Neilan,
-        nonconforming Arnold-Winther, nonconforming AW,
-        TScurl, trimmed serendipity Hcurl,
-        TSdiv, trimmed serendipity Hdiv,
-        TNT, tiniest tensor,
-        TNTcurl, tiniest tensor Hcurl,
-        TNTdiv, tiniest tensor Hdiv,
-        Arnold-Boffi-Falk, ABF,
-        Arbogast-Correa, AC, AC full, Arbogast-Correa full,
-        Rannacher-Turek,
-        P1-iso-P2, P2-iso-P1, iso-P2 P1
-    order : int
-        The order of the element.
+    Args:
+        cell_type: The reference cell type.
+                   Supported values: point, interval, triangle, quadrilateral, tetrahedron,
+                   hexahedron, prism, pyramid, dual polygon(number_of_triangles)
+        element_type: The type of the element.
+                      Supported values:
+                      Lagrange, P,
+                      vector Lagrange, vP,
+                      matrix Lagrange,
+                      symmetric matrix Lagrange,
+                      dPc,
+                      vector dPc,
+                      Crouzeix-Raviart, CR, Crouzeix-Falk, CF,
+                      conforming Crouzeix-Raviart, conforming CR,
+                      serendipity, S,
+                      serendipity Hcurl, Scurl, BDMCE, AAE,
+                      serendipity Hdiv, Sdiv, BDMCF, AAF,
+                      direct serendipity,
+                      Regge,
+                      Nedelec, Nedelec1, N1curl, Ncurl,
+                      Nedelec2, N2curl,
+                      Raviart-Thomas, RT, N1div,
+                      Brezzi-Douglas-Marini, BDM, N2div,
+                      Q,
+                      vector Q, vQ,
+                      NCE, RTCE, Qcurl,
+                      NCF, RTCF, Qdiv,
+                      Morley,
+                      Morley-Wang-Xu, MWX,
+                      Hermite,
+                      Mardal-Tai-Winther, MTW,
+                      Argyris,
+                      bubble,
+                      dual polynomial, dual P, dual,
+                      Buffa-Christiansen, BC,
+                      rotated Buffa-Christiansen, RBC,
+                      Brezzi-Douglas-Fortin-Marini, BDFM,
+                      Brezzi-Douglas-Duran-Fortin, BDDF,
+                      Hellan-Herrmann-Johnson, HHJ,
+                      Arnold-Winther, AW, conforming Arnold-Winther,
+                      Bell,
+                      Kong-Mulder-Veldhuizen, KMV,
+                      Bernstein, Bernstein-Bezier,
+                      Hsieh-Clough-Tocher, Clough-Tocher, HCT, CT,
+                      reduced Hsieh-Clough-Tocher, rHCT,
+                      Taylor, discontinuous Taylor,
+                      bubble enriched Lagrange,
+                      bubble enriched vector Lagrange,
+                      Bogner-Fox-Schmit, BFS,
+                      Fortin-Soulie, FS,
+                      Bernardi-Raugel,
+                      Wu-Xu,
+                      transition,
+                      Guzman-Neilan,
+                      nonconforming Arnold-Winther, nonconforming AW,
+                      TScurl, trimmed serendipity Hcurl,
+                      TSdiv, trimmed serendipity Hdiv,
+                      TNT, tiniest tensor,
+                      TNTcurl, tiniest tensor Hcurl,
+                      TNTdiv, tiniest tensor Hdiv,
+                      Arnold-Boffi-Falk, ABF,
+                      Arbogast-Correa, AC, AC full, Arbogast-Correa full,
+                      Rannacher-Turek,
+                      P1-iso-P2, P2-iso-P1, iso-P2 P1
+        order: The order of the element.
     """
     reference = create_reference(cell_type)
 

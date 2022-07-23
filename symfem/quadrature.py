@@ -11,10 +11,8 @@ def equispaced(
 ) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
     """Get equispaced points and weights.
 
-    Parameters
-    ----------
-    n : int
-        Number of points
+    Args:
+        n: Number of points
     """
     return ([sympy.Rational(i, n - 1) for i in range(n)],
             [sympy.Rational(1, 2*(n-1)) if i == 0 or i == n - 1 else sympy.Rational(1, n-1)
@@ -26,10 +24,8 @@ def lobatto(
 ) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
     """Get Gauss-Lobatto-Legendre points and weights.
 
-    Parameters
-    ----------
-    n : int
-        Number of points
+    Args:
+        n: Number of points
     """
     if n == 2:
         return ([0, 1],
@@ -78,10 +74,8 @@ def radau(
 ) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
     """Get Radau points and weights.
 
-    Parameters
-    ----------
-    n : int
-        Number of points
+    Args:
+        n: Number of points
     """
     if n == 2:
         return ([0, sympy.Rational(2, 3)],
@@ -97,10 +91,8 @@ def legendre(
 ) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
     """Get Gauss-Legendre points and weights.
 
-    Parameters
-    ----------
-    n : int
-        Number of points
+    Args:
+        n: Number of points
     """
     if n == 1:
         return ([sympy.Rational(1, 2)], [1])
@@ -118,13 +110,11 @@ def get_quadrature(
 ) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
     """Get quadrature points and weights.
 
-    Parameters
-    ----------
-    rule : str
-        The quadrature rule.
-        Supported values: equispaced, lobatto, radau, legendre
-    n : int
-        Number of points
+    Args:
+        rule: The quadrature rule.
+              Supported values: equispaced, lobatto, radau, legendre
+
+        n: Number of points
     """
     if rule == "equispaced":
         return equispaced(n)

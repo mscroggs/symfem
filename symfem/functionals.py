@@ -37,6 +37,7 @@ class BaseFunctional(ABC):
 
     def __init__(self, reference: Reference, entity: typing.Tuple[int, int],
                  mapping: typing.Union[str, None]):
+        """Create the functional."""
         self.reference = reference
         self.entity = entity
         self.mapping = mapping
@@ -118,6 +119,7 @@ class PointEvaluation(BaseFunctional):
 
     def __init__(self, reference: Reference, point_in: FunctionInput,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+        """Create the functional."""
         super().__init__(reference, entity, mapping)
         self.point = parse_function_input(point_in)
         assert self.point.is_vector
@@ -145,6 +147,7 @@ class WeightedPointEvaluation(BaseFunctional):
 
     def __init__(self, reference: Reference, point_in: FunctionInput, weight: sympy.core.expr.Expr,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+        """Create the functional."""
         super().__init__(reference, entity, mapping)
         self.point = parse_function_input(point_in)
         assert self.point.is_vector
@@ -175,6 +178,7 @@ class DerivativePointEvaluation(BaseFunctional):
     def __init__(self, reference: Reference, point_in: FunctionInput,
                  derivative: typing.Tuple[int, ...],
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = None):
+        """Create the functional."""
         super().__init__(reference, entity, mapping)
         self.point = parse_function_input(point_in)
         assert self.point.is_vector
@@ -243,6 +247,7 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
 
     def __init__(self, reference: Reference, point_in: FunctionInput, direction_in: FunctionInput,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+        """Create the functional."""
         super().__init__(reference, entity, mapping)
         self.point = parse_function_input(point_in)
         assert self.point.is_vector
@@ -289,6 +294,7 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
 
     def __init__(self, reference: Reference, point_in: FunctionInput, edge: Reference,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+        """Create the functional."""
         assert isinstance(edge, Interval)
         super().__init__(reference, point_in, edge.normal(), entity=entity, mapping=mapping)
         self.reference = edge
@@ -312,6 +318,7 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
     def __init__(self, reference: Reference, point_in: FunctionInput,
                  component: typing.Tuple[int, int],
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+        """Create the functional."""
         super().__init__(reference, entity, mapping)
         self.point = parse_function_input(point_in)
         assert self.point.is_vector
@@ -345,6 +352,7 @@ class PointInnerProduct(BaseFunctional):
     def __init__(self, reference: Reference, point_in: FunctionInput, lvec: FunctionInput,
                  rvec: FunctionInput,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+        """Create the functional."""
         super().__init__(reference, entity, mapping)
         self.point = parse_function_input(point_in)
         assert self.point.is_vector
@@ -395,6 +403,7 @@ class DotPointEvaluation(BaseFunctional):
 
     def __init__(self, reference: Reference, point_in: FunctionInput, vector_in: FunctionInput,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+        """Create the functional."""
         super().__init__(reference, entity, mapping)
         self.point = parse_function_input(point_in)
         assert self.point.is_vector
@@ -440,6 +449,7 @@ class IntegralAgainst(BaseFunctional):
 
     def __init__(self, reference: Reference, integral_domain: Reference, f_in: FunctionInput,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+        """Create the functional."""
         super().__init__(reference, entity, mapping)
         self.integral_domain = integral_domain
 
@@ -503,6 +513,7 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
 
     def __init__(self, reference: Reference, integral_domain: Reference, f_in: FunctionInput,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+        """Create the functional."""
         super().__init__(reference, entity, mapping)
         self.integral_domain = integral_domain
 
@@ -547,6 +558,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
     def __init__(self, reference: Reference, integral_domain: Reference, directions: SetOfPoints,
                  orders: typing.Tuple[int, ...], entity: typing.Tuple[int, int], scale: int = 1,
                  mapping: typing.Union[str, None] = "identity"):
+        """Create the functional."""
         super().__init__(reference, entity, mapping)
         self.integral_domain = integral_domain
         self.directions = directions
@@ -610,6 +622,7 @@ class IntegralMoment(BaseFunctional):
     def __init__(self, reference: Reference, integral_domain: Reference,
                  f_in: FunctionInput, dof: BaseFunctional,
                  entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+        """Create the functional."""
         super().__init__(reference, entity, mapping)
         self.integral_domain = integral_domain
         self.dof = dof
@@ -711,6 +724,7 @@ class VecIntegralMoment(IntegralMoment):
     def __init__(self, reference: Reference, integral_domain: Reference, f_in: FunctionInput,
                  dot_with_in: FunctionInput, dof: BaseFunctional, entity: typing.Tuple[int, int],
                  mapping: typing.Union[str, None] = "identity"):
+        """Create the functional."""
         f = parse_function_input(f_in)
         super().__init__(reference, integral_domain, f, dof, entity=entity, mapping=mapping)
         self.dot_with = parse_function_input(dot_with_in)
@@ -746,6 +760,7 @@ class DerivativeIntegralMoment(IntegralMoment):
     def __init__(self, reference: Reference, integral_domain: Reference, f: FunctionInput,
                  dot_with_in: FunctionInput, dof: BaseFunctional, entity: typing.Tuple[int, int],
                  mapping: typing.Union[str, None] = "identity"):
+        """Create the functional."""
         super().__init__(reference, integral_domain, f, dof, entity=entity, mapping=mapping)
         self.dot_with = parse_function_input(dot_with_in)
 
@@ -780,6 +795,7 @@ class DivergenceIntegralMoment(IntegralMoment):
     def __init__(self, reference: Reference, integral_domain: Reference, f_in: FunctionInput,
                  dof: BaseFunctional, entity: typing.Tuple[int, int],
                  mapping: typing.Union[str, None] = "identity"):
+        """Create the functional."""
         f = parse_function_input(f_in)
         assert f.is_scalar
         super().__init__(reference, integral_domain, f, dof, entity=entity, mapping=mapping)
@@ -814,6 +830,7 @@ class TangentIntegralMoment(VecIntegralMoment):
     def __init__(self, reference: Reference, integral_domain: Reference, f_in: FunctionInput,
                  dof: BaseFunctional, entity: typing.Tuple[int, int],
                  mapping: typing.Union[str, None] = "covariant"):
+        """Create the functional."""
         f = parse_function_input(f_in)
         assert f.is_scalar
         super().__init__(reference, integral_domain, f, integral_domain.tangent(), dof,
@@ -844,6 +861,7 @@ class NormalIntegralMoment(VecIntegralMoment):
     def __init__(self, reference: Reference, integral_domain: Reference, f_in: FunctionInput,
                  dof: BaseFunctional, entity: typing.Tuple[int, int],
                  mapping: typing.Union[str, None] = "contravariant"):
+        """Create the functional."""
         f = parse_function_input(f_in)
         assert f.is_scalar
         super().__init__(reference, integral_domain, f, integral_domain.normal(), dof,
@@ -874,6 +892,7 @@ class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
     def __init__(self, reference: Reference, integral_domain: Reference, f_in: FunctionInput,
                  dof: BaseFunctional, entity: typing.Tuple[int, int],
                  mapping: typing.Union[str, None] = "identity"):
+        """Create the functional."""
         f = parse_function_input(f_in)
         assert f.is_scalar
         super().__init__(reference, integral_domain, f, integral_domain.normal(), dof,
@@ -905,6 +924,7 @@ class InnerProductIntegralMoment(IntegralMoment):
                  inner_with_left_in: FunctionInput, inner_with_right_in: FunctionInput,
                  dof: BaseFunctional, entity: typing.Tuple[int, int],
                  mapping: typing.Union[str, None] = "identity"):
+        """Create the functional."""
         f = parse_function_input(f_in)
         inner_with_left = parse_function_input(inner_with_left_in)
         inner_with_right = parse_function_input(inner_with_right_in)
@@ -952,6 +972,7 @@ class NormalInnerProductIntegralMoment(InnerProductIntegralMoment):
     def __init__(self, reference: Reference, integral_domain: Reference, f_in: FunctionInput,
                  dof: BaseFunctional, entity: typing.Tuple[int, int],
                  mapping: typing.Union[str, None] = "double_contravariant"):
+        """Create the functional."""
         f = parse_function_input(f_in)
         assert f.is_scalar
         super().__init__(reference, integral_domain, f, integral_domain.normal(),

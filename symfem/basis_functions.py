@@ -167,6 +167,13 @@ class SubbedBasisFunction(BasisFunction):
     def __init__(
         self, f: BasisFunction, vars: AxisVariables, values: ValuesToSubstitute
     ):
+        """Create a basis function following a substitution.
+
+        Args:
+            f: The basis function
+            vars: The variables that have been substituted
+            values: The values to substitute
+        """
         super().__init__(scalar=f.is_scalar, vector=f.is_vector, matrix=f.is_matrix)
         self.f = f
         self._vars = vars
