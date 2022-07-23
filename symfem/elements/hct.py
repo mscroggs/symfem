@@ -20,6 +20,12 @@ class HsiehCloughTocher(CiarletElement):
     """Hsieh-Clough-Tocher finite element."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+        """
         from symfem import create_reference
         assert order == 3
         assert reference.name == "triangle"

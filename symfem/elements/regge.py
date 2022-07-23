@@ -25,6 +25,13 @@ class Regge(CiarletElement):
     """A Regge element on a simplex."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "point"):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
+        """
         from symfem import create_reference
         poly: typing.List[FunctionInput] = []
         if reference.tdim == 2:
@@ -99,7 +106,11 @@ class Regge(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["Regge"]
@@ -112,6 +123,13 @@ class ReggeTP(CiarletElement):
     """A Regge element on a tensor product cell."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "integral"):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
+        """
         from symfem import create_reference
 
         poly: typing.List[FunctionInput] = []
@@ -224,7 +242,11 @@ class ReggeTP(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["Regge"]

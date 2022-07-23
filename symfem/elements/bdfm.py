@@ -17,7 +17,15 @@ from .dpc import DPC, VectorDPC
 
 
 def bdfm_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]:
-    """Create the polynomial basis for a BDFM element."""
+    """Create the polynomial basis for a BDFM element.
+
+    Args:
+        reference: The reference cell
+        order: The polynomial order
+
+    Returns:
+        The polynomial basis
+    """
     dim = reference.tdim
     pset: typing.List[FunctionInput] = []
     pset += polynomial_set_vector(dim, dim, order - 1)
@@ -49,6 +57,13 @@ class BDFM(CiarletElement):
     """Brezzi-Douglas-Fortin-Marini Hdiv finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
+        """
         poly = bdfm_polyset(reference, order)
 
         dofs: ListOfFunctionals = []
@@ -69,7 +84,11 @@ class BDFM(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["Brezzi-Douglas-Fortin-Marini", "BDFM"]

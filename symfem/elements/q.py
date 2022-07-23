@@ -18,6 +18,13 @@ class Q(CiarletElement):
     """A Q element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
+        """
         dofs: ListOfFunctionals = []
         if order == 0:
             dofs = [PointEvaluation(
@@ -84,7 +91,11 @@ class Q(CiarletElement):
         return [("scalar", [interval_q for i in range(self.reference.tdim)], perm)]
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["Q", "Lagrange", "P"]
@@ -97,6 +108,13 @@ class VectorQ(CiarletElement):
     """A vector Q element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
+        """
         scalar_space = Q(reference, order, variant)
         dofs: ListOfFunctionals = []
         poly: typing.List[FunctionInput] = []
@@ -120,7 +138,11 @@ class VectorQ(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["vector Q", "vQ"]
@@ -133,6 +155,13 @@ class Nedelec(CiarletElement):
     """Nedelec Hcurl finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
+        """
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_vector(reference.tdim, reference.tdim, order - 1)
         poly += Hcurl_quolynomials(reference.tdim, reference.tdim, order)
@@ -148,7 +177,11 @@ class Nedelec(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["NCE", "RTCE", "Qcurl", "Nedelec", "Ncurl"]
@@ -161,6 +194,13 @@ class RaviartThomas(CiarletElement):
     """Raviart-Thomas Hdiv finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
+        """
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_vector(reference.tdim, reference.tdim, order - 1)
         poly += Hdiv_quolynomials(reference.tdim, reference.tdim, order)
@@ -175,7 +215,11 @@ class RaviartThomas(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["NCF", "RTCF", "Qdiv"]

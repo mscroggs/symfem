@@ -20,6 +20,13 @@ class Serendipity(CiarletElement):
     """A serendipity element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
+        """
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
         poly += serendipity_set_1d(reference.tdim, order)
@@ -38,7 +45,11 @@ class Serendipity(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["serendipity", "S"]
@@ -51,6 +62,13 @@ class SerendipityCurl(CiarletElement):
     """A serendipity Hcurl element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
+        """
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
         poly += Hcurl_serendipity(reference.tdim, reference.tdim, order)
@@ -68,7 +86,11 @@ class SerendipityCurl(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
@@ -81,6 +103,13 @@ class SerendipityDiv(CiarletElement):
     """A serendipity Hdiv element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
+        """
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
         poly += Hdiv_serendipity(reference.tdim, reference.tdim, order)
@@ -96,7 +125,11 @@ class SerendipityDiv(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]

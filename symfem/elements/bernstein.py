@@ -38,17 +38,12 @@ def choose(n: int, powers: typing.List[int]) -> sympy.core.expr.Expr:
 def bernstein_polynomials(
     n: int, d: int, vars: AxisVariablesNotSingle = x
 ) -> typing.List[sympy.core.expr.Expr]:
-    """
-    Return a list of Bernstein polynomials.
+    """Return a list of Bernstein polynomials.
 
-    Parameters
-    ----------
-    n : int
-        The polynomial order
-    d : int
-        The topological dimension
-    vars: list
-        The variables to use
+    Args:
+        n: The polynomial order
+        d: The topological dimension
+        vars: The variables to use
     """
     poly = []
     if d == 1:
@@ -80,6 +75,15 @@ class BernsteinFunctional(BaseFunctional):
 
     def __init__(self, reference: Reference, integral_domain: Reference, index: int,
                  degree: int, entity: typing.Tuple[int, int]):
+        """Create the functional.
+
+        Args:
+            reference: The reference element
+            integral_domain: The subentity to integrate over
+            index: The index of the bernstein polynomial
+            degree: The polynomial degree
+            entity: The entity this functional is associated with
+        """
         super().__init__(reference, entity, "identity")
         orth = [
             o / sympy.sqrt((o * o).integral(integral_domain))
@@ -133,6 +137,12 @@ class Bernstein(CiarletElement):
     """Bernstein finite element."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+        """
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
 

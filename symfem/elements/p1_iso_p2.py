@@ -19,6 +19,12 @@ class P1IsoP2Tri(CiarletElement):
     """P1-iso-P2 finite element on a triangle."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+        """
         half = sympy.Rational(1, 2)
         zero = sympy.Integer(0)
         one = sympy.Integer(1)
@@ -65,6 +71,12 @@ class P1IsoP2Quad(CiarletElement):
     """P1-iso-P2 finite element on a quadrilateral."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+        """
         half = sympy.Rational(1, 2)
         zero = sympy.Integer(0)
         one = sympy.Integer(1)

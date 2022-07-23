@@ -1,3 +1,5 @@
+"""Run the demos."""
+
 import pytest
 import os
 

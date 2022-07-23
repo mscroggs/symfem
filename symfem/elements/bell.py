@@ -18,6 +18,13 @@ class Bell(CiarletElement):
     """Bell finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
+        """
         assert reference.name == "triangle"
         assert order == 5
         dofs: ListOfFunctionals = []
@@ -40,7 +47,11 @@ class Bell(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["Bell"]

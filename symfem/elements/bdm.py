@@ -19,6 +19,13 @@ class BDM(CiarletElement):
     """Brezzi-Douglas-Marini Hdiv finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
+        """
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
 
@@ -32,7 +39,11 @@ class BDM(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]

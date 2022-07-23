@@ -18,6 +18,12 @@ class Argyris(CiarletElement):
     """Argyris finite element."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+        """
         assert order == 5
         assert reference.name == "triangle"
         dofs: ListOfFunctionals = []

@@ -16,6 +16,12 @@ class RannacherTurek(CiarletElement):
     """Rannacher-Turek finite element."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+        """
         assert order == 1
 
         dofs: ListOfFunctionals = []
@@ -32,7 +38,11 @@ class RannacherTurek(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {}
 
     names = ["Rannacher-Turek"]

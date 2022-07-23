@@ -15,6 +15,12 @@ class Taylor(CiarletElement):
     """Taylor finite element."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+        """
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
             cells=(IntegralMoment, Lagrange, 0, {"variant": "equispaced"}),

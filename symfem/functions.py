@@ -83,7 +83,14 @@ def _check_equal(first: SympyFormat, second: SympyFormat) -> bool:
 class AnyFunction(ABC):
     """A function."""
 
-    def __init__(self, scalar=False, vector=False, matrix=False):
+    def __init__(self, scalar: bool = False, vector: bool = False, matrix: bool = False):
+        """Create a function.
+
+        Args:
+            scalar: Is the function scalar-valued?
+            vector: Is the function vector-valued?
+            matrix: Is the function matrix-valued?
+        """
         assert len([i for i in [scalar, vector, matrix] if i]) == 1
         self.is_scalar = scalar
         self.is_vector = vector
@@ -346,6 +353,11 @@ class ScalarFunction(AnyFunction):
     _f: sympy.core.expr.Expr
 
     def __init__(self, f: typing.Union[int, sympy.core.expr.Expr]):
+        """Create a scalar-valued function.
+
+        Args:
+            f: The sympy representation of the function.
+        """
         super().__init__(scalar=True)
         if isinstance(f, int):
             self._f = sympy.Integer(f)
@@ -582,6 +594,11 @@ class VectorFunction(AnyFunction):
         typing.Tuple[typing.Union[AnyFunction, int, sympy.core.expr.Expr], ...],
         typing.List[typing.Union[AnyFunction, int, sympy.core.expr.Expr]]
     ]):
+        """Create a vector-valued function.
+
+        Args:
+            vec: The sympy representation of the function.
+        """
         from .basis_functions import BasisFunction
         super().__init__(vector=True)
         vec_l = []
@@ -834,6 +851,11 @@ class MatrixFunction(AnyFunction):
         typing.List[typing.List[typing.Union[AnyFunction, int, sympy.core.expr.Expr]]],
         sympy.matrices.dense.MutableDenseMatrix
     ]):
+        """Create a matrix-valued function.
+
+        Args:
+            mat: The sympy representation of the function.
+        """
         from .basis_functions import BasisFunction
         super().__init__(matrix=True)
         if isinstance(mat, sympy.matrices.dense.MutableDenseMatrix):

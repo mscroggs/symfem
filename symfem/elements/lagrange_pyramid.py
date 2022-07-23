@@ -19,6 +19,13 @@ class Lagrange(CiarletElement):
     """Lagrange finite element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
+        """
         dofs: ListOfFunctionals = []
         if order == 0:
             dofs = [
@@ -74,7 +81,11 @@ class Lagrange(CiarletElement):
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["Lagrange", "P"]
