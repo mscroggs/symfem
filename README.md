@@ -1,4 +1,4 @@
-![Symfem](logo/logo.png)
+![Symfem](https://raw.githubusercontent.com/mscroggs/symfem/main/logo/logo.png)
 
 |  | Badges |
 | --- | :---: |
@@ -137,7 +137,7 @@ behaviour can be reported to Matthew (symfem@mscroggs.co.uk).
 ## Interval
 The reference interval has vertices (0,) and (1,). Its sub-entities are numbered as follows.
 
-![The numbering of a reference interval](img/interval_numbering.png)
+![The numbering of a reference interval](https://raw.githubusercontent.com/mscroggs/symfem/main/img/)interval_numbering.png)
 
 ### List of supported elements
 - Bernstein (alternative names: Bernstein-Bezier)
@@ -154,7 +154,7 @@ The reference interval has vertices (0,) and (1,). Its sub-entities are numbered
 ## Triangle
 The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities are numbered as follows.
 
-![The numbering of a reference triangle](img/triangle_numbering.png)
+![The numbering of a reference triangle](https://raw.githubusercontent.com/mscroggs/symfem/main/img/)triangle_numbering.png)
 
 ### List of supported elements
 - Argyris
@@ -196,7 +196,7 @@ The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities
 ## Quadrilateral
 The reference quadrilateral has vertices (0, 0), (1, 0), (0, 1), and (1, 1). Its sub-entities are numbered as follows.
 
-![The numbering of a reference quadrilateral](img/quadrilateral_numbering.png)
+![The numbering of a reference quadrilateral](https://raw.githubusercontent.com/mscroggs/symfem/main/img/)quadrilateral_numbering.png)
 
 ### List of supported elements
 - Arbogast-Correa (alternative names: AC, AC full, Arbogast-Correa full)
@@ -226,7 +226,7 @@ The reference quadrilateral has vertices (0, 0), (1, 0), (0, 1), and (1, 1). Its
 ## Tetrahedron
 The reference tetrahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), and (0, 0, 1). Its sub-entities are numbered as follows.
 
-![The numbering of a reference tetrahedron](img/tetrahedron_numbering.png)
+![The numbering of a reference tetrahedron](https://raw.githubusercontent.com/mscroggs/symfem/main/img/)tetrahedron_numbering.png)
 
 ### List of supported elements
 - Bernardi-Raugel
@@ -255,7 +255,7 @@ The reference tetrahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), and (0, 
 ## Hexahedron
 The reference hexahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0), (0, 0, 1), (1, 0, 1), (0, 1, 1), and (1, 1, 1). Its sub-entities are numbered as follows.
 
-![The numbering of a reference hexahedron](img/hexahedron_numbering.png)
+![The numbering of a reference hexahedron](https://raw.githubusercontent.com/mscroggs/symfem/main/img/)hexahedron_numbering.png)
 
 ### List of supported elements
 - Brezzi-Douglas-Duran-Fortin (alternative names: BDDF)
@@ -281,7 +281,7 @@ The reference hexahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0)
 ## Prism
 The reference prism has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (1, 0, 1), and (0, 1, 1). Its sub-entities are numbered as follows.
 
-![The numbering of a reference prism](img/prism_numbering.png)
+![The numbering of a reference prism](https://raw.githubusercontent.com/mscroggs/symfem/main/img/)prism_numbering.png)
 
 ### List of supported elements
 - Lagrange (alternative names: P)
@@ -290,7 +290,7 @@ The reference prism has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (1,
 ## Pyramid
 The reference pyramid has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0), and (0, 0, 1). Its sub-entities are numbered as follows.
 
-![The numbering of a reference pyramid](img/pyramid_numbering.png)
+![The numbering of a reference pyramid](https://raw.githubusercontent.com/mscroggs/symfem/main/img/)pyramid_numbering.png)
 
 ### List of supported elements
 - Lagrange (alternative names: P)
@@ -298,7 +298,7 @@ The reference pyramid has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0), a
 ## Dual polygon
 The reference dual polygon (hexagon example shown) has vertices (1, 0), (3/4, sqrt(3)/4), (1/2, sqrt(3)/2), (0, sqrt(3)/2), (-1/2, sqrt(3)/2), (-3/4, sqrt(3)/4), (-1, 0), (-3/4, -sqrt(3)/4), (-1/2, -sqrt(3)/2), (0, -sqrt(3)/2), (1/2, -sqrt(3)/2), and (3/4, -sqrt(3)/4). Its sub-entities are numbered as follows.
 
-![The numbering of a reference dual polygon](img/dual_polygon_numbering.png)
+![The numbering of a reference dual polygon](https://raw.githubusercontent.com/mscroggs/symfem/main/img/)dual_polygon_numbering.png)
 
 ### List of supported elements
 - Buffa-Christiansen (alternative names: BC)
