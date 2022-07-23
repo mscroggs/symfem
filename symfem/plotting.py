@@ -282,7 +282,7 @@ class NCircle(PictureElement):
 
     def __init__(
         self, centre: PointType, number: int, color: str, text_color: str, fill_color: str,
-        radius: float, font_size: typing.Union[int, None], width: float
+        radius: float, font_size: typing.Union[int, None], width: float, font: str
     ):
         """Create a circle containing a number.
 
@@ -295,6 +295,7 @@ class NCircle(PictureElement):
             radius: The radius of the circle
             font_size: The font size
             width: The width of the line
+            font: The font to use for the number
         """
         self.centre = centre
         self.number = number
@@ -302,6 +303,7 @@ class NCircle(PictureElement):
         self.text_color = text_color
         self.fill_color = fill_color
         self.radius = radius
+        self.font = font
         if font_size is None:
             if number < 10:
                 self.font_size = 25
@@ -333,7 +335,7 @@ class NCircle(PictureElement):
         out.append((
             "text", (f"{self.number}", map_pt(self.centre)),
             {"fill": self.text_color, "font_size": self.font_size,
-             "style": "text-anchor:middle;dominant-baseline:middle;font-family:sans-serif"}))
+             "style": f"text-anchor:middle;dominant-baseline:middle;font-family:{self.font}"}))
 
         return out
 
@@ -562,12 +564,12 @@ class Picture:
     def add_ncircle(
         self, centre: PointOrFunction, number: int, color: str = "red",
         text_color: str = colors.BLACK, fill_color: str = colors.WHITE, radius: float = 20.0,
-        font_size: int = None, width: float = 4.0
+        font_size: int = None, width: float = 4.0, font: str = "'Varela Round',sans-serif"
     ):
         """Add a numbered circle to the picture."""
         self.elements.append(NCircle(
             self.parse_point(centre), number, color, text_color, fill_color, radius, font_size,
-            width))
+            width, font))
 
     def add_math(self, point: PointTypeInput, math: str, color: str = colors.BLACK,
                  font_size: int = 35):
