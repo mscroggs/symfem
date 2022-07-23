@@ -24,6 +24,18 @@ class DualCiarletElement(FiniteElement):
         fine_space: str, reference: DualPolygon, order: int,
         domain_dim: int, range_dim: int, range_shape: typing.Tuple[int, ...] = None
     ):
+        """Create a dual element.
+
+        Args:
+            dual_coefficients: the coefficients that define this element in terms of the basis
+                               functions of the fine space
+            fine_space: the family of the fine space
+            reference: The reference element
+            order: The polynomia order of the fine space
+            domain_dim: the topological dimension of the domain
+            range_dim: the dimension of the range
+            range_shape: the shape of the range
+        """
         self.dual_coefficients = dual_coefficients
         self.fine_space = fine_space
         super().__init__(reference, order, len(dual_coefficients), domain_dim, range_dim,
@@ -90,7 +102,12 @@ class Dual(DualCiarletElement):
     """Barycentric dual finite element."""
 
     def __init__(self, reference: DualPolygon, order: int):
+        """Create the element.
 
+        Args:
+            reference: The reference element
+            order: The polynomial order
+        """
         dual_coefficients: typing.List[typing.List[typing.List[
             typing.Union[int, sympy.core.expr.Expr]]]] = []
         if order == 0:
@@ -133,6 +150,12 @@ class BuffaChristiansen(DualCiarletElement):
     """Buffa-Christiansen barycentric dual finite element."""
 
     def __init__(self, reference: DualPolygon, order: int):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+        """
         assert order == 1
         dual_coefficients: typing.List[typing.List[typing.List[
             typing.Union[int, sympy.core.expr.Expr]]]] = [
@@ -164,6 +187,12 @@ class RotatedBuffaChristiansen(DualCiarletElement):
     """RotatedBuffa-Christiansen barycentric dual finite element."""
 
     def __init__(self, reference: DualPolygon, order: int):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+        """
         assert order == 1
         dual_coefficients: typing.List[typing.List[typing.List[
             typing.Union[int, sympy.core.expr.Expr]]]] = [

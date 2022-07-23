@@ -18,6 +18,13 @@ class P1Hermite(CiarletElement):
     """P1Hermite finite element."""
 
     def __init__(self, reference: Reference, order: int, poly: typing.List[FunctionInput]):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            poly: The polynomial basis
+        """
         assert order == 3
         dofs: ListOfFunctionals = []
         for v_n, vs in enumerate(reference.vertices):
@@ -28,7 +35,11 @@ class P1Hermite(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"poly": self._basis}
 
     names: typing.List[str] = []
@@ -42,6 +53,12 @@ class ReducedHsiehCloughTocher(CiarletElement):
     """Reduced Hsieh-Clough-Tocher finite element."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+        """
         from symfem import create_reference
         assert order == 3
         assert reference.name == "triangle"

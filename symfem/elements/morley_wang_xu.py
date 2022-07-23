@@ -17,6 +17,12 @@ class MorleyWangXu(CiarletElement):
     """Morley-Wang-Xu finite element."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+        """
         assert order <= reference.tdim
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)

@@ -21,6 +21,12 @@ class GuzmanNeilan(CiarletElement):
     """Guzman-Neilan Hdiv finite element."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+        """
         if reference.name == "triangle":
             poly = self._make_polyset_triangle(reference, order)
         else:

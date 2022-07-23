@@ -49,26 +49,16 @@ def make_integral_moment_dofs(
 ) -> typing.List[BaseFunctional]:
     """Generate DOFs due to integral moments on sub entities.
 
-    Parameters
-    ----------
-    reference: symfem.references.Reference
-        The reference cell.
-    vertices: tuple
-        DOFs on dimension 0 entities.
-    edges: tuple
-        DOFs on dimension 1 entities.
-    faces: tuple
-        DOFs on dimension 2 entities.
-    volumes: tuple
-        DOFs on dimension 3 entities.
-    cells: tuple
-        DOFs on codimension 0 entities.
-    facets: tuple
-        DOFs on codimension 1 entities.
-    ridges: tuple
-        DOFs on codimension 2 entities.
-    peaks: tuple
-        DOFs on codimension 3 entities.
+    Args:
+        reference: The reference cell.
+        vertices: DOFs on dimension 0 entities.
+        edges: DOFs on dimension 1 entities.
+        faces: DOFs on dimension 2 entities.
+        volumes: DOFs on dimension 3 entities.
+        cells: DOFs on codimension 0 entities.
+        facets: DOFs on codimension 1 entities.
+        ridges: DOFs on codimension 2 entities.
+        peaks: DOFs on codimension 3 entities.
     """
     dofs = []
 

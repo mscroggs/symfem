@@ -26,7 +26,14 @@ class Colors:
     GRAY = "#AAAAAA"
 
     def entity(self, n: int) -> str:
-        """Get the color used for an entity of a given dimension."""
+        """Get the color used for an entity of a given dimension.
+
+        Args:
+            n: The dimension of the entity
+
+        Returns:
+            The color used for entities of the given dimension
+        """
         if n == 0:
             return self.ORANGE
         if n == 1:
@@ -45,35 +52,63 @@ class PictureElement(ABC):
     """An element in a picture."""
 
     def __init__(self):
+        """Create an element."""
         pass
 
     @abstractmethod
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
     ) -> SVGFormat:
-        """Return SVG format."""
+        """Return SVG format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A list of svgwrite functions to call, with args tuples and kwargs dictionaries
+        """
         pass
 
     @property
     @abstractmethod
     def points(self) -> SetOfPoints:
-        """Get set of points used by this element."""
+        """Get set of points used by this element.
+
+        Returns:
+            A set of points
+        """
         pass
 
     def minx(self) -> sympy.core.expr.Expr:
-        """Get the minimum x-coordinate."""
+        """Get the minimum x-coordinate.
+
+        Returns:
+            The minimum x-coordinate
+        """
         return min(p[0] for p in self.points)
 
     def miny(self) -> sympy.core.expr.Expr:
-        """Get the minimum y-coordinate."""
+        """Get the minimum y-coordinate.
+
+        Returns:
+            The minimum y-coordinate
+        """
         return min(p[1] for p in self.points)
 
     def maxx(self) -> sympy.core.expr.Expr:
-        """Get the maximum x-coordinate."""
+        """Get the maximum x-coordinate.
+
+        Returns:
+            The maximum x-coordinate
+        """
         return max(p[0] for p in self.points)
 
     def maxy(self) -> sympy.core.expr.Expr:
-        """Get the maximum y-coordinate."""
+        """Get the maximum y-coordinate.
+
+        Returns:
+            The maximum y-coordinate
+        """
         return max(p[1] for p in self.points)
 
 
@@ -84,6 +119,14 @@ class Line(PictureElement):
         self, start: PointType, end: PointType, color: str,
         width: float
     ):
+        """Create a line.
+
+        Args:
+            start: The start point
+            end: The end point
+            color: The color
+            width: The width of the line
+        """
         super().__init__()
         self.start = start
         self.end = end
@@ -93,14 +136,25 @@ class Line(PictureElement):
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
     ) -> SVGFormat:
-        """Return SVG format."""
+        """Return SVG format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A list of svgwrite functions to call, with args tuples and kwargs dictionaries
+        """
         return [(
             "line", (map_pt(self.start), map_pt(self.end)),
             {"stroke": self.color, "stroke_width": self.width, "stroke_linecap": "round"})]
 
     @property
     def points(self) -> SetOfPoints:
-        """Get set of points used by this element."""
+        """Get set of points used by this element.
+
+        Returns:
+            A set of points
+        """
         return (self.start, self.end)
 
 
@@ -111,6 +165,16 @@ class Bezier(PictureElement):
         self, start: PointType, mid1: PointType, mid2: PointType, end: PointType, color: str,
         width: float
     ):
+        """Create a Bezier curve.
+
+        Args:
+            start: The start point
+            mid1: The first control point
+            mid2: The second control point
+            end: The end point
+            color: The color
+            width: The width of the line
+        """
         super().__init__()
         self.start = start
         self.mid1 = mid1
@@ -122,7 +186,14 @@ class Bezier(PictureElement):
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
     ) -> SVGFormat:
-        """Return SVG format."""
+        """Return SVG format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A list of svgwrite functions to call, with args tuples and kwargs dictionaries
+        """
         a = map_pt(self.start)
         b = map_pt(self.mid1)
         c = map_pt(self.mid2)
@@ -135,7 +206,11 @@ class Bezier(PictureElement):
 
     @property
     def points(self) -> SetOfPoints:
-        """Get set of points used by this element."""
+        """Get set of points used by this element.
+
+        Returns:
+            A set of points
+        """
         return (self.start, self.end)
 
 
@@ -146,6 +221,14 @@ class Arrow(PictureElement):
         self, start: PointType, end: PointType, color: str,
         width: float
     ):
+        """Create an arrow.
+
+        Args:
+            start: The start point
+            end: The end point
+            color: The color
+            width: The width of the line
+        """
         super().__init__()
         self.start = start
         self.end = end
@@ -155,7 +238,14 @@ class Arrow(PictureElement):
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
     ) -> SVGFormat:
-        """Return SVG format."""
+        """Return SVG format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A list of svgwrite functions to call, with args tuples and kwargs dictionaries
+        """
         out: SVGFormat = []
 
         out.append((
@@ -179,7 +269,11 @@ class Arrow(PictureElement):
 
     @property
     def points(self) -> SetOfPoints:
-        """Get set of points used by this element."""
+        """Get set of points used by this element.
+
+        Returns:
+            A set of points
+        """
         return (self.start, self.end)
 
 
@@ -187,10 +281,22 @@ class NCircle(PictureElement):
     """A circle containing a number."""
 
     def __init__(
-        self, center: PointType, number: int, color: str, text_color: str, fill_color: str,
+        self, centre: PointType, number: int, color: str, text_color: str, fill_color: str,
         radius: float, font_size: typing.Union[int, None], width: float
     ):
-        self.center = center
+        """Create a circle containing a number.
+
+        Args:
+            centre: The centre of the circle
+            number: The number to print inside the circle
+            color: The colour of the circle's line
+            text_color: The text colour
+            fill_color: The colour to fill the circle
+            radius: The radius of the circle
+            font_size: The font size
+            width: The width of the line
+        """
+        self.centre = centre
         self.number = number
         self.color = color
         self.text_color = text_color
@@ -210,15 +316,22 @@ class NCircle(PictureElement):
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
     ) -> SVGFormat:
-        """Return SVG format."""
+        """Return SVG format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A list of svgwrite functions to call, with args tuples and kwargs dictionaries
+        """
         out: SVGFormat = []
 
         out.append((
-            "circle", (map_pt(self.center), self.radius),
+            "circle", (map_pt(self.centre), self.radius),
             {"stroke": self.color, "stroke_width": self.width, "fill": self.fill_color}))
 
         out.append((
-            "text", (f"{self.number}", map_pt(self.center)),
+            "text", (f"{self.number}", map_pt(self.centre)),
             {"fill": self.text_color, "font_size": self.font_size,
              "style": "text-anchor:middle;dominant-baseline:middle;font-family:sans-serif"}))
 
@@ -226,14 +339,25 @@ class NCircle(PictureElement):
 
     @property
     def points(self) -> SetOfPoints:
-        """Get set of points used by this element."""
-        return (self.center, )
+        """Get set of points used by this element.
+
+        Returns:
+            A set of points
+        """
+        return (self.centre, )
 
 
 class Fill(PictureElement):
     """A filled polygon."""
 
     def __init__(self, vertices: SetOfPoints, color: str, opacity: float):
+        """Create a filled polygon.
+
+        Args:
+            vertices: The vertices of the polygon in clockwise or anticlockwise order
+            color: The colour to fill the polygon
+            opacity: The opacity
+        """
         self.vertices = vertices
         self.color = color
         self.opacity = opacity
@@ -241,13 +365,24 @@ class Fill(PictureElement):
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
     ) -> SVGFormat:
-        """Return SVG format."""
+        """Return SVG format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A list of svgwrite functions to call, with args tuples and kwargs dictionaries
+        """
         return [("polygon", (tuple(map_pt(p) for p in self.vertices), ),
                 {"fill": self.color, "opacity": self.opacity})]
 
     @property
     def points(self) -> SetOfPoints:
-        """Get set of points used by this element."""
+        """Get set of points used by this element.
+
+        Returns:
+            A set of points
+        """
         return self.vertices
 
 
@@ -260,6 +395,14 @@ class Picture:
         self, padding: sympy.core.expr.Expr = sympy.Integer(25), width=None, height=None,
         axes_3d: SetOfPointsInput = None
     ):
+        """Create a picture.
+
+        Args:
+            padding: The padding between the objects and the edge of the picture
+            width: The width of the picture
+            height: The height of the picture
+            axes_3d: The axes to use when drawing a 3D object
+        """
         self._default_axes: SetOfPoints = (
             (sympy.Integer(1), -sympy.Rational(2, 25)),
             (sympy.Rational(1, 2), sympy.Rational(1, 5)),
@@ -275,7 +418,14 @@ class Picture:
             self.axes_3d = parse_set_of_points_input(axes_3d)
 
     def z(self, p_in: PointOrFunction) -> sympy.core.expr.Expr:
-        """Get the into/out-of-the-page component of a point."""
+        """Get the into/out-of-the-page component of a point.
+
+        Args:
+            p_in: The point
+
+        Returns:
+            The into/out-of-the-page component of the point
+        """
         p = self.parse_point(p_in)
         if len(p) == 3:
             assert self.axes_3d == self._default_axes
@@ -283,7 +433,14 @@ class Picture:
         return sympy.Integer(0)
 
     def to_2d(self, p: PointType) -> PointType:
-        """Map a point to 2D."""
+        """Map a point to 2D.
+
+        Args:
+            p: The point
+
+        Return:
+            The projection of the point into 2 dimensions
+        """
         zero = sympy.Integer(0)
         if len(p) == 0:
             return (zero, zero)
@@ -298,7 +455,14 @@ class Picture:
         raise ValueError(f"Unsupported gdim: {len(p)}")
 
     def parse_point(self, p: PointOrFunction) -> PointType:
-        """Parse an input point."""
+        """Parse an input point.
+
+        Args:
+            p: a point or a function
+
+        Returns:
+            The point as a tuple of Sympy expressions
+        """
         if isinstance(p, AnyFunction):
             p_s = p.as_sympy()
             assert isinstance(p_s, tuple)
@@ -352,13 +516,13 @@ class Picture:
         self.add_dof_marker(start, number, color, bold)
 
     def add_ncircle(
-        self, center: PointOrFunction, number: int, color: str = "red",
+        self, centre: PointOrFunction, number: int, color: str = "red",
         text_color: str = colors.BLACK, fill_color: str = colors.WHITE, radius: float = 20.0,
         font_size: int = None, width: float = 4.0
     ):
         """Add a numbered circle to the picture."""
         self.elements.append(NCircle(
-            self.parse_point(center), number, color, text_color, fill_color, radius, font_size,
+            self.parse_point(centre), number, color, text_color, fill_color, radius, font_size,
             width))
 
     def add_fill(

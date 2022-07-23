@@ -21,6 +21,13 @@ class ArnoldWinther(CiarletElement):
     """An Arnold-Winther element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
+        """
         assert reference.name == "triangle"
         self.variant = variant
         poly: typing.List[FunctionInput] = []
@@ -76,7 +83,11 @@ class ArnoldWinther(CiarletElement):
                          (reference.tdim, reference.tdim))
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["Arnold-Winther", "AW", "conforming Arnold-Winther"]
@@ -89,6 +100,13 @@ class NonConformingArnoldWinther(CiarletElement):
     """A nonconforming Arnold-Winther element."""
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
+        """
         assert reference.name == "triangle"
         self.variant = variant
         poly: typing.List[FunctionInput] = []
@@ -127,7 +145,11 @@ class NonConformingArnoldWinther(CiarletElement):
                          (reference.tdim, reference.tdim))
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant}
 
     names = ["nonconforming Arnold-Winther", "nonconforming AW"]

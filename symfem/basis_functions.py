@@ -11,14 +11,29 @@ from .symbols import AxisVariables, AxisVariablesNotSingle, t
 
 
 class BasisFunction(AnyFunction):
-    """A basis function."""
+    """A basis function of a finite element.
+
+    This basis function can be used before the element's basis functions have been computed. When
+    the explicit basis function is needed, only then will it be computed.
+    """
 
     def __init__(self, scalar=False, vector=False, matrix=False):
+        """Create a basis function.
+
+        Args:
+            scalar: Is the function a scalar?
+            vector: Is the function a vector?
+            matrix: Is the function a matrix?
+        """
         super().__init__(scalar=scalar, vector=vector, matrix=matrix)
 
     @abstractmethod
     def get_function(self) -> AnyFunction:
-        """Return the symbolic function."""
+        """Get the actual basis function.
+
+        Returns:
+            The basis function
+        """
         pass
 
     def __add__(self, other: typing.Any) -> AnyFunction:
@@ -152,6 +167,13 @@ class SubbedBasisFunction(BasisFunction):
     def __init__(
         self, f: BasisFunction, vars: AxisVariables, values: ValuesToSubstitute
     ):
+        """Create a basis function following a substitution.
+
+        Args:
+            f: The basis function
+            vars: The variables that have been substituted
+            values: The values to substitute
+        """
         super().__init__(scalar=f.is_scalar, vector=f.is_vector, matrix=f.is_matrix)
         self.f = f
         self._vars = vars

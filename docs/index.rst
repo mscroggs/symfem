@@ -201,10 +201,13 @@ representing a subentity:
 
 Documentation index
 ===================
+
 .. toctree::
    :titlesonly:
 
    demos/index
    docs/index
 
+References
+==========
 .. [Ciarlet] Ciarlet, P. G., The Finite Element Method for Elliptic Problems (2002, first published 1978) `DOI: 10.1137/1.9780898719208 <https://doi.org/10.1137/1.9780898719208>`_

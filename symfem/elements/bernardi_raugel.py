@@ -21,6 +21,13 @@ class BernardiRaugel(CiarletElement):
     """Bernardi-Raugel Hdiv finite element."""
 
     def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            variant: The variant of the element
+        """
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
 

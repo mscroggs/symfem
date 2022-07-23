@@ -17,11 +17,24 @@ class Transition(CiarletElement):
     """Transition finite element."""
 
     def __init__(self, reference: Reference, order: int,
-                 edge_orders=None, face_orders=None, variant: str = "equispaced"):
+                 edge_orders: typing.List[int] = None, face_orders: typing.List[int] = None,
+                 variant: str = "equispaced"):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+            edge_orders: the polynomial order for each edge
+            face_orders: the polynomial order for each face
+            variant: The variant of the element
+        """
         if reference.name == "triangle":
             assert face_orders is None
+            assert edge_orders is not None
             assert len(edge_orders) == 3
         elif reference.name == "tetrahedron":
+            assert face_orders is not None
+            assert edge_orders is not None
             assert len(face_orders) == 4
             assert len(edge_orders) == 6
 
@@ -40,8 +53,10 @@ class Transition(CiarletElement):
                 if edim == reference.tdim:
                     entity_order = order
                 elif edim == 1:
+                    assert edge_orders is not None
                     entity_order = edge_orders[e_n]
                 elif edim == 2:
+                    assert face_orders is not None
                     entity_order = face_orders[e_n]
                 else:
                     raise RuntimeError("Could not find order for this entity.")
@@ -88,7 +103,11 @@ class Transition(CiarletElement):
         self.edge_orders = edge_orders
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
         return {"variant": self.variant, "face_orders": self.face_orders,
                 "edge_orders": self.edge_orders}
 
