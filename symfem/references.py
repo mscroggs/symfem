@@ -284,6 +284,16 @@ class Reference(ABC):
         """Check is a point is contained in the reference."""
         pass
 
+    def plot_entity_diagrams(self, filename: str):
+        """Plot diagrams showing the entity numbering of the reference."""
+        from .plotting import Picture, colors
+
+        img = Picture()
+
+        
+
+        img.save(filename)
+
 
 class Point(Reference):
     """A point."""

@@ -146,3 +146,14 @@ def test_function_plots_bc(n):
     for ext in ["svg", "png"]:
         e.plot_basis_function(0, os.path.join(
             dir, f"test-output-test_function_plots_bc-{n}.{ext}"))
+
+
+@pytest.mark.parametrize("reference", [
+    "interval", "triangle", "quadrilateral",
+    "tetrahedron", "hexahedron", "prism", "pyramid",
+    "dual polygon(6)"
+])
+def test_plot_reference(reference):
+    r = symfem.create_reference(reference)
+    for ext in ["svg", "png"]:
+        r.plot_entity_diagrams(f"test-output-test_plot_references-{reference}.{ext}")
