@@ -16,23 +16,23 @@ SVGFormat = typing.List[typing.Tuple[
 
 def tex_font_size(n: int):
     """Convert a font size to a tex size command."""
-    if n < 5:
-        return "\\tiny"
-    if n < 11:
-        return "\\scriptsize"
     if n < 21:
+        return "\\tiny"
+    if n < 24:
+        return "\\scriptsize"
+    if n < 27:
         return "\\footnotesize"
-    if n < 26:
+    if n < 30:
         return "\\small"
-    if n < 36:
+    if n < 33:
         return "\\normalsize"
-    if n < 48:
+    if n < 36:
         return "\\large"
-    if n < 60:
+    if n < 39:
         return "\\Large"
-    if n < 75:
+    if n < 42:
         return "\\LARGE"
-    if n < 90:
+    if n < 45:
         return "\\huge"
     return "\\Huge"
 
