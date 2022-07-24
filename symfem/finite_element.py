@@ -101,10 +101,7 @@ class FiniteElement(ABC):
 
         assert self._float_basis_functions is not None
         points = parse_set_of_points_input(points_in)
-        tabbed = [tuple(b.subs(x, p).as_sympy() for b in self._float_basis_functions)
-                  for p in points]
-
-        return tabbed
+        return [tuple(b.subs(x, p).as_sympy() for b in self._float_basis_functions) for p in points]
 
     def plot_basis_function(
         self, n: int, filename: typing.Union[str, typing.List[str]], **kwargs: typing.Any
