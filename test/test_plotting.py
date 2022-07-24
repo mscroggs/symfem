@@ -216,4 +216,4 @@ def test_metadata():
         "</metadata>\n"))
     img.add_line((sympy.Integer(0), sympy.Integer(0)),
                  (sympy.Integer(1), sympy.Integer(1)), symfem.plotting.colors.ORANGE)
-    img.save(os.path.join(folder, f"test_metadata.svg"))
+    img.save(os.path.join(folder, "test_metadata.svg"))
