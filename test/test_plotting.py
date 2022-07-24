@@ -20,6 +20,9 @@ def compile_tex(filename):
         f.write("\\begin{document}\n")
         f.write(content)
         f.write("\\end{document}\n")
+
+    assert os.system(f"cd {folder} && pdflatex -halt-on-error {filename2}") == 0
+
     assert os.system(f"cd {folder} && pdflatex -halt-on-error {filename2} > /dev/null") == 0
 
 
