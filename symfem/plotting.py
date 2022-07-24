@@ -620,12 +620,13 @@ class Picture:
             (sympy.Integer(0), sympy.Integer(1)))
         self.elements: typing.List[PictureElement] = []
         self.padding = padding
-        self.scale = sympy.Integer(scale)
+        self.scale = scale
         self.height = height
         if isinstance(dof_arrow_size, int):
-            dof_arrow_size = sympy.Integer(dof_arrow_size)
-        assert isinstance(dof_arrow_size, sympy.core.expr.Expr)
-        self.dof_arrow_size = dof_arrow_size / 3
+            self.dof_arrow_size = sympy.Integer(dof_arrow_size)
+        else:
+            assert isinstance(dof_arrow_size, sympy.core.expr.Expr)
+            self.dof_arrow_size = dof_arrow_size
         self.width = width
         self.title = title
         self.desc = desc
@@ -747,9 +748,10 @@ class Picture:
         """Add a DOF arrow."""
         vdirection = VectorFunction(self.parse_point(direction))
         vdirection /= 8 * vdirection.norm()
+        vdirection *= self.dof_arrow_size
         start = VectorFunction(self.parse_point(point))
         if shifted:
-            start += vdirection * self.dof_arrow_size
+            start += vdirection / 3
         self.add_arrow(start, start + vdirection, color)
         self.add_dof_marker(start, number, color, bold)
 
@@ -794,7 +796,7 @@ class Picture:
         if self.scale is not None:
             assert self.width is None
             assert self.height is None
-            scale = self.scale
+            scale = sympy.Integer(self.scale)
         elif self.width is not None:
             assert self.height is None
             scale = sympy.Integer(self.width) / (maxx - minx)
