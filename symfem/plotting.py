@@ -14,6 +14,29 @@ SVGFormat = typing.List[typing.Tuple[
     str, typing.Tuple[typing.Any, ...], typing.Dict[str, typing.Any]]]
 
 
+def tex_font_size(n: int):
+    """Convert a font size to a tex size command."""
+    if n < 5:
+        return "\\tiny"
+    if n < 11:
+        return "\\scriptsize"
+    if n < 21:
+        return "\\footnotesize"
+    if n < 26:
+        return "\\small"
+    if n < 36:
+        return "\\normalsize"
+    if n < 48:
+        return "\\large"
+    if n < 60:
+        return "\\Large"
+    if n < 75:
+        return "\\LARGE"
+    if n < 90:
+        return "\\huge"
+    return "\\Huge"
+
+
 class Colors:
     """Class storing colours used in diagrams."""
 
@@ -24,6 +47,10 @@ class Colors:
     GREEN = "#55FF00"
     PURPLE = "#DD2299"
     GRAY = "#AAAAAA"
+
+    def __init__(self):
+        """Initialise."""
+        self._tikz = {}
 
     def entity(self, n: int) -> str:
         """Get the color used for an entity of a given dimension.
@@ -43,6 +70,22 @@ class Colors:
         if n == 3:
             return self.PURPLE
         raise ValueError(f"Unsupported dimension: {n}")
+
+    def get_tikz_name(self, name: str) -> str:
+        """Get the name of the colour to be used in Tikz."""
+        if name.startswith("#"):
+            if name not in self._tikz:
+                self._tikz[name] = f"customcolor{len(self._tikz)}"
+            return self._tikz[name]
+        return name
+
+    def get_tikz_definitions(self) -> str:
+        """Get the definitions of colours used in Tikz."""
+        out = ""
+        for a, b in self._tikz.items():
+            assert a.startswith("#")
+            out += f"\\definecolor{{{b}}}{{HTML}}{{{a[1:]}}}\n"
+        return out
 
 
 colors = Colors()
@@ -72,7 +115,7 @@ class PictureElement(ABC):
     @abstractmethod
     def as_tikz(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
-    ) -> SVGFormat:
+    ) -> str:
         """Return Tikz format.
 
         Args:
@@ -164,7 +207,7 @@ class Line(PictureElement):
 
     def as_tikz(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
-    ) -> SVGFormat:
+    ) -> str:
         """Return Tikz format.
 
         Args:
@@ -175,9 +218,8 @@ class Line(PictureElement):
         """
         s = map_pt(self.start)
         e = map_pt(self.end)
-        # TODO: color
-        # TODO: width
-        return f"\\draw ({s[0]},{s[1]}) -- ({e[0]},{e[1]});\n"
+        return (f"\\draw[{colors.get_tikz_name(self.color)},line width={self.width * 0.2}pt,"
+                f"line cap=round] ({s[0]},{s[1]}) -- ({e[0]},{e[1]});\n")
 
     @property
     def points(self) -> SetOfPoints:
@@ -225,15 +267,34 @@ class Bezier(PictureElement):
         Returns:
             A list of svgwrite functions to call, with args tuples and kwargs dictionaries
         """
-        a = map_pt(self.start)
-        b = map_pt(self.mid1)
-        c = map_pt(self.mid2)
-        d = map_pt(self.end)
+        s = map_pt(self.start)
+        m1 = map_pt(self.mid1)
+        m2 = map_pt(self.mid2)
+        e = map_pt(self.end)
         return [(
             "path", tuple(),
-            {"d": (f"M{a[0]},{a[1]} C{b[0]},{b[1]}, {c[0]},{c[1]}, {d[0]},{d[1]}"),
+            {"d": (f"M{s[0]},{s[1]} C{m1[0]},{m1[1]}, {m2[0]},{m2[1]}, {e[0]},{e[1]}"),
              "stroke": self.color, "stroke_width": self.width, "stroke_linecap": "round",
              "fill": "none"})]
+
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> str:
+        """Return Tikz format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A Tikz string
+        """
+        s = map_pt(self.start)
+        m1 = map_pt(self.mid1)
+        m2 = map_pt(self.mid2)
+        e = map_pt(self.end)
+        return (f"\\draw[{colors.get_tikz_name(self.color)},line width={self.width * 0.2}pt,"
+                f"line cap=round] ({s[0]},{s[1]}) .. controls ({m1[0]},{m1[1]}) "
+                f"and ({m2[0]},{m2[1]}) .. ({e[0]},{e[1]});\n")
 
     @property
     def points(self) -> SetOfPoints:
@@ -300,7 +361,7 @@ class Arrow(PictureElement):
 
     def as_tikz(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
-    ) -> SVGFormat:
+    ) -> str:
         """Return Tikz format.
 
         Args:
@@ -311,9 +372,9 @@ class Arrow(PictureElement):
         """
         s = map_pt(self.start)
         e = map_pt(self.end)
-        # TODO: color
-        # TODO: width
-        return f"\\arrow ({s[0]},{s[1]}) -- ({e[0]},{e[1]});\n"
+        return (f"\\draw[-stealth,{colors.get_tikz_name(self.color)},"
+                f"line width={self.width * 0.2}pt,line cap=round] "
+                f"({s[0]},{s[1]}) -- ({e[0]},{e[1]});\n")
 
     @property
     def points(self) -> SetOfPoints:
@@ -330,7 +391,7 @@ class NCircle(PictureElement):
 
     def __init__(
         self, centre: PointType, number: int, color: str, text_color: str, fill_color: str,
-        radius: float, font_size: typing.Union[int, None], width: float
+        radius: float, font_size: typing.Union[int, None], width: float, font: str
     ):
         """Create a circle containing a number.
 
@@ -343,6 +404,7 @@ class NCircle(PictureElement):
             radius: The radius of the circle
             font_size: The font size
             width: The width of the line
+            font: The font to use for the number
         """
         self.centre = centre
         self.number = number
@@ -350,6 +412,7 @@ class NCircle(PictureElement):
         self.text_color = text_color
         self.fill_color = fill_color
         self.radius = radius
+        self.font = font
         if font_size is None:
             if number < 10:
                 self.font_size = 25
@@ -381,9 +444,27 @@ class NCircle(PictureElement):
         out.append((
             "text", (f"{self.number}", map_pt(self.centre)),
             {"fill": self.text_color, "font_size": self.font_size,
-             "style": "text-anchor:middle;dominant-baseline:middle;font-family:sans-serif"}))
+             "style": f"text-anchor:middle;dominant-baseline:middle;font-family:{self.font}"}))
 
         return out
+
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> str:
+        """Return Tikz format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A Tikz string
+        """
+        c = map_pt(self.centre)
+        return (f"\\draw[{colors.get_tikz_name(self.color)},line width={self.width * 0.2}pt,"
+                f"fill={colors.get_tikz_name(self.fill_color)}] "
+                f"({c[0]},{c[1]}) circle ({self.radius * 0.2}pt);\n"
+                f"\\node[{colors.get_tikz_name(self.text_color)},anchor=center] "
+                f"at ({c[0]},{c[1]}) {{{tex_font_size(self.font_size)} {self.number}}};")
 
     @property
     def points(self) -> SetOfPoints:
@@ -424,6 +505,21 @@ class Fill(PictureElement):
         return [("polygon", (tuple(map_pt(p) for p in self.vertices), ),
                 {"fill": self.color, "opacity": self.opacity})]
 
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> str:
+        """Return Tikz format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A Tikz string
+        """
+        vs = [map_pt(v) for v in self.vertices]
+        return (f"\\fill[{colors.get_tikz_name(self.color)},opacity={self.opacity}]"
+                " " + " -- ".join([f"({v[0]},{v[1]})" for v in vs]) + " -- cycle;")
+
     @property
     def points(self) -> SetOfPoints:
         """Get set of points used by this element.
@@ -434,14 +530,73 @@ class Fill(PictureElement):
         return self.vertices
 
 
+class Math(PictureElement):
+    """A mathematical symbol."""
+
+    def __init__(self, point: PointType, math: str, color: str, font_size: int):
+        """Create a filled polygon.
+
+        Args:
+            point: The centre point to put the math
+            math: The math
+            color: The color of the math
+            font_size: The font size
+        """
+        self.point = parse_point_input(point)
+        self.math = math
+        self.color = color
+        self.font_size = font_size
+
+    def as_svg(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> SVGFormat:
+        """Return SVG format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A list of svgwrite functions to call, with args tuples and kwargs dictionaries
+        """
+        return [(
+            "text", (f"{self.math}", map_pt(self.point)),
+            {"fill": self.color, "font_size": self.font_size,
+             "style": "text-anchor:middle;dominant-baseline:middle;"
+                      "font-family:'CMU Serif',serif;font-style:italic"})]
+
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> str:
+        """Return Tikz format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A Tikz string
+        """
+        p = map_pt(self.point)
+        return (f"\\node[{colors.get_tikz_name(self.color)},anchor=center] "
+                f"at ({p[0]},{p[1]}) {{{tex_font_size(self.font_size)}${self.math}$}};")
+
+    @property
+    def points(self) -> SetOfPoints:
+        """Get set of points used by this element.
+
+        Returns:
+            A set of points
+        """
+        return (self.point, )
+
+
 class Picture:
     """A picture."""
 
     axes_3d: SetOfPoints
 
     def __init__(
-        self, padding: sympy.core.expr.Expr = sympy.Integer(25), width=None, height=None,
-        axes_3d: SetOfPointsInput = None
+        self, padding: sympy.core.expr.Expr = sympy.Integer(25), width: int = None,
+        height: int = None, axes_3d: SetOfPointsInput = None
     ):
         """Create a picture.
 
@@ -566,12 +721,24 @@ class Picture:
     def add_ncircle(
         self, centre: PointOrFunction, number: int, color: str = "red",
         text_color: str = colors.BLACK, fill_color: str = colors.WHITE, radius: float = 20.0,
-        font_size: int = None, width: float = 4.0
+        font_size: int = None, width: float = 4.0, font: str = "'Varela Round',sans-serif"
     ):
         """Add a numbered circle to the picture."""
         self.elements.append(NCircle(
             self.parse_point(centre), number, color, text_color, fill_color, radius, font_size,
-            width))
+            width, font))
+
+    def add_math(self, point: PointTypeInput, math: str, color: str = colors.BLACK,
+                 font_size: int = 35):
+        """Create mathematical symbol.
+
+        Args:
+            point: The centre point to put the math
+            math: The math
+            color: The color of the math
+            font_size: The font size
+        """
+        self.elements.append(Math(self.parse_point(point), math, color, font_size))
 
     def add_fill(
         self, vertices: SetOfPointsOrFunctions, color: str = "red", opacity: float = 1.0
@@ -579,7 +746,7 @@ class Picture:
         """Add a filled polygon to the picture."""
         self.elements.append(Fill(tuple(self.parse_point(p) for p in vertices), color, opacity))
 
-    def compute_scale(self, unit: str = "px") -> typing.Tuple[
+    def compute_scale(self, unit: str = "px", reverse_y: bool = True) -> typing.Tuple[
         sympy.core.expr.Expr, sympy.core.expr.Expr, sympy.core.expr.Expr,
         typing.Callable[[PointType], typing.Tuple[float, float]]
     ]:
@@ -610,11 +777,18 @@ class Picture:
         width = 2 * self.padding + (maxx - minx) * scale
         height = 2 * self.padding + (maxy - miny) * scale
 
-        def map_pt(pt: PointType) -> typing.Tuple[float, float]:
-            """Map a point."""
-            return (
-                float(self.padding + (pt[0] - minx) * scale),
-                float(height - self.padding - (pt[1] - miny) * scale))
+        if reverse_y:
+            def map_pt(pt: PointType) -> typing.Tuple[float, float]:
+                """Map a point."""
+                return (
+                    float(self.padding + (pt[0] - minx) * scale),
+                    float(height - self.padding - (pt[1] - miny) * scale))
+        else:
+            def map_pt(pt: PointType) -> typing.Tuple[float, float]:
+                """Map a point."""
+                return (
+                    float(self.padding + (pt[0] - minx) * scale),
+                    float(self.padding + (pt[1] - miny) * scale))
 
         return scale, height, width, map_pt
 
@@ -653,13 +827,16 @@ class Picture:
 
     def as_tikz(self, filename: str = None) -> str:
         """Convert to tikz."""
-        scale, height, width, map_pt = self.compute_scale("cm")
+        scale, height, width, map_pt = self.compute_scale("cm", False)
         tikz = "\\begin{tikzpicture}[x=1cm,y=1cm]\n"
 
+        inner_tikz = ""
         for e in self.elements:
-            tikz += e.as_tikz(map_pt)
+            inner_tikz += e.as_tikz(map_pt)
 
-        tikz += "\\end{tikzpicture}"
+        tikz += colors.get_tikz_definitions() + inner_tikz
+
+        tikz += "\\end{tikzpicture}\n"
 
         if filename is not None:
             with open(filename, "w") as f:

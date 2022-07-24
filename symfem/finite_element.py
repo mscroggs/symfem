@@ -89,7 +89,7 @@ class FiniteElement(ABC):
         else:
             raise ValueError(f"Unknown order: {order}")
 
-    def plot_basis_function(self, n: int, filename: str):
+    def plot_basis_function(self, n: int, filename: str, width: int = None, height: int = None):
         """Plot a diagram showing a basis function."""
         f = self.get_basis_functions()[n]
         values = self.tabulate_basis(self.reference.make_lattice(6), "xyz,xyz")
@@ -99,7 +99,7 @@ class FiniteElement(ABC):
             for i in row:
                 max_v = max(max_v, parse_function_input(i).norm())
         scale = 1 / max_v
-        f.plot(self.reference, filename, None, None, None, n, scale)
+        f.plot(self.reference, filename, None, None, None, n, scale, width=width, height=height)
 
     @abstractmethod
     def map_to_cell(
@@ -347,7 +347,7 @@ class CiarletElement(FiniteElement):
 
         return self._basis_functions
 
-    def plot_basis_function(self, n: int, filename: str):
+    def plot_basis_function(self, n: int, filename: str, width: int = None, height: int = None):
         """Plot a diagram showing a basis function."""
         f = self.get_basis_functions()[n]
         d = self.dofs[n]
@@ -358,13 +358,12 @@ class CiarletElement(FiniteElement):
             for i in row:
                 max_v = max(max_v, parse_function_input(i).norm())
         scale = 1 / max_v
-        f.plot(self.reference, filename, d.dof_point(), d.dof_direction(), d.entity, n, scale)
+        f.plot(self.reference, filename, d.dof_point(), d.dof_direction(), d.entity, n, scale,
+               width=width, height=height)
 
-    def plot_dof_diagram(self, filename: str):
+    def plot_dof_diagram(self, filename: str, width: int = None, height: int = None):
         """Plot a diagram showing the DOFs of the element."""
-        assert filename.endswith(".svg") or filename.endswith(".png")
-
-        img = Picture()
+        img = Picture(width=width, height=height)
 
         dofs_by_subentity: typing.Dict[int, typing.Dict[int, ListOfFunctionals]] = {
             i: {j: [] for j in range(self.reference.sub_entity_count(i))}

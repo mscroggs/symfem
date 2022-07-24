@@ -12,13 +12,14 @@ dir = os.path.dirname(os.path.realpath(__file__))
 def compile_tex(filename):
     with open(os.path.join(dir, filename)) as f:
         content = f.read()
-    with open(os.path.join(dir, filename), "w") as f:
+    filename2 = filename.split(".")[0] + "-with-preamble.tex"
+    with open(os.path.join(dir, filename2), "w") as f:
         f.write("\\documentclass{standalone}\n")
         f.write("\\usepackage{tikz}\n")
         f.write("\\begin{document}\n")
         f.write(content)
         f.write("\\end{document}\n")
-    os.system(f"cd {dir} && pdflatex -halt-on-error {filename} > /dev/null")
+    assert os.system(f"cd {dir} && pdflatex -halt-on-error {filename2} > /dev/null") == 0
 
 
 def test_plot_line():
@@ -28,6 +29,7 @@ def test_plot_line():
     for ext in ["svg", "png", "tex"]:
         p.save(os.path.join(dir, f"test-output-test_plot_line.{ext}"))
     compile_tex("test-output-test_plot_line.tex")
+
 
 def test_plot_arrow():
     p = symfem.plotting.Picture()
@@ -169,3 +171,17 @@ def test_function_plots_bc(n):
         e.plot_basis_function(0, os.path.join(
             dir, f"test-output-test_function_plots_bc-{n}.{ext}"))
     compile_tex(f"test-output-test_function_plots_bc-{n}.tex")
+
+
+@pytest.mark.parametrize("reference", [
+    "interval", "triangle", "quadrilateral",
+    "tetrahedron", "hexahedron", "prism", "pyramid",
+    "dual polygon(6)"
+])
+def test_plot_reference(reference):
+    r = symfem.create_reference(reference)
+    rname = reference.replace("(", "").replace(")", "").replace(" ", "_")
+    for ext in ["svg", "png", "tex"]:
+        r.plot_entity_diagrams(os.path.join(
+            dir, f"test-output-test_plot_reference-{rname}.{ext}"))
+    compile_tex(f"test-output-test_plot_reference-{rname}.tex")

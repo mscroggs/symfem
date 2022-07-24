@@ -250,7 +250,8 @@ class AnyFunction(ABC):
     def plot(
         self, reference: Reference, filename: str, dof_point: PointType = None,
         dof_direction: PointType = None, dof_entity: typing.Tuple[int, int] = None,
-        dof_n: int = None, scale: sympy.core.expr.Expr = sympy.Integer(1)
+        dof_n: int = None, scale: sympy.core.expr.Expr = sympy.Integer(1),
+        width: int = None, height: int = None
     ):
         """Plot the function."""
         from .plotting import Picture, colors
@@ -259,7 +260,7 @@ class AnyFunction(ABC):
         if self.is_scalar:
             extra = (0, )
 
-        img = Picture()
+        img = Picture(width=width, height=height)
 
         if dof_entity is not None and dof_entity[0] > 1:
             sub_e = reference.sub_entity(*dof_entity)
