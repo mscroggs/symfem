@@ -99,7 +99,7 @@ class FiniteElement(ABC):
         for row in values:
             assert isinstance(row, tuple)
             for i in row:
-                max_v = max(float(parse_function_input(i).norm()) for row in values for i in row)
+                max_v = max(max_v, float(parse_function_input(i).norm()))
         value_scale = 1 / sympy.Float(max_v)
         f.plot(self.reference, filename, None, None, None, n, value_scale, **kwargs)
 
