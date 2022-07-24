@@ -36,6 +36,9 @@ class NoTensorProduct(Exception):
 class FiniteElement(ABC):
     """Abstract finite element."""
 
+    _float_basis_functions: typing.Union[None, typing.List[AnyFunction]]
+    _value_scale: typing.Union[None, sympy.core.expr.Expr]
+
     def __init__(
         self, reference: Reference, order: int, space_dim: int, domain_dim: int, range_dim: int,
         range_shape: typing.Tuple[int, ...] = None
@@ -47,6 +50,8 @@ class FiniteElement(ABC):
         self.domain_dim = domain_dim
         self.range_dim = range_dim
         self.range_shape = range_shape
+        self._float_basis_functions = None
+        self._value_scale = None
 
     @abstractmethod
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
@@ -89,22 +94,60 @@ class FiniteElement(ABC):
         else:
             raise ValueError(f"Unknown order: {order}")
 
+    def tabulate_basis_float(
+        self, points_in: SetOfPointsInput, order: str = "xyzxyz",
+    ) -> TabulatedBasis:
+        """Evaluate the basis functions of the element at the given points."""
+        if self._float_basis_functions is None:
+            self._float_basis_functions = []
+            for b in self.get_basis_functions():
+                if isinstance(b, ScalarFunction):
+                    b_fun = b.as_sympy()
+                    assert isinstance(b_fun, sympy.core.expr.Expr)
+                    b_float_fun = sympy.Float(0.0)
+                    for term, co in b_fub.as_coefficients_dict().items():
+                        b_float_fun += float(co) * term
+                    self._float_basis_functions.append(b_float_fun)
+                else:
+                    self._float_basis_functions.append(b)
+
+        assert self._float_basis_functions is not None
+        points = parse_set_of_points_input(points_in)
+        tabbed = [tuple(b.subs(x, p).as_sympy() for b in self._float_basis_functions)
+                  for p in points]
+        if self.range_dim == 1:
+            return tabbed
+
+        if order == "xyz,xyz":
+            return tabbed
+        elif order == "xxyyzz":
+            output = []
+            for row in tabbed:
+                output.append(tuple(j for i in zip(*row) for j in i))
+            return output
+        elif order == "xyzxyz":
+            output = []
+            for row in tabbed:
+                output.append(tuple(j for i in row for j in i))
+            return output
+        else:
+            raise ValueError(f"Unknown order: {order}")
+
     def plot_basis_function(
         self, n: int, filename: str, **kwargs: typing.Any
     ):
         """Plot a diagram showing a basis function."""
         f = self.get_basis_functions()[n]
-        print("A")
-        values = self.tabulate_basis(self.reference.make_lattice_float(6), "xyz,xyz")
-        print("B")
-        max_v = 0.0
-        for row in values:
-            assert isinstance(row, tuple)
-            for i in row:
-                max_v = max(max_v, float(parse_function_input(i).norm()))
-        value_scale = 1 / sympy.Float(max_v)
-        print("C")
-        f.plot(self.reference, filename, None, None, None, n, value_scale, **kwargs)
+        values = self.tabulate_basis_float(self.reference.make_lattice_float(6), "xyz,xyz")
+        if self._value_scale is None:
+            max_v = 0.0
+            for row in values:
+                assert isinstance(row, tuple)
+                for i in row:
+                    max_v = max(max_v, float(parse_function_input(i).norm()))
+            self._value_scale = 1 / sympy.Float(max_v)
+        assert self._value_scale is not None
+        f.plot(self.reference, filename, None, None, None, n, self._value_scale, **kwargs)
 
     @abstractmethod
     def map_to_cell(

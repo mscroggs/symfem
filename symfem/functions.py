@@ -256,23 +256,18 @@ class AnyFunction(ABC):
         """Plot the function."""
         from .plotting import Picture, colors
 
-        print(" A")
-
         extra: typing.Tuple[int, ...] = tuple()
         if self.is_scalar:
             extra = (0, )
 
-        print(" B")
         img = Picture(**kwargs)
 
         if dof_entity is not None and dof_entity[0] > 1:
             sub_e = reference.sub_entity(*dof_entity)
             img.add_fill([i + extra for i in sub_e.clockwise_vertices], colors.BLUE, 0.5)
 
-        print(" C")
         for ze in reference.z_ordered_entities_extra_dim():
             for dim, entity in ze:
-                print("", dim, entity)
                 if dim == 1:
                     c = colors.GRAY
                     if dof_entity == (1, entity):
@@ -293,10 +288,7 @@ class AnyFunction(ABC):
                     assert dof_n is not None
                     img.add_dof_marker(dof_point + extra, dof_n, colors.PURPLE, bold=False)
 
-        print(" D")
-
         img.save(filename, plot_options=plot_options)
-        print(" E")
 
     def plot_values(
         self, reference: Reference, img: typing.Any,
@@ -568,43 +560,33 @@ class ScalarFunction(AnyFunction):
         from .plotting import Picture, colors
         assert isinstance(img, Picture)
 
-        print("  A")
-
         pts, pairs = reference.make_lattice_with_lines_float(n)
 
         value_scale *= sympy.Rational(5, 8)
         value_scale = sympy.Float(float(value_scale))
 
-        print("  B")
-
         deriv = self.grad(reference.tdim)
         evals = []
-        print("  C")
         for p in pts:
             value = self.subs(x, p).as_sympy()
             assert isinstance(value, sympy.core.expr.Expr)
             value = sympy.Float(float(value))
             value *= value_scale
             evals.append(value)
-        print("  D")
 
         for i, j in pairs:
-            print(" ", i, j)
-            print("  E")
             pi = VectorFunction(pts[i])
             pj = VectorFunction(pts[j])
             d_pi = (2 * pi + pj) / 3
             d_pj = (2 * pj + pi) / 3
             di = deriv.subs(x, pi).dot(d_pi - pts[i]).as_sympy()
             dj = deriv.subs(x, pj).dot(d_pj - pts[j]).as_sympy()
-            print("  F")
             assert isinstance(di, sympy.core.expr.Expr)
             assert isinstance(dj, sympy.core.expr.Expr)
             img.add_bezier(
                 tuple(pi) + (evals[i], ), tuple(d_pi) + (evals[i] + di * value_scale, ),
                 tuple(d_pj) + (evals[j] + dj * value_scale, ), tuple(pj) + (evals[j], ),
                 colors.ORANGE)
-            print("  G")
 
 
 class VectorFunction(AnyFunction):
