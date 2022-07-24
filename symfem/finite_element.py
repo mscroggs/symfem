@@ -94,10 +94,8 @@ class FiniteElement(ABC):
         else:
             raise ValueError(f"Unknown order: {order}")
 
-    def tabulate_basis_float(
-        self, points_in: SetOfPointsInput, order: str = "xyzxyz",
-    ) -> TabulatedBasis:
-        """Evaluate the basis functions of the element at the given points."""
+    def tabulate_basis_float(self, points_in: SetOfPointsInput) -> TabulatedBasis:
+        """Evaluate the basis functions of the element at the given points in xyz,xyz order."""
         if self._float_basis_functions is None:
             self._float_basis_functions = [b.with_floats() for b in self.get_basis_functions()]
 
@@ -105,23 +103,8 @@ class FiniteElement(ABC):
         points = parse_set_of_points_input(points_in)
         tabbed = [tuple(b.subs(x, p).as_sympy() for b in self._float_basis_functions)
                   for p in points]
-        if self.range_dim == 1:
-            return tabbed
 
-        if order == "xyz,xyz":
-            return tabbed
-        elif order == "xxyyzz":
-            output = []
-            for row in tabbed:
-                output.append(tuple(j for i in zip(*row) for j in i))
-            return output
-        elif order == "xyzxyz":
-            output = []
-            for row in tabbed:
-                output.append(tuple(j for i in row for j in i))
-            return output
-        else:
-            raise ValueError(f"Unknown order: {order}")
+        return tabbed
 
     def plot_basis_function(
         self, n: int, filename: typing.Union[str, typing.List[str]], **kwargs: typing.Any
@@ -129,7 +112,7 @@ class FiniteElement(ABC):
         """Plot a diagram showing a basis function."""
         if self._value_scale is None:
             max_v = 0.0
-            values = self.tabulate_basis_float(self.reference.make_lattice_float(6), "xyz,xyz")
+            values = self.tabulate_basis_float(self.reference.make_lattice_float(6))
             for row in values:
                 assert isinstance(row, tuple)
                 for i in row:
@@ -391,7 +374,7 @@ class CiarletElement(FiniteElement):
     ):
         """Plot a diagram showing a basis function."""
         if self._value_scale is None:
-            values = self.tabulate_basis_float(self.reference.make_lattice_float(6), "xyz,xyz")
+            values = self.tabulate_basis_float(self.reference.make_lattice_float(6))
             max_v = 0.0
             for row in values:
                 assert isinstance(row, tuple)
