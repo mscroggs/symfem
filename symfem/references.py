@@ -523,7 +523,8 @@ class Reference(ABC):
         pass
 
     def plot_entity_diagrams(
-        self, filename: str, plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
+        self, filename: typing.Union[str, typing.List[str]],
+        plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
     ):
         """Plot diagrams showing the entity numbering of the reference."""
         from .plotting import Picture, colors

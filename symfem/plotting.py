@@ -907,8 +907,15 @@ class Picture:
 
         return tikz
 
-    def save(self, filename: str, plot_options: typing.Dict[str, typing.Any] = {}):
+    def save(self, filename: typing.Union[str, typing.List[str]],
+             plot_options: typing.Dict[str, typing.Any] = {}):
         """Save the picture as a file."""
+        if isinstance(filename, list):
+            for fn in filename:
+                self.save(fn, plot_options)
+                return
+
+        assert isinstance(filename, str)
         if filename.endswith(".svg"):
             self.as_svg(filename, **plot_options)
         elif filename.endswith(".png"):

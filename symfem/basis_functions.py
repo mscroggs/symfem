@@ -160,6 +160,10 @@ class BasisFunction(AnyFunction):
             raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'transpose'")
         return self.get_function().transpose()
 
+    def with_floats(self) -> AnyFunction:
+        """Return a version the function with floats as coefficients."""
+        return self.get_function().with_floats()
+
 
 class SubbedBasisFunction(BasisFunction):
     """A basis function following a substitution."""
