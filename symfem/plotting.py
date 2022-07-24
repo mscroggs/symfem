@@ -622,7 +622,12 @@ class Picture:
         self.title = title
         self.desc = desc
         if svg_metadata is None:
-            self.svg_metadata = ""
+            self.svg_metadata = (
+                "<!--\n"
+                "This diagram was created using Symfem\n"
+                f"{symfem.__github__}\n"
+                f"{symfem.__citation__}\n"
+                "-->\n")
         else:
             assert isinstance(svg_metadata, str)
             self.svg_metadata = svg_metadata
