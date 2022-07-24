@@ -283,7 +283,7 @@ class AnyFunction(ABC):
                 if dof_direction is not None:
                     assert dof_point is not None and dof_n is not None
                     img.add_dof_arrow(dof_point + extra, dof_direction + extra, dof_n,
-                                          colors.PURPLE, bold=False)
+                                      colors.PURPLE, bold=False)
                 elif dof_point is not None:
                     assert dof_n is not None
                     img.add_dof_marker(dof_point + extra, dof_n, colors.PURPLE, bold=False)
