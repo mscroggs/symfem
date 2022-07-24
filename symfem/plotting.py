@@ -3,6 +3,7 @@
 import sympy
 import typing
 from abc import ABC, abstractmethod
+from xml.etree import ElementTree
 from .geometry import (PointType, SetOfPoints, SetOfPointsInput, parse_set_of_points_input,
                        PointTypeInput, parse_point_input)
 from .functions import VectorFunction, AnyFunction
@@ -593,10 +594,12 @@ class Picture:
     """A picture."""
 
     axes_3d: SetOfPoints
+    svg_metadata: typing.Union[None, ElementTree.Element]
 
     def __init__(
         self, padding: sympy.core.expr.Expr = sympy.Integer(25), width: int = None,
-        height: int = None, axes_3d: SetOfPointsInput = None
+        height: int = None, axes_3d: SetOfPointsInput = None, title: str = None,
+        desc: str = None, svg_metadata: str = None, tex_comment: str = None
     ):
         """Create a picture.
 
@@ -605,6 +608,10 @@ class Picture:
             width: The width of the picture
             height: The height of the picture
             axes_3d: The axes to use when drawing a 3D object
+            title: The title of the picture
+            desc: A description of the picture
+            svg_metadata: Metadata to put at the start of the SVG file
+            tex_comment: Comment to put at the start of the TeX file
         """
         self._default_axes: SetOfPoints = (
             (sympy.Integer(1), -sympy.Rational(2, 25)),
@@ -614,6 +621,22 @@ class Picture:
         self.padding = padding
         self.height = height
         self.width = width
+        self.title = title
+        self.desc = desc
+        if svg_metadata is None:
+            self.svg_metadata = None
+        else:
+            assert isinstance(svg_metadata, str)
+            self.svg_metadata = ElementTree.fromstring(svg_metadata)
+        if tex_comment is None:
+            import symfem
+            self.tex_comment = (
+                "% This diagram was created using Symfem\n"
+                f"% {symfem.__github__}\n"
+                f"% {symfem.__citation__}\n\n")
+        else:
+            assert isinstance(tex_comment, str)
+            self.tex_comment = tex_comment
 
         if axes_3d is None:
             self.axes_3d = self._default_axes
@@ -804,6 +827,10 @@ class Picture:
 
         assert filename is None or filename.endswith(".svg")
         img = svgwrite.Drawing(filename, size=(float(width), float(height)))
+        img.set_desc(title=self.title, desc=self.desc)
+        if self.svg_metadata is not None:
+            assert isinstance(self.svg_metadata, ElementTree.Element)
+            img.set_metadata(self.svg_metadata)
 
         for e in self.elements:
             for f, args, kwargs in e.as_svg(map_pt):
@@ -828,7 +855,8 @@ class Picture:
     def as_tikz(self, filename: str = None) -> str:
         """Convert to tikz."""
         scale, height, width, map_pt = self.compute_scale("cm", False)
-        tikz = "\\begin{tikzpicture}[x=1cm,y=1cm]\n"
+        tikz = self.tex_comment
+        tikz += "\\begin{tikzpicture}[x=1cm,y=1cm]\n"
 
         inner_tikz = ""
         for e in self.elements:

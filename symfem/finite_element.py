@@ -89,7 +89,10 @@ class FiniteElement(ABC):
         else:
             raise ValueError(f"Unknown order: {order}")
 
-    def plot_basis_function(self, n: int, filename: str, width: int = None, height: int = None):
+    def plot_basis_function(
+        self, n: int, filename: str, width: int = None, height: int = None, title: str = None,
+        desc: str = None, svg_metadata: str = None, tex_comment: str = None
+    ):
         """Plot a diagram showing a basis function."""
         f = self.get_basis_functions()[n]
         values = self.tabulate_basis(self.reference.make_lattice(6), "xyz,xyz")
@@ -99,7 +102,8 @@ class FiniteElement(ABC):
             for i in row:
                 max_v = max(max_v, parse_function_input(i).norm())
         scale = 1 / max_v
-        f.plot(self.reference, filename, None, None, None, n, scale, width=width, height=height)
+        f.plot(self.reference, filename, None, None, None, n, scale, width=width, height=height,
+               title=title, desc=desc, svg_metadata=svg_metadata, tex_comment=tex_comment)
 
     @abstractmethod
     def map_to_cell(
@@ -347,7 +351,10 @@ class CiarletElement(FiniteElement):
 
         return self._basis_functions
 
-    def plot_basis_function(self, n: int, filename: str, width: int = None, height: int = None):
+    def plot_basis_function(
+        self, n: int, filename: str, width: int = None, height: int = None, title: str = None,
+        desc: str = None, svg_metadata: str = None, tex_comment: str = None
+    ):
         """Plot a diagram showing a basis function."""
         f = self.get_basis_functions()[n]
         d = self.dofs[n]
@@ -359,7 +366,8 @@ class CiarletElement(FiniteElement):
                 max_v = max(max_v, parse_function_input(i).norm())
         scale = 1 / max_v
         f.plot(self.reference, filename, d.dof_point(), d.dof_direction(), d.entity, n, scale,
-               width=width, height=height)
+               width=width, height=height, title=title, desc=desc, svg_metadata=svg_metadata,
+               tex_comment=tex_comment)
 
     def plot_dof_diagram(self, filename: str, width: int = None, height: int = None):
         """Plot a diagram showing the DOFs of the element."""
