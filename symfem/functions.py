@@ -279,14 +279,14 @@ class AnyFunction(ABC):
                 if dim == reference.tdim:
                     self.plot_values(reference, img, value_scale)
 
-                if (dim, entity) == dof_entity:
-                    if dof_direction is not None:
-                        assert dof_point is not None and dof_n is not None
-                        img.add_dof_arrow(dof_point + extra, dof_direction + extra, dof_n,
+            if (dim, entity) in ze:
+                if dof_direction is not None:
+                    assert dof_point is not None and dof_n is not None
+                    img.add_dof_arrow(dof_point + extra, dof_direction + extra, dof_n,
                                           colors.PURPLE, bold=False)
-                    elif dof_point is not None:
-                        assert dof_n is not None
-                        img.add_dof_marker(dof_point + extra, dof_n, colors.PURPLE, bold=False)
+                elif dof_point is not None:
+                    assert dof_n is not None
+                    img.add_dof_marker(dof_point + extra, dof_n, colors.PURPLE, bold=False)
 
         img.save(filename, plot_options=plot_options)
 
