@@ -622,6 +622,7 @@ class Picture:
         self.title = title
         self.desc = desc
         if svg_metadata is None:
+            import symfem
             self.svg_metadata = (
                 "<!--\n"
                 "This diagram was created using Symfem\n"
