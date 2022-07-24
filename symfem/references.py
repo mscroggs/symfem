@@ -499,15 +499,12 @@ class Reference(ABC):
         pass
 
     def plot_entity_diagrams(
-        self, filename: str, scale: int = None, width: int = None, height: int = None,
-        title: str = None, desc: str = None, svg_metadata: str = None, tex_comment: str = None,
-        plot_options: typing.Dict[str, typing.Any] = {}
+        self, filename: str, plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
     ):
         """Plot diagrams showing the entity numbering of the reference."""
         from .plotting import Picture, colors
 
-        img = Picture(scale=scale, width=width, height=height, title=title, desc=desc,
-                      svg_metadata=svg_metadata, tex_comment=tex_comment)
+        img = Picture(**kwargs)
 
         if self.tdim == 1:
             offset_unit: typing.Tuple[typing.Union[

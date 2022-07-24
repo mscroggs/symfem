@@ -596,8 +596,9 @@ class Picture:
 
     def __init__(
         self, padding: sympy.core.expr.Expr = sympy.Integer(25), scale: int = None,
-        width: int = None, height: int = None, axes_3d: SetOfPointsInput = None, title: str = None,
-        desc: str = None, svg_metadata: str = None, tex_comment: str = None
+        width: int = None, height: int = None, axes_3d: SetOfPointsInput = None,
+        dof_arrow_size: typing.Union[int, sympy.core.expr.Expr] = 1,
+        title: str = None, desc: str = None, svg_metadata: str = None, tex_comment: str = None
     ):
         """Create a picture.
 
@@ -607,6 +608,7 @@ class Picture:
             width: The width of the picture
             height: The height of the picture
             axes_3d: The axes to use when drawing a 3D object
+            dof_arrow_size: The relative length of the DOF arrows
             title: The title of the picture
             desc: A description of the picture
             svg_metadata: Metadata to put at the start of the SVG file
@@ -620,6 +622,10 @@ class Picture:
         self.padding = padding
         self.scale = sympy.Integer(scale)
         self.height = height
+        if isinstance(dof_arrow_size, int):
+            dof_arrow_size = sympy.Integer(dof_arrow_size)
+        assert isinstance(dof_arrow_size, sympy.core.expr.Expr)
+        self.dof_arrow_size = dof_arrow_size / 3
         self.width = width
         self.title = title
         self.desc = desc
@@ -743,7 +749,7 @@ class Picture:
         vdirection /= 8 * vdirection.norm()
         start = VectorFunction(self.parse_point(point))
         if shifted:
-            start += vdirection / 3
+            start += vdirection * self.dof_arrow_size
         self.add_arrow(start, start + vdirection, color)
         self.add_dof_marker(start, number, color, bold)
 
