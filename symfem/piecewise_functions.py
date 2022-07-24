@@ -375,7 +375,7 @@ class PiecewiseFunction(AnyFunction):
 
     def plot_values(
         self, reference: Reference, img: typing.Any,
-        scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
+        value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
         """Plot the function's values."""
         from .plotting import Picture
@@ -397,4 +397,4 @@ class PiecewiseFunction(AnyFunction):
                     raise ValueError("Unsupported cell type")
             else:
                 raise ValueError("Unsupported tdim")
-            f.plot_values(ref, img, scale, n // 2)
+            f.plot_values(ref, img, value_scale, n // 2)

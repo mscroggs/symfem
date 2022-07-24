@@ -595,14 +595,15 @@ class Picture:
     axes_3d: SetOfPoints
 
     def __init__(
-        self, padding: sympy.core.expr.Expr = sympy.Integer(25), width: int = None,
-        height: int = None, axes_3d: SetOfPointsInput = None, title: str = None,
+        self, padding: sympy.core.expr.Expr = sympy.Integer(25), scale: int = None,
+        width: int = None, height: int = None, axes_3d: SetOfPointsInput = None, title: str = None,
         desc: str = None, svg_metadata: str = None, tex_comment: str = None
     ):
         """Create a picture.
 
         Args:
             padding: The padding between the objects and the edge of the picture
+            scale: The amount to scale the coordinates by
             width: The width of the picture
             height: The height of the picture
             axes_3d: The axes to use when drawing a 3D object
@@ -617,6 +618,7 @@ class Picture:
             (sympy.Integer(0), sympy.Integer(1)))
         self.elements: typing.List[PictureElement] = []
         self.padding = padding
+        self.scale = sympy.Integer(scale)
         self.height = height
         self.width = width
         self.title = title
@@ -783,14 +785,17 @@ class Picture:
         maxx = max(i.maxx() for i in self.elements)
         maxy = max(i.maxy() for i in self.elements)
 
-        if self.width is not None:
-            assert self.height is None
-            scale = self.width / (maxx - minx)
-        elif self.height is not None:
+        if self.scale is not None:
             assert self.width is None
-            scale = self.height / (maxy - miny)
+            assert self.height is None
+            scale = self.scale
+        elif self.width is not None:
+            assert self.height is None
+            scale = sympy.Integer(self.width) / (maxx - minx)
+        elif self.height is not None:
+            scale = sympy.Integer(self.height) / (maxy - miny)
         else:
-            scale = 450
+            scale = sympy.Integer(450)
 
         if unit == "mm":
             scale /= 20
@@ -850,7 +855,8 @@ class Picture:
 
         return svg_string
 
-    def as_png(self, filename: str, png_scale: float = 1.0):
+    def as_png(self, filename: str, png_scale: float = None, png_width: int = None,
+               png_height: int = None):
         """Convert to a PNG."""
         try:
             from cairosvg import svg2png
@@ -858,6 +864,18 @@ class Picture:
             raise ImportError("CairoSVG is needed for plotting PNGs"
                               " (pip install CairoSVG)")
 
+        if png_scale is not None:
+            assert png_width is None
+            assert png_height is None
+        elif png_width is not None:
+            assert png_height is None
+            png_scale = png_width / float(self.compute_scale("px")[2])
+        elif png_height is not None:
+            png_scale = png_height / float(self.compute_scale("px")[1])
+        else:
+            png_scale = 1.0
+
+        assert isinstance(png_scale, float)
         assert filename.endswith(".png")
         svg2png(bytestring=self.as_svg(None), write_to=filename, scale=png_scale)
 

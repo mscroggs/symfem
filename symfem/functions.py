@@ -250,9 +250,9 @@ class AnyFunction(ABC):
     def plot(
         self, reference: Reference, filename: str, dof_point: PointType = None,
         dof_direction: PointType = None, dof_entity: typing.Tuple[int, int] = None,
-        dof_n: int = None, scale: sympy.core.expr.Expr = sympy.Integer(1),
-        width: int = None, height: int = None, title: str = None, desc: str = None,
-        svg_metadata: str = None, tex_comment: str = None,
+        dof_n: int = None, value_scale: sympy.core.expr.Expr = sympy.Integer(1),
+        scale: int = None, width: int = None, height: int = None, title: str = None,
+        desc: str = None, svg_metadata: str = None, tex_comment: str = None,
         plot_options: typing.Dict[str, typing.Any] = {}
     ):
         """Plot the function."""
@@ -262,7 +262,7 @@ class AnyFunction(ABC):
         if self.is_scalar:
             extra = (0, )
 
-        img = Picture(width=width, height=height, title=title, desc=desc,
+        img = Picture(scale=scale, width=width, height=height, title=title, desc=desc,
                       svg_metadata=svg_metadata, tex_comment=tex_comment)
 
         if dof_entity is not None and dof_entity[0] > 1:
@@ -280,7 +280,7 @@ class AnyFunction(ABC):
                         reference.vertices[reference.edges[entity][1]] + extra, c)
 
                 if dim == reference.tdim:
-                    self.plot_values(reference, img, scale)
+                    self.plot_values(reference, img, value_scale)
 
                 if (dim, entity) == dof_entity:
                     if dof_direction is not None:
@@ -295,7 +295,7 @@ class AnyFunction(ABC):
 
     def plot_values(
         self, reference: Reference, img: typing.Any,
-        scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
+        value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
         """Plot the function's values."""
         raise ValueError(f"Cannot plot function of type '{self.__class__.__name__}'")
@@ -557,7 +557,7 @@ class ScalarFunction(AnyFunction):
 
     def plot_values(
         self, reference: Reference, img: typing.Any,
-        scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
+        value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
         """Plot the function's values."""
         from .plotting import Picture, colors
@@ -565,12 +565,12 @@ class ScalarFunction(AnyFunction):
 
         pts, pairs = reference.make_lattice_with_lines(n)
 
-        scale *= sympy.Rational(5, 8)
+        value_scale *= sympy.Rational(5, 8)
 
         deriv = self.grad(reference.tdim)
         evals = []
         for p in pts:
-            value = self.subs(x, p).as_sympy() * scale
+            value = self.subs(x, p).as_sympy() * value_scale
             assert isinstance(value, sympy.core.expr.Expr)
             evals.append(value)
 
@@ -584,8 +584,8 @@ class ScalarFunction(AnyFunction):
             assert isinstance(di, sympy.core.expr.Expr)
             assert isinstance(dj, sympy.core.expr.Expr)
             img.add_bezier(
-                tuple(pi) + (evals[i], ), tuple(d_pi) + (evals[i] + di * scale, ),
-                tuple(d_pj) + (evals[j] + dj * scale, ), tuple(pj) + (evals[j], ),
+                tuple(pi) + (evals[i], ), tuple(d_pi) + (evals[i] + di * value_scale, ),
+                tuple(d_pj) + (evals[j] + dj * value_scale, ), tuple(pj) + (evals[j], ),
                 colors.ORANGE)
 
 
@@ -828,7 +828,7 @@ class VectorFunction(AnyFunction):
 
     def plot_values(
         self, reference: Reference, img: typing.Any,
-        scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
+        value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
         """Plot the function's values."""
         from .plotting import Picture, colors
@@ -837,7 +837,7 @@ class VectorFunction(AnyFunction):
         pts = reference.make_lattice(n)
 
         for p in pts:
-            value = self.subs(x, p) * scale / 4
+            value = self.subs(x, p) * value_scale / 4
             size = float(value.norm() * 40)
             img.add_arrow(p, VectorFunction(p) + value, colors.ORANGE, size)
 
