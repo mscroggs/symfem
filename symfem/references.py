@@ -8,6 +8,11 @@ from .geometry import (PointType, PointTypeInput, SetOfPoints, SetOfPointsInput,
                        parse_set_of_points_input, parse_point_input)
 from .symbols import t, x, AxisVariablesNotSingle
 
+LatticeWithLines = typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]
+IntLimits = typing.List[typing.Union[
+    typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
+    typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr]]]
+
 
 def _vsub(v: PointTypeInput, w: PointTypeInput) -> PointType:
     """Subtract.
@@ -169,9 +174,7 @@ class Reference(ABC):
         pass
 
     @abstractmethod
-    def make_lattice_with_lines(
-        self, n: int
-    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+    def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
 
         Args:
@@ -216,10 +219,7 @@ class Reference(ABC):
         return tuple(pt)
 
     @abstractmethod
-    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
-    ]]:
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> IntLimits:
         """Get the limits for an integral over this reference.
 
         Args:
@@ -498,11 +498,13 @@ class Reference(ABC):
         """
         pass
 
-    def plot_entity_diagrams(self, filename: str, width: int = None, height: int = None):
+    def plot_entity_diagrams(
+        self, filename: str, plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
+    ):
         """Plot diagrams showing the entity numbering of the reference."""
         from .plotting import Picture, colors
 
-        img = Picture(width=width, height=height)
+        img = Picture(**kwargs)
 
         if self.tdim == 1:
             offset_unit: typing.Tuple[typing.Union[
@@ -558,15 +560,13 @@ class Reference(ABC):
                         ref = self.sub_entity(dim, n)
                         img.add_ncircle(offset(ref.midpoint(), current_dim), n, colors.entity(dim))
 
-        img.save(filename)
+        img.save(filename, plot_options)
 
 
 class Point(Reference):
     """A point."""
 
-    def __init__(
-        self, vertices: SetOfPointsInput = (tuple(), )
-    ):
+    def __init__(self, vertices: SetOfPointsInput = ((), )):
         """Create a point.
 
         Args:
@@ -577,12 +577,12 @@ class Point(Reference):
             tdim=0,
             name="point",
             origin=vertices[0],
-            axes=tuple(),
-            reference_vertices=(tuple(), ),
+            axes=(),
+            reference_vertices=((), ),
             vertices=vertices,
-            edges=tuple(),
-            faces=tuple(),
-            volumes=tuple(),
+            edges=(),
+            faces=(),
+            volumes=(),
             sub_entity_types=["point", None, None, None],
             simplex=True, tp=True)
 
@@ -605,9 +605,7 @@ class Point(Reference):
         """
         raise NotImplementedError()
 
-    def make_lattice_with_lines(
-        self, n: int
-    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+    def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
 
         Args:
@@ -619,10 +617,7 @@ class Point(Reference):
         """
         raise NotImplementedError()
 
-    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
-    ]]:
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> IntLimits:
         """Get the limits for an integral over this reference.
 
         Args:
@@ -698,9 +693,7 @@ class Point(Reference):
 class Interval(Reference):
     """An interval."""
 
-    def __init__(
-        self, vertices: SetOfPointsInput = ((0,), (1,))
-    ):
+    def __init__(self, vertices: SetOfPointsInput = ((0,), (1,))):
         """Create an interval.
 
         Args:
@@ -715,8 +708,8 @@ class Interval(Reference):
             reference_vertices=((0,), (1,)),
             vertices=vertices,
             edges=((0, 1),),
-            faces=tuple(),
-            volumes=tuple(),
+            faces=(),
+            volumes=(),
             sub_entity_types=["point", "interval", None, None],
             simplex=True, tp=True)
 
@@ -740,9 +733,7 @@ class Interval(Reference):
         assert self.vertices == self.reference_vertices
         return tuple((sympy.Rational(2 * i + 1, 2 * (n + 1)), ) for i in range(n))
 
-    def make_lattice_with_lines(
-        self, n: int
-    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+    def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
 
         Args:
@@ -757,10 +748,7 @@ class Interval(Reference):
         pairs = [(i, i + 1) for i in range(n - 1)]
         return pts, pairs
 
-    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
-    ]]:
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> IntLimits:
         """Get the limits for an integral over this reference.
 
         Args:
@@ -841,9 +829,7 @@ class Interval(Reference):
 class Triangle(Reference):
     """A triangle."""
 
-    def __init__(
-        self, vertices: SetOfPointsInput = ((0, 0), (1, 0), (0, 1))
-    ):
+    def __init__(self, vertices: SetOfPointsInput = ((0, 0), (1, 0), (0, 1))):
         """Create a triangle.
 
         Args:
@@ -859,7 +845,7 @@ class Triangle(Reference):
             vertices=vertices,
             edges=((1, 2), (0, 2), (0, 1)),
             faces=((0, 1, 2),),
-            volumes=tuple(),
+            volumes=(),
             sub_entity_types=["point", "interval", "triangle", None],
             simplex=True)
 
@@ -885,9 +871,7 @@ class Triangle(Reference):
             for o, a0, a1 in zip(self.origin, *self.axes)
         ) for i in range(n) for j in range(n - i))
 
-    def make_lattice_with_lines(
-        self, n: int
-    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+    def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
 
         Args:
@@ -924,10 +908,7 @@ class Triangle(Reference):
         """
         return [[(1, 0), (1, 1)], [(0, 2)], [(2, 0), (1, 2), (0, 0), (0, 1)]]
 
-    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
-    ]]:
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> IntLimits:
         """Get the limits for an integral over this reference.
 
         Args:
@@ -1022,9 +1003,7 @@ class Triangle(Reference):
 class Tetrahedron(Reference):
     """A tetrahedron."""
 
-    def __init__(
-        self, vertices: SetOfPointsInput = ((0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1))
-    ):
+    def __init__(self, vertices: SetOfPointsInput = ((0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1))):
         """Create a tetrahedron.
 
         Args:
@@ -1091,9 +1070,7 @@ class Tetrahedron(Reference):
             for o, a0, a1, a2 in zip(self.origin, *self.axes)
         ) for i in range(n) for j in range(n - i) for k in range(n - i - j))
 
-    def make_lattice_with_lines(
-        self, n: int
-    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+    def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
 
         Args:
@@ -1105,10 +1082,7 @@ class Tetrahedron(Reference):
         """
         raise NotImplementedError()
 
-    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
-    ]]:
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> IntLimits:
         """Get the limits for an integral over this reference.
 
         Args:
@@ -1204,9 +1178,7 @@ class Tetrahedron(Reference):
 class Quadrilateral(Reference):
     """A quadrilateral."""
 
-    def __init__(
-        self, vertices: SetOfPointsInput = ((0, 0), (1, 0), (0, 1), (1, 1))
-    ):
+    def __init__(self, vertices: SetOfPointsInput = ((0, 0), (1, 0), (0, 1), (1, 1))):
         """Create a quadrilateral.
 
         Args:
@@ -1222,7 +1194,7 @@ class Quadrilateral(Reference):
             vertices=vertices,
             edges=((0, 1), (0, 2), (1, 3), (2, 3)),
             faces=((0, 1, 2, 3),),
-            volumes=tuple(),
+            volumes=(),
             sub_entity_types=["point", "interval", "quadrilateral", None],
             tp=True)
 
@@ -1257,9 +1229,7 @@ class Quadrilateral(Reference):
             for o, a0, a1 in zip(self.origin, *self.axes)
         ) for i in range(n + 1) for j in range(n + 1))
 
-    def make_lattice_with_lines(
-        self, n: int
-    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+    def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
 
         Args:
@@ -1293,10 +1263,7 @@ class Quadrilateral(Reference):
         """
         return [[(1, 3), (1, 1), (0, 2)], [(2, 0)], [(1, 2), (0, 3), (1, 0), (0, 0), (0, 1)]]
 
-    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
-    ]]:
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> IntLimits:
         """Get the limits for an integral over this reference.
 
         Args:
@@ -1411,9 +1378,8 @@ class Quadrilateral(Reference):
 class Hexahedron(Reference):
     """A hexahedron."""
 
-    def __init__(
-        self, vertices: SetOfPointsInput = ((0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0),
-                                            (0, 0, 1), (1, 0, 1), (0, 1, 1), (1, 1, 1))
+    def __init__(self, vertices: SetOfPointsInput = (
+        (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0), (0, 0, 1), (1, 0, 1), (0, 1, 1), (1, 1, 1))
     ):
         """Create a hexahedron.
 
@@ -1492,9 +1458,7 @@ class Hexahedron(Reference):
             sympy.Rational(2 * k + 1, 2 * (n + 1))
         ) for i in range(n + 1) for j in range(n + 1) for k in range(n + 1))
 
-    def make_lattice_with_lines(
-        self, n: int
-    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+    def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
 
         Args:
@@ -1506,10 +1470,7 @@ class Hexahedron(Reference):
         """
         raise NotImplementedError()
 
-    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
-    ]]:
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> IntLimits:
         """Get the limits for an integral over this reference.
 
         Args:
@@ -1619,9 +1580,8 @@ class Hexahedron(Reference):
 class Prism(Reference):
     """A (triangular) prism."""
 
-    def __init__(
-        self, vertices: SetOfPointsInput = ((0, 0, 0), (1, 0, 0), (0, 1, 0),
-                                            (0, 0, 1), (1, 0, 1), (0, 1, 1))
+    def __init__(self, vertices: SetOfPointsInput = (
+        (0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (1, 0, 1), (0, 1, 1))
     ):
         """Create a prism.
 
@@ -1703,9 +1663,7 @@ class Prism(Reference):
             sympy.Rational(2 * k + 1, 2 * (n + 1))
         ) for i in range(n + 1) for j in range(n + 1 - i) for k in range(n + 1))
 
-    def make_lattice_with_lines(
-        self, n: int
-    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+    def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
 
         Args:
@@ -1717,10 +1675,7 @@ class Prism(Reference):
         """
         raise NotImplementedError()
 
-    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
-    ]]:
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> IntLimits:
         """Get the limits for an integral over this reference.
 
         Args:
@@ -1827,9 +1782,8 @@ class Prism(Reference):
 class Pyramid(Reference):
     """A (square-based) pyramid."""
 
-    def __init__(
-        self, vertices: SetOfPointsInput = ((0, 0, 0), (1, 0, 0), (0, 1, 0),
-                                            (1, 1, 0), (0, 0, 1))
+    def __init__(self, vertices: SetOfPointsInput = (
+        (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0), (0, 0, 1))
     ):
         """Create a pyramid.
 
@@ -1905,9 +1859,7 @@ class Pyramid(Reference):
         """
         raise NotImplementedError()
 
-    def make_lattice_with_lines(
-        self, n: int
-    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+    def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
 
         Args:
@@ -1919,10 +1871,7 @@ class Pyramid(Reference):
         """
         raise NotImplementedError()
 
-    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
-    ]]:
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> IntLimits:
         """Get the limits for an integral over this reference.
 
         Args:
@@ -2035,10 +1984,7 @@ class DualPolygon(Reference):
 
     reference_origin: PointType
 
-    def __init__(
-        self, number_of_triangles: int,
-        vertices: SetOfPointsInput = None
-    ):
+    def __init__(self, number_of_triangles: int, vertices: SetOfPointsInput = None):
         """Create a dual polygon.
 
         Args:
@@ -2068,14 +2014,14 @@ class DualPolygon(Reference):
         super().__init__(
             tdim=2,
             name="dual polygon",
-            axes=tuple(),
+            axes=(),
             origin=origin,
             vertices=vertices,
             reference_vertices=tuple(reference_vertices),
             edges=tuple((i, (i + 1) % (2 * number_of_triangles))
                         for i in range(2 * number_of_triangles)),
             faces=(tuple(range(2 * number_of_triangles)), ),
-            volumes=tuple(),
+            volumes=(),
             sub_entity_types=["point", "interval", f"dual polygon({number_of_triangles})", None],
 
         )
@@ -2091,10 +2037,7 @@ class DualPolygon(Reference):
         """
         raise NotImplementedError()
 
-    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> typing.List[typing.Union[
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
-    ]]:
+    def integration_limits(self, vars: AxisVariablesNotSingle = t) -> IntLimits:
         """Get the limits for an integral over this reference.
 
         Args:
@@ -2170,15 +2113,13 @@ class DualPolygon(Reference):
         """
         assert self.vertices == self.reference_vertices
         from .create import create_reference
-        lattice: SetOfPoints = tuple()
+        lattice: SetOfPoints = ()
         for v1, v2 in zip(self.vertices, self.vertices[1:] + (self.vertices[0], )):
             ref = create_reference("triangle", (self.origin, v1, v2))
             lattice += ref.make_lattice(n // 2)
         return lattice
 
-    def make_lattice_with_lines(
-        self, n: int
-    ) -> typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]:
+    def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
 
         Args:

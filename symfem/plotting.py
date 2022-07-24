@@ -14,6 +14,29 @@ SVGFormat = typing.List[typing.Tuple[
     str, typing.Tuple[typing.Any, ...], typing.Dict[str, typing.Any]]]
 
 
+def tex_font_size(n: int):
+    """Convert a font size to a tex size command."""
+    if n < 21:
+        return "\\tiny"
+    if n < 24:
+        return "\\scriptsize"
+    if n < 27:
+        return "\\footnotesize"
+    if n < 30:
+        return "\\small"
+    if n < 33:
+        return "\\normalsize"
+    if n < 36:
+        return "\\large"
+    if n < 39:
+        return "\\Large"
+    if n < 42:
+        return "\\LARGE"
+    if n < 45:
+        return "\\huge"
+    return "\\Huge"
+
+
 class Colors:
     """Class storing colours used in diagrams."""
 
@@ -24,6 +47,10 @@ class Colors:
     GREEN = "#55FF00"
     PURPLE = "#DD2299"
     GRAY = "#AAAAAA"
+
+    def __init__(self):
+        """Initialise."""
+        self._tikz = {}
 
     def entity(self, n: int) -> str:
         """Get the color used for an entity of a given dimension.
@@ -43,6 +70,22 @@ class Colors:
         if n == 3:
             return self.PURPLE
         raise ValueError(f"Unsupported dimension: {n}")
+
+    def get_tikz_name(self, name: str) -> str:
+        """Get the name of the colour to be used in Tikz."""
+        if name.startswith("#"):
+            if name not in self._tikz:
+                self._tikz[name] = f"customcolor{len(self._tikz)}"
+            return self._tikz[name]
+        return name
+
+    def get_tikz_definitions(self) -> str:
+        """Get the definitions of colours used in Tikz."""
+        out = ""
+        for a, b in self._tikz.items():
+            assert a.startswith("#")
+            out += f"\\definecolor{{{b}}}{{HTML}}{{{a[1:]}}}\n"
+        return out
 
 
 colors = Colors()
@@ -66,6 +109,20 @@ class PictureElement(ABC):
 
         Returns:
             A list of svgwrite functions to call, with args tuples and kwargs dictionaries
+        """
+        pass
+
+    @abstractmethod
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> str:
+        """Return Tikz format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A Tikz string
         """
         pass
 
@@ -148,6 +205,22 @@ class Line(PictureElement):
             "line", (map_pt(self.start), map_pt(self.end)),
             {"stroke": self.color, "stroke_width": self.width, "stroke_linecap": "round"})]
 
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> str:
+        """Return Tikz format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A Tikz string
+        """
+        s = map_pt(self.start)
+        e = map_pt(self.end)
+        return (f"\\draw[{colors.get_tikz_name(self.color)},line width={self.width * 0.2}pt,"
+                f"line cap=round] ({s[0]},{s[1]}) -- ({e[0]},{e[1]});\n")
+
     @property
     def points(self) -> SetOfPoints:
         """Get set of points used by this element.
@@ -194,15 +267,34 @@ class Bezier(PictureElement):
         Returns:
             A list of svgwrite functions to call, with args tuples and kwargs dictionaries
         """
-        a = map_pt(self.start)
-        b = map_pt(self.mid1)
-        c = map_pt(self.mid2)
-        d = map_pt(self.end)
+        s = map_pt(self.start)
+        m1 = map_pt(self.mid1)
+        m2 = map_pt(self.mid2)
+        e = map_pt(self.end)
         return [(
             "path", tuple(),
-            {"d": (f"M{a[0]},{a[1]} C{b[0]},{b[1]}, {c[0]},{c[1]}, {d[0]},{d[1]}"),
+            {"d": (f"M{s[0]},{s[1]} C{m1[0]},{m1[1]}, {m2[0]},{m2[1]}, {e[0]},{e[1]}"),
              "stroke": self.color, "stroke_width": self.width, "stroke_linecap": "round",
              "fill": "none"})]
+
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> str:
+        """Return Tikz format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A Tikz string
+        """
+        s = map_pt(self.start)
+        m1 = map_pt(self.mid1)
+        m2 = map_pt(self.mid2)
+        e = map_pt(self.end)
+        return (f"\\draw[{colors.get_tikz_name(self.color)},line width={self.width * 0.2}pt,"
+                f"line cap=round] ({s[0]},{s[1]}) .. controls ({m1[0]},{m1[1]}) "
+                f"and ({m2[0]},{m2[1]}) .. ({e[0]},{e[1]});\n")
 
     @property
     def points(self) -> SetOfPoints:
@@ -266,6 +358,23 @@ class Arrow(PictureElement):
                 "line", (map_pt(pt_s), map_pt(self.end)),
                 {"stroke": self.color, "stroke_width": self.width, "stroke_linecap": "round"}))
         return out
+
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> str:
+        """Return Tikz format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A Tikz string
+        """
+        s = map_pt(self.start)
+        e = map_pt(self.end)
+        return (f"\\draw[-stealth,{colors.get_tikz_name(self.color)},"
+                f"line width={self.width * 0.2}pt,line cap=round] "
+                f"({s[0]},{s[1]}) -- ({e[0]},{e[1]});\n")
 
     @property
     def points(self) -> SetOfPoints:
@@ -339,6 +448,24 @@ class NCircle(PictureElement):
 
         return out
 
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> str:
+        """Return Tikz format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A Tikz string
+        """
+        c = map_pt(self.centre)
+        return (f"\\draw[{colors.get_tikz_name(self.color)},line width={self.width * 0.2}pt,"
+                f"fill={colors.get_tikz_name(self.fill_color)}] "
+                f"({c[0]},{c[1]}) circle ({self.radius * 0.2}pt);\n"
+                f"\\node[{colors.get_tikz_name(self.text_color)},anchor=center] "
+                f"at ({c[0]},{c[1]}) {{{tex_font_size(self.font_size)} {self.number}}};")
+
     @property
     def points(self) -> SetOfPoints:
         """Get set of points used by this element.
@@ -377,6 +504,21 @@ class Fill(PictureElement):
         """
         return [("polygon", (tuple(map_pt(p) for p in self.vertices), ),
                 {"fill": self.color, "opacity": self.opacity})]
+
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> str:
+        """Return Tikz format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A Tikz string
+        """
+        vs = [map_pt(v) for v in self.vertices]
+        return (f"\\fill[{colors.get_tikz_name(self.color)},opacity={self.opacity}]"
+                " " + " -- ".join([f"({v[0]},{v[1]})" for v in vs]) + " -- cycle;")
 
     @property
     def points(self) -> SetOfPoints:
@@ -422,6 +564,21 @@ class Math(PictureElement):
              "style": "text-anchor:middle;dominant-baseline:middle;"
                       "font-family:'CMU Serif',serif;font-style:italic"})]
 
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> str:
+        """Return Tikz format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A Tikz string
+        """
+        p = map_pt(self.point)
+        return (f"\\node[{colors.get_tikz_name(self.color)},anchor=center] "
+                f"at ({p[0]},{p[1]}) {{{tex_font_size(self.font_size)}${self.math}$}};")
+
     @property
     def points(self) -> SetOfPoints:
         """Get set of points used by this element.
@@ -438,16 +595,24 @@ class Picture:
     axes_3d: SetOfPoints
 
     def __init__(
-        self, padding: sympy.core.expr.Expr = sympy.Integer(25), width: int = None,
-        height: int = None, axes_3d: SetOfPointsInput = None
+        self, padding: sympy.core.expr.Expr = sympy.Integer(25), scale: int = None,
+        width: int = None, height: int = None, axes_3d: SetOfPointsInput = None,
+        dof_arrow_size: typing.Union[int, sympy.core.expr.Expr] = 1,
+        title: str = None, desc: str = None, svg_metadata: str = None, tex_comment: str = None
     ):
         """Create a picture.
 
         Args:
             padding: The padding between the objects and the edge of the picture
+            scale: The amount to scale the coordinates by
             width: The width of the picture
             height: The height of the picture
             axes_3d: The axes to use when drawing a 3D object
+            dof_arrow_size: The relative length of the DOF arrows
+            title: The title of the picture
+            desc: A description of the picture
+            svg_metadata: Metadata to put at the start of the SVG file
+            tex_comment: Comment to put at the start of the TeX file
         """
         self._default_axes: SetOfPoints = (
             (sympy.Integer(1), -sympy.Rational(2, 25)),
@@ -455,8 +620,36 @@ class Picture:
             (sympy.Integer(0), sympy.Integer(1)))
         self.elements: typing.List[PictureElement] = []
         self.padding = padding
+        self.scale = scale
         self.height = height
+        if isinstance(dof_arrow_size, int):
+            self.dof_arrow_size = sympy.Integer(dof_arrow_size)
+        else:
+            assert isinstance(dof_arrow_size, sympy.core.expr.Expr)
+            self.dof_arrow_size = dof_arrow_size
         self.width = width
+        self.title = title
+        self.desc = desc
+        if svg_metadata is None:
+            import symfem
+            self.svg_metadata = (
+                "<!--\n"
+                "This diagram was created using Symfem\n"
+                f"{symfem.__github__}\n"
+                f"{symfem.__citation__}\n"
+                "-->\n")
+        else:
+            assert isinstance(svg_metadata, str)
+            self.svg_metadata = svg_metadata
+        if tex_comment is None:
+            import symfem
+            self.tex_comment = (
+                "% This diagram was created using Symfem\n"
+                f"% {symfem.__github__}\n"
+                f"% {symfem.__citation__}\n\n")
+        else:
+            assert isinstance(tex_comment, str)
+            self.tex_comment = tex_comment
 
         if axes_3d is None:
             self.axes_3d = self._default_axes
@@ -555,6 +748,7 @@ class Picture:
         """Add a DOF arrow."""
         vdirection = VectorFunction(self.parse_point(direction))
         vdirection /= 8 * vdirection.norm()
+        vdirection *= self.dof_arrow_size
         start = VectorFunction(self.parse_point(point))
         if shifted:
             start += vdirection / 3
@@ -589,6 +783,55 @@ class Picture:
         """Add a filled polygon to the picture."""
         self.elements.append(Fill(tuple(self.parse_point(p) for p in vertices), color, opacity))
 
+    def compute_scale(self, unit: str = "px", reverse_y: bool = True) -> typing.Tuple[
+        sympy.core.expr.Expr, sympy.core.expr.Expr, sympy.core.expr.Expr,
+        typing.Callable[[PointType], typing.Tuple[float, float]]
+    ]:
+        """Compute the scale and size of the picture."""
+        minx = min(i.minx() for i in self.elements)
+        miny = min(i.miny() for i in self.elements)
+        maxx = max(i.maxx() for i in self.elements)
+        maxy = max(i.maxy() for i in self.elements)
+
+        if self.scale is not None:
+            assert self.width is None
+            assert self.height is None
+            scale = sympy.Integer(self.scale)
+        elif self.width is not None:
+            assert self.height is None
+            scale = sympy.Integer(self.width) / (maxx - minx)
+        elif self.height is not None:
+            scale = sympy.Integer(self.height) / (maxy - miny)
+        else:
+            scale = sympy.Integer(450)
+
+        if unit == "mm":
+            scale /= 20
+        elif unit == "cm":
+            scale /= 200
+        elif unit == "px":
+            pass
+        else:
+            raise ValueError(f"Unknown unit: {unit}")
+
+        width = 2 * self.padding + (maxx - minx) * scale
+        height = 2 * self.padding + (maxy - miny) * scale
+
+        if reverse_y:
+            def map_pt(pt: PointType) -> typing.Tuple[float, float]:
+                """Map a point."""
+                return (
+                    float(self.padding + (pt[0] - minx) * scale),
+                    float(height - self.padding - (pt[1] - miny) * scale))
+        else:
+            def map_pt(pt: PointType) -> typing.Tuple[float, float]:
+                """Map a point."""
+                return (
+                    float(self.padding + (pt[0] - minx) * scale),
+                    float(self.padding + (pt[1] - miny) * scale))
+
+        return scale, height, width, map_pt
+
     def as_svg(self, filename: str = None) -> str:
         """Convert to an SVG."""
         try:
@@ -597,42 +840,31 @@ class Picture:
             raise ImportError("svgwrite is needed for plotting SVGs"
                               " (pip install svgwrite)")
 
-        minx = min(i.minx() for i in self.elements)
-        miny = min(i.miny() for i in self.elements)
-        maxx = max(i.maxx() for i in self.elements)
-        maxy = max(i.maxy() for i in self.elements)
-
-        if self.width is not None:
-            assert self.height is None
-            scale = self.width / (maxx - minx)
-        elif self.height is not None:
-            assert self.width is None
-            scale = self.height / (maxy - miny)
-        else:
-            scale = 450
-
-        width = 2 * self.padding + (maxx - minx) * scale
-        height = 2 * self.padding + (maxy - miny) * scale
+        scale, height, width, map_pt = self.compute_scale("px")
 
         assert filename is None or filename.endswith(".svg")
         img = svgwrite.Drawing(filename, size=(float(width), float(height)))
-
-        def map_pt(pt: PointType) -> typing.Tuple[float, float]:
-            """Map a point."""
-            return (
-                float(self.padding + (pt[0] - minx) * scale),
-                float(height - self.padding - (pt[1] - miny) * scale))
+        img.set_desc(title=self.title, desc=self.desc)
 
         for e in self.elements:
-            for f, args, kwargs in e.as_svg(map_pt):
-                img.add(getattr(img, f)(*args, **kwargs))
+            for func, args, kwargs in e.as_svg(map_pt):
+                img.add(getattr(img, func)(*args, **kwargs))
+
+        svg_string = img.tostring()
+
+        a, b = svg_string.split("<svg", 1)
+        c, d = b.split(">", 1)
+
+        svg_string = a + "<svg" + c + ">" + self.svg_metadata + d
 
         if filename is not None:
-            img.save()
+            with open(filename, "w") as f:
+                f.write(svg_string)
 
-        return img.tostring()
+        return svg_string
 
-    def as_png(self, filename: str):
+    def as_png(self, filename: str, png_scale: float = None, png_width: int = None,
+               png_height: int = None):
         """Convert to a PNG."""
         try:
             from cairosvg import svg2png
@@ -640,15 +872,49 @@ class Picture:
             raise ImportError("CairoSVG is needed for plotting PNGs"
                               " (pip install CairoSVG)")
 
-        assert filename.endswith(".png")
-        svg2png(bytestring=self.as_svg(None), write_to=filename)
+        if png_scale is not None:
+            assert png_width is None
+            assert png_height is None
+        elif png_width is not None:
+            assert png_height is None
+            png_scale = png_width / float(self.compute_scale("px")[2])
+        elif png_height is not None:
+            png_scale = png_height / float(self.compute_scale("px")[1])
+        else:
+            png_scale = 1.0
 
-    def save(self, filename: str):
+        assert isinstance(png_scale, float)
+        assert filename.endswith(".png")
+        svg2png(bytestring=self.as_svg(None), write_to=filename, scale=png_scale)
+
+    def as_tikz(self, filename: str = None) -> str:
+        """Convert to tikz."""
+        scale, height, width, map_pt = self.compute_scale("cm", False)
+        tikz = self.tex_comment
+        tikz += "\\begin{tikzpicture}[x=1cm,y=1cm]\n"
+
+        inner_tikz = ""
+        for e in self.elements:
+            inner_tikz += e.as_tikz(map_pt)
+
+        tikz += colors.get_tikz_definitions() + inner_tikz
+
+        tikz += "\\end{tikzpicture}\n"
+
+        if filename is not None:
+            with open(filename, "w") as f:
+                f.write(tikz)
+
+        return tikz
+
+    def save(self, filename: str, plot_options: typing.Dict[str, typing.Any] = {}):
         """Save the picture as a file."""
         if filename.endswith(".svg"):
-            self.as_svg(filename)
+            self.as_svg(filename, **plot_options)
         elif filename.endswith(".png"):
-            self.as_png(filename)
+            self.as_png(filename, **plot_options)
+        elif filename.endswith(".tex"):
+            self.as_tikz(filename, **plot_options)
         else:
             if "." in filename:
                 ext = "." + filename.split(".")[-1]

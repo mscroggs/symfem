@@ -190,7 +190,7 @@ class SubbedBasisFunction(BasisFunction):
 
     def plot_values(
         self, reference: Reference, img: typing.Any,
-        scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
+        value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
         """Plot the function's values."""
-        self.f.plot_values(reference, img, scale, n)
+        self.f.plot_values(reference, img, value_scale, n)

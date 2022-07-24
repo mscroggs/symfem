@@ -89,7 +89,9 @@ class FiniteElement(ABC):
         else:
             raise ValueError(f"Unknown order: {order}")
 
-    def plot_basis_function(self, n: int, filename: str, width: int = None, height: int = None):
+    def plot_basis_function(
+        self, n: int, filename: str, **kwargs: typing.Any
+    ):
         """Plot a diagram showing a basis function."""
         f = self.get_basis_functions()[n]
         values = self.tabulate_basis(self.reference.make_lattice(6), "xyz,xyz")
@@ -98,8 +100,8 @@ class FiniteElement(ABC):
             assert isinstance(row, tuple)
             for i in row:
                 max_v = max(max_v, parse_function_input(i).norm())
-        scale = 1 / max_v
-        f.plot(self.reference, filename, None, None, None, n, scale, width=width, height=height)
+        value_scale = 1 / max_v
+        f.plot(self.reference, filename, None, None, None, n, value_scale, **kwargs)
 
     @abstractmethod
     def map_to_cell(
@@ -347,7 +349,9 @@ class CiarletElement(FiniteElement):
 
         return self._basis_functions
 
-    def plot_basis_function(self, n: int, filename: str, width: int = None, height: int = None):
+    def plot_basis_function(
+        self, n: int, filename: str, **kwargs: typing.Any
+    ):
         """Plot a diagram showing a basis function."""
         f = self.get_basis_functions()[n]
         d = self.dofs[n]
@@ -357,15 +361,15 @@ class CiarletElement(FiniteElement):
             assert isinstance(row, tuple)
             for i in row:
                 max_v = max(max_v, parse_function_input(i).norm())
-        scale = 1 / max_v
-        f.plot(self.reference, filename, d.dof_point(), d.dof_direction(), d.entity, n, scale,
-               width=width, height=height)
+        value_scale = 1 / max_v
+        f.plot(self.reference, filename, d.dof_point(), d.dof_direction(), d.entity, n,
+               value_scale, **kwargs)
 
-    def plot_dof_diagram(self, filename: str, width: int = None, height: int = None):
+    def plot_dof_diagram(
+        self, filename: str, plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
+    ):
         """Plot a diagram showing the DOFs of the element."""
-        assert filename.endswith(".svg") or filename.endswith(".png")
-
-        img = Picture(width=width, height=height)
+        img = Picture(**kwargs)
 
         dofs_by_subentity: typing.Dict[int, typing.Dict[int, ListOfFunctionals]] = {
             i: {j: [] for j in range(self.reference.sub_entity_count(i))}
@@ -402,7 +406,7 @@ class CiarletElement(FiniteElement):
                         img.add_dof_marker(
                             d.dof_point(), self.dofs.index(d), colors.entity(d.entity[0]))
 
-        img.save(filename)
+        img.save(filename, plot_options=plot_options)
 
     def map_to_cell(
         self, vertices_in: SetOfPointsInput, basis: typing.List[AnyFunction] = None,
