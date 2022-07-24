@@ -252,7 +252,8 @@ class AnyFunction(ABC):
         dof_direction: PointType = None, dof_entity: typing.Tuple[int, int] = None,
         dof_n: int = None, scale: sympy.core.expr.Expr = sympy.Integer(1),
         width: int = None, height: int = None, title: str = None, desc: str = None,
-        svg_metadata: str = None, tex_comment: str = None
+        svg_metadata: str = None, tex_comment: str = None,
+        plot_options: typing.Dict[str, typing.Any] = {}
     ):
         """Plot the function."""
         from .plotting import Picture, colors
@@ -290,7 +291,7 @@ class AnyFunction(ABC):
                         assert dof_n is not None
                         img.add_dof_marker(dof_point + extra, dof_n, colors.PURPLE, bold=False)
 
-        img.save(filename)
+        img.save(filename, plot_options=plot_options)
 
     def plot_values(
         self, reference: Reference, img: typing.Any,
