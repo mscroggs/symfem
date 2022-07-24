@@ -175,6 +175,8 @@ class Line(PictureElement):
         """
         s = map_pt(self.start)
         e = map_pt(self.end)
+        # TODO: color
+        # TODO: width
         return f"\\draw ({s[0]},{s[1]}) -- ({e[0]},{e[1]});\n"
 
     @property
@@ -295,6 +297,23 @@ class Arrow(PictureElement):
                 "line", (map_pt(pt_s), map_pt(self.end)),
                 {"stroke": self.color, "stroke_width": self.width, "stroke_linecap": "round"}))
         return out
+
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> SVGFormat:
+        """Return Tikz format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A Tikz string
+        """
+        s = map_pt(self.start)
+        e = map_pt(self.end)
+        # TODO: color
+        # TODO: width
+        return f"\\arrow ({s[0]},{s[1]}) -- ({e[0]},{e[1]});\n"
 
     @property
     def points(self) -> SetOfPoints:
