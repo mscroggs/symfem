@@ -560,15 +560,18 @@ class ScalarFunction(AnyFunction):
         from .plotting import Picture, colors
         assert isinstance(img, Picture)
 
-        pts, pairs = reference.make_lattice_with_lines(n)
+        pts, pairs = reference.make_lattice_with_lines_float(n)
 
         value_scale *= sympy.Rational(5, 8)
+        value_scale = sympy.Float(float(value_scale))
 
         deriv = self.grad(reference.tdim)
         evals = []
         for p in pts:
-            value = self.subs(x, p).as_sympy() * value_scale
+            value = self.subs(x, p).as_sympy()
             assert isinstance(value, sympy.core.expr.Expr)
+            value = sympy.Float(float(value))
+            value *= value_scale
             evals.append(value)
 
         for i, j in pairs:
@@ -831,10 +834,14 @@ class VectorFunction(AnyFunction):
         from .plotting import Picture, colors
         assert isinstance(img, Picture)
 
-        pts = reference.make_lattice(n)
+        pts = reference.make_lattice_float(n)
+        value_scale = sympy.Float(float(value_scale)) / 4
 
         for p in pts:
-            value = self.subs(x, p) * value_scale / 4
+            value_s = self.subs(x, p).as_sympy()
+            assert isinstance(value_s, tuple)
+            value = VectorFunction(tuple(sympy.Float(float(v)) for v in value_s))
+            value *= value_scale
             size = float(value.norm() * 40)
             img.add_arrow(p, VectorFunction(p) + value, colors.ORANGE, size)
 

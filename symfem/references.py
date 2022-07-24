@@ -186,6 +186,30 @@ class Reference(ABC):
         """
         pass
 
+    def make_lattice_float(self, n: int) -> SetOfPoints:
+        """Make a lattice of points.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points offset from the edge of the cell
+        """
+        return tuple(tuple(sympy.Float(float(i)) for i in p) for p in self.make_lattice(n))
+
+    def make_lattice_with_lines_float(self, n: int) -> LatticeWithLines:
+        """Make a lattice of points, and a list of lines connecting them.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points including the edges of the cell
+            Pairs of point numbers that make a mesh of lines across the cell
+        """
+        pts, pairs = self.make_lattice_with_lines(n)
+        return tuple(tuple(sympy.Float(float(i)) for i in p) for p in pts), pairs
+
     def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
         """Get the subentities of the cell in back-to-front plotting order.
 
@@ -884,6 +908,52 @@ class Triangle(Reference):
         pts = tuple(tuple(
             o + (i * a0 + j * a1) / (n - 1)
             for o, a0, a1 in zip(self.origin, *self.axes)
+        ) for i in range(n) for j in range(n - i))
+        pairs = []
+        s = 0
+        for j in range(n-1, 0, -1):
+            pairs += [(i, i + 1) for i in range(s, s + j)]
+            s += j + 1
+        for k in range(n + 1):
+            s = k
+            for i in range(n, k, -1):
+                if i != k + 1:
+                    pairs += [(s, s + i)]
+                if k != 0:
+                    pairs += [(s, s + i - 1)]
+                s += i
+        return pts, pairs
+
+    def make_lattice_float(self, n: int) -> SetOfPoints:
+        """Make a lattice of points.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points offset from the edge of the cell
+        """
+        origin = tuple(sympy.Float(float(i)) for i in self.origin)
+        axes = tuple(tuple(sympy.Float(float(i)) for i in a) for a in self.axes)
+        return tuple(tuple(
+            o + ((2 * i + 1) * a0 + (2 * j + 1) * a1) / 2 / (n + 1)
+            for o, a0, a1 in zip(origin, *axes)
+        ) for i in range(n) for j in range(n - i))
+
+    def make_lattice_with_lines_float(self, n: int) -> LatticeWithLines:
+        """Make a lattice of points, and a list of lines connecting them.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points including the edges of the cell
+            Pairs of point numbers that make a mesh of lines across the cell
+        """
+        origin = tuple(sympy.Float(float(i)) for i in self.origin)
+        axes = tuple(tuple(sympy.Float(float(i)) for i in a) for a in self.axes)
+        pts = tuple(tuple(
+            o + (i * a0 + j * a1) / (n - 1) for o, a0, a1 in zip(origin, *axes)
         ) for i in range(n) for j in range(n - i))
         pairs = []
         s = 0
