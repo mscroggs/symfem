@@ -282,7 +282,7 @@ class NCircle(PictureElement):
 
     def __init__(
         self, centre: PointType, number: int, color: str, text_color: str, fill_color: str,
-        radius: float, font_size: typing.Union[int, None], width: float
+        radius: float, font_size: typing.Union[int, None], width: float, font: str
     ):
         """Create a circle containing a number.
 
@@ -295,6 +295,7 @@ class NCircle(PictureElement):
             radius: The radius of the circle
             font_size: The font size
             width: The width of the line
+            font: The font to use for the number
         """
         self.centre = centre
         self.number = number
@@ -302,6 +303,7 @@ class NCircle(PictureElement):
         self.text_color = text_color
         self.fill_color = fill_color
         self.radius = radius
+        self.font = font
         if font_size is None:
             if number < 10:
                 self.font_size = 25
@@ -333,7 +335,7 @@ class NCircle(PictureElement):
         out.append((
             "text", (f"{self.number}", map_pt(self.centre)),
             {"fill": self.text_color, "font_size": self.font_size,
-             "style": "text-anchor:middle;dominant-baseline:middle;font-family:sans-serif"}))
+             "style": f"text-anchor:middle;dominant-baseline:middle;font-family:{self.font}"}))
 
         return out
 
@@ -386,14 +388,58 @@ class Fill(PictureElement):
         return self.vertices
 
 
+class Math(PictureElement):
+    """A mathematical symbol."""
+
+    def __init__(self, point: PointType, math: str, color: str, font_size: int):
+        """Create a filled polygon.
+
+        Args:
+            point: The centre point to put the math
+            math: The math
+            color: The color of the math
+            font_size: The font size
+        """
+        self.point = parse_point_input(point)
+        self.math = math
+        self.color = color
+        self.font_size = font_size
+
+    def as_svg(
+        self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
+    ) -> SVGFormat:
+        """Return SVG format.
+
+        Args:
+            map_pt: A function that adjust the origin and scales the picture
+
+        Returns:
+            A list of svgwrite functions to call, with args tuples and kwargs dictionaries
+        """
+        return [(
+            "text", (f"{self.math}", map_pt(self.point)),
+            {"fill": self.color, "font_size": self.font_size,
+             "style": "text-anchor:middle;dominant-baseline:middle;"
+                      "font-family:'CMU Serif',serif;font-style:italic"})]
+
+    @property
+    def points(self) -> SetOfPoints:
+        """Get set of points used by this element.
+
+        Returns:
+            A set of points
+        """
+        return (self.point, )
+
+
 class Picture:
     """A picture."""
 
     axes_3d: SetOfPoints
 
     def __init__(
-        self, padding: sympy.core.expr.Expr = sympy.Integer(25), width=None, height=None,
-        axes_3d: SetOfPointsInput = None
+        self, padding: sympy.core.expr.Expr = sympy.Integer(25), width: int = None,
+        height: int = None, axes_3d: SetOfPointsInput = None
     ):
         """Create a picture.
 
@@ -518,12 +564,24 @@ class Picture:
     def add_ncircle(
         self, centre: PointOrFunction, number: int, color: str = "red",
         text_color: str = colors.BLACK, fill_color: str = colors.WHITE, radius: float = 20.0,
-        font_size: int = None, width: float = 4.0
+        font_size: int = None, width: float = 4.0, font: str = "'Varela Round',sans-serif"
     ):
         """Add a numbered circle to the picture."""
         self.elements.append(NCircle(
             self.parse_point(centre), number, color, text_color, fill_color, radius, font_size,
-            width))
+            width, font))
+
+    def add_math(self, point: PointTypeInput, math: str, color: str = colors.BLACK,
+                 font_size: int = 35):
+        """Create mathematical symbol.
+
+        Args:
+            point: The centre point to put the math
+            math: The math
+            color: The color of the math
+            font_size: The font size
+        """
+        self.elements.append(Math(self.parse_point(point), math, color, font_size))
 
     def add_fill(
         self, vertices: SetOfPointsOrFunctions, color: str = "red", opacity: float = 1.0
