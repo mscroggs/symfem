@@ -3,7 +3,6 @@
 import sympy
 import typing
 from abc import ABC, abstractmethod
-from xml.etree import ElementTree
 from .geometry import (PointType, SetOfPoints, SetOfPointsInput, parse_set_of_points_input,
                        PointTypeInput, parse_point_input)
 from .functions import VectorFunction, AnyFunction
@@ -594,7 +593,6 @@ class Picture:
     """A picture."""
 
     axes_3d: SetOfPoints
-    svg_metadata: typing.Union[None, ElementTree.Element]
 
     def __init__(
         self, padding: sympy.core.expr.Expr = sympy.Integer(25), width: int = None,
@@ -624,10 +622,10 @@ class Picture:
         self.title = title
         self.desc = desc
         if svg_metadata is None:
-            self.svg_metadata = None
+            self.svg_metadata = ""
         else:
             assert isinstance(svg_metadata, str)
-            self.svg_metadata = ElementTree.fromstring(svg_metadata)
+            self.svg_metadata = svg_metadata
         if tex_comment is None:
             import symfem
             self.tex_comment = (
@@ -828,18 +826,23 @@ class Picture:
         assert filename is None or filename.endswith(".svg")
         img = svgwrite.Drawing(filename, size=(float(width), float(height)))
         img.set_desc(title=self.title, desc=self.desc)
-        if self.svg_metadata is not None:
-            assert isinstance(self.svg_metadata, ElementTree.Element)
-            img.set_metadata(self.svg_metadata)
 
         for e in self.elements:
             for f, args, kwargs in e.as_svg(map_pt):
                 img.add(getattr(img, f)(*args, **kwargs))
 
-        if filename is not None:
-            img.save()
+        svg_string = img.tostring()
 
-        return img.tostring()
+        a, b = svg_string.split("<svg", 1)
+        c, d = b.split(">", 1)
+
+        svg_string = a + "<svg" + c + ">" + self.svg_metadata + d
+
+        if filename is not None:
+            with open(filename, "w") as f:
+                f.write(svg_string)
+
+        return svg_string
 
     def as_png(self, filename: str):
         """Convert to a PNG."""

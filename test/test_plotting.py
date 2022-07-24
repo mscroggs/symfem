@@ -186,3 +186,34 @@ def test_plot_reference(reference):
         r.plot_entity_diagrams(os.path.join(
             folder, f"test_plot_reference-{rname}.{ext}"))
     compile_tex(f"test_plot_reference-{rname}.tex")
+
+
+def test_metadata():
+    img = symfem.plotting.Picture(svg_metadata=(
+        "<metadata id='license'>\n"
+        " <rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' "
+        "xmlns:dc='http://purl.org/dc/elements/1.1/' "
+        "xmlns:cc='http://web.resource.org/cc/'>\n"
+        "   <cc:Work rdf:about=''>\n"
+        "     <dc:title>Title</dc:title>\n"
+        "     <dc:date>1970-01-01</dc:date>\n"
+        "     <dc:creator>\n"
+        "       <cc:Agent><dc:title>Symfem</dc:title></cc:Agent>\n"
+        "     </dc:creator>\n"
+        "     <dc:description>See document description</dc:description>\n"
+        "     <cc:license rdf:resource='http://creativecommons.org/licenses/by/4.0/'/>\n"
+        "     <dc:format>image/svg+xml</dc:format>\n"
+        "     <dc:type rdf:resource='http://purl.org/dc/dcmitype/StillImage'/>\n"
+        "   </cc:Work>\n"
+        "   <cc:License rdf:about='http://creativecommons.org/licenses/by/4.0/'>\n"
+        "     <cc:permits rdf:resource='http://web.resource.org/cc/Reproduction'/>\n"
+        "     <cc:permits rdf:resource='http://web.resource.org/cc/Distribution'/>\n"
+        "     <cc:permits rdf:resource='http://web.resource.org/cc/DerivativeWorks'/>\n"
+        "     <cc:requires rdf:resource='http://web.resource.org/cc/Notice'/>\n"
+        "     <cc:requires rdf:resource='http://web.resource.org/cc/Attribution'/>\n"
+        "   </cc:License>\n"
+        " </rdf:RDF>\n"
+        "</metadata>\n"))
+    img.add_line((sympy.Integer(0), sympy.Integer(0)),
+                 (sympy.Integer(1), sympy.Integer(1)), symfem.plotting.colors.ORANGE)
+    img.save(os.path.join(folder, f"test_metadata.svg"))
