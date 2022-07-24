@@ -94,13 +94,13 @@ class FiniteElement(ABC):
     ):
         """Plot a diagram showing a basis function."""
         f = self.get_basis_functions()[n]
-        values = self.tabulate_basis(self.reference.make_lattice(6), "xyz,xyz")
-        max_v = sympy.Integer(0)
+        values = self.tabulate_basis(self.reference.make_lattice_float(6), "xyz,xyz")
+        max_v = 0.0
         for row in values:
             assert isinstance(row, tuple)
             for i in row:
-                max_v = max(max_v, parse_function_input(i).norm())
-        value_scale = 1 / max_v
+                max_v = max(float(parse_function_input(i).norm()) for row in values for i in row)
+        value_scale = 1 / sympy.Float(max_v)
         f.plot(self.reference, filename, None, None, None, n, value_scale, **kwargs)
 
     @abstractmethod
