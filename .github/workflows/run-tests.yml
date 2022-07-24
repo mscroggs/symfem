@@ -28,7 +28,7 @@ jobs:
       - name: Install LaTeΧ
         run: |
           sudo apt-get update
-          sudo apt-get install -y texlive-latex-base
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra
 
 
       - run: python3 -m pytest --durations=50 test/test_plotting.py -x -W error
