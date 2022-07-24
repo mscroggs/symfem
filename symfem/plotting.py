@@ -834,8 +834,8 @@ class Picture:
         img.set_desc(title=self.title, desc=self.desc)
 
         for e in self.elements:
-            for func, args, kwargs in e.as_svg(map_pt):
-                img.add(getattr(img, func)(*args, **kwargs))
+            for f, args, kwargs in e.as_svg(map_pt):
+                img.add(getattr(img, f)(*args, **kwargs))
 
         svg_string = img.tostring()
 
@@ -850,7 +850,7 @@ class Picture:
 
         return svg_string
 
-    def as_png(self, filename: str, png_scale: float = 1.0):
+    def as_png(self, filename: str):
         """Convert to a PNG."""
         try:
             from cairosvg import svg2png
@@ -859,7 +859,7 @@ class Picture:
                               " (pip install CairoSVG)")
 
         assert filename.endswith(".png")
-        svg2png(bytestring=self.as_svg(None), write_to=filename, scale=png_scale)
+        svg2png(bytestring=self.as_svg(None), write_to=filename)
 
     def as_tikz(self, filename: str = None) -> str:
         """Convert to tikz."""
@@ -881,14 +881,14 @@ class Picture:
 
         return tikz
 
-    def save(self, filename: str, plot_options: typing.Dict[str, typing.Any]):
+    def save(self, filename: str):
         """Save the picture as a file."""
         if filename.endswith(".svg"):
-            self.as_svg(filename, **plot_options)
+            self.as_svg(filename)
         elif filename.endswith(".png"):
-            self.as_png(filename, **plot_options)
+            self.as_png(filename)
         elif filename.endswith(".tex"):
-            self.as_tikz(filename, **plot_options)
+            self.as_tikz(filename)
         else:
             if "." in filename:
                 ext = "." + filename.split(".")[-1]

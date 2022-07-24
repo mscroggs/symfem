@@ -500,8 +500,7 @@ class Reference(ABC):
 
     def plot_entity_diagrams(
         self, filename: str, width: int = None, height: int = None, title: str = None,
-        desc: str = None, svg_metadata: str = None, tex_comment: str = None,
-        plot_options: typing.Dict[str, typing.Any] = {}
+        desc: str = None, svg_metadata: str = None, tex_comment: str = None
     ):
         """Plot diagrams showing the entity numbering of the reference."""
         from .plotting import Picture, colors
@@ -563,7 +562,7 @@ class Reference(ABC):
                         ref = self.sub_entity(dim, n)
                         img.add_ncircle(offset(ref.midpoint(), current_dim), n, colors.entity(dim))
 
-        img.save(filename, plot_options)
+        img.save(filename)
 
 
 class Point(Reference):
