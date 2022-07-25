@@ -14,8 +14,8 @@ SetOfPointsInput = typing.Union[
     typing.List[PointTypeInput]]
 
 
-def _is_close(a: sympy.core.expr.Expr, b: sympy.core.expr.Expr) -> bool:
-    """Check if two sympy values are close."""
+def _is_close(a: sympy.core.expr.Expr, b: int) -> bool:
+    """Check if a Sympy expression is close to an int."""
     return abs(a - b) < 1e-8
 
 
