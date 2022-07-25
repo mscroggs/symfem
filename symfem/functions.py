@@ -226,6 +226,11 @@ class AnyFunction(ABC):
         """Compute the integral of the function."""
         pass
 
+    @abstractmethod
+    def with_floats(self) -> AnyFunction:
+        """Return a version the function with floats as coefficients."""
+        pass
+
     def integrate(self, *limits: typing.Tuple[
         sympy.core.symbol.Symbol,
         typing.Union[int, sympy.core.expr.Expr],
@@ -248,7 +253,8 @@ class AnyFunction(ABC):
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'shape'")
 
     def plot(
-        self, reference: Reference, filename: str, dof_point: PointType = None,
+        self, reference: Reference, filename: typing.Union[str, typing.List[str]],
+        dof_point: PointType = None,
         dof_direction: PointType = None, dof_entity: typing.Tuple[int, int] = None,
         dof_n: int = None, value_scale: sympy.core.expr.Expr = sympy.Integer(1),
         plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
@@ -365,6 +371,8 @@ class ScalarFunction(AnyFunction):
         else:
             self._f = f
         assert isinstance(self._f, sympy.core.expr.Expr)
+        self._plot_beziers: typing.Dict[typing.Tuple[Reference, int], typing.List[
+            typing.Tuple[PointType, PointType, PointType, PointType]]] = {}
 
     def __add__(self, other: typing.Any) -> ScalarFunction:
         """Add."""
@@ -560,30 +568,44 @@ class ScalarFunction(AnyFunction):
         from .plotting import Picture, colors
         assert isinstance(img, Picture)
 
-        pts, pairs = reference.make_lattice_with_lines(n)
+        if (reference, n) not in self._plot_beziers:
+            self._plot_beziers[(reference, n)] = []
+            pts, pairs = reference.make_lattice_with_lines_float(n)
 
-        value_scale *= sympy.Rational(5, 8)
+            value_scale *= sympy.Rational(5, 8)
+            value_scale = sympy.Float(float(value_scale))
 
-        deriv = self.grad(reference.tdim)
-        evals = []
-        for p in pts:
-            value = self.subs(x, p).as_sympy() * value_scale
-            assert isinstance(value, sympy.core.expr.Expr)
-            evals.append(value)
+            deriv = self.grad(reference.tdim)
+            evals = []
+            for p in pts:
+                value = self.subs(x, p).as_sympy()
+                assert isinstance(value, sympy.core.expr.Expr)
+                value = sympy.Float(float(value))
+                value *= value_scale
+                evals.append(value)
 
-        for i, j in pairs:
-            pi = VectorFunction(pts[i])
-            pj = VectorFunction(pts[j])
-            d_pi = (2 * pi + pj) / 3
-            d_pj = (2 * pj + pi) / 3
-            di = deriv.subs(x, pi).dot(d_pi - pts[i]).as_sympy()
-            dj = deriv.subs(x, pj).dot(d_pj - pts[j]).as_sympy()
-            assert isinstance(di, sympy.core.expr.Expr)
-            assert isinstance(dj, sympy.core.expr.Expr)
-            img.add_bezier(
-                tuple(pi) + (evals[i], ), tuple(d_pi) + (evals[i] + di * value_scale, ),
-                tuple(d_pj) + (evals[j] + dj * value_scale, ), tuple(pj) + (evals[j], ),
-                colors.ORANGE)
+            for i, j in pairs:
+                pi = VectorFunction(pts[i])
+                pj = VectorFunction(pts[j])
+                d_pi = (2 * pi + pj) / 3
+                d_pj = (2 * pj + pi) / 3
+                di = deriv.subs(x, pi).dot(d_pi - pts[i]).as_sympy()
+                dj = deriv.subs(x, pj).dot(d_pj - pts[j]).as_sympy()
+                assert isinstance(di, sympy.core.expr.Expr)
+                assert isinstance(dj, sympy.core.expr.Expr)
+                self._plot_beziers[(reference, n)].append((
+                    tuple(pi) + (evals[i], ), tuple(d_pi) + (evals[i] + di * value_scale, ),
+                    tuple(d_pj) + (evals[j] + dj * value_scale, ), tuple(pj) + (evals[j], )))
+
+        for s, m1, m2, e in self._plot_beziers[(reference, n)]:
+            img.add_bezier(s, m1, m2, e, colors.ORANGE)
+
+    def with_floats(self) -> AnyFunction:
+        """Return a version the function with floats as coefficients."""
+        out = sympy.Float(0.0)
+        for term, co in self._f.as_coefficients_dict().items():
+            out += float(co) * term
+        return ScalarFunction(out)
 
 
 class VectorFunction(AnyFunction):
@@ -614,6 +636,9 @@ class VectorFunction(AnyFunction):
         self._vec = tuple(vec_l)
         for i in self._vec:
             assert i.is_scalar
+
+        self._plot_arrows: typing.Dict[typing.Tuple[Reference, int], typing.List[
+            typing.Tuple[typing.Tuple[sympy.core.expr.Expr, ...], VectorFunction, float]]] = {}
 
     def __len__(self):
         """Get the length of the vector."""
@@ -831,12 +856,24 @@ class VectorFunction(AnyFunction):
         from .plotting import Picture, colors
         assert isinstance(img, Picture)
 
-        pts = reference.make_lattice(n)
+        if (reference, n) not in self._plot_arrows:
+            self._plot_arrows[(reference, n)] = []
+            pts = reference.make_lattice_float(n)
+            value_scale /= 4
 
-        for p in pts:
-            value = self.subs(x, p) * value_scale / 4
-            size = float(value.norm() * 40)
-            img.add_arrow(p, VectorFunction(p) + value, colors.ORANGE, size)
+            for p in pts:
+                value_s = self.subs(x, p).as_sympy()
+                assert isinstance(value_s, tuple)
+                value = VectorFunction(tuple(sympy.Float(float(v)) for v in value_s))
+                value *= value_scale
+                size = float(value.norm() * 40)
+                self._plot_arrows[(reference, n)].append((p, VectorFunction(p) + value, size))
+        for p, q, size in self._plot_arrows[(reference, n)]:
+            img.add_arrow(p, q, colors.ORANGE, size)
+
+    def with_floats(self) -> AnyFunction:
+        """Return a version the function with floats as coefficients."""
+        return VectorFunction(tuple(f.with_floats() for f in self._vec))
 
 
 class MatrixFunction(AnyFunction):
@@ -1130,6 +1167,10 @@ class MatrixFunction(AnyFunction):
         mat = self.as_sympy()
         assert isinstance(mat, sympy.matrices.dense.MutableDenseMatrix)
         return MatrixFunction(mat.transpose())
+
+    def with_floats(self) -> AnyFunction:
+        """Return a version the function with floats as coefficients."""
+        return MatrixFunction(tuple(tuple(f.with_floats() for f in row) for row in self._mat))
 
 
 FunctionInput = typing.Union[

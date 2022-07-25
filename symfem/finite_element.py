@@ -36,6 +36,9 @@ class NoTensorProduct(Exception):
 class FiniteElement(ABC):
     """Abstract finite element."""
 
+    _float_basis_functions: typing.Union[None, typing.List[AnyFunction]]
+    _value_scale: typing.Union[None, sympy.core.expr.Expr]
+
     def __init__(
         self, reference: Reference, order: int, space_dim: int, domain_dim: int, range_dim: int,
         range_shape: typing.Tuple[int, ...] = None
@@ -47,6 +50,8 @@ class FiniteElement(ABC):
         self.domain_dim = domain_dim
         self.range_dim = range_dim
         self.range_shape = range_shape
+        self._float_basis_functions = None
+        self._value_scale = None
 
     @abstractmethod
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
@@ -89,19 +94,31 @@ class FiniteElement(ABC):
         else:
             raise ValueError(f"Unknown order: {order}")
 
+    def tabulate_basis_float(self, points_in: SetOfPointsInput) -> TabulatedBasis:
+        """Evaluate the basis functions of the element at the given points in xyz,xyz order."""
+        if self._float_basis_functions is None:
+            self._float_basis_functions = [b.with_floats() for b in self.get_basis_functions()]
+
+        assert self._float_basis_functions is not None
+        points = parse_set_of_points_input(points_in)
+        return [tuple(b.subs(x, p).as_sympy() for b in self._float_basis_functions) for p in points]
+
     def plot_basis_function(
-        self, n: int, filename: str, **kwargs: typing.Any
+        self, n: int, filename: typing.Union[str, typing.List[str]], **kwargs: typing.Any
     ):
         """Plot a diagram showing a basis function."""
+        if self._value_scale is None:
+            max_v = 0.0
+            values = self.tabulate_basis_float(self.reference.make_lattice_float(6))
+            for row in values:
+                assert isinstance(row, tuple)
+                for i in row:
+                    max_v = max(max_v, float(parse_function_input(i).norm()))
+            self._value_scale = 1 / sympy.Float(max_v)
+
         f = self.get_basis_functions()[n]
-        values = self.tabulate_basis(self.reference.make_lattice(6), "xyz,xyz")
-        max_v = sympy.Integer(0)
-        for row in values:
-            assert isinstance(row, tuple)
-            for i in row:
-                max_v = max(max_v, parse_function_input(i).norm())
-        value_scale = 1 / max_v
-        f.plot(self.reference, filename, None, None, None, n, value_scale, **kwargs)
+        assert self._value_scale is not None
+        f.plot(self.reference, filename, None, None, None, n, self._value_scale, **kwargs)
 
     @abstractmethod
     def map_to_cell(
@@ -350,23 +367,27 @@ class CiarletElement(FiniteElement):
         return self._basis_functions
 
     def plot_basis_function(
-        self, n: int, filename: str, **kwargs: typing.Any
+        self, n: int, filename: typing.Union[str, typing.List[str]], **kwargs: typing.Any
     ):
         """Plot a diagram showing a basis function."""
+        if self._value_scale is None:
+            values = self.tabulate_basis_float(self.reference.make_lattice_float(6))
+            max_v = 0.0
+            for row in values:
+                assert isinstance(row, tuple)
+                for i in row:
+                    max_v = max(max_v, float(parse_function_input(i).norm()))
+            self._value_scale = 1 / sympy.Float(max_v)
+
         f = self.get_basis_functions()[n]
         d = self.dofs[n]
-        values = self.tabulate_basis(self.reference.make_lattice(6), "xyz,xyz")
-        max_v = sympy.Integer(0)
-        for row in values:
-            assert isinstance(row, tuple)
-            for i in row:
-                max_v = max(max_v, parse_function_input(i).norm())
-        value_scale = 1 / max_v
+        assert self._value_scale is not None
         f.plot(self.reference, filename, d.dof_point(), d.dof_direction(), d.entity, n,
-               value_scale, **kwargs)
+               self._value_scale, **kwargs)
 
     def plot_dof_diagram(
-        self, filename: str, plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
+        self, filename: typing.Union[str, typing.List[str]],
+        plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
     ):
         """Plot a diagram showing the DOFs of the element."""
         img = Picture(**kwargs)

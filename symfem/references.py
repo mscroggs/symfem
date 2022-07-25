@@ -186,6 +186,30 @@ class Reference(ABC):
         """
         pass
 
+    def make_lattice_float(self, n: int) -> SetOfPoints:
+        """Make a lattice of points.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points offset from the edge of the cell
+        """
+        return tuple(tuple(sympy.Float(float(i)) for i in p) for p in self.make_lattice(n))
+
+    def make_lattice_with_lines_float(self, n: int) -> LatticeWithLines:
+        """Make a lattice of points, and a list of lines connecting them.
+
+        Args:
+            n: The number of points along each edge
+
+        Returns:
+            A lattice of points including the edges of the cell
+            Pairs of point numbers that make a mesh of lines across the cell
+        """
+        pts, pairs = self.make_lattice_with_lines(n)
+        return tuple(tuple(sympy.Float(float(i)) for i in p) for p in pts), pairs
+
     def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
         """Get the subentities of the cell in back-to-front plotting order.
 
@@ -499,7 +523,8 @@ class Reference(ABC):
         pass
 
     def plot_entity_diagrams(
-        self, filename: str, plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
+        self, filename: typing.Union[str, typing.List[str]],
+        plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
     ):
         """Plot diagrams showing the entity numbering of the reference."""
         from .plotting import Picture, colors

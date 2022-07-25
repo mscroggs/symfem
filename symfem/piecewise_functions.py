@@ -398,3 +398,8 @@ class PiecewiseFunction(AnyFunction):
             else:
                 raise ValueError("Unsupported tdim")
             f.plot_values(ref, img, value_scale, n // 2)
+
+    def with_floats(self) -> AnyFunction:
+        """Return a version the function with floats as coefficients."""
+        return PiecewiseFunction(
+            {shape: f.with_floats() for shape, f in self._pieces.items()}, self.tdim)
