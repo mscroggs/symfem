@@ -14,7 +14,7 @@ SetOfPointsInput = typing.Union[
     typing.List[PointTypeInput]]
 
 
-def is_close(a: sympy.core.expr.Expr, b: sympy.core.expr.Expr) -> bool:
+def _is_close(a: sympy.core.expr.Expr, b: sympy.core.expr.Expr) -> bool:
     """Check if two sympy values are close."""
     return abs(a - b) < 1e-8
 
@@ -66,11 +66,11 @@ def point_in_triangle(point: PointType, triangle: SetOfPoints) -> bool:
 
     uv = u + v
 
-    if isinstance(u, sympy.Float) and isclose(u, 0):
+    if isinstance(u, sympy.Float) and _is_close(u, 0):
         u = sympy.Integer(0)
-    if isinstance(v, sympy.Float) and isclose(v, 0):
+    if isinstance(v, sympy.Float) and _is_close(v, 0):
         v = sympy.Integer(0)
-    if isinstance(uv, sympy.Float) and isclose(uv, 1):
+    if isinstance(uv, sympy.Float) and _is_close(uv, 1):
         uv = sympy.Integer(1)
 
     return u >= 0 and v >= 0 and uv <= 1
@@ -93,13 +93,13 @@ def point_in_quadrilateral(point: PointType, quad: SetOfPoints) -> bool:
     d2 = _vdot(n2, _vsub(point, quad[1]))
     d3 = _vdot(n3, _vsub(point, quad[3]))
 
-    if isinstance(d0, sympy.Float) and isclose(d0, 0):
+    if isinstance(d0, sympy.Float) and _is_close(d0, 0):
         d0 = sympy.Integer(0)
-    if isinstance(d1, sympy.Float) and isclose(d1, 0):
+    if isinstance(d1, sympy.Float) and _is_close(d1, 0):
         d1 = sympy.Integer(0)
-    if isinstance(d2, sympy.Float) and isclose(d2, 0):
+    if isinstance(d2, sympy.Float) and _is_close(d2, 0):
         d2 = sympy.Integer(0)
-    if isinstance(d3, sympy.Float) and isclose(d3, 0):
+    if isinstance(d3, sympy.Float) and _is_close(d3, 0):
         d3 = sympy.Integer(0)
 
     return d0 >= 0 and d1 >= 0 and d2 >= 0 and d3 >= 0
@@ -141,13 +141,13 @@ def point_in_tetrahedron(point: PointType, tetrahedron: SetOfPoints) -> bool:
 
     uvw = u + v + w
 
-    if isinstance(u, sympy.Float) and isclose(u, 0):
+    if isinstance(u, sympy.Float) and _is_close(u, 0):
         u = sympy.Integer(0)
-    if isinstance(v, sympy.Float) and isclose(v, 0):
+    if isinstance(v, sympy.Float) and _is_close(v, 0):
         v = sympy.Integer(0)
-    if isinstance(w, sympy.Float) and isclose(w, 0):
+    if isinstance(w, sympy.Float) and _is_close(w, 0):
         w = sympy.Integer(0)
-    if isinstance(uvw, sympy.Float) and isclose(uvw, 1):
+    if isinstance(uvw, sympy.Float) and _is_close(uvw, 1):
         uvw = sympy.Integer(1)
 
     return u >= 0 and v >= 0 and w >= 0 and uvw <= 1
