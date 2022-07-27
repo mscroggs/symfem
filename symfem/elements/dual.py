@@ -99,6 +99,24 @@ class DualCiarletElement(FiniteElement):
         """Get the numbers of the DOFs associated with the given entity."""
         raise NotImplementedError()
 
+    def plot_dof_diagram(
+        self, filename: typing.Union[str, typing.List[str]],
+        plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
+    ):
+        """Plot a diagram showing the DOFs of the element."""
+        img = Picture(**kwargs)
+
+        for entities in self.reference.z_ordered_entities():
+            for dim, e in entities:
+                if dim == 1:
+                    pts = tuple(self.reference.vertices[i] for i in self.reference.edges[e])
+                    img.add_line(pts[0], pts[1], colors.BLACK)
+
+        # TODO: plot DOFs
+
+        img.save(filename, plot_options=plot_options)
+
+
 
 class Dual(DualCiarletElement):
     """Barycentric dual finite element."""
