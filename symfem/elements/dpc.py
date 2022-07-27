@@ -1,11 +1,14 @@
 """DPC elements on tensor product cells."""
 
-import sympy
 import typing
 from itertools import product
-from ..functionals import PointEvaluation, DotPointEvaluation, ListOfFunctionals
-from ..functions import FunctionInput
+
+import sympy
+
 from ..finite_element import CiarletElement
+from ..functionals import (DotPointEvaluation, ListOfFunctionals,
+                           PointEvaluation)
+from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d, polynomial_set_vector
 from ..references import Reference
 from .lagrange import Lagrange

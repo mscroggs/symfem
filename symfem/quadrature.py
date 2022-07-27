@@ -1,7 +1,8 @@
 """Quadrature definitions."""
 
-import sympy
 import typing
+
+import sympy
 
 Scalar = typing.Union[sympy.core.expr.Expr, int]
 

@@ -1,6 +1,7 @@
 """Test Bernstein elements."""
 
 import pytest
+
 import symfem
 
 

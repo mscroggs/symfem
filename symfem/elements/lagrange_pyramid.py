@@ -4,11 +4,13 @@ This element's definition appears in https://doi.org/10.1007/s10915-009-9334-9
 (Bergot, Cohen, Durufle, 2010)
 """
 
-import sympy
 import typing
 from itertools import product
+
+import sympy
+
 from ..finite_element import CiarletElement
-from ..functionals import PointEvaluation, ListOfFunctionals
+from ..functionals import ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..polynomials import pyramid_polynomial_set_1d
 from ..quadrature import get_quadrature

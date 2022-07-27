@@ -1,12 +1,15 @@
 """Test polynomials."""
 
+from random import choice
+
 import pytest
 import sympy
-from random import choice
-from symfem import create_reference, create_element
+
+from symfem import create_element, create_reference
 from symfem.functions import VectorFunction
-from symfem.polynomials import Hdiv_polynomials, Hcurl_polynomials, orthogonal_basis
-from symfem.symbols import x, t
+from symfem.polynomials import (Hcurl_polynomials, Hdiv_polynomials,
+                                orthogonal_basis)
+from symfem.symbols import t, x
 
 
 @pytest.mark.parametrize("reference", ["triangle", "tetrahedron"])

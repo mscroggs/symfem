@@ -1,7 +1,9 @@
 """Test that basis functions agree with Basix."""
 
-import pytest
 import typing
+
+import pytest
+
 from symfem import create_element
 
 elements: typing.Dict[str, typing.List[typing.Tuple[

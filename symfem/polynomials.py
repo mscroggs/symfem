@@ -1,10 +1,12 @@
 """Polynomial sets."""
 
-import sympy
 import typing
 from itertools import product
+
+import sympy
+
 from .functions import ScalarFunction, VectorFunction
-from .symbols import x, AxisVariablesNotSingle
+from .symbols import AxisVariablesNotSingle, x
 
 
 def polynomial_set_1d(

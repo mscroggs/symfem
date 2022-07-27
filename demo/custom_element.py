@@ -1,6 +1,7 @@
 """Demo showing how a custom element can be created in Symfem."""
 
 import sympy
+
 import symfem
 from symfem.finite_element import CiarletElement
 from symfem.functionals import PointEvaluation

@@ -4,13 +4,15 @@ This element's definition appears in https://doi.org/10.2307/2006147
 (Ciarlet, 1978)
 """
 
-import sympy
 import typing
+
+import sympy
+
 from ..basis_functions import BasisFunction
 from ..finite_element import CiarletElement
-from ..functionals import (PointEvaluation, PointNormalDerivativeEvaluation,
-                           DerivativePointEvaluation, ListOfFunctionals)
-from ..functions import VectorFunction, FunctionInput
+from ..functionals import (DerivativePointEvaluation, ListOfFunctionals,
+                           PointEvaluation, PointNormalDerivativeEvaluation)
+from ..functions import FunctionInput, VectorFunction
 from ..piecewise_functions import PiecewiseFunction
 from ..references import Reference
 from .hermite import Hermite

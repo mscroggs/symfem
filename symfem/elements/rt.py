@@ -5,11 +5,13 @@ This element's definition appears in https://doi.org/10.1007/BF01396415
 """
 
 import typing
+
 from ..finite_element import CiarletElement
-from ..functionals import NormalIntegralMoment, IntegralMoment, ListOfFunctionals
+from ..functionals import (IntegralMoment, ListOfFunctionals,
+                           NormalIntegralMoment)
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
-from ..polynomials import polynomial_set_vector, Hdiv_polynomials
+from ..polynomials import Hdiv_polynomials, polynomial_set_vector
 from ..references import Reference
 from .lagrange import Lagrange, VectorLagrange
 

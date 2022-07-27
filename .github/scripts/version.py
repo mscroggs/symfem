@@ -1,7 +1,8 @@
 import json
 import sys
-import github
 from datetime import datetime
+
+import github
 
 access_key = sys.argv[-1]
 

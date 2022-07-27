@@ -4,11 +4,14 @@ This element's definition appears in https://doi.org/10.1007/978-3-642-23099-8_3
 (Kirby, Logg, Rognes, Terrel, 2012)
 """
 
-import sympy
 import typing
 from itertools import product
+
+import sympy
+
 from ..finite_element import CiarletElement
-from ..functionals import PointEvaluation, DotPointEvaluation, ListOfFunctionals
+from ..functionals import (DotPointEvaluation, ListOfFunctionals,
+                           PointEvaluation)
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d, quolynomial_set_1d
 from ..references import Reference

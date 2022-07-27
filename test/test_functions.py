@@ -1,7 +1,8 @@
 """Test function classes."""
 
 import sympy
-from symfem.functions import ScalarFunction, VectorFunction, MatrixFunction
+
+from symfem.functions import MatrixFunction, ScalarFunction, VectorFunction
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.symbols import x
 

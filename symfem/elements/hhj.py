@@ -5,8 +5,10 @@ This element's definition appears in https://arxiv.org/abs/1909.09687
 """
 
 import typing
+
 from ..finite_element import CiarletElement
-from ..functionals import NormalInnerProductIntegralMoment, IntegralMoment, ListOfFunctionals
+from ..functionals import (IntegralMoment, ListOfFunctionals,
+                           NormalInnerProductIntegralMoment)
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector

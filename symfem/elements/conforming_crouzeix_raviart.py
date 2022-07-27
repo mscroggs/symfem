@@ -4,10 +4,12 @@ This element's definition appears in https://doi.org/10.1051/m2an/197307R300331
 (Crouzeix, Raviart, 1973)
 """
 
-import sympy
 import typing
+
+import sympy
+
 from ..finite_element import CiarletElement
-from ..functionals import PointEvaluation, ListOfFunctionals
+from ..functionals import ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
 from ..references import Reference

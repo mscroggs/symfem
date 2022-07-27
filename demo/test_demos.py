@@ -1,7 +1,8 @@
 """Run the demos."""
 
-import pytest
 import os
+
+import pytest
 
 
 @pytest.mark.parametrize("file", [

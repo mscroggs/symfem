@@ -1,10 +1,11 @@
 """Draw the symfem logo."""
 
-from math import sqrt
-import svgwrite
-import typing
 import os
 import sys
+import typing
+from math import sqrt
+
+import svgwrite
 
 TESTING = "test" in sys.argv
 

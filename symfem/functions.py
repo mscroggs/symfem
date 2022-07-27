@@ -1,12 +1,15 @@
 """Basis function classes."""
 
 from __future__ import annotations
-import sympy
+
 import typing
 from abc import ABC, abstractmethod
+
+import sympy
+
 from .geometry import PointType
 from .references import Reference
-from .symbols import x, t, AxisVariables, AxisVariablesNotSingle
+from .symbols import AxisVariables, AxisVariablesNotSingle, t, x
 
 SingleSympyFormat = typing.Union[
     sympy.core.expr.Expr,

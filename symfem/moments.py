@@ -1,6 +1,7 @@
 """Functions to create integral moments."""
 
 import typing
+
 from .functionals import BaseFunctional
 from .references import Reference
 

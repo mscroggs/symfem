@@ -1,14 +1,16 @@
 """Generate coefficients for Guzman-Neilan element."""
 
-import numpy as np
-import typing
-import symfem
-import sympy
-import sys
 import os
-from symfem.functions import VectorFunction, MatrixFunction
-from symfem.symbols import x, t
+import sys
+import typing
+
+import numpy as np
+import sympy
+
+import symfem
 from symfem.elements.guzman_neilan import make_piecewise_lagrange
+from symfem.functions import MatrixFunction, VectorFunction
+from symfem.symbols import t, x
 
 TESTING = "test" in sys.argv
 

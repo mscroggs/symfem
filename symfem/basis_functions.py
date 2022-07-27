@@ -1,10 +1,14 @@
 """Abstract basis function classes and functions."""
 
 from __future__ import annotations
-import sympy
+
 import typing
 from abc import abstractmethod
-from .functions import AnyFunction, SympyFormat, ValuesToSubstitute, ScalarFunction, FunctionInput
+
+import sympy
+
+from .functions import (AnyFunction, FunctionInput, ScalarFunction,
+                        SympyFormat, ValuesToSubstitute)
 from .geometry import PointType
 from .references import Reference
 from .symbols import AxisVariables, AxisVariablesNotSingle, t

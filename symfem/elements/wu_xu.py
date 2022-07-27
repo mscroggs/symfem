@@ -5,9 +5,11 @@ This element's definition appears in https://doi.org/10.1090/mcom/3361
 """
 
 import typing
+
 from ..finite_element import CiarletElement
-from ..functionals import (PointEvaluation, DerivativePointEvaluation,
-                           IntegralOfDirectionalMultiderivative, ListOfFunctionals)
+from ..functionals import (DerivativePointEvaluation,
+                           IntegralOfDirectionalMultiderivative,
+                           ListOfFunctionals, PointEvaluation)
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
 from ..references import Reference

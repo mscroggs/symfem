@@ -4,17 +4,21 @@ These elements' definitions appear in https://doi.org/10.1090/S0025-5718-2013-02
 (Cockburn, Qiu, 2013)
 """
 
-import sympy
 import typing
 from itertools import product
+
+import sympy
+
 from ..finite_element import CiarletElement
-from ..functionals import (TangentIntegralMoment, IntegralAgainst, NormalIntegralMoment,
-                           PointEvaluation, DerivativeIntegralMoment, ListOfFunctionals)
-from ..functions import ScalarFunction, VectorFunction, FunctionInput
+from ..functionals import (DerivativeIntegralMoment, IntegralAgainst,
+                           ListOfFunctionals, NormalIntegralMoment,
+                           PointEvaluation, TangentIntegralMoment)
+from ..functions import FunctionInput, ScalarFunction, VectorFunction
 from ..moments import make_integral_moment_dofs
-from ..polynomials import quolynomial_set_1d, quolynomial_set_vector, orthogonal_basis
+from ..polynomials import (orthogonal_basis, quolynomial_set_1d,
+                           quolynomial_set_vector)
 from ..references import Reference
-from ..symbols import x, t
+from ..symbols import t, x
 from .q import Q
 
 

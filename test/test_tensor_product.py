@@ -2,9 +2,11 @@
 
 import pytest
 import sympy
+
 import symfem
 from symfem import create_element
 from symfem.utils import allequal
+
 from .utils import test_elements
 
 

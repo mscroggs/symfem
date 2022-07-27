@@ -1,6 +1,7 @@
 """Test Nedelec elements."""
 
 import sympy
+
 from symfem import create_element
 from symfem.symbols import x
 

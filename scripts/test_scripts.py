@@ -1,5 +1,6 @@
-import pytest
 import os
+
+import pytest
 
 file_path = os.path.join(
     os.path.dirname(os.path.realpath(__file__)), "../_temp"

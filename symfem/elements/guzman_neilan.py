@@ -4,17 +4,20 @@ This element's definition appears in https://doi.org/10.1137/17M1153467
 (Guzman and Neilan, 2018)
 """
 
-import sympy
 import typing
-from ..functionals import NormalIntegralMoment, DotPointEvaluation, ListOfFunctionals
-from ..functions import VectorFunction, FunctionInput
+
+import sympy
+
 from ..finite_element import CiarletElement
+from ..functionals import (DotPointEvaluation, ListOfFunctionals,
+                           NormalIntegralMoment)
+from ..functions import FunctionInput, VectorFunction
 from ..geometry import SetOfPoints, SetOfPointsInput
 from ..moments import make_integral_moment_dofs
 from ..piecewise_functions import PiecewiseFunction
 from ..references import Reference
-from .lagrange import Lagrange, VectorLagrange
 from .bernardi_raugel import BernardiRaugel
+from .lagrange import Lagrange, VectorLagrange
 
 
 class GuzmanNeilan(CiarletElement):

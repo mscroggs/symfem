@@ -1,11 +1,14 @@
 """Plotting."""
 
-import sympy
 import typing
 from abc import ABC, abstractmethod
-from .geometry import (PointType, SetOfPoints, SetOfPointsInput, parse_set_of_points_input,
-                       PointTypeInput, parse_point_input)
-from .functions import VectorFunction, AnyFunction
+
+import sympy
+
+from .functions import AnyFunction, VectorFunction
+from .geometry import (PointType, PointTypeInput, SetOfPoints,
+                       SetOfPointsInput, parse_point_input,
+                       parse_set_of_points_input)
 
 PointOrFunction = typing.Union[PointTypeInput, AnyFunction]
 SetOfPointsOrFunctions = typing.Union[

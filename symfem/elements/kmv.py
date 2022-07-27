@@ -4,10 +4,12 @@ This element's definition is given in https://doi.org/10.1023/A:1004420829610
 (Chin-Joe-Kong, Mulder, Van Veldhuizen, 1999)
 """
 
-import sympy
 import typing
+
+import sympy
+
 from ..finite_element import CiarletElement
-from ..functionals import WeightedPointEvaluation, ListOfFunctionals
+from ..functionals import ListOfFunctionals, WeightedPointEvaluation
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
 from ..references import Reference

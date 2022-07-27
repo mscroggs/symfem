@@ -1,8 +1,9 @@
 """Test Hsieh-Clough-Tocher elements."""
 
 import sympy
+
 import symfem
-from symfem.symbols import x, t
+from symfem.symbols import t, x
 from symfem.utils import allequal
 
 half = sympy.Rational(1, 2)

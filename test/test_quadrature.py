@@ -2,6 +2,7 @@
 
 import pytest
 import sympy
+
 from symfem import quadrature
 from symfem.functions import ScalarFunction
 from symfem.utils import allequal

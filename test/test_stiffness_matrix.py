@@ -1,6 +1,7 @@
 """Test assembly of a stiffness matrix."""
 
 import sympy
+
 import symfem
 
 

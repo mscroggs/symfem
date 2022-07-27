@@ -2,8 +2,10 @@
 
 import typing
 from itertools import product
+
 from ..finite_element import CiarletElement
-from ..functionals import IntegralMoment, DerivativePointEvaluation, ListOfFunctionals
+from ..functionals import (DerivativePointEvaluation, IntegralMoment,
+                           ListOfFunctionals)
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_1d

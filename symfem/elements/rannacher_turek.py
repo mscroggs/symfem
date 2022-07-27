@@ -5,8 +5,9 @@ This element's definition appears in https://doi.org/10.1002/num.1690080202
 """
 
 import typing
+
 from ..finite_element import CiarletElement
-from ..functionals import PointEvaluation, ListOfFunctionals
+from ..functionals import ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..references import Reference
 from ..symbols import x

@@ -1,8 +1,10 @@
 """Test DOF descriptions."""
 
 import pytest
+
 from symfem import create_element
 from symfem.finite_element import CiarletElement
+
 from .utils import test_elements
 
 

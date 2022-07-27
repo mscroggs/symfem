@@ -5,15 +5,17 @@ https://doi.org/10.1007/s00211-010-0327-2 (Kirby, 2011) and
 https://doi.org/10.1137/11082539X (Ainsworth, Andriamaro, Davydov, 2011)
 """
 
-import sympy
 import typing
-from ..functionals import BaseFunctional, PointEvaluation, ListOfFunctionals
-from ..functions import AnyFunction, FunctionInput
+
+import sympy
+
 from ..finite_element import CiarletElement
+from ..functionals import BaseFunctional, ListOfFunctionals, PointEvaluation
+from ..functions import AnyFunction, FunctionInput
 from ..geometry import PointType
-from ..polynomials import polynomial_set_1d, orthogonal_basis
+from ..polynomials import orthogonal_basis, polynomial_set_1d
 from ..references import Reference
-from ..symbols import x, t, AxisVariablesNotSingle
+from ..symbols import AxisVariablesNotSingle, t, x
 
 
 def single_choose(n: int, k: int) -> sympy.core.expr.Expr:

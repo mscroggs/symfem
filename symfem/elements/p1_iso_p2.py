@@ -4,10 +4,12 @@ This element's definition appears in https://doi.org/10.1007/BF01399555
 (Bercovier, Pironneau, 1979)
 """
 
-import sympy
 import typing
+
+import sympy
+
 from ..finite_element import CiarletElement
-from ..functionals import PointEvaluation, ListOfFunctionals
+from ..functionals import ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..geometry import SetOfPoints
 from ..piecewise_functions import PiecewiseFunction

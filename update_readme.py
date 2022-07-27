@@ -1,7 +1,8 @@
 """Script to update the list of available elements in README.md."""
 
-import symfem
 import typing
+
+import symfem
 
 cells = ["interval", "triangle", "quadrilateral", "tetrahedron",
          "hexahedron", "prism", "pyramid", "dual polygon"]

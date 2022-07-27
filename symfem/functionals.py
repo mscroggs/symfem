@@ -1,14 +1,16 @@
 """Functionals used to define the dual sets."""
 
-import sympy
 import typing
 from abc import ABC, abstractmethod
+
+import sympy
+
 from . import mappings
+from .functions import (AnyFunction, FunctionInput, ScalarFunction,
+                        VectorFunction, parse_function_input)
 from .geometry import PointType, SetOfPoints
-from .functions import (ScalarFunction, VectorFunction, AnyFunction, FunctionInput,
-                        parse_function_input)
-from .references import Reference, Interval
-from .symbols import x, t
+from .references import Interval, Reference
+from .symbols import t, x
 
 ScalarValueOrFloat = typing.Union[sympy.core.expr.Expr, float]
 

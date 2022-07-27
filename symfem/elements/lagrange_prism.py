@@ -1,10 +1,13 @@
 """Lagrange elements on a prism."""
 
-import sympy
 import typing
 from itertools import product
+
+import sympy
+
 from ..finite_element import CiarletElement
-from ..functionals import PointEvaluation, DotPointEvaluation, ListOfFunctionals
+from ..functionals import (DotPointEvaluation, ListOfFunctionals,
+                           PointEvaluation)
 from ..functions import FunctionInput
 from ..polynomials import prism_polynomial_set_1d, prism_polynomial_set_vector
 from ..quadrature import get_quadrature

@@ -7,6 +7,7 @@ In this demo, we verify that this is true for an order 5 Lagrange element on a t
 """
 
 import sympy
+
 import symfem
 from symfem.symbols import x
 from symfem.utils import allequal

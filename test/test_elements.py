@@ -1,11 +1,13 @@
 """Test every element."""
 
 import pytest
+
 import symfem
 from symfem import create_element
+from symfem.functions import VectorFunction
 from symfem.symbols import x
 from symfem.utils import allequal
-from symfem.functions import VectorFunction
+
 from .utils import test_elements
 
 

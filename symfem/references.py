@@ -1,12 +1,16 @@
 """Reference elements."""
 
 from __future__ import annotations
+
 import typing
-import sympy
 from abc import ABC, abstractmethod
-from .geometry import (PointType, PointTypeInput, SetOfPoints, SetOfPointsInput,
-                       parse_set_of_points_input, parse_point_input)
-from .symbols import t, x, AxisVariablesNotSingle
+
+import sympy
+
+from .geometry import (PointType, PointTypeInput, SetOfPoints,
+                       SetOfPointsInput, parse_point_input,
+                       parse_set_of_points_input)
+from .symbols import AxisVariablesNotSingle, t, x
 
 LatticeWithLines = typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]
 IntLimits = typing.List[typing.Union[

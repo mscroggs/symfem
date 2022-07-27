@@ -4,11 +4,13 @@ This element's definition appears in https://doi.org/10.2307/2007793
 (Bernardi and Raugel, 1985)
 """
 
-import sympy
 import typing
+
+import sympy
+
 from ..finite_element import CiarletElement
-from ..functionals import (NormalIntegralMoment, DotPointEvaluation,
-                           DivergenceIntegralMoment, ListOfFunctionals)
+from ..functionals import (DivergenceIntegralMoment, DotPointEvaluation,
+                           ListOfFunctionals, NormalIntegralMoment)
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector

@@ -4,10 +4,13 @@ This element's definition appears in https://doi.org/10.2307/2006147
 (Ciarlet, 1978)
 """
 
-import sympy
 import typing
+
+import sympy
+
 from ..finite_element import CiarletElement
-from ..functionals import PointEvaluation, DerivativePointEvaluation, ListOfFunctionals
+from ..functionals import (DerivativePointEvaluation, ListOfFunctionals,
+                           PointEvaluation)
 from ..functions import FunctionInput
 from ..piecewise_functions import PiecewiseFunction
 from ..references import Reference

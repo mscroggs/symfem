@@ -4,13 +4,14 @@ This element's definition is given in https://doi.org/10.1002/nme.1620010108 (Be
 """
 
 import typing
+
 from ..finite_element import CiarletElement
-from ..functionals import (PointEvaluation, NormalDerivativeIntegralMoment,
-                           DerivativePointEvaluation, ListOfFunctionals)
+from ..functionals import (DerivativePointEvaluation, ListOfFunctionals,
+                           NormalDerivativeIntegralMoment, PointEvaluation)
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
-from ..references import Reference
 from ..polynomials import polynomial_set_1d
+from ..references import Reference
 from .lagrange import Lagrange
 
 

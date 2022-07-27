@@ -1,15 +1,18 @@
 """Q elements on tensor product cells."""
 
-import sympy
 import typing
 from itertools import product
+
+import sympy
+
 from ..finite_element import CiarletElement, FiniteElement
-from ..functionals import (PointEvaluation, DotPointEvaluation, IntegralMoment,
-                           TangentIntegralMoment, NormalIntegralMoment, ListOfFunctionals)
+from ..functionals import (DotPointEvaluation, IntegralMoment,
+                           ListOfFunctionals, NormalIntegralMoment,
+                           PointEvaluation, TangentIntegralMoment)
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
-from ..polynomials import (quolynomial_set_1d, quolynomial_set_vector, Hdiv_quolynomials,
-                           Hcurl_quolynomials)
+from ..polynomials import (Hcurl_quolynomials, Hdiv_quolynomials,
+                           quolynomial_set_1d, quolynomial_set_vector)
 from ..quadrature import get_quadrature
 from ..references import Reference
 

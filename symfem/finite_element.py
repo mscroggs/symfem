@@ -1,15 +1,18 @@
 """Abstract finite element classes and functions."""
 
 from __future__ import annotations
+
 import math
-import sympy
 import typing
 from abc import ABC, abstractmethod
 from itertools import product
+
+import sympy
+
 from .basis_functions import BasisFunction
 from .functionals import ListOfFunctionals
-from .functions import (ScalarFunction, VectorFunction, parse_function_input,
-                        AnyFunction, FunctionInput)
+from .functions import (AnyFunction, FunctionInput, ScalarFunction,
+                        VectorFunction, parse_function_input)
 from .geometry import PointType, SetOfPointsInput, parse_set_of_points_input
 from .piecewise_functions import PiecewiseFunction
 from .plotting import Picture, colors

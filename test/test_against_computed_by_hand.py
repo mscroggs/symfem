@@ -1,6 +1,7 @@
 """Test that basis functions agree with examples computed by hand."""
 
 import sympy
+
 from symfem import create_element
 from symfem.functions import ScalarFunction
 from symfem.symbols import x

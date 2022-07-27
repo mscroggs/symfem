@@ -2,6 +2,7 @@
 
 import os
 import sys
+
 import setuptools
 
 if sys.version_info < (3, 6):
@@ -39,7 +40,7 @@ if __name__ == "__main__":
         data_files=data_files,
         install_requires=["sympy>=1.10"],
         extras_require={
-            "style": ["flake8", "pydocstyle", "mypy"],
+            "style": ["flake8", "pydocstyle", "mypy", "isort"],
             "docs": ["sphinx==5.0.2", "sphinx-autoapi"],
             "optional": ["svgwrite", "CairoSVG"],
             "test": ["pytest", "symfem[optional]", "numpy"],

@@ -4,10 +4,12 @@ This element's definition appears in https://doi.org/10.1002/nme.1620190405
 (Fortin, Soulie, 1973)
 """
 
-import sympy
 import typing
+
+import sympy
+
 from ..finite_element import CiarletElement
-from ..functionals import PointEvaluation, IntegralMoment, ListOfFunctionals
+from ..functionals import IntegralMoment, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_1d

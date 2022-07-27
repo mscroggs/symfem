@@ -1,14 +1,19 @@
 """Piecewise basis function classes."""
 
 from __future__ import annotations
-import sympy
+
 import typing
-from .functions import (AnyFunction, _to_sympy_format, ValuesToSubstitute,
-                        SympyFormat, FunctionInput, parse_function_input, VectorFunction)
-from .geometry import (PointType, SetOfPoints, point_in_triangle, point_in_quadrilateral,
-                       point_in_tetrahedron, SetOfPointsInput, parse_set_of_points_input)
+
+import sympy
+
+from .functions import (AnyFunction, FunctionInput, SympyFormat,
+                        ValuesToSubstitute, VectorFunction, _to_sympy_format,
+                        parse_function_input)
+from .geometry import (PointType, SetOfPoints, SetOfPointsInput,
+                       parse_set_of_points_input, point_in_quadrilateral,
+                       point_in_tetrahedron, point_in_triangle)
 from .references import Reference
-from .symbols import x, t, AxisVariables, AxisVariablesNotSingle
+from .symbols import AxisVariables, AxisVariablesNotSingle, t, x
 
 
 class PiecewiseFunction(AnyFunction):
@@ -378,8 +383,8 @@ class PiecewiseFunction(AnyFunction):
         value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
         """Plot the function's values."""
-        from .plotting import Picture
         from .create import create_reference
+        from .plotting import Picture
         assert isinstance(img, Picture)
 
         for shape, f in self._pieces.items():

@@ -6,14 +6,15 @@ These elements' definitions appear in https://doi.org/10.1137/16M1073352
 """
 
 import typing
+
 from ..finite_element import CiarletElement
-from ..polynomials import polynomial_set_vector
-from ..functionals import (IntegralMoment, TangentIntegralMoment, IntegralAgainst,
-                           NormalIntegralMoment, ListOfFunctionals)
-from ..functions import VectorFunction, ScalarFunction, FunctionInput
+from ..functionals import (IntegralAgainst, IntegralMoment, ListOfFunctionals,
+                           NormalIntegralMoment, TangentIntegralMoment)
+from ..functions import FunctionInput, ScalarFunction, VectorFunction
 from ..moments import make_integral_moment_dofs
+from ..polynomials import polynomial_set_vector
 from ..references import Reference
-from ..symbols import x, t
+from ..symbols import t, x
 from .dpc import DPC, VectorDPC
 
 

@@ -1,8 +1,9 @@
 """Draw reference cells for the README."""
 
 import os
-import symfem
 import sys
+
+import symfem
 
 TESTING = "test" in sys.argv
 

@@ -1,6 +1,7 @@
 """Test reordering inside tabulate_basis."""
 
 import sympy
+
 import symfem
 
 half = sympy.Rational(1, 2)

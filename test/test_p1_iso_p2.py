@@ -2,6 +2,7 @@
 
 import pytest
 import sympy
+
 import symfem
 from symfem.symbols import x
 

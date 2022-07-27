@@ -5,11 +5,14 @@ Thse elements definitions appear in https://doi.org/10.1007/s002110100348
 (Arnold, Winther, 2003) [nonconforming]
 """
 
-import sympy
 import typing
+
+import sympy
+
 from ..finite_element import CiarletElement
-from ..functionals import (PointInnerProduct, InnerProductIntegralMoment,
-                           VecIntegralMoment, IntegralMoment, ListOfFunctionals)
+from ..functionals import (InnerProductIntegralMoment, IntegralMoment,
+                           ListOfFunctionals, PointInnerProduct,
+                           VecIntegralMoment)
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_vector
 from ..references import Reference

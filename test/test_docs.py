@@ -2,11 +2,13 @@
 
 import json
 import os
-import pytest
 import re
 import sys
 import typing
 from io import StringIO
+
+import pytest
+
 import symfem
 
 code = False

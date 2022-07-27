@@ -1,8 +1,10 @@
 """Test plotting."""
 
 import os
+
 import pytest
 import sympy
+
 import symfem
 import symfem.plotting
 

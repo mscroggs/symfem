@@ -1,8 +1,10 @@
 """Test Guzman-Neilan elements."""
 
+from itertools import combinations
+
 import pytest
 import sympy
-from itertools import combinations
+
 import symfem
 from symfem.elements.guzman_neilan import make_piecewise_lagrange
 from symfem.symbols import x

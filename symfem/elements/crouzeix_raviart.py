@@ -6,9 +6,10 @@ This element's definition appears in https://doi.org/10.1051/m2an/197307R300331
 
 import typing
 from itertools import product
-from ..functionals import PointEvaluation, ListOfFunctionals
-from ..functions import FunctionInput
+
 from ..finite_element import CiarletElement
+from ..functionals import ListOfFunctionals, PointEvaluation
+from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
 from ..quadrature import get_quadrature
 from ..references import Reference
