@@ -10,8 +10,8 @@ import sympy
 
 from ..basis_functions import BasisFunction
 from ..finite_element import CiarletElement
-from ..functionals import (DerivativePointEvaluation, ListOfFunctionals,
-                           PointEvaluation, PointNormalDerivativeEvaluation)
+from ..functionals import (DerivativePointEvaluation, ListOfFunctionals, PointEvaluation,
+                           PointNormalDerivativeEvaluation)
 from ..functions import FunctionInput, VectorFunction
 from ..piecewise_functions import PiecewiseFunction
 from ..references import Reference

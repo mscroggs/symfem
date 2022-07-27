@@ -7,8 +7,7 @@ import sympy
 
 from symfem import create_element, create_reference
 from symfem.functions import VectorFunction
-from symfem.polynomials import (Hcurl_polynomials, Hdiv_polynomials,
-                                orthogonal_basis)
+from symfem.polynomials import Hcurl_polynomials, Hdiv_polynomials, orthogonal_basis
 from symfem.symbols import t, x
 
 

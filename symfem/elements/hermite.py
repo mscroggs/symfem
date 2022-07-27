@@ -7,8 +7,7 @@ This element's definition appears in https://doi.org/10.1016/0045-7825(72)90006-
 import typing
 
 from ..finite_element import CiarletElement
-from ..functionals import (DerivativePointEvaluation, ListOfFunctionals,
-                           PointEvaluation)
+from ..functionals import DerivativePointEvaluation, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
 from ..references import Reference

@@ -7,8 +7,7 @@ This element's definition appears in https://doi.org/10.1051/m2an/1987210405811
 import typing
 
 from ..finite_element import CiarletElement
-from ..functionals import (IntegralMoment, ListOfFunctionals,
-                           NormalIntegralMoment)
+from ..functionals import IntegralMoment, ListOfFunctionals, NormalIntegralMoment
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector

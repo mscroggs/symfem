@@ -7,9 +7,8 @@ This element's definition appears in https://doi.org/10.1090/S0025-5718-2012-026
 import typing
 
 from ..finite_element import CiarletElement
-from ..functionals import (IntegralAgainst,
-                           IntegralOfDirectionalMultiderivative,
-                           ListOfFunctionals, PointEvaluation)
+from ..functionals import (IntegralAgainst, IntegralOfDirectionalMultiderivative, ListOfFunctionals,
+                           PointEvaluation)
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
 from ..references import Reference

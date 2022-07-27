@@ -7,8 +7,7 @@ from abc import ABC, abstractmethod
 
 import sympy
 
-from .geometry import (PointType, PointTypeInput, SetOfPoints,
-                       SetOfPointsInput, parse_point_input,
+from .geometry import (PointType, PointTypeInput, SetOfPoints, SetOfPointsInput, parse_point_input,
                        parse_set_of_points_input)
 from .symbols import AxisVariablesNotSingle, t, x
 

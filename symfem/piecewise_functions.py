@@ -6,12 +6,10 @@ import typing
 
 import sympy
 
-from .functions import (AnyFunction, FunctionInput, SympyFormat,
-                        ValuesToSubstitute, VectorFunction, _to_sympy_format,
-                        parse_function_input)
-from .geometry import (PointType, SetOfPoints, SetOfPointsInput,
-                       parse_set_of_points_input, point_in_quadrilateral,
-                       point_in_tetrahedron, point_in_triangle)
+from .functions import (AnyFunction, FunctionInput, SympyFormat, ValuesToSubstitute, VectorFunction,
+                        _to_sympy_format, parse_function_input)
+from .geometry import (PointType, SetOfPoints, SetOfPointsInput, parse_set_of_points_input,
+                       point_in_quadrilateral, point_in_tetrahedron, point_in_triangle)
 from .references import Reference
 from .symbols import AxisVariables, AxisVariablesNotSingle, t, x
 

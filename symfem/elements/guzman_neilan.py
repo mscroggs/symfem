@@ -9,8 +9,7 @@ import typing
 import sympy
 
 from ..finite_element import CiarletElement
-from ..functionals import (DotPointEvaluation, ListOfFunctionals,
-                           NormalIntegralMoment)
+from ..functionals import DotPointEvaluation, ListOfFunctionals, NormalIntegralMoment
 from ..functions import FunctionInput, VectorFunction
 from ..geometry import SetOfPoints, SetOfPointsInput
 from ..moments import make_integral_moment_dofs

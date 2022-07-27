@@ -8,8 +8,8 @@ and https://doi.org/10.1007/s10092-006-0124-6 (Tail, Mardal, 2006)
 import typing
 
 from ..finite_element import CiarletElement
-from ..functionals import (IntegralMoment, ListOfFunctionals,
-                           NormalIntegralMoment, TangentIntegralMoment)
+from ..functionals import (IntegralMoment, ListOfFunctionals, NormalIntegralMoment,
+                           TangentIntegralMoment)
 from ..functions import FunctionInput, VectorFunction
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector

@@ -10,13 +10,11 @@ from itertools import product
 import sympy
 
 from ..finite_element import CiarletElement
-from ..functionals import (DerivativeIntegralMoment, IntegralAgainst,
-                           ListOfFunctionals, NormalIntegralMoment,
-                           PointEvaluation, TangentIntegralMoment)
+from ..functionals import (DerivativeIntegralMoment, IntegralAgainst, ListOfFunctionals,
+                           NormalIntegralMoment, PointEvaluation, TangentIntegralMoment)
 from ..functions import FunctionInput, ScalarFunction, VectorFunction
 from ..moments import make_integral_moment_dofs
-from ..polynomials import (orthogonal_basis, quolynomial_set_1d,
-                           quolynomial_set_vector)
+from ..polynomials import orthogonal_basis, quolynomial_set_1d, quolynomial_set_vector
 from ..references import Reference
 from ..symbols import t, x
 from .q import Q

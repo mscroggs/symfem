@@ -6,8 +6,8 @@ from abc import ABC, abstractmethod
 import sympy
 
 from . import mappings
-from .functions import (AnyFunction, FunctionInput, ScalarFunction,
-                        VectorFunction, parse_function_input)
+from .functions import (AnyFunction, FunctionInput, ScalarFunction, VectorFunction,
+                        parse_function_input)
 from .geometry import PointType, SetOfPoints
 from .references import Interval, Reference
 from .symbols import t, x

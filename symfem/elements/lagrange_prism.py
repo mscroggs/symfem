@@ -6,8 +6,7 @@ from itertools import product
 import sympy
 
 from ..finite_element import CiarletElement
-from ..functionals import (DotPointEvaluation, ListOfFunctionals,
-                           PointEvaluation)
+from ..functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..polynomials import prism_polynomial_set_1d, prism_polynomial_set_vector
 from ..quadrature import get_quadrature

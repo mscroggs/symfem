@@ -9,8 +9,8 @@ import typing
 import sympy
 
 from ..finite_element import CiarletElement
-from ..functionals import (DivergenceIntegralMoment, DotPointEvaluation,
-                           ListOfFunctionals, NormalIntegralMoment)
+from ..functionals import (DivergenceIntegralMoment, DotPointEvaluation, ListOfFunctionals,
+                           NormalIntegralMoment)
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector

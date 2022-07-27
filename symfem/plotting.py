@@ -6,8 +6,7 @@ from abc import ABC, abstractmethod
 import sympy
 
 from .functions import AnyFunction, VectorFunction
-from .geometry import (PointType, PointTypeInput, SetOfPoints,
-                       SetOfPointsInput, parse_point_input,
+from .geometry import (PointType, PointTypeInput, SetOfPoints, SetOfPointsInput, parse_point_input,
                        parse_set_of_points_input)
 
 PointOrFunction = typing.Union[PointTypeInput, AnyFunction]

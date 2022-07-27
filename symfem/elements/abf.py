@@ -7,8 +7,8 @@ Thse elements definitions appear in https://dx.doi.org/10.1137/S0036142903431924
 import typing
 
 from ..finite_element import CiarletElement
-from ..functionals import (IntegralMoment, IntegralOfDivergenceAgainst,
-                           ListOfFunctionals, NormalIntegralMoment)
+from ..functionals import (IntegralMoment, IntegralOfDivergenceAgainst, ListOfFunctionals,
+                           NormalIntegralMoment)
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..references import Reference

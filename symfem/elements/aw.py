@@ -10,9 +10,8 @@ import typing
 import sympy
 
 from ..finite_element import CiarletElement
-from ..functionals import (InnerProductIntegralMoment, IntegralMoment,
-                           ListOfFunctionals, PointInnerProduct,
-                           VecIntegralMoment)
+from ..functionals import (InnerProductIntegralMoment, IntegralMoment, ListOfFunctionals,
+                           PointInnerProduct, VecIntegralMoment)
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_vector
 from ..references import Reference

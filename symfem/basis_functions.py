@@ -7,8 +7,7 @@ from abc import abstractmethod
 
 import sympy
 
-from .functions import (AnyFunction, FunctionInput, ScalarFunction,
-                        SympyFormat, ValuesToSubstitute)
+from .functions import AnyFunction, FunctionInput, ScalarFunction, SympyFormat, ValuesToSubstitute
 from .geometry import PointType
 from .references import Reference
 from .symbols import AxisVariables, AxisVariablesNotSingle, t

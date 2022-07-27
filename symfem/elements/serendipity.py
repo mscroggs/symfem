@@ -7,14 +7,12 @@ This element's definition appears in https://doi.org/10.1007/s10208-011-9087-3
 import typing
 
 from ..finite_element import CiarletElement
-from ..functionals import (IntegralMoment, ListOfFunctionals,
-                           NormalIntegralMoment, PointEvaluation,
+from ..functionals import (IntegralMoment, ListOfFunctionals, NormalIntegralMoment, PointEvaluation,
                            TangentIntegralMoment)
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
-from ..polynomials import (Hcurl_serendipity, Hdiv_serendipity,
-                           polynomial_set_1d, polynomial_set_vector,
-                           serendipity_set_1d)
+from ..polynomials import (Hcurl_serendipity, Hdiv_serendipity, polynomial_set_1d,
+                           polynomial_set_vector, serendipity_set_1d)
 from ..references import Reference
 from .dpc import DPC, VectorDPC
 

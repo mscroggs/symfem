@@ -13,9 +13,8 @@ from itertools import product
 import sympy
 
 from ..finite_element import CiarletElement
-from ..functionals import (InnerProductIntegralMoment, IntegralAgainst,
-                           IntegralMoment, ListOfFunctionals,
-                           PointInnerProduct)
+from ..functionals import (InnerProductIntegralMoment, IntegralAgainst, IntegralMoment,
+                           ListOfFunctionals, PointInnerProduct)
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector

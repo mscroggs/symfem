@@ -7,8 +7,7 @@ These elements' definitions appear in https://doi.org/10.1007/BF01396415
 import typing
 
 from ..finite_element import CiarletElement
-from ..functionals import (IntegralMoment, ListOfFunctionals,
-                           TangentIntegralMoment)
+from ..functionals import IntegralMoment, ListOfFunctionals, TangentIntegralMoment
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import Hcurl_polynomials, polynomial_set_vector

@@ -7,10 +7,9 @@ This element's definition appears in https://doi.org/10.1017/S000192400008489X
 import typing
 
 from ..finite_element import CiarletElement
-from ..functionals import (ListOfFunctionals,
-                           PointComponentSecondDerivativeEvaluation,
-                           PointDirectionalDerivativeEvaluation,
-                           PointEvaluation, PointNormalDerivativeEvaluation)
+from ..functionals import (ListOfFunctionals, PointComponentSecondDerivativeEvaluation,
+                           PointDirectionalDerivativeEvaluation, PointEvaluation,
+                           PointNormalDerivativeEvaluation)
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
 from ..references import Reference

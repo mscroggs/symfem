@@ -10,8 +10,7 @@ from itertools import product
 import sympy
 
 from ..finite_element import CiarletElement
-from ..functionals import (DotPointEvaluation, ListOfFunctionals,
-                           PointEvaluation)
+from ..functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d, quolynomial_set_1d
 from ..references import Reference

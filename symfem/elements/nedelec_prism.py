@@ -3,12 +3,10 @@
 import typing
 
 from ..finite_element import CiarletElement
-from ..functionals import (IntegralAgainst, IntegralMoment, ListOfFunctionals,
-                           TangentIntegralMoment)
+from ..functionals import IntegralAgainst, IntegralMoment, ListOfFunctionals, TangentIntegralMoment
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
-from ..polynomials import (Hcurl_polynomials, polynomial_set_1d,
-                           polynomial_set_vector)
+from ..polynomials import Hcurl_polynomials, polynomial_set_1d, polynomial_set_vector
 from ..references import Reference
 from ..symbols import x
 from .lagrange import Lagrange, VectorLagrange

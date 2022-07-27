@@ -9,8 +9,7 @@ import typing
 import sympy
 
 from ..finite_element import CiarletElement
-from ..functionals import (DerivativePointEvaluation, ListOfFunctionals,
-                           PointEvaluation)
+from ..functionals import DerivativePointEvaluation, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..piecewise_functions import PiecewiseFunction
 from ..references import Reference
