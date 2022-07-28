@@ -10,7 +10,7 @@ import sympy
 
 from ..finite_element import CiarletElement, FiniteElement
 from ..functions import AnyFunction, FunctionInput, VectorFunction
-from ..geometry import SetOfPointsInput
+from ..geometry import SetOfPointsInput, SetOfPoints, PointType
 from ..piecewise_functions import PiecewiseFunction
 from ..plotting import Picture, colors
 from ..references import DualPolygon
@@ -25,7 +25,9 @@ class DualCiarletElement(FiniteElement):
         self, dual_coefficients: typing.List[typing.List[typing.List[
             typing.Union[int, sympy.core.expr.Expr]]]],
         fine_space: str, reference: DualPolygon, order: int,
-        domain_dim: int, range_dim: int, range_shape: typing.Tuple[int, ...] = None
+        dof_entities: typing.List[typing.Tuple[int, int]],
+        domain_dim: int, range_dim: int, range_shape: typing.Tuple[int, ...] = None,
+        dof_directions: SetOfPoints = None
     ):
         """Create a dual element.
 
@@ -44,6 +46,8 @@ class DualCiarletElement(FiniteElement):
         super().__init__(reference, order, len(dual_coefficients), domain_dim, range_dim,
                          range_shape=range_shape)
         self._basis_functions: typing.Union[typing.List[AnyFunction], None] = None
+        self.dof_entities = dof_entities
+        self.dof_directions = dof_directions
 
     def get_polynomial_basis(
         self, reshape: bool = True
@@ -65,6 +69,7 @@ class DualCiarletElement(FiniteElement):
             from symfem import create_element
 
             bfs: typing.List[AnyFunction] = []
+            sub_e = create_element("triangle", self.fine_space, self.order)
             for coeff_list in self.dual_coefficients:
                 v0 = self.reference.origin
                 pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
@@ -72,8 +77,6 @@ class DualCiarletElement(FiniteElement):
                     coeff_list, self.reference.vertices,
                     self.reference.vertices[1:] + self.reference.vertices[:1]
                 ):
-                    sub_e = create_element("triangle", self.fine_space, self.order)
-
                     sub_basis = sub_e.map_to_cell((v0, v1, v2))
 
                     if self.range_dim == 1:
@@ -91,6 +94,7 @@ class DualCiarletElement(FiniteElement):
                         sub_fun = tuple(sf_list)
                     pieces[(v0, v1, v2)] = sub_fun
                 bfs.append(PiecewiseFunction(pieces, 2))
+            assert len(bfs) == len(self.dof_entities)
             self._basis_functions = bfs
 
         assert self._basis_functions is not None
@@ -105,7 +109,17 @@ class DualCiarletElement(FiniteElement):
         plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
     ):
         """Plot a diagram showing the DOFs of the element."""
+        from ..create import create_reference, create_element
         img = Picture(**kwargs)
+
+        dofs_by_subentity: typing.Dict[int, typing.Dict[int, typing.List[int]]] = {
+            i: {j: [] for j in range(self.reference.sub_entity_count(i))}
+            for i in range(self.reference.tdim + 1)}
+
+        for i, e in enumerate(self.dof_entities):
+            dofs_by_subentity[e[0]][e[1]].append(i)
+
+        sub_e = create_element("triangle", self.fine_space, self.order)
 
         for entities in self.reference.z_ordered_entities():
             for dim, e in entities:
@@ -113,7 +127,23 @@ class DualCiarletElement(FiniteElement):
                     pts = tuple(self.reference.vertices[i] for i in self.reference.edges[e])
                     img.add_line(pts[0], pts[1], colors.BLACK)
 
-        # TODO: plot DOFs
+            for dim, e in entities:
+                dofs = dofs_by_subentity[dim][e]
+                for d in dofs:
+                    if dim == 0:
+                        point = self.reference.vertices[e]
+                    elif dim == 1:
+                        raise NotImplementedError() # TODO
+                    elif dim == 2:
+                        point = self.reference.midpoint()
+                    else:
+                        raise ValueError("Unsupported tdim")
+
+                    if self.dof_directions is not None:
+                        direction = self.dof_directions[d]
+                        img.add_dof_arrow(point, direction, d, colors.entity(dim), False)
+                    else:
+                        img.add_dof_marker(point, d, colors.entity(dim))
 
         img.save(filename, plot_options=plot_options)
 
@@ -135,6 +165,7 @@ class Dual(DualCiarletElement):
                 [[1] for i in range(2 * reference.number_of_triangles)]
             ]
             fine_space = "Lagrange"
+            dof_entities = [(2, 0)]
         else:
             dual_coefficients = [
                 [[sympy.Rational(1, reference.number_of_triangles), 0, 0]
@@ -153,10 +184,12 @@ class Dual(DualCiarletElement):
                 else:
                     dual_coefficients[j][2 * j + 2][1] = sympy.Rational(1, 2)
 
+            dof_entities = [(1, i) for i in range(1, len(reference.vertices), 2)]
+
             fine_space = "Lagrange"
 
         super().__init__(
-            dual_coefficients, fine_space, reference, order, reference.tdim, 1
+            dual_coefficients, fine_space, reference, order, dof_entities, reference.tdim, 1
         )
 
     names = ["dual polynomial", "dual P", "dual"]
@@ -192,9 +225,15 @@ class BuffaChristiansen(DualCiarletElement):
                 dual_coefficients[j][(2 * j + i) % N][2] = sympy.Rational(i + 1 - N // 2, N)
                 dual_coefficients[j][(2 * j + i + 1) % N][1] = sympy.Rational(i + 1 - N // 2, N)
 
+        dof_entities = [(0, i) for i in range(0, len(reference.vertices), 2)]
+        dof_directions: typing.List[PointType] = []
+        for i in range(0, len(reference.vertices), 2):
+            dof_directions.append(tuple(
+                b - a for a, b in zip(reference.origin, reference.vertices[i])))
+
         super().__init__(
-            dual_coefficients, "RT", reference, order, reference.tdim, 2
-        )
+            dual_coefficients, "RT", reference, order, dof_entities, reference.tdim, 2,
+            dof_directions=tuple(dof_directions))
 
     names = ["Buffa-Christiansen", "BC"]
     references = ["dual polygon"]
@@ -229,9 +268,15 @@ class RotatedBuffaChristiansen(DualCiarletElement):
                 dual_coefficients[j][(2 * j + i) % N][2] = sympy.Rational(N // 2 - 1 - i, N)
                 dual_coefficients[j][(2 * j + i + 1) % N][1] = sympy.Rational(N // 2 - 1 - i, N)
 
+        dof_entities = [(0, i) for i in range(0, len(reference.vertices), 2)]
+        dof_directions: typing.List[PointType] = []
+        for i in range(0, len(reference.vertices), 2):
+            dof_directions.append(tuple(
+                b - a for a, b in zip(reference.origin, reference.vertices[i])))
+
         super().__init__(
-            dual_coefficients, "N1curl", reference, order, reference.tdim, 2
-        )
+            dual_coefficients, "N1curl", reference, order, dof_entities, dof_points,
+            reference.tdim, 2, dof_directions=tuple(dof_directions))
 
     names = ["rotated Buffa-Christiansen", "RBC"]
     references = ["dual polygon"]
