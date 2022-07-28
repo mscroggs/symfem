@@ -12,8 +12,8 @@ from ..finite_element import CiarletElement, FiniteElement
 from ..functions import AnyFunction, FunctionInput, VectorFunction
 from ..geometry import SetOfPointsInput
 from ..piecewise_functions import PiecewiseFunction
-from ..references import DualPolygon
 from ..plotting import Picture, colors
+from ..references import DualPolygon
 
 
 class DualCiarletElement(FiniteElement):
