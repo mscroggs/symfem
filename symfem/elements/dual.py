@@ -13,6 +13,7 @@ from ..functions import AnyFunction, FunctionInput, VectorFunction
 from ..geometry import SetOfPointsInput
 from ..piecewise_functions import PiecewiseFunction
 from ..references import DualPolygon
+from ..plotting import Picture, colors
 
 
 class DualCiarletElement(FiniteElement):
@@ -115,7 +116,6 @@ class DualCiarletElement(FiniteElement):
         # TODO: plot DOFs
 
         img.save(filename, plot_options=plot_options)
-
 
 
 class Dual(DualCiarletElement):
