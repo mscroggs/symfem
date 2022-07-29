@@ -57,6 +57,14 @@ class FiniteElement(ABC):
         self._value_scale = None
 
     @abstractmethod
+    def plot_dof_diagram(
+        self, filename: typing.Union[str, typing.List[str]],
+        plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
+    ):
+        """Plot a diagram showing the DOFs of the element."""
+        pass
+
+    @abstractmethod
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
         """Get the numbers of the DOFs associated with the given entity."""
         pass
@@ -559,6 +567,64 @@ class DirectElement(FiniteElement):
     def get_polynomial_basis(self) -> typing.List[AnyFunction]:
         """Get the symbolic polynomial basis for the element."""
         raise NotImplementedError()
+
+    def plot_dof_diagram(
+        self, filename: typing.Union[str, typing.List[str]],
+        plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
+    ):
+        """Plot a diagram showing the DOFs of the element."""
+        img = Picture(**kwargs)
+
+        dofs_by_subentity: typing.Dict[int, typing.Dict[int, typing.List[int]]] = {
+            i: {j: [] for j in range(self.reference.sub_entity_count(i))}
+            for i in range(self.reference.tdim + 1)}
+
+        for i, e in enumerate(self._basis_entities):
+            dofs_by_subentity[e[0]][e[1]].append(i)
+
+        for entities in self.reference.z_ordered_entities():
+            for dim, e_n in entities:
+                if dim == 1:
+                    pts = tuple(self.reference.vertices[i] for i in self.reference.edges[e_n])
+                    img.add_line(pts[0], pts[1], colors.BLACK)
+                if dim == 2:
+                    pts = tuple(self.reference.vertices[i] for i in self.reference.faces[e_n])
+                    if len(pts) == 4:
+                        pts = (pts[0], pts[1], pts[3], pts[2])
+                    img.add_fill(pts, colors.WHITE, 0.5)
+
+            for dim, e_n in entities:
+                n = len(dofs_by_subentity[dim][e_n])
+                if n > 0:
+                    sub_ref = self.reference.sub_entity(dim, e_n)
+                    points: typing.List[PointType] = []
+                    if dim == 0:
+                        assert n == 1
+                        points = [sub_ref.vertices[0]]
+                    elif dim == 1:
+                        points = [tuple(o + sympy.Rational(i * a, n + 1)
+                                        for o, a in zip(sub_ref.origin, *sub_ref.axes))
+                                  for i in range(1, n + 1)]
+                    elif dim == 2:
+                        ne = 1
+                        while ne * (ne + 1) // 2 < n:
+                            ne += 1
+                        points = [tuple(o + sympy.Rational(i * a + j * b, n + 1)
+                                        for o, a, b in zip(sub_ref.origin, *sub_ref.axes))
+                                  for i in range(1, ne + 1) for j in range(1, ne + 1 - i)]
+                    elif dim == 3:
+                        ne = 1
+                        while ne * (ne + 1) * (ne + 2) // 6 < n:
+                            ne += 1
+                        points = [tuple(o + sympy.Rational(i * a + j * b + k * c, n + 1)
+                                        for o, a, b, c in zip(sub_ref.origin, *sub_ref.axes))
+                                  for i in range(1, ne + 1) for j in range(1, ne + 1 - i)
+                                  for k in range(1, ne + 1 - i - j)]
+
+                    for p, d in zip(points, dofs_by_subentity[dim][e_n]):
+                        img.add_dof_marker(p, d, colors.entity(dim))
+
+        img.save(filename, plot_options=plot_options)
 
     def test(self):
         """Run tests for this element."""

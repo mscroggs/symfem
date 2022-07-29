@@ -70,7 +70,6 @@ qcurl = symfem.create_element("quadrilateral", "Qcurl", 2)
 The polynomial basis of an element can be obtained by calling `get_polynomial_basis()`:
 
 ```python
-import symfem
 
 lagrange = symfem.create_element("triangle", "Lagrange", 1)
 print(lagrange.get_basis_functions())
@@ -89,7 +88,6 @@ The function `map_to_cell` can be used to map the basis functions of a finite el
 to a non-default cell:
 
 ```python
-import symfem
 
 lagrange = symfem.create_element("triangle", "Lagrange", 1)
 print(lagrange.get_basis_functions())
@@ -304,4 +302,3 @@ The reference dual polygon (hexagon example shown) has vertices (1, 0), (3/4, sq
 - Buffa-Christiansen (alternative names: BC)
 - dual polynomial (alternative names: dual P, dual)
 - rotated Buffa-Christiansen (alternative names: RBC)
-

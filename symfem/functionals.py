@@ -426,8 +426,9 @@ class DotPointEvaluation(BaseFunctional):
     def dof_direction(self) -> typing.Union[PointType, None]:
         """Get the direction of the DOF."""
         v = self.vector.as_sympy()
-        assert isinstance(v, tuple)
-        return v
+        if isinstance(v, tuple):
+            return v
+        return None
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
@@ -738,8 +739,9 @@ class VecIntegralMoment(IntegralMoment):
     def dof_direction(self) -> typing.Union[PointType, None]:
         """Get the direction of the DOF."""
         dw = self.dot_with.as_sympy()
-        assert isinstance(dw, tuple)
-        return dw
+        if isinstance(dw, tuple):
+            return dw
+        return None
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""

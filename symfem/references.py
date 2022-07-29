@@ -538,7 +538,7 @@ class Reference(ABC):
             offset_unit: typing.Tuple[typing.Union[
                 sympy.core.expr.Expr, int], ...] = (sympy.Rational(4, 3), )
             img.add_arrow((-sympy.Rational(1, 2), 0), (-sympy.Rational(1, 3), 0))
-            img.add_math((-sympy.Rational(8, 27), 0), "x")
+            img.add_math((-sympy.Rational(8, 25), 0), "x", anchor="west")
         elif self.tdim == 2:
             if self.name.startswith("dual polygon"):
                 offset_unit = (sympy.Rational(9, 4), 0)
@@ -546,15 +546,16 @@ class Reference(ABC):
                 img.add_arrow((-sympy.Rational(3, 4), -rt52), (-sympy.Rational(7, 12), -rt52))
                 img.add_arrow((-sympy.Rational(3, 4), -rt52),
                               (-sympy.Rational(3, 4), sympy.Rational(1, 6) - rt52))
-                img.add_math((-sympy.Rational(59, 108), -rt52), "x")
-                img.add_math((-sympy.Rational(3, 4), sympy.Rational(12, 54) - rt52), "y")
+                img.add_math((-sympy.Rational(171, 300), -rt52), "x", anchor="west")
+                img.add_math((-sympy.Rational(3, 4), sympy.Rational(9, 50) - rt52), "y",
+                             anchor="south")
             else:
                 offset_unit = (sympy.Rational(4, 3), 0)
                 img.add_arrow((-sympy.Rational(1, 2), 0), (-sympy.Rational(1, 3), 0))
                 img.add_arrow((-sympy.Rational(1, 2), 0),
                               (-sympy.Rational(1, 2), sympy.Rational(1, 6)))
-                img.add_math((-sympy.Rational(8, 27), 0), "x")
-                img.add_math((-sympy.Rational(1, 2), sympy.Rational(12, 54)), "y")
+                img.add_math((-sympy.Rational(8, 25), 0), "x", anchor="west")
+                img.add_math((-sympy.Rational(1, 2), sympy.Rational(9, 50)), "y", anchor="south")
         elif self.tdim == 3:
             if self.name == "pyramid":
                 offset_unit = (sympy.Rational(17, 12), sympy.Rational(17, 30), 0)
@@ -568,9 +569,11 @@ class Reference(ABC):
                           (-sympy.Rational(3, 8), sympy.Rational(1, 60), 0))
             img.add_arrow((-sympy.Rational(3, 8), -sympy.Rational(3, 20), 0),
                           (-sympy.Rational(3, 8), -sympy.Rational(3, 20), sympy.Rational(1, 6)))
-            img.add_math((-sympy.Rational(7, 40), -sympy.Rational(3, 20), 0), "x")
-            img.add_math((-sympy.Rational(3, 8), sympy.Rational(1, 15), 0), "y")
-            img.add_math((-sympy.Rational(3, 8), -sympy.Rational(3, 20), sympy.Rational(1, 5)), "z")
+            img.add_math((-sympy.Rational(39, 200), -sympy.Rational(3, 20), 0), "x", anchor="west")
+            img.add_math((-sympy.Rational(3, 8), sympy.Rational(1, 60), 0), "y",
+                         anchor="south west")
+            img.add_math((-sympy.Rational(3, 8), -sympy.Rational(3, 20), sympy.Rational(9, 50)),
+                         "z", anchor="south")
         else:
             raise ValueError("Unsupported tdim")
 
