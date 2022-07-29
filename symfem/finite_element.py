@@ -612,7 +612,7 @@ class DirectElement(FiniteElement):
                         points = [tuple(o + sympy.Rational(i * a + j * b, n + 1)
                                         for o, a, b in zip(sub_ref.origin, *sub_ref.axes))
                                   for i in range(1, ne + 1) for j in range(1, ne + 1 - i)]
-                    elif dim == 2:
+                    elif dim == 3:
                         ne = 1
                         while ne * (ne + 1) * (ne + 2) // 6 < n:
                             ne += 1
