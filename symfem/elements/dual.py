@@ -8,9 +8,9 @@ import typing
 
 import sympy
 
-from ..finite_element import CiarletElement, FiniteElement
+from ..finite_element import FiniteElement
 from ..functions import AnyFunction, FunctionInput, VectorFunction
-from ..geometry import SetOfPointsInput, SetOfPoints, PointType
+from ..geometry import PointType, SetOfPoints, SetOfPointsInput
 from ..piecewise_functions import PiecewiseFunction
 from ..plotting import Picture, colors
 from ..references import DualPolygon
@@ -18,8 +18,6 @@ from ..references import DualPolygon
 
 class DualCiarletElement(FiniteElement):
     """Abstract barycentric finite element."""
-
-    map_to_cell = CiarletElement.map_to_cell
 
     def __init__(
         self, dual_coefficients: typing.List[typing.List[typing.List[
@@ -37,9 +35,11 @@ class DualCiarletElement(FiniteElement):
             fine_space: the family of the fine space
             reference: The reference element
             order: The polynomia order of the fine space
+            dof_entities: The cell entity that each basis function is associated with
             domain_dim: the topological dimension of the domain
             range_dim: the dimension of the range
             range_shape: the shape of the range
+            dof_directions: The direction that each basis function is associated with
         """
         self.dual_coefficients = dual_coefficients
         self.fine_space = fine_space
@@ -102,6 +102,17 @@ class DualCiarletElement(FiniteElement):
 
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
         """Get the numbers of the DOFs associated with the given entity."""
+        out = []
+        for i, e in enumerate(self.dof_entities):
+            if e == (entity_dim, entity_number):
+                out.append(i)
+        return out
+
+    def map_to_cell(
+        self, vertices_in: SetOfPointsInput, basis: typing.List[AnyFunction] = None,
+        forward_map: PointType = None, inverse_map: PointType = None
+    ) -> typing.List[AnyFunction]:
+        """Map the basis onto a cell using the appropriate mapping for the element."""
         raise NotImplementedError()
 
     def plot_dof_diagram(
@@ -109,31 +120,23 @@ class DualCiarletElement(FiniteElement):
         plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
     ):
         """Plot a diagram showing the DOFs of the element."""
-        from ..create import create_reference, create_element
         img = Picture(**kwargs)
 
-        dofs_by_subentity: typing.Dict[int, typing.Dict[int, typing.List[int]]] = {
-            i: {j: [] for j in range(self.reference.sub_entity_count(i))}
-            for i in range(self.reference.tdim + 1)}
-
-        for i, e in enumerate(self.dof_entities):
-            dofs_by_subentity[e[0]][e[1]].append(i)
-
-        sub_e = create_element("triangle", self.fine_space, self.order)
-
         for entities in self.reference.z_ordered_entities():
-            for dim, e in entities:
+            for dim, e_n in entities:
                 if dim == 1:
-                    pts = tuple(self.reference.vertices[i] for i in self.reference.edges[e])
+                    pts = tuple(self.reference.vertices[i] for i in self.reference.edges[e_n])
                     img.add_line(pts[0], pts[1], colors.BLACK)
 
-            for dim, e in entities:
-                dofs = dofs_by_subentity[dim][e]
-                for d in dofs:
+            for dim, e_n in entities:
+                for d in self.entity_dofs(dim, e_n):
                     if dim == 0:
-                        point = self.reference.vertices[e]
+                        point = self.reference.vertices[e_n]
                     elif dim == 1:
-                        raise NotImplementedError() # TODO
+                        point = tuple((a + b) / 2 for a, b in zip(
+                            self.reference.vertices[self.reference.edges[e_n][0]],
+                            self.reference.vertices[self.reference.edges[e_n][1]],
+                        ))
                     elif dim == 2:
                         point = self.reference.midpoint()
                     else:
@@ -275,7 +278,7 @@ class RotatedBuffaChristiansen(DualCiarletElement):
                 b - a for a, b in zip(reference.origin, reference.vertices[i])))
 
         super().__init__(
-            dual_coefficients, "N1curl", reference, order, dof_entities, dof_points,
+            dual_coefficients, "N1curl", reference, order, dof_entities,
             reference.tdim, 2, dof_directions=tuple(dof_directions))
 
     names = ["rotated Buffa-Christiansen", "RBC"]
