@@ -535,19 +535,25 @@ class Fill(PictureElement):
 class Math(PictureElement):
     """A mathematical symbol."""
 
-    def __init__(self, point: PointType, math: str, color: str, font_size: int):
+    def __init__(self, point: PointType, math: str, color: str, font_size: int,
+                 anchor: str):
         """Create a filled polygon.
 
         Args:
-            point: The centre point to put the math
+            point: The point to put the math
             math: The math
             color: The color of the math
             font_size: The font size
+            anchor: The point on the equation to anchor to
         """
         self.point = parse_point_input(point)
         self.math = math
         self.color = color
         self.font_size = font_size
+        assert anchor in [
+            "center", "north", "south", "east", "west",
+            "north east", "north west", "south east", "south west"]
+        self.anchor = anchor
 
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
@@ -560,11 +566,28 @@ class Math(PictureElement):
         Returns:
             A list of svgwrite functions to call, with args tuples and kwargs dictionaries
         """
+        if self.anchor == "center":
+            anchor = "text-anchor:middle;dominant-baseline:middle"
+        else:
+            anchor = ""
+            if self.anchor.startswith("north"):
+                anchor += "dominant-baseline:top"
+            elif self.anchor.startswith("south"):
+                anchor += "dominant-baseline:bottom"
+            else:
+                anchor += "dominant-baseline:middle"
+            anchor += ";"
+            if self.anchor.endswith("east"):
+                anchor += "text-anchor:right"
+            elif self.anchor.endswith("west"):
+                anchor += "text-anchor:left"
+            else:
+                anchor += "text-anchor:middle"
+
         return [(
             "text", (f"{self.math}", map_pt(self.point)),
             {"fill": self.color, "font_size": self.font_size,
-             "style": "text-anchor:middle;dominant-baseline:middle;"
-                      "font-family:'CMU Serif',serif;font-style:italic"})]
+             "style": anchor + ";font-family:'CMU Serif',serif;font-style:italic"})]
 
     def as_tikz(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
@@ -578,7 +601,7 @@ class Math(PictureElement):
             A Tikz string
         """
         p = map_pt(self.point)
-        return (f"\\node[{colors.get_tikz_name(self.color)},anchor=center] "
+        return (f"\\node[{colors.get_tikz_name(self.color)},anchor={self.anchor}] "
                 f"at ({p[0]},{p[1]}) {{{tex_font_size(self.font_size)}${self.math}$}};")
 
     @property
@@ -768,16 +791,17 @@ class Picture:
             width, font))
 
     def add_math(self, point: PointTypeInput, math: str, color: str = colors.BLACK,
-                 font_size: int = 35):
+                 font_size: int = 35, anchor="center"):
         """Create mathematical symbol.
 
         Args:
-            point: The centre point to put the math
+            point: The point to put the math
             math: The math
             color: The color of the math
             font_size: The font size
+            anchor: The point on the equation to anchor to
         """
-        self.elements.append(Math(self.parse_point(point), math, color, font_size))
+        self.elements.append(Math(self.parse_point(point), math, color, font_size, anchor))
 
     def add_fill(
         self, vertices: SetOfPointsOrFunctions, color: str = "red", opacity: float = 1.0
