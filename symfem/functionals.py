@@ -147,6 +147,10 @@ class PointEvaluation(BaseFunctional):
         assert isinstance(pt, tuple)
         return pt
 
+    def adjusted_dof_point(self) -> PointType:
+        """Get the adjusted position of the DOF in the cell for plotting."""
+        return self.dof_point()
+
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         assert isinstance(self.point, VectorFunction)
@@ -175,6 +179,10 @@ class WeightedPointEvaluation(BaseFunctional):
         pt = self.point.as_sympy()
         assert isinstance(pt, tuple)
         return pt
+
+    def adjusted_dof_point(self) -> PointType:
+        """Get the adjusted position of the DOF in the cell for plotting."""
+        return self.dof_point()
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
@@ -209,6 +217,10 @@ class DerivativePointEvaluation(BaseFunctional):
         pt = self.point.as_sympy()
         assert isinstance(pt, tuple)
         return pt
+
+    def adjusted_dof_point(self) -> PointType:
+        """Get the adjusted position of the DOF in the cell for plotting."""
+        return self.dof_point()
 
     def perform_mapping(
         self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType, tdim: int
@@ -284,6 +296,10 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
         assert isinstance(d, tuple)
         return d
 
+    def adjusted_dof_point(self) -> PointType:
+        """Get the adjusted position of the DOF in the cell for plotting."""
+        return self.dof_point()
+
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         assert isinstance(self.point, VectorFunction)
@@ -347,6 +363,10 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
         assert isinstance(pt, tuple)
         return pt
 
+    def adjusted_dof_point(self) -> PointType:
+        """Get the adjusted position of the DOF in the cell for plotting."""
+        return self.dof_point()
+
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         desc = "v\\mapsto"
@@ -394,6 +414,10 @@ class PointInnerProduct(BaseFunctional):
         assert isinstance(lv, tuple)
         return lv
 
+    def adjusted_dof_point(self) -> PointType:
+        """Get the adjusted position of the DOF in the cell for plotting."""
+        return self.dof_point()
+
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
         assert isinstance(self.lvec, VectorFunction)
@@ -440,6 +464,10 @@ class DotPointEvaluation(BaseFunctional):
         if isinstance(v, tuple):
             return v
         return None
+
+    def adjusted_dof_point(self) -> PointType:
+        """Get the adjusted position of the DOF in the cell for plotting."""
+        return self.dof_point()
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved."""
