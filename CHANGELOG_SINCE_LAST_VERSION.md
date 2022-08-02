@@ -1,5 +1,0 @@
-- Added plotting of DOF diagrams
-- Added P1-iso-P2 element
-- Added typing
-- Added plotting of basis functions
-- Added plotting of entity numbering

@@ -1,3 +1,11 @@
+# Version 2022.8.1 (02 August 2022)
+
+- Added plotting of DOF diagrams
+- Added P1-iso-P2 element
+- Added typing
+- Added plotting of basis functions
+- Added plotting of entity numbering
+
 # Version 2022.6.1 (18 June 2022)
 
 - Added Rannacher-Turek element
