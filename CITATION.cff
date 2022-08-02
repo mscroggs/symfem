@@ -5,8 +5,8 @@ authors:
     given-names: Matthew W.
     orcid: 0000-0002-4658-2443
 title: Symfem
-version: 2022.6.1
-date-released: 2022-06-18
+version: 2022.8.1
+date-released: 2022-08-02
 license: MIT
 url: https://github.com/mscroggs/symfem
 preferred-citation:
