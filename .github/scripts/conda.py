@@ -16,7 +16,7 @@ version = symfem.get_contents("VERSION", branch.commit.sha).decoded_content.deco
 with urllib.request.urlopen(f"https://pypi.org/pypi/symfem/{version}/json") as f:
     data = json.load(f)
 
-for file in data["releases"][version]:
+for file in data["urls"]:
     if file["packagetype"] == "sdist":
         hash = file["digests"]["sha256"]
 
