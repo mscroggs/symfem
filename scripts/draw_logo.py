@@ -3,9 +3,8 @@
 import os
 import sys
 import typing
+from cairosvg import svg2png
 from math import sqrt
-
-import svgwrite
 
 TESTING = "test" in sys.argv
 
@@ -90,7 +89,8 @@ def in_letter(a, b, c):
     return False
 
 
-svg = svgwrite.Drawing(os.path.join(folder, "logo.svg"), size=(800, 200))
+svg = ("<svg width='800' height='200' xmlns='http://www.w3.org/2000/svg' "
+       "xmlns:xlink='http://www.w3.org/1999/xlink'>\n")
 
 polys = []
 for x in range(-4, 26):
@@ -140,18 +140,23 @@ for x in range(-4, 26):
 polys.sort(key=lambda p: p[0])
 
 for p in polys:
-    svg.add(svg.polygon(
-        p[1],
-        stroke=p[3], stroke_width=1, fill=p[2]))
+    svg += "<polygon points='"
+    svg += " ".join(f"{pt[0]},{pt[1]}" for pt in p[1])
+    svg += f"' stroke='{p[3]}' stroke-width='1' fill='{p[2]}' />\n"
 
 for letter in letters:
     for line_group in letter:
         for i, j in zip(line_group[:-1], line_group[1:]):
-            svg.add(svg.line(
-                to_2d(*i, 1.3), to_2d(*j, 1.3),
-                stroke="black", stroke_width=3, stroke_linecap="round"))
+            x1, y1 = to_2d(*i, 1.3)
+            x2, y2 = to_2d(*j, 1.3)
+            svg += (f"<line x1='{x1}' y1='{y1}' x2='{x2}' y2='{y2}' stroke='black' "
+                    "stroke-width='3' stroke-linecap='round' />\n")
 
-svg.save()
+svg += "</svg>"
+
+with open(os.path.join(folder, "logo.svg"), "w") as f:
+    f.write(svg)
+svg2png(bytestring=svg, write_to=os.path.join(folder, "logo.png"))
 
 
 def to_2d_new(x, y, z):
@@ -159,7 +164,8 @@ def to_2d_new(x, y, z):
     return (1.6 * (90 + (x + (-z+y/2-3)/2) * 30), 160 + 1.6 * (68 + (3-y - z) * sqrt(3)/2 * 30))
 
 
-svg = svgwrite.Drawing(os.path.join(folder, "logo-1280-640.svg"), size=(1280, 640))
+svg = ("<svg width='1280' height='640' xmlns='http://www.w3.org/2000/svg' "
+       "xmlns:xlink='http://www.w3.org/1999/xlink'>\n")
 
 polys = []
 for x in range(-4, 27):
@@ -208,38 +214,49 @@ for x in range(-4, 27):
 polys.sort(key=lambda p: p[0])
 
 for p in polys:
-    svg.add(svg.polygon(
-        p[1],
-        stroke=p[3], stroke_width=1, fill=p[2]))
+    svg += "<polygon points='"
+    svg += " ".join(f"{pt[0]},{pt[1]}" for pt in p[1])
+    svg += f"' stroke='{p[3]}' stroke-width='1' fill='{p[2]}' />\n"
 
 for letter in letters:
     for line_group in letter:
         for i, j in zip(line_group[:-1], line_group[1:]):
-            svg.add(svg.line(
-                to_2d_new(*i, 1.3), to_2d_new(*j, 1.3),
-                stroke="black", stroke_width=3, stroke_linecap="round"))
+            x1, y1 = to_2d_new(*i, 1.3)
+            x2, y2 = to_2d_new(*j, 1.3)
+            svg += (f"<line x1='{x1}' y1='{y1}' x2='{x2}' y2='{y2}' stroke='black' "
+                    "stroke-width='3' stroke-linecap='round' />\n")
 
-svg.save()
+svg += "</svg>"
+
+with open(os.path.join(folder, "logo-1280-640.svg"), "w") as f:
+    f.write(svg)
+svg2png(bytestring=svg, write_to=os.path.join(folder, "logo-1280-640.png"))
 
 
 def fav_move(p):
     """Shift the origin."""
-    return p[0] - 22, p[1] - 15
+    return p[0] - 10, p[1] - 150
 
 
-svg = svgwrite.Drawing(os.path.join(folder, "favicon.svg"), size=(120, 120))
+svg = ("<svg width='240' height='240' xmlns='http://www.w3.org/2000/svg' "
+       "xmlns:xlink='http://www.w3.org/1999/xlink'>\n")
 
 for p in polys:
     if p[4]:
-        svg.add(svg.polygon(
-            [fav_move(i) for i in p[1]],
-            stroke=p[3], stroke_width=1, fill=p[2]))
+        pts = [fav_move(i) for i in p[1]]
+        svg += "<polygon points='"
+        svg += " ".join(f"{pt[0]},{pt[1]}" for pt in pts)
+        svg += f"' stroke='{p[3]}' stroke-width='1' fill='{p[2]}' />\n"
 
 for line_group in letters[0]:
     for i, j in zip(line_group[:-1], line_group[1:]):
-        svg.add(svg.line(
-            fav_move(to_2d_new(*i, 1.3)),
-            fav_move(to_2d_new(*j, 1.3)),
-            stroke="black", stroke_width=3, stroke_linecap="round"))
+        x1, y1 = fav_move(to_2d_new(*i, 1.3))
+        x2, y2 = fav_move(to_2d_new(*j, 1.3))
+        svg += (f"<line x1='{x1}' y1='{y1}' x2='{x2}' y2='{y2}' stroke='black' "
+                "stroke-width='3' stroke-linecap='round' />\n")
 
-svg.save()
+svg += "</svg>"
+
+with open(os.path.join(folder, "favicon.svg"), "w") as f:
+    f.write(svg)
+svg2png(bytestring=svg, write_to=os.path.join(folder, "favicon.png"))

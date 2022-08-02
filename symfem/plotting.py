@@ -12,8 +12,6 @@ from .geometry import (PointType, PointTypeInput, SetOfPoints, SetOfPointsInput,
 PointOrFunction = typing.Union[PointTypeInput, AnyFunction]
 SetOfPointsOrFunctions = typing.Union[
     typing.List[PointOrFunction], typing.Tuple[PointOrFunction, ...]]
-SVGFormat = typing.List[typing.Tuple[
-    str, typing.Tuple[typing.Any, ...], typing.Dict[str, typing.Any]]]
 
 
 def tex_font_size(n: int):
@@ -103,14 +101,14 @@ class PictureElement(ABC):
     @abstractmethod
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
-    ) -> SVGFormat:
+    ) -> str:
         """Return SVG format.
 
         Args:
             map_pt: A function that adjust the origin and scales the picture
 
         Returns:
-            A list of svgwrite functions to call, with args tuples and kwargs dictionaries
+            An SVG string
         """
         pass
 
@@ -194,18 +192,19 @@ class Line(PictureElement):
 
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
-    ) -> SVGFormat:
+    ) -> str:
         """Return SVG format.
 
         Args:
             map_pt: A function that adjust the origin and scales the picture
 
         Returns:
-            A list of svgwrite functions to call, with args tuples and kwargs dictionaries
+            An SVG string
         """
-        return [(
-            "line", (map_pt(self.start), map_pt(self.end)),
-            {"stroke": self.color, "stroke_width": self.width, "stroke_linecap": "round"})]
+        s = map_pt(self.start)
+        e = map_pt(self.end)
+        return (f"<line x1='{s[0]}' y1='{s[1]}' x2='{e[0]}' y2='{e[1]}' "
+                f"stroke='{self.color}' stroke-width='{self.width}' stroke-linecap='round' />\n")
 
     def as_tikz(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
@@ -260,24 +259,22 @@ class Bezier(PictureElement):
 
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
-    ) -> SVGFormat:
+    ) -> str:
         """Return SVG format.
 
         Args:
             map_pt: A function that adjust the origin and scales the picture
 
         Returns:
-            A list of svgwrite functions to call, with args tuples and kwargs dictionaries
+            An SVG string
         """
         s = map_pt(self.start)
         m1 = map_pt(self.mid1)
         m2 = map_pt(self.mid2)
         e = map_pt(self.end)
-        return [(
-            "path", tuple(),
-            {"d": (f"M{s[0]},{s[1]} C{m1[0]},{m1[1]}, {m2[0]},{m2[1]}, {e[0]},{e[1]}"),
-             "stroke": self.color, "stroke_width": self.width, "stroke_linecap": "round",
-             "fill": "none"})]
+        return (f"<path d='M{s[0]},{s[1]} C{m1[0]},{m1[1]}, {m2[0]},{m2[1]}, {e[0]},{e[1]}' "
+                f"stroke='{self.color}' stroke-width='{self.width}' stroke-linecap='round' "
+                " fill='none' />\n")
 
     def as_tikz(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
@@ -331,20 +328,22 @@ class Arrow(PictureElement):
 
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
-    ) -> SVGFormat:
+    ) -> str:
         """Return SVG format.
 
         Args:
             map_pt: A function that adjust the origin and scales the picture
 
         Returns:
-            A list of svgwrite functions to call, with args tuples and kwargs dictionaries
+            An SVG string
         """
-        out: SVGFormat = []
+        out = ""
 
-        out.append((
-            "line", (map_pt(self.start), map_pt(self.end)),
-            {"stroke": self.color, "stroke_width": self.width, "stroke_linecap": "round"}))
+        s = map_pt(self.start)
+        e = map_pt(self.end)
+        out += (f"<line x1='{s[0]}' y1='{s[1]}' x2='{e[0]}' y2='{e[1]}' "
+                f"stroke='{self.color}' stroke-width='{self.width}' stroke-linecap='round' />\n")
+
         ve = VectorFunction(self.end)
         vs = VectorFunction(self.start)
         vdirection = ve - vs
@@ -356,9 +355,10 @@ class Arrow(PictureElement):
             pt = ve - adir * sympy.S(self.width) / 4
             pt_s = pt.as_sympy()
             assert isinstance(pt_s, tuple)
-            out.append((
-                "line", (map_pt(pt_s), map_pt(self.end)),
-                {"stroke": self.color, "stroke_width": self.width, "stroke_linecap": "round"}))
+            m = map_pt(pt_s)
+            out += (f"<line x1='{m[0]}' y1='{m[1]}' x2='{e[0]}' y2='{e[1]}' "
+                    f"stroke='{self.color}' stroke-width='{self.width}' stroke-linecap='round'"
+                    " />\n")
         return out
 
     def as_tikz(
@@ -428,27 +428,22 @@ class NCircle(PictureElement):
 
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
-    ) -> SVGFormat:
+    ) -> str:
         """Return SVG format.
 
         Args:
             map_pt: A function that adjust the origin and scales the picture
 
         Returns:
-            A list of svgwrite functions to call, with args tuples and kwargs dictionaries
+            An SVG string
         """
-        out: SVGFormat = []
+        c = map_pt(self.centre)
 
-        out.append((
-            "circle", (map_pt(self.centre), self.radius),
-            {"stroke": self.color, "stroke_width": self.width, "fill": self.fill_color}))
-
-        out.append((
-            "text", (f"{self.number}", map_pt(self.centre)),
-            {"fill": self.text_color, "font_size": self.font_size,
-             "style": f"text-anchor:middle;dominant-baseline:middle;font-family:{self.font}"}))
-
-        return out
+        return (f"<circle cx='{c[0]}' cy='{c[1]}' r='{self.radius}' "
+                f"stroke='{self.color}' stroke-width='{self.width}' fill='{self.fill_color}' />\n"
+                f"<text x='{c[0]}' y='{c[1]}' fill='{self.text_color}' font_size='{self.font_size}'"
+                f" style=\"text-anchor:middle;dominant-baseline:middle;font-family:{self.font}\">"
+                f"{self.number}</text>\n")
 
     def as_tikz(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
@@ -495,17 +490,18 @@ class Fill(PictureElement):
 
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
-    ) -> SVGFormat:
+    ) -> str:
         """Return SVG format.
 
         Args:
             map_pt: A function that adjust the origin and scales the picture
 
         Returns:
-            A list of svgwrite functions to call, with args tuples and kwargs dictionaries
+            An SVG string
         """
-        return [("polygon", (tuple(map_pt(p) for p in self.vertices), ),
-                {"fill": self.color, "opacity": self.opacity})]
+        pts = [map_pt(p) for p in self.vertices]
+        ptstring = " ".join(f"{p[0]},{p[1]}" for p in pts)
+        return f"<polygon points='{ptstring}' fill='{self.color}' opacity='{self.opacity}' />"
 
     def as_tikz(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
@@ -557,14 +553,14 @@ class Math(PictureElement):
 
     def as_svg(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
-    ) -> SVGFormat:
+    ) -> str:
         """Return SVG format.
 
         Args:
             map_pt: A function that adjust the origin and scales the picture
 
         Returns:
-            A list of svgwrite functions to call, with args tuples and kwargs dictionaries
+            An SVG string
         """
         if self.anchor == "center":
             anchor = "text-anchor:middle;dominant-baseline:middle"
@@ -584,10 +580,11 @@ class Math(PictureElement):
             else:
                 anchor += "text-anchor:middle"
 
-        return [(
-            "text", (f"{self.math}", map_pt(self.point)),
-            {"fill": self.color, "font_size": self.font_size,
-             "style": anchor + ";font-family:'CMU Serif',serif;font-style:italic"})]
+        c = map_pt(self.point)
+
+        return (f"<text x='{c[0]}' y='{c[1]}' fill='{self.color}' font_size='{self.font_size}'"
+                f" style=\"{anchor};font-family:'CMU Serif',serif;font-style:italic\">"
+                f"{self.math}</text>\n")
 
     def as_tikz(
         self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]
@@ -860,34 +857,28 @@ class Picture:
 
     def as_svg(self, filename: str = None) -> str:
         """Convert to an SVG."""
-        try:
-            import svgwrite
-        except ImportError:
-            raise ImportError("svgwrite is needed for plotting SVGs"
-                              " (pip install svgwrite)")
-
         scale, height, width, map_pt = self.compute_scale("px")
 
         assert filename is None or filename.endswith(".svg")
-        img = svgwrite.Drawing(filename, size=(float(width), float(height)))
-        img.set_desc(title=self.title, desc=self.desc)
+        img = (f"<svg width='{float(width)}' height='{float(height)}'"
+               " xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>\n")
+        if self.title is not None:
+            img += f"<title>{self.title}</title>\n"
+        if self.desc is not None:
+            img += f"<desc>{self.desc}</desc>\n"
+        if self.svg_metadata is not None:
+            img += self.svg_metadata + "\n"
 
         for e in self.elements:
-            for func, args, kwargs in e.as_svg(map_pt):
-                img.add(getattr(img, func)(*args, **kwargs))
+            img += e.as_svg(map_pt)
 
-        svg_string = img.tostring()
-
-        a, b = svg_string.split("<svg", 1)
-        c, d = b.split(">", 1)
-
-        svg_string = a + "<svg" + c + ">" + self.svg_metadata + d
+        img += "</svg>"
 
         if filename is not None:
             with open(filename, "w") as f:
-                f.write(svg_string)
+                f.write(img)
 
-        return svg_string
+        return img
 
     def as_png(self, filename: str, png_scale: float = None, png_width: int = None,
                png_height: int = None):
