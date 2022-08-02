@@ -3,8 +3,9 @@
 import os
 import sys
 import typing
-from cairosvg import svg2png
 from math import sqrt
+
+from cairosvg import svg2png
 
 TESTING = "test" in sys.argv
 
