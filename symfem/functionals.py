@@ -94,6 +94,17 @@ class BaseFunctional(ABC):
         """Get the location of the DOF in the cell."""
         pass
 
+    def adjusted_dof_point(self) -> PointType:
+        """Get the adjusted position of the DOF in the cell for plotting."""
+        point = self.dof_point()
+        if self.entity[0] == 0:
+            return point
+
+        midpoint = self.reference.sub_entity(*self.entity).midpoint()
+        return tuple(
+            m + sympy.Rational(7, 10) * (p - m)
+            for m, p in zip(midpoint, point))
+
     def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
         """Apply to the functional to a function."""
         e = self._eval_symbolic(function)

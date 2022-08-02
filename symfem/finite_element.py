@@ -423,20 +423,20 @@ class CiarletElement(FiniteElement):
 
             for dim, e in entities:
                 dofs = dofs_by_subentity[dim][e]
-                dofs.sort(key=lambda d: img.z(d.dof_point()))
+                dofs.sort(key=lambda d: img.z(d.adjusted_dof_point()))
                 for d in dofs:
                     direction = d.dof_direction()
                     if direction is not None:
                         shifted = False
                         for d2 in self.dofs:
-                            if d != d2 and d.dof_point() == d2.dof_point():
+                            if d != d2 and d.adjusted_dof_point() == d2.adjusted_dof_point():
                                 shifted = True
                                 break
-                        img.add_dof_arrow(d.dof_point(), direction, self.dofs.index(d),
+                        img.add_dof_arrow(d.adjusted_dof_point(), direction, self.dofs.index(d),
                                           colors.entity(d.entity[0]), shifted)
                     else:
                         img.add_dof_marker(
-                            d.dof_point(), self.dofs.index(d), colors.entity(d.entity[0]))
+                            d.adjusted_dof_point(), self.dofs.index(d), colors.entity(d.entity[0]))
 
         img.save(filename, plot_options=plot_options)
 
