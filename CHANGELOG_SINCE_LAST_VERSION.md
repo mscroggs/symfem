@@ -1,0 +1,1 @@
+- Remove svgwrite dependency

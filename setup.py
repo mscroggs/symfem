@@ -42,7 +42,7 @@ if __name__ == "__main__":
         extras_require={
             "style": ["flake8", "pydocstyle", "mypy", "isort"],
             "docs": ["sphinx==5.0.2", "sphinx-autoapi"],
-            "optional": ["svgwrite", "CairoSVG"],
+            "optional": ["CairoSVG"],
             "test": ["pytest", "symfem[optional]", "numpy"],
         }
     )
