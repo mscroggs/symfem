@@ -22,4 +22,5 @@ for shape in ["interval", "triangle", "tetrahedron",
 
     filename = shape.replace(" ", "_") + "_numbering"
     ref.plot_entity_diagrams(
-        f"{folder}/{filename}.png", {"png_width": 230 + 200 * ref.tdim})
+        f"{folder}/{filename}.png", {"png_width": 207 * (ref.tdim + 1)},
+        scale=300)

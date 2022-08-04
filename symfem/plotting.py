@@ -441,7 +441,7 @@ class NCircle(PictureElement):
 
         return (f"<circle cx='{c[0]}' cy='{c[1]}' r='{self.radius}' "
                 f"stroke='{self.color}' stroke-width='{self.width}' fill='{self.fill_color}' />\n"
-                f"<text x='{c[0]}' y='{c[1]}' fill='{self.text_color}' font_size='{self.font_size}'"
+                f"<text x='{c[0]}' y='{c[1]}' fill='{self.text_color}' font-size='{self.font_size}'"
                 f" style=\"text-anchor:middle;dominant-baseline:middle;font-family:{self.font}\">"
                 f"{self.number}</text>\n")
 
@@ -582,7 +582,7 @@ class Math(PictureElement):
 
         c = map_pt(self.point)
 
-        return (f"<text x='{c[0]}' y='{c[1]}' fill='{self.color}' font_size='{self.font_size}'"
+        return (f"<text x='{c[0]}' y='{c[1]}' fill='{self.color}' font-size='{self.font_size}'"
                 f" style=\"{anchor};font-family:'CMU Serif',serif;font-style:italic\">"
                 f"{self.math}</text>\n")
 
