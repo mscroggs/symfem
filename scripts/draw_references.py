@@ -21,4 +21,5 @@ for shape in ["interval", "triangle", "tetrahedron",
         ref = symfem.create_reference(shape)
 
     filename = shape.replace(" ", "_") + "_numbering"
-    ref.plot_entity_diagrams(f"{folder}/{filename}.png")
+    ref.plot_entity_diagrams(
+        f"{folder}/{filename}.png", {"png_width": 230 + 200 * ref.tdim})
