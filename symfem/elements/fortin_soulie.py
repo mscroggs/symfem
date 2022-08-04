@@ -9,12 +9,10 @@ import typing
 import sympy
 
 from ..finite_element import CiarletElement
-from ..functionals import IntegralMoment, ListOfFunctionals, PointEvaluation
+from ..functionals import ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
-from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_1d
 from ..references import Reference
-from .lagrange import Lagrange
 
 
 class FortinSoulie(CiarletElement):
@@ -31,12 +29,16 @@ class FortinSoulie(CiarletElement):
 
         assert order == 2
 
-        dofs: ListOfFunctionals = make_integral_moment_dofs(
-            reference,
-            edges=(IntegralMoment, Lagrange, order - 1, {"variant": "equispaced"}),
-        )
-        dofs[-1] = PointEvaluation(reference, (sympy.Rational(1, 3), sympy.Rational(1, 3)),
-                                   entity=(2, 0))
+        third = sympy.Rational(1, 3)
+        two_thirds = sympy.Rational(2, 3)
+        dofs: ListOfFunctionals = [
+            PointEvaluation(reference, (two_thirds, third), entity=(1, 0)),
+            PointEvaluation(reference, (third, two_thirds), entity=(1, 0)),
+            PointEvaluation(reference, (0, third), entity=(1, 1)),
+            PointEvaluation(reference, (0, two_thirds), entity=(1, 1)),
+            PointEvaluation(reference, (sympy.Rational(1, 2), 0), entity=(1, 2)),
+            PointEvaluation(reference, (third, third), entity=(2, 0))
+        ]
 
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
