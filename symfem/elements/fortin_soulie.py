@@ -11,10 +11,8 @@ import sympy
 from ..finite_element import CiarletElement
 from ..functionals import ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
-from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_1d
 from ..references import Reference
-from .lagrange import Lagrange
 
 
 class FortinSoulie(CiarletElement):
@@ -33,7 +31,7 @@ class FortinSoulie(CiarletElement):
 
         third = sympy.Rational(1, 3)
         two_thirds = sympy.Rational(2, 3)
-        dofs = [
+        dofs: ListOfFunctionals = [
             PointEvaluation(reference, (two_thirds, third), entity=(1, 0)),
             PointEvaluation(reference, (third, two_thirds), entity=(1, 0)),
             PointEvaluation(reference, (0, third), entity=(1, 1)),
