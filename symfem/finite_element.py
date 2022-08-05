@@ -568,9 +568,9 @@ class DirectElement(CiarletElement):
                         orth = []
                         for f in self._basis_functions:
                             g = f.subs(x, point)
+                            for h in orth:
+                                g -= (g * h).integral(entity)
                             if g != 0:
-                                for h in orth:
-                                    g -= (g * h).integral(entity)
                                 g /= sympy.sqrt((g**2).integral(entity))
                                 g._f = g._f.expand().simplify()
                                 print(g)
