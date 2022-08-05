@@ -7,7 +7,8 @@ import sympy
 
 from symfem import create_element, create_reference
 from symfem.functions import VectorFunction
-from symfem.polynomials import Hcurl_polynomials, Hdiv_polynomials, orthogonal_basis
+from symfem.polynomials import (Hcurl_polynomials, Hdiv_polynomials, orthogonal_basis,
+                                orthonormal_basis)
 from symfem.symbols import t, x
 
 
@@ -120,3 +121,18 @@ def test_orthogonal_polynomial_derivatives(reference, order):
     for i, j, k in second_d:
         for p, q in zip(polynomials[0], polynomials[i]):
             assert p.diff(x[j]).diff(x[k]) == q
+
+
+@pytest.mark.parametrize("reference", [
+    "interval", "triangle", "quadrilateral",
+    "tetrahedron", "hexahedron", "prism",
+    "pyramid"])
+@pytest.mark.parametrize("order", range(3))
+def test_orthonormal_polynomials(reference, order, speed):
+    if speed == "fast" and order > 2:
+        pytest.skip()
+
+    polynomials = orthonormal_basis(reference, order, 0)[0]
+    ref = create_reference(reference)
+    for p in polynomials:
+        assert (p ** 2).integral(ref, x) == 1
