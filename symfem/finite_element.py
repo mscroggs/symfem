@@ -565,21 +565,36 @@ class DirectElement(CiarletElement):
                         entity = reference.sub_entity(d, e)
                         point = tuple(o + sum(a[i] * tj for a, tj in zip(entity.axes, t))
                                       for i, o in enumerate(entity.origin))
-                        orth = orthonormal_basis(entity.name, max_degree, 0, t[:entity.tdim])[0]
+                        orth = []
+                        for f in self._basis_functions:
+                            g = f.subs(x, point)
+                            if g != 0:
+                                for h in orth:
+                                    g -= (g * h).integral(entity)
+                                g /= sympy.sqrt((g**2).integral(entity))
+                                g._f = g._f.expand().simplify()
+                                print(g)
+                                orth.append(g)
+                        print(orth)
+                        # orth = orthonormal_basis(entity.name, max_degree, 0, t[:entity.tdim])[0]
                         # TODO: span(orth) != span(basis_functions)
                         for f in functions_by_entity[d][e]:
                             for dof in dofs:
                                 assert dof.eval(f) == 0
                         mat = []
+                        rows = []
                         for f in functions_by_entity[d][e]:
-                            mat.append([(f.subs(x, point) * g).integral(entity) for g in orth])
+                            rows.append(f)
+
                         for d2 in range(d):
                             for e2 in reference.connectivity[d][e][d2]:
                                 for f in functions_by_entity[d2][e2]:
-                                    mat.append([(f.subs(x, point) * g).integral(entity)
-                                                for g in orth])
-                        assert len(mat) == len(mat[0])
-                        matrix = sympy.Matrix(mat).inv()
+                                    rows.append(f)
+
+                        assert len(rows) == len(orth)
+                        matrix = sympy.Matrix([
+                            [(f.subs(x, point) * g).integral(entity) for g in orth]
+                            for f in rows]).inv()
                         for i, _ in enumerate(functions_by_entity[d][e]):
                             func = sum(a * b for a, b in zip(matrix.col(i), orth))
                             dofs.append(IntegralAgainst(reference, entity, func, entity=(d, e)))
