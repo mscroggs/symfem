@@ -10,14 +10,15 @@ from itertools import product
 import sympy
 
 from .basis_functions import BasisFunction
-from .functionals import ListOfFunctionals
+from .functionals import ListOfFunctionals, PointEvaluation, IntegralAgainst
 from .functions import (AnyFunction, FunctionInput, ScalarFunction, VectorFunction,
                         parse_function_input)
 from .geometry import PointType, SetOfPointsInput, parse_set_of_points_input
 from .piecewise_functions import PiecewiseFunction
 from .plotting import Picture, colors
+from .polynomials import orthonormal_basis
 from .references import Reference
-from .symbols import x
+from .symbols import x, t
 from .utils import allequal
 
 TabulatedBasis = typing.Union[
@@ -44,7 +45,7 @@ class FiniteElement(ABC):
 
     def __init__(
         self, reference: Reference, order: int, space_dim: int, domain_dim: int, range_dim: int,
-        range_shape: typing.Tuple[int, ...] = None
+        range_shape: typing.Tuple[int, ...] = None, continuity: str = None
     ):
         """Create a finite element."""
         self.reference = reference
@@ -55,6 +56,7 @@ class FiniteElement(ABC):
         self.range_shape = range_shape
         self._float_basis_functions = None
         self._value_scale = None
+        self.continuity = continuity
 
     @abstractmethod
     def plot_dof_diagram(
@@ -152,8 +154,7 @@ class FiniteElement(ABC):
     def test_continuity(self):
         """Test that this element has the correct continuity."""
         continuity = self.continuity
-        if "{order}" in continuity:
-            continuity = continuity.replace("{order}", f"{self.order}")
+        assert continuity is not None
 
         # Test continuity
         if self.reference.name == "interval":
@@ -307,7 +308,7 @@ class CiarletElement(FiniteElement):
     def __init__(
         self, reference: Reference, order: int, basis: typing.List[FunctionInput],
         dofs: ListOfFunctionals, domain_dim: int, range_dim: int,
-        range_shape: typing.Tuple[int, ...] = None
+        range_shape: typing.Tuple[int, ...] = None, continuity: str = None
     ):
         """Create a Ciarlet element.
 
@@ -319,8 +320,10 @@ class CiarletElement(FiniteElement):
             domain_dim: The topological dimension of the cell
             range_dim: The dimension of the range
             range_shape: The shape of the range
+            continuity: The continuity between cells
         """
-        super().__init__(reference, order, len(dofs), domain_dim, range_dim, range_shape)
+        super().__init__(
+            reference, order, len(dofs), domain_dim, range_dim, range_shape, continuity)
         assert len(basis) == len(dofs)
         self._basis = [parse_function_input(b) for b in basis]
         for b in self._basis:
@@ -518,158 +521,81 @@ class CiarletElement(FiniteElement):
                 assert d.entity_dim() is not None
 
 
-class DirectElement(FiniteElement):
+class DirectElement(CiarletElement):
     """Finite element defined directly."""
 
     _basis_functions: typing.List[AnyFunction]
 
     def __init__(
         self, reference: Reference, order: int, basis_functions: typing.List[FunctionInput],
-        basis_entities: typing.List[typing.Tuple[int, int]],
-        domain_dim: int, range_dim: int, range_shape: typing.Tuple[int, ...] = None
+        basis_entities: typing.List[typing.Tuple[int, int]], domain_dim: int, range_dim: int,
+        range_shape: typing.Tuple[int, ...] = None, continuity: str = None
     ):
-        """Create a Ciarlet element.
+        """Create a direct element.
 
         Args:
             reference: The reference cell
             order: The polynomial order
             basis_functions: The basis functions
-            basis_entities: The entitiy each basis function is associated with
+            basis_entities: The entity each basis function is associated with
             domain_dim: The topological dimension of the cell
             range_dim: The dimension of the range
             range_shape: The shape of the range
+            continuity: The continuity between cells
         """
-        super().__init__(reference, order, len(basis_functions), domain_dim, range_dim,
-                         range_shape)
-        self._basis_entities = basis_entities
         self._basis_functions = [parse_function_input(f) for f in basis_functions]
 
-    def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
-        """Get the numbers of the DOFs associated with the given entity."""
-        return [i for i, j in enumerate(self._basis_entities) if j == (entity_dim, entity_number)]
+        functions_by_entity: typing.Dict[int, typing.Dict[int, typing.List[AnyFunction]]] = {
+            i: {j: [] for j in range(reference.sub_entity_count(i))}
+            for i in range(reference.tdim + 1)}
+        for f, (i, j) in zip(self._basis_functions, basis_entities):
+            functions_by_entity[i][j].append(f)
+        dofs: ListOfFunctionals = []
 
-    def get_basis_functions(
-        self, use_tensor_factorisation: bool = False
-    ) -> typing.List[AnyFunction]:
-        """Get the basis functions of the element."""
-        if use_tensor_factorisation:
-            return self._get_basis_functions_tensor()
+        max_degree = max(f.degree(reference) for f in self._basis_functions)
 
-        return self._basis_functions
+        for d in range(reference.tdim + 1):
+            for e in range(reference.sub_entity_count(d)):
+                if len(functions_by_entity[d][e]) > 0:
+                    if d == 0:
+                        assert len(functions_by_entity[d][e]) == 1
+                        dofs.append(PointEvaluation(
+                            reference, reference.vertices[e], entity=(d, e)))
+                    else:
+                        entity = reference.sub_entity(d, e)
+                        point = tuple(o + sum(a[i] * tj for a, tj in zip(entity.axes, t))
+                                      for i, o in enumerate(entity.origin))
+                        orth = orthonormal_basis(entity.name, max_degree, 0, t[:entity.tdim])[0]
+                        # TODO: span(orth) != span(basis_functions)
+                        for f in functions_by_entity[d][e]:
+                            for dof in dofs:
+                                assert dof.eval(f) == 0
+                        mat = []
+                        for f in functions_by_entity[d][e]:
+                            mat.append([(f.subs(x, point) * g).integral(entity) for g in orth])
+                        for d2 in range(d):
+                            for e2 in reference.connectivity[d][e][d2]:
+                                for f in functions_by_entity[d2][e2]:
+                                    mat.append([(f.subs(x, point) * g).integral(entity)
+                                                for g in orth])
+                        assert len(mat) == len(mat[0])
+                        matrix = sympy.Matrix(mat).inv()
+                        for i, _ in enumerate(functions_by_entity[d][e]):
+                            func = sum(a * b for a, b in zip(matrix.col(i), orth))
+                            dofs.append(IntegralAgainst(reference, entity, func, entity=(d, e)))
 
-    def map_to_cell(
-        self, vertices_in: SetOfPointsInput, basis: typing.List[AnyFunction] = None,
-        forward_map: PointType = None, inverse_map: PointType = None
-    ) -> typing.List[AnyFunction]:
-        """Map the basis onto a cell using the appropriate mapping for the element."""
-        raise NotImplementedError()
-
-    def get_polynomial_basis(self) -> typing.List[AnyFunction]:
-        """Get the symbolic polynomial basis for the element."""
-        raise NotImplementedError()
-
-    def plot_dof_diagram(
-        self, filename: typing.Union[str, typing.List[str]],
-        plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
-    ):
-        """Plot a diagram showing the DOFs of the element."""
-        img = Picture(**kwargs)
-
-        dofs_by_subentity: typing.Dict[int, typing.Dict[int, typing.List[int]]] = {
-            i: {j: [] for j in range(self.reference.sub_entity_count(i))}
-            for i in range(self.reference.tdim + 1)}
-
-        for i, e in enumerate(self._basis_entities):
-            dofs_by_subentity[e[0]][e[1]].append(i)
-
-        for entities in self.reference.z_ordered_entities():
-            for dim, e_n in entities:
-                if dim == 1:
-                    pts = tuple(self.reference.vertices[i] for i in self.reference.edges[e_n])
-                    img.add_line(pts[0], pts[1], colors.BLACK)
-                if dim == 2:
-                    pts = tuple(self.reference.vertices[i] for i in self.reference.faces[e_n])
-                    if len(pts) == 4:
-                        pts = (pts[0], pts[1], pts[3], pts[2])
-                    img.add_fill(pts, colors.WHITE, 0.5)
-
-            for dim, e_n in entities:
-                n = len(dofs_by_subentity[dim][e_n])
-                if n > 0:
-                    sub_ref = self.reference.sub_entity(dim, e_n)
-                    points: typing.List[PointType] = []
-                    if dim == 0:
-                        assert n == 1
-                        points = [sub_ref.vertices[0]]
-                    elif dim == 1:
-                        points = [tuple(o + sympy.Rational(i * a, n + 1)
-                                        for o, a in zip(sub_ref.origin, *sub_ref.axes))
-                                  for i in range(1, n + 1)]
-                    elif dim == 2:
-                        ne = 1
-                        while ne * (ne + 1) // 2 < n:
-                            ne += 1
-                        points = [tuple(o + sympy.Rational(i * a + j * b, n + 1)
-                                        for o, a, b in zip(sub_ref.origin, *sub_ref.axes))
-                                  for i in range(1, ne + 1) for j in range(1, ne + 1 - i)]
-                    elif dim == 3:
-                        ne = 1
-                        while ne * (ne + 1) * (ne + 2) // 6 < n:
-                            ne += 1
-                        points = [tuple(o + sympy.Rational(i * a + j * b + k * c, n + 1)
-                                        for o, a, b, c in zip(sub_ref.origin, *sub_ref.axes))
-                                  for i in range(1, ne + 1) for j in range(1, ne + 1 - i)
-                                  for k in range(1, ne + 1 - i - j)]
-
-                    for p, d in zip(points, dofs_by_subentity[dim][e_n]):
-                        img.add_dof_marker(p, d, colors.entity(dim))
-
-        img.save(filename, plot_options=plot_options)
+        super().__init__(reference, order, basis_functions, dofs, domain_dim, range_dim,
+                         range_shape, continuity)
 
     def test(self):
         """Run tests for this element."""
         super().test()
-        self.test_independence()
+        self.test_basis_functions()
 
-    def test_independence(self):
-        """Test that the basis functions of this element are linearly independent."""
-        basis = self.get_basis_functions()
-        all_terms = set()
-
-        scalar = basis[0].is_scalar
-
-        if scalar:
-            for f in basis:
-                f_s = f.as_sympy()
-                assert isinstance(f_s, sympy.core.expr.Expr)
-                for term in f_s.as_coefficients_dict():
-                    all_terms.add(term)
-            mat = [[0 for i in all_terms] for j in basis]
-            for i, t in enumerate(all_terms):
-                for j, f in enumerate(basis):
-                    f_s = f.as_sympy()
-                    assert isinstance(f_s, sympy.core.expr.Expr)
-                    fd = f_s.as_coefficients_dict()
-                    if t in fd:
-                        mat[j][i] = fd[t]
-        else:
-            for f in basis:
-                for fi, fpart in enumerate(f):
-                    fpart_s = fpart.as_sympy()
-                    assert isinstance(fpart_s, sympy.core.expr.Expr)
-                    for term in fpart_s.as_coefficients_dict():
-                        all_terms.add((fi, term))
-            mat = [[0 for i in all_terms] for j in basis]
-            for i, (fi, t) in enumerate(all_terms):
-                for j, f in enumerate(basis):
-                    ffi_s = f[fi].as_sympy()
-                    assert isinstance(ffi_s, sympy.core.expr.Expr)
-                    fd = ffi_s.as_coefficients_dict()
-                    if t in fd:
-                        mat[j][i] = fd[t]
-        mat = sympy.Matrix(mat)
-
-        assert mat.rank() == mat.rows
+    def test_basis_functions(self):
+        """Test that the basis functions of this element are as input."""
+        for i, j in zip(self.get_basis_functions(), self._basis_functions):
+            assert i == j
 
 
 class ElementBasisFunction(BasisFunction):
@@ -700,3 +626,49 @@ class ElementBasisFunction(BasisFunction):
             The basis function
         """
         return self.element.get_basis_functions()[self.n]
+
+
+def enrich(*elements: CiarletElement, preserve: str = "functions") -> FiniteElement:
+    """Enrich an element with extra functions.
+
+    Args:
+        elements: The elements to combine
+        preserve: The item to preserve. Allowd values: "dofs", "functions"
+
+    Returns:
+        An enriched element
+    """
+    assert len(elements) > 0
+    ref = elements[0].reference
+    dd = elements[0].domain_dim
+    rd = elements[0].range_dim
+    rs = elements[0].range_shape
+    c = elements[0].continuity
+    for e in elements:
+        assert e.reference == ref
+        assert e.domain_dim == dd
+        assert e.range_dim == rd
+        assert e.range_shape == rs
+        assert e.continuity == c
+
+    o = max(e.order for e in elements)
+
+    if preserve == "dofs":
+        poly_set: typing.List[FunctionInput] = []
+        dofs = []
+        for e in elements:
+            poly_set += e.get_polynomial_basis()
+            dofs += e.dofs
+
+        return CiarletElement(ref, o, poly_set, dofs, dd, rd, rs, c)
+
+    if preserve == "functions":
+        bfs: typing.List[FunctionInput] = []
+        bes = []
+        for e in elements:
+            bfs += e.get_basis_functions()
+            bes += [d.entity for d in e.dofs]
+
+        return DirectElement(ref, o, bfs, bes, dd, rd, rs, c)
+
+    raise ValueError(f"Unrecognised item to preserve: {preserve}")

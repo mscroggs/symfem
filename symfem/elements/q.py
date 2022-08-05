@@ -51,7 +51,7 @@ class Q(CiarletElement):
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_1d(reference.tdim, order)
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1, continuity="C0")
         self.variant = variant
 
     def get_tensor_factorisation(
@@ -103,7 +103,6 @@ class Q(CiarletElement):
     names = ["Q", "Lagrange", "P"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
-    continuity = "C0"
 
 
 class VectorQ(CiarletElement):
@@ -136,7 +135,8 @@ class VectorQ(CiarletElement):
 
             poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="C0")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -150,7 +150,6 @@ class VectorQ(CiarletElement):
     names = ["vector Q", "vQ"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
-    continuity = "C0"
 
 
 class Nedelec(CiarletElement):
@@ -175,7 +174,8 @@ class Nedelec(CiarletElement):
             volumes=(IntegralMoment, RaviartThomas, order - 1, "covariant", {"variant": variant}),
         )
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="H(curl)")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -189,7 +189,6 @@ class Nedelec(CiarletElement):
     names = ["NCE", "RTCE", "Qcurl", "Nedelec", "Ncurl"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
-    continuity = "H(curl)"
 
 
 class RaviartThomas(CiarletElement):
@@ -213,7 +212,8 @@ class RaviartThomas(CiarletElement):
             cells=(IntegralMoment, Nedelec, order - 1, "contravariant", {"variant": variant}),
         )
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="H(div)")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -227,4 +227,3 @@ class RaviartThomas(CiarletElement):
     names = ["NCF", "RTCF", "Qdiv"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
-    continuity = "H(div)"

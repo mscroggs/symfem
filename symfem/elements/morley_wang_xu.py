@@ -79,10 +79,10 @@ class MorleyWangXu(CiarletElement):
                     reference, subentity, (subentity.normal(), ), (2, ), (2, f_n),
                     scale=1 / volume))
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1,
+                         continuity=f"C{order}")
 
     names = ["Morley-Wang-Xu", "MWX"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 1
     max_order = {"interval": 1, "triangle": 2, "tetrahedron": 3}
-    continuity = "C{order}"

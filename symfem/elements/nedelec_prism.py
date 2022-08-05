@@ -63,7 +63,8 @@ class Nedelec(CiarletElement):
                     dofs.append(IntegralAgainst(
                         reference, reference, f, entity=(3, 0), mapping="covariant"))
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="H(curl)")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -78,4 +79,3 @@ class Nedelec(CiarletElement):
     references = ["prism"]
     min_order = 1
     max_order = 2
-    continuity = "H(curl)"

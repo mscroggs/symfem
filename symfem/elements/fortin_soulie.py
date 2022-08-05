@@ -42,10 +42,10 @@ class FortinSoulie(CiarletElement):
 
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1,
+                         continuity="L2")
 
     names = ["Fortin-Soulie", "FS"]
     references = ["triangle"]
     min_order = 2
     max_order = 2
-    continuity = "L2"

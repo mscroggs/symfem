@@ -234,6 +234,11 @@ class AnyFunction(ABC):
         """Return a version the function with floats as coefficients."""
         pass
 
+    @abstractmethod
+    def degree(self, reference: Reference) -> int:
+        """Get the degree of the function."""
+        pass
+
     def integrate(self, *limits: typing.Tuple[
         sympy.core.symbol.Symbol,
         typing.Union[int, sympy.core.expr.Expr],
@@ -376,6 +381,21 @@ class ScalarFunction(AnyFunction):
         assert isinstance(self._f, sympy.core.expr.Expr)
         self._plot_beziers: typing.Dict[typing.Tuple[Reference, int], typing.List[
             typing.Tuple[PointType, PointType, PointType, PointType]]] = {}
+
+    def degree(self, reference: Reference) -> int:
+        """Get the degree of the function."""
+        p = self._f.as_poly()
+        if reference.name in ["interval", "quadrilateral", "hexahedron"]:
+            return max(p.degree(x[0]), p.degree(x[1]), p.degree(x[2]))
+        if reference.name in ["triangle", "tetrahedron"]:
+            return p.subs(x[1], x[0]).subs(x[2], x[0]).as_poly().degree(x[0])
+        if reference.name == "prism":
+            return max(p.subs(x[1], x[0]).as_poly().degree(x[0]), p.degree(x[2]))
+        if reference.name == "pyramid":
+            return max(p.subs(x[2], x[0]).as_poly().degree(x[0]),
+                       p.subs(x[1], x[0]).as_poly().degree(x[1]))
+
+        raise ValueError(f"Unsupported cell: {reference.name}")
 
     def __add__(self, other: typing.Any) -> ScalarFunction:
         """Add."""
@@ -646,6 +666,10 @@ class VectorFunction(AnyFunction):
     def __len__(self):
         """Get the length of the vector."""
         return len(self._vec)
+
+    def degree(self, reference: Reference) -> int:
+        """Get the degree of the function."""
+        return max(f.degree(reference) for f in self._vec)
 
     @property
     def shape(self) -> typing.Tuple[int, ...]:
@@ -921,6 +945,10 @@ class MatrixFunction(AnyFunction):
             assert len(i) == self._shape[1]
             for j in i:
                 assert j.is_scalar
+
+    def degree(self, reference: Reference) -> int:
+        """Get the degree of the function."""
+        return max(f.degree(reference) for row in self._mat for f in row)
 
     @property
     def shape(self) -> typing.Tuple[int, ...]:

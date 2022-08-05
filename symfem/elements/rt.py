@@ -38,7 +38,8 @@ class RaviartThomas(CiarletElement):
                    {"variant": variant}),
         )
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="H(div)")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -52,4 +53,3 @@ class RaviartThomas(CiarletElement):
     names = ["Raviart-Thomas", "RT", "N1div"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
-    continuity = "H(div)"

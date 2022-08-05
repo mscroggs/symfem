@@ -36,7 +36,7 @@ class RannacherTurek(CiarletElement):
         else:
             poly += [1, x[0], x[1], x[2], x[0]**2 - x[1]**2, x[1]**2 - x[2]**2]
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1, continuity="L2")
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element.
@@ -50,4 +50,3 @@ class RannacherTurek(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     max_order = 1
-    continuity = "L2"

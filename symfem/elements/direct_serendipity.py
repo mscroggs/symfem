@@ -74,9 +74,8 @@ class DirectSerendipity(DirectElement):
                 basis_entities.append((2, 0))
 
         super().__init__(reference, order, basis_functions, basis_entities,
-                         reference.tdim, 1)
+                         reference.tdim, 1, continuity="C0")
 
     names = ["direct serendipity"]
     references = ["quadrilateral"]
     min_order = 1
-    continuity = "C0"

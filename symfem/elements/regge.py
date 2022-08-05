@@ -104,7 +104,7 @@ class Regge(CiarletElement):
             raise ValueError(f"Unknown variant: {variant}")
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
-                         (reference.tdim, reference.tdim))
+                         (reference.tdim, reference.tdim), continuity="inner H(curl)")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -118,7 +118,6 @@ class Regge(CiarletElement):
     names = ["Regge"]
     references = ["triangle", "tetrahedron"]
     min_order = 0
-    continuity = "inner H(curl)"
 
 
 class ReggeTP(CiarletElement):
@@ -240,7 +239,7 @@ class ReggeTP(CiarletElement):
             raise ValueError(f"Unknown variant: {variant}")
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
-                         (reference.tdim, reference.tdim))
+                         (reference.tdim, reference.tdim), continuity="inner H(curl)")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -254,4 +253,3 @@ class ReggeTP(CiarletElement):
     names = ["Regge"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
-    continuity = "inner H(curl)"

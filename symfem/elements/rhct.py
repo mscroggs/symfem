@@ -34,7 +34,7 @@ class P1Hermite(CiarletElement):
             dofs.append(DerivativePointEvaluation(reference, vs, (1, 0), entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(reference, vs, (0, 1), entity=(0, v_n)))
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1, continuity="C0")
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element.
@@ -48,7 +48,6 @@ class P1Hermite(CiarletElement):
     references = ["triangle"]
     min_order = 3
     max_order = 3
-    continuity = "C0"
 
 
 class ReducedHsiehCloughTocher(CiarletElement):
@@ -121,11 +120,10 @@ class ReducedHsiehCloughTocher(CiarletElement):
         ]
 
         super().__init__(
-            reference, order, poly, dofs, reference.tdim, 1
+            reference, order, poly, dofs, reference.tdim, 1, continuity="C1"
         )
 
     names = ["reduced Hsieh-Clough-Tocher", "rHCT"]
     references = ["triangle"]
     min_order = 3
     max_order = 3
-    continuity = "C1"

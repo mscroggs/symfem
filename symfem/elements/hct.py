@@ -96,11 +96,10 @@ class HsiehCloughTocher(CiarletElement):
             for p in piece_list2]
 
         super().__init__(
-            reference, order, poly, dofs, reference.tdim, 1
+            reference, order, poly, dofs, reference.tdim, 1, continuity="C1"
         )
 
     names = ["Hsieh-Clough-Tocher", "Clough-Tocher", "HCT", "CT"]
     references = ["triangle"]
     min_order = 3
     max_order = 3
-    continuity = "C1"

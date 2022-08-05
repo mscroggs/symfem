@@ -50,7 +50,7 @@ class Lagrange(CiarletElement):
 
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1, continuity="C0")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -64,7 +64,6 @@ class Lagrange(CiarletElement):
     names = ["Lagrange", "P"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
-    continuity = "C0"
 
 
 class VectorLagrange(CiarletElement):
@@ -96,7 +95,8 @@ class VectorLagrange(CiarletElement):
                     dofs.append(DotPointEvaluation(reference, p.dof_point(), d, entity=p.entity))
 
             poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="C0")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -110,7 +110,6 @@ class VectorLagrange(CiarletElement):
     names = ["vector Lagrange", "vP"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
-    continuity = "C0"
 
 
 class MatrixLagrange(CiarletElement):
@@ -141,7 +140,7 @@ class MatrixLagrange(CiarletElement):
         poly += polynomial_set_vector(reference.tdim, reference.tdim ** 2, order)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
-                         (reference.tdim, reference.tdim))
+                         (reference.tdim, reference.tdim), continuity="L2")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -155,7 +154,6 @@ class MatrixLagrange(CiarletElement):
     names = ["matrix Lagrange"]
     references = ["triangle", "tetrahedron"]
     min_order = 0
-    continuity = "L2"
 
 
 class SymmetricMatrixLagrange(CiarletElement):
@@ -205,6 +203,7 @@ class SymmetricMatrixLagrange(CiarletElement):
             super().__init__(
                 reference, order, poly, dofs,
                 reference.tdim, reference.tdim ** 2, (reference.tdim, reference.tdim),
+                continuity="L2"
             )
         self.variant = variant
 
@@ -219,4 +218,3 @@ class SymmetricMatrixLagrange(CiarletElement):
     names = ["symmetric matrix Lagrange"]
     references = ["triangle", "tetrahedron"]
     min_order = 0
-    continuity = "L2"

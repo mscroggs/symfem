@@ -65,7 +65,8 @@ class MardalTaiWinther(CiarletElement):
                 reference, facets=(IntegralMoment, NedelecFirstKind, 1, "contravariant",
                                    {"variant": variant}))
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="H(div)")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -80,4 +81,3 @@ class MardalTaiWinther(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 3
     max_order = 3
-    continuity = "H(div)"

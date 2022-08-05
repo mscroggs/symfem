@@ -167,6 +167,10 @@ class BasisFunction(AnyFunction):
         """Return a version the function with floats as coefficients."""
         return self.get_function().with_floats()
 
+    def degree(self, reference: Reference) -> int:
+        """Get the degree of the function."""
+        return self.get_function().degree(reference)
+
 
 class SubbedBasisFunction(BasisFunction):
     """A basis function following a substitution."""

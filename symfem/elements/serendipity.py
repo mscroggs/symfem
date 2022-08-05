@@ -42,7 +42,8 @@ class Serendipity(CiarletElement):
             volumes=(IntegralMoment, DPC, order - 6, {"variant": variant}),
         )
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1,
+                         continuity="C0")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -56,7 +57,6 @@ class Serendipity(CiarletElement):
     names = ["serendipity", "S"]
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 1
-    continuity = "C0"
 
 
 class SerendipityCurl(CiarletElement):
@@ -83,7 +83,8 @@ class SerendipityCurl(CiarletElement):
                      {"variant": variant}),
         )
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="H(curl)")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -97,7 +98,6 @@ class SerendipityCurl(CiarletElement):
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
-    continuity = "H(curl)"
 
 
 class SerendipityDiv(CiarletElement):
@@ -122,7 +122,8 @@ class SerendipityDiv(CiarletElement):
                    {"variant": variant}),
         )
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="H(div)")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -136,4 +137,3 @@ class SerendipityDiv(CiarletElement):
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
-    continuity = "H(div)"

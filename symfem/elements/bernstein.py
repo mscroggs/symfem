@@ -182,9 +182,8 @@ class Bernstein(CiarletElement):
                             dofs.append(BernsteinFunctional(
                                 reference, reference, index(i, j, k), order, (3, 0)))
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1, continuity="C0")
 
     names = ["Bernstein", "Bernstein-Bezier"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
-    continuity = "C0"

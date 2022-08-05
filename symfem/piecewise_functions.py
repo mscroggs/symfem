@@ -406,3 +406,7 @@ class PiecewiseFunction(AnyFunction):
         """Return a version the function with floats as coefficients."""
         return PiecewiseFunction(
             {shape: f.with_floats() for shape, f in self._pieces.items()}, self.tdim)
+
+    def degree(self, reference: Reference) -> int:
+        """Get the degree of the function."""
+        return max(f.degree(reference) for f in self._pieces.values())

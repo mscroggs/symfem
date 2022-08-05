@@ -59,14 +59,13 @@ class P1IsoP2Tri(CiarletElement):
             dofs.append(PointEvaluation(reference, entity.midpoint(), entity=(1, e_n)))
 
         super().__init__(
-            reference, order, poly, dofs, reference.tdim, 1
+            reference, order, poly, dofs, reference.tdim, 1, continuity="C0"
         )
 
     names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
     references = ["triangle"]
     min_order = 1
     max_order = 1
-    continuity = "C0"
 
 
 class P1IsoP2Quad(CiarletElement):
@@ -114,11 +113,10 @@ class P1IsoP2Quad(CiarletElement):
         dofs.append(PointEvaluation(reference, reference.midpoint(), entity=(2, 0)))
 
         super().__init__(
-            reference, order, poly, dofs, reference.tdim, 1
+            reference, order, poly, dofs, reference.tdim, 1, continuity="C0"
         )
 
     names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
     references = ["quadrilateral"]
     min_order = 1
     max_order = 1
-    continuity = "C0"

@@ -73,7 +73,7 @@ class Lagrange(CiarletElement):
         poly: typing.List[FunctionInput] = []
         poly += prism_polynomial_set_1d(reference.tdim, order)
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1, continuity="C0")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -87,7 +87,6 @@ class Lagrange(CiarletElement):
     names = ["Lagrange", "P"]
     references = ["prism"]
     min_order = 0
-    continuity = "C0"
 
 
 class VectorLagrange(CiarletElement):
@@ -120,7 +119,8 @@ class VectorLagrange(CiarletElement):
 
             poly += prism_polynomial_set_vector(reference.tdim, reference.tdim, order)
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="C0")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -134,4 +134,3 @@ class VectorLagrange(CiarletElement):
     names: typing.List[str] = []
     references = ["prism"]
     min_order = 0
-    continuity = "C0"

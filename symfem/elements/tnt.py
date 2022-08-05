@@ -93,8 +93,7 @@ class TNT(CiarletElement):
                     reference, reference, 1, grad_f, dummy_dof, entity=(3, 0), mapping="identity"))
 
         super().__init__(
-            reference, order, poly, dofs, reference.tdim, 1
-        )
+            reference, order, poly, dofs, reference.tdim, 1, continuity="C0")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -108,7 +107,6 @@ class TNT(CiarletElement):
     names = ["tiniest tensor", "TNT"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
-    continuity = "C0"
 
 
 class TNTcurl(CiarletElement):
@@ -210,8 +208,7 @@ class TNTcurl(CiarletElement):
                             reference, reference, grad_f, entity=(3, 0), mapping="contravariant"))
 
         super().__init__(
-            reference, order, poly, dofs, reference.tdim, reference.tdim
-        )
+            reference, order, poly, dofs, reference.tdim, reference.tdim, continuity="H(curl)")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -225,7 +222,6 @@ class TNTcurl(CiarletElement):
     names = ["tiniest tensor Hcurl", "TNTcurl"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
-    continuity = "H(curl)"
 
 
 class TNTdiv(CiarletElement):
@@ -320,8 +316,7 @@ class TNTdiv(CiarletElement):
                                 mapping="covariant"))
 
         super().__init__(
-            reference, order, poly, dofs, reference.tdim, reference.tdim
-        )
+            reference, order, poly, dofs, reference.tdim, reference.tdim, continuity="H(div)")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -335,4 +330,3 @@ class TNTdiv(CiarletElement):
     names = ["tiniest tensor Hdiv", "TNTdiv"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
-    continuity = "H(div)"

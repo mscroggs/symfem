@@ -25,7 +25,7 @@ class DualCiarletElement(FiniteElement):
         fine_space: str, reference: DualPolygon, order: int,
         dof_entities: typing.List[typing.Tuple[int, int]],
         domain_dim: int, range_dim: int, range_shape: typing.Tuple[int, ...] = None,
-        dof_directions: SetOfPoints = None
+        dof_directions: SetOfPoints = None, continuity: str = None
     ):
         """Create a dual element.
 
@@ -40,11 +40,12 @@ class DualCiarletElement(FiniteElement):
             range_dim: the dimension of the range
             range_shape: the shape of the range
             dof_directions: The direction that each basis function is associated with
+            continuity: The continuity between cells
         """
         self.dual_coefficients = dual_coefficients
         self.fine_space = fine_space
         super().__init__(reference, order, len(dual_coefficients), domain_dim, range_dim,
-                         range_shape=range_shape)
+                         range_shape=range_shape, continuity=continuity)
         self._basis_functions: typing.Union[typing.List[AnyFunction], None] = None
         self.dof_entities = dof_entities
         self.dof_directions = dof_directions
@@ -192,14 +193,14 @@ class Dual(DualCiarletElement):
             fine_space = "Lagrange"
 
         super().__init__(
-            dual_coefficients, fine_space, reference, order, dof_entities, reference.tdim, 1
+            dual_coefficients, fine_space, reference, order, dof_entities, reference.tdim, 1,
+            continuity="C0"
         )
 
     names = ["dual polynomial", "dual P", "dual"]
     references = ["dual polygon"]
     min_order = 0
     max_order = 1
-    continuity = "C0"
 
 
 class BuffaChristiansen(DualCiarletElement):
@@ -236,13 +237,12 @@ class BuffaChristiansen(DualCiarletElement):
 
         super().__init__(
             dual_coefficients, "RT", reference, order, dof_entities, reference.tdim, 2,
-            dof_directions=tuple(dof_directions))
+            dof_directions=tuple(dof_directions), continuity="H(div)")
 
     names = ["Buffa-Christiansen", "BC"]
     references = ["dual polygon"]
     min_order = 1
     max_order = 1
-    continuity = "H(div)"
 
 
 class RotatedBuffaChristiansen(DualCiarletElement):
@@ -279,10 +279,10 @@ class RotatedBuffaChristiansen(DualCiarletElement):
 
         super().__init__(
             dual_coefficients, "N1curl", reference, order, dof_entities,
-            reference.tdim, 2, dof_directions=tuple(dof_directions))
+            reference.tdim, 2, dof_directions=tuple(dof_directions),
+            continuity="H(div)")
 
     names = ["rotated Buffa-Christiansen", "RBC"]
     references = ["dual polygon"]
     min_order = 1
     max_order = 1
-    continuity = "H(div)"

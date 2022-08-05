@@ -62,7 +62,8 @@ class BDDF(CiarletElement):
 
         self.variant = variant
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="H(div)")
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element.
@@ -75,4 +76,3 @@ class BDDF(CiarletElement):
     names = ["Brezzi-Douglas-Duran-Fortin", "BDDF"]
     references = ["hexahedron"]
     min_order = 1
-    continuity = "H(div)"

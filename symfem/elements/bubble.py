@@ -63,7 +63,7 @@ class Bubble(CiarletElement):
         self.variant = variant
 
         super().__init__(
-            reference, order, poly, dofs, reference.tdim, 1
+            reference, order, poly, dofs, reference.tdim, 1, continuity="C0"
         )
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -78,7 +78,6 @@ class Bubble(CiarletElement):
     references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
     min_order = {"interval": 2, "triangle": 3, "tetrahedron": 4,
                  "quadrilateral": 2, "hexahedron": 2}
-    continuity = "C0"
 
 
 class BubbleEnrichedLagrange(CiarletElement):
@@ -103,8 +102,8 @@ class BubbleEnrichedLagrange(CiarletElement):
         self.variant = variant
 
         super().__init__(
-            reference, order, poly,
-            lagrange.dofs + bubble.dofs, reference.tdim, 1
+            reference, order, poly, lagrange.dofs + bubble.dofs, reference.tdim, 1,
+            continuity="C0"
         )
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -118,7 +117,6 @@ class BubbleEnrichedLagrange(CiarletElement):
     names = ["bubble enriched Lagrange"]
     references = ["triangle"]
     min_order = 1
-    continuity = "C0"
 
 
 class BubbleEnrichedVectorLagrange(CiarletElement):
@@ -147,7 +145,7 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
 
         self.variant = variant
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 2)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 2, continuity="C0")
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element.
@@ -160,4 +158,3 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
     names = ["bubble enriched vector Lagrange"]
     references = ["triangle"]
     min_order = 1
-    continuity = "C0"

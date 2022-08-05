@@ -82,7 +82,8 @@ class GuzmanNeilan(CiarletElement):
             dofs.append(DotPointEvaluation(reference, mid, direction, entity=(reference.tdim, 0),
                                            mapping="contravariant"))
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="H(div)")
 
     def _make_polyset_triangle(
         self, reference: Reference, order: int
@@ -160,7 +161,6 @@ class GuzmanNeilan(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 1
     max_order = {"triangle": 1, "tetrahedron": 2}
-    continuity = "H(div)"
 
 
 def make_piecewise_lagrange(

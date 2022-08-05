@@ -99,7 +99,7 @@ class Transition(CiarletElement):
                         variables.append(origin[i] + (p[i] - origin[i]) * x[i])
                     poly += [f.subs(x, variables) * bubble for f in space.get_basis_functions()]
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1, continuity="C0")
         self.variant = variant
         self.face_orders = face_orders
         self.edge_orders = edge_orders
@@ -116,4 +116,3 @@ class Transition(CiarletElement):
     names = ["transition"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
-    continuity = "C0"

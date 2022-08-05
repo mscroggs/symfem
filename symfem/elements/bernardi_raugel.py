@@ -90,10 +90,10 @@ class BernardiRaugel(CiarletElement):
                     mapping="contravariant"
                 ))
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="H(div)")
 
     names = ["Bernardi-Raugel"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
     max_order = {"triangle": 1, "tetrahedron": 2}
-    continuity = "H(div)"

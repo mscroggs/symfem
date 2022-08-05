@@ -82,7 +82,7 @@ class ArnoldWinther(CiarletElement):
                 dofs.append(IntegralMoment(reference, reference, J, dof, entity=(2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
-                         (reference.tdim, reference.tdim))
+                         (reference.tdim, reference.tdim), continuity="integral inner H(div)")
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element.
@@ -95,7 +95,6 @@ class ArnoldWinther(CiarletElement):
     names = ["Arnold-Winther", "AW", "conforming Arnold-Winther"]
     references = ["triangle"]
     min_order = 3
-    continuity = "integral inner H(div)"
 
 
 class NonConformingArnoldWinther(CiarletElement):
@@ -144,7 +143,7 @@ class NonConformingArnoldWinther(CiarletElement):
                     reference, reference, p, component22, dof, entity=(2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
-                         (reference.tdim, reference.tdim))
+                         (reference.tdim, reference.tdim), continuity="integral inner H(div)")
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element.
@@ -158,4 +157,3 @@ class NonConformingArnoldWinther(CiarletElement):
     references = ["triangle"]
     min_order = 2
     max_order = 2
-    continuity = "integral inner H(div)"

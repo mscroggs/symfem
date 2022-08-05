@@ -144,10 +144,9 @@ class KongMulderVeldhuizen(CiarletElement):
             raise NotImplementedError
 
         super().__init__(
-            reference, order, poly, dofs, reference.tdim, 1
+            reference, order, poly, dofs, reference.tdim, 1, continuity="C0"
         )
 
     names = ["Kong-Mulder-Veldhuizen", "KMV"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
-    continuity = "C0"

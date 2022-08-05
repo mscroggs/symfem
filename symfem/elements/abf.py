@@ -50,7 +50,8 @@ class ArnoldBoffiFalk(CiarletElement):
                 reference, reference, x[0] ** i * x[1] ** (order + 1),
                 entity=(2, 0), mapping="contravariant"))
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="H(div)")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -64,4 +65,3 @@ class ArnoldBoffiFalk(CiarletElement):
     names = ["Arnold-Boffi-Falk", "ABF"]
     references = ["quadrilateral"]
     min_order = 0
-    continuity = "H(div)"

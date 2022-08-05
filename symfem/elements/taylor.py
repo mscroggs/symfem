@@ -34,9 +34,9 @@ class Taylor(CiarletElement):
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1,
+                         continuity="L2")
 
     names = ["Taylor", "discontinuous Taylor"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
-    continuity = "L2"

@@ -105,6 +105,8 @@ def _vnormalise(v_in: PointTypeInput) -> PointType:
 class Reference(ABC):
     """A reference cell on which a finite element can be defined."""
 
+    _connectivity: typing.Union[None, typing.List[typing.List[typing.List[typing.List[int]]]]]
+
     def __init__(
         self, tdim: int, name: str, origin: PointTypeInput, axes: SetOfPointsInput,
         reference_vertices: SetOfPointsInput, vertices: SetOfPointsInput,
@@ -145,6 +147,58 @@ class Reference(ABC):
         self.tp = tp
         self._inverse_map_to_self: typing.Union[PointType, None] = None
         self._map_to_self: typing.Union[PointType, None] = None
+        self._connectivity = None
+
+    def __eq__(self, other: object) -> bool:
+        """Check if two references are equal."""
+        if not isinstance(other, Reference):
+            return False
+        return self.name == other.name and self.vertices == other.vertices
+
+    @property
+    def connectivity(self) -> typing.List[typing.List[typing.List[typing.List[int]]]]:
+        """Get connectivity information.
+
+        Returns:
+            Connectivity. Indices are tdim, entity number, tdim
+        """
+        if self._connectivity is None:
+            self._compute_connectivity()
+        assert self._connectivity is not None
+        return self._connectivity
+
+    def _compute_connectivity(self):
+        """Compute the connectivity information."""
+        entities = [[[i] for i in range(self.sub_entity_count(0))]]
+        if self.tdim >= 1:
+            entities.append(self.edges)
+        if self.tdim >= 2:
+            entities.append(self.faces)
+        if self.tdim >= 3:
+            entities.append(self.volumes)
+        self._connectivity = []
+
+        for d, d_vs in enumerate(entities):
+            ccc = []
+            for vs in d_vs:
+                cc = []
+                for d2, d2_vs in enumerate(entities):
+                    c = []
+                    for i, vs2 in enumerate(d2_vs):
+                        if d <= d2:
+                            smaller = vs
+                            larger = vs2
+                        else:
+                            smaller = vs2
+                            larger = vs
+                        for j in smaller:
+                            if j not in larger:
+                                break
+                        else:
+                            c.append(i)
+                    cc.append(c)
+                ccc.append(cc)
+            self._connectivity.append(ccc)
 
     @property
     def clockwise_vertices(self) -> SetOfPoints:

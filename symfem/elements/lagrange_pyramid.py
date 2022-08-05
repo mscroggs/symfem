@@ -79,7 +79,7 @@ class Lagrange(CiarletElement):
         poly: typing.List[FunctionInput] = []
         poly += pyramid_polynomial_set_1d(reference.tdim, order)
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1, continuity="C0")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -93,4 +93,3 @@ class Lagrange(CiarletElement):
     names = ["Lagrange", "P"]
     references = ["pyramid"]
     min_order = 0
-    continuity = "C0"

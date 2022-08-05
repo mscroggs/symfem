@@ -46,10 +46,10 @@ class Argyris(CiarletElement):
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1,
+                         continuity="L2")
 
     names = ["Argyris"]
     references = ["triangle"]
     min_order = 5
     max_order = 5
-    continuity = "L2"

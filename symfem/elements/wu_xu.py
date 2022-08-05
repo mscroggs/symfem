@@ -84,10 +84,10 @@ class WuXu(CiarletElement):
                         reference, subentity, tuple(normals), orders, (dim, e_n),
                         scale=1 / volume))
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1,
+                         continuity=f"C{order}")
 
     names = ["Wu-Xu"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = {"interval": 2, "triangle": 3, "tetrahedron": 4}
     max_order = {"interval": 2, "triangle": 3, "tetrahedron": 4}
-    continuity = "C{order}"

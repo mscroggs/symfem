@@ -92,8 +92,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
                         reference, face, f2, entity=(2, f_n), mapping="contravariant"))
 
         super().__init__(
-            reference, order, poly, dofs, reference.tdim, reference.tdim
-        )
+            reference, order, poly, dofs, reference.tdim, reference.tdim, continuity="H(curl)")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -107,7 +106,6 @@ class TrimmedSerendipityHcurl(CiarletElement):
     names = ["trimmed serendipity Hcurl", "TScurl"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
-    continuity = "H(curl)"
 
 
 class TrimmedSerendipityHdiv(CiarletElement):

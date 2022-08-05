@@ -41,7 +41,7 @@ class DPC(CiarletElement):
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
         super().__init__(
-            reference, order, poly, dofs, reference.tdim, 1
+            reference, order, poly, dofs, reference.tdim, 1, continuity="L2"
         )
         self.variant = variant
 
@@ -56,7 +56,6 @@ class DPC(CiarletElement):
     names = ["dPc"]
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 0
-    continuity = "L2"
 
 
 class VectorDPC(CiarletElement):
@@ -86,7 +85,8 @@ class VectorDPC(CiarletElement):
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="L2")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -100,4 +100,3 @@ class VectorDPC(CiarletElement):
     names = ["vector dPc"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
-    continuity = "L2"

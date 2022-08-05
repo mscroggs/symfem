@@ -57,7 +57,8 @@ class AC(CiarletElement):
                 dofs.append(IntegralAgainst(reference, reference, f, entity=(2, 0),
                                             mapping="contravariant"))
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="H(div)")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -71,4 +72,3 @@ class AC(CiarletElement):
     names = ["Arbogast-Correa", "AC", "AC full", "Arbogast-Correa full"]
     references = ["quadrilateral"]
     min_order = 0
-    continuity = "H(div)"

@@ -38,10 +38,9 @@ class BognerFoxSchmit(CiarletElement):
 
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_1d(reference.tdim, order)
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1, continuity="C1")
 
     names = ["Bogner-Fox-Schmit", "BFS"]
     references = ["quadrilateral"]
     min_order = 3
     max_order = 3
-    continuity = "C1"

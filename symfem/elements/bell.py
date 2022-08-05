@@ -45,7 +45,7 @@ class Bell(CiarletElement):
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1, continuity="C1")
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element.
@@ -59,4 +59,3 @@ class Bell(CiarletElement):
     references = ["triangle"]
     min_order = 5
     max_order = 5
-    continuity = "C1"

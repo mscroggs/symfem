@@ -62,7 +62,8 @@ class CrouzeixRaviart(CiarletElement):
         poly += polynomial_set_1d(reference.tdim, order)
 
         self.variant = variant
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1,
+                         continuity="L2")
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element.
@@ -76,4 +77,3 @@ class CrouzeixRaviart(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 1
     max_order = {"tetrahedron": 1}
-    continuity = "L2"

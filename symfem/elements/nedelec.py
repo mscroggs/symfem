@@ -40,7 +40,8 @@ class NedelecFirstKind(CiarletElement):
                      {"variant": variant}),
         )
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="H(curl)")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -54,7 +55,6 @@ class NedelecFirstKind(CiarletElement):
     names = ["Nedelec", "Nedelec1", "N1curl"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
-    continuity = "H(curl)"
 
 
 class NedelecSecondKind(CiarletElement):
@@ -78,7 +78,8 @@ class NedelecSecondKind(CiarletElement):
             volumes=(IntegralMoment, RaviartThomas, order - 2, "covariant", {"variant": variant}),
         )
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim,
+                         continuity="H(curl)")
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -92,4 +93,3 @@ class NedelecSecondKind(CiarletElement):
     names = ["Nedelec2", "N2curl"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
-    continuity = "H(curl)"

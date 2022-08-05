@@ -45,7 +45,7 @@ class HellanHerrmannJohnson(CiarletElement):
         self.variant = variant
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
-                         (reference.tdim, reference.tdim))
+                         (reference.tdim, reference.tdim), continuity="inner H(div)")
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element.
@@ -58,4 +58,3 @@ class HellanHerrmannJohnson(CiarletElement):
     names = ["Hellan-Herrmann-Johnson", "HHJ"]
     references = ["triangle"]
     min_order = 0
-    continuity = "inner H(div)"

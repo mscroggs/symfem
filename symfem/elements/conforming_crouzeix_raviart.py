@@ -55,9 +55,8 @@ class ConformingCrouzeixRaviart(CiarletElement):
                     )
                     dofs.append(PointEvaluation(reference, point, entity=(2, 0)))
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1, continuity="L2")
 
     names = ["conforming Crouzeix-Raviart", "conforming CR"]
     references = ["triangle"]
     min_order = 1
-    continuity = "L2"
