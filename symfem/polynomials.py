@@ -779,3 +779,18 @@ def orthogonal_basis(
         return orthogonal_basis_pyramid(*args)
 
     raise ValueError(f"Unsupported cell type: {cell}")
+
+
+def orthonormal_basis(
+    cell, order: int, derivs: int, variables: AxisVariablesNotSingle = None
+) -> typing.List[typing.List[ScalarFunction]]:
+    """Create a basis of orthonormal polynomials."""
+    from .create import create_reference
+
+    poly = orthogonal_basis(cell, order, derivs, variables)
+    ref = create_reference(cell)
+    norms = [sympy.sqrt((f ** 2).integral(ref, x)) for f in poly[0]]
+    for i, n in enumerate(norms):
+        for j in range(len(poly)):
+            poly[j][i] /= n
+    return poly
