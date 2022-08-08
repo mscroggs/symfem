@@ -1,2 +1,0 @@
-- Remove svgwrite dependency
-- Added normalised orthogonal functions
