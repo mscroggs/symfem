@@ -1,3 +1,8 @@
+# Version 2022.8.2 (08 August 2022)
+
+- Remove svgwrite dependency
+- Added normalised orthogonal functions
+
 # Version 2022.8.1 (02 August 2022)
 
 - Added plotting of DOF diagrams
