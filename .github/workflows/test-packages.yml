@@ -3,6 +3,9 @@ name: 🧪📦 Test packages
 on:
   schedule:
     - cron: "0 7 * * 1"
+  push:
+    branches:
+      - main
 
 jobs:
   run-tests-with-pip:
@@ -22,6 +25,8 @@ jobs:
         name: Get latest Symfem version
       - run: rm -rf symfem VERSION
         name: Remove downloaded symfem
+      - run: python3 -m pip install CairoSVG
+        name: Install optional dependencies
       - run: python3 -m pip install symfem
         name: Install Symfem
       - run: pip install pytest
@@ -49,6 +54,8 @@ jobs:
         name: Get latest Symfem version
       - run: rm -rf symfem VERSION
         name: Remove downloaded symfem
+      - run: conda install CairoSVG
+        name: Install optional dependencies
       - run: |
           conda config --add channels conda-forge
           conda config --set channel_priority strict
@@ -78,6 +85,6 @@ jobs:
         name: Install pytest
       - run: |
           cd symfem-2022.8.2
-          pip install -r requirements.txt
+          pip install .[optional]
           python3 -m pytest test/
         name: Install requirements, run tests and demos
