@@ -51,12 +51,11 @@ jobs:
         name: Get latest Symfem version
       - run: rm -rf symfem VERSION
         name: Remove downloaded symfem
-      - run: conda install CairoSVG
-        name: Install optional dependencies
       - run: |
           conda config --add channels conda-forge
           conda config --set channel_priority strict
           conda install symfem
+          conda install cairosvg
           conda install pytest
           pytest test/
           pytest demo/test_demos.py
