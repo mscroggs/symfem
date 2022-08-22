@@ -22,6 +22,10 @@ jobs:
         name: Get latest Symfem version
       - run: rm -rf symfem VERSION
         name: Remove downloaded symfem
+      - name: Install LaTeΧ
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra
       - run: python3 -m pip install CairoSVG
         name: Install optional dependencies
       - run: python3 -m pip install symfem
@@ -51,6 +55,10 @@ jobs:
         name: Get latest Symfem version
       - run: rm -rf symfem VERSION
         name: Remove downloaded symfem
+      - name: Install LaTeΧ
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra
       - run: |
           conda config --add channels conda-forge
           conda config --set channel_priority strict
@@ -77,6 +85,10 @@ jobs:
           wget -O symfem.tar.gz https://pypi.io/packages/source/s/symfem/symfem-2022.8.2.tar.gz
           tar -xvzf symfem.tar.gz
         name: Download and unpack latest version of Symfem
+      - name: Install LaTeΧ
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra
       - run: pip install pytest
         name: Install pytest
       - run: |
