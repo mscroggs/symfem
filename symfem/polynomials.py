@@ -42,29 +42,6 @@ def polynomial_set_vector(
         for i in range(range_dim)
     ]
 
-def polynomial_set_1d_ZH(
-        dim: int, variant: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[ScalarFunction]:
-    """Huang-Zhang ."""
-    order = 2;
-    if dim == 1:
-        raise RuntimeError('The Haung-Zhang polynomial space is not implemented for dimension {}'.format(dim))
-    if dim == 2:
-        if variant == 0:
-            return [
-                ScalarFunction(variables[0] ** i * variables[1] ** j)
-                for j in range(order + 1)
-                for i in range(order)
-            ]
-        elif variant == 1:
-            return [
-                ScalarFunction(variables[0] ** i * variables[1] ** j)
-                for j in range(order)
-                for i in range(order+1)
-            ]
-
-    if dim == 3:
-        raise RuntimeError('The Haung-Zhang polynomial space is not implemented for dimension {}'.format(dim))
 
 def Hdiv_polynomials(domain_dim: int, range_dim: int, order: int) -> typing.List[VectorFunction]:
     """Hdiv conforming polynomial set."""
