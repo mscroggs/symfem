@@ -31,8 +31,11 @@ class HuangZhang(CiarletElement):
         assert order == 2
 
         half = sympy.Rational(1, 2)
+        dofs: ListOfFunctionals = []
+        poly: typing.List[FunctionInput] = []
+
         if variant == "X":
-            dofs: ListOfFunctionals = [
+            dofs = [
                 PointEvaluation(reference, (0, 0), entity=(0, 0)),
                 PointEvaluation(reference, (0, 1), entity=(0, 1)),
                 PointEvaluation(reference, (1, 1), entity=(0, 2)),
@@ -41,13 +44,13 @@ class HuangZhang(CiarletElement):
                 PointEvaluation(reference, (half, 0), entity=(1, 3))
             ]
 
-            poly: typing.List[FunctionInput] = [
+            poly = [
                 ScalarFunction(x[0] ** i * x[1] ** j)
                 for j in range(order)
                 for i in range(order+1)
             ]
         elif variant == "Y":
-            dofs: ListOfFunctionals = [
+            dofs = [
                 PointEvaluation(reference, (0, 0), entity=(0, 0)),
                 PointEvaluation(reference, (0, 1), entity=(0, 1)),
                 PointEvaluation(reference, (1, 1), entity=(0, 2)),
@@ -56,15 +59,16 @@ class HuangZhang(CiarletElement):
                 PointEvaluation(reference, (1, 1 + half), entity=(1, 2))
             ]
 
-            poly: typing.List[FunctionInput] = [
+            poly = [
                 ScalarFunction(x[0] ** i * x[1] ** j)
                 for j in range(order + 1)
                 for i in range(order)
             ]
+
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     names = ["Huang-Zhang", "HZ"]
     references = ["quadrilateral"]
     min_order = 2
     max_order = 2
-    continuity = "C0"
+    continuity = "H(div)"
