@@ -302,3 +302,4 @@ The reference dual polygon (hexagon example shown) has vertices (1, 0), (3/4, sq
 - Buffa-Christiansen (alternative names: BC)
 - dual polynomial (alternative names: dual P, dual)
 - rotated Buffa-Christiansen (alternative names: RBC)
+
