@@ -29,6 +29,7 @@ class HuangZhang(CiarletElement):
             variant: The variant of the element
         """
         assert reference.name == "quadrilateral"
+        self.variant = variant
 
         dofs: ListOfFunctionals = []
         poly: typing.List[FunctionInput] = []
