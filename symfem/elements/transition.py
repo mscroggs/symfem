@@ -19,7 +19,8 @@ class Transition(CiarletElement):
     """Transition finite element."""
 
     def __init__(self, reference: Reference, order: int,
-                 edge_orders: typing.List[int] = None, face_orders: typing.List[int] = None,
+                 edge_orders: typing.Optional[typing.List[int]] = None,
+                 face_orders: typing.Optional[typing.List[int]] = None,
                  variant: str = "equispaced"):
         """Create the element.
 
