@@ -24,7 +24,8 @@ class DualCiarletElement(FiniteElement):
             typing.Union[int, sympy.core.expr.Expr]]]],
         fine_space: str, reference: DualPolygon, order: int,
         dof_entities: typing.List[typing.Tuple[int, int]],
-        domain_dim: int, range_dim: int, range_shape: typing.Optional[typing.Tuple[int, ...]] = None,
+        domain_dim: int, range_dim: int,
+        range_shape: typing.Optional[typing.Tuple[int, ...]] = None,
         dof_directions: typing.Optional[SetOfPoints] = None
     ):
         """Create a dual element.
