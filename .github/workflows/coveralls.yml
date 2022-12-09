@@ -19,7 +19,7 @@ jobs:
       CXX: g++-10
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.10"
       - run: |
@@ -28,7 +28,7 @@ jobs:
         name: Install Basix requirements
       - run: pip install coverage coveralls pytest-cov
         name: Install Coveralls
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: pip install .[test] pytest-xdist
         name: Install Symfem
       - run: pip install git+https://github.com/FEniCS/basix.git
