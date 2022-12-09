@@ -15,7 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt-get install -y python3-setuptools
-      - run: pip3 install .[style,docs]
+      - run: |
+          pip3 install .[style,docs]
+          pip3 uninstall symfem
       - run: python3 -m flake8 .
         name: Run flake8 checks
       - run: python3 -m pydocstyle .
