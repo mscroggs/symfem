@@ -24,8 +24,9 @@ class DualCiarletElement(FiniteElement):
             typing.Union[int, sympy.core.expr.Expr]]]],
         fine_space: str, reference: DualPolygon, order: int,
         dof_entities: typing.List[typing.Tuple[int, int]],
-        domain_dim: int, range_dim: int, range_shape: typing.Tuple[int, ...] = None,
-        dof_directions: SetOfPoints = None
+        domain_dim: int, range_dim: int,
+        range_shape: typing.Optional[typing.Tuple[int, ...]] = None,
+        dof_directions: typing.Optional[SetOfPoints] = None
     ):
         """Create a dual element.
 
@@ -109,8 +110,10 @@ class DualCiarletElement(FiniteElement):
         return out
 
     def map_to_cell(
-        self, vertices_in: SetOfPointsInput, basis: typing.List[AnyFunction] = None,
-        forward_map: PointType = None, inverse_map: PointType = None
+        self, vertices_in: SetOfPointsInput, basis:
+        typing.Optional[typing.List[AnyFunction]] = None,
+        forward_map: typing.Optional[PointType] = None,
+        inverse_map: typing.Optional[PointType] = None
     ) -> typing.List[AnyFunction]:
         """Map the basis onto a cell using the appropriate mapping for the element."""
         raise NotImplementedError()

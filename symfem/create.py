@@ -60,7 +60,7 @@ for _file in _os.listdir(_os.path.join(_folder, "elements")):
 
 
 def create_reference(
-    cell_type: str, vertices: _SetOfPointsInput = None
+    cell_type: str, vertices: _typing.Optional[_SetOfPointsInput] = None
 ) -> _references.Reference:
     """Make a reference cell.
 
@@ -165,7 +165,8 @@ def create_element(
                       Arnold-Boffi-Falk, ABF,
                       Arbogast-Correa, AC, AC full, Arbogast-Correa full,
                       Rannacher-Turek,
-                      P1-iso-P2, P2-iso-P1, iso-P2 P1
+                      P1-iso-P2, P2-iso-P1, iso-P2 P1,
+                      Huang-Zhang, HZ
         order: The order of the element.
     """
     reference = create_reference(cell_type)

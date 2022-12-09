@@ -204,6 +204,7 @@ The reference quadrilateral has vertices (0, 0), (1, 0), (0, 1), and (1, 1). Its
 - bubble
 - direct serendipity
 - dPc
+- Huang-Zhang (alternative names: HZ)
 - NCE (alternative names: RTCE, Qcurl, Nedelec, Ncurl)
 - NCF (alternative names: RTCF, Qdiv)
 - P1-iso-P2 (alternative names: P2-iso-P1, iso-P2 P1)
@@ -302,3 +303,4 @@ The reference dual polygon (hexagon example shown) has vertices (1, 0), (3/4, sq
 - Buffa-Christiansen (alternative names: BC)
 - dual polynomial (alternative names: dual P, dual)
 - rotated Buffa-Christiansen (alternative names: RBC)
+

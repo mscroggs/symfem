@@ -142,7 +142,7 @@ def Hcurl_quolynomials(domain_dim: int, range_dim: int, order: int) -> typing.Li
 
 
 def serendipity_indices(
-    total: int, linear: int, dim: int, done: typing.List[int] = None
+    total: int, linear: int, dim: int, done: typing.Optional[typing.List[int]] = None
 ) -> typing.List[typing.List[int]]:
     """Get the set indices for a serendipity polynomial set."""
     if done is None:
@@ -756,7 +756,7 @@ def orthogonal_basis_pyramid(
 
 
 def orthogonal_basis(
-    cell, order: int, derivs: int, variables: AxisVariablesNotSingle = None
+    cell, order: int, derivs: int, variables: typing.Optional[AxisVariablesNotSingle] = None
 ) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthogonal polynomials."""
     args: typing.List[typing.Any] = [order, derivs]
@@ -782,7 +782,7 @@ def orthogonal_basis(
 
 
 def orthonormal_basis(
-    cell, order: int, derivs: int, variables: AxisVariablesNotSingle = None
+    cell, order: int, derivs: int, variables: typing.Optional[AxisVariablesNotSingle] = None
 ) -> typing.List[typing.List[ScalarFunction]]:
     """Create a basis of orthonormal polynomials."""
     from .create import create_reference

@@ -132,6 +132,7 @@ test_elements: typing.Dict[str, typing.Dict[
         "AC": [({}, range(4))],
         "Rannacher-Turek": [({}, [1])],
         "P1-iso-P2": [({}, [1])],
+        "HZ": [({}, [2, 3, 4])],
     },
     "hexahedron": {
         "bubble": [({"variant": "equispaced"}, range(2, 4)), ({"variant": "lobatto"}, range(2, 4))],

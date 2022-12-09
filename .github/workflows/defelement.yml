@@ -3,6 +3,10 @@ name: 📙 DefElement
 on:
   pull_request
 
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   defelement:
     name: Test DefElement build
