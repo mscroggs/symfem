@@ -44,7 +44,7 @@ class FiniteElement(ABC):
 
     def __init__(
         self, reference: Reference, order: int, space_dim: int, domain_dim: int, range_dim: int,
-        range_shape: typing.Tuple[int, ...] = None
+        range_shape: typing.Optional[typing.Tuple[int, ...]] = None
     ):
         """Create a finite element."""
         self.reference = reference
@@ -133,8 +133,10 @@ class FiniteElement(ABC):
 
     @abstractmethod
     def map_to_cell(
-        self, vertices_in: SetOfPointsInput, basis: typing.List[AnyFunction] = None,
-        forward_map: PointType = None, inverse_map: PointType = None
+        self, vertices_in: SetOfPointsInput,
+        basis: typing.Optional[typing.List[AnyFunction]] = None,
+        forward_map: typing.Optional[PointType] = None,
+        inverse_map: typing.Optional[PointType] = None
     ) -> typing.List[AnyFunction]:
         """Map the basis onto a cell using the appropriate mapping for the element."""
         pass
@@ -307,7 +309,7 @@ class CiarletElement(FiniteElement):
     def __init__(
         self, reference: Reference, order: int, basis: typing.List[FunctionInput],
         dofs: ListOfFunctionals, domain_dim: int, range_dim: int,
-        range_shape: typing.Tuple[int, ...] = None
+        range_shape: typing.Optional[typing.Tuple[int, ...]] = None
     ):
         """Create a Ciarlet element.
 
@@ -441,8 +443,10 @@ class CiarletElement(FiniteElement):
         img.save(filename, plot_options=plot_options)
 
     def map_to_cell(
-        self, vertices_in: SetOfPointsInput, basis: typing.List[AnyFunction] = None,
-        forward_map: PointType = None, inverse_map: PointType = None
+        self, vertices_in: SetOfPointsInput,
+        basis: typing.Optional[typing.List[AnyFunction]] = None,
+        forward_map: typing.Optional[PointType] = None,
+        inverse_map: typing.Optional[PointType] = None
     ) -> typing.List[AnyFunction]:
         """Map the basis onto a cell using the appropriate mapping for the element."""
         vertices = parse_set_of_points_input(vertices_in)
@@ -526,7 +530,7 @@ class DirectElement(FiniteElement):
     def __init__(
         self, reference: Reference, order: int, basis_functions: typing.List[FunctionInput],
         basis_entities: typing.List[typing.Tuple[int, int]],
-        domain_dim: int, range_dim: int, range_shape: typing.Tuple[int, ...] = None
+        domain_dim: int, range_dim: int, range_shape: typing.Optional[typing.Tuple[int, ...]] = None
     ):
         """Create a Ciarlet element.
 
@@ -558,8 +562,10 @@ class DirectElement(FiniteElement):
         return self._basis_functions
 
     def map_to_cell(
-        self, vertices_in: SetOfPointsInput, basis: typing.List[AnyFunction] = None,
-        forward_map: PointType = None, inverse_map: PointType = None
+        self, vertices_in: SetOfPointsInput,
+        basis: typing.Optional[typing.List[AnyFunction]] = None,
+        forward_map: typing.Optional[PointType] = None,
+        inverse_map: typing.Optional[PointType] = None
     ) -> typing.List[AnyFunction]:
         """Map the basis onto a cell using the appropriate mapping for the element."""
         raise NotImplementedError()

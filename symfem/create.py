@@ -60,7 +60,7 @@ for _file in _os.listdir(_os.path.join(_folder, "elements")):
 
 
 def create_reference(
-    cell_type: str, vertices: _SetOfPointsInput = None
+    cell_type: str, vertices: _typing.Optional[_SetOfPointsInput] = None
 ) -> _references.Reference:
     """Make a reference cell.
 

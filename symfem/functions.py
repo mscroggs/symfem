@@ -257,9 +257,10 @@ class AnyFunction(ABC):
 
     def plot(
         self, reference: Reference, filename: typing.Union[str, typing.List[str]],
-        dof_point: PointType = None,
-        dof_direction: PointType = None, dof_entity: typing.Tuple[int, int] = None,
-        dof_n: int = None, value_scale: sympy.core.expr.Expr = sympy.Integer(1),
+        dof_point: typing.Optional[PointType] = None,
+        dof_direction: typing.Optional[PointType] = None,
+        dof_entity: typing.Optional[typing.Tuple[int, int]] = None,
+        dof_n: typing.Optional[int] = None, value_scale: sympy.core.expr.Expr = sympy.Integer(1),
         plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
     ):
         """Plot the function."""
