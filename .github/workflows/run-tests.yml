@@ -10,6 +10,10 @@ on:
   schedule:
     - cron: "0 7 * * 1"
 
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   run-tests:
     name: Run tests
@@ -61,7 +65,3 @@ jobs:
         name: Install Basix
       - run: python3 -m pytest -n=auto --durations=50 test/test_against_basix.py --has-basix 1 -W error
         name: Run unit tests
-
-concurrency: 
-  group: ${{ github.head_ref }}
-  cancel-in-progress: true
