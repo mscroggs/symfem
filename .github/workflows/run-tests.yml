@@ -61,3 +61,7 @@ jobs:
         name: Install Basix
       - run: python3 -m pytest -n=auto --durations=50 test/test_against_basix.py --has-basix 1 -W error
         name: Run unit tests
+
+concurrency: 
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true

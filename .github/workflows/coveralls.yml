@@ -39,3 +39,7 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.coverall_token }}
         run: python3 -m coveralls
+
+concurrency: 
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
