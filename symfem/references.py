@@ -395,7 +395,7 @@ class Reference(ABC):
         raise RuntimeError
 
     def sub_entities(
-        self, dim: int = None, codim: int = None
+        self, dim: typing.Optional[int] = None, codim: typing.Optional[int] = None
     ) -> typing.Tuple[typing.Tuple[int, ...], ...]:
         """Get the sub-entities of a given dimension.
 
@@ -419,7 +419,9 @@ class Reference(ABC):
             return self.volumes
         raise ValueError(f"Unsupported dimension: {dim}")
 
-    def sub_entity_count(self, dim: int = None, codim: int = None) -> int:
+    def sub_entity_count(
+        self, dim: typing.Optional[int] = None, codim: typing.Optional[int] = None
+    ) -> int:
         """Get the number of sub-entities of a given dimension.
 
         Args:
@@ -2015,7 +2017,9 @@ class DualPolygon(Reference):
 
     reference_origin: PointType
 
-    def __init__(self, number_of_triangles: int, vertices: SetOfPointsInput = None):
+    def __init__(
+        self, number_of_triangles: int, vertices: typing.Optional[SetOfPointsInput] = None
+    ):
         """Create a dual polygon.
 
         Args:

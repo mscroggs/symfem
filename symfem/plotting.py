@@ -617,10 +617,12 @@ class Picture:
     axes_3d: SetOfPoints
 
     def __init__(
-        self, padding: sympy.core.expr.Expr = sympy.Integer(25), scale: int = None,
-        width: int = None, height: int = None, axes_3d: SetOfPointsInput = None,
+        self, padding: sympy.core.expr.Expr = sympy.Integer(25), scale: typing.Optional[int] = None,
+        width: typing.Optional[int] = None, height: typing.Optional[int] = None,
+        axes_3d: typing.Optional[SetOfPointsInput] = None,
         dof_arrow_size: typing.Union[int, sympy.core.expr.Expr] = 1,
-        title: str = None, desc: str = None, svg_metadata: str = None, tex_comment: str = None
+        title: typing.Optional[str] = None, desc: typing.Optional[str] = None,
+        svg_metadata: typing.Optional[str] = None, tex_comment: typing.Optional[str] = None
     ):
         """Create a picture.
 
@@ -780,7 +782,8 @@ class Picture:
     def add_ncircle(
         self, centre: PointOrFunction, number: int, color: str = "red",
         text_color: str = colors.BLACK, fill_color: str = colors.WHITE, radius: float = 20.0,
-        font_size: int = None, width: float = 4.0, font: str = "'Varela Round',sans-serif"
+        font_size: typing.Optional[int] = None, width: float = 4.0,
+        font: str = "'Varela Round',sans-serif"
     ):
         """Add a numbered circle to the picture."""
         self.elements.append(NCircle(
@@ -855,7 +858,7 @@ class Picture:
 
         return scale, height, width, map_pt
 
-    def as_svg(self, filename: str = None) -> str:
+    def as_svg(self, filename: typing.Optional[str] = None) -> str:
         """Convert to an SVG."""
         scale, height, width, map_pt = self.compute_scale("px")
 
@@ -880,8 +883,8 @@ class Picture:
 
         return img
 
-    def as_png(self, filename: str, png_scale: float = None, png_width: int = None,
-               png_height: int = None):
+    def as_png(self, filename: str, png_scale: typing.Optional[float] = None,
+               png_width: typing.Optional[int] = None, png_height: typing.Optional[int] = None):
         """Convert to a PNG."""
         try:
             from cairosvg import svg2png
@@ -904,7 +907,7 @@ class Picture:
         assert filename.endswith(".png")
         svg2png(bytestring=self.as_svg(), write_to=filename, scale=png_scale)
 
-    def as_tikz(self, filename: str = None) -> str:
+    def as_tikz(self, filename: typing.Optional[str] = None) -> str:
         """Convert to tikz."""
         scale, height, width, map_pt = self.compute_scale("cm", False)
         tikz = self.tex_comment

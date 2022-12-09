@@ -198,7 +198,7 @@ class DerivativePointEvaluation(BaseFunctional):
 
     def __init__(self, reference: Reference, point_in: FunctionInput,
                  derivative: typing.Tuple[int, ...],
-                 entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = None):
+                 entity: typing.Tuple[int, int], mapping: typing.Optional[str] = None):
         """Create the functional."""
         super().__init__(reference, entity, mapping)
         self.point = parse_function_input(point_in)
