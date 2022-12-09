@@ -7,13 +7,12 @@ This element's definition appears in https://doi.org/10.1007/s11464-011-0094-0
 import typing
 
 from ..finite_element import CiarletElement
-from ..functionals import (ListOfFunctionals, TangentIntegralMoment, NormalIntegralMoment,
-                           IntegralAgainst)
-from ..functions import FunctionInput
+from ..functionals import (IntegralAgainst, ListOfFunctionals, NormalIntegralMoment,
+                           TangentIntegralMoment)
+from ..functions import FunctionInput, VectorFunction
 from ..moments import make_integral_moment_dofs
 from ..references import Reference
 from ..symbols import x
-from ..functions import VectorFunction
 from .lagrange import Lagrange
 
 
