@@ -1,70 +1,77 @@
-"""Huang-Zhang elements on a triangle.
+"""Huang-Zhang element on a quadrilateral.
 
 This element's definition appears in https://doi.org/10.1007/s11464-011-0094-0
-(Huang, Zhang, 2011)
+(Huang, Zhang, 2011) and https://doi.org/10.1137/080728949 (Zhang, 2009)
 """
 
 import typing
 
-import sympy
-
 from ..finite_element import CiarletElement
-from ..functionals import ListOfFunctionals, DotPointEvaluation
+from ..functionals import (ListOfFunctionals, TangentIntegralMoment, NormalIntegralMoment,
+                           IntegralAgainst)
 from ..functions import FunctionInput
+from ..moments import make_integral_moment_dofs
 from ..references import Reference
 from ..symbols import x
 from ..functions import VectorFunction
+from .lagrange import Lagrange
 
 
 class HuangZhang(CiarletElement):
     """Huang-Zhang finite element."""
 
-    def __init__(self, reference: Reference, order: int):
+    def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         """Create the element.
 
         Args:
             reference: The reference element
             order: The polynomial order
+            variant: The variant of the element
         """
         assert reference.name == "quadrilateral"
-        assert order == 1
 
-        half = sympy.Rational(1, 2)
         dofs: ListOfFunctionals = []
         poly: typing.List[FunctionInput] = []
         poly += [
             VectorFunction([x[0] ** i * x[1] ** j, 0])
-            for j in range(2)
-            for i in range(3)
+            for i in range(order + 1)
+            for j in range(order)
         ]
         poly += [
             VectorFunction([0, x[0] ** i * x[1] ** j])
-            for j in range(3)
-            for i in range(2)
+            for i in range(order)
+            for j in range(order + 1)
         ]
 
-        dofs += [
-            DotPointEvaluation(reference, (0, 0), (1, 0), entity=(0, 0)),
-            DotPointEvaluation(reference, (0, 1), (1, 0), entity=(0, 1)),
-            DotPointEvaluation(reference, (1, 1), (1, 0), entity=(0, 2)),
-            DotPointEvaluation(reference, (1, 0), (1, 0), entity=(0, 3)),
-            DotPointEvaluation(reference, (half, 1), (1, 0), entity=(1, 1)),
-            DotPointEvaluation(reference, (half, 0), (1, 0), entity=(1, 3))
-        ]
+        dofs += make_integral_moment_dofs(
+            reference,
+            facets=(NormalIntegralMoment, Lagrange, order - 1,
+                    {"variant": variant}),
+        )
+        dofs += make_integral_moment_dofs(
+            reference,
+            facets=(TangentIntegralMoment, Lagrange, order - 2,
+                    {"variant": variant}),
+        )
 
-        dofs += [
-            DotPointEvaluation(reference, (0, 0), (0, 1), entity=(0, 0)),
-            DotPointEvaluation(reference, (0, 1), (0, 1), entity=(0, 1)),
-            DotPointEvaluation(reference, (1, 1), (0, 1), entity=(0, 2)),
-            DotPointEvaluation(reference, (1, 0), (0, 1), entity=(0, 3)),
-            DotPointEvaluation(reference, (0, half), (0, 1), entity=(1, 0)),
-            DotPointEvaluation(reference, (1, half), (0, 1), entity=(1, 2))
-        ]
+        for i in range(order - 1):
+            for j in range(order - 2):
+                dofs.append(IntegralAgainst(
+                    reference, reference, (x[0] ** i * x[1] ** j, 0), (2, 0)))
+                dofs.append(IntegralAgainst(
+                    reference, reference, (0, x[0] ** j * x[1] ** i), (2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+        """Return the kwargs used to create this element.
+
+        Returns:
+            Keyword argument dictionary
+        """
+        return {"variant": self.variant}
+
     names = ["Huang-Zhang", "HZ"]
     references = ["quadrilateral"]
-    min_order = 1
-    max_order = 1
+    min_order = 2
     continuity = "H(div)"
