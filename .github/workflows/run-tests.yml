@@ -10,7 +10,7 @@ on:
   schedule:
     - cron: "0 7 * * 1"
 
-concurrency: 
+concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
@@ -20,13 +20,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - run: pip install git+https://github.com/mscroggs/CairoSVG@mscroggs/python-311-deprecation-warning
       - run: pip install .[test] pytest-xdist
         name: Install Symfem
       - name: Install LaTeΧ
@@ -45,20 +46,20 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
     env:
       CC: gcc-10
       CXX: g++-10
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - run: |
             sudo apt-get install -y libopenblas-dev liblapack-dev ninja-build
             pip install pybind11
         name: Install Basix dependencies
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: pip install .[test] pytest-xdist
         name: Install Symfem
       - run: pip install git+https://github.com/FEniCS/basix.git
