@@ -68,4 +68,5 @@ python3 update_readme.py
 To confirm that you have completes steps 4 and 5 correctly, you can run:
 
 ```bash
-python3 -m pytest test/test_docs.py```
+python3 -m pytest test/test_docs.py
+```
