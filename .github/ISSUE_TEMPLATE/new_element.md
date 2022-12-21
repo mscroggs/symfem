@@ -2,7 +2,7 @@
 name: New element
 about: Suggest a new element
 title: 'Add [NAME] element'
-labels: enhancement
+labels: enhancement,new element
 assignees: ''
 
 ---

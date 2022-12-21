@@ -119,6 +119,9 @@ If you find a bug in Symfem, please report it on the [issue tracker](https://git
 If you want to suggest a new feature or an improvement of a current feature, you can submit this
 on the [issue tracker](https://github.com/mscroggs/symfem/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=).
 
+## Adding a new element
+If you want to add a new element to Symfem, take a look at the [Adding an element guide](ADDING_AN_ELEMENT.md).
+
 ## Submitting a pull request
 If you want to directly submit code to Symfem, you can do this by forking the Symfem repo, then submitting a pull request.
 If you want to contribute, but are unsure where to start, have a look at the
