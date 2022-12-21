@@ -19,7 +19,15 @@ from ..symbols import AxisVariablesNotSingle, t, x
 
 
 def single_choose(n: int, k: int) -> sympy.core.expr.Expr:
-    """Calculate choose function of a set of powers."""
+    """Calculate choose function of a set of powers.
+
+    Args:
+        n: Number of items
+        k: Number to select
+
+    Returns:
+        Number of ways to pick k items from n items (ie n choose k)
+    """
     out = sympy.Integer(1)
     for i in range(k + 1, n + 1):
         out *= i
@@ -29,7 +37,15 @@ def single_choose(n: int, k: int) -> sympy.core.expr.Expr:
 
 
 def choose(n: int, powers: typing.List[int]) -> sympy.core.expr.Expr:
-    """Calculate choose function of a set of powers."""
+    """Calculate choose function of a set of powers.
+
+    Args:
+        n: Number of items
+        k: Numbers to select
+
+    Returns:
+        A multichoose function
+    """
     out = sympy.Integer(1)
     for p in powers:
         out *= single_choose(n, p)
@@ -46,6 +62,9 @@ def bernstein_polynomials(
         n: The polynomial order
         d: The topological dimension
         vars: The variables to use
+
+    Returns:
+        Bernstein polynomials
     """
     poly = []
     if d == 1:
@@ -104,11 +123,22 @@ class BernsteinFunctional(BaseFunctional):
         self.moment = sum(i * j for i, j in zip(alpha, orth))
 
     def dof_point(self) -> PointType:
-        """Get the location of the DOF in the cell."""
+        """Get the location of the DOF in the cell.
+
+        Returns:
+            Location of the DOF
+        """
         return self.ref.sub_entity(*self.entity).midpoint()
 
     def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
-        """Apply the functional to a function."""
+        """Apply the functional to a function.
+
+        Args:
+            function: The function
+
+        Returns:
+            Evaluation of the functional
+        """
         point = [i for i in self.ref.origin]
         for i, a in enumerate(zip(*self.ref.axes)):
             for j, k in zip(a, t):
@@ -118,7 +148,11 @@ class BernsteinFunctional(BaseFunctional):
         return integrand.integral(self.ref)
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
-        """Get a representation of the functional as TeX, and list of terms involved."""
+        """Get a representation of the functional as TeX, and list of terms involved.
+
+        Returns:
+            TeX representation
+        """
         if self.reference.tdim == self.ref.tdim:
             return f"v\\mapsto c_{{{self.index}}}", [
                 "\\(v=\\sum_ic_iB_i\\)",
