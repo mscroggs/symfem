@@ -40,107 +40,270 @@ class BasisFunction(AnyFunction):
         pass
 
     def __add__(self, other: typing.Any) -> AnyFunction:
-        """Add."""
+        """Add.
+
+        Args:
+            other: A function to add to this function.
+
+        Returns:
+            The sum of two functions
+        """
         return self.get_function().__add__(other)
 
     def __radd__(self, other: typing.Any) -> AnyFunction:
-        """Add."""
+        """Add.
+
+        Args:
+            other: A function to add to this function.
+
+        Returns:
+            The sum of two functions
+        """
         return self.get_function().__radd__(other)
 
     def __sub__(self, other: typing.Any) -> AnyFunction:
-        """Subtract."""
+        """Subtract.
+
+        Args:
+            other: A function to subtract this function.
+
+        Returns:
+            The difference of two functions
+        """
         return self.get_function().__sub__(other)
 
     def __rsub__(self, other: typing.Any) -> AnyFunction:
-        """Subtract."""
+        """Subtract.
+
+        Args:
+            other: A function to subtract this function from.
+
+        Returns:
+            The difference of two functions
+        """
         return self.get_function().__rsub__(other)
 
     def __neg__(self) -> AnyFunction:
-        """Negate."""
+        """Negate.
+
+        Returns:
+            Negated function
+        """
         return self.get_function().__neg__()
 
     def __truediv__(self, other: typing.Any) -> AnyFunction:
-        """Divide."""
+        """Divide.
+
+        Args:
+            other: A function to divide this function by.
+
+        Returns:
+            The ratio of two functions
+        """
         return self.get_function().__truediv__(other)
 
     def __rtruediv__(self, other: typing.Any) -> AnyFunction:
-        """Divide."""
+        """Divide.
+
+        Args:
+            other: A function to divide by this function.
+
+        Returns:
+            The ratio of two functions
+        """
         return self.get_function().__rtruediv__(other)
 
     def __mul__(self, other: typing.Any) -> AnyFunction:
-        """Multiply."""
+        """Multiply.
+
+        Args:
+            other: A function to multiply by this function.
+
+        Returns:
+            The product of two functions
+        """
         return self.get_function().__mul__(other)
 
     def __rmul__(self, other: typing.Any) -> AnyFunction:
-        """Multiply."""
+        """Multiply.
+
+        Args:
+            other: A function to multiply by this function.
+
+        Returns:
+            The product of two functions
+        """
         return self.get_function().__rmul__(other)
 
     def __matmul__(self, other: typing.Any) -> AnyFunction:
-        """Multiply."""
+        """Multiply.
+
+        Args:
+            other: A function to matrix multiply by this function.
+
+        Returns:
+            The product of two matrix functions
+        """
         return self.get_function().__matmul__(other)
 
     def __rmatmul__(self, other: typing.Any) -> AnyFunction:
-        """Multiply."""
+        """Multiply.
+
+        Args:
+            other: A function to matrix multiply by this function.
+
+        Returns:
+            The product of two matrix functions
+        """
         return self.get_function().__rmatmul__(other)
 
     def __pow__(self, other: typing.Any) -> AnyFunction:
-        """Raise to a power."""
+        """Raise to a power.
+
+        Args:
+            other: A power to raise this function to.
+
+        Returns:
+            This function to the power of other
+        """
         return self.get_function().__pow__(other)
 
     def as_sympy(self) -> SympyFormat:
-        """Convert to a sympy expression."""
+        """Convert to a sympy expression.
+
+        Returns:
+            This function as a Sympy expression
+        """
         return self.get_function().as_sympy()
 
     def as_tex(self) -> str:
-        """Convert to a TeX expression."""
+        """Convert to a TeX expression.
+
+        Returns:
+            A TeX representation of this function
+        """
         return self.get_function().as_tex()
 
     def diff(self, variable: sympy.core.symbol.Symbol) -> AnyFunction:
-        """Differentiate the function."""
+        """Differentiate the function.
+
+        Args:
+            variable: The variable to differentiate with respect to
+
+        Returns:
+            The derivative
+        """
         return self.get_function().diff(variable)
 
     def directional_derivative(self, direction: PointType) -> AnyFunction:
-        """Compute a directional derivative."""
+        """Compute a directional derivative.
+
+        Args:
+            direction: The direction of the derivative
+
+        Returns:
+            The derivative
+        """
         return self.get_function().directional_derivative(direction)
 
     def jacobian_component(self, component: typing.Tuple[int, int]) -> AnyFunction:
-        """Compute a component of the jacobian."""
+        """Compute a component of the jacobian.
+
+        Args:
+            component: The component to compute
+
+        Returns:
+            Component of the Jacobian
+        """
         return self.get_function().jacobian_component(component)
 
     def jacobian(self, dim: int) -> AnyFunction:
-        """Compute the jacobian."""
+        """Compute the jacobian.
+
+        Args:
+            dim: The dimension of the Jacobian
+
+        Returns:
+            The Jabobian
+        """
         return self.get_function().jacobian(dim)
 
     def dot(self, other_in: FunctionInput) -> AnyFunction:
-        """Compute the dot product with another function."""
+        """Compute the dot product with another function.
+
+        Args:
+            other_in: The function to dot with
+
+        Return:
+            The dot product
+        """
         return self.get_function().dot(other_in)
 
     def cross(self, other_in: FunctionInput) -> AnyFunction:
-        """Compute the cross product with another function."""
+        """Compute the cross product with another function.
+
+        Args:
+            other_in: The function to cross with
+
+        Return:
+            The cross product
+        """
         return self.get_function().cross(other_in)
 
     def div(self) -> AnyFunction:
-        """Compute the div of the function."""
+        """Compute the divergence of the function.
+
+        Returns:
+            The divergence
+        """
         return self.get_function().div()
 
     def grad(self, dim: int) -> AnyFunction:
-        """Compute the grad of the function."""
+        """Compute the gradient of the function.
+
+        Returns:
+            The gradient
+        """
         return self.get_function().grad(dim)
 
     def curl(self) -> AnyFunction:
-        """Compute the curl of the function."""
+        """Compute the curl of the function.
+
+        Returns:
+            The curl
+        """
         return self.get_function().curl()
 
     def norm(self) -> ScalarFunction:
-        """Compute the norm of the function."""
+        """Compute the norm of the function.
+
+        Returns:
+            The norm
+        """
         raise self.get_function().norm()
 
     def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t) -> AnyFunction:
-        """Compute the integral of the function."""
+        """Compute the integral of the function.
+
+        Args:
+            domain: The domain to integrate over
+            vars: The variables to integrate over
+
+        Returns:
+            The integral
+        """
         return self.get_function().integral(domain, vars)
 
     def subs(self, vars: AxisVariables, values: ValuesToSubstitute) -> BasisFunction:
-        """Substitute values into the function."""
+        """Substitute values into the function.
+
+        Args:
+            vars: The variable(s) to substitute
+            values: The value(s) to substitute
+
+        Returns:
+            Substituted function
+        """
         return SubbedBasisFunction(self, vars, values)
 
     def __getitem__(self, key) -> AnyFunction:
@@ -148,23 +311,39 @@ class BasisFunction(AnyFunction):
         return self.get_function().__getitem__(key)
 
     def __len__(self) -> int:
-        """Get length."""
+        """Get length.
+
+        Return:
+            The length
+        """
         return self.get_function().__len__()
 
     def det(self) -> ScalarFunction:
-        """Compute the determinant."""
+        """Compute the determinant.
+
+        Returns:
+            The determinant
+        """
         if not self.is_matrix:
             raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'det'")
         return self.get_function().det()
 
     def transpose(self) -> ScalarFunction:
-        """Compute the transpose."""
+        """Compute the transpose.
+
+        Returns:
+            The transpose
+        """
         if not self.is_matrix:
             raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'transpose'")
         return self.get_function().transpose()
 
     def with_floats(self) -> AnyFunction:
-        """Return a version the function with floats as coefficients."""
+        """Return a version the function with floats as coefficients.
+
+        Returns:
+            The function with floats as coefficients
+        """
         return self.get_function().with_floats()
 
 
@@ -187,17 +366,32 @@ class SubbedBasisFunction(BasisFunction):
         self._values = values
 
     def get_function(self) -> AnyFunction:
-        """Return the symbolic function."""
+        """Return the symbolic function.
+
+        Returns:
+            Symbolic function
+        """
         return self.f.get_function().subs(self._vars, self._values)
 
     @property
     def shape(self) -> typing.Tuple[int, ...]:
-        """Get the value shape of the function."""
+        """Get the value shape of the function.
+
+        Returns:
+            shape
+        """
         return self.f.get_function().shape
 
     def plot_values(
         self, reference: Reference, img: typing.Any,
         value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
-        """Plot the function's values."""
+        """Plot the function's values.
+
+        Args:
+            reference: The domain to plot the function on
+            img: The image to plot the values on
+            value_scale: The factor to scale values by
+            n: The number of plotting points
+        """
         self.f.plot_values(reference, img, value_scale, n)
