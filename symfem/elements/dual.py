@@ -53,17 +53,32 @@ class DualCiarletElement(FiniteElement):
     def get_polynomial_basis(
         self, reshape: bool = True
     ) -> typing.List[AnyFunction]:
-        """Get the symbolic polynomial basis for the element."""
+        """Get the symbolic polynomial basis for the element.
+
+        Returns:
+            The polynomial basis
+        """
         raise ValueError("Polynomial basis not supported for barycentric dual elements.")
 
     def get_dual_matrix(self) -> sympy.matrices.dense.MutableDenseMatrix:
-        """Get the dual matrix."""
+        """Get the dual matrix.
+
+        Returns:
+            The dual matrix
+        """
         raise ValueError("Dual matrix not supported for barycentric dual elements.")
 
     def get_basis_functions(
         self, use_tensor_factorisation: bool = False
     ) -> typing.List[AnyFunction]:
-        """Get the basis functions of the element."""
+        """Get the basis functions of the element.
+
+        Args:
+            use_tensor_factorisation: Should a tensor factorisation be used?
+
+        Returns:
+            The basis functions
+        """
         assert not use_tensor_factorisation
 
         if self._basis_functions is None:
@@ -102,7 +117,15 @@ class DualCiarletElement(FiniteElement):
         return self._basis_functions
 
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
-        """Get the numbers of the DOFs associated with the given entity."""
+        """Get the numbers of the DOFs associated with the given entity.
+
+        Args:
+            entity_dim: The dimension of the entity
+            entity_number: The number of the entity
+
+        Returns:
+            The numbers of the DOFs associated with the entity
+        """
         out = []
         for i, e in enumerate(self.dof_entities):
             if e == (entity_dim, entity_number):
@@ -115,14 +138,30 @@ class DualCiarletElement(FiniteElement):
         forward_map: typing.Optional[PointType] = None,
         inverse_map: typing.Optional[PointType] = None
     ) -> typing.List[AnyFunction]:
-        """Map the basis onto a cell using the appropriate mapping for the element."""
+        """Map the basis onto a cell using the appropriate mapping for the element.
+
+        Args:
+            vertices_in: The vertices of the cell
+            basis: The basis functions
+            forward_map: The map from the reference to the cell
+            inverse_map: The map to the reference from the cell
+
+        Returns:
+            The basis functions mapped to the cell
+        """
         raise NotImplementedError()
 
     def plot_dof_diagram(
         self, filename: typing.Union[str, typing.List[str]],
         plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
     ):
-        """Plot a diagram showing the DOFs of the element."""
+        """Plot a diagram showing the DOFs of the element.
+
+        Args:
+            filename: The file name
+            plot_options: Options for the plot
+            kwargs: Keyword arguments
+        """
         img = Picture(**kwargs)
 
         for entities in self.reference.z_ordered_entities():
