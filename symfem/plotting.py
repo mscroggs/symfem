@@ -15,7 +15,14 @@ SetOfPointsOrFunctions = typing.Union[
 
 
 def tex_font_size(n: int):
-    """Convert a font size to a tex size command."""
+    """Convert a font size to a TeX size command.
+
+    Args:
+        n: Font size
+
+    Returns:
+        TeX size command
+    """
     if n < 21:
         return "\\tiny"
     if n < 24:
@@ -72,7 +79,14 @@ class Colors:
         raise ValueError(f"Unsupported dimension: {n}")
 
     def get_tikz_name(self, name: str) -> str:
-        """Get the name of the colour to be used in Tikz."""
+        """Get the name of the colour to be used in Tikz.
+
+        Args:
+            name: HTML name of the color
+
+        Returns:
+            The Tikz name of the color
+        """
         if name.startswith("#"):
             if name not in self._tikz:
                 self._tikz[name] = f"customcolor{len(self._tikz)}"
@@ -80,7 +94,11 @@ class Colors:
         return name
 
     def get_tikz_definitions(self) -> str:
-        """Get the definitions of colours used in Tikz."""
+        """Get the definitions of colours used in Tikz.
+
+        Returns:
+            Definitions of Tikz colors
+        """
         out = ""
         for a, b in self._tikz.items():
             assert a.startswith("#")
@@ -737,14 +755,30 @@ class Picture:
         self, start: PointOrFunction, end: PointOrFunction, color: str = colors.BLACK,
         width: float = 4.0
     ):
-        """Add a line to the picture."""
+        """Add a line to the picture.
+
+        Args:
+            start: The start point of the line
+            end: The end point of the line
+            color: The color of the line
+            width: The width of the line
+        """
         self.elements.append(Line(self.parse_point(start), self.parse_point(end), color, width))
 
     def add_bezier(
         self, start: PointOrFunction, mid1: PointOrFunction, mid2: PointOrFunction,
         end: PointOrFunction, color: str = colors.BLACK, width: float = 4.0
     ):
-        """Add a Bezier curve to the picture."""
+        """Add a Bezier curve to the picture.
+
+        Args:
+            start: The start point of the Bezier curve
+            mid1: The first control point
+            mid2: The second control point
+            end: The end point of the Bezier curve
+            color: The color of the Bezier curve
+            width: The width of the Bezier curve
+        """
         self.elements.append(Bezier(
             self.parse_point(start), self.parse_point(mid1), self.parse_point(mid2),
             self.parse_point(end), color, width))
@@ -753,13 +787,27 @@ class Picture:
         self, start: PointOrFunction, end: PointOrFunction, color: str = colors.BLACK,
         width: float = 4.0
     ):
-        """Add an arrow to the picture."""
+        """Add an arrow to the picture.
+
+        Args:
+            start: The start point of the arrow
+            end: The end point of the arrow
+            color: The color of the arrow
+            width: The width of the arrow
+        """
         self.elements.append(Arrow(self.parse_point(start), self.parse_point(end), color, width))
 
     def add_dof_marker(
         self, point: PointOrFunction, number: int, color: str, bold: bool = True
     ):
-        """Add a DOF marker."""
+        """Add a DOF marker.
+
+        Args:
+            point: The point
+            number: The number to put in the marker
+            color: The color of the marker
+            bold: Should the marker be bold?
+        """
         if bold:
             self.add_ncircle(point, number, colors.BLACK, colors.BLACK, color)
         else:
@@ -769,7 +817,16 @@ class Picture:
         self, point: PointOrFunction, direction: PointOrFunction, number: int,
         color: str = colors.PURPLE, shifted: bool = False, bold: bool = True
     ):
-        """Add a DOF arrow."""
+        """Add a DOF arrow.
+
+        Args:
+            point: The point
+            direction: The direction of the arrow
+            number: The number to put in the marker
+            color: The color of the marker
+            shifted: Should the marker be shifted?
+            bold: Should the marker be bold?
+        """
         vdirection = VectorFunction(self.parse_point(direction))
         vdirection /= 8 * vdirection.norm()
         vdirection *= self.dof_arrow_size
@@ -785,7 +842,19 @@ class Picture:
         font_size: typing.Optional[int] = None, width: float = 4.0,
         font: str = "'Varela Round',sans-serif"
     ):
-        """Add a numbered circle to the picture."""
+        """Add a numbered circle to the picture.
+
+        Args:
+            centre: The centre points
+            number: The number in the circle
+            color: The color of the outline
+            text_color: The color of the test
+            fill_color: The colour of the background fill
+            radius: The radius of the circle
+            font_size: The font size
+            width: The width of the line
+            font: The font
+        """
         self.elements.append(NCircle(
             self.parse_point(centre), number, color, text_color, fill_color, radius, font_size,
             width, font))
@@ -806,14 +875,28 @@ class Picture:
     def add_fill(
         self, vertices: SetOfPointsOrFunctions, color: str = "red", opacity: float = 1.0
     ):
-        """Add a filled polygon to the picture."""
+        """Add a filled polygon to the picture.
+
+        Args:
+            vertices: The vertices of the polygon
+            color: The color of the polygon
+            opacity: The opacity of the polygon
+        """
         self.elements.append(Fill(tuple(self.parse_point(p) for p in vertices), color, opacity))
 
     def compute_scale(self, unit: str = "px", reverse_y: bool = True) -> typing.Tuple[
         sympy.core.expr.Expr, sympy.core.expr.Expr, sympy.core.expr.Expr,
         typing.Callable[[PointType], typing.Tuple[float, float]]
     ]:
-        """Compute the scale and size of the picture."""
+        """Compute the scale and size of the picture.
+
+        Args:
+            unit: The unit to use. Accepted values: px, cm, mm
+            reverse_y: Should the y-axis be reversed?
+
+        Returns:
+            The scale, height, and width of the image, and a mapping function
+        """
         minx = min(i.minx() for i in self.elements)
         miny = min(i.miny() for i in self.elements)
         maxx = max(i.maxx() for i in self.elements)
@@ -859,7 +942,14 @@ class Picture:
         return scale, height, width, map_pt
 
     def as_svg(self, filename: typing.Optional[str] = None) -> str:
-        """Convert to an SVG."""
+        """Convert to an SVG.
+
+        Args:
+            filename: The file name
+
+        Returns:
+            The image as an SVG string
+        """
         scale, height, width, map_pt = self.compute_scale("px")
 
         assert filename is None or filename.endswith(".svg")
@@ -885,7 +975,14 @@ class Picture:
 
     def as_png(self, filename: str, png_scale: typing.Optional[float] = None,
                png_width: typing.Optional[int] = None, png_height: typing.Optional[int] = None):
-        """Convert to a PNG."""
+        """Convert to a PNG.
+
+        Args:
+            filename: The file name
+            png_scale: The scale of the png
+            png_width: The width of the png
+            png_height: The height of the png
+        """
         try:
             from cairosvg import svg2png
         except ImportError:
@@ -908,7 +1005,14 @@ class Picture:
         svg2png(bytestring=self.as_svg(), write_to=filename, scale=png_scale)
 
     def as_tikz(self, filename: typing.Optional[str] = None) -> str:
-        """Convert to tikz."""
+        """Convert to tikz.
+
+        Args:
+            filename: The file name
+
+        Returns:
+            The image as a Tikz string
+        """
         scale, height, width, map_pt = self.compute_scale("cm", False)
         tikz = self.tex_comment
         tikz += "\\begin{tikzpicture}[x=1cm,y=1cm]\n"
@@ -929,7 +1033,12 @@ class Picture:
 
     def save(self, filename: typing.Union[str, typing.List[str]],
              plot_options: typing.Dict[str, typing.Any] = {}):
-        """Save the picture as a file."""
+        """Save the picture as a file.
+
+        Args:
+            filename: The file name
+            plot_options: The plotting options
+        """
         if isinstance(filename, list):
             for fn in filename:
                 self.save(fn, plot_options)
