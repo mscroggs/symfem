@@ -1,4 +1,4 @@
-"""Polynomial sets."""
+"""Polynomial sets"""
 
 import typing
 from itertools import product
@@ -1074,6 +1074,8 @@ def orthonormal_basis(
 
     poly = orthogonal_basis(cell, order, derivs, variables)
     ref = create_reference(cell)
+    if variables is None:
+        variables = x
     norms = [sympy.sqrt((f ** 2).integral(ref, variables)) for f in poly[0]]
     for i, n in enumerate(norms):
         for j in range(len(poly)):
