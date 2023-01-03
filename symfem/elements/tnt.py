@@ -21,7 +21,15 @@ from .q import Q
 
 
 def p(k: int, v: sympy.core.symbol.Symbol) -> ScalarFunction:
-    """Return the kth Legendre polynomial."""
+    """Return the kth Legendre polynomial.
+
+    Args:
+        k: k
+        v: The variable to use
+
+    Returns:
+        The kth Legendre polynomial
+    """
     return orthogonal_basis("interval", k, 0, [v])[0][-1]
 
 
@@ -30,6 +38,13 @@ def b(k: int, v: sympy.core.symbol.Symbol) -> ScalarFunction:
 
     This function is defined on page 4 (606) of
     https://doi.org/10.1090/S0025-5718-2013-02729-9 (Cockburn, Qiu, 2013).
+
+    Args:
+        k: k
+        v: The variable to use
+
+    Returns:
+        The function B_k
     """
     if k == 1:
         return ScalarFunction(0)

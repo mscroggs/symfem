@@ -453,7 +453,7 @@ class CiarletElement(FiniteElement):
         """Return the keyword arguments used to create this element.
 
         Returns:
-            The keyword arguements
+            Keyword arguments dictionary
         """
         return {}
 
