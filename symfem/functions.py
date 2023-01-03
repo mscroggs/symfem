@@ -27,7 +27,14 @@ _ValuesToSubstitute = typing.Union[
 
 
 def _to_sympy_format(item: typing.Any) -> SympyFormat:
-    """Convert to Sympy format used by these functions."""
+    """Convert to Sympy format used by these functions.
+
+    Args:
+        item: The input item
+
+    Returns:
+        The item in Sympy format expected by functions
+    """
     if isinstance(item, AnyFunction):
         return item.as_sympy()
 
@@ -53,7 +60,15 @@ def _to_sympy_format(item: typing.Any) -> SympyFormat:
 
 
 def _check_equal(first: SympyFormat, second: SympyFormat) -> bool:
-    """Check if two items are equal."""
+    """Check if two items are equal.
+
+    Args:
+        first: The first item
+        second: The second item
+
+    Returns:
+        Are the two items equal?
+    """
     if isinstance(first, sympy.core.expr.Expr) and isinstance(second, sympy.core.expr.Expr):
         return (first - second).expand().simplify() == 0
 
@@ -161,77 +176,163 @@ class AnyFunction(ABC):
 
     @abstractmethod
     def as_sympy(self) -> SympyFormat:
-        """Convert to a sympy expression."""
+        """Convert to a Sympy expression.
+
+        Returns:
+            A Sympy expression
+        """
         pass
 
     @abstractmethod
     def as_tex(self) -> str:
-        """Convert to a TeX expression."""
+        """Convert to a TeX expression.
+
+        Returns:
+            A TeX string
+        """
         pass
 
     @abstractmethod
     def subs(self, vars: AxisVariables, values: typing.Union[AnyFunction, _ValuesToSubstitute]):
-        """Substitute values into the function."""
+        """Substitute values into the function.
+
+        Args:
+            vars: The variables to substitute out
+            values: The value to substitute in
+
+        Returns:
+            The substituted function
+        """
         pass
 
     @abstractmethod
     def diff(self, variable: sympy.core.symbol.Symbol):
-        """Differentiate the function."""
+        """Differentiate the function.
+
+        Args:
+            variable: The variable to differentiate with respect to
+
+        Returns:
+            The differentiated function
+        """
         pass
 
     @abstractmethod
     def directional_derivative(self, direction: PointType):
-        """Compute a directional derivative."""
+        """Compute a directional derivative.
+
+        Args:
+            direction: The diection
+
+        Returns:
+            The directional differentiate
+        """
         pass
 
     @abstractmethod
-    def jacobian_component(self, direction: typing.Tuple[int, int]):
-        """Compute a component of the jacobian."""
+    def jacobian_component(self, component: typing.Tuple[int, int]):
+        """Compute a component of the jacobian.
+
+        Args:
+            component: The component
+
+        Returns:
+            The component of the jacobian
+        """
         pass
 
     @abstractmethod
     def jacobian(self, dim: int):
-        """Compute the jacobian."""
+        """Compute the jacobian.
+
+        Args:
+            dim: The topological dimension of the cell
+
+        Returns:
+            The jacobian
+        """
         pass
 
     @abstractmethod
     def dot(self, other_in: FunctionInput):
-        """Compute the dot product with another function."""
+        """Compute the dot product with another function.
+
+        Args:
+            other_in: The function to multiply with
+
+        Returns:
+            The product
+        """
         pass
 
     @abstractmethod
     def cross(self, other_in: FunctionInput):
-        """Compute the cross product with another function."""
+        """Compute the cross product with another function.
+
+        Args:
+            other_in: The function to multiply with
+
+        Returns:
+            The cross product
+        """
         pass
 
     @abstractmethod
     def div(self):
-        """Compute the div of the function."""
+        """Compute the div of the function.
+
+        Returns:
+            The divergence
+        """
         pass
 
     @abstractmethod
     def grad(self, dim: int):
-        """Compute the grad of the function."""
+        """Compute the grad of the function.
+
+        Returns:
+            The gradient
+        """
         pass
 
     @abstractmethod
     def curl(self):
-        """Compute the curl of the function."""
+        """Compute the curl of the function.
+
+        Returns:
+            The curl
+        """
         pass
 
     @abstractmethod
     def norm(self):
-        """Compute the norm of the function."""
+        """Compute the norm of the function.
+
+        Returns:
+            The norm
+        """
         pass
 
     @abstractmethod
     def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t):
-        """Compute the integral of the function."""
+        """Compute the integral of the function.
+
+        Args:
+            domain: The domain of the integral
+            vars: The variables to integrate with respect to
+
+        Returns:
+            The integral
+        """
         pass
 
     @abstractmethod
     def with_floats(self) -> AnyFunction:
-        """Return a version the function with floats as coefficients."""
+        """Return a version the function with floats as coefficients.
+
+        Returns:
+            A version the function with floats as coefficients
+        """
         pass
 
     def integrate(self, *limits: typing.Tuple[
@@ -239,20 +340,39 @@ class AnyFunction(ABC):
         typing.Union[int, sympy.core.expr.Expr],
         typing.Union[int, sympy.core.expr.Expr]
     ]):
-        """Integrate the function."""
+        """Integrate the function.
+
+        Args:
+            limits: The variables and limits
+
+        Returns:
+            The integral
+        """
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'integrate'")
 
     def det(self):
-        """Compute the determinant."""
+        """Compute the determinant.
+
+        Returns:
+            The deteminant
+        """
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'det'")
 
     def transpose(self):
-        """Compute the transpose."""
+        """Compute the transpose.
+
+        Returns:
+            The transpose
+        """
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'transpose'")
 
     @property
     def shape(self) -> typing.Tuple[int, ...]:
-        """Get the value shape of the function."""
+        """Get the value shape of the function.
+
+        Returns:
+            The value shape
+        """
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'shape'")
 
     def plot(
@@ -263,7 +383,19 @@ class AnyFunction(ABC):
         dof_n: typing.Optional[int] = None, value_scale: sympy.core.expr.Expr = sympy.Integer(1),
         plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
     ):
-        """Plot the function."""
+        """Plot the function.
+
+        Args:
+            reference: The reference cell
+            filename: The file name
+            dof_point: The DOF point
+            dof_direction: The direction of the DOF
+            dof_entity: The entity the DOF is associated with
+            dof_n: The number of the DOF
+            value_scale: The scale factor for the function values
+            plot_options: Options for the plot
+            kwargs: Keyword arguments
+        """
         from .plotting import Picture, colors
 
         extra: typing.Tuple[int, ...] = tuple()
@@ -304,7 +436,14 @@ class AnyFunction(ABC):
         self, reference: Reference, img: typing.Any,
         value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
-        """Plot the function's values."""
+        """Plot the function's values.
+
+        Args:
+            reference: The reference cell
+            img: The image to plot on
+            value_scale: The scale factor for the function values
+            n: The number of points per side for plotting
+        """
         raise ValueError(f"Cannot plot function of type '{self.__class__.__name__}'")
 
     def __len__(self):
@@ -316,6 +455,7 @@ class AnyFunction(ABC):
         raise ValueError(f"'{self.__class__.__name__}' object is not subscriptable")
 
     def _sympy_(self) -> SympyFormat:
+        """Convert to Sympy format."""
         return self.as_sympy()
 
     def __float__(self) -> float:
@@ -459,18 +599,34 @@ class ScalarFunction(AnyFunction):
         return ScalarFunction(-self._f)
 
     def as_sympy(self) -> SympyFormat:
-        """Convert to a sympy expression."""
+        """Convert to a sympy expression.
+
+        Returns:
+            A Sympy expression
+        """
         return self._f
 
     def as_tex(self) -> str:
-        """Convert to a TeX expression."""
+        """Convert to a TeX expression.
+
+        Returns:
+            A TeX string
+        """
         out = sympy.latex(sympy.simplify(sympy.expand(self._f)))
         out = out.replace("\\left[", "\\left(")
         out = out.replace("\\right]", "\\right)")
         return out
 
     def subs(self, vars: AxisVariables, values: ValuesToSubstitute) -> ScalarFunction:
-        """Substitute values into the function."""
+        """Substitute values into the function.
+
+        Args:
+            vars: The variables to substitute out
+            values: The value to substitute in
+
+        Returns:
+            The substituted function
+        """
         subbed = self._f
         if isinstance(values, AnyFunction):
             values = values.as_sympy()
@@ -487,28 +643,63 @@ class ScalarFunction(AnyFunction):
         return ScalarFunction(subbed)
 
     def diff(self, variable: sympy.core.symbol.Symbol) -> ScalarFunction:
-        """Differentiate the function."""
+        """Differentiate the function.
+
+        Args:
+            variable: The variable to differentiate with respect to
+
+        Returns:
+            The differentiated function
+        """
         return ScalarFunction(self._f.diff(variable))
 
     def directional_derivative(self, direction: PointType) -> ScalarFunction:
-        """Compute a directional derivative."""
+        """Compute a directional derivative.
+
+        Args:
+            direction: The diection
+
+        Returns:
+            The directional derivatve
+        """
         out = ScalarFunction(0)
         for i, j in zip(x, direction):
             out += j * self.diff(i)
         return out
 
     def jacobian_component(self, component: typing.Tuple[int, int]) -> ScalarFunction:
-        """Compute a component of the jacobian."""
+        """Compute a component of the jacobian.
+
+        Args:
+            component: The component
+
+        Returns:
+            The component of the jacobian
+        """
         return self.diff(x[component[0]]).diff(x[component[1]])
 
     def jacobian(self, dim: int) -> MatrixFunction:
-        """Compute the jacobian."""
+        """Compute the jacobian.
+
+        Args:
+            dim: The topological dimension of the cell
+
+        Returns:
+            The jacobian
+        """
         return MatrixFunction(tuple(
             tuple(self.jacobian_component((i, j)) for j in range(dim))
             for i in range(dim)))
 
     def dot(self, other_in: FunctionInput) -> ScalarFunction:
-        """Compute the dot product with another function."""
+        """Compute the dot product with another function.
+
+        Args:
+            other_in: The function to multiply with
+
+        Returns:
+            The product
+        """
         other = parse_function_input(other_in)
         if isinstance(other, ScalarFunction):
             return self * other
@@ -519,27 +710,58 @@ class ScalarFunction(AnyFunction):
         raise NotImplementedError()
 
     def cross(self, other_in: FunctionInput):
-        """Compute the cross product with another function."""
+        """Compute the cross product with another function.
+
+        Args:
+            other_in: The function to multiply with
+
+        Returns:
+            The cross product
+        """
         raise ValueError("Cannot cross a scalar-valued function.")
 
     def div(self):
-        """Compute the div of the function."""
+        """Compute the div of the function.
+
+        Returns:
+            The divergence
+        """
         raise ValueError("Cannot compute the div of a scalar-valued function.")
 
     def grad(self, dim: int) -> VectorFunction:
-        """Compute the grad of the function."""
+        """Compute the grad of the function.
+
+        Returns:
+            The gradient
+        """
         return VectorFunction([self.diff(x[i]) for i in range(dim)])
 
     def curl(self):
-        """Compute the curl of the function."""
+        """Compute the curl of the function.
+
+        Returns:
+            The curl
+        """
         raise ValueError("Cannot compute the curl of a scalar-valued function.")
 
     def norm(self) -> ScalarFunction:
-        """Compute the norm of the function."""
+        """Compute the norm of the function.
+
+        Returns:
+            The norm
+        """
         return ScalarFunction(abs(self._f))
 
     def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t) -> ScalarFunction:
-        """Compute the integral of the function."""
+        """Compute the integral of the function.
+
+        Args:
+            domain: The domain of the integral
+            vars: The variables to integrate with respect to
+
+        Returns:
+            The integral
+        """
         limits = domain.integration_limits(vars)
 
         point = VectorFunction(domain.origin)
@@ -561,14 +783,28 @@ class ScalarFunction(AnyFunction):
         typing.Union[int, sympy.core.expr.Expr],
         typing.Union[int, sympy.core.expr.Expr]
     ]):
-        """Integrate the function."""
+        """Integrate the function.
+
+        Args:
+            limits: The variables and limits
+
+        Returns:
+            The integral
+        """
         return ScalarFunction(self._f.integrate(*limits))
 
     def plot_values(
         self, reference: Reference, img: typing.Any,
         value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
-        """Plot the function's values."""
+        """Plot the function's values.
+
+        Args:
+            reference: The reference cell
+            img: The image to plot on
+            value_scale: The scale factor for the function values
+            n: The number of points per side for plotting
+        """
         from .plotting import Picture, colors
         assert isinstance(img, Picture)
 
@@ -605,7 +841,11 @@ class ScalarFunction(AnyFunction):
             img.add_bezier(s, m1, m2, e, colors.ORANGE)
 
     def with_floats(self) -> AnyFunction:
-        """Return a version the function with floats as coefficients."""
+        """Return a version the function with floats as coefficients.
+
+        Returns:
+            A version the function with floats as coefficients
+        """
         out = sympy.Float(0.0)
         for term, co in self._f.as_coefficients_dict().items():
             out += float(co) * term
@@ -650,7 +890,11 @@ class VectorFunction(AnyFunction):
 
     @property
     def shape(self) -> typing.Tuple[int, ...]:
-        """Get the value shape of the function."""
+        """Get the value shape of the function.
+
+        Returns:
+            The value shape
+        """
         return (len(self), )
 
     def __getitem__(self, key) -> typing.Union[ScalarFunction, VectorFunction]:
@@ -751,38 +995,89 @@ class VectorFunction(AnyFunction):
         return NotImplemented
 
     def as_sympy(self) -> SympyFormat:
-        """Convert to a sympy expression."""
+        """Convert to a sympy expression.
+
+        Returns:
+            A Sympy expression
+        """
         return tuple(i._f for i in self._vec)
 
     def as_tex(self) -> str:
-        """Convert to a TeX expression."""
+        """Convert to a TeX expression.
+
+        Returns:
+            A TeX string
+        """
         return "\\left(\\begin{array}{c}" + "\\\\".join([
             "\\displaystyle " + i.as_tex() for i in self._vec
         ]) + "\\end{array}\\right)"
 
     def subs(self, vars: AxisVariables, values: ValuesToSubstitute) -> VectorFunction:
-        """Substitute values into the function."""
+        """Substitute values into the function.
+
+        Args:
+            vars: The variables to substitute out
+            values: The value to substitute in
+
+        Returns:
+            The substituted function
+        """
         subbed = tuple(i.subs(vars, values) for i in self._vec)
         return VectorFunction(subbed)
 
     def diff(self, variable: sympy.core.symbol.Symbol) -> VectorFunction:
-        """Differentiate the function."""
+        """Differentiate the function.
+
+        Args:
+            variable: The variable to differentiate with respect to
+
+        Returns:
+            The differentiated function
+        """
         return VectorFunction([i.diff(variable) for i in self._vec])
 
     def directional_derivative(self, direction: PointType):
-        """Compute a directional derivative."""
+        """Compute a directional derivative.
+
+        Args:
+            direction: The diection
+
+        Returns:
+            The directional derivatve
+        """
         raise NotImplementedError()
 
-    def jacobian_component(self, direction: typing.Tuple[int, int]):
-        """Compute a component of the jacobian."""
+    def jacobian_component(self, component: typing.Tuple[int, int]):
+        """Compute a component of the jacobian.
+
+        Args:
+            component: The component
+
+        Returns:
+            The component of the jacobian
+        """
         raise NotImplementedError()
 
     def jacobian(self, dim: int) -> MatrixFunction:
-        """Compute the jacobian."""
+        """Compute the jacobian.
+
+        Args:
+            dim: The topological dimension of the cell
+
+        Returns:
+            The jacobian
+        """
         raise NotImplementedError()
 
     def dot(self, other_in: FunctionInput) -> ScalarFunction:
-        """Compute the dot product with another function."""
+        """Compute the dot product with another function.
+
+        Args:
+            other_in: The function to multiply with
+
+        Returns:
+            The product
+        """
         other = parse_function_input(other_in)
         if isinstance(other, VectorFunction):
             assert len(self._vec) == len(other._vec)
@@ -797,7 +1092,14 @@ class VectorFunction(AnyFunction):
         raise NotImplementedError()
 
     def cross(self, other_in: FunctionInput) -> typing.Union[VectorFunction, ScalarFunction]:
-        """Compute the cross product with another function."""
+        """Compute the cross product with another function.
+
+        Args:
+            other_in: The function to multiply with
+
+        Returns:
+            The cross product
+        """
         other = parse_function_input(other_in)
         assert other.is_vector and len(self) == len(other)
         if len(self) == 2:
@@ -809,18 +1111,30 @@ class VectorFunction(AnyFunction):
                                    self[0] * other[1] - self[1] * other[0]])
 
     def div(self) -> ScalarFunction:
-        """Compute the div of the function."""
+        """Compute the div of the function.
+
+        Returns:
+            The divergence
+        """
         out = ScalarFunction(0)
         for i, j in zip(self._vec, x):
             out += i.diff(j)
         return out
 
     def grad(self):
-        """Compute the grad of the function."""
+        """Compute the grad of the function.
+
+        Returns:
+            The gradient
+        """
         raise ValueError("Cannot compute the grad of a vector-valued function.")
 
     def curl(self) -> VectorFunction:
-        """Compute the curl of the function."""
+        """Compute the curl of the function.
+
+        Returns:
+            The curl
+        """
         assert len(self._vec) == 3
         return VectorFunction([
             self._vec[2].diff(x[1]) - self._vec[1].diff(x[2]),
@@ -829,14 +1143,26 @@ class VectorFunction(AnyFunction):
         ])
 
     def norm(self) -> ScalarFunction:
-        """Compute the norm of the function."""
+        """Compute the norm of the function.
+
+        Returns:
+            The norm
+        """
         a = sympy.Integer(0)
         for i in self._vec:
             a += i._f ** 2
         return ScalarFunction(sympy.sqrt(a))
 
     def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t):
-        """Compute the integral of the function."""
+        """Compute the integral of the function.
+
+        Args:
+            domain: The domain of the integral
+            vars: The variables to integrate with respect to
+
+        Returns:
+            The integral
+        """
         raise NotImplementedError()
 
     def __iter__(self):
@@ -856,7 +1182,14 @@ class VectorFunction(AnyFunction):
         self, reference: Reference, img: typing.Any,
         value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
-        """Plot the function's values."""
+        """Plot the function's values.
+
+        Args:
+            reference: The reference cell
+            img: The image to plot on
+            value_scale: The scale factor for the function values
+            n: The number of points per side for plotting
+        """
         from .plotting import Picture, colors
         assert isinstance(img, Picture)
 
@@ -876,7 +1209,11 @@ class VectorFunction(AnyFunction):
             img.add_arrow(p, q, colors.ORANGE, size)
 
     def with_floats(self) -> AnyFunction:
-        """Return a version the function with floats as coefficients."""
+        """Return a version the function with floats as coefficients.
+
+        Returns:
+            A version the function with floats as coefficients
+        """
         return VectorFunction(tuple(f.with_floats() for f in self._vec))
 
 
@@ -925,7 +1262,11 @@ class MatrixFunction(AnyFunction):
 
     @property
     def shape(self) -> typing.Tuple[int, ...]:
-        """Get the value shape of the function."""
+        """Get the value shape of the function.
+
+        Returns:
+            The value shape
+        """
         return self._shape
 
     def __getitem__(self, key) -> typing.Union[ScalarFunction, VectorFunction]:
@@ -936,11 +1277,25 @@ class MatrixFunction(AnyFunction):
         return self.row(key)
 
     def row(self, n: int) -> VectorFunction:
-        """Get a row of the matrix."""
+        """Get a row of the matrix.
+
+        Args:
+            n: The row number
+
+        Returns:
+            The row of the matrix
+        """
         return VectorFunction([self._mat[n][i] for i in range(self.shape[1])])
 
     def col(self, n: int) -> VectorFunction:
-        """Get a colunm of the matrix."""
+        """Get a colunm of the matrix.
+
+        Args:
+            n: The column number
+
+        Returns:
+            The column of the matrix
+        """
         return VectorFunction([self._mat[i][n] for i in range(self.shape[0])])
 
     def __add__(self, other: typing.Any) -> MatrixFunction:
@@ -1078,11 +1433,19 @@ class MatrixFunction(AnyFunction):
         return NotImplemented
 
     def as_sympy(self) -> SympyFormat:
-        """Convert to a sympy expression."""
+        """Convert to a sympy expression.
+
+        Returns:
+            A Sympy expression
+        """
         return sympy.Matrix([[j._f for j in i] for i in self._mat])
 
     def as_tex(self) -> str:
-        """Convert to a TeX expression."""
+        """Convert to a TeX expression.
+
+        Returns:
+            A TeX string
+        """
         out = "\\left(\\begin{array}{"
         out += "c" * self.shape[1]
         out += "}"
@@ -1094,30 +1457,73 @@ class MatrixFunction(AnyFunction):
         return out
 
     def subs(self, vars: AxisVariables, values: ValuesToSubstitute) -> MatrixFunction:
-        """Substitute values into the function."""
+        """Substitute values into the function.
+
+        Args:
+            vars: The variables to substitute out
+            values: The value to substitute in
+
+        Returns:
+            The substituted function
+        """
         subbed = tuple(tuple(j.subs(vars, values) for j in i) for i in self._mat)
         return MatrixFunction(subbed)
 
     def diff(self, variable: sympy.core.symbol.Symbol) -> MatrixFunction:
-        """Differentiate the function."""
+        """Differentiate the function.
+
+        Args:
+            variable: The variable to differentiate with respect to
+
+        Returns:
+            The differentiated function
+        """
         return MatrixFunction(tuple(
             tuple(self._mat[i][j].diff(variable) for j in range(self.shape[1]))
             for i in range(self.shape[0])))
 
     def directional_derivative(self, direction: PointType):
-        """Compute a directional derivative."""
+        """Compute a directional derivative.
+
+        Args:
+            direction: The diection
+
+        Returns:
+            The directional derivatve
+        """
         raise NotImplementedError()
 
-    def jacobian_component(self, direction: typing.Tuple[int, int]):
-        """Compute a component of the jacobian."""
+    def jacobian_component(self, component: typing.Tuple[int, int]):
+        """Compute a component of the jacobian.
+
+        Args:
+            component: The component
+
+        Returns:
+            The component of the jacobian
+        """
         raise NotImplementedError()
 
     def jacobian(self, dim: int):
-        """Compute the jacobian."""
+        """Compute the jacobian.
+
+        Args:
+            dim: The topological dimension of the cell
+
+        Returns:
+            The jacobian
+        """
         raise NotImplementedError()
 
     def dot(self, other_in: FunctionInput) -> ScalarFunction:
-        """Compute the dot product with another function."""
+        """Compute the dot product with another function.
+
+        Args:
+            other_in: The function to multiply with
+
+        Returns:
+            The product
+        """
         other = parse_function_input(other_in)
         if isinstance(other, MatrixFunction):
             assert self.shape == other.shape
@@ -1133,31 +1539,66 @@ class MatrixFunction(AnyFunction):
         raise NotImplementedError()
 
     def cross(self, other_in: FunctionInput):
-        """Compute the cross product with another function."""
+        """Compute the cross product with another function.
+
+        Args:
+            other_in: The function to multiply with
+
+        Returns:
+            The cross product
+        """
         raise ValueError("Cannot cross a matrix-valued function.")
 
     def div(self):
-        """Compute the div of the function."""
+        """Compute the div of the function.
+
+        Returns:
+            The divergence
+        """
         raise ValueError("Cannot compute the div of a matrix-valued function.")
 
     def grad(self):
-        """Compute the grad of the function."""
+        """Compute the grad of the function.
+
+        Returns:
+            The gradient
+        """
         raise ValueError("Cannot compute the grad of a matrix-valued function.")
 
     def curl(self):
-        """Compute the curl of the function."""
+        """Compute the curl of the function.
+
+        Returns:
+            The curl
+        """
         raise ValueError("Cannot compute the curl of a matrix-valued function.")
 
     def norm(self) -> ScalarFunction:
-        """Compute the norm of the function."""
+        """Compute the norm of the function.
+
+        Returns:
+            The norm
+        """
         raise NotImplementedError()
 
     def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t):
-        """Compute the integral of the function."""
+        """Compute the integral of the function.
+
+        Args:
+            domain: The domain of the integral
+            vars: The variables to integrate with respect to
+
+        Returns:
+            The integral
+        """
         raise NotImplementedError()
 
     def det(self) -> ScalarFunction:
-        """Compute the determinant."""
+        """Compute the determinant.
+
+        Returns:
+            The deteminant
+        """
         if self.shape[0] == self.shape[1]:
             mat = self.as_sympy()
             assert isinstance(mat, sympy.matrices.dense.MutableDenseMatrix)
@@ -1167,13 +1608,21 @@ class MatrixFunction(AnyFunction):
         raise ValueError(f"Cannot find determinant of {self.shape[0]}x{self.shape[1]} matrix.")
 
     def transpose(self) -> MatrixFunction:
-        """Compute the transpose."""
+        """Compute the transpose.
+
+        Returns:
+            The transpose
+        """
         mat = self.as_sympy()
         assert isinstance(mat, sympy.matrices.dense.MutableDenseMatrix)
         return MatrixFunction(mat.transpose())
 
     def with_floats(self) -> AnyFunction:
-        """Return a version the function with floats as coefficients."""
+        """Return a version the function with floats as coefficients.
+
+        Returns:
+            A version the function with floats as coefficients
+        """
         return MatrixFunction(tuple(tuple(f.with_floats() for f in row) for row in self._mat))
 
 
@@ -1190,7 +1639,14 @@ FunctionInput = typing.Union[
 
 
 def parse_function_input(f: FunctionInput) -> AnyFunction:
-    """Parse a function."""
+    """Parse a function.
+
+    Args:
+        f: A function
+
+    Returns:
+        The function as a Symfem function
+    """
     if isinstance(f, AnyFunction):
         return f
     if isinstance(f, (sympy.core.expr.Expr, int)):
@@ -1214,5 +1670,12 @@ def parse_function_input(f: FunctionInput) -> AnyFunction:
 def parse_function_list_input(
     functions: typing.Union[typing.List[FunctionInput], typing.Tuple[FunctionInput, ...]]
 ) -> typing.List[AnyFunction]:
-    """Parse a list of functions."""
+    """Parse a list of functions.
+
+    Args:
+        functions: The functions
+
+    Returns:
+        The functions as Symfem functions
+    """
     return [parse_function_input(f) for f in functions]

@@ -54,7 +54,11 @@ class PiecewiseFunction(AnyFunction):
         return len(self.first_piece)
 
     def as_sympy(self) -> SympyFormat:
-        """Convert to a sympy expression."""
+        """Convert to a sympy expression.
+
+        Returns:
+            A Sympy expression
+        """
         for f in self._pieces.values():
             if f != self.first_piece:
                 break
@@ -69,7 +73,11 @@ class PiecewiseFunction(AnyFunction):
         return out
 
     def as_tex(self) -> str:
-        """Convert to a TeX expression."""
+        """Convert to a TeX expression.
+
+        Returns:
+            A TeX string
+        """
         out = "\\begin{cases}\n"
         joiner = ""
         for shape, f in self._pieces.items():
@@ -97,7 +105,14 @@ class PiecewiseFunction(AnyFunction):
         return out
 
     def get_piece(self, point: PointType) -> AnyFunction:
-        """Get a pieces of the function."""
+        """Get a piece of the function.
+
+        Args:
+            point: The point to get the piece at
+
+        Returns:
+            The piece of the function that is valid at that point
+        """
         if self.tdim == 2:
             for cell, value in self._pieces.items():
                 if len(cell) == 3:
@@ -138,7 +153,11 @@ class PiecewiseFunction(AnyFunction):
 
     @property
     def pieces(self) -> typing.Dict[SetOfPoints, AnyFunction]:
-        """Get the pieces of the function."""
+        """Get the pieces of the function.
+
+        Returns:
+            The function pieces
+        """
         return self._pieces
 
     def __add__(self, other: typing.Any) -> PiecewiseFunction:
@@ -269,7 +288,15 @@ class PiecewiseFunction(AnyFunction):
     def subs(
         self, vars: AxisVariables, values: ValuesToSubstitute
     ) -> PiecewiseFunction:
-        """Substitute values into the function."""
+        """Substitute values into the function.
+
+        Args:
+            vars: The variables to substitute out
+            values: The value to substitute in
+
+        Returns:
+            The substituted function
+        """
         if isinstance(values, AnyFunction):
             values = values.as_sympy()
 
@@ -286,80 +313,161 @@ class PiecewiseFunction(AnyFunction):
             {shape: f.subs(vars, values) for shape, f in self._pieces.items()}, self.tdim)
 
     def diff(self, variable: sympy.core.symbol.Symbol) -> PiecewiseFunction:
-        """Differentiate the function."""
+        """Differentiate the function.
+
+        Args:
+            variable: The variable to differentiate with respect to
+
+        Returns:
+            The differentiated function
+        """
         return PiecewiseFunction(
             {shape: f.diff(variable) for shape, f in self._pieces.items()}, self.tdim)
 
     def directional_derivative(self, direction: PointType) -> PiecewiseFunction:
-        """Compute a directional derivative."""
+        """Compute a directional derivative.
+
+        Args:
+            direction: The diection
+
+        Returns:
+            The directional derivative
+        """
         return PiecewiseFunction(
             {shape: f.directional_derivative(direction)
              for shape, f in self._pieces.items()}, self.tdim)
 
     def jacobian_component(self, component: typing.Tuple[int, int]) -> PiecewiseFunction:
-        """Compute a component of the jacobian."""
+        """Compute a component of the jacobian.
+
+        Args:
+            component: The component
+
+        Returns:
+            The component of the jacobian
+        """
         return PiecewiseFunction(
             {shape: f.jacobian_component(component) for shape, f in self._pieces.items()},
             self.tdim)
 
     def jacobian(self, dim: int) -> PiecewiseFunction:
-        """Compute the jacobian."""
+        """Compute the jacobian.
+
+        Args:
+            dim: The topological dimension of the cell
+
+        Returns:
+            The jacobian
+        """
         return PiecewiseFunction(
             {shape: f.jacobian(dim) for shape, f in self._pieces.items()}, self.tdim)
 
     def dot(self, other_in: FunctionInput) -> PiecewiseFunction:
-        """Compute the dot product with another function."""
+        """Compute the dot product with another function.
+
+        Args:
+            other_in: The function to multiply with
+
+        Returns:
+            The product
+        """
         return PiecewiseFunction(
             {shape: f.dot(other_in) for shape, f in self._pieces.items()}, self.tdim)
 
     def cross(self, other_in: FunctionInput) -> PiecewiseFunction:
-        """Compute the cross product with another function."""
+        """Compute the cross product with another function.
+
+        Args:
+            other_in: The function to multiply with
+
+        Returns:
+            The cross product
+        """
         return PiecewiseFunction(
             {shape: f.cross(other_in) for shape, f in self._pieces.items()}, self.tdim)
 
     def div(self) -> PiecewiseFunction:
-        """Compute the div of the function."""
+        """Compute the div of the function.
+
+        Returns:
+            The divergence
+        """
         return PiecewiseFunction(
             {shape: f.div() for shape, f in self._pieces.items()}, self.tdim)
 
     def grad(self, dim: int) -> PiecewiseFunction:
-        """Compute the grad of the function."""
+        """Compute the grad of the function.
+
+        Returns:
+            The gradient
+        """
         return PiecewiseFunction(
             {shape: f.grad(dim) for shape, f in self._pieces.items()}, self.tdim)
 
     def curl(self) -> PiecewiseFunction:
-        """Compute the curl of the function."""
+        """Compute the curl of the function.
+
+        Returns:
+            The curl
+        """
         return PiecewiseFunction(
             {shape: f.curl() for shape, f in self._pieces.items()}, self.tdim)
 
     def norm(self) -> PiecewiseFunction:
-        """Compute the norm of the function."""
+        """Compute the norm of the function.
+
+        Returns:
+            The norm
+        """
         return PiecewiseFunction(
             {shape: f.norm() for shape, f in self._pieces.items()}, self.tdim)
 
     def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t) -> AnyFunction:
-        """Compute the integral of the function."""
+        """Compute the integral of the function.
+
+        Args:
+            domain: The domain of the integral
+            vars: The variables to integrate with respect to
+
+        Returns:
+            The integral
+        """
         # TODO: Add check that the domain is a subset of one piece
         # TODO: Add integral over multiple pieces
         p = self.get_piece(domain.midpoint())
         return p.integral(domain, vars)
 
     def det(self) -> PiecewiseFunction:
-        """Compute the determinant."""
+        """Compute the determinant.
+
+        Returns:
+            The deteminant
+        """
         if not self.is_matrix:
             raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'det'")
         return PiecewiseFunction(
             {shape: f.det() for shape, f in self._pieces.items()}, self.tdim)
 
     def transpose(self) -> PiecewiseFunction:
-        """Compute the transpose."""
+        """Compute the transpose.
+
+        Returns:
+            The transpose
+        """
         if not self.is_matrix:
             raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'transpose'")
         return PiecewiseFunction(
             {shape: f.transpose() for shape, f in self._pieces.items()}, self.tdim)
 
     def map_pieces(self, fwd_map: PointType):
-        """Map the function's pieces."""
+        """Map the function's pieces.
+
+        Args:
+            fwd_map: The map from the reference cell to a physical cell
+
+        Returns:
+            The mapped pieces
+        """
         new_pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
         for shape, f in self._pieces.items():
             nshape = []
@@ -373,14 +481,25 @@ class PiecewiseFunction(AnyFunction):
 
     @property
     def shape(self) -> typing.Tuple[int, ...]:
-        """Get the value shape of the function."""
+        """Get the value shape of the function.
+
+        Returns:
+            The value shape
+        """
         return self.first_piece.shape
 
     def plot_values(
         self, reference: Reference, img: typing.Any,
         value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
-        """Plot the function's values."""
+        """Plot the function's values.
+
+        Args:
+            reference: The reference cell
+            img: The image to plot on
+            value_scale: The scale factor for the function values
+            n: The number of points per side for plotting
+        """
         from .create import create_reference
         from .plotting import Picture
         assert isinstance(img, Picture)
@@ -403,6 +522,10 @@ class PiecewiseFunction(AnyFunction):
             f.plot_values(ref, img, value_scale, n // 2)
 
     def with_floats(self) -> AnyFunction:
-        """Return a version the function with floats as coefficients."""
+        """Return a version the function with floats as coefficients.
+
+        Returns:
+            A version the function with floats as coefficients
+        """
         return PiecewiseFunction(
             {shape: f.with_floats() for shape, f in self._pieces.items()}, self.tdim)
