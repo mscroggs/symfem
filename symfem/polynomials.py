@@ -1,4 +1,4 @@
-"""Polynomial sets"""
+"""Polynomial sets."""
 
 import typing
 from itertools import product
