@@ -19,10 +19,18 @@ MomentTypeInput = typing.Union[
 ]
 
 
-def extract_moment_data(moment_data: MomentTypeInput, sub_type: str) -> MomentType:
-    """Get the information for a moment."""
+def _extract_moment_data(moment_data: MomentTypeInput, sub_type: str) -> MomentType:
+    """Get the information for a moment.
+
+    Args:
+        moment_data: The moment data
+        sub_type: The subentity type
+
+    Returns:
+        The moment type, finite elment, order, mapping, and keyword arguments for the moment
+    """
     if isinstance(moment_data, dict):
-        return extract_moment_data(moment_data[sub_type], sub_type)
+        return _extract_moment_data(moment_data[sub_type], sub_type)
 
     mapping: typing.Union[str, None] = None
     if isinstance(moment_data[-1], dict):
@@ -64,6 +72,9 @@ def make_integral_moment_dofs(
         facets: DOFs on codimension 1 entities.
         ridges: DOFs on codimension 2 entities.
         peaks: DOFs on codimension 3 entities.
+
+    Returns:
+        A list of DOFs for the element
     """
     dofs = []
 
@@ -79,7 +90,7 @@ def make_integral_moment_dofs(
                 assert dim > 0
                 for i, vs in enumerate(reference.sub_entities(dim)):
                     sub_ref = reference.sub_entity(dim, i, True)
-                    IntegralMoment, SubElement, order, mapping, kwargs = extract_moment_data(
+                    IntegralMoment, SubElement, order, mapping, kwargs = _extract_moment_data(
                         moment_data, sub_ref.name)
                     if order >= SubElement.min_order:
                         sub_element = SubElement(sub_ref.default_reference(), order, **kwargs)
