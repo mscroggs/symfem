@@ -9,14 +9,34 @@ from .symbols import x
 def identity(
     f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
 ) -> AnyFunction:
-    """Map functions."""
+    """Map functions.
+
+    Args:
+        f_in: The function
+        map: The map from the reference cell to the physical cell
+        inverse_map: The map to the reference cell from the physical cell
+        tdim: The topological dimension of the cell
+
+    Returns:
+        The mapped function
+    """
     return parse_function_input(f_in).subs(x, inverse_map)
 
 
 def covariant(
     f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
 ) -> VectorFunction:
-    """Map H(curl) functions."""
+    """Map H(curl) functions.
+
+    Args:
+        f_in: The function
+        map: The map from the reference cell to the physical cell
+        inverse_map: The map to the reference cell from the physical cell
+        tdim: The topological dimension of the cell
+
+    Returns:
+        The mapped function
+    """
     f = parse_function_input(f_in).subs(x, inverse_map)
     assert f.is_vector
 
@@ -27,7 +47,17 @@ def covariant(
 def contravariant(
     f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
 ) -> VectorFunction:
-    """Map H(div) functions."""
+    """Map H(div) functions.
+
+    Args:
+        f_in: The function
+        map: The map from the reference cell to the physical cell
+        inverse_map: The map to the reference cell from the physical cell
+        tdim: The topological dimension of the cell
+
+    Returns:
+        The mapped function
+    """
     f = parse_function_input(f_in).subs(x, inverse_map)
     assert f.is_vector
 
@@ -39,7 +69,17 @@ def contravariant(
 def double_covariant(
     f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
 ) -> MatrixFunction:
-    """Map matrix functions."""
+    """Map matrix functions.
+
+    Args:
+        f_in: The function
+        map: The map from the reference cell to the physical cell
+        inverse_map: The map to the reference cell from the physical cell
+        tdim: The topological dimension of the cell
+
+    Returns:
+        The mapped function
+    """
     f = parse_function_input(f_in).subs(x, inverse_map)
     assert f.is_matrix
 
@@ -50,7 +90,17 @@ def double_covariant(
 def double_contravariant(
     f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
 ) -> MatrixFunction:
-    """Map matrix functions."""
+    """Map matrix functions.
+
+    Args:
+        f_in: The function
+        map: The map from the reference cell to the physical cell
+        inverse_map: The map to the reference cell from the physical cell
+        tdim: The topological dimension of the cell
+
+    Returns:
+        The mapped function
+    """
     f = parse_function_input(f_in).subs(x, inverse_map)
     assert f.is_matrix
 

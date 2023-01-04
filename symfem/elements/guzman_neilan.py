@@ -87,7 +87,15 @@ class GuzmanNeilan(CiarletElement):
     def _make_polyset_triangle(
         self, reference: Reference, order: int
     ) -> typing.List[FunctionInput]:
-        """Make the polyset for a triangle."""
+        """Make the polyset for a triangle.
+
+        Args:
+            reference: The reference cell
+            order: The polynomial order
+
+        Returns:
+            The polynomial set
+        """
         assert order == 1
 
         from ._guzman_neilan_triangle import coeffs
@@ -123,7 +131,15 @@ class GuzmanNeilan(CiarletElement):
     def _make_polyset_tetrahedron(
         self, reference: Reference, order: int
     ) -> typing.List[FunctionInput]:
-        """Make the polyset for a tetrahedron."""
+        """Make the polyset for a tetrahedron.
+
+        Args:
+            reference: The reference cell
+            order: The polynomial order
+
+        Returns:
+            The polynomial set
+        """
         assert order in [1, 2]
         from ._guzman_neilan_tetrahedron import coeffs
 
@@ -167,7 +183,18 @@ def make_piecewise_lagrange(
     sub_cells: typing.List[SetOfPoints], cell_name, order: int, zero_on_boundary: bool = False,
     zero_at_centre: bool = False
 ) -> typing.List[PiecewiseFunction]:
-    """Make the basis functions of a piecewise Lagrange space."""
+    """Make the basis functions of a piecewise Lagrange space.
+
+    Args:
+        sub_cells: A list of vertices of sub cells
+        cell_name: The cell type of the sub cells
+        order: The polynomial order
+        zero_in_boundary: Should the functions be zero on the boundary?
+        zero_at_centre: Should the functions be zero at the centre?
+
+    Returns:
+        The basis functions
+    """
     from symfem import create_reference
     lagrange_space = VectorLagrange(create_reference(cell_name), order)
     lagrange_bases: typing.List[typing.List[VectorFunction]] = []

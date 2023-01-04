@@ -46,7 +46,16 @@ class FiniteElement(ABC):
         self, reference: Reference, order: int, space_dim: int, domain_dim: int, range_dim: int,
         range_shape: typing.Optional[typing.Tuple[int, ...]] = None
     ):
-        """Create a finite element."""
+        """Create a finite element.
+
+        Args:
+            reference: The reference cell
+            order: The polynomial order
+            space_dim: The dimension of the finite element space
+            domain_dim: The topological dimension of the reference cell
+            range_dim: The dimension/value size of functions in the space
+            range_shape: The (value) shape of function in the space
+        """
         self.reference = reference
         self.order = order
         self.space_dim = space_dim
@@ -61,29 +70,65 @@ class FiniteElement(ABC):
         self, filename: typing.Union[str, typing.List[str]],
         plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
     ):
-        """Plot a diagram showing the DOFs of the element."""
+        """Plot a diagram showing the DOFs of the element.
+
+        Args:
+            filename: The file name
+            plot_options: Options for the plot
+            kwargs: Keyword arguments
+        """
         pass
 
     @abstractmethod
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
-        """Get the numbers of the DOFs associated with the given entity."""
+        """Get the numbers of the DOFs associated with the given entity.
+
+        Args:
+            entity_dim: The dimension of the entity
+            entity_number: The number of the entity
+
+        Returns:
+            The numbers of the DOFs associated with the entity
+        """
         pass
 
     @abstractmethod
     def get_basis_functions(
         self, use_tensor_factorisation: bool = False
     ) -> typing.List[AnyFunction]:
-        """Get the basis functions of the element."""
+        """Get the basis functions of the element.
+
+        Args:
+            use_tensor_factorisation: Should a tensor factorisation be used?
+
+        Returns:
+            The basis functions
+        """
         pass
 
     def get_basis_function(self, n: int) -> BasisFunction:
-        """Get a single basis function of the element."""
+        """Get a single basis function of the element.
+
+        Args:
+            n: The number of the basis function
+
+        Returns:
+            The basis function
+        """
         return ElementBasisFunction(self, n)
 
     def tabulate_basis(
         self, points_in: SetOfPointsInput, order: str = "xyzxyz",
     ) -> TabulatedBasis:
-        """Evaluate the basis functions of the element at the given points."""
+        """Evaluate the basis functions of the element at the given points.
+
+        Args:
+            points_in: The points
+            order: The order to return the values
+
+        Returns:
+            The tabulated basis functions
+        """
         points = parse_set_of_points_input(points_in)
         tabbed = [tuple(b.subs(x, p).as_sympy() for b in self.get_basis_functions())
                   for p in points]
@@ -106,7 +151,14 @@ class FiniteElement(ABC):
             raise ValueError(f"Unknown order: {order}")
 
     def tabulate_basis_float(self, points_in: SetOfPointsInput) -> TabulatedBasis:
-        """Evaluate the basis functions of the element at the given points in xyz,xyz order."""
+        """Evaluate the basis functions of the element at the given points in xyz,xyz order.
+
+        Args:
+            points_in: The points
+
+        Returns:
+            The tabulated basis functions
+        """
         if self._float_basis_functions is None:
             self._float_basis_functions = [b.with_floats() for b in self.get_basis_functions()]
 
@@ -117,7 +169,13 @@ class FiniteElement(ABC):
     def plot_basis_function(
         self, n: int, filename: typing.Union[str, typing.List[str]], **kwargs: typing.Any
     ):
-        """Plot a diagram showing a basis function."""
+        """Plot a diagram showing a basis function.
+
+        Args:
+            n: The basis function number
+            filename: The file name
+            kwargs: Keyword arguments
+        """
         if self._value_scale is None:
             max_v = 0.0
             values = self.tabulate_basis_float(self.reference.make_lattice_float(6))
@@ -138,12 +196,26 @@ class FiniteElement(ABC):
         forward_map: typing.Optional[PointType] = None,
         inverse_map: typing.Optional[PointType] = None
     ) -> typing.List[AnyFunction]:
-        """Map the basis onto a cell using the appropriate mapping for the element."""
+        """Map the basis onto a cell using the appropriate mapping for the element.
+
+        Args:
+            vertices_in: The vertices of the cell
+            basis: The basis functions
+            forward_map: The map from the reference to the cell
+            inverse_map: The map to the reference from the cell
+
+        Returns:
+            The basis functions mapped to the cell
+        """
         pass
 
     @abstractmethod
     def get_polynomial_basis(self) -> typing.List[AnyFunction]:
-        """Get the symbolic polynomial basis for the element."""
+        """Get the symbolic polynomial basis for the element.
+
+        Returns:
+            The polynomial basis
+        """
         pass
 
     def test(self):
@@ -275,11 +347,19 @@ class FiniteElement(ABC):
     def get_tensor_factorisation(
         self
     ) -> typing.List[typing.Tuple[str, typing.List[FiniteElement], typing.List[int]]]:
-        """Get the representation of the element as a tensor product."""
+        """Get the representation of the element as a tensor product.
+
+        Returns:
+            The tensor factorisation
+        """
         raise NoTensorProduct()
 
     def _get_basis_functions_tensor(self) -> typing.List[AnyFunction]:
-        """Compute the basis functions using the space's tensor product factorisation."""
+        """Compute the basis functions using the space's tensor product factorisation.
+
+        Returns:
+            The basis functions
+        """
         factorisation = self.get_tensor_factorisation()
         basis = {}
         for t_type, factors, perm in factorisation:
@@ -296,7 +376,11 @@ class FiniteElement(ABC):
 
     @property
     def name(self) -> str:
-        """Get the name of the element."""
+        """Get the name of the element.
+
+        Returns:
+            The name of the element's family
+        """
         return self.names[0]
 
     names: typing.List[str] = []
@@ -331,15 +415,31 @@ class CiarletElement(FiniteElement):
         self._basis_functions: typing.Union[typing.List[AnyFunction], None] = None
 
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
-        """Get the numbers of the DOFs associated with the given entity."""
+        """Get the numbers of the DOFs associated with the given entity.
+
+        Args:
+            entity_dim: The dimension of the entity
+            entity_number: The number of the entity
+
+        Returns:
+            The numbers of the DOFs associated with the entity
+        """
         return [i for i, j in enumerate(self.dofs) if j.entity == (entity_dim, entity_number)]
 
     def get_polynomial_basis(self) -> typing.List[AnyFunction]:
-        """Get the symbolic polynomial basis for the element."""
+        """Get the symbolic polynomial basis for the element.
+
+        Returns:
+            The polynomial basis
+        """
         return self._basis
 
     def get_dual_matrix(self) -> sympy.matrices.dense.MutableDenseMatrix:
-        """Get the dual matrix."""
+        """Get the dual matrix.
+
+        Returns:
+            The dual matrix
+        """
         mat = []
         for b in self.get_polynomial_basis():
             row = []
@@ -350,13 +450,24 @@ class CiarletElement(FiniteElement):
         return sympy.Matrix(mat)
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the kwargs used to create this element."""
+        """Return the keyword arguments used to create this element.
+
+        Returns:
+            Keyword arguments dictionary
+        """
         return {}
 
     def get_basis_functions(
         self, use_tensor_factorisation: bool = False
     ) -> typing.List[AnyFunction]:
-        """Get the basis functions of the element."""
+        """Get the basis functions of the element.
+
+        Args:
+            use_tensor_factorisation: Should a tensor factorisation be used?
+
+        Returns:
+            The basis functions
+        """
         if self._basis_functions is None:
             if use_tensor_factorisation:
                 self._basis_functions = self._get_basis_functions_tensor()
@@ -382,7 +493,13 @@ class CiarletElement(FiniteElement):
     def plot_basis_function(
         self, n: int, filename: typing.Union[str, typing.List[str]], **kwargs: typing.Any
     ):
-        """Plot a diagram showing a basis function."""
+        """Plot a diagram showing a basis function.
+
+        Args:
+            n: The basis function number
+            filename: The file name
+            kwargs: Keyword arguments
+        """
         if self._value_scale is None:
             values = self.tabulate_basis_float(self.reference.make_lattice_float(6))
             max_v = 0.0
@@ -402,7 +519,13 @@ class CiarletElement(FiniteElement):
         self, filename: typing.Union[str, typing.List[str]],
         plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
     ):
-        """Plot a diagram showing the DOFs of the element."""
+        """Plot a diagram showing the DOFs of the element.
+
+        Args:
+            filename: The file name
+            plot_options: Options for the plot
+            kwargs: Keyword arguments
+        """
         img = Picture(**kwargs)
 
         dofs_by_subentity: typing.Dict[int, typing.Dict[int, ListOfFunctionals]] = {
@@ -448,7 +571,17 @@ class CiarletElement(FiniteElement):
         forward_map: typing.Optional[PointType] = None,
         inverse_map: typing.Optional[PointType] = None
     ) -> typing.List[AnyFunction]:
-        """Map the basis onto a cell using the appropriate mapping for the element."""
+        """Map the basis onto a cell using the appropriate mapping for the element.
+
+        Args:
+            vertices_in: The vertices of the cell
+            basis: The basis functions
+            forward_map: The map from the reference to the cell
+            inverse_map: The map to the reference from the cell
+
+        Returns:
+            The basis functions mapped to the cell
+        """
         vertices = parse_set_of_points_input(vertices_in)
         if basis is None:
             basis = self.get_basis_functions()
@@ -549,13 +682,28 @@ class DirectElement(FiniteElement):
         self._basis_functions = [parse_function_input(f) for f in basis_functions]
 
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
-        """Get the numbers of the DOFs associated with the given entity."""
+        """Get the numbers of the DOFs associated with the given entity.
+
+        Args:
+            entity_dim: The dimension of the entity
+            entity_number: The number of the entity
+
+        Returns:
+            The numbers of the DOFs associated with the entity
+        """
         return [i for i, j in enumerate(self._basis_entities) if j == (entity_dim, entity_number)]
 
     def get_basis_functions(
         self, use_tensor_factorisation: bool = False
     ) -> typing.List[AnyFunction]:
-        """Get the basis functions of the element."""
+        """Get the basis functions of the element.
+
+        Args:
+            use_tensor_factorisation: Should a tensor factorisation be used?
+
+        Returns:
+            The basis functions
+        """
         if use_tensor_factorisation:
             return self._get_basis_functions_tensor()
 
@@ -567,18 +715,38 @@ class DirectElement(FiniteElement):
         forward_map: typing.Optional[PointType] = None,
         inverse_map: typing.Optional[PointType] = None
     ) -> typing.List[AnyFunction]:
-        """Map the basis onto a cell using the appropriate mapping for the element."""
+        """Map the basis onto a cell using the appropriate mapping for the element.
+
+        Args:
+            vertices_in: The vertices of the cell
+            basis: The basis functions
+            forward_map: The map from the reference to the cell
+            inverse_map: The map to the reference from the cell
+
+        Returns:
+            The basis functions mapped to the cell
+        """
         raise NotImplementedError()
 
     def get_polynomial_basis(self) -> typing.List[AnyFunction]:
-        """Get the symbolic polynomial basis for the element."""
+        """Get the symbolic polynomial basis for the element.
+
+        Returns:
+            The polynomial basis
+        """
         raise NotImplementedError()
 
     def plot_dof_diagram(
         self, filename: typing.Union[str, typing.List[str]],
         plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
     ):
-        """Plot a diagram showing the DOFs of the element."""
+        """Plot a diagram showing the DOFs of the element.
+
+        Args:
+            filename: The file name
+            plot_options: Options for the plot
+            kwargs: Keyword arguments
+        """
         img = Picture(**kwargs)
 
         dofs_by_subentity: typing.Dict[int, typing.Dict[int, typing.List[int]]] = {

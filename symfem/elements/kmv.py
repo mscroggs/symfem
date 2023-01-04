@@ -17,7 +17,15 @@ from ..symbols import x
 
 
 def kmv_tri_polyset(m: int, mf: int) -> typing.List[FunctionInput]:
-    """Create the polynomial set for a KMV space on a triangle."""
+    """Create the polynomial set for a KMV space on a triangle.
+
+    Args:
+        m: The parameter m
+        mf: The parameter mf
+
+    Returns:
+        The polynomial set
+    """
     poly: typing.List[FunctionInput] = []
     poly += polynomial_set_1d(2, m)
 
@@ -29,7 +37,16 @@ def kmv_tri_polyset(m: int, mf: int) -> typing.List[FunctionInput]:
 
 
 def kmv_tet_polyset(m: int, mf: int, mi: int) -> typing.List[FunctionInput]:
-    """Create the polynomial set for a KMV space on a tetrahedron."""
+    """Create the polynomial set for a KMV space on a tetrahedron.
+
+    Args:
+        m: The parameter m
+        mf: The parameter mf
+        mi: The parameter mi
+
+    Returns:
+        The polynomial set
+    """
     poly: typing.List[FunctionInput] = []
     poly += polynomial_set_1d(3, m)
 

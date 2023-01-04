@@ -57,7 +57,11 @@ class Q(CiarletElement):
     def get_tensor_factorisation(
         self
     ) -> typing.List[typing.Tuple[str, typing.List[FiniteElement], typing.List[int]]]:
-        """Get the representation of the element as a tensor product."""
+        """Get the representation of the element as a tensor product.
+
+        Returns:
+            The tensor factorisation
+        """
         from symfem import create_element
         interval_q = create_element("interval", "Lagrange", self.order)
 

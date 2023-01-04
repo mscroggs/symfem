@@ -16,17 +16,39 @@ SetOfPointsInput = typing.Union[
 
 
 def _is_close(a: sympy.core.expr.Expr, b: int) -> bool:
-    """Check if a Sympy expression is close to an int."""
+    """Check if a Sympy expression is close to an int.
+
+    Args:
+        a: A Sympy expression
+        b: An integer
+
+    Returns:
+        Is the sympy expression close to the integer?
+    """
     return abs(a - b) < 1e-8
 
 
 def parse_set_of_points_input(points: SetOfPointsInput) -> SetOfPoints:
-    """Convert an input set of points to the correct format."""
+    """Convert an input set of points to the correct format.
+
+    Args:
+        points: A set of points in some input format
+
+    Returns:
+        A set of points
+    """
     return tuple(parse_point_input(p) for p in points)
 
 
 def parse_point_input(point: PointTypeInput) -> PointType:
-    """Convert an input point to the correct format."""
+    """Convert an input point to the correct format.
+
+    Args:
+        point: A point in some input fotmat
+
+    Returns:
+        A point
+    """
     if isinstance(point, sympy.Matrix):
         assert point.rows == 1 or point.cols == 1
         if point.rows == 1:
@@ -37,12 +59,28 @@ def parse_point_input(point: PointTypeInput) -> PointType:
 
 
 def _vsub(v: PointType, w: PointType) -> PointType:
-    """Subtract."""
+    """Subtract.
+
+    Args:
+        v: A vector
+        w: A vector
+
+    Returns:
+        The vector v - w
+    """
     return tuple(i - j for i, j in zip(v, w))
 
 
 def _vdot(v: PointType, w: PointType) -> sympy.core.expr.Expr:
-    """Compute dot product."""
+    """Compute dot product.
+
+    Args:
+        v: A vector
+        w: A vector
+
+    Returns:
+        The dot product of v and w
+    """
     out = sympy.Integer(0)
     for i, j in zip(v, w):
         out += i * j
@@ -50,7 +88,15 @@ def _vdot(v: PointType, w: PointType) -> sympy.core.expr.Expr:
 
 
 def point_in_triangle(point: PointType, triangle: SetOfPoints) -> bool:
-    """Check if a point is inside a triangle."""
+    """Check if a point is inside a triangle.
+
+    Args:
+        point: The point
+        traingle: The vertices of the triangle
+
+    Returns:
+        Is the point inside the triangle?
+    """
     v0 = _vsub(triangle[2], triangle[0])
     v1 = _vsub(triangle[1], triangle[0])
     v2 = _vsub(point, triangle[0])
@@ -78,7 +124,15 @@ def point_in_triangle(point: PointType, triangle: SetOfPoints) -> bool:
 
 
 def point_in_quadrilateral(point: PointType, quad: SetOfPoints) -> bool:
-    """Check if a point is inside a quadrilateral."""
+    """Check if a point is inside a quadrilateral.
+
+    Args:
+        point: The point
+        traingle: The vertices of the quadrilateral
+
+    Returns:
+        Is the point inside the quadrilateral?
+    """
     e0 = _vsub(quad[1], quad[0])
     e1 = _vsub(quad[0], quad[2])
     e2 = _vsub(quad[3], quad[1])
@@ -107,7 +161,15 @@ def point_in_quadrilateral(point: PointType, quad: SetOfPoints) -> bool:
 
 
 def point_in_tetrahedron(point: PointType, tetrahedron: SetOfPoints) -> bool:
-    """Check if a point is inside a tetrahedron."""
+    """Check if a point is inside a tetrahedron.
+
+    Args:
+        point: The point
+        traingle: The vertices of the tetrahedron
+
+    Returns:
+        Is the point inside the tetrahedron?
+    """
     v0 = _vsub(tetrahedron[3], tetrahedron[0])
     v1 = _vsub(tetrahedron[2], tetrahedron[0])
     v2 = _vsub(tetrahedron[1], tetrahedron[0])
