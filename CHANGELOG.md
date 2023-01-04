@@ -1,3 +1,9 @@
+# Version 2023.1.1 (04 January 2023)
+
+- Added Huang-Zhang element
+- Added adding an element guide
+- Increased documentation
+
 # Version 2022.8.2 (08 August 2022)
 
 - Remove svgwrite dependency
