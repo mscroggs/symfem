@@ -1,3 +1,0 @@
-- Added Huang-Zhang element
-- Added adding an element guide
-- Increased documentation
