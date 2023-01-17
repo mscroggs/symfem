@@ -1,4 +1,4 @@
-![Symfem](https://raw.githubusercontent.com/mscroggs/symfem/main/logo/logo.png)
+![Symfem](logo/logo.png)
 
 |  | Badges |
 | --- | :---: |
