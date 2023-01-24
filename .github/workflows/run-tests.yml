@@ -27,7 +27,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - uses: actions/checkout@v3
-      - run: pip install git+https://github.com/Kozea/CairoSVG
       - run: pip install .[test] pytest-xdist
         name: Install Symfem
       - name: Install LaTeΧ
