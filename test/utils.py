@@ -20,6 +20,7 @@ test_elements: typing.Dict[str, typing.Dict[
         "Taylor": [({}, range(0, 5))],
         "Wu-Xu": [({}, [2])],
         "MWX": [({}, [1])],
+        "EG": [({}, range(1, 5))]
     },
     "triangle": {
         "P": [({"variant": "equispaced"}, range(5)), ({"variant": "lobatto"}, range(3))],
@@ -65,6 +66,7 @@ test_elements: typing.Dict[str, typing.Dict[
                        ({"edge_orders": [3, 3, 2], "variant": "equispaced"}, range(1, 6)),
                        ({"edge_orders": [2, 2, 1], "variant": "lobatto"}, range(1, 3))],
         "P1-iso-P2": [({}, [1])],
+        "EG": [({}, range(1, 4))]
     },
     "tetrahedron": {
         "P": [({"variant": "equispaced"}, range(3)), ({"variant": "lobatto"}, range(3))],
@@ -106,6 +108,7 @@ test_elements: typing.Dict[str, typing.Dict[
                          "variant": "equispaced"}, range(1, 5)),
                        ({"edge_orders": [1, 1, 2, 1, 2, 5], "face_orders": [3, 3, 2, 5],
                          "variant": "equispaced"}, range(1, 5))],
+        "EG": [({}, range(1, 3))]
     },
     "quadrilateral": {
         "bubble": [({"variant": "equispaced"}, range(2, 4)), ({"variant": "lobatto"}, range(2, 4))],
@@ -133,6 +136,7 @@ test_elements: typing.Dict[str, typing.Dict[
         "Rannacher-Turek": [({}, [1])],
         "P1-iso-P2": [({}, [1])],
         "HZ": [({}, [2, 3, 4])],
+        "EG": [({}, range(1, 4))]
     },
     "hexahedron": {
         "bubble": [({"variant": "equispaced"}, range(2, 4)), ({"variant": "lobatto"}, range(2, 4))],
@@ -155,6 +159,7 @@ test_elements: typing.Dict[str, typing.Dict[
         "TNTdiv": [({"variant": "equispaced"}, range(1, 2))],
         "Regge": [({"variant": "integral"}, range(2))],
         "Rannacher-Turek": [({}, [1])],
+        "EG": [({}, range(1, 3))]
     },
     "prism": {
         "Lagrange": [({"variant": "equispaced"}, range(4))],

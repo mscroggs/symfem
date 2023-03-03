@@ -110,6 +110,19 @@ def test_dof_diagrams_raviart_thomas(reference, degree):
 
 @pytest.mark.parametrize("reference", [
     "interval", "triangle", "quadrilateral",
+    "tetrahedron", "hexahedron",
+])
+@pytest.mark.parametrize("degree", [1, 2])
+def test_dof_diagrams_eg(reference, degree):
+    e = symfem.create_element(reference, "EG", degree)
+    for ext in ["svg", "png", "tex"]:
+        e.plot_dof_diagram(os.path.join(
+            folder, f"test_dof_diagrams_eg-{reference}-{degree}.{ext}"))
+    compile_tex(f"test_dof_diagrams_eg-{reference}-{degree}.tex")
+
+
+@pytest.mark.parametrize("reference", [
+    "interval", "triangle", "quadrilateral",
 ])
 @pytest.mark.parametrize("degree", [0, 1, 2])
 def test_function_plots_lagrange(reference, degree):
@@ -174,6 +187,18 @@ def test_function_plots_bc(n):
         e.plot_basis_function(0, os.path.join(
             folder, f"test_function_plots_bc-{n}.{ext}"))
     compile_tex(f"test_function_plots_bc-{n}.tex")
+
+
+@pytest.mark.parametrize("reference", [
+    "interval", "triangle", "quadrilateral",
+])
+@pytest.mark.parametrize("degree", [1, 2])
+def test_function_plots_eg(reference, degree):
+    e = symfem.create_element(reference, "EG", degree)
+    for ext in ["svg", "png", "tex"]:
+        e.plot_basis_function(0, os.path.join(
+            folder, f"test_function_plots_eg-{reference}-{degree}.{ext}"))
+    compile_tex(f"test_function_plots_eg-{reference}-{degree}.tex")
 
 
 @pytest.mark.parametrize("reference", [

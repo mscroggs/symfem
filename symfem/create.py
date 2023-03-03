@@ -166,7 +166,8 @@ def create_element(
                       Arbogast-Correa, AC, AC full, Arbogast-Correa full,
                       Rannacher-Turek,
                       P1-iso-P2, P2-iso-P1, iso-P2 P1,
-                      Huang-Zhang, HZ
+                      Huang-Zhang, HZ,
+                      enriched Galerkin, EG
         order: The order of the element.
     """
     reference = create_reference(cell_type)

@@ -144,6 +144,7 @@ The reference interval has vertices (0,) and (1,). Its sub-entities are numbered
 - Bernstein (alternative names: Bernstein-Bezier)
 - bubble
 - dPc
+- enriched Galerkin (alternative names: EG)
 - Hermite
 - Lagrange (alternative names: P)
 - Morley-Wang-Xu (alternative names: MWX)
@@ -170,6 +171,7 @@ The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities
 - bubble enriched vector Lagrange
 - conforming Crouzeix-Raviart (alternative names: conforming CR)
 - Crouzeix-Raviart (alternative names: CR, Crouzeix-Falk, CF)
+- enriched Galerkin (alternative names: EG)
 - Fortin-Soulie (alternative names: FS)
 - Guzman-Neilan
 - Hellan-Herrmann-Johnson (alternative names: HHJ)
@@ -207,6 +209,7 @@ The reference quadrilateral has vertices (0, 0), (1, 0), (0, 1), and (1, 1). Its
 - bubble
 - direct serendipity
 - dPc
+- enriched Galerkin (alternative names: EG)
 - Huang-Zhang (alternative names: HZ)
 - NCE (alternative names: RTCE, Qcurl, Nedelec, Ncurl)
 - NCF (alternative names: RTCF, Qdiv)
@@ -237,6 +240,7 @@ The reference tetrahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), and (0, 
 - Brezzi-Douglas-Marini (alternative names: BDM, N2div)
 - bubble
 - Crouzeix-Raviart (alternative names: CR, Crouzeix-Falk, CF)
+- enriched Galerkin (alternative names: EG)
 - Guzman-Neilan
 - Hermite
 - Kong-Mulder-Veldhuizen (alternative names: KMV)
@@ -264,6 +268,7 @@ The reference hexahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0)
 - Brezzi-Douglas-Fortin-Marini (alternative names: BDFM)
 - bubble
 - dPc
+- enriched Galerkin (alternative names: EG)
 - NCE (alternative names: RTCE, Qcurl, Nedelec, Ncurl)
 - NCF (alternative names: RTCF, Qdiv)
 - Q (alternative names: Lagrange, P)

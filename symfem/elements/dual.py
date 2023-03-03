@@ -12,7 +12,6 @@ from ..finite_element import FiniteElement
 from ..functions import AnyFunction, FunctionInput, VectorFunction
 from ..geometry import PointType, SetOfPoints, SetOfPointsInput
 from ..piecewise_functions import PiecewiseFunction
-from ..plotting import Picture, colors
 from ..references import DualPolygon
 
 
@@ -47,8 +46,8 @@ class DualCiarletElement(FiniteElement):
         super().__init__(reference, order, len(dual_coefficients), domain_dim, range_dim,
                          range_shape=range_shape)
         self._basis_functions: typing.Union[typing.List[AnyFunction], None] = None
-        self.dof_entities = dof_entities
-        self.dof_directions = dof_directions
+        self._dof_entities = dof_entities
+        self._dof_directions = dof_directions
 
     def get_polynomial_basis(
         self, reshape: bool = True
@@ -110,7 +109,7 @@ class DualCiarletElement(FiniteElement):
                         sub_fun = tuple(sf_list)
                     pieces[(v0, v1, v2)] = sub_fun
                 bfs.append(PiecewiseFunction(pieces, 2))
-            assert len(bfs) == len(self.dof_entities)
+            assert len(bfs) == len(self._dof_entities)
             self._basis_functions = bfs
 
         assert self._basis_functions is not None
@@ -127,10 +126,50 @@ class DualCiarletElement(FiniteElement):
             The numbers of the DOFs associated with the entity
         """
         out = []
-        for i, e in enumerate(self.dof_entities):
+        for i, e in enumerate(self._dof_entities):
             if e == (entity_dim, entity_number):
                 out.append(i)
         return out
+
+    def dof_plot_positions(self) -> typing.List[PointType]:
+        """Get the points to plot each DOF at on a DOF diagram.
+
+        Returns:
+            The DOF positions
+        """
+        positions = []
+        for d, (dim, e_n) in enumerate(self._dof_entities):
+            if dim == 0:
+                positions.append(self.reference.vertices[e_n])
+            elif dim == 1:
+                positions.append(tuple((a + b) / 2 for a, b in zip(
+                    self.reference.vertices[self.reference.edges[e_n][0]],
+                    self.reference.vertices[self.reference.edges[e_n][1]],
+                )))
+            elif dim == 2:
+                positions.append(self.reference.midpoint())
+            else:
+                raise ValueError("Unsupported tdim")
+
+        return positions
+
+    def dof_directions(self) -> typing.List[typing.Union[PointType, None]]:
+        """Get the direction associated with each DOF.
+
+        Returns:
+            The DOF directions
+        """
+        if self._dof_directions is None:
+            return [None for d in self._dof_entities]
+        return list(self._dof_directions)
+
+    def dof_entities(self) -> typing.List[typing.Tuple[int, int]]:
+        """Get the entities that each DOF is associated with.
+
+        Returns:
+            The entities
+        """
+        return self._dof_entities
 
     def map_to_cell(
         self, vertices_in: SetOfPointsInput, basis:
@@ -150,47 +189,6 @@ class DualCiarletElement(FiniteElement):
             The basis functions mapped to the cell
         """
         raise NotImplementedError()
-
-    def plot_dof_diagram(
-        self, filename: typing.Union[str, typing.List[str]],
-        plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
-    ):
-        """Plot a diagram showing the DOFs of the element.
-
-        Args:
-            filename: The file name
-            plot_options: Options for the plot
-            kwargs: Keyword arguments
-        """
-        img = Picture(**kwargs)
-
-        for entities in self.reference.z_ordered_entities():
-            for dim, e_n in entities:
-                if dim == 1:
-                    pts = tuple(self.reference.vertices[i] for i in self.reference.edges[e_n])
-                    img.add_line(pts[0], pts[1], colors.BLACK)
-
-            for dim, e_n in entities:
-                for d in self.entity_dofs(dim, e_n):
-                    if dim == 0:
-                        point = self.reference.vertices[e_n]
-                    elif dim == 1:
-                        point = tuple((a + b) / 2 for a, b in zip(
-                            self.reference.vertices[self.reference.edges[e_n][0]],
-                            self.reference.vertices[self.reference.edges[e_n][1]],
-                        ))
-                    elif dim == 2:
-                        point = self.reference.midpoint()
-                    else:
-                        raise ValueError("Unsupported tdim")
-
-                    if self.dof_directions is not None:
-                        direction = self.dof_directions[d]
-                        img.add_dof_arrow(point, direction, d, colors.entity(dim), False)
-                    else:
-                        img.add_dof_marker(point, d, colors.entity(dim))
-
-        img.save(filename, plot_options=plot_options)
 
 
 class Dual(DualCiarletElement):
@@ -219,17 +217,14 @@ class Dual(DualCiarletElement):
             ]
 
             for j in range(reference.number_of_triangles):
-                dual_coefficients[j][2 * j][2] = 1
-                dual_coefficients[j][2 * j + 1][1] = 1
-                dual_coefficients[j][2 * j - 1][2] = sympy.Rational(1, 2)
-                dual_coefficients[j][2 * j][1] = sympy.Rational(1, 2)
-                dual_coefficients[j][2 * j + 1][2] = sympy.Rational(1, 2)
-                if j + 1 == reference.number_of_triangles:
-                    dual_coefficients[j][0][1] = sympy.Rational(1, 2)
-                else:
-                    dual_coefficients[j][2 * j + 2][1] = sympy.Rational(1, 2)
+                dual_coefficients[j][2 * j - 1][2] = 1
+                dual_coefficients[j][2 * j][1] = 1
+                dual_coefficients[j][2 * j - 2][2] = sympy.Rational(1, 2)
+                dual_coefficients[j][2 * j - 1][1] = sympy.Rational(1, 2)
+                dual_coefficients[j][2 * j][2] = sympy.Rational(1, 2)
+                dual_coefficients[j][2 * j + 1][1] = sympy.Rational(1, 2)
 
-            dof_entities = [(1, i) for i in range(1, len(reference.vertices), 2)]
+            dof_entities = [(0, i) for i in range(0, len(reference.vertices), 2)]
 
             fine_space = "Lagrange"
 

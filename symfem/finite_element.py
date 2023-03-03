@@ -66,6 +66,32 @@ class FiniteElement(ABC):
         self._value_scale = None
 
     @abstractmethod
+    def dof_plot_positions(self) -> typing.List[PointType]:
+        """Get the points to plot each DOF at on a DOF diagram.
+
+        Returns:
+            The DOF positions
+        """
+        pass
+
+    @abstractmethod
+    def dof_directions(self) -> typing.List[typing.Union[PointType, None]]:
+        """Get the direction associated with each DOF.
+
+        Returns:
+            The DOF directions
+        """
+        pass
+
+    @abstractmethod
+    def dof_entities(self) -> typing.List[typing.Tuple[int, int]]:
+        """Get the entities that each DOF is associated with.
+
+        Returns:
+            The entities
+        """
+        pass
+
     def plot_dof_diagram(
         self, filename: typing.Union[str, typing.List[str]],
         plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
@@ -77,7 +103,42 @@ class FiniteElement(ABC):
             plot_options: Options for the plot
             kwargs: Keyword arguments
         """
-        pass
+        img = Picture(**kwargs)
+
+        dof_positions = self.dof_plot_positions()
+        dof_directions = self.dof_directions()
+        dof_entities = self.dof_entities()
+
+        for entities in self.reference.z_ordered_entities():
+            for dim, e in entities:
+                if dim == 1:
+                    pts = tuple(self.reference.vertices[i] for i in self.reference.edges[e])
+                    img.add_line(pts[0], pts[1], colors.BLACK)
+                if dim == 2:
+                    pts = tuple(self.reference.vertices[i] for i in self.reference.faces[e])
+                    if len(pts) == 4:
+                        pts = (pts[0], pts[1], pts[3], pts[2])
+                    img.add_fill(pts, colors.WHITE, 0.5)
+
+            for dim, e in entities:
+                dofs = [(dof_positions[i], dof_directions[i], dof_entities[i], i)
+                        for i in self.entity_dofs(dim, e)]
+                dofs.sort(key=lambda d: img.z(d[0]))
+                for d in dofs:
+                    direction = d[1]
+                    if direction is not None:
+                        shifted = False
+                        for d2, p in enumerate(dof_positions):
+                            if d != d2 and d[0] == p:
+                                shifted = True
+                                break
+                        img.add_dof_arrow(d[0], direction, d[3],
+                                          colors.entity(d[2][0]), shifted)
+                    else:
+                        img.add_dof_marker(
+                            d[0], d[3], colors.entity(d[2][0]))
+
+        img.save(filename, plot_options=plot_options)
 
     @abstractmethod
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
@@ -426,6 +487,30 @@ class CiarletElement(FiniteElement):
         """
         return [i for i, j in enumerate(self.dofs) if j.entity == (entity_dim, entity_number)]
 
+    def dof_plot_positions(self) -> typing.List[PointType]:
+        """Get the points to plot each DOF at on a DOF diagram.
+
+        Returns:
+            The DOF positions
+        """
+        return [d.adjusted_dof_point() for d in self.dofs]
+
+    def dof_directions(self) -> typing.List[typing.Union[PointType, None]]:
+        """Get the direction associated with each DOF.
+
+        Returns:
+            The DOF directions
+        """
+        return [d.dof_direction() for d in self.dofs]
+
+    def dof_entities(self) -> typing.List[typing.Tuple[int, int]]:
+        """Get the entities that each DOF is associated with.
+
+        Returns:
+            The entities
+        """
+        return [d.entity for d in self.dofs]
+
     def get_polynomial_basis(self) -> typing.List[AnyFunction]:
         """Get the symbolic polynomial basis for the element.
 
@@ -514,56 +599,6 @@ class CiarletElement(FiniteElement):
         assert self._value_scale is not None
         f.plot(self.reference, filename, d.dof_point(), d.dof_direction(), d.entity, n,
                self._value_scale, **kwargs)
-
-    def plot_dof_diagram(
-        self, filename: typing.Union[str, typing.List[str]],
-        plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
-    ):
-        """Plot a diagram showing the DOFs of the element.
-
-        Args:
-            filename: The file name
-            plot_options: Options for the plot
-            kwargs: Keyword arguments
-        """
-        img = Picture(**kwargs)
-
-        dofs_by_subentity: typing.Dict[int, typing.Dict[int, ListOfFunctionals]] = {
-            i: {j: [] for j in range(self.reference.sub_entity_count(i))}
-            for i in range(self.reference.tdim + 1)}
-
-        for d in self.dofs:
-            dofs_by_subentity[d.entity[0]][d.entity[1]].append(d)
-
-        for entities in self.reference.z_ordered_entities():
-            for dim, e in entities:
-                if dim == 1:
-                    pts = tuple(self.reference.vertices[i] for i in self.reference.edges[e])
-                    img.add_line(pts[0], pts[1], colors.BLACK)
-                if dim == 2:
-                    pts = tuple(self.reference.vertices[i] for i in self.reference.faces[e])
-                    if len(pts) == 4:
-                        pts = (pts[0], pts[1], pts[3], pts[2])
-                    img.add_fill(pts, colors.WHITE, 0.5)
-
-            for dim, e in entities:
-                dofs = dofs_by_subentity[dim][e]
-                dofs.sort(key=lambda d: img.z(d.adjusted_dof_point()))
-                for d in dofs:
-                    direction = d.dof_direction()
-                    if direction is not None:
-                        shifted = False
-                        for d2 in self.dofs:
-                            if d != d2 and d.adjusted_dof_point() == d2.adjusted_dof_point():
-                                shifted = True
-                                break
-                        img.add_dof_arrow(d.adjusted_dof_point(), direction, self.dofs.index(d),
-                                          colors.entity(d.entity[0]), shifted)
-                    else:
-                        img.add_dof_marker(
-                            d.adjusted_dof_point(), self.dofs.index(d), colors.entity(d.entity[0]))
-
-        img.save(filename, plot_options=plot_options)
 
     def map_to_cell(
         self, vertices_in: SetOfPointsInput,
@@ -665,7 +700,7 @@ class DirectElement(FiniteElement):
         basis_entities: typing.List[typing.Tuple[int, int]],
         domain_dim: int, range_dim: int, range_shape: typing.Optional[typing.Tuple[int, ...]] = None
     ):
-        """Create a Ciarlet element.
+        """Create a direct element.
 
         Args:
             reference: The reference cell
@@ -692,6 +727,70 @@ class DirectElement(FiniteElement):
             The numbers of the DOFs associated with the entity
         """
         return [i for i, j in enumerate(self._basis_entities) if j == (entity_dim, entity_number)]
+
+    def dof_plot_positions(self) -> typing.List[PointType]:
+        """Get the points to plot each DOF at on a DOF diagram.
+
+        Returns:
+            The DOF positions
+        """
+        positions = []
+        for n, (dim, e_n) in enumerate(self._basis_entities):
+            ed = self.entity_dofs(dim, e_n)
+            entity_n = ed.index(n)
+            dof_count = len(ed)
+            sub_ref = self.reference.sub_entity(dim, e_n)
+            if dim == 0:
+                assert entity_n == 0
+                positions.append(sub_ref.vertices[0])
+            elif dim == 1:
+                positions.append(tuple(
+                    o + sympy.Rational((entity_n + 1) * a, dof_count + 1)
+                    for o, a in zip(sub_ref.origin, *sub_ref.axes)))
+            elif dim == 2:
+                ne = 1
+                while ne * (ne + 1) // 2 < dof_count:
+                    ne += 1
+                i = 0
+                while entity_n >= ne - i:
+                    entity_n -= ne - i
+                    i += 1
+                positions.append(tuple(
+                    o + sympy.Rational((entity_n + 1) * a + (i + 1) * b, ne + 1)
+                    for o, a, b in zip(sub_ref.origin, *sub_ref.axes)))
+            elif dim == 3:
+                ne = 1
+                while ne * (ne + 1) * (ne + 2) // 6 < n:
+                    ne += 1
+                i = 0
+                while entity_n >= (ne - i) * (ne + 1 - i) // 2:
+                    entity_n -= (ne - i) * (ne + 1 - i) // 2
+                    i += 1
+                j = 0
+                while entity_n >= ne - j:
+                    entity_n -= ne - j
+                    j += 1
+                positions.append(tuple(
+                    o + sympy.Rational((entity_n + 1) * a + (j + 1) * b + (i + 1) * c, n + 1)
+                    for o, a, b, c in zip(sub_ref.origin, *sub_ref.axes)))
+
+        return positions
+
+    def dof_directions(self) -> typing.List[typing.Union[PointType, None]]:
+        """Get the direction associated with each DOF.
+
+        Returns:
+            The DOF directions
+        """
+        return [None for d in self._basis_entities]
+
+    def dof_entities(self) -> typing.List[typing.Tuple[int, int]]:
+        """Get the entities that each DOF is associated with.
+
+        Returns:
+            The entities
+        """
+        return self._basis_entities
 
     def get_basis_functions(
         self, use_tensor_factorisation: bool = False
@@ -735,70 +834,6 @@ class DirectElement(FiniteElement):
             The polynomial basis
         """
         raise NotImplementedError()
-
-    def plot_dof_diagram(
-        self, filename: typing.Union[str, typing.List[str]],
-        plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
-    ):
-        """Plot a diagram showing the DOFs of the element.
-
-        Args:
-            filename: The file name
-            plot_options: Options for the plot
-            kwargs: Keyword arguments
-        """
-        img = Picture(**kwargs)
-
-        dofs_by_subentity: typing.Dict[int, typing.Dict[int, typing.List[int]]] = {
-            i: {j: [] for j in range(self.reference.sub_entity_count(i))}
-            for i in range(self.reference.tdim + 1)}
-
-        for i, e in enumerate(self._basis_entities):
-            dofs_by_subentity[e[0]][e[1]].append(i)
-
-        for entities in self.reference.z_ordered_entities():
-            for dim, e_n in entities:
-                if dim == 1:
-                    pts = tuple(self.reference.vertices[i] for i in self.reference.edges[e_n])
-                    img.add_line(pts[0], pts[1], colors.BLACK)
-                if dim == 2:
-                    pts = tuple(self.reference.vertices[i] for i in self.reference.faces[e_n])
-                    if len(pts) == 4:
-                        pts = (pts[0], pts[1], pts[3], pts[2])
-                    img.add_fill(pts, colors.WHITE, 0.5)
-
-            for dim, e_n in entities:
-                n = len(dofs_by_subentity[dim][e_n])
-                if n > 0:
-                    sub_ref = self.reference.sub_entity(dim, e_n)
-                    points: typing.List[PointType] = []
-                    if dim == 0:
-                        assert n == 1
-                        points = [sub_ref.vertices[0]]
-                    elif dim == 1:
-                        points = [tuple(o + sympy.Rational(i * a, n + 1)
-                                        for o, a in zip(sub_ref.origin, *sub_ref.axes))
-                                  for i in range(1, n + 1)]
-                    elif dim == 2:
-                        ne = 1
-                        while ne * (ne + 1) // 2 < n:
-                            ne += 1
-                        points = [tuple(o + sympy.Rational(i * a + j * b, n + 1)
-                                        for o, a, b in zip(sub_ref.origin, *sub_ref.axes))
-                                  for i in range(1, ne + 1) for j in range(1, ne + 1 - i)]
-                    elif dim == 3:
-                        ne = 1
-                        while ne * (ne + 1) * (ne + 2) // 6 < n:
-                            ne += 1
-                        points = [tuple(o + sympy.Rational(i * a + j * b + k * c, n + 1)
-                                        for o, a, b, c in zip(sub_ref.origin, *sub_ref.axes))
-                                  for i in range(1, ne + 1) for j in range(1, ne + 1 - i)
-                                  for k in range(1, ne + 1 - i - j)]
-
-                    for p, d in zip(points, dofs_by_subentity[dim][e_n]):
-                        img.add_dof_marker(p, d, colors.entity(dim))
-
-        img.save(filename, plot_options=plot_options)
 
     def test(self):
         """Run tests for this element."""
@@ -844,6 +879,138 @@ class DirectElement(FiniteElement):
         mat = sympy.Matrix(mat)
 
         assert mat.rank() == mat.rows
+
+
+class EnrichedElement(FiniteElement):
+    """Finite element defined directly."""
+
+    _basis_functions: typing.Optional[typing.List[AnyFunction]]
+
+    def __init__(
+        self, subelements: typing.List[FiniteElement],
+    ):
+        """Create an enriched element.
+
+        Args:
+            subelements: The sub elements
+        """
+        reference = subelements[0].reference
+        order = subelements[0].order
+        domain_dim = subelements[0].domain_dim
+        range_dim = subelements[0].range_dim
+        range_shape = subelements[0].range_shape
+        for e in subelements:
+            assert e.reference == reference
+            assert e.domain_dim == domain_dim
+            assert e.range_dim == range_dim
+            assert e.range_shape == range_shape
+        self._basis_functions = None
+        self._subelements = subelements
+
+        super().__init__(reference, order, sum(e.space_dim for e in subelements),
+                         domain_dim, range_dim, range_shape)
+
+    def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
+        """Get the numbers of the DOFs associated with the given entity.
+
+        Args:
+            entity_dim: The dimension of the entity
+            entity_number: The number of the entity
+
+        Returns:
+            The numbers of the DOFs associated with the entity
+        """
+        start = 0
+        dofs = []
+        for e in self._subelements:
+            dofs += [start + i for i in e.entity_dofs(entity_dim, entity_number)]
+            start += e.space_dim
+        return dofs
+
+    def dof_plot_positions(self) -> typing.List[PointType]:
+        """Get the points to plot each DOF at on a DOF diagram.
+
+        Returns:
+            The DOF positions
+        """
+        positions = []
+        for e in self._subelements:
+            positions += e.dof_plot_positions()
+        return positions
+
+    def dof_directions(self) -> typing.List[typing.Union[PointType, None]]:
+        """Get the direction associated with each DOF.
+
+        Returns:
+            The DOF directions
+        """
+        positions = []
+        for e in self._subelements:
+            positions += e.dof_directions()
+        return positions
+
+    def dof_entities(self) -> typing.List[typing.Tuple[int, int]]:
+        """Get the entities that each DOF is associated with.
+
+        Returns:
+            The entities
+        """
+        positions = []
+        for e in self._subelements:
+            positions += e.dof_entities()
+        return positions
+
+    def get_basis_functions(
+        self, use_tensor_factorisation: bool = False
+    ) -> typing.List[AnyFunction]:
+        """Get the basis functions of the element.
+
+        Args:
+            use_tensor_factorisation: Should a tensor factorisation be used?
+
+        Returns:
+            The basis functions
+        """
+        if use_tensor_factorisation:
+            return self._get_basis_functions_tensor()
+
+        if self._basis_functions is None:
+            self._basis_functions = []
+            for e in self._subelements:
+                self._basis_functions += e.get_basis_functions()
+
+        return self._basis_functions
+
+    def map_to_cell(
+        self, vertices_in: SetOfPointsInput,
+        basis: typing.Optional[typing.List[AnyFunction]] = None,
+        forward_map: typing.Optional[PointType] = None,
+        inverse_map: typing.Optional[PointType] = None
+    ) -> typing.List[AnyFunction]:
+        """Map the basis onto a cell using the appropriate mapping for the element.
+
+        Args:
+            vertices_in: The vertices of the cell
+            basis: The basis functions
+            forward_map: The map from the reference to the cell
+            inverse_map: The map to the reference from the cell
+
+        Returns:
+            The basis functions mapped to the cell
+        """
+        raise NotImplementedError()
+
+    def get_polynomial_basis(self) -> typing.List[AnyFunction]:
+        """Get the symbolic polynomial basis for the element.
+
+        Returns:
+            The polynomial basis
+        """
+        raise NotImplementedError()
+
+    def test(self):
+        """Run tests for this element."""
+        super().test()
 
 
 class ElementBasisFunction(BasisFunction):
