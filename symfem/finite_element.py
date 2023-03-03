@@ -575,8 +575,8 @@ class CiarletElement(FiniteElement):
         """
         img = Picture(**kwargs)
 
-        dofs_by_subentity: typing.Dict[int, typing.Dict[int, typing.List[int]]] = {
-            i: {j: self.entity_dofs(i, j) for j in range(self.reference.sub_entity_count(i))}
+        dofs_by_subentity: typing.Dict[int, typing.Dict[int, ListOfFunctionals]] = {
+            i: {j: [] for j in range(self.reference.sub_entity_count(i))}
             for i in range(self.reference.tdim + 1)}
 
         for d in self.dofs:
