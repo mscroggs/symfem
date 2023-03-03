@@ -745,33 +745,33 @@ class DirectElement(FiniteElement):
                 positions.append(sub_ref.vertices[0])
             elif dim == 1:
                 positions.append(tuple(
-                    o + sympy.Rational(entity_n * a, dof_count + 1)
+                    o + sympy.Rational((entity_n + 1) * a, dof_count + 1)
                     for o, a in zip(sub_ref.origin, *sub_ref.axes)))
             elif dim == 2:
                 ne = 1
                 while ne * (ne + 1) // 2 < dof_count:
                     ne += 1
                 i = 0
-                while entity_n >= ne + 1 - i:
-                    entity_n -= ne + 1 - i
+                while entity_n >= ne - i:
+                    entity_n -= ne - i
                     i += 1
                 positions.append(tuple(
-                    o + sympy.Rational(i * a + entity_n * b, dof_count + 1)
+                    o + sympy.Rational((entity_n + 1) * a + (i + 1) * b, ne + 1)
                     for o, a, b in zip(sub_ref.origin, *sub_ref.axes)))
             elif dim == 3:
                 ne = 1
                 while ne * (ne + 1) * (ne + 2) // 6 < n:
                     ne += 1
                 i = 0
-                while entity_n >= (ne + 1 - i) * (ne + 2 - i) // 2:
-                    entity_n -= (ne + 1 - i) * (ne + 2 - i) // 2
+                while entity_n >= (ne - i) * (ne + 1 - i) // 2:
+                    entity_n -= (ne - i) * (ne + 1 - i) // 2
                     i += 1
                 j = 0
-                while entity_n >= ne + 1 - j:
-                    entity_n -= ne + 1 - j
+                while entity_n >= ne - j:
+                    entity_n -= ne - j
                     j += 1
                 positions.append(tuple(
-                    o + sympy.Rational(i * a + j * b + entity_n * c, n + 1)
+                    o + sympy.Rational((entity_n + 1) * a + (j + 1) * b + (i + 1) * c, n + 1)
                     for o, a, b, c in zip(sub_ref.origin, *sub_ref.axes)))
 
         return positions
@@ -923,7 +923,7 @@ class EnrichedElement(FiniteElement):
         start = 0
         dofs = []
         for e in self._subelements:
-            dofs += e.entity_dofs(entity_dim, entity_number)
+            dofs += [start + i for i in e.entity_dofs(entity_dim, entity_number)]
             start += e.space_dim
         return dofs
 

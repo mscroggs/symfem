@@ -12,7 +12,6 @@ from ..finite_element import FiniteElement
 from ..functions import AnyFunction, FunctionInput, VectorFunction
 from ..geometry import PointType, SetOfPoints, SetOfPointsInput
 from ..piecewise_functions import PiecewiseFunction
-from ..plotting import Picture, colors
 from ..references import DualPolygon
 
 
@@ -191,47 +190,6 @@ class DualCiarletElement(FiniteElement):
         """
         raise NotImplementedError()
 
-    def plot_dof_diagram(
-        self, filename: typing.Union[str, typing.List[str]],
-        plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
-    ):
-        """Plot a diagram showing the DOFs of the element.
-
-        Args:
-            filename: The file name
-            plot_options: Options for the plot
-            kwargs: Keyword arguments
-        """
-        img = Picture(**kwargs)
-
-        for entities in self.reference.z_ordered_entities():
-            for dim, e_n in entities:
-                if dim == 1:
-                    pts = tuple(self.reference.vertices[i] for i in self.reference.edges[e_n])
-                    img.add_line(pts[0], pts[1], colors.BLACK)
-
-            for dim, e_n in entities:
-                for d in self.entity_dofs(dim, e_n):
-                    if dim == 0:
-                        point = self.reference.vertices[e_n]
-                    elif dim == 1:
-                        point = tuple((a + b) / 2 for a, b in zip(
-                            self.reference.vertices[self.reference.edges[e_n][0]],
-                            self.reference.vertices[self.reference.edges[e_n][1]],
-                        ))
-                    elif dim == 2:
-                        point = self.reference.midpoint()
-                    else:
-                        raise ValueError("Unsupported tdim")
-
-                    if self._dof_directions is not None:
-                        direction = self._dof_directions[d]
-                        img.add_dof_arrow(point, direction, d, colors.entity(dim), False)
-                    else:
-                        img.add_dof_marker(point, d, colors.entity(dim))
-
-        img.save(filename, plot_options=plot_options)
-
 
 class Dual(DualCiarletElement):
     """Barycentric dual finite element."""
@@ -259,17 +217,14 @@ class Dual(DualCiarletElement):
             ]
 
             for j in range(reference.number_of_triangles):
-                dual_coefficients[j][2 * j][2] = 1
-                dual_coefficients[j][2 * j + 1][1] = 1
-                dual_coefficients[j][2 * j - 1][2] = sympy.Rational(1, 2)
-                dual_coefficients[j][2 * j][1] = sympy.Rational(1, 2)
-                dual_coefficients[j][2 * j + 1][2] = sympy.Rational(1, 2)
-                if j + 1 == reference.number_of_triangles:
-                    dual_coefficients[j][0][1] = sympy.Rational(1, 2)
-                else:
-                    dual_coefficients[j][2 * j + 2][1] = sympy.Rational(1, 2)
+                dual_coefficients[j][2 * j - 1][2] = 1
+                dual_coefficients[j][2 * j][1] = 1
+                dual_coefficients[j][2 * j - 2][2] = sympy.Rational(1, 2)
+                dual_coefficients[j][2 * j - 1][1] = sympy.Rational(1, 2)
+                dual_coefficients[j][2 * j][2] = sympy.Rational(1, 2)
+                dual_coefficients[j][2 * j + 1][1] = sympy.Rational(1, 2)
 
-            dof_entities = [(1, i) for i in range(1, len(reference.vertices), 2)]
+            dof_entities = [(0, i) for i in range(0, len(reference.vertices), 2)]
 
             fine_space = "Lagrange"
 

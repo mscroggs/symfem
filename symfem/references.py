@@ -2165,3 +2165,16 @@ class DualPolygon(Reference):
             Pairs of point numbers that make a mesh of lines across the cell
         """
         raise NotImplementedError()
+
+    def z_ordered_entities_extra_dim(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
+        """Get the subentities in back-to-front plotting order when using an extra dimension.
+
+        Returns:
+            List of lists of subentity dimensions and numbers
+        """
+        N = 2 * self.number_of_triangles
+        n = (self.number_of_triangles + 1) // 2 * 2
+        return [
+            [(1, i) for i in range(n)] + [(0, i) for i in range(1, n)],
+            [(2, 0)] + [(1, i) for i in range(n, N)] + [(0, 0)] + [(0, i) for i in range(n, N)]
+        ]
