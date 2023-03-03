@@ -131,14 +131,18 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
     import numpy as np
 
     points = make_lattice(cell, 2)
-    parsed_args = []
+    parsed_args = [
+        basix.LagrangeVariant.unset,
+        basix.DPCVariant.unset,
+        False
+    ]
     for a in args:
         if a[0] == "LagrangeVariant":
-            parsed_args.append(basix.variants.string_to_lagrange_variant(a[1]))
+            parsed_args[0] = basix.variants.string_to_lagrange_variant(a[1])
         elif a[0] == "DPCVariant":
-            parsed_args.append(basix.variants.string_to_dpc_variant(a[1]))
+            parsed_args[1] = basix.variants.string_to_dpc_variant(a[1])
         elif a[0] == "bool":
-            parsed_args.append(a[1])
+            parsed_args[2] = a[1]
         else:
             raise ValueError(f"Unknown arg type: {a[0]}")
     space = basix.create_element(
