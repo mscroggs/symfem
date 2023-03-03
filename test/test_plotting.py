@@ -178,6 +178,18 @@ def test_function_plots_bc(n):
 
 @pytest.mark.parametrize("reference", [
     "interval", "triangle", "quadrilateral",
+])
+@pytest.mark.parametrize("degree", [1, 2])
+def test_function_plots_eg(reference, degree):
+    e = symfem.create_element(reference, "EG", degree)
+    for ext in ["svg", "png", "tex"]:
+        e.plot_basis_function(0, os.path.join(
+            folder, f"test_function_plots_eg-{reference}-{degree}.{ext}"))
+    compile_tex(f"test_function_plots_eg-{reference}-{degree}.tex")
+
+
+@pytest.mark.parametrize("reference", [
+    "interval", "triangle", "quadrilateral",
     "tetrahedron", "hexahedron", "prism", "pyramid",
     "dual polygon(6)"
 ])
