@@ -47,8 +47,8 @@ class DualCiarletElement(FiniteElement):
         super().__init__(reference, order, len(dual_coefficients), domain_dim, range_dim,
                          range_shape=range_shape)
         self._basis_functions: typing.Union[typing.List[AnyFunction], None] = None
-        self.dof_entities = dof_entities
-        self.dof_directions = dof_directions
+        self._dof_entities = dof_entities
+        self._dof_directions = dof_directions
 
     def get_polynomial_basis(
         self, reshape: bool = True
@@ -110,7 +110,7 @@ class DualCiarletElement(FiniteElement):
                         sub_fun = tuple(sf_list)
                     pieces[(v0, v1, v2)] = sub_fun
                 bfs.append(PiecewiseFunction(pieces, 2))
-            assert len(bfs) == len(self.dof_entities)
+            assert len(bfs) == len(self._dof_entities)
             self._basis_functions = bfs
 
         assert self._basis_functions is not None
@@ -127,10 +127,50 @@ class DualCiarletElement(FiniteElement):
             The numbers of the DOFs associated with the entity
         """
         out = []
-        for i, e in enumerate(self.dof_entities):
+        for i, e in enumerate(self._dof_entities):
             if e == (entity_dim, entity_number):
                 out.append(i)
         return out
+
+    def dof_plot_positions(self) -> typing.List[PointType]:
+        """Get the points to plot each DOF at on a DOF diagram.
+
+        Returns:
+            The DOF positions
+        """
+        positions = []
+        for d, (dim, e_n) in enumerate(self._dof_entities):
+            if dim == 0:
+                positions.append(self.reference.vertices[e_n])
+            elif dim == 1:
+                positions.append(tuple((a + b) / 2 for a, b in zip(
+                    self.reference.vertices[self.reference.edges[e_n][0]],
+                    self.reference.vertices[self.reference.edges[e_n][1]],
+                )))
+            elif dim == 2:
+                positions.append(self.reference.midpoint())
+            else:
+                raise ValueError("Unsupported tdim")
+
+        return positions
+
+    def dof_directions(self) -> typing.List[typing.Union[PointType, None]]:
+        """Get the direction associated with each DOF.
+
+        Returns:
+            The DOF directions
+        """
+        if self._dof_directions is None:
+            return [None for d in self._dof_entities]
+        return list(self._dof_directions)
+
+    def dof_entities(self) -> typing.List[typing.Tuple[int, int]]:
+        """Get the entities that each DOF is associated with.
+
+        Returns:
+            The entities
+        """
+        return self._dof_entities
 
     def map_to_cell(
         self, vertices_in: SetOfPointsInput, basis:
@@ -184,8 +224,8 @@ class DualCiarletElement(FiniteElement):
                     else:
                         raise ValueError("Unsupported tdim")
 
-                    if self.dof_directions is not None:
-                        direction = self.dof_directions[d]
+                    if self._dof_directions is not None:
+                        direction = self._dof_directions[d]
                         img.add_dof_arrow(point, direction, d, colors.entity(dim), False)
                     else:
                         img.add_dof_marker(point, d, colors.entity(dim))
