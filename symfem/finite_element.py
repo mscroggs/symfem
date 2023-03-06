@@ -228,13 +228,15 @@ class FiniteElement(ABC):
         return [tuple(b.subs(x, p).as_sympy() for b in self._float_basis_functions) for p in points]
 
     def plot_basis_function(
-        self, n: int, filename: typing.Union[str, typing.List[str]], **kwargs: typing.Any
+        self, n: int, filename: typing.Union[str, typing.List[str]],
+        cell: typing.Optional[Reference] = None, **kwargs: typing.Any
     ):
         """Plot a diagram showing a basis function.
 
         Args:
             n: The basis function number
             filename: The file name
+            cell: The cell to push the basis function to and plot on
             kwargs: Keyword arguments
         """
         if self._value_scale is None:
@@ -246,9 +248,14 @@ class FiniteElement(ABC):
                     max_v = max(max_v, float(parse_function_input(i).norm()))
             self._value_scale = 1 / sympy.Float(max_v)
 
-        f = self.get_basis_functions()[n]
         assert self._value_scale is not None
-        f.plot(self.reference, filename, None, None, None, n, self._value_scale, **kwargs)
+
+        if cell is None:
+            f = self.get_basis_functions()[n]
+            f.plot(self.reference, filename, None, None, None, n, self._value_scale, **kwargs)
+        else:
+            f = self.map_to_cell(cell.vertices)[n]
+            f.plot(cell, filename, None, None, None, n, self._value_scale, **kwargs)
 
     @abstractmethod
     def map_to_cell(
@@ -576,15 +583,20 @@ class CiarletElement(FiniteElement):
         return self._basis_functions
 
     def plot_basis_function(
-        self, n: int, filename: typing.Union[str, typing.List[str]], **kwargs: typing.Any
+        self, n: int, filename: typing.Union[str, typing.List[str]],
+        cell: typing.Optional[Reference] = None, **kwargs: typing.Any
     ):
         """Plot a diagram showing a basis function.
 
         Args:
             n: The basis function number
             filename: The file name
+            cell: The cell to push the basis function to and plot on
             kwargs: Keyword arguments
         """
+        if cell is not None:
+            raise NotImplementedError()
+
         if self._value_scale is None:
             values = self.tabulate_basis_float(self.reference.make_lattice_float(6))
             max_v = 0.0
@@ -998,7 +1010,10 @@ class EnrichedElement(FiniteElement):
         Returns:
             The basis functions mapped to the cell
         """
-        raise NotImplementedError()
+        out = []
+        for e in self._subelements:
+            out += e.map_to_cell(vertices_in, basis, forward_map, inverse_map)
+        return out
 
     def get_polynomial_basis(self) -> typing.List[AnyFunction]:
         """Get the symbolic polynomial basis for the element.

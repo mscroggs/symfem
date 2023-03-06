@@ -408,7 +408,12 @@ class AnyFunction(ABC):
             sub_e = reference.sub_entity(*dof_entity)
             img.add_fill([i + extra for i in sub_e.clockwise_vertices], colors.BLUE, 0.5)
 
-        for ze in reference.z_ordered_entities_extra_dim():
+        if self.is_scalar:
+            zentities = reference.z_ordered_entities_extra_dim()
+        else:
+            zentities = reference.z_ordered_entities()
+
+        for ze in zentities:
             for dim, entity in ze:
                 if dim == 1:
                     c = colors.GRAY
@@ -418,6 +423,7 @@ class AnyFunction(ABC):
                         reference.vertices[reference.edges[entity][0]] + extra,
                         reference.vertices[reference.edges[entity][1]] + extra, c)
 
+            for dim, entity in ze:
                 if dim == reference.tdim:
                     self.plot_values(reference, img, value_scale)
 
