@@ -6,7 +6,7 @@ This element's definition appears in https://doi.org/10.1016/j.camwa.2022.06.018
 
 import typing
 
-from ..finite_element import EnrichedElement, CiarletElement
+from ..finite_element import CiarletElement, EnrichedElement
 from ..functionals import BaseFunctional, IntegralAgainst
 from ..functions import FunctionInput, VectorFunction
 from ..references import Reference
