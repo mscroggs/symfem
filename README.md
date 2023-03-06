@@ -172,6 +172,7 @@ The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities
 - conforming Crouzeix-Raviart (alternative names: conforming CR)
 - Crouzeix-Raviart (alternative names: CR, Crouzeix-Falk, CF)
 - enriched Galerkin (alternative names: EG)
+- enriched vector Galerkin (alternative names: locking-free enriched Galerkin, LFEG)
 - Fortin-Soulie (alternative names: FS)
 - Guzman-Neilan
 - Hellan-Herrmann-Johnson (alternative names: HHJ)
@@ -210,6 +211,7 @@ The reference quadrilateral has vertices (0, 0), (1, 0), (0, 1), and (1, 1). Its
 - direct serendipity
 - dPc
 - enriched Galerkin (alternative names: EG)
+- enriched vector Galerkin (alternative names: locking-free enriched Galerkin, LFEG)
 - Huang-Zhang (alternative names: HZ)
 - NCE (alternative names: RTCE, Qcurl, Nedelec, Ncurl)
 - NCF (alternative names: RTCF, Qdiv)
@@ -241,6 +243,7 @@ The reference tetrahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), and (0, 
 - bubble
 - Crouzeix-Raviart (alternative names: CR, Crouzeix-Falk, CF)
 - enriched Galerkin (alternative names: EG)
+- enriched vector Galerkin (alternative names: locking-free enriched Galerkin, LFEG)
 - Guzman-Neilan
 - Hermite
 - Kong-Mulder-Veldhuizen (alternative names: KMV)
@@ -269,6 +272,7 @@ The reference hexahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0)
 - bubble
 - dPc
 - enriched Galerkin (alternative names: EG)
+- enriched vector Galerkin (alternative names: locking-free enriched Galerkin, LFEG)
 - NCE (alternative names: RTCE, Qcurl, Nedelec, Ncurl)
 - NCF (alternative names: RTCF, Qdiv)
 - Q (alternative names: Lagrange, P)

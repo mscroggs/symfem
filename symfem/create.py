@@ -167,7 +167,8 @@ def create_element(
                       Rannacher-Turek,
                       P1-iso-P2, P2-iso-P1, iso-P2 P1,
                       Huang-Zhang, HZ,
-                      enriched Galerkin, EG
+                      enriched Galerkin, EG,
+                      enriched vector Galerkin, locking-free enriched Galerkin, LFEG
         order: The order of the element.
     """
     reference = create_reference(cell_type)

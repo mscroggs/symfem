@@ -228,7 +228,8 @@ class FiniteElement(ABC):
         return [tuple(b.subs(x, p).as_sympy() for b in self._float_basis_functions) for p in points]
 
     def plot_basis_function(
-        self, n: int, filename: typing.Union[str, typing.List[str]], **kwargs: typing.Any
+        self, n: int, filename: typing.Union[str, typing.List[str]], reference: typing.Optional[Reference] = None,
+        **kwargs: typing.Any
     ):
         """Plot a diagram showing a basis function.
 
@@ -246,9 +247,14 @@ class FiniteElement(ABC):
                     max_v = max(max_v, float(parse_function_input(i).norm()))
             self._value_scale = 1 / sympy.Float(max_v)
 
-        f = self.get_basis_functions()[n]
         assert self._value_scale is not None
-        f.plot(self.reference, filename, None, None, None, n, self._value_scale, **kwargs)
+
+        if reference is None:
+            f = self.get_basis_functions()[n]
+            f.plot(self.reference, filename, None, None, None, n, self._value_scale, **kwargs)
+        else:
+            f = self.map_to_cell(reference.vertices)[n]
+            f.plot(reference, filename, None, None, None, n, self._value_scale, **kwargs)
 
     @abstractmethod
     def map_to_cell(
@@ -998,7 +1004,10 @@ class EnrichedElement(FiniteElement):
         Returns:
             The basis functions mapped to the cell
         """
-        raise NotImplementedError()
+        out = []
+        for e in self._subelements:
+            out += e.map_to_cell(vertices_in, basis, forward_map, inverse_map)
+        return out
 
     def get_polynomial_basis(self) -> typing.List[AnyFunction]:
         """Get the symbolic polynomial basis for the element.
