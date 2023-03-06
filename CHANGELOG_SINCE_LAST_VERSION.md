@@ -1,1 +1,2 @@
 - Added enriched Galerkin elements
+- Improved plotting
