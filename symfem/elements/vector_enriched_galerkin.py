@@ -4,9 +4,11 @@ This element's definition appears in https://doi.org/10.1016/j.camwa.2022.06.018
 (Yi, Hu, Lee, Adler, 2022)
 """
 
+import typing
+
 from ..finite_element import EnrichedElement, CiarletElement
-from ..functionals import IntegralAgainst
-from ..functions import ScalarFunction
+from ..functionals import BaseFunctional, IntegralAgainst
+from ..functions import FunctionInput, VectorFunction
 from ..references import Reference
 from ..symbols import x
 from .lagrange import VectorLagrange
@@ -16,19 +18,19 @@ from .q import VectorQ
 class Enrichment(CiarletElement):
     """An LF enriched Galerkin element."""
 
-    def __init__(self, reference: Reference, order: int):
+    def __init__(self, reference: Reference):
         """Create the element.
 
         Args:
             reference: The reference element
         """
-        f = tuple(x[i] - j for i, j in enumerate(reference.midpoint()))
-        poly = [f]
-        size = ScalarFunction(sum(i*i for i in f)).integral(reference, x)
-        dofs = [IntegralAgainst(reference, reference, tuple(i / size for i in f),
-                                (reference.tdim, 0), "contravariant")]
+        f = VectorFunction(tuple(x[i] - j for i, j in enumerate(reference.midpoint())))
+        poly: typing.List[FunctionInput] = [f]
+        size = f.dot(f).integral(reference, x)
+        dofs: typing.List[BaseFunctional] = [IntegralAgainst(
+            reference, reference, tuple(i / size for i in f), (reference.tdim, 0), "contravariant")]
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, 1, poly, dofs, reference.tdim, reference.tdim)
 
     names = []
     references = ["triangle", "quadrilateral", "tetrahedron", "hexahedron"]
@@ -48,9 +50,9 @@ class VectorEnrichedGalerkin(EnrichedElement):
             order: The polynomial order
         """
         if reference.name in ["quadrilateral", "hexahedron"]:
-            super().__init__([VectorQ(reference, order), Enrichment(reference, 1)])
+            super().__init__([VectorQ(reference, order), Enrichment(reference)])
         else:
-            super().__init__([VectorLagrange(reference, order), Enrichment(reference, 1)])
+            super().__init__([VectorLagrange(reference, order), Enrichment(reference)])
 
     names = ["enriched vector Galerkin", "locking-free enriched Galerkin", "LFEG"]
     references = ["triangle", "quadrilateral", "tetrahedron", "hexahedron"]
