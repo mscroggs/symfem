@@ -1076,7 +1076,7 @@ def orthonormal_basis(
     ref = create_reference(cell)
     if variables is None:
         variables = x
-    norms = [sympy.sqrt((f ** 2).integral(ref, variables)) for f in poly[0]]
+    norms = [sympy.sqrt((f ** 2).integral(ref, dummy_vars=variables)) for f in poly[0]]
     for i, n in enumerate(norms):
         for j in range(len(poly)):
             poly[j][i] /= n
