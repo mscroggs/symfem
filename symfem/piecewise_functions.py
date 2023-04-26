@@ -422,12 +422,16 @@ class PiecewiseFunction(AnyFunction):
         return PiecewiseFunction(
             {shape: f.norm() for shape, f in self._pieces.items()}, self.tdim)
 
-    def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t) -> AnyFunction:
+    def integral(
+        self, domain: Reference, vars: AxisVariablesNotSingle = x,
+        dummy_vars: AxisVariablesNotSingle = t
+    ) -> ScalarFunction:
         """Compute the integral of the function.
 
         Args:
             domain: The domain of the integral
             vars: The variables to integrate with respect to
+            dummy_vars: The dummy variables to use inside the integral
 
         Returns:
             The integral
@@ -436,7 +440,8 @@ class PiecewiseFunction(AnyFunction):
         for shape, f in self._pieces.items():
             ref = _piece_reference(self.tdim, shape)
             sub_domain = ref.intersection(domain)
-            result += f.integral(sub_domain, vars)
+            if sub_domain is not None:
+                result += f.integral(sub_domain, vars, dummy_vars)
         return result
 
     def det(self) -> PiecewiseFunction:

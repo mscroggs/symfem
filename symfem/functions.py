@@ -314,12 +314,16 @@ class AnyFunction(ABC):
         pass
 
     @abstractmethod
-    def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t):
+    def integral(
+        self, domain: Reference, vars: AxisVariablesNotSingle = x,
+        dummy_vars: AxisVariablesNotSingle = t
+    ) -> ScalarFunction:
         """Compute the integral of the function.
 
         Args:
             domain: The domain of the integral
             vars: The variables to integrate with respect to
+            dummy_vars: The dummy variables to use inside the integral
 
         Returns:
             The integral
@@ -1164,12 +1168,16 @@ class VectorFunction(AnyFunction):
             a += i._f ** 2
         return ScalarFunction(sympy.sqrt(a))
 
-    def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t):
+    def integral(
+        self, domain: Reference, vars: AxisVariablesNotSingle = x,
+        dummy_vars: AxisVariablesNotSingle = t
+    ) -> ScalarFunction:
         """Compute the integral of the function.
 
         Args:
             domain: The domain of the integral
             vars: The variables to integrate with respect to
+            dummy_vars: The dummy variables to use inside the integral
 
         Returns:
             The integral
@@ -1592,12 +1600,16 @@ class MatrixFunction(AnyFunction):
         """
         raise NotImplementedError()
 
-    def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t):
+    def integral(
+        self, domain: Reference, vars: AxisVariablesNotSingle = x,
+        dummy_vars: AxisVariablesNotSingle = t
+    ) -> ScalarFunction:
         """Compute the integral of the function.
 
         Args:
             domain: The domain of the integral
             vars: The variables to integrate with respect to
+            dummy_vars: The dummy variables to use inside the integral
 
         Returns:
             The integral
