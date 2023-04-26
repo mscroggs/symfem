@@ -432,7 +432,6 @@ class PiecewiseFunction(AnyFunction):
         Returns:
             The integral
         """
-
         result = ScalarFunction(0)
         for shape, f in self._pieces.items():
             ref = _piece_reference(self.tdim, shape)
@@ -521,7 +520,7 @@ class PiecewiseFunction(AnyFunction):
 
 
 def _piece_reference(tdim, shape):
-    """Create a reference element for a single piece"""
+    """Create a reference element for a single piece."""
     from .create import create_reference
     if tdim == 2:
         if len(shape) == 3:
