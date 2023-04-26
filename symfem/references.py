@@ -17,6 +17,49 @@ IntLimits = typing.List[typing.Union[
     typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr]]]
 
 
+def _which_side(vs: SetOfPoints, p: PointType, q: PointType) -> typing.Optional[int]:
+    """Check which side of a line or plane a set of points are.
+
+    Args:
+        vs: The set of points
+        p: A point on the line or plane
+        q: Another point on the line (2D) or the normal to the plane (3D)
+
+    Returns:
+        2 if the points are all to the left, 1 if the points are all to the left or on the line,
+        0 if the points are all on the line, -1 if the points are all to the right or on the line,
+        -1 if the points are all to the right, None if there are some points on either side.
+    """
+    sides = []
+    for v in vs:
+        if len(q) == 2:
+            cross = (v[0] - p[0]) * (q[1] - p[1]) - (v[1] - p[1]) * (q[0] - p[0])
+        elif len(q) == 3:
+            cross = (v[0] - p[0]) * q[0] + (v[1] - p[1]) * q[1] + (v[2] - p[2]) * q[2]
+        else:
+            return None
+        if cross == 0:
+            sides.append(0)
+        elif cross > 0:
+            sides.append(1)
+        else:
+            sides.append(-1)
+
+    if -1 in sides and 1 in sides:
+        return None
+    if 1 in sides:
+        if 0 in sides:
+            return 1
+        else:
+            return 2
+    if -1 in sides:
+        if 0 in sides:
+            return -1
+        else:
+            return -2
+    return 0
+
+
 def _vsub(v: PointTypeInput, w: PointTypeInput) -> PointType:
     """Subtract.
 
@@ -155,7 +198,7 @@ class Reference(ABC):
         """
         return self.vertices
 
-    def intersection(self, other: Reference) -> _typing.Optional[Reference]:
+    def intersection(self, other: Reference) -> typing.Optional[Reference]:
         """Get the intersection of two references.
 
         Returns:
@@ -163,49 +206,6 @@ class Reference(ABC):
         """
         if self.gdim != other.gdim:
             raise ValueError("Incompatible cell dimensions")
-
-        def _which_side(vs: SetofPoints, p: PointType, q: PointType) -> _typing.Optional[int]:
-            """Check which side of a line or plane a set of points are.
-
-            Args:
-                vs: The set of points
-                p: A point on the line or plane
-                q: Another point on the line (2D) or the normal to the plane (3D)
-
-            Returns:
-                2 if the points are all to the left, 1 if the points are all to the left or on the line,
-                0 if the points are all on the line, -1 if the points are all to the right or on the line,
-                -1 if the points are all to the right, None if there are some points on either side.
-            """
-            out = 0
-            sides = []
-            for v in vs:
-                if len(q) == 2:
-                    cross = (v[0] - p[0]) * (q[1] - p[1]) - (v[1] - p[1]) * (q[0] - p[0])
-                elif len(q) == 3:
-                    cross = (v[0] - p[0]) * q[0] + (v[1] - p[1]) * q[1] + (v[2] - p[2]) * q[2]
-                else:
-                    return Non
-                if cross == 0:
-                    sides.append(0)
-                elif cross > 0:
-                    sides.append(1)
-                else:
-                    sides.append(-1)
-
-            if -1 in sides and 1 in sides:
-                return None
-            if 1 in sides:
-                if 0 in sides:
-                    return 1
-                else:
-                    return 2
-            if -1 in sides:
-                if 0 in sides:
-                    return -1
-                else:
-                    return -2
-            return 0
 
         for cell1, cell2 in [(self, other), (other, self)]:
             try:
@@ -1283,19 +1283,6 @@ class Tetrahedron(Reference):
             The volume of the cell
         """
         return sympy.Rational(1, 6) * self.jacobian()
-
-    def contains(self, point: PointType) -> bool:
-        """Check if a point is contained in the reference.
-
-        Args:
-            point: The point
-
-        Returns:
-            Is the point contained in the reference?
-        """
-        if self.vertices != self.reference_vertices:
-            raise NotImplementedError()
-        return 0 <= point[0] and 0 <= point[1] and 0 <= point[2] and sum(point) <= 1
 
     def contains(self, point: PointType) -> bool:
         """Check if a point is contained in the reference.
