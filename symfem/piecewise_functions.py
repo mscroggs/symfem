@@ -6,8 +6,8 @@ import typing
 
 import sympy
 
-from .functions import (AnyFunction, FunctionInput, SympyFormat, ValuesToSubstitute, VectorFunction,
-                        _to_sympy_format, parse_function_input)
+from .functions import (AnyFunction, FunctionInput, ScalarFunction, SympyFormat, ValuesToSubstitute,
+                        VectorFunction, _to_sympy_format, parse_function_input)
 from .geometry import (PointType, SetOfPoints, SetOfPointsInput, parse_set_of_points_input,
                        point_in_quadrilateral, point_in_tetrahedron, point_in_triangle)
 from .references import Reference
@@ -422,20 +422,27 @@ class PiecewiseFunction(AnyFunction):
         return PiecewiseFunction(
             {shape: f.norm() for shape, f in self._pieces.items()}, self.tdim)
 
-    def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t) -> AnyFunction:
+    def integral(
+        self, domain: Reference, vars: AxisVariablesNotSingle = x,
+        dummy_vars: AxisVariablesNotSingle = t
+    ) -> ScalarFunction:
         """Compute the integral of the function.
 
         Args:
             domain: The domain of the integral
             vars: The variables to integrate with respect to
+            dummy_vars: The dummy variables to use inside the integral
 
         Returns:
             The integral
         """
-        # TODO: Add check that the domain is a subset of one piece
-        # TODO: Add integral over multiple pieces
-        p = self.get_piece(domain.midpoint())
-        return p.integral(domain, vars)
+        result = ScalarFunction(0)
+        for shape, f in self._pieces.items():
+            ref = _piece_reference(self.tdim, shape)
+            sub_domain = ref.intersection(domain)
+            if sub_domain is not None:
+                result += f.integral(sub_domain, vars, dummy_vars)
+        return result
 
     def det(self) -> PiecewiseFunction:
         """Compute the determinant.
@@ -500,25 +507,11 @@ class PiecewiseFunction(AnyFunction):
             value_scale: The scale factor for the function values
             n: The number of points per side for plotting
         """
-        from .create import create_reference
         from .plotting import Picture
         assert isinstance(img, Picture)
 
         for shape, f in self._pieces.items():
-            if self.tdim == 2:
-                if len(shape) == 3:
-                    ref = create_reference("triangle", shape)
-                elif len(shape) == 4:
-                    ref = create_reference("quadrilateral", shape)
-                else:
-                    raise ValueError("Unsupported cell type")
-            elif self.tdim == 3:
-                if len(shape) == 4:
-                    ref = create_reference("tetrahedron", shape)
-                else:
-                    raise ValueError("Unsupported cell type")
-            else:
-                raise ValueError("Unsupported tdim")
+            ref = _piece_reference(self.tdim, shape)
             f.plot_values(ref, img, value_scale, n // 2)
 
     def with_floats(self) -> AnyFunction:
@@ -529,3 +522,22 @@ class PiecewiseFunction(AnyFunction):
         """
         return PiecewiseFunction(
             {shape: f.with_floats() for shape, f in self._pieces.items()}, self.tdim)
+
+
+def _piece_reference(tdim, shape):
+    """Create a reference element for a single piece."""
+    from .create import create_reference
+    if tdim == 2:
+        if len(shape) == 3:
+            return create_reference("triangle", shape)
+        elif len(shape) == 4:
+            return create_reference("quadrilateral", shape)
+        else:
+            raise ValueError("Unsupported cell type")
+    elif tdim == 3:
+        if len(shape) == 4:
+            return create_reference("tetrahedron", shape)
+        else:
+            raise ValueError("Unsupported cell type")
+    else:
+        raise ValueError("Unsupported tdim")

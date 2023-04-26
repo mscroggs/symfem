@@ -17,6 +17,49 @@ IntLimits = typing.List[typing.Union[
     typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr]]]
 
 
+def _which_side(vs: SetOfPoints, p: PointType, q: PointType) -> typing.Optional[int]:
+    """Check which side of a line or plane a set of points are.
+
+    Args:
+        vs: The set of points
+        p: A point on the line or plane
+        q: Another point on the line (2D) or the normal to the plane (3D)
+
+    Returns:
+        2 if the points are all to the left, 1 if the points are all to the left or on the line,
+        0 if the points are all on the line, -1 if the points are all to the right or on the line,
+        -1 if the points are all to the right, None if there are some points on either side.
+    """
+    sides = []
+    for v in vs:
+        if len(q) == 2:
+            cross = (v[0] - p[0]) * (q[1] - p[1]) - (v[1] - p[1]) * (q[0] - p[0])
+        elif len(q) == 3:
+            cross = (v[0] - p[0]) * q[0] + (v[1] - p[1]) * q[1] + (v[2] - p[2]) * q[2]
+        else:
+            return None
+        if cross == 0:
+            sides.append(0)
+        elif cross > 0:
+            sides.append(1)
+        else:
+            sides.append(-1)
+
+    if -1 in sides and 1 in sides:
+        return None
+    if 1 in sides:
+        if 0 in sides:
+            return 1
+        else:
+            return 2
+    if -1 in sides:
+        if 0 in sides:
+            return -1
+        else:
+            return -2
+    return 0
+
+
 def _vsub(v: PointTypeInput, w: PointTypeInput) -> PointType:
     """Subtract.
 
@@ -154,6 +197,45 @@ class Reference(ABC):
             A list of vertices
         """
         return self.vertices
+
+    def intersection(self, other: Reference) -> typing.Optional[Reference]:
+        """Get the intersection of two references.
+
+        Returns:
+            A reference element that is the intersection
+        """
+        if self.gdim != other.gdim:
+            raise ValueError("Incompatible cell dimensions")
+
+        for cell1, cell2 in [(self, other), (other, self)]:
+            try:
+                for v in cell1.vertices:
+                    if not cell2.contains(v):
+                        break
+                else:
+                    return cell1
+            except NotImplementedError:
+                pass
+        for cell1, cell2 in [(self, other), (other, self)]:
+            if cell1.gdim == 2:
+                for e in cell1.edges:
+                    p = cell1.vertices[e[0]]
+                    q = cell1.vertices[e[1]]
+                    dir1 = _which_side(cell1.vertices, p, q)
+                    dir2 = _which_side(cell2.vertices, p, q)
+                    if dir1 is not None and dir2 is not None and dir1 * dir2 < 0:
+                        return None
+            if cell1.gdim == 3:
+                for i in range(cell1.sub_entity_count(2)):
+                    face = cell1.sub_entity(2, i)
+                    p = face.midpoint()
+                    n = face.normal()
+                    dir1 = _which_side(cell1.vertices, p, n)
+                    dir2 = _which_side(cell2.vertices, p, n)
+                    if dir1 is not None and dir2 is not None and dir1 * dir2 < 0:
+                        return None
+
+        raise NotImplementedError("Intersection of these elements is not yet supported")
 
     @abstractmethod
     def default_reference(self) -> Reference:
@@ -1028,9 +1110,17 @@ class Triangle(Reference):
         Returns:
             Is the point contained in the reference?
         """
-        if self.vertices != self.reference_vertices:
-            raise NotImplementedError()
-        return 0 <= point[0] and 0 <= point[1] and sum(point) <= 1
+        if self.vertices == self.reference_vertices:
+            return 0 <= point[0] and 0 <= point[1] and sum(point) <= 1
+        elif self.gdim == 2:
+            po = _vsub(point, self.origin)
+            det = self.axes[0][0] * self.axes[1][1] - self.axes[0][1] * self.axes[1][0]
+            t0 = (self.axes[1][1] * po[0] - self.axes[1][0] * po[1]) / det
+            t1 = (self.axes[0][0] * po[1] - self.axes[0][1] * po[0]) / det
+            print(self.origin, self.axes, point)
+            print(t0, t1)
+            return 0 <= t0 and 0 <= t1 and t0 + t1 <= 1
+        raise NotImplementedError()
 
 
 class Tetrahedron(Reference):
@@ -1203,9 +1293,15 @@ class Tetrahedron(Reference):
         Returns:
             Is the point contained in the reference?
         """
-        if self.vertices != self.reference_vertices:
-            raise NotImplementedError()
-        return 0 <= point[0] and 0 <= point[1] and 0 <= point[2] and sum(point) <= 1
+        if self.vertices == self.reference_vertices:
+            return 0 <= point[0] and 0 <= point[1] and 0 <= point[2] and sum(point) <= 1
+        else:
+            po = _vsub(point, self.origin)
+            minv = sympy.Matrix([[a[i] for a in self.axes] for i in range(3)]).inv()
+            t0 = (minv[0, 0] * po[0] + minv[0, 1] * po[1] + minv[0, 2] * po[2])
+            t1 = (minv[1, 0] * po[0] + minv[1, 1] * po[1] + minv[1, 2] * po[2])
+            t2 = (minv[2, 0] * po[0] + minv[2, 1] * po[1] + minv[2, 2] * po[2])
+            return 0 <= t0 and 0 <= t1 and 0 >= t2 and t0 + t1 + t2 <= 1
 
 
 class Quadrilateral(Reference):

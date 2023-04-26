@@ -10,7 +10,7 @@ import sympy
 from .functions import AnyFunction, FunctionInput, ScalarFunction, SympyFormat, ValuesToSubstitute
 from .geometry import PointType
 from .references import Reference
-from .symbols import AxisVariables, AxisVariablesNotSingle, t
+from .symbols import AxisVariables, AxisVariablesNotSingle, t, x
 
 
 class BasisFunction(AnyFunction):
@@ -282,17 +282,21 @@ class BasisFunction(AnyFunction):
         """
         raise self.get_function().norm()
 
-    def integral(self, domain: Reference, vars: AxisVariablesNotSingle = t) -> AnyFunction:
+    def integral(
+        self, domain: Reference, vars: AxisVariablesNotSingle = x,
+        dummy_vars: AxisVariablesNotSingle = t
+    ) -> ScalarFunction:
         """Compute the integral of the function.
 
         Args:
-            domain: The domain to integrate over
-            vars: The variables to integrate over
+            domain: The domain of the integral
+            vars: The variables to integrate with respect to
+            dummy_vars: The dummy variables to use inside the integral
 
         Returns:
             The integral
         """
-        return self.get_function().integral(domain, vars)
+        return self.get_function().integral(domain, vars, dummy_vars)
 
     def subs(self, vars: AxisVariables, values: ValuesToSubstitute) -> BasisFunction:
         """Substitute values into the function.
