@@ -1,3 +1,10 @@
+# Version 2023.4.1 (26 April 2023)
+
+- Added enriched Galerkin element
+- Improved plotting
+- Added enriched vector Galerkin element
+- Fixed bug in integration of piecewise functions
+
 # Version 2023.1.1 (04 January 2023)
 
 - Added Huang-Zhang element
