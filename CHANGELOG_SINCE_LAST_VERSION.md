@@ -1,4 +1,0 @@
-- Added enriched Galerkin element
-- Improved plotting
-- Added enriched vector Galerkin element
-- Fixed bug in integration of piecewise functions
