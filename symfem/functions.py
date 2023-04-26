@@ -768,21 +768,13 @@ class ScalarFunction(AnyFunction):
         Returns:
             The integral
         """
-        dummy = [sympy.Symbol(f"INTEGRATE_DUMMY_{i}") for i, _ in enumerate(domain.axes)]
-        limits = domain.integration_limits(dummy)
-
+        limits = domain.integration_limits(vars)
         point = VectorFunction(domain.origin)
-        for di, a in zip(dummy, domain.axes):
+        for di, a in zip(t, domain.axes):
             point += di * VectorFunction(a)
         out = self._f * 1
-        for v, p in zip(vars, point):
+        for v, p in zip(x, point):
             out = out.subs(v, p)
-
-        if len(limits[0]) == 2:
-            for i in limits:
-                assert len(i) == 2
-                out = out.subs(*i)
-            return out
 
         out *= domain.jacobian()
         return ScalarFunction(out.integrate(*limits))

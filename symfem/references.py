@@ -161,16 +161,22 @@ class Reference(ABC):
         Returns:
             A reference element that is the intersection
         """
-        for v in self.vertices:
-            if not other.contains(v):
-                break
-        else:
-            return self
-        for v in other.vertices:
-            if not self.contains(v):
-                break
-        else:
-            return other
+        try:
+            for v in self.vertices:
+                if not other.contains(v):
+                    break
+            else:
+                return self
+        except NotImplementedError:
+            pass
+        try:
+            for v in other.vertices:
+                if not self.contains(v):
+                    break
+            else:
+                return other
+        except NotImplementedError:
+            pass
 
         raise NotImplementedError("Intersection of these elements is not yet supported")
 
