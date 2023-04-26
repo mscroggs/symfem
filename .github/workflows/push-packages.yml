@@ -34,14 +34,3 @@ jobs:
     - uses: actions/checkout@master
     - name: Trigger Read the Docs build
       run: python .github/scripts/trigger_rtd_build.py ${{ secrets.RTDS_TOKEN }}
-
-  conda:
-    name: Open conda-forge PR
-    needs: pypi
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    - name: Install PyGitHub
-      run: pip3 install PyGitHub requests
-    - name: Open PR to update conda package
-      run: python .github/scripts/conda.py ${{ secrets.conda_github_token }}
