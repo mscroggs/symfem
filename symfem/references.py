@@ -155,6 +155,25 @@ class Reference(ABC):
         """
         return self.vertices
 
+    def intersection(self, other: Reference) -> Reference:
+        """Get the intersection of two references.
+
+        Returns:
+            A reference element that is the intersection
+        """
+        for v in self.vertices:
+            if not other.contains(v):
+                break
+        else:
+            return self
+        for v in other.vertices:
+            if not self.contains(v):
+                break
+        else:
+            return other
+
+        raise NotImplementedError("Intersection of these elements is not yet supported")
+
     @abstractmethod
     def default_reference(self) -> Reference:
         """Get the default reference for this cell type.

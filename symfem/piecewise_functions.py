@@ -6,8 +6,8 @@ import typing
 
 import sympy
 
-from .functions import (AnyFunction, FunctionInput, SympyFormat, ValuesToSubstitute, VectorFunction,
-                        _to_sympy_format, parse_function_input)
+from .functions import (AnyFunction, FunctionInput, ScalarFunction, SympyFormat, ValuesToSubstitute,
+                        VectorFunction, _to_sympy_format, parse_function_input)
 from .geometry import (PointType, SetOfPoints, SetOfPointsInput, parse_set_of_points_input,
                        point_in_quadrilateral, point_in_tetrahedron, point_in_triangle)
 from .references import Reference
@@ -432,10 +432,27 @@ class PiecewiseFunction(AnyFunction):
         Returns:
             The integral
         """
-        # TODO: Add check that the domain is a subset of one piece
-        # TODO: Add integral over multiple pieces
-        p = self.get_piece(domain.midpoint())
-        return p.integral(domain, vars)
+        from .create import create_reference
+
+        result = ScalarFunction(0)
+        for shape, f in self._pieces.items():
+            if self.tdim == 2:
+                if len(shape) == 3:
+                    ref = create_reference("triangle", shape)
+                elif len(shape) == 4:
+                    ref = create_reference("quadrilateral", shape)
+                else:
+                    raise ValueError("Unsupported cell type")
+            elif self.tdim == 3:
+                if len(shape) == 4:
+                    ref = create_reference("tetrahedron", shape)
+                else:
+                    raise ValueError("Unsupported cell type")
+            else:
+                raise ValueError("Unsupported tdim")
+            sub_domain = ref.intersection(domain)
+            result += f.integral(sub_domain, vars)
+        return result
 
     def det(self) -> PiecewiseFunction:
         """Compute the determinant.

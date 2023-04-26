@@ -768,12 +768,15 @@ class ScalarFunction(AnyFunction):
         Returns:
             The integral
         """
-        limits = domain.integration_limits(vars)
+        dummy = [sympy.Symbol(f"DUMMY_{i}") for i, _ in enumerate(domain.axes)]
+        limits = domain.integration_limits(dummy)
 
         point = VectorFunction(domain.origin)
-        for ti, a in zip(t, domain.axes):
-            point += ti * VectorFunction(a)
-        out = self._f.subs(x, point)
+        for di, a in zip(dummy, domain.axes):
+            point += di * VectorFunction(a)
+        out = self._f * 1
+        for v, p in zip(vars, point):
+            out = out.subs(v, p)
 
         if len(limits[0]) == 2:
             for i in limits:

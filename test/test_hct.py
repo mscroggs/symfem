@@ -78,3 +78,20 @@ def test_rhct():
         assert f1.diff(x[0]).diff(x[0]) == 0
         assert f2.diff(x[0]).diff(x[0]) == 0
         assert f3.diff(x[1]).diff(x[1]) == 0
+
+
+def test_rhct_integral():
+    element = symfem.create_element("triangle", "rHCT", 3)
+    ref = element.reference
+    f1 = element.get_basis_function(1).directional_derivative((1, 0))
+    f2 = element.get_basis_function(6).directional_derivative((1, 0))
+    integrand = f1 * f2
+
+    third = sympy.Rational(1, 3)
+    expr = (f1*f2).pieces[((0, 1), (0, 0), (third, third))].as_sympy()
+    assert len((f1*f2).pieces) == 3
+    assert (f1*f2).pieces[((0, 0), (1, 0), (third, third))] == 0
+    assert (f1*f2).pieces[((1, 0), (0, 1), (third, third))] == 0
+
+    assert sympy.integrate(sympy.integrate(
+        expr, (x[1], x[0], 1 - 2 * x[0])), (x[0], 0, third)) == integrand.integral(ref, x)
