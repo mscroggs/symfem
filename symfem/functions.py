@@ -768,7 +768,7 @@ class ScalarFunction(AnyFunction):
         Returns:
             The integral
         """
-        dummy = [sympy.Symbol(f"DUMMY_{i}") for i, _ in enumerate(domain.axes)]
+        dummy = [sympy.Symbol(f"INTEGRATE_DUMMY_{i}") for i, _ in enumerate(domain.axes)]
         limits = domain.integration_limits(dummy)
 
         point = VectorFunction(domain.origin)
