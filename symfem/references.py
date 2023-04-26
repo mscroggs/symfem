@@ -1297,10 +1297,10 @@ class Tetrahedron(Reference):
             return 0 <= point[0] and 0 <= point[1] and 0 <= point[2] and sum(point) <= 1
         else:
             po = _vsub(point, self.origin)
-            Minv = sympy.Matrix([[a[i] for a in self.axes] for i in range(3)]).inv()
-            t0 = (Minv[0, 0] * po[0] + Minv[0, 1] * po[1] + Minv[0, 2] * po[2])
-            t1 = (Minv[1, 0] * po[0] + Minv[1, 1] * po[1] + Minv[1, 2] * po[2])
-            t2 = (Minv[2, 0] * po[0] + Minv[2, 1] * po[1] + Minv[2, 2] * po[2])
+            minv = sympy.Matrix([[a[i] for a in self.axes] for i in range(3)]).inv()
+            t0 = (minv[0, 0] * po[0] + minv[0, 1] * po[1] + minv[0, 2] * po[2])
+            t1 = (minv[1, 0] * po[0] + minv[1, 1] * po[1] + minv[1, 2] * po[2])
+            t2 = (minv[2, 0] * po[0] + minv[2, 1] * po[1] + minv[2, 2] * po[2])
             return 0 <= t0 and 0 <= t1 and 0 >= t2 and t0 + t1 + t2 <= 1
 
 
