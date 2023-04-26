@@ -432,24 +432,10 @@ class PiecewiseFunction(AnyFunction):
         Returns:
             The integral
         """
-        from .create import create_reference
 
         result = ScalarFunction(0)
         for shape, f in self._pieces.items():
-            if self.tdim == 2:
-                if len(shape) == 3:
-                    ref = create_reference("triangle", shape)
-                elif len(shape) == 4:
-                    ref = create_reference("quadrilateral", shape)
-                else:
-                    raise ValueError("Unsupported cell type")
-            elif self.tdim == 3:
-                if len(shape) == 4:
-                    ref = create_reference("tetrahedron", shape)
-                else:
-                    raise ValueError("Unsupported cell type")
-            else:
-                raise ValueError("Unsupported tdim")
+            ref = _piece_reference(self.tdim, shape)
             sub_domain = ref.intersection(domain)
             result += f.integral(sub_domain, vars)
         return result
@@ -517,25 +503,11 @@ class PiecewiseFunction(AnyFunction):
             value_scale: The scale factor for the function values
             n: The number of points per side for plotting
         """
-        from .create import create_reference
         from .plotting import Picture
         assert isinstance(img, Picture)
 
         for shape, f in self._pieces.items():
-            if self.tdim == 2:
-                if len(shape) == 3:
-                    ref = create_reference("triangle", shape)
-                elif len(shape) == 4:
-                    ref = create_reference("quadrilateral", shape)
-                else:
-                    raise ValueError("Unsupported cell type")
-            elif self.tdim == 3:
-                if len(shape) == 4:
-                    ref = create_reference("tetrahedron", shape)
-                else:
-                    raise ValueError("Unsupported cell type")
-            else:
-                raise ValueError("Unsupported tdim")
+            ref = _piece_reference(self.tdim, shape)
             f.plot_values(ref, img, value_scale, n // 2)
 
     def with_floats(self) -> AnyFunction:
@@ -546,3 +518,22 @@ class PiecewiseFunction(AnyFunction):
         """
         return PiecewiseFunction(
             {shape: f.with_floats() for shape, f in self._pieces.items()}, self.tdim)
+
+
+def _piece_reference(tdim, shape):
+    """Create a reference element for a single piece"""
+    from .create import create_reference
+    if tdim == 2:
+        if len(shape) == 3:
+            return create_reference("triangle", shape)
+        elif len(shape) == 4:
+            return create_reference("quadrilateral", shape)
+        else:
+            raise ValueError("Unsupported cell type")
+    elif tdim == 3:
+        if len(shape) == 4:
+            return create_reference("tetrahedron", shape)
+        else:
+            raise ValueError("Unsupported cell type")
+    else:
+        raise ValueError("Unsupported tdim")
