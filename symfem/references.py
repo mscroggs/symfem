@@ -1117,8 +1117,6 @@ class Triangle(Reference):
             det = self.axes[0][0] * self.axes[1][1] - self.axes[0][1] * self.axes[1][0]
             t0 = (self.axes[1][1] * po[0] - self.axes[1][0] * po[1]) / det
             t1 = (self.axes[0][0] * po[1] - self.axes[0][1] * po[0]) / det
-            print(self.origin, self.axes, point)
-            print(t0, t1)
             return 0 <= t0 and 0 <= t1 and t0 + t1 <= 1
         raise NotImplementedError()
 
