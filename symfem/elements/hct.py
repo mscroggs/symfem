@@ -51,11 +51,14 @@ class HsiehCloughTocher(CiarletElement):
                                 x[0]**3, x[0]**2*x[1], x[0]*x[1]**2, x[1]**3]]
         piece_list.append((
             ScalarFunction(-23*x[0]**3 + 24*x[0]**2*x[1] - 12*x[0]*x[1]**2 + 36*x[1]**2),
-            ScalarFunction(-28*x[0]**3 + 12*x[0]**2*x[1] + 9*x[0]**2 - 3*x[0] + 32*x[1]**3 + 12*x[1] - 1),
+            ScalarFunction(
+                -28*x[0]**3 + 12*x[0]**2*x[1] + 9*x[0]**2 - 3*x[0] + 32*x[1]**3 + 12*x[1] - 1),
             ScalarFunction(-15*x[0]**2 - 33*x[0]*x[1]**2 + 30*x[0]*x[1] + 22*x[1]**3 + 21*x[1]**2)))
         piece_list.append((
-            ScalarFunction(22*x[0]**3 - 21*x[0]**2*x[1] - 12*x[0]*x[1]**2 + 30*x[0]*x[1] - 24*x[1]**2),
-            ScalarFunction(32*x[0]**3 + 12*x[0]**2*x[1] - 21*x[0]**2 + 12*x[0] - 28*x[1]**3 - 3*x[1] - 1),
+            ScalarFunction(
+                22*x[0]**3 - 21*x[0]**2*x[1] - 12*x[0]*x[1]**2 + 30*x[0]*x[1] - 24*x[1]**2),
+            ScalarFunction(
+                32*x[0]**3 + 12*x[0]**2*x[1] - 21*x[0]**2 + 12*x[0] - 28*x[1]**3 - 3*x[1] - 1),
             ScalarFunction(15*x[0]**2 + 12*x[0]*x[1]**2 - 23*x[1]**3 - 9*x[1]**2)))
 
         poly: typing.List[FunctionInput] = []
