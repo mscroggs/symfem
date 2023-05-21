@@ -8,14 +8,13 @@ import typing
 
 import sympy
 
-from ..basis_functions import BasisFunction
 from ..finite_element import CiarletElement
 from ..functionals import (DerivativePointEvaluation, ListOfFunctionals, PointEvaluation,
                            PointNormalDerivativeEvaluation)
-from ..functions import FunctionInput, VectorFunction
+from ..functions import FunctionInput, ScalarFunction
 from ..piecewise_functions import PiecewiseFunction
 from ..references import Reference
-from .hermite import Hermite
+from ..symbols import x
 
 
 class HsiehCloughTocher(CiarletElement):
@@ -28,7 +27,6 @@ class HsiehCloughTocher(CiarletElement):
             reference: The reference element
             order: The polynomial order
         """
-        from symfem import create_reference
         assert order == 3
         assert reference.name == "triangle"
         dofs: ListOfFunctionals = []
@@ -48,52 +46,25 @@ class HsiehCloughTocher(CiarletElement):
             (reference.vertices[1], reference.vertices[2], mid),
             (reference.vertices[2], reference.vertices[0], mid)]
 
-        refs = [create_reference("triangle", vs) for vs in subs]
-
-        hermite_spaces = [Hermite(ref, 3) for ref in refs]
-
-        piece_list: typing.List[typing.Tuple[typing.Union[int, BasisFunction], ...]] = []
-        piece_list.append((hermite_spaces[0].get_basis_function(0), 0,
-                           hermite_spaces[2].get_basis_function(3)))
-        piece_list.append((hermite_spaces[0].get_basis_function(1), 0,
-                           hermite_spaces[2].get_basis_function(4)))
-        piece_list.append((hermite_spaces[0].get_basis_function(2), 0,
-                           hermite_spaces[2].get_basis_function(5)))
-        piece_list.append((hermite_spaces[0].get_basis_function(3),
-                           hermite_spaces[1].get_basis_function(0), 0))
-        piece_list.append((hermite_spaces[0].get_basis_function(4),
-                           hermite_spaces[1].get_basis_function(1), 0))
-        piece_list.append((hermite_spaces[0].get_basis_function(5),
-                           hermite_spaces[1].get_basis_function(2), 0))
-        piece_list.append((hermite_spaces[0].get_basis_function(6),
-                           hermite_spaces[1].get_basis_function(6),
-                           hermite_spaces[2].get_basis_function(6)))
-        piece_list.append((hermite_spaces[0].get_basis_function(7),
-                           hermite_spaces[1].get_basis_function(7),
-                           hermite_spaces[2].get_basis_function(7)))
-        piece_list.append((hermite_spaces[0].get_basis_function(8),
-                           hermite_spaces[1].get_basis_function(8),
-                           hermite_spaces[2].get_basis_function(8)))
-        piece_list.append((0, hermite_spaces[1].get_basis_function(3),
-                           hermite_spaces[2].get_basis_function(0)))
-        piece_list.append((0, hermite_spaces[1].get_basis_function(4),
-                           hermite_spaces[2].get_basis_function(1)))
-        piece_list.append((0, hermite_spaces[1].get_basis_function(5),
-                           hermite_spaces[2].get_basis_function(2)))
-
-        # TODO: are these right to remove??
-        # piece_list.append((hermite_spaces[0].get_basis_function(9), 0, 0))
-        # piece_list.append((0, hermite_spaces[1].get_basis_function(9), 0))
-        # piece_list.append((0, 0, hermite_spaces[2].get_basis_function(9)))
-
-        piece_list2: typing.List[VectorFunction] = []
-        for i in piece_list:
-            piece_list2.append(VectorFunction(i))
+        piece_list = [tuple(ScalarFunction(p) for _ in range(3))
+                      for p in [1, x[0], x[1], x[0]**2, x[0]*x[1], x[1]**2,
+                                x[0]**3, x[0]**2*x[1], x[0]*x[1]**2, x[1]**3]]
+        piece_list.append((
+            ScalarFunction(-23*x[0]**3 + 24*x[0]**2*x[1] - 12*x[0]*x[1]**2 + 36*x[1]**2),
+            ScalarFunction(
+                -28*x[0]**3 + 12*x[0]**2*x[1] + 9*x[0]**2 - 3*x[0] + 32*x[1]**3 + 12*x[1] - 1),
+            ScalarFunction(-15*x[0]**2 - 33*x[0]*x[1]**2 + 30*x[0]*x[1] + 22*x[1]**3 + 21*x[1]**2)))
+        piece_list.append((
+            ScalarFunction(
+                22*x[0]**3 - 21*x[0]**2*x[1] - 12*x[0]*x[1]**2 + 30*x[0]*x[1] - 24*x[1]**2),
+            ScalarFunction(
+                32*x[0]**3 + 12*x[0]**2*x[1] - 21*x[0]**2 + 12*x[0] - 28*x[1]**3 - 3*x[1] - 1),
+            ScalarFunction(15*x[0]**2 + 12*x[0]*x[1]**2 - 23*x[1]**3 - 9*x[1]**2)))
 
         poly: typing.List[FunctionInput] = []
         poly += [
             PiecewiseFunction({i: j for i, j in zip(subs, p)}, 2)
-            for p in piece_list2]
+            for p in piece_list]
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1
