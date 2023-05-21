@@ -77,3 +77,4 @@ class CrouzeixRaviart(CiarletElement):
     min_order = 1
     max_order = {"tetrahedron": 1}
     continuity = "L2"
+    last_updated = "2023.05"

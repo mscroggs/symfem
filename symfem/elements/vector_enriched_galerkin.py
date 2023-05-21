@@ -37,6 +37,7 @@ class Enrichment(CiarletElement):
     min_order = 1
     max_order = 1
     continuity = "C0"
+    last_updated = "2023.05"
 
 
 class VectorEnrichedGalerkin(EnrichedElement):
@@ -58,3 +59,4 @@ class VectorEnrichedGalerkin(EnrichedElement):
     references = ["triangle", "quadrilateral", "tetrahedron", "hexahedron"]
     min_order = 1
     continuity = "C0"
+    last_updated = "2023.05"

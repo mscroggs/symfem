@@ -29,3 +29,4 @@ class EnrichedGalerkin(EnrichedElement):
     references = ["interval", "triangle", "quadrilateral", "tetrahedron", "hexahedron"]
     min_order = 1
     continuity = "C0"
+    last_updated = "2023.05"

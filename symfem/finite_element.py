@@ -20,6 +20,7 @@ from .plotting import Picture, colors
 from .references import Reference
 from .symbols import x
 from .utils import allequal
+from .version import version
 
 TabulatedBasis = typing.Union[
     typing.List[typing.Union[sympy.core.expr.Expr, int]],
@@ -541,7 +542,8 @@ class CiarletElement(FiniteElement):
         """
         if caching:
             id = (f"{self.__class__.__name__} {self.order} {self.reference.vertices} "
-                  f"{self.init_kwargs()}")
+                  f"{self.init_kwargs()} "
+                  f"{self.last_updated if hasattr(self, 'last_updated') else version}")
             matrix_type = "dualinv" if inverse else "dual"
             mat = load_cached_matrix(matrix_type, id)
             if mat is None:

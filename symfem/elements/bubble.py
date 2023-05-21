@@ -79,6 +79,7 @@ class Bubble(CiarletElement):
     min_order = {"interval": 2, "triangle": 3, "tetrahedron": 4,
                  "quadrilateral": 2, "hexahedron": 2}
     continuity = "C0"
+    last_updated = "2023.05"
 
 
 class BubbleEnrichedLagrange(CiarletElement):
@@ -119,6 +120,7 @@ class BubbleEnrichedLagrange(CiarletElement):
     references = ["triangle"]
     min_order = 1
     continuity = "C0"
+    last_updated = "2023.05"
 
 
 class BubbleEnrichedVectorLagrange(CiarletElement):
@@ -161,3 +163,4 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
     references = ["triangle"]
     min_order = 1
     continuity = "C0"
+    last_updated = "2023.05"

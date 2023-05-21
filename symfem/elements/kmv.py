@@ -168,3 +168,4 @@ class KongMulderVeldhuizen(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 1
     continuity = "C0"
+    last_updated = "2023.05"

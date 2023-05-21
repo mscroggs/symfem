@@ -57,6 +57,7 @@ class DPC(CiarletElement):
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
+    last_updated = "2023.05"
 
 
 class VectorDPC(CiarletElement):
@@ -101,3 +102,4 @@ class VectorDPC(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
+    last_updated = "2023.05"

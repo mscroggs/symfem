@@ -91,3 +91,4 @@ class WuXu(CiarletElement):
     min_order = {"interval": 2, "triangle": 3, "tetrahedron": 4}
     max_order = {"interval": 2, "triangle": 3, "tetrahedron": 4}
     continuity = "C{order}"
+    last_updated = "2023.05"

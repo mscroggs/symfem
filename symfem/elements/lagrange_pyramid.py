@@ -94,3 +94,4 @@ class Lagrange(CiarletElement):
     references = ["pyramid"]
     min_order = 0
     continuity = "C0"
+    last_updated = "2023.05"

@@ -108,6 +108,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(curl)"
+    last_updated = "2023.05"
 
 
 class TrimmedSerendipityHdiv(CiarletElement):
@@ -185,3 +186,4 @@ class TrimmedSerendipityHdiv(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(div)"
+    last_updated = "2023.05"

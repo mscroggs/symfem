@@ -22,6 +22,12 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Load matrix cache
+        id: cache-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: .cache/symfem
+          key: symfem-matrix-cache
       - uses: actions/checkout@v3
       - run: pip install .[test] pytest-xdist
         name: Install Symfem
@@ -35,6 +41,12 @@ jobs:
         name: Run demos
       - run: python3 -m pytest scripts/test_scripts.py
         name: Run scripts
+      - name: Save matrix cache
+        id: cache-save
+        uses: actions/cache/save@v3
+        with:
+          path: .cache/symfem
+          key: symfem-matrix-cache
 
   run-tests-against-basix:
     name: Run tests against Basix
@@ -50,6 +62,12 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Load matrix cache
+        id: cache-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: .cache/symfem
+          key: symfem-matrix-cache
       - run: |
             sudo apt-get install -y libopenblas-dev liblapack-dev ninja-build
             pip install pybind11
@@ -61,3 +79,9 @@ jobs:
         name: Install Basix
       - run: python3 -m pytest -n=auto --durations=50 test/test_against_basix.py --has-basix 1 -W error
         name: Run unit tests
+      - name: Save matrix cache
+        id: cache-save
+        uses: actions/cache/save@v3
+        with:
+          path: .cache/symfem
+          key: symfem-matrix-cache

@@ -18,6 +18,12 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
+      - name: Load matrix cache
+        id: cache-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: .cache/symfem
+          key: symfem-matrix-cache
       - run: |
             sudo apt-get install -y libeigen3-dev libopenblas-dev liblapack-dev ninja-build
             pip install pybind11
@@ -39,3 +45,9 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.coverall_token }}
         run: python3 -m coveralls
+      - name: Save matrix cache
+        id: cache-save
+        uses: actions/cache/save@v3
+        with:
+          path: .cache/symfem
+          key: symfem-matrix-cache

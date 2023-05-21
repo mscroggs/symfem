@@ -96,6 +96,7 @@ class ArnoldWinther(CiarletElement):
     references = ["triangle"]
     min_order = 3
     continuity = "integral inner H(div)"
+    last_updated = "2023.05"
 
 
 class NonConformingArnoldWinther(CiarletElement):
@@ -159,3 +160,4 @@ class NonConformingArnoldWinther(CiarletElement):
     min_order = 2
     max_order = 2
     continuity = "integral inner H(div)"
+    last_updated = "2023.05"
