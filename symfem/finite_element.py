@@ -10,6 +10,7 @@ from itertools import product
 import sympy
 
 from .basis_functions import BasisFunction
+from .caching import cached_inverse, load_cached_matrix, save_cached_matrix
 from .functionals import ListOfFunctionals
 from .functions import (AnyFunction, FunctionInput, ScalarFunction, VectorFunction,
                         parse_function_input)
@@ -526,20 +527,32 @@ class CiarletElement(FiniteElement):
         """
         return self._basis
 
-    def get_dual_matrix(self) -> sympy.matrices.dense.MutableDenseMatrix:
+    def get_dual_matrix(self, inverse=False, caching=True) -> sympy.matrices.dense.MutableDenseMatrix:
         """Get the dual matrix.
+
+        Args:
+            inverse: Should the dual matrix be inverted?
+            caching: Should the result be cached
 
         Returns:
             The dual matrix
         """
-        mat = []
-        for b in self.get_polynomial_basis():
-            row = []
-            for d in self.dofs:
-                entry = d.eval_symbolic(b).as_sympy()
-                row.append(entry)
-            mat.append(row)
-        return sympy.Matrix(mat)
+        if caching:
+            id = (f"{self.__class__.__name__} {self.order} {self.reference.vertices} "
+                  f"{self.init_kwargs()}")
+            matrix_type = "dualinv" if inverse else "dual"
+            mat = load_cached_matrix(matrix_type, id)
+            if mat is None:
+                mat = self.get_dual_matrix(inverse, caching=False)
+                save_cached_matrix(matrix_type, id, mat)
+            return mat
+        else:
+            mat = sympy.Matrix([[d.eval_symbolic(b).as_sympy() for d in self.dofs]
+                                for b in self.get_polynomial_basis()])
+            if inverse:
+                return mat.inv("LU")
+            else:
+                return mat
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the keyword arguments used to create this element.
@@ -564,9 +577,7 @@ class CiarletElement(FiniteElement):
             if use_tensor_factorisation:
                 self._basis_functions = self._get_basis_functions_tensor()
             else:
-                m = self.get_dual_matrix()
-                assert isinstance(m, sympy.Matrix)
-                minv = m.inv("LU")
+                minv = self.get_dual_matrix(inverse=True)
 
                 sfs: typing.List[AnyFunction] = []
                 pb = self.get_polynomial_basis()

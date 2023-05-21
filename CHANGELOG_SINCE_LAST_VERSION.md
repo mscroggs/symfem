@@ -1,1 +1,2 @@
 - Corrected HCT and rHCT elements
+- Added caching of matrix inverses and dual matrices
