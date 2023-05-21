@@ -35,8 +35,11 @@ def load_cached_matrix(
     filename = os.path.join(CACHE_DIR, f"{matrix_type}{CACHE_FORMAT}-{hashed_id}.matrix")
     try:
         with open(filename) as f:
-            return matrix_from_string(f.read())
-    except BaseException:
+            mat = matrix_from_string(f.read())
+        if mat.rows == 0:
+            return None
+        return mat
+    except FileNotFoundError:
         return None
 
 
