@@ -7,10 +7,14 @@ from hashlib import sha256
 import sympy
 from appdirs import user_cache_dir
 
+if not os.path.isdir(user_cache_dir()):
+    os.mkdir(user_cache_dir())
 CACHE_DIR = user_cache_dir("symfem")
 CACHE_FORMAT = "1"
 if not os.path.isdir(CACHE_DIR):
     os.mkdir(CACHE_DIR)
+
+assert os.path.isdir(CACHE_DIR)
 
 
 def load_cached_matrix(
