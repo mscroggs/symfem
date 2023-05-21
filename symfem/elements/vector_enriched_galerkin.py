@@ -32,7 +32,7 @@ class Enrichment(CiarletElement):
 
         super().__init__(reference, 1, poly, dofs, reference.tdim, reference.tdim)
 
-    names = []
+    names: typing.List[str] = []
     references = ["triangle", "quadrilateral", "tetrahedron", "hexahedron"]
     min_order = 1
     max_order = 1
