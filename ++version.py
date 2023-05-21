@@ -25,8 +25,11 @@ if now.year == version[0] and now.month == version[1]:
     else:
         new_version = (now.year, now.month, version[2] + 1)
 else:
-    new_version = (now.year, now.month)
-new_version_str = ".".join([f"{i}" for i in new_version])
+    new_version = (now.year, now.month, 0)
+if len(new_version) == 2:
+    new_version_str = f"{new_version[0]}.{new_version[1]}"
+else:
+    new_version_str = f"{new_version[0]}.{new_version[1]}.{new_version[2]}"
 
 # VERSION file
 with open("VERSION", "w") as f:
