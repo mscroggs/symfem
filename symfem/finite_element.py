@@ -457,6 +457,7 @@ class FiniteElement(ABC):
     references: typing.List[str] = []
     last_updated = version
 
+
 class CiarletElement(FiniteElement):
     """Finite element defined using the Ciarlet definition."""
 
