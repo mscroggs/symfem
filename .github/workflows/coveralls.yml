@@ -45,9 +45,3 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.coverall_token }}
         run: python3 -m coveralls
-      - name: Save matrix cache
-        id: cache-save
-        uses: actions/cache/save@v3
-        with:
-          path: /home/runner/.cache/symfem
-          key: symfem-matrix-cache

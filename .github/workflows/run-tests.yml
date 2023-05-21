@@ -47,6 +47,7 @@ jobs:
         with:
           path: /home/runner/.cache/symfem
           key: symfem-matrix-cache
+        if: matrix.python-version == '3.11'
 
   run-tests-against-basix:
     name: Run tests against Basix
@@ -79,12 +80,3 @@ jobs:
         name: Install Basix
       - run: python3 -m pytest -n=auto --durations=50 test/test_against_basix.py --has-basix 1 -W error
         name: Run unit tests
-      - run: ls -a
-      - run: ls /home/runner/.cache
-      - run: ls /home/runner/.cache/symfem
-      - name: Save matrix cache
-        id: cache-save
-        uses: actions/cache/save@v3
-        with:
-          path: /home/runner/.cache/symfem
-          key: symfem-matrix-cache
