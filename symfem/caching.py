@@ -11,6 +11,8 @@ if not os.path.isdir(user_cache_dir()):
     os.mkdir(user_cache_dir())
 CACHE_DIR = user_cache_dir("symfem")
 CACHE_FORMAT = "1"
+if os.path.isfile(CACHE_DIR):
+    os.remove(CACHE_DIR)
 if not os.path.isdir(CACHE_DIR):
     os.mkdir(CACHE_DIR)
 
