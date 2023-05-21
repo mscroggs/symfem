@@ -75,3 +75,4 @@ class HuangZhang(CiarletElement):
     references = ["quadrilateral"]
     min_order = 2
     continuity = "H(div)"
+    last_updated = "2023.05"

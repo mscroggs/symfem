@@ -97,3 +97,4 @@ class BernardiRaugel(CiarletElement):
     min_order = 1
     max_order = {"triangle": 1, "tetrahedron": 2}
     continuity = "H(div)"
+    last_updated = "2023.05"

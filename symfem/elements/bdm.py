@@ -51,3 +51,4 @@ class BDM(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 1
     continuity = "H(div)"
+    last_updated = "2023.05"

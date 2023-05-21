@@ -86,3 +86,4 @@ class MorleyWangXu(CiarletElement):
     min_order = 1
     max_order = {"interval": 1, "triangle": 2, "tetrahedron": 3}
     continuity = "C{order}"
+    last_updated = "2023.05"

@@ -88,6 +88,7 @@ class Lagrange(CiarletElement):
     references = ["prism"]
     min_order = 0
     continuity = "C0"
+    last_updated = "2023.05"
 
 
 class VectorLagrange(CiarletElement):
@@ -135,3 +136,4 @@ class VectorLagrange(CiarletElement):
     references = ["prism"]
     min_order = 0
     continuity = "C0"
+    last_updated = "2023.05"

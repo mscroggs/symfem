@@ -61,3 +61,4 @@ class ConformingCrouzeixRaviart(CiarletElement):
     references = ["triangle"]
     min_order = 1
     continuity = "L2"
+    last_updated = "2023.05"

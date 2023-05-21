@@ -119,6 +119,7 @@ class Regge(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 0
     continuity = "inner H(curl)"
+    last_updated = "2023.05"
 
 
 class ReggeTP(CiarletElement):
@@ -255,3 +256,4 @@ class ReggeTP(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "inner H(curl)"
+    last_updated = "2023.05"

@@ -222,3 +222,4 @@ class Bernstein(CiarletElement):
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "C0"
+    last_updated = "2023.05"

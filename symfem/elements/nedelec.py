@@ -55,6 +55,7 @@ class NedelecFirstKind(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 1
     continuity = "H(curl)"
+    last_updated = "2023.05"
 
 
 class NedelecSecondKind(CiarletElement):
@@ -93,3 +94,4 @@ class NedelecSecondKind(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 1
     continuity = "H(curl)"
+    last_updated = "2023.05"
