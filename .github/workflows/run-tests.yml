@@ -79,6 +79,9 @@ jobs:
         name: Install Basix
       - run: python3 -m pytest -n=auto --durations=50 test/test_against_basix.py --has-basix 1 -W error
         name: Run unit tests
+      - run: ls -a
+      - run: ls .cache
+      - run: ls .cache/symfem
       - name: Save matrix cache
         id: cache-save
         uses: actions/cache/save@v3
