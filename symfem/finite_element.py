@@ -527,7 +527,9 @@ class CiarletElement(FiniteElement):
         """
         return self._basis
 
-    def get_dual_matrix(self, inverse=False, caching=True) -> sympy.matrices.dense.MutableDenseMatrix:
+    def get_dual_matrix(
+        self, inverse=False, caching=True
+    ) -> sympy.matrices.dense.MutableDenseMatrix:
         """Get the dual matrix.
 
         Args:
