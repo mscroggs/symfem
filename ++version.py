@@ -22,7 +22,7 @@ now = datetime.now()
 if now.year == version[0] and now.month == version[1]:
     new_version = (now.year, now.month, version[2] + 1)
 else:
-    new_version = (now.year, now.month, 1)
+    new_version = (now.year, now.month, 0)
 new_version_str = ".".join([f"{i}" for i in new_version])
 
 # VERSION file
