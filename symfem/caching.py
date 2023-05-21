@@ -13,28 +13,6 @@ if not os.path.isdir(CACHE_DIR):
     os.mkdir(CACHE_DIR)
 
 
-def cached_inverse(
-    m: sympy.matrices.dense.MutableDenseMatrix
-) -> sympy.matrices.dense.MutableDenseMatrix:
-    """Invert a matrix or load the inverse from the cache.
-
-    Args:
-        m: The matrix to invert
-
-    Returns:
-        The inverse of m
-    """
-    if m.rows < 10:
-        return m.inv("LU")
-
-    id = matrix_to_string(m)
-    minv = load_cached_matrix("inverse", id)
-    if minv is None:
-        minv = m.inv("LU")
-        save_cached_matrix("inverse", id, minv)
-    return minv
-
-
 def load_cached_matrix(
     matrix_type: str, id: str
 ) -> typing.Union[sympy.matrices.dense.MutableDenseMatrix, None]:

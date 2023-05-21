@@ -10,7 +10,7 @@ from itertools import product
 import sympy
 
 from .basis_functions import BasisFunction
-from .caching import cached_inverse, load_cached_matrix, save_cached_matrix
+from .caching import load_cached_matrix, save_cached_matrix
 from .functionals import ListOfFunctionals
 from .functions import (AnyFunction, FunctionInput, ScalarFunction, VectorFunction,
                         parse_function_input)
