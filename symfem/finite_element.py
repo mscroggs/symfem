@@ -455,7 +455,7 @@ class FiniteElement(ABC):
 
     names: typing.List[str] = []
     references: typing.List[str] = []
-
+    last_updated = version
 
 class CiarletElement(FiniteElement):
     """Finite element defined using the Ciarlet definition."""
@@ -541,14 +541,14 @@ class CiarletElement(FiniteElement):
             The dual matrix
         """
         if caching:
-            id = (f"{self.__class__.__name__} {self.order} {self.reference.vertices} "
-                  f"{self.init_kwargs()} "
-                  f"{self.last_updated if hasattr(self, 'last_updated') else version}")
+            cid = (f"{self.__class__.__name__} {self.order} {self.reference.vertices} "
+                   f"{self.init_kwargs()} "
+                   f"{self.last_updated}")
             matrix_type = "dualinv" if inverse else "dual"
-            mat = load_cached_matrix(matrix_type, id)
+            mat = load_cached_matrix(matrix_type, cid)
             if mat is None:
                 mat = self.get_dual_matrix(inverse, caching=False)
-                save_cached_matrix(matrix_type, id, mat)
+                save_cached_matrix(matrix_type, cid, mat)
             return mat
         else:
             mat = sympy.Matrix([[d.eval_symbolic(b).as_sympy() for d in self.dofs]

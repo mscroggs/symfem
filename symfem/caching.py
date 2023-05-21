@@ -20,19 +20,19 @@ assert os.path.isdir(CACHE_DIR)
 
 
 def load_cached_matrix(
-    matrix_type: str, id: str
+    matrix_type: str, cache_id: str
 ) -> typing.Union[sympy.matrices.dense.MutableDenseMatrix, None]:
     """Load a cached matrix.
 
     Args:
         matrix_type: The type of the matrix. This will be included in the filename.
-        id: The unique identifier of the matrix within this type
+        cache_id: The unique identifier of the matrix within this type
 
     Returns:
         The matrix
     """
-    hash = sha256(id.encode("utf-8")).hexdigest()
-    filename = os.path.join(CACHE_DIR, f"{matrix_type}{CACHE_FORMAT}-{hash}.matrix")
+    hashed_id = sha256(cache_id.encode("utf-8")).hexdigest()
+    filename = os.path.join(CACHE_DIR, f"{matrix_type}{CACHE_FORMAT}-{hashed_id}.matrix")
     try:
         with open(filename) as f:
             return matrix_from_string(f.read())
@@ -40,16 +40,18 @@ def load_cached_matrix(
         return None
 
 
-def save_cached_matrix(matrix_type: str, id: str, matrix: sympy.matrices.dense.MutableDenseMatrix):
+def save_cached_matrix(
+    matrix_type: str, cache_id: str, matrix: sympy.matrices.dense.MutableDenseMatrix
+):
     """Save a matrix to the cache.
 
     Args:
         matrix_type: The type of the matrix. This will be included in the filename.
-        id: The unique identifier of the matrix within this type
+        cache_id: The unique identifier of the matrix within this type
         matrix: The matrix
     """
-    hash = sha256(id.encode("utf-8")).hexdigest()
-    filename = os.path.join(CACHE_DIR, f"{matrix_type}{CACHE_FORMAT}-{hash}.matrix")
+    hashed_id = sha256(cache_id.encode("utf-8")).hexdigest()
+    filename = os.path.join(CACHE_DIR, f"{matrix_type}{CACHE_FORMAT}-{hashed_id}.matrix")
     with open(filename, "w") as f:
         f.write(matrix_to_string(matrix))
 
