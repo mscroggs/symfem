@@ -16,7 +16,7 @@ jobs:
         id: cache-restore
         uses: actions/cache/restore@v3
         with:
-          path: .cache/symfem
+          path: /home/runner/.cache/symfem
           key: symfem-matrix-cache
       - uses: actions/checkout@v3
       - run: pip install .[optional]
@@ -36,9 +36,3 @@ jobs:
         run: |
           cd defelement
           python3 build.py ../_test_html --test auto
-      - name: Save matrix cache
-        id: cache-save
-        uses: actions/cache/save@v3
-        with:
-          path: .cache/symfem
-          key: symfem-matrix-cache

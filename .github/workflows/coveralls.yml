@@ -22,7 +22,7 @@ jobs:
         id: cache-restore
         uses: actions/cache/restore@v3
         with:
-          path: .cache/symfem
+          path: /home/runner/.cache/symfem
           key: symfem-matrix-cache
       - run: |
             sudo apt-get install -y libeigen3-dev libopenblas-dev liblapack-dev ninja-build
@@ -49,5 +49,5 @@ jobs:
         id: cache-save
         uses: actions/cache/save@v3
         with:
-          path: .cache/symfem
+          path: /home/runner/.cache/symfem
           key: symfem-matrix-cache
