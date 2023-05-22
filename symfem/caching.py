@@ -36,7 +36,7 @@ def load_cached_matrix(
     try:
         with open(filename) as f:
             mat = matrix_from_string(f.read())
-        if mat.rows != size[0] or matrix.cols != size[1]:
+        if mat.rows != size[0] or mat.cols != size[1]:
             return None
         return mat
     except FileNotFoundError:
