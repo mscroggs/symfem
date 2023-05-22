@@ -546,7 +546,7 @@ class CiarletElement(FiniteElement):
                    f"{self.init_kwargs()} "
                    f"{self.last_updated}")
             matrix_type = "dualinv" if inverse else "dual"
-            mat = load_cached_matrix(matrix_type, cid)
+            mat = load_cached_matrix(matrix_type, cid, (len(self.dofs), len(self.dofs)))
             if mat is None:
                 mat = self.get_dual_matrix(inverse, caching=False)
                 save_cached_matrix(matrix_type, cid, mat)
