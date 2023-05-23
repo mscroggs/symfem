@@ -456,7 +456,7 @@ class FiniteElement(ABC):
     names: typing.List[str] = []
     references: typing.List[str] = []
     last_updated = version
-
+    cache = True
 
 class CiarletElement(FiniteElement):
     """Finite element defined using the Ciarlet definition."""
@@ -541,7 +541,7 @@ class CiarletElement(FiniteElement):
         Returns:
             The dual matrix
         """
-        if caching:
+        if caching and self.cache:
             cid = (f"{self.__class__.__name__} {self.order} {self.reference.vertices} "
                    f"{self.init_kwargs()} "
                    f"{self.last_updated}")
