@@ -458,6 +458,7 @@ class FiniteElement(ABC):
     last_updated = version
     cache = True
 
+
 class CiarletElement(FiniteElement):
     """Finite element defined using the Ciarlet definition."""
 
