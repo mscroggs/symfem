@@ -68,6 +68,7 @@ test_elements: typing.Dict[str, typing.Dict[
         "P1-iso-P2": [({}, [1])],
         "EG": [({}, range(1, 4))],
         "LFEG": [({}, range(1, 4))],
+        "P1 macro": [({}, [1])],
     },
     "tetrahedron": {
         "P": [({"variant": "equispaced"}, range(3)), ({"variant": "lobatto"}, range(3))],
