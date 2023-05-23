@@ -187,6 +187,7 @@ The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities
 - Nedelec (alternative names: Nedelec1, N1curl)
 - Nedelec2 (alternative names: N2curl)
 - nonconforming Arnold-Winther (alternative names: nonconforming AW)
+- P1 macro
 - P1-iso-P2 (alternative names: P2-iso-P1, iso-P2 P1)
 - Raviart-Thomas (alternative names: RT, N1div)
 - reduced Hsieh-Clough-Tocher (alternative names: rHCT)
