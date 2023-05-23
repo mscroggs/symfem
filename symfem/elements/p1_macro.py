@@ -9,7 +9,7 @@ import typing
 import sympy
 
 from ..finite_element import CiarletElement
-from ..functionals import ListOfFunctionals, PointEvaluation, IntegralAgainst
+from ..functionals import IntegralAgainst, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..geometry import SetOfPoints
 from ..piecewise_functions import PiecewiseFunction
