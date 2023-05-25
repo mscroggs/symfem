@@ -412,7 +412,6 @@ class FiniteElement(ABC):
                 else:
                     raise ValueError(f"Unknown continuity: {continuity}")
 
-                print([j.as_sympy().expand() for i in f for j in i], [j.as_sympy().expand() for i in g for j in i])
                 assert allequal(f, g)
 
     def get_tensor_factorisation(

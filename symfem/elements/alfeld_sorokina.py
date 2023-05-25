@@ -33,19 +33,13 @@ class AlfeldSorokina(CiarletElement):
         for v_n, vs in enumerate(reference.vertices):
             dofs.append(DotPointEvaluation(reference, vs, (1, 0), entity=(0, v_n)))
             dofs.append(DotPointEvaluation(reference, vs, (0, 1), entity=(0, v_n)))
+            dofs.append(PointDivergenceEvaluation(reference, vs, entity=(0, v_n)))
 
         for e_n in range(reference.sub_entity_count(1)):
             sub_ref = reference.sub_entity(1, e_n)
-            dofs.append(DotPointEvaluation(reference, sub_ref.midpoint(), (1, 0), entity=(0, v_n)))
-            dofs.append(DotPointEvaluation(reference, sub_ref.midpoint(), (0, 1), entity=(0, v_n)))
-            #dofs.append(TangentIntegralMoment(
-            #    reference, sub_ref, 1, None, entity=(1, e_n)))
-            #dofs.append(DotPointEvaluation(
-            #    reference, sub_ref.midpoint(), sub_ref.normal(), entity=(1, e_n),
-            #    mapping="contravariant"))
+            dofs.append(DotPointEvaluation(reference, sub_ref.midpoint(), (1, 0), entity=(1, e_n)))
+            dofs.append(DotPointEvaluation(reference, sub_ref.midpoint(), (0, 1), entity=(1, e_n)))
 
-        for v_n, vs in enumerate(reference.vertices):
-            dofs.append(PointDivergenceEvaluation(reference, vs, entity=(0, v_n)))
         mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
 
         subs = [
