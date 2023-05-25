@@ -9,6 +9,7 @@ from . import mappings
 from .functions import (AnyFunction, FunctionInput, ScalarFunction, VectorFunction,
                         parse_function_input)
 from .geometry import PointType, SetOfPoints
+from .piecewise_functions import PiecewiseFunction
 from .references import Interval, Reference
 from .symbols import t, x
 
@@ -818,10 +819,13 @@ class PointDivergenceEvaluation(BaseFunctional):
         Returns:
             The value of the functional for the function
         """
-        out = sympy.Integer(0)
-        fs = function.as_sympy()
-        assert isinstance(fs, tuple)
-        for f, i in zip(fs, x):
+        out = ScalarFunction(0)
+        if isinstance(function, PiecewiseFunction):
+            pt = self.point.as_sympy()
+            assert isinstance(pt, tuple)
+            function = function.get_piece(pt)
+        assert isinstance(function, VectorFunction)
+        for f, i in zip(function, x):
             out += f.diff(i)
         return out.subs(x, self.point)
 
