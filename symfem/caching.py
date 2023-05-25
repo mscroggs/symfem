@@ -20,7 +20,7 @@ assert os.path.isdir(CACHE_DIR)
 
 
 def load_cached_matrix(
-    matrix_type: str, cache_id: str
+    matrix_type: str, cache_id: str, size: typing.Tuple[int, int]
 ) -> typing.Union[sympy.matrices.dense.MutableDenseMatrix, None]:
     """Load a cached matrix.
 
@@ -36,7 +36,7 @@ def load_cached_matrix(
     try:
         with open(filename) as f:
             mat = matrix_from_string(f.read())
-        if mat.rows == 0:
+        if mat.rows != size[0] or mat.cols != size[1]:
             return None
         return mat
     except FileNotFoundError:

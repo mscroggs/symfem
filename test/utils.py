@@ -69,6 +69,7 @@ test_elements: typing.Dict[str, typing.Dict[
         "EG": [({}, range(1, 4))],
         "LFEG": [({}, range(1, 4))],
         "Alfeld-Sorokina": [({}, [2])],
+        "P1 macro": [({}, [1])],
     },
     "tetrahedron": {
         "P": [({"variant": "equispaced"}, range(3)), ({"variant": "lobatto"}, range(3))],
