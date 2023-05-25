@@ -819,8 +819,9 @@ class PointDivergenceEvaluation(BaseFunctional):
             The value of the functional for the function
         """
         out = sympy.Integer(0)
-        assert isinstance(function, VectorFunction)
-        for f, i in zip(function.as_sympy(), x):
+        fs = function.as_sympy()
+        assert isinstance(fs, tuple)
+        for f, i in zip(fs, x):
             out += f.diff(i)
         return out.subs(x, self.point)
 
