@@ -159,6 +159,7 @@ The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities
 ![The numbering of a reference triangle](img/triangle_numbering.png)
 
 ### List of supported elements
+- Alfeld-Sorokina (alternative names: AS)
 - Argyris
 - Arnold-Winther (alternative names: AW, conforming Arnold-Winther)
 - Bell
