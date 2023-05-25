@@ -363,9 +363,6 @@ class FiniteElement(ABC):
                     f = get_piece(f, (0, sympy.Rational(1, 3), sympy.Rational(1, 3)))
                     g = get_piece(g, (0, sympy.Rational(1, 3), sympy.Rational(1, 3)))
 
-                f = f.subs(x[0], 0)
-                g = g.subs(x[0], 0)
-
                 if continuity[0] == "C":
                     order = int(continuity[1:])
                     deriv_f = [f]
@@ -377,6 +374,16 @@ class FiniteElement(ABC):
                         f += deriv_f
                         deriv_g = [d.diff(i) for d in deriv_g for i in x[:self.reference.tdim]]
                         g += deriv_g
+
+                    f = [i.subs(x[0], 0) for i in f]
+                    g = [i.subs(x[0], 0) for i in g]
+                else:
+                    f = f.subs(x[0], 0)
+                    g = g.subs(x[0], 0)
+
+                if continuity[0] == "C":
+                    pass
+
                 elif continuity == "H(div)":
                     f = f[0]
                     g = g[0]
