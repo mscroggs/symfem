@@ -169,7 +169,8 @@ def create_element(
                       Huang-Zhang, HZ,
                       enriched Galerkin, EG,
                       enriched vector Galerkin, locking-free enriched Galerkin, LFEG,
-                      P1 macro
+                      P1 macro,
+                      Alfeld-Sorokina, AS
         order: The order of the element.
     """
     reference = create_reference(cell_type)

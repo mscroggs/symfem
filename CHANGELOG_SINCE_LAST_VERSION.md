@@ -1,3 +1,4 @@
 - Corrected HCT and rHCT elements
 - Added caching of matrix inverses and dual matrices
 - Added P1 macro element
+- Added Alfeld-Sorokina element

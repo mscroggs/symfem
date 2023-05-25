@@ -9,6 +9,7 @@ from . import mappings
 from .functions import (AnyFunction, FunctionInput, ScalarFunction, VectorFunction,
                         parse_function_input)
 from .geometry import PointType, SetOfPoints
+from .piecewise_functions import PiecewiseFunction
 from .references import Interval, Reference
 from .symbols import t, x
 
@@ -790,6 +791,82 @@ class DotPointEvaluation(BaseFunctional):
         return desc, []
 
     name = "Dot point evaluation"
+
+
+class PointDivergenceEvaluation(BaseFunctional):
+    """A point evaluation of the divergence."""
+
+    def __init__(self, reference: Reference, point_in: FunctionInput,
+                 entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+        """Create the functional.
+
+        Args:
+            reference: The reference cell
+            point_in: The points
+            entity: The entity the functional is associated with
+            mapping: The type of mappping from the reference cell to a physical cell
+        """
+        super().__init__(reference, entity, mapping)
+        self.point = parse_function_input(point_in)
+        assert self.point.is_vector
+
+    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+        """Apply to the functional to a function.
+
+        Args:
+            function: The function
+
+        Returns:
+            The value of the functional for the function
+        """
+        out = ScalarFunction(0)
+        if isinstance(function, PiecewiseFunction):
+            pt = self.point.as_sympy()
+            assert isinstance(pt, tuple)
+            function = function.get_piece(pt)
+        assert isinstance(function, VectorFunction)
+        for f, i in zip(function, x):
+            out += f.diff(i)
+        return out.subs(x, self.point)
+
+    def dof_point(self) -> PointType:
+        """Get the location of the DOF in the cell.
+
+        Returns:
+            The point
+        """
+        pt = self.point.as_sympy()
+        assert isinstance(pt, tuple)
+        return pt
+
+    def dof_direction(self) -> typing.Union[PointType, None]:
+        """Get the direction of the DOF.
+
+        Returns:
+            The direction
+        """
+        return None
+
+    def adjusted_dof_point(self) -> PointType:
+        """Get the adjusted position of the DOF in the cell for plotting.
+
+        Returns:
+            The point
+        """
+        return self.dof_point()
+
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
+        """Get a representation of the functional as TeX, and list of terms involved.
+
+        Returns:
+            Representation of the functional as TeX, and list of terms involved
+        """
+        desc = "\\boldsymbol{v}\\mapsto"
+        desc += "\\nablaa\\cdot\\boldsymbol{v}"
+        desc += "(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
+        return desc, []
+
+    name = "Point evaluation of divergence"
 
 
 class IntegralAgainst(BaseFunctional):
