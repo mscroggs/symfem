@@ -1,10 +1,8 @@
 """Test Hsieh-Clough-Tocher elements."""
 
-import pytest
 import sympy
 
 import symfem
-from symfem.functions import ScalarFunction
 from symfem.symbols import t, x
 from symfem.utils import allequal
 

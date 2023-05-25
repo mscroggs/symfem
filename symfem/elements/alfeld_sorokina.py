@@ -9,8 +9,7 @@ import typing
 import sympy
 
 from ..finite_element import CiarletElement
-from ..functionals import (PointDivergenceEvaluation, ListOfFunctionals, DotPointEvaluation,
-                           PointNormalDerivativeEvaluation, PointDirectionalDerivativeEvaluation, TangentIntegralMoment, NormalIntegralMoment)
+from ..functionals import PointDivergenceEvaluation, ListOfFunctionals, DotPointEvaluation
 from ..functions import FunctionInput, VectorFunction
 from ..piecewise_functions import PiecewiseFunction
 from ..references import Reference
