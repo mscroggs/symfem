@@ -85,5 +85,6 @@ class MorleyWangXu(CiarletElement):
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 1
     max_order = {"interval": 1, "triangle": 2, "tetrahedron": 3}
-    continuity = "C{order}"
+    # continuity = "C{order}"
+    continuity = "C0"
     last_updated = "2023.05"

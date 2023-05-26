@@ -74,5 +74,6 @@ class HsiehCloughTocher(CiarletElement):
     references = ["triangle"]
     min_order = 3
     max_order = 3
-    continuity = "C1"
+    # continuity = "C1"
+    continuity = "C0"
     last_updated = "2023.05"
