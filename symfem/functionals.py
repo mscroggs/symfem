@@ -784,6 +784,7 @@ class DotPointEvaluation(BaseFunctional):
         desc += "\\boldsymbol{v}(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
         if self.vector.is_vector:
             desc += "\\cdot\\left(\\begin{array}{c}"
+            assert hasattr(self.vector, "__iter__")
             desc += "\\\\".join([_to_tex(i) for i in self.vector])
             desc += "\\end{array}\\right)"
         elif self.vector != 1:
@@ -1247,6 +1248,7 @@ class IntegralMoment(BaseFunctional):
                 desc += f"\\displaystyle\\int_{{{entity}}}"
                 desc += "\\boldsymbol{v}\\cdot"
                 desc += "\\left(\\begin{array}{c}"
+                assert hasattr(self.f, "__iter__")
                 desc += "\\\\".join([_to_tex(i) for i in self.f])
                 desc += "\\end{array}\\right)"
             else:
@@ -1270,7 +1272,6 @@ class IntegralMoment(BaseFunctional):
             if self.f != 1:
                 desc += "(" + _to_tex(self.f) + ")"
             desc += "v"
-        print(desc)
         return desc, [entity_def]
 
     name = "Integral moment"
