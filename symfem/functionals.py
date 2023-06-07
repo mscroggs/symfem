@@ -782,7 +782,7 @@ class DotPointEvaluation(BaseFunctional):
         """
         desc = "\\boldsymbol{v}\\mapsto"
         desc += "\\boldsymbol{v}(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
-        if isinstance(self.vector, (tuple, list)):
+        if self.vector.is_vector:
             desc += "\\cdot\\left(\\begin{array}{c}"
             desc += "\\\\".join([_to_tex(i) for i in self.vector])
             desc += "\\end{array}\\right)"
@@ -949,7 +949,7 @@ class IntegralAgainst(BaseFunctional):
         """
         entity = self.entity_tex()
         entity_def = self.entity_definition()
-        if isinstance(self.f, tuple):
+        if self.f.is_vector:
             desc = "\\mathbf{v}\\mapsto"
             desc += f"\\displaystyle\\int_{{{entity}}}"
             desc += _to_tex(self.f, True) + "\\cdot"
@@ -1241,7 +1241,7 @@ class IntegralMoment(BaseFunctional):
         """
         entity = self.entity_tex()
         entity_def = self.entity_definition()
-        if isinstance(self.f, tuple):
+        if self.f.is_vector:
             if len(self.f) in [self.reference.tdim, self.integral_domain.tdim]:
                 desc = "\\boldsymbol{v}\\mapsto"
                 desc += f"\\displaystyle\\int_{{{entity}}}"
@@ -1270,6 +1270,7 @@ class IntegralMoment(BaseFunctional):
             if self.f != 1:
                 desc += "(" + _to_tex(self.f) + ")"
             desc += "v"
+        print(desc)
         return desc, [entity_def]
 
     name = "Integral moment"
