@@ -2,3 +2,4 @@
 - Added caching of matrix inverses and dual matrices
 - Added P1 macro element
 - Added Alfeld-Sorokina element
+- Corrected C1 and higher order C tests

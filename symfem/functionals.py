@@ -782,8 +782,9 @@ class DotPointEvaluation(BaseFunctional):
         """
         desc = "\\boldsymbol{v}\\mapsto"
         desc += "\\boldsymbol{v}(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
-        if isinstance(self.vector, (tuple, list)):
+        if self.vector.is_vector:
             desc += "\\cdot\\left(\\begin{array}{c}"
+            assert hasattr(self.vector, "__iter__")
             desc += "\\\\".join([_to_tex(i) for i in self.vector])
             desc += "\\end{array}\\right)"
         elif self.vector != 1:
@@ -949,7 +950,7 @@ class IntegralAgainst(BaseFunctional):
         """
         entity = self.entity_tex()
         entity_def = self.entity_definition()
-        if isinstance(self.f, tuple):
+        if self.f.is_vector:
             desc = "\\mathbf{v}\\mapsto"
             desc += f"\\displaystyle\\int_{{{entity}}}"
             desc += _to_tex(self.f, True) + "\\cdot"
@@ -1241,12 +1242,13 @@ class IntegralMoment(BaseFunctional):
         """
         entity = self.entity_tex()
         entity_def = self.entity_definition()
-        if isinstance(self.f, tuple):
+        if self.f.is_vector:
             if len(self.f) in [self.reference.tdim, self.integral_domain.tdim]:
                 desc = "\\boldsymbol{v}\\mapsto"
                 desc += f"\\displaystyle\\int_{{{entity}}}"
                 desc += "\\boldsymbol{v}\\cdot"
                 desc += "\\left(\\begin{array}{c}"
+                assert hasattr(self.f, "__iter__")
                 desc += "\\\\".join([_to_tex(i) for i in self.f])
                 desc += "\\end{array}\\right)"
             else:
