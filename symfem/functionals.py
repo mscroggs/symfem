@@ -41,12 +41,14 @@ def _nth(n: int) -> str:
         n: The number
 
     Returns:
-        The string (n)th, (n)st or (n)nd
+        The string (n)th, (n)st, (n)rd or (n)nd
     """
     if n % 10 == 1 and n != 11:
         return f"{n}st"
     if n % 10 == 2 and n != 12:
         return f"{n}nd"
+    if n % 10 == 3 and n != 12:
+        return f"{n}rd"
     return f"{n}th"
 
 
