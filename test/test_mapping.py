@@ -43,17 +43,4 @@ def test_push_forward(
     a = e.map_to_cell(vertices)
     b = e2.get_basis_functions()
 
-    for i, j in zip(a, b):
-        print(i, " =?= ", j)
-        for v in vertices:
-            print(i.subs(symfem.symbols.x, v), j.subs(symfem.symbols.x, v))
-        print()
-
-    print()
-    for d in e.dofs:
-        print(d.point)
-    print()
-    for d in e2.dofs:
-        print(d.point)
-
     assert allequal(e.map_to_cell(vertices), e2.get_basis_functions())

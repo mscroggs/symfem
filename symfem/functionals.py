@@ -1145,8 +1145,8 @@ class IntegralMoment(BaseFunctional):
     f: AnyFunction
 
     def __init__(self, reference: Reference, integral_domain: Reference,
-                 f_in: FunctionInput, dof: BaseFunctional,
-                 entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+                 f_in: FunctionInput, dof: BaseFunctional, entity: typing.Tuple[int, int],
+                 mapping: typing.Union[str, None] = "l2"):
         """Create the functional.
 
         Args:

@@ -89,7 +89,7 @@ def make_integral_moment_dofs(
             if sub_type is not None:
                 assert dim > 0
                 for i, vs in enumerate(reference.sub_entities(dim)):
-                    sub_ref = reference.sub_entity(dim, i, True)
+                    sub_ref = reference.sub_entity(dim, i, False)
                     IntegralMoment, SubElement, order, mapping, kwargs = _extract_moment_data(
                         moment_data, sub_ref.name)
                     if order >= SubElement.min_order:

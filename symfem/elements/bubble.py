@@ -29,7 +29,7 @@ class Bubble(CiarletElement):
             variant: The variant of the element
         """
         from .. import create_element
-        p1 = create_element(reference.name, "Lagrange", 1)
+        p1 = create_element(reference.name, "Lagrange", 1, vertices=reference.vertices)
         bubble = 1
         for f in p1.get_basis_functions():
             bubble *= f
@@ -57,7 +57,7 @@ class Bubble(CiarletElement):
             def func(i): return max(i)
         for i in product(range(1, order), repeat=reference.tdim):
             if func(i) < order:
-                point = tuple(sympy.Rational(j, order) for j in i)
+                point = reference.get_point(tuple(sympy.Rational(j, order) for j in i))
                 dofs.append(PointEvaluation(reference, point, entity=(reference.tdim, 0)))
 
         self.variant = variant
@@ -79,7 +79,7 @@ class Bubble(CiarletElement):
     min_order = {"interval": 2, "triangle": 3, "tetrahedron": 4,
                  "quadrilateral": 2, "hexahedron": 2}
     continuity = "C0"
-    last_updated = "2023.05"
+    last_updated = "2023.06"
 
 
 class BubbleEnrichedLagrange(CiarletElement):

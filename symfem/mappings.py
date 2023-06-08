@@ -23,6 +23,24 @@ def identity(
     return parse_function_input(f_in).subs(x, inverse_map)
 
 
+def l2(
+    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
+) -> AnyFunction:
+    """Map functions, scaling by the determinant of the jacobian.
+
+    Args:
+        f_in: The function
+        map: The map from the reference cell to the physical cell
+        inverse_map: The map to the reference cell from the physical cell
+        tdim: The topological dimension of the cell
+
+    Returns:
+        The mapped function
+    """
+    jacobian = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
+    return parse_function_input(f_in).subs(x, inverse_map) / abs(jacobian.det().as_sympy())
+
+
 def covariant(
     f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
 ) -> VectorFunction:
