@@ -15,6 +15,10 @@ def test_push_forward(
     elements_to_test, cells_to_test, cell_type, element_type, order, kwargs,
     speed
 ):
+    if elements_to_test != "ALL" and element_type not in elements_to_test:
+        pytest.skip()
+    if cells_to_test != "ALL" and cell_type not in cells_to_test:
+        pytest.skip()
     if speed == "fast":
         if order > 2:
             pytest.skip()
@@ -42,10 +46,5 @@ def test_push_forward(
 
     e = symfem.create_element(cell_type, element_type, order, **kwargs)
     e2 = symfem.create_element(cell_type, element_type, order, vertices=vertices, **kwargs)
-
-    # print(e.map_to_cell(vertices))
-    # print(e2.get_basis_functions())
-    # a = e.map_to_cell(vertices)
-    # b = e2.get_basis_functions()
 
     assert allequal(e.map_to_cell(vertices), e2.get_basis_functions())
