@@ -40,7 +40,6 @@ class Transition(CiarletElement):
             assert edge_orders is not None
             assert len(face_orders) == 4
             assert len(edge_orders) == 6
-
         bubble_space = Lagrange(reference, 1)
 
         dofs: ListOfFunctionals = []
@@ -88,7 +87,8 @@ class Transition(CiarletElement):
                         for i, f in enumerate(bubble_space.get_basis_functions()):
                             if i in reference.edges[e_n]:
                                 bubble *= f
-                    space = Lagrange(entity, entity_order - edim - 1, variant=variant)
+                    space = Lagrange(entity.default_reference(), entity_order - edim - 1,
+                                     variant=variant)
                     variables = []
                     origin = entity.vertices[0]
                     used = []
