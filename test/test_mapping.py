@@ -38,9 +38,9 @@ def test_push_forward(
     e = symfem.create_element(cell_type, element_type, order, **kwargs)
     e2 = symfem.create_element(cell_type, element_type, order, vertices=vertices, **kwargs)
 
-    print(e.map_to_cell(vertices))
-    print(e2.get_basis_functions())
-    a = e.map_to_cell(vertices)
-    b = e2.get_basis_functions()
+    # print(e.map_to_cell(vertices))
+    # print(e2.get_basis_functions())
+    # a = e.map_to_cell(vertices)
+    # b = e2.get_basis_functions()
 
     assert allequal(e.map_to_cell(vertices), e2.get_basis_functions())

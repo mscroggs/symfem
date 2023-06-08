@@ -68,6 +68,7 @@ class Lagrange(CiarletElement):
     continuity = "C0"
     last_updated = "2023.06"
 
+
 class VectorLagrange(CiarletElement):
     """Vector Lagrange finite element."""
 
