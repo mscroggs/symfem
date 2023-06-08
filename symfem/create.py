@@ -98,7 +98,8 @@ def create_reference(
 
 
 def create_element(
-    cell_type: str, element_type: str, order: int, **kwargs: _typing.Any
+    cell_type: str, element_type: str, order: int,
+    vertices: _typing.Optional[_SetOfPointsInput] = None, **kwargs: _typing.Any
 ) -> _FiniteElement:
     """Make a finite element.
 
@@ -172,8 +173,13 @@ def create_element(
                       P1 macro,
                       Alfeld-Sorokina, AS
         order: The order of the element.
+        vertices: The vertices of the reference.
     """
-    reference = create_reference(cell_type)
+    reference = create_reference(cell_type, vertices=vertices)
+
+    if reference.tdim != reference.gdim:
+        raise ValueError("Cannot create element on cell with different "
+                         "topological and geometric dimensions.")
 
     if element_type in _elementmap:
         if reference.name not in _elementmap[element_type]:

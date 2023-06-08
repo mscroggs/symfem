@@ -290,7 +290,7 @@ class FiniteElement(ABC):
 
     def test(self):
         """Run tests for this element."""
-        if self.order <= 4:
+        if self.order <= self._max_continuity_test_order:
             self.test_continuity()
 
     def test_continuity(self):
@@ -464,6 +464,7 @@ class FiniteElement(ABC):
     references: typing.List[str] = []
     last_updated = version
     cache = True
+    _max_continuity_test_order = 4
 
 
 class CiarletElement(FiniteElement):
@@ -551,8 +552,7 @@ class CiarletElement(FiniteElement):
         """
         if caching and self.cache:
             cid = (f"{self.__class__.__name__} {self.order} {self.reference.vertices} "
-                   f"{self.init_kwargs()} "
-                   f"{self.last_updated}")
+                   f"{self.init_kwargs()} {self.last_updated}")
             matrix_type = "dualinv" if inverse else "dual"
             mat = load_cached_matrix(matrix_type, cid, (len(self.dofs), len(self.dofs)))
             if mat is None:
