@@ -8,6 +8,10 @@ from .geometry import PointType
 from .symbols import x
 
 
+class MappingNotImplemented(NotImplementedError):
+    pass
+
+
 def identity(
     f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int
 ) -> AnyFunction:

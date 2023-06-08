@@ -40,10 +40,10 @@ class Transition(CiarletElement):
             assert edge_orders is not None
             assert len(face_orders) == 4
             assert len(edge_orders) == 6
-        bubble_space = Lagrange(reference, 1)
+        bubble_space = Lagrange(reference.default_reference(), 1)
 
         dofs: ListOfFunctionals = []
-        for v_n, v in enumerate(reference.reference_vertices):
+        for v_n, v in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
 
         poly: typing.List[FunctionInput] = []
@@ -52,6 +52,7 @@ class Transition(CiarletElement):
         for edim in range(1, 4):
             for e_n in range(reference.sub_entity_count(edim)):
                 entity = reference.sub_entity(edim, e_n)
+                ref_entity = reference.default_reference().sub_entity(edim, e_n)
                 if edim == reference.tdim:
                     entity_order = order
                 elif edim == 1:
@@ -90,15 +91,19 @@ class Transition(CiarletElement):
                     space = Lagrange(entity.default_reference(), entity_order - edim - 1,
                                      variant=variant)
                     variables = []
-                    origin = entity.vertices[0]
+                    origin = ref_entity.vertices[0]
                     used = []
-                    for p in entity.vertices[1:]:
+                    for p in ref_entity.vertices[1:]:
                         i = 0
-                        while p[i] == origin[i] or origin[i] == 1 or i in used:
+                        while p[i] == origin[i] or i in used:
                             i += 1
                         used.append(i)
                         variables.append(origin[i] + (p[i] - origin[i]) * x[i])
                     poly += [f.subs(x, variables) * bubble for f in space.get_basis_functions()]
+
+        if reference.vertices != reference.reference_vertices:
+            invmap = reference.get_inverse_map_to_self()
+            poly = [f.subs(x, invmap) for f in poly]
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant
@@ -118,4 +123,4 @@ class Transition(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 1
     continuity = "C0"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

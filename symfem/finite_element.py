@@ -15,6 +15,7 @@ from .functionals import ListOfFunctionals
 from .functions import (AnyFunction, FunctionInput, ScalarFunction, VectorFunction,
                         parse_function_input)
 from .geometry import PointType, SetOfPointsInput, parse_set_of_points_input
+from .mappings import MappingNotImplemented
 from .piecewise_functions import PiecewiseFunction
 from .plotting import Picture, colors
 from .references import Reference
@@ -341,7 +342,7 @@ class FiniteElement(ABC):
                 basis = self.get_basis_functions()
                 try:
                     basis2 = self.map_to_cell(vertices)
-                except NotImplementedError:
+                except MappingNotImplemented:
                     return "Mapping not implemented for this element."
 
                 f = basis[fi]
@@ -661,31 +662,36 @@ class CiarletElement(FiniteElement):
         if inverse_map is None:
             inverse_map = self.reference.get_inverse_map_to(vertices)
 
-        functions: typing.List[AnyFunction] = [ScalarFunction(0) for f in basis]
-        for dim in range(self.reference.tdim + 1):
-            for e in range(self.reference.sub_entity_count(dim)):
-                entity_dofs = self.entity_dofs(dim, e)
-                dofs_by_type: typing.Dict[
-                    typing.Tuple[typing.Type, typing.Union[str, None]], typing.List[int]
-                ] = {}
-                for d in entity_dofs:
-                    dof = self.dofs[d]
-                    t = (type(dof), dof.mapping)
-                    if t not in dofs_by_type:
-                        dofs_by_type[t] = []
-                    dofs_by_type[t].append(d)
-                for ds in dofs_by_type.values():
-                    mapped_dofs = self.dofs[ds[0]].perform_mapping(
-                        [basis[d] for d in ds],
-                        forward_map, inverse_map, self.reference.tdim)
-                    for d_n, mdof in zip(ds, mapped_dofs):
-                        functions[d_n] = mdof
+        try:
+            functions: typing.List[AnyFunction] = [ScalarFunction(0) for f in basis]
+            for dim in range(self.reference.tdim + 1):
+                for e in range(self.reference.sub_entity_count(dim)):
+                    entity_dofs = self.entity_dofs(dim, e)
+                    dofs_by_type: typing.Dict[
+                        typing.Tuple[typing.Type, typing.Union[str, None]], typing.List[int]
+                    ] = {}
+                    for d in entity_dofs:
+                        dof = self.dofs[d]
+                        t = (type(dof), dof.mapping)
+                        if t not in dofs_by_type:
+                            dofs_by_type[t] = []
+                        dofs_by_type[t].append(d)
+                    for ds in dofs_by_type.values():
+                        mapped_dofs = self.dofs[ds[0]].perform_mapping(
+                            [basis[d] for d in ds],
+                            forward_map, inverse_map, self.reference.tdim)
+                        for d_n, mdof in zip(ds, mapped_dofs):
+                            functions[d_n] = mdof
 
-        for fun in functions:
-            if isinstance(fun, PiecewiseFunction):
-                fun.map_pieces(forward_map)
+            for fun in functions:
+                if isinstance(fun, PiecewiseFunction):
+                    fun.map_pieces(forward_map)
 
-        return functions
+            return functions
+        except MappingNotImplemented:
+            e = self.__class__(self.reference.__class__(vertices=vertices), self.order,
+                               **self.init_kwargs())
+            return e.get_basis_functions()
 
     def test(self):
         """Run tests for this element."""

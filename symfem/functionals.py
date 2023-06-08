@@ -400,22 +400,7 @@ class DerivativePointEvaluation(BaseFunctional):
         Returns:
             Mapped functions
         """
-        if self.mapping is not None:
-            return super().perform_mapping(fs, map, inverse_map, tdim)
-        out = []
-        J = sympy.Matrix([[map[i].diff(x[j]) for j in range(tdim)] for i in range(tdim)])
-        for dofs in zip(*[fs[i::tdim] for i in range(tdim)]):
-            for i in range(tdim):
-                f = ScalarFunction(0)
-                for a, b in zip(dofs, J.row(i)):
-                    f += a * b
-                out.append(f)
-
-        out2: typing.List[AnyFunction] = []
-        for b in out:
-            item = b.subs(x, inverse_map)
-            out2.append(item)
-        return out2
+        raise mappings.MappingNotImplemented()
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved.
