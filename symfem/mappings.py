@@ -1,5 +1,7 @@
 """Functions to map functions between cells."""
 
+import sympy
+
 from .functions import (AnyFunction, FunctionInput, MatrixFunction, VectorFunction,
                         parse_function_input)
 from .geometry import PointType
@@ -37,8 +39,9 @@ def l2(
     Returns:
         The mapped function
     """
-    jacobian = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
-    return parse_function_input(f_in).subs(x, inverse_map) / abs(jacobian.det().as_sympy())
+    jdet = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map]).det().as_sympy()
+    assert isinstance(jdet, sympy.core.expr.Expr)
+    return parse_function_input(f_in).subs(x, inverse_map) / abs(jdet)
 
 
 def covariant(
