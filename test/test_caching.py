@@ -1,6 +1,7 @@
 import pytest
-import symfem
 import sympy
+
+import symfem
 from symfem.utils import allequal
 
 

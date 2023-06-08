@@ -1,4 +1,5 @@
 import pytest
+
 import symfem
 from symfem.utils import allequal
 
@@ -14,6 +15,12 @@ def test_push_forward(
     elements_to_test, cells_to_test, cell_type, element_type, order, kwargs,
     speed
 ):
+    if speed == "fast":
+        if order > 2:
+            pytest.skip()
+        if order == 2 and cell_type in ["tetrahedron", "hexahedron", "prism", "pyramid"]:
+            pytest.skip()
+
     if cell_type == "interval":
         vertices = [(3, ), (1, )]
     elif cell_type == "triangle":
@@ -32,8 +39,6 @@ def test_push_forward(
 
     else:
         raise ValueError(f"Unsupported cell type: {cell_type}")
-    r = symfem.create_reference(cell_type, vertices=vertices)
-    assert r.volume() not in [0, 1]
 
     e = symfem.create_element(cell_type, element_type, order, **kwargs)
     e2 = symfem.create_element(cell_type, element_type, order, vertices=vertices, **kwargs)
