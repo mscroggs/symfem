@@ -14,6 +14,7 @@ from ..polynomials import (Hcurl_quolynomials, Hdiv_quolynomials, quolynomial_se
                            quolynomial_set_vector)
 from ..quadrature import get_quadrature
 from ..references import Reference
+from ..symbols import x
 
 
 class Q(CiarletElement):
@@ -30,7 +31,8 @@ class Q(CiarletElement):
         dofs: ListOfFunctionals = []
         if order == 0:
             dofs = [PointEvaluation(
-                reference, tuple(sympy.Rational(1, 2) for i in range(reference.tdim)),
+                reference,
+                reference.get_point(tuple(sympy.Rational(1, 2) for i in range(reference.tdim))),
                 entity=(reference.tdim, 0))]
         else:
             points, _ = get_quadrature(variant, order + 1)
@@ -50,6 +52,10 @@ class Q(CiarletElement):
 
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_1d(reference.tdim, order)
+
+        if reference.vertices != reference.reference_vertices:
+            invmap = reference.get_inverse_map_to_self()
+            poly = [f.subs(x, invmap) for f in poly]
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant
@@ -108,7 +114,7 @@ class Q(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "C0"
-    last_updated = "2023.05"
+    last_updated = "2023.06"
 
 
 class VectorQ(CiarletElement):
