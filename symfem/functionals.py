@@ -1102,9 +1102,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         Returns:
             Mapped functions
         """
-        if sum(self.orders) > 0:
-            raise NotImplementedError("Mapping high order derivatives not implemented")
-        return super().perform_mapping(fs, map, inverse_map, tdim)
+        raise mappings.MappingNotImplemented()
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved.
@@ -1161,14 +1159,22 @@ class IntegralMoment(BaseFunctional):
         f = parse_function_input(f_in)
         f = f.subs(x, t)
 
-        """
-        if f.is_vector:
+        if reference.vertices != reference.default_reference().vertices:
+            if mapping is None or not hasattr(mappings, f"{mapping}_inverse_transpose"):
+                raise ValueError(
+                    "Cannot create this element on a non-default reference.")
+            mf = getattr(mappings, f"{mapping}_inverse_transpose")
+            self.f = mf(f, integral_domain.get_map_to_self(),
+                        integral_domain.get_inverse_map_to_self(),
+                        integral_domain.tdim, substitute=False)
+            if integral_domain.tdim > 1:  # FIXME: this is a hack
+                integral_domain_def = reference.default_reference().sub_entity(*entity)
+                self.f *= integral_domain_def.volume() / integral_domain.volume()
+        elif f.is_vector:
             assert len(f) == self.integral_domain.tdim
             self.f = mappings.contravariant(
                 f, integral_domain.get_map_to_self(), integral_domain.get_inverse_map_to_self(),
                 integral_domain.tdim)
-            print("premap", f)
-            print("postmap", self.f)
         elif f.is_matrix:
             assert f.shape[0] == self.integral_domain.tdim
             assert f.shape[1] == self.integral_domain.tdim
@@ -1176,8 +1182,7 @@ class IntegralMoment(BaseFunctional):
                 f, integral_domain.get_map_to_self(), integral_domain.get_inverse_map_to_self(),
                 integral_domain.tdim)
         else:
-        """
-        self.f = f
+            self.f = f
 
     def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply to the functional to a function.

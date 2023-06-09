@@ -93,7 +93,6 @@ def make_integral_moment_dofs(
         assert dim > 0
         for i, vs in enumerate(reference.sub_entities(dim)):
             sub_ref = reference.sub_entity(dim, i, False)
-            sub_ref_def = reference.default_reference().sub_entity(dim, i, False)
             IntegralMoment, SubElement, order, mapping, kwargs = _extract_moment_data(
                 moment_data, sub_ref.name)
             m_kwargs = {}
@@ -104,43 +103,6 @@ def make_integral_moment_dofs(
             sub_element = SubElement(sub_ref.default_reference(), order, **kwargs)
             for dn, d in enumerate(sub_element.dofs):
                 f = sub_element.get_basis_function(dn)
-                if reference.vertices != reference.default_reference().vertices:
-                    m = IntegralMoment.default_mapping if mapping is None else mapping
-                    if m is None or not hasattr(mappings, f"{m}_inverse_transpose"):
-                        raise ValueError(
-                            "Cannot create this element on a non-default reference.")
-                    #m = "identity"
-                    mf = getattr(mappings, f"{m}_inverse_transpose")
-                    # print("fbefore", f)
-                    # print(sub_ref.vertices)
-                    f = mf(f, sub_ref.get_map_to_self(), sub_ref.get_inverse_map_to_self(),
-                           sub_ref.tdim, substitute=False)
-                    if sub_ref.tdim > 1:
-                        f *= sub_ref_def.volume() / sub_ref.volume()
-                    #
-                    # F = (1,1) + x(1, 1) + y(0, 3)
-                    # J = ( 1 0 )
-                    #     ( 1 3 )
-                    # detJ = 3
-                    #
-                    # FF : (a, b) -> 1/detJ J (a, b)
-                    #      (a, b) -> 1/3 * (a, a+3b)
-                    #
-                    # J^-1 = (  1   0   )
-                    #        ( -1/3 1/3 )
-                    # J^-T = ( 1 -1/3 )
-                    #        ( 0  1/3 )
-                    #
-                    # FFit : (c, d) -> detJ J^-T (c, d)
-                    #        (c, d) -> (3c - d, d)
-                    #
-                    # CLAIM: (a, b) . (c, d) = FF(a,b) . FFit(c,d)
-                    #   FF(a,b) . FFit(c,d) = 1/3 * (a, a+3b) . (3c - d, d)
-                    #                       = 1/3 * (3ac - ad + ad + 3bd)
-                    #                       = 1/3 * (3ac + 3bd)
-                    #                       = ac + bd
-                    # print("fafter", f)
-                    # print()
                 dofs.append(IntegralMoment(
                     reference, sub_ref, f, d, (dim, i), **m_kwargs))
     return dofs

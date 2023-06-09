@@ -452,6 +452,14 @@ class FiniteElement(ABC):
                 raise ValueError(f"Unknown tensor product type: {t_type}")
         return [basis[i] for i in range(len(basis))]
 
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+        """Return the keyword arguments used to create this element.
+
+        Returns:
+            Keyword arguments dictionary
+        """
+        return {}
+
     @property
     def name(self) -> str:
         """Get the name of the element.
@@ -567,14 +575,6 @@ class CiarletElement(FiniteElement):
                 return mat.inv("LU")
             else:
                 return mat
-
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the keyword arguments used to create this element.
-
-        Returns:
-            Keyword arguments dictionary
-        """
-        return {}
 
     def get_basis_functions(
         self, use_tensor_factorisation: bool = False
@@ -867,7 +867,12 @@ class DirectElement(FiniteElement):
         Returns:
             The basis functions mapped to the cell
         """
-        raise NotImplementedError()
+        raise MappingNotImplemented()
+        # TODO: make this work
+        # vertices = parse_set_of_points_input(vertices_in)
+        # e = self.__class__(self.reference.__class__(vertices=vertices), self.order,
+        #                   **self.init_kwargs())
+        # return e.get_basis_functions()
 
     def get_polynomial_basis(self) -> typing.List[AnyFunction]:
         """Get the symbolic polynomial basis for the element.
