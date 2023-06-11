@@ -202,6 +202,10 @@ class Reference(ABC):
         """Check if two references are equal."""
         return type(self) == type(other) and self.vertices == other.vertices
 
+    def __hash__(self) -> int:
+        """Check if two references are equal."""
+        return hash((self.reference_vertices, self.vertices))
+
     def intersection(self, other: Reference) -> typing.Optional[Reference]:
         """Get the intersection of two references.
 
