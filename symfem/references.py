@@ -198,6 +198,10 @@ class Reference(ABC):
         """
         return self.vertices
 
+    def __eq__(self, other: Reference) -> bool:
+        """Check if two references are equal."""
+        return type(self) == type(other) and self.vertices == other.vertices
+
     def intersection(self, other: Reference) -> typing.Optional[Reference]:
         """Get the intersection of two references.
 

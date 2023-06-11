@@ -213,7 +213,6 @@ class BaseFunctional(ABC):
         pass
 
     name = "Base functional"
-    default_mapping: typing.Optional[str] = None
 
 
 class PointEvaluation(BaseFunctional):
@@ -272,7 +271,6 @@ class PointEvaluation(BaseFunctional):
         return f"v\\mapsto v({','.join([_to_tex(i, True) for i in self.point])})", []
 
     name = "Point evaluation"
-    default_mapping = "identity"
 
 
 class WeightedPointEvaluation(BaseFunctional):
@@ -334,7 +332,6 @@ class WeightedPointEvaluation(BaseFunctional):
                 f"v({','.join([_to_tex(i, True) for i in self.point])})"), []
 
     name = "Weighted point evaluation"
-    default_mapping = "identity"
 
 
 class DerivativePointEvaluation(BaseFunctional):
@@ -513,7 +510,6 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
         return desc, []
 
     name = "Point evaluation of directional derivative"
-    default_mapping = "identity"
 
 
 class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
@@ -549,7 +545,6 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
         ]
 
     name = "Point evaluation of normal derivative"
-    default_mapping = "identity"
 
 
 class PointComponentSecondDerivativeEvaluation(BaseFunctional):
@@ -615,7 +610,6 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
         return desc, []
 
     name = "Point evaluation of Jacobian component"
-    default_mapping = "identity"
 
 
 class PointInnerProduct(BaseFunctional):
@@ -704,7 +698,6 @@ class PointInnerProduct(BaseFunctional):
         return desc, []
 
     name = "Point inner product"
-    default_mapping = "identity"
 
 
 class DotPointEvaluation(BaseFunctional):
@@ -786,7 +779,6 @@ class DotPointEvaluation(BaseFunctional):
         return desc, []
 
     name = "Dot point evaluation"
-    default_mapping = "identity"
 
 
 class PointDivergenceEvaluation(BaseFunctional):
@@ -863,7 +855,6 @@ class PointDivergenceEvaluation(BaseFunctional):
         return desc, []
 
     name = "Point evaluation of divergence"
-    default_mapping = "identity"
 
 
 class IntegralAgainst(BaseFunctional):
@@ -960,7 +951,6 @@ class IntegralAgainst(BaseFunctional):
         return desc, [entity_def]
 
     name = "Integral against"
-    default_mapping = "identity"
 
 
 class IntegralOfDivergenceAgainst(BaseFunctional):
@@ -1035,7 +1025,6 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
         return desc, [entity_def]
 
     name = "Integral of divergence against"
-    default_mapping = "identity"
 
 
 class IntegralOfDirectionalMultiderivative(BaseFunctional):
@@ -1131,7 +1120,6 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         return desc, [entity_def]
 
     name = "Integral of a directional derivative"
-    default_mapping = "identity"
 
 
 class IntegralMoment(BaseFunctional):
@@ -1157,32 +1145,32 @@ class IntegralMoment(BaseFunctional):
         self.dof = dof
 
         f = parse_function_input(f_in)
-        f = f.subs(x, t)
+        self.f = f.subs(x, t)
 
-        if reference.vertices != reference.default_reference().vertices:
+        # Map from reference entity to entity
+        if integral_domain.default_reference() != integral_domain:
+            if self.f.is_vector:
+                assert len(self.f) == self.integral_domain.tdim
+                self.f = mappings.contravariant(
+                    self.f, integral_domain.get_map_to_self(),
+                    integral_domain.get_inverse_map_to_self(), integral_domain.tdim)
+            elif self.f.is_matrix:
+                assert self.f.shape[0] == self.integral_domain.tdim
+                assert self.f.shape[1] == self.integral_domain.tdim
+                self.f = mappings.double_contravariant(
+                    self.f, integral_domain.get_map_to_self(),
+                    integral_domain.get_inverse_map_to_self(), integral_domain.tdim)
+
+        # Map from default reference to reference
+        if reference != reference.default_reference():
             if mapping is None or not hasattr(mappings, f"{mapping}_inverse_transpose"):
                 raise ValueError(
                     "Cannot create this element on a non-default reference.")
             mf = getattr(mappings, f"{mapping}_inverse_transpose")
-            self.f = mf(f, integral_domain.get_map_to_self(),
-                        integral_domain.get_inverse_map_to_self(),
-                        integral_domain.tdim, substitute=False)
-            if integral_domain.tdim > 1:  # FIXME: this is a hack
-                integral_domain_def = reference.default_reference().sub_entity(*entity)
-                self.f *= integral_domain_def.volume() / integral_domain.volume()
-        elif f.is_vector:
-            assert len(f) == self.integral_domain.tdim
-            self.f = mappings.contravariant(
-                f, integral_domain.get_map_to_self(), integral_domain.get_inverse_map_to_self(),
-                integral_domain.tdim)
-        elif f.is_matrix:
-            assert f.shape[0] == self.integral_domain.tdim
-            assert f.shape[1] == self.integral_domain.tdim
-            self.f = mappings.double_contravariant(
-                f, integral_domain.get_map_to_self(), integral_domain.get_inverse_map_to_self(),
-                integral_domain.tdim)
-        else:
-            self.f = f
+            self.f = mf(self.f, reference.get_map_to_self(),
+                        reference.get_inverse_map_to_self(),
+                        reference.tdim, substitute=False)
+            self.f *= reference.default_reference().volume() / reference.volume()
 
     def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply to the functional to a function.
@@ -1283,7 +1271,6 @@ class IntegralMoment(BaseFunctional):
         return desc, [entity_def]
 
     name = "Integral moment"
-    default_mapping = "identity"
 
 
 class VecIntegralMoment(IntegralMoment):
@@ -1346,7 +1333,6 @@ class VecIntegralMoment(IntegralMoment):
         return desc, [entity_def]
 
     name = "Vector integral moment"
-    default_mapping = "identity"
 
 
 class DerivativeIntegralMoment(IntegralMoment):
@@ -1410,7 +1396,6 @@ class DerivativeIntegralMoment(IntegralMoment):
         return value
 
     name = "Derivative integral moment"
-    default_mapping = "identity"
 
 
 class DivergenceIntegralMoment(IntegralMoment):
@@ -1466,7 +1451,6 @@ class DivergenceIntegralMoment(IntegralMoment):
         return desc, [entity_def]
 
     name = "Integral moment of divergence"
-    default_mapping = "identity"
 
 
 class TangentIntegralMoment(VecIntegralMoment):
@@ -1511,7 +1495,6 @@ class TangentIntegralMoment(VecIntegralMoment):
         ]
 
     name = "Tangential integral moment"
-    default_mapping = "covariant"
 
 
 class NormalIntegralMoment(VecIntegralMoment):
@@ -1556,7 +1539,6 @@ class NormalIntegralMoment(VecIntegralMoment):
         ]
 
     name = "Normal integral moment"
-    default_mapping = "contravariant"
 
 
 class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
@@ -1601,7 +1583,6 @@ class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
         ]
 
     name = "Normal derivative integral moment"
-    default_mapping = "identity"
 
 
 class InnerProductIntegralMoment(IntegralMoment):
@@ -1677,7 +1658,6 @@ class InnerProductIntegralMoment(IntegralMoment):
         return desc, [entity_def]
 
     name = "Inner product integral moment"
-    default_mapping = "identity"
 
 
 class NormalInnerProductIntegralMoment(InnerProductIntegralMoment):
@@ -1724,7 +1704,6 @@ class NormalInnerProductIntegralMoment(InnerProductIntegralMoment):
         ]
 
     name = "Normal inner product integral moment"
-    default_mapping = "double_contravariant"
 
 
 # Types

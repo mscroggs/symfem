@@ -95,13 +95,13 @@ class Transition(CiarletElement):
                     used = []
                     for p in ref_entity.vertices[1:]:
                         i = 0
-                        while p[i] == origin[i] or i in used:
+                        while p[i] == origin[i] or origin[i] == 1 or i in used:
                             i += 1
                         used.append(i)
                         variables.append(origin[i] + (p[i] - origin[i]) * x[i])
                     poly += [f.subs(x, variables) * bubble for f in space.get_basis_functions()]
 
-        if reference.vertices != reference.reference_vertices:
+        if reference != reference.default_reference():
             invmap = reference.get_inverse_map_to_self()
             poly = [f.subs(x, invmap) for f in poly]
 

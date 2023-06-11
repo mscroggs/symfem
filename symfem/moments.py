@@ -4,7 +4,6 @@ import typing
 
 from .functionals import BaseFunctional
 from .references import Reference
-from . import mappings
 
 MomentType = typing.Tuple[typing.Type, typing.Type, int, typing.Union[str, None],
                           typing.Dict[str, typing.Any]]
