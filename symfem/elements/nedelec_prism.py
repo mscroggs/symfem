@@ -79,4 +79,4 @@ class Nedelec(CiarletElement):
     min_order = 1
     max_order = 2
     continuity = "H(curl)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

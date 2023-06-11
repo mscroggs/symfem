@@ -53,4 +53,4 @@ class RaviartThomas(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 1
     continuity = "H(div)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

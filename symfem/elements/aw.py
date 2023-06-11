@@ -160,4 +160,4 @@ class NonConformingArnoldWinther(CiarletElement):
     min_order = 2
     max_order = 2
     continuity = "integral inner H(div)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

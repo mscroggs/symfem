@@ -162,7 +162,7 @@ class VectorQ(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "C0"
-    last_updated = "2023.05"
+    last_updated = "2023.06"
 
 
 class Nedelec(CiarletElement):
@@ -202,7 +202,7 @@ class Nedelec(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(curl)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"
 
 
 class RaviartThomas(CiarletElement):
@@ -241,4 +241,4 @@ class RaviartThomas(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(div)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

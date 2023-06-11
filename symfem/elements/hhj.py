@@ -59,4 +59,4 @@ class HellanHerrmannJohnson(CiarletElement):
     references = ["triangle"]
     min_order = 0
     continuity = "inner H(div)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

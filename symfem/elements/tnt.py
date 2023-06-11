@@ -124,7 +124,7 @@ class TNT(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "C0"
-    last_updated = "2023.05"
+    last_updated = "2023.06"
 
 
 class TNTcurl(CiarletElement):
@@ -242,7 +242,7 @@ class TNTcurl(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(curl)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"
 
 
 class TNTdiv(CiarletElement):
@@ -353,4 +353,4 @@ class TNTdiv(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(div)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

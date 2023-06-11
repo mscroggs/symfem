@@ -57,7 +57,7 @@ class Serendipity(CiarletElement):
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "C0"
-    last_updated = "2023.05"
+    last_updated = "2023.06"
 
 
 class SerendipityCurl(CiarletElement):
@@ -99,7 +99,7 @@ class SerendipityCurl(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(curl)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"
 
 
 class SerendipityDiv(CiarletElement):
@@ -139,4 +139,4 @@ class SerendipityDiv(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(div)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"
