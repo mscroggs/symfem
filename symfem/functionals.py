@@ -1164,7 +1164,7 @@ class IntegralMoment(BaseFunctional):
         # Map from default reference to reference
         if reference != reference.default_reference():
             if mapping is None or not hasattr(mappings, f"{mapping}_inverse_transpose"):
-                raise ValueError(
+                raise NotImplementedError(
                     "Cannot create this element on a non-default reference.")
             mf = getattr(mappings, f"{mapping}_inverse_transpose")
             self.f = mf(self.f, reference.get_map_to_self(),
