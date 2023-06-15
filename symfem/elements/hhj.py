@@ -27,7 +27,7 @@ class HellanHerrmannJohnson(CiarletElement):
             variant: The variant of the element
         """
         if reference.vertices != reference.reference_vertices:
-            raise NotImplementedError()
+            raise NotImplementedError("Cannot create this element on a non-default reference")
         assert reference.name == "triangle"
 
         poly: typing.List[FunctionInput] = []

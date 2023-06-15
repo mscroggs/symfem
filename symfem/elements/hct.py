@@ -66,6 +66,10 @@ class HsiehCloughTocher(CiarletElement):
             PiecewiseFunction({i: j for i, j in zip(subs, p)}, 2)
             for p in piece_list]
 
+        if reference != reference.default_reference():
+            invmap = reference.get_inverse_map_to_self()
+            poly = [f.subs(x, invmap) for f in poly]
+
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1
         )
@@ -76,4 +80,4 @@ class HsiehCloughTocher(CiarletElement):
     max_order = 3
     # continuity = "C1"
     continuity = "C0"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

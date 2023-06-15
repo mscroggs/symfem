@@ -24,7 +24,7 @@ class Morley(CiarletElement):
             order: The polynomial order
         """
         if reference.vertices != reference.reference_vertices:
-            raise NotImplementedError()
+            raise NotImplementedError("Cannot create this element on a non-default reference")
         assert order == 2
         assert reference.name == "triangle"
         dofs: ListOfFunctionals = []
