@@ -11,7 +11,7 @@ import sympy
 
 from ..finite_element import CiarletElement
 from ..functionals import (InnerProductIntegralMoment, IntegralMoment, ListOfFunctionals,
-                           PointInnerProduct, VecIntegralMoment)
+                           PointInnerProduct, IntegralMoment)
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_vector
 from ..references import Reference
@@ -68,7 +68,7 @@ class ArnoldWinther(CiarletElement):
         for dof_n, dof in enumerate(sub_e.dofs):
             p = sub_e.get_basis_function(dof_n).get_function()
             for component22 in [((1, 0), (0, 0)), ((0, 1), (0, 0)), ((0, 0), (0, 1))]:
-                dofs.append(VecIntegralMoment(
+                dofs.append(IntegralMoment(
                     reference, reference, p, component22, dof, entity=(2, 0)))
 
         if order >= 4:
@@ -141,7 +141,7 @@ class NonConformingArnoldWinther(CiarletElement):
         for dof_n, dof in enumerate(sub_e.dofs):
             p = sub_e.get_basis_function(dof_n).get_function()
             for component22 in [((1, 0), (0, 0)), ((0, 1), (0, 0)), ((0, 0), (0, 1))]:
-                dofs.append(VecIntegralMoment(
+                dofs.append(IntegralMoment(
                     reference, reference, p, component22, dof, entity=(2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,

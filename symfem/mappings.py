@@ -234,6 +234,9 @@ def covariant_inverse_transpose(
         return f * jdet
 
     assert f.is_vector
+    # if not f.is_vector:
+    #    jdet = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map]).det()
+    #    return f * jdet
 
     jacobian = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
     return jacobian @ f
@@ -260,6 +263,9 @@ def contravariant_inverse_transpose(
 
     if tdim == 1:
         return f
+
+    # if not f.is_vector:
+    #    return f
 
     assert f.is_vector
 

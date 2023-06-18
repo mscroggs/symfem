@@ -1129,7 +1129,7 @@ class IntegralMoment(BaseFunctional):
 
     def __init__(self, reference: Reference, integral_domain: Reference,
                  f_in: FunctionInput, dof: BaseFunctional, entity: typing.Tuple[int, int],
-                 mapping: typing.Union[str, None] = "identity"):
+                 mapping: typing.Union[str, None] = "identity", map_function: bool = True):
         """Create the functional.
 
         Args:
@@ -1139,30 +1139,32 @@ class IntegralMoment(BaseFunctional):
             dof: The DOF in a moment space that the function is associated with
             entity: The entity the functional is associated with
             mapping: The type of mappping from the reference cell to a physical cell
+            map_function: Should the function be mapped?
         """
         super().__init__(reference, entity, mapping)
         self.integral_domain = integral_domain
         self.dof = dof
 
+        id_def = reference.default_reference().sub_entity(*entity)
+
         f = parse_function_input(f_in)
         self.f = f.subs(x, t)
 
         # Map from reference entity to entity
-        if integral_domain.default_reference() != integral_domain:
-            if self.f.is_vector:
-                assert len(self.f) == self.integral_domain.tdim
+        if map_function and id_def.default_reference() != id_def:
+            if self.f.is_vector and len(self.f) != reference.gdim:
                 self.f = mappings.contravariant(
-                    self.f, integral_domain.get_map_to_self(),
-                    integral_domain.get_inverse_map_to_self(), integral_domain.tdim)
+                    self.f, id_def.get_map_to_self(),
+                    id_def.get_inverse_map_to_self(), id_def.tdim)
             elif self.f.is_matrix:
-                assert self.f.shape[0] == self.integral_domain.tdim
-                assert self.f.shape[1] == self.integral_domain.tdim
+                assert self.f.shape[0] == self.id_def.tdim
+                assert self.f.shape[1] == self.id_def.tdim
                 self.f = mappings.double_contravariant(
-                    self.f, integral_domain.get_map_to_self(),
-                    integral_domain.get_inverse_map_to_self(), integral_domain.tdim)
+                    self.f, id_def.get_map_to_self(),
+                    id_def.get_inverse_map_to_self(), id_def.tdim)
 
         # Map from default reference to reference
-        if reference != reference.default_reference():
+        if map_function and reference != reference.default_reference():
             if mapping is None or not hasattr(mappings, f"{mapping}_inverse_transpose"):
                 raise NotImplementedError(
                     "Cannot create this element on a non-default reference.")
@@ -1221,6 +1223,10 @@ class IntegralMoment(BaseFunctional):
         """
         p = self.dof.dof_direction()
         if p is None:
+            if self.f.is_vector:
+                out = (self.f / self.f.norm()).as_sympy()
+                assert isinstance(out, tuple)
+                return out
             return None
         vp = VectorFunction(p)
         out = []
@@ -1271,68 +1277,6 @@ class IntegralMoment(BaseFunctional):
         return desc, [entity_def]
 
     name = "Integral moment"
-
-
-class VecIntegralMoment(IntegralMoment):
-    """An integral moment applied to a component of a vector."""
-
-    def __init__(self, reference: Reference, integral_domain: Reference, f_in: FunctionInput,
-                 dot_with_in: FunctionInput, dof: BaseFunctional, entity: typing.Tuple[int, int],
-                 mapping: typing.Union[str, None] = "identity"):
-        """Create the functional.
-
-        Args:
-            reference: The reference cell
-            integral_domain: The domain of the integral
-            f_in: The function to multiply with
-            dot_with_in: The vector to take the dot product with
-            dof: The DOF in a moment space that the function is associated with
-            entity: The entity the functional is associated with
-            mapping: The type of mappping from the reference cell to a physical cell
-        """
-        f = parse_function_input(f_in)
-        super().__init__(reference, integral_domain, f, dof, entity=entity, mapping=mapping)
-        self.dot_with = parse_function_input(dot_with_in)
-
-    def dot(self, function: AnyFunction) -> ScalarFunction:
-        """Dot a function with the moment function.
-
-        Args:
-            function: The function
-
-        Returns:
-            The product of the function and the moment function
-        """
-        return function.dot(self.dot_with) * self.f
-
-    def dof_direction(self) -> typing.Union[PointType, None]:
-        """Get the direction of the DOF.
-
-        Returns:
-            The direction
-        """
-        dw = self.dot_with.as_sympy()
-        if isinstance(dw, tuple):
-            return dw
-        return None
-
-    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
-        """Get a representation of the functional as TeX, and list of terms involved.
-
-        Returns:
-            Representation of the functional as TeX, and list of terms involved
-        """
-        entity = self.entity_tex()
-        entity_def = self.entity_definition()
-        desc = "\\boldsymbol{v}\\mapsto"
-        desc += f"\\displaystyle\\int_{{{entity}}}"
-        if self.f != 1:
-            desc += "(" + _to_tex(self.f, True) + ")"
-        desc += "\\boldsymbol{v}\\cdot"
-        desc += _to_tex(self.dot_with)
-        return desc, [entity_def]
-
-    name = "Vector integral moment"
 
 
 class DerivativeIntegralMoment(IntegralMoment):
@@ -1453,7 +1397,7 @@ class DivergenceIntegralMoment(IntegralMoment):
     name = "Integral moment of divergence"
 
 
-class TangentIntegralMoment(VecIntegralMoment):
+class TangentIntegralMoment(IntegralMoment):
     """An integral moment in the tangential direction."""
 
     def __init__(self, reference: Reference, integral_domain: Reference, f_in: FunctionInput,
@@ -1471,8 +1415,9 @@ class TangentIntegralMoment(VecIntegralMoment):
         """
         f = parse_function_input(f_in)
         assert f.is_scalar
-        super().__init__(reference, integral_domain, f, integral_domain.tangent(), dof,
-                         entity=entity, mapping=mapping)
+        super().__init__(
+            reference, integral_domain, tuple(f * i for i in integral_domain.tangent()), dof,
+            entity=entity, mapping=mapping)
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved.
@@ -1497,7 +1442,7 @@ class TangentIntegralMoment(VecIntegralMoment):
     name = "Tangential integral moment"
 
 
-class NormalIntegralMoment(VecIntegralMoment):
+class NormalIntegralMoment(IntegralMoment):
     """An integral moment in the normal direction."""
 
     def __init__(self, reference: Reference, integral_domain: Reference, f_in: FunctionInput,
@@ -1515,8 +1460,9 @@ class NormalIntegralMoment(VecIntegralMoment):
         """
         f = parse_function_input(f_in)
         assert f.is_scalar
-        super().__init__(reference, integral_domain, f, integral_domain.normal(), dof,
-                         entity=entity, mapping=mapping)
+        super().__init__(
+            reference, integral_domain, tuple(f * i for i in integral_domain.normal()), dof,
+            entity=entity, mapping=mapping, map_function=False)
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved.
