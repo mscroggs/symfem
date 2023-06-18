@@ -1224,9 +1224,9 @@ class IntegralMoment(BaseFunctional):
         p = self.dof.dof_direction()
         if p is None:
             if self.f.is_vector:
-                out = (self.f / self.f.norm()).as_sympy()
-                assert isinstance(out, tuple)
-                return out
+                p = (self.f.subs(t, self.dof_point())).as_sympy()
+                assert isinstance(p, tuple)
+                return p
             return None
         vp = VectorFunction(p)
         out = []
@@ -1419,6 +1419,14 @@ class TangentIntegralMoment(IntegralMoment):
             reference, integral_domain, tuple(f * i for i in integral_domain.tangent()), dof,
             entity=entity, mapping=mapping)
 
+    def dof_direction(self) -> typing.Union[PointType, None]:
+        """Get the direction of the DOF.
+
+        Returns:
+            The direction
+        """
+        return self.integral_domain.tangent()
+
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved.
 
@@ -1463,6 +1471,14 @@ class NormalIntegralMoment(IntegralMoment):
         super().__init__(
             reference, integral_domain, tuple(f * i for i in integral_domain.normal()), dof,
             entity=entity, mapping=mapping, map_function=False)
+
+    def dof_direction(self) -> typing.Union[PointType, None]:
+        """Get the direction of the DOF.
+
+        Returns:
+            The direction
+        """
+        return self.integral_domain.normal()
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved.
