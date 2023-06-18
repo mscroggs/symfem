@@ -69,7 +69,8 @@ class ArnoldWinther(CiarletElement):
             p = sub_e.get_basis_function(dof_n).get_function()
             for component22 in [((1, 0), (0, 0)), ((0, 1), (0, 0)), ((0, 0), (0, 1))]:
                 dofs.append(IntegralMoment(
-                    reference, reference, p, component22, dof, entity=(2, 0)))
+                    reference, reference, tuple(tuple(p * j for j in i) for i in component22),
+                    dof, entity=(2, 0)))
 
         if order >= 4:
             sub_e = Lagrange(reference, order - 4, variant)
@@ -142,7 +143,8 @@ class NonConformingArnoldWinther(CiarletElement):
             p = sub_e.get_basis_function(dof_n).get_function()
             for component22 in [((1, 0), (0, 0)), ((0, 1), (0, 0)), ((0, 0), (0, 1))]:
                 dofs.append(IntegralMoment(
-                    reference, reference, p, component22, dof, entity=(2, 0)))
+                    reference, reference, tuple(tuple(p * j for j in i) for i in component22),
+                    dof, entity=(2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))

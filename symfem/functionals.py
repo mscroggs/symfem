@@ -1157,8 +1157,8 @@ class IntegralMoment(BaseFunctional):
                     self.f, id_def.get_map_to_self(),
                     id_def.get_inverse_map_to_self(), id_def.tdim)
             elif self.f.is_matrix:
-                assert self.f.shape[0] == self.id_def.tdim
-                assert self.f.shape[1] == self.id_def.tdim
+                assert self.f.shape[0] == id_def.tdim
+                assert self.f.shape[1] == id_def.tdim
                 self.f = mappings.double_contravariant(
                     self.f, id_def.get_map_to_self(),
                     id_def.get_inverse_map_to_self(), id_def.tdim)
