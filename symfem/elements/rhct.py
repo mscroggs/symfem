@@ -65,7 +65,9 @@ class ReducedHsiehCloughTocher(CiarletElement):
 
         if reference != reference.default_reference():
             invmap = reference.get_inverse_map_to_self()
-            poly = [f.subs(x, invmap) for f in poly]
+            for i, p in enumerate(poly):
+                assert isinstance(p, ScalarFunction)
+                poly[i] = p.subs(x, invmap)
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1

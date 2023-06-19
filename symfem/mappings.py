@@ -78,8 +78,9 @@ def covariant(
     assert f.is_vector
 
     j_inv = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
-    return j_inv @ f
-
+    out = j_inv @ f
+    assert isinstance(out, VectorFunction)
+    return out
 
 def contravariant(
     f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
@@ -100,14 +101,13 @@ def contravariant(
     if substitute:
         f = f.subs(x, inverse_map)
 
-    if tdim == 1:
-        return f
-
     assert f.is_vector
 
     jacobian = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
     jacobian /= jacobian.det()
-    return jacobian @ f
+    out = jacobian @ f
+    assert isinstance(out, VectorFunction)
+    return out
 
 
 def double_covariant(
@@ -221,18 +221,13 @@ def covariant_inverse_transpose(
     f = parse_function_input(f_in)
     if substitute:
         f = f.subs(x, inverse_map)
-    if tdim == 1:
-        jdet = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map]).det()
-        return f * jdet
 
     assert f.is_vector
-    # if not f.is_vector:
-    #    jdet = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map]).det()
-    #    return f * jdet
 
     jacobian = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
-    return jacobian @ f
-
+    out = jacobian @ f
+    assert isinstance(out, VectorFunction)
+    return out
 
 def contravariant_inverse_transpose(
     f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
@@ -257,4 +252,6 @@ def contravariant_inverse_transpose(
 
     j_inv = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
     j_inv /= j_inv.det()
-    return j_inv @ f
+    out = j_inv @ f
+    assert isinstance(out, VectorFunction)
+    return out

@@ -352,7 +352,10 @@ class BasisFunction(AnyFunction):
 
     def __iter__(self) -> typing.Iterator[AnyFunction]:
         """Iterate through components of vector function."""
-        return self.get_function().__iter__()
+        f = self.get_function()
+        if not hasattr(f, "__iter__"):
+            raise TypeError(f"'{self.__class__.__name__}' object is not iterable")
+        return f.__iter__()
 
 
 class SubbedBasisFunction(BasisFunction):

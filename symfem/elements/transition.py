@@ -7,7 +7,7 @@ import sympy
 
 from ..finite_element import CiarletElement
 from ..functionals import ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput
+from ..functions import FunctionInput, ScalarFunction
 from ..polynomials import polynomial_set_1d
 from ..quadrature import get_quadrature
 from ..references import Reference
@@ -99,11 +99,15 @@ class Transition(CiarletElement):
                             i += 1
                         used.append(i)
                         variables.append(origin[i] + (p[i] - origin[i]) * x[i])
-                    poly += [f.subs(x, variables) * bubble for f in space.get_basis_functions()]
+                    for f in space.get_basis_functions():
+                        assert isinstance(f, ScalarFunction)
+                        poly.append(f.subs(x, variables) * bubble)
 
         if reference != reference.default_reference():
             invmap = reference.get_inverse_map_to_self()
-            poly = [f.subs(x, invmap) for f in poly]
+            for i, p in enumerate(poly):
+                assert isinstance(p, ScalarFunction)
+                poly[i] = p.subs(x, invmap)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant

@@ -689,9 +689,9 @@ class CiarletElement(FiniteElement):
 
             return functions
         except MappingNotImplemented:
-            e = self.__class__(self.reference.__class__(vertices=vertices), self.order,
-                               **self.init_kwargs())
-            return e.get_basis_functions()
+            element = self.__class__(
+                self.reference.__class__(vertices=vertices), self.order, **self.init_kwargs())
+            return element.get_basis_functions()
 
     def test(self):
         """Run tests for this element."""
