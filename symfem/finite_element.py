@@ -420,9 +420,6 @@ class FiniteElement(ABC):
                 else:
                     raise ValueError(f"Unknown continuity: {continuity}")
 
-                print(f)
-                print(g)
-                print()
                 assert allequal(f, g)
 
     def get_tensor_factorisation(

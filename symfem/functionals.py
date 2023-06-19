@@ -1151,7 +1151,7 @@ class IntegralMoment(BaseFunctional):
         self.f = f.subs(x, t)
 
         # Map from reference entity to entity
-        if map_function and id_def.default_reference() != id_def:
+        if id_def.default_reference() != id_def:
             if self.f.is_vector and len(self.f) != reference.gdim:
                 self.f = mappings.contravariant(
                     self.f, id_def.get_map_to_self(),
@@ -1171,7 +1171,7 @@ class IntegralMoment(BaseFunctional):
             self.f = mf(self.f, reference.get_map_to_self(),
                         reference.get_inverse_map_to_self(),
                         reference.tdim, substitute=False)
-            self.f *= reference.default_reference().volume() / reference.volume()
+            self.f *= id_def.volume() / self.integral_domain.volume()
 
     def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
         """Apply to the functional to a function.
@@ -1416,7 +1416,7 @@ class TangentIntegralMoment(IntegralMoment):
         assert f.is_scalar
         super().__init__(
             reference, integral_domain, tuple(f * i for i in integral_domain.tangent()), dof,
-            entity=entity, mapping=mapping)
+            entity=entity, mapping=mapping, map_function=False)
 
     def dof_direction(self) -> typing.Union[PointType, None]:
         """Get the direction of the DOF.
