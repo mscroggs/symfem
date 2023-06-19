@@ -82,6 +82,7 @@ def covariant(
     assert isinstance(out, VectorFunction)
     return out
 
+
 def contravariant(
     f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
     substitute: bool = True
@@ -228,6 +229,7 @@ def covariant_inverse_transpose(
     out = jacobian @ f
     assert isinstance(out, VectorFunction)
     return out
+
 
 def contravariant_inverse_transpose(
     f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
