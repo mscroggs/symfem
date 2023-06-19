@@ -11,7 +11,7 @@ from ..functionals import IntegralMoment, ListOfFunctionals, NormalInnerProductI
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from .lagrange import Lagrange, SymmetricMatrixLagrange
 
 
@@ -27,7 +27,7 @@ class HellanHerrmannJohnson(CiarletElement):
             variant: The variant of the element
         """
         if reference.vertices != reference.reference_vertices:
-            raise NotImplementedError("Cannot create this element on a non-default reference")
+            raise NonDefaultReferenceError()
         assert reference.name == "triangle"
 
         poly: typing.List[FunctionInput] = []

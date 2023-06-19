@@ -18,7 +18,7 @@ from .geometry import PointType, SetOfPointsInput, parse_set_of_points_input
 from .mappings import MappingNotImplemented
 from .piecewise_functions import PiecewiseFunction
 from .plotting import Picture, colors
-from .references import Reference
+from .references import NonDefaultReferenceError, Reference
 from .symbols import x
 from .utils import allequal
 from .version import version
@@ -342,7 +342,7 @@ class FiniteElement(ABC):
                 basis = self.get_basis_functions()
                 try:
                     basis2 = self.map_to_cell(vertices)
-                except MappingNotImplemented:
+                except (MappingNotImplemented, NonDefaultReferenceError):
                     return "Mapping not implemented for this element."
 
                 f = basis[fi]

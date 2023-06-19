@@ -1,6 +1,7 @@
 import pytest
 
 import symfem
+from symfem.references import NonDefaultReferenceError
 from symfem.utils import allequal
 
 from .utils import test_elements
@@ -44,7 +45,10 @@ def test_push_forward(
     else:
         raise ValueError(f"Unsupported cell type: {cell_type}")
 
+    try:
+        e2 = symfem.create_element(cell_type, element_type, order, vertices=vertices, **kwargs)
+    except NonDefaultReferenceError:
+        pytest.xfail("Cannot create element on non-default reference.")
     e = symfem.create_element(cell_type, element_type, order, **kwargs)
-    e2 = symfem.create_element(cell_type, element_type, order, vertices=vertices, **kwargs)
 
     assert allequal(e.map_to_cell(vertices), e2.get_basis_functions())

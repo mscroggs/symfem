@@ -11,7 +11,7 @@ from ..functionals import (IntegralAgainst, IntegralOfDirectionalMultiderivative
                            PointEvaluation)
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 
 
 class MorleyWangXu(CiarletElement):
@@ -25,6 +25,9 @@ class MorleyWangXu(CiarletElement):
             order: The polynomial order
         """
         assert order <= reference.tdim
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
 
@@ -85,6 +88,5 @@ class MorleyWangXu(CiarletElement):
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 1
     max_order = {"interval": 1, "triangle": 2, "tetrahedron": 3}
-    # continuity = "C{order}"
-    continuity = "C0"
-    last_updated = "2023.05"
+    continuity = "C{order}"
+    last_updated = "2023.06"

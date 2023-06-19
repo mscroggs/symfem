@@ -11,7 +11,7 @@ from ..functionals import (DerivativePointEvaluation, IntegralOfDirectionalMulti
                            ListOfFunctionals, PointEvaluation)
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 
 
@@ -45,6 +45,9 @@ class WuXu(CiarletElement):
             order: The polynomial order
         """
         assert order == reference.tdim + 1
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
 

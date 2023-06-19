@@ -10,7 +10,7 @@ from .functions import (AnyFunction, FunctionInput, ScalarFunction, VectorFuncti
                         parse_function_input)
 from .geometry import PointType, SetOfPoints
 from .piecewise_functions import PiecewiseFunction
-from .references import Interval, Reference
+from .references import Interval, NonDefaultReferenceError, Reference
 from .symbols import t, x
 
 ScalarValueOrFloat = typing.Union[sympy.core.expr.Expr, float]
@@ -1166,8 +1166,7 @@ class IntegralMoment(BaseFunctional):
         # Map from default reference to reference
         if map_function and reference != reference.default_reference():
             if mapping is None or not hasattr(mappings, f"{mapping}_inverse_transpose"):
-                raise NotImplementedError(
-                    "Cannot create this element on a non-default reference.")
+                raise NonDefaultReferenceError()
             mf = getattr(mappings, f"{mapping}_inverse_transpose")
             self.f = mf(self.f, reference.get_map_to_self(),
                         reference.get_inverse_map_to_self(),

@@ -10,7 +10,7 @@ from ..finite_element import CiarletElement
 from ..functionals import ListOfFunctionals, PointEvaluation, PointNormalDerivativeEvaluation
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 
 
 class Morley(CiarletElement):
@@ -24,7 +24,7 @@ class Morley(CiarletElement):
             order: The polynomial order
         """
         if reference.vertices != reference.reference_vertices:
-            raise NotImplementedError("Cannot create this element on a non-default reference")
+            raise NonDefaultReferenceError()
         assert order == 2
         assert reference.name == "triangle"
         dofs: ListOfFunctionals = []

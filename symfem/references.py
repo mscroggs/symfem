@@ -17,6 +17,11 @@ IntLimits = typing.List[typing.Union[
     typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr]]]
 
 
+class NonDefaultReferenceError(NotImplementedError):
+    def __init__(self):
+        super().__init__("Cannot create this element on a non-default reference")
+
+
 def _which_side(vs: SetOfPoints, p: PointType, q: PointType) -> typing.Optional[int]:
     """Check which side of a line or plane a set of points are.
 
