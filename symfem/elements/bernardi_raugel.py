@@ -14,7 +14,7 @@ from ..functionals import (DivergenceIntegralMoment, DotPointEvaluation, ListOfF
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 from .lagrange import Lagrange
 
@@ -30,6 +30,9 @@ class BernardiRaugel(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
 

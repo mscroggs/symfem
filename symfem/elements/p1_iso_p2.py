@@ -13,7 +13,7 @@ from ..functionals import ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..geometry import SetOfPoints
 from ..piecewise_functions import PiecewiseFunction
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x as x_variables
 
 
@@ -27,6 +27,9 @@ class P1IsoP2Tri(CiarletElement):
             reference: The reference element
             order: The polynomial order
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         half = sympy.Rational(1, 2)
         zero = sympy.Integer(0)
         one = sympy.Integer(1)
@@ -48,11 +51,13 @@ class P1IsoP2Tri(CiarletElement):
             {0: 2 * y, 2: 2 * c, 3: 1 - 2 * x},
             {1: 2 * y, 2: 2 * x, 3: 1 - 2 * c},
         ]:
-            poly.append(PiecewiseFunction(
-                {q: pieces[i] if i in pieces else 0 for i, q in enumerate(tris)}, 2))
+            poly.append(PiecewiseFunction({
+                tuple(reference.get_point(pt) for pt in q): pieces[i] if i in pieces else 0
+                for i, q in enumerate(tris)
+            }, 2))
 
         dofs: ListOfFunctionals = []
-        for v_n, v in enumerate(reference.reference_vertices):
+        for v_n, v in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
         for e_n in range(3):
             entity = reference.sub_entity(1, e_n)
@@ -80,6 +85,9 @@ class P1IsoP2Quad(CiarletElement):
             reference: The reference element
             order: The polynomial order
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         half = sympy.Rational(1, 2)
         zero = sympy.Integer(0)
         one = sympy.Integer(1)

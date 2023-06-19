@@ -18,7 +18,10 @@ IntLimits = typing.List[typing.Union[
 
 
 class NonDefaultReferenceError(NotImplementedError):
+    """Exception to be thrown when an element can only be created on the default reference."""
+
     def __init__(self):
+        """Initialise the exception."""
         super().__init__("Cannot create this element on a non-default reference")
 
 
@@ -203,8 +206,10 @@ class Reference(ABC):
         """
         return self.vertices
 
-    def __eq__(self, other: Reference) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Check if two references are equal."""
+        if not isinstance(other, Reference):
+            return False
         return type(self) == type(other) and self.vertices == other.vertices
 
     def __hash__(self) -> int:

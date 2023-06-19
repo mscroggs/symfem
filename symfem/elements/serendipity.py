@@ -13,7 +13,7 @@ from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import (Hcurl_serendipity, Hdiv_serendipity, polynomial_set_1d,
                            polynomial_set_vector, serendipity_set_1d)
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from .dpc import DPC, VectorDPC
 
 
@@ -28,6 +28,9 @@ class Serendipity(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
         poly += serendipity_set_1d(reference.tdim, order)
@@ -71,6 +74,9 @@ class SerendipityCurl(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
         poly += Hcurl_serendipity(reference.tdim, reference.tdim, order)
@@ -113,6 +119,9 @@ class SerendipityDiv(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
         poly += Hdiv_serendipity(reference.tdim, reference.tdim, order)

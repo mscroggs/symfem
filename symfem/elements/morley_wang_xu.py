@@ -25,7 +25,6 @@ class MorleyWangXu(CiarletElement):
             order: The polynomial order
         """
         assert order <= reference.tdim
-        print(reference.vertices)
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 

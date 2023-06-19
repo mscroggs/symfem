@@ -9,7 +9,7 @@ import typing
 from ..finite_element import CiarletElement, EnrichedElement
 from ..functionals import BaseFunctional, IntegralAgainst
 from ..functions import FunctionInput, VectorFunction
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 from .lagrange import VectorLagrange
 from .q import VectorQ
@@ -24,6 +24,8 @@ class Enrichment(CiarletElement):
         Args:
             reference: The reference element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
         f = VectorFunction(tuple(x[i] - j for i, j in enumerate(reference.midpoint())))
         poly: typing.List[FunctionInput] = [f]
         size = f.dot(f).integral(reference, x)

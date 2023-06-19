@@ -14,7 +14,7 @@ from ..functions import FunctionInput, VectorFunction
 from ..geometry import SetOfPoints, SetOfPointsInput
 from ..moments import make_integral_moment_dofs
 from ..piecewise_functions import PiecewiseFunction
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from .bernardi_raugel import BernardiRaugel
 from .lagrange import Lagrange, VectorLagrange
 
@@ -29,6 +29,9 @@ class GuzmanNeilan(CiarletElement):
             reference: The reference element
             order: The polynomial order
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         if reference.name == "triangle":
             poly = self._make_polyset_triangle(reference, order)
         else:

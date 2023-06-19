@@ -13,7 +13,7 @@ from ..moments import make_integral_moment_dofs
 from ..polynomials import (Hcurl_quolynomials, Hdiv_quolynomials, quolynomial_set_1d,
                            quolynomial_set_vector)
 from ..quadrature import get_quadrature
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 
 
@@ -128,6 +128,9 @@ class VectorQ(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         scalar_space = Q(reference, order, variant)
         dofs: ListOfFunctionals = []
         poly: typing.List[FunctionInput] = []
@@ -176,6 +179,9 @@ class Nedelec(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_vector(reference.tdim, reference.tdim, order - 1)
         poly += Hcurl_quolynomials(reference.tdim, reference.tdim, order)
@@ -216,6 +222,9 @@ class RaviartThomas(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_vector(reference.tdim, reference.tdim, order - 1)
         poly += Hdiv_quolynomials(reference.tdim, reference.tdim, order)

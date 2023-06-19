@@ -11,7 +11,7 @@ from ..functionals import IntegralMoment, ListOfFunctionals, NormalIntegralMomen
 from ..functions import FunctionInput, VectorFunction
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 from .dpc import DPC, VectorDPC
 
@@ -26,8 +26,9 @@ def bddf_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]
     Returns:
         The polynomial basis
     """
-    dim = reference.tdim
     assert reference.name == "hexahedron"
+
+    dim = reference.tdim
     pset: typing.List[FunctionInput] = []
     pset += polynomial_set_vector(dim, dim, order)
     pset.append(VectorFunction((0, 0, x[0] ** (order + 1) * x[1])).curl())
@@ -52,6 +53,9 @@ class BDDF(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly = bddf_polyset(reference, order)
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(

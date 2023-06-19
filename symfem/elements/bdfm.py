@@ -11,7 +11,7 @@ from ..functionals import IntegralMoment, ListOfFunctionals, NormalIntegralMomen
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 from .dpc import DPC, VectorDPC
 from .lagrange import Lagrange, VectorLagrange
@@ -65,6 +65,9 @@ class BDFM(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly = bdfm_polyset(reference, order)
 
         dofs: ListOfFunctionals = []

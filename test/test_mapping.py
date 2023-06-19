@@ -1,6 +1,7 @@
 import pytest
 
 import symfem
+from symfem.mappings import MappingNotImplemented
 from symfem.references import NonDefaultReferenceError
 from symfem.utils import allequal
 
@@ -51,4 +52,7 @@ def test_push_forward(
         pytest.xfail("Cannot create element on non-default reference.")
     e = symfem.create_element(cell_type, element_type, order, **kwargs)
 
-    assert allequal(e.map_to_cell(vertices), e2.get_basis_functions())
+    try:
+        assert allequal(e.map_to_cell(vertices), e2.get_basis_functions())
+    except MappingNotImplemented:
+        pytest.xfail("Mapping not implemented for this element.")

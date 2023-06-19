@@ -13,7 +13,7 @@ from ..functionals import (DerivativePointEvaluation, ListOfFunctionals, PointEv
                            PointNormalDerivativeEvaluation)
 from ..functions import FunctionInput, ScalarFunction
 from ..piecewise_functions import PiecewiseFunction
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 
 
@@ -29,6 +29,9 @@ class HsiehCloughTocher(CiarletElement):
         """
         assert order == 3
         assert reference.name == "triangle"
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         dofs: ListOfFunctionals = []
         for v_n, vs in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))

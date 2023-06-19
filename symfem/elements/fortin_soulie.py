@@ -12,7 +12,7 @@ from ..finite_element import CiarletElement
 from ..functionals import ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 
 
 class FortinSoulie(CiarletElement):
@@ -26,8 +26,9 @@ class FortinSoulie(CiarletElement):
             order: The polynomial order
         """
         assert reference.name == "triangle"
-
         assert order == 2
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
 
         third = sympy.Rational(1, 3)
         two_thirds = sympy.Rational(2, 3)

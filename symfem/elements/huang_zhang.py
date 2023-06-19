@@ -11,7 +11,7 @@ from ..functionals import (IntegralAgainst, ListOfFunctionals, NormalIntegralMom
                            TangentIntegralMoment)
 from ..functions import FunctionInput, VectorFunction
 from ..moments import make_integral_moment_dofs
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 from .lagrange import Lagrange
 
@@ -28,6 +28,9 @@ class HuangZhang(CiarletElement):
             variant: The variant of the element
         """
         assert reference.name == "quadrilateral"
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         self.variant = variant
 
         dofs: ListOfFunctionals = []

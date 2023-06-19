@@ -12,7 +12,7 @@ from ..finite_element import FiniteElement
 from ..functions import AnyFunction, FunctionInput, VectorFunction
 from ..geometry import PointType, SetOfPoints, SetOfPointsInput
 from ..piecewise_functions import PiecewiseFunction
-from ..references import DualPolygon
+from ..references import NonDefaultReferenceError, DualPolygon
 
 
 class DualCiarletElement(FiniteElement):
@@ -41,6 +41,9 @@ class DualCiarletElement(FiniteElement):
             range_shape: the shape of the range
             dof_directions: The direction that each basis function is associated with
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         self.dual_coefficients = dual_coefficients
         self.fine_space = fine_space
         super().__init__(reference, order, len(dual_coefficients), domain_dim, range_dim,

@@ -11,7 +11,7 @@ from ..functionals import (IntegralMoment, IntegralOfDivergenceAgainst, ListOfFu
                            NormalIntegralMoment)
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 from .lagrange import Lagrange
 from .q import Nedelec
@@ -29,6 +29,9 @@ class ArnoldBoffiFalk(CiarletElement):
             variant: The variant of the element
         """
         assert reference.name == "quadrilateral"
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly: typing.List[FunctionInput] = []
         poly += [
             (x[0] ** i * x[1] ** j, 0)

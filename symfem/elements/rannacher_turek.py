@@ -9,7 +9,7 @@ import typing
 from ..finite_element import CiarletElement
 from ..functionals import ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 
 
@@ -24,6 +24,8 @@ class RannacherTurek(CiarletElement):
             order: The polynomial order
         """
         assert order == 1
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
 
         dofs: ListOfFunctionals = []
         for e_n, vs in enumerate(reference.sub_entities(reference.tdim - 1)):

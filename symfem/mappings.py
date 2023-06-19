@@ -9,7 +9,7 @@ from .symbols import x
 
 
 class MappingNotImplemented(NotImplementedError):
-    pass
+    """Exception thrown when a mapping is not implemented for an element."""
 
 
 def identity(
@@ -74,9 +74,6 @@ def covariant(
     f = parse_function_input(f_in)
     if substitute:
         f = f.subs(x, inverse_map)
-    if tdim == 1:
-        jdet = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map]).det()
-        return f / jdet
 
     assert f.is_vector
 
@@ -110,11 +107,6 @@ def contravariant(
 
     jacobian = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
     jacobian /= jacobian.det()
-    # print("contravariant")
-    # print(jacobian)
-    # print(f)
-    # print(jacobian @ f)
-    # print()
     return jacobian @ f
 
 
@@ -261,18 +253,8 @@ def contravariant_inverse_transpose(
     if substitute:
         f = f.subs(x, inverse_map)
 
-    if tdim == 1:
-        return f
-
-    # if not f.is_vector:
-    #    return f
-
     assert f.is_vector
 
     j_inv = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
-    # print("contravariant_inverse_transpose")
     j_inv /= j_inv.det()
-    # print(j_inv)
-    # print(f)
-    # print(j_inv @ f)
     return j_inv @ f
