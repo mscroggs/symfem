@@ -881,13 +881,15 @@ class IntegralAgainst(BaseFunctional):
         if f.is_vector:
             assert len(f) == self.integral_domain.tdim
             self.f = mappings.contravariant(
-                f, self.integral_domain.get_map_to_self(), self.integral_domain.get_inverse_map_to_self(),
+                f, self.integral_domain.get_map_to_self(),
+                self.integral_domain.get_inverse_map_to_self(),
                 self.integral_domain.tdim)
         elif f.is_matrix:
             assert f.shape[0] == self.integral_domain.tdim
             assert f.shape[1] == self.integral_domain.tdim
             self.f = mappings.double_contravariant(
-                f, self.integral_domain.get_map_to_self(), self.integral_domain.get_inverse_map_to_self(),
+                f, self.integral_domain.get_map_to_self(),
+                self.integral_domain.get_inverse_map_to_self(),
                 self.integral_domain.tdim)
         else:
             self.f = f

@@ -87,7 +87,6 @@ class TNT(CiarletElement):
         for i in range(1, order + 1):
             f = i * t[0] ** (i - 1)
             for edge_n in range(reference.sub_entity_count(1)):
-                edge = reference.sub_entity(1, edge_n)
                 dofs.append(IntegralAgainst(
                     reference, f, entity=(1, edge_n), mapping="identity"))
 
@@ -96,7 +95,6 @@ class TNT(CiarletElement):
                 f = t[0] ** i * (t[0] - 1) * t[1] ** j * (t[1] - 1)
                 delta_f = (f.diff(t[0]).diff(t[0]) + f.diff(t[1]).diff(t[1])).expand()
                 for face_n in range(reference.sub_entity_count(2)):
-                    face = reference.sub_entity(2, face_n)
                     dofs.append(IntegralAgainst(
                         reference, delta_f, entity=(2, face_n), mapping="identity"))
 
@@ -195,7 +193,6 @@ class TNTcurl(CiarletElement):
                     reference, f, entity=(2, 0), mapping="contravariant"))
         elif reference.tdim == 3:
             for face_n in range(6):
-                face = reference.sub_entity(2, face_n)
                 for f in face_moments:
                     dofs.append(IntegralAgainst(
                         reference, f, entity=(2, face_n), mapping="contravariant"))

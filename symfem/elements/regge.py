@@ -183,7 +183,6 @@ class ReggeTP(CiarletElement):
 
             # DOFs on faces
             for f_n, vs in enumerate(reference.sub_entities(2)):
-                face = reference.sub_entity(2, f_n)
                 for i in range(order + 1):
                     for j in range(order + 1):
                         dofs.append(IntegralAgainst(

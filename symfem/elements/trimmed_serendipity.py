@@ -87,7 +87,6 @@ class TrimmedSerendipityHcurl(CiarletElement):
         )
         if order >= 2:
             for f_n in range(reference.sub_entity_count(2)):
-                face = reference.sub_entity(2, f_n)
                 for i in range(order):
                     f = ScalarFunction(x[0] ** (order - 1 - i) * x[1] ** i).grad(2)
                     f2 = VectorFunction((f[1], -f[0])).subs(x, tuple(t))
