@@ -89,7 +89,7 @@ class BernardiRaugel(CiarletElement):
 
             for i in range(3):
                 dofs.append(DivergenceIntegralMoment(
-                    reference, reference, x[i], p.dofs[0], entity=(3, 0),
+                    reference, x[i], p.dofs[0], entity=(3, 0),
                     mapping="contravariant"
                 ))
 

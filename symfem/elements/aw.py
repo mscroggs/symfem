@@ -58,18 +58,18 @@ class ArnoldWinther(CiarletElement):
                 p = sub_e.get_basis_function(dof_n).get_function()
                 for component in [sub_ref.normal(), sub_ref.tangent()]:
                     InnerProductIntegralMoment(
-                        reference, sub_ref, p, component, sub_ref.normal(), dof,
+                        reference, p, component, sub_ref.normal(), dof,
                         entity=(1, e_n), mapping="double_contravariant")
                     dofs.append(
                         InnerProductIntegralMoment(
-                            reference, sub_ref, p, component, sub_ref.normal(), dof,
+                            reference, p, component, sub_ref.normal(), dof,
                             entity=(1, e_n), mapping="double_contravariant"))
         sub_e = Lagrange(reference, order - 3, variant)
         for dof_n, dof in enumerate(sub_e.dofs):
             p = sub_e.get_basis_function(dof_n).get_function()
             for component22 in [((1, 0), (0, 0)), ((0, 1), (0, 0)), ((0, 0), (0, 1))]:
                 dofs.append(IntegralMoment(
-                    reference, reference, tuple(tuple(p * j for j in i) for i in component22),
+                    reference, tuple(tuple(p * j for j in i) for i in component22),
                     dof, entity=(2, 0)))
 
         if order >= 4:
@@ -80,7 +80,7 @@ class ArnoldWinther(CiarletElement):
                 f = p * x[0] ** 2 * x[1] ** 2 * (1 - x[0] - x[1]) ** 2
                 J = tuple(tuple(f.diff(x[i]).diff(x[j]) for j in range(2))
                           for i in range(2))
-                dofs.append(IntegralMoment(reference, reference, J, dof, entity=(2, 0)))
+                dofs.append(IntegralMoment(reference, J, dof, entity=(2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
                          (reference.tdim, reference.tdim))
@@ -136,14 +136,14 @@ class NonConformingArnoldWinther(CiarletElement):
                 for component in [sub_ref.normal(), sub_ref.tangent()]:
                     dofs.append(
                         InnerProductIntegralMoment(
-                            reference, sub_ref, p, component, sub_ref.normal(), dof,
+                            reference, p, component, sub_ref.normal(), dof,
                             entity=(1, e_n), mapping="double_contravariant"))
         sub_e = Lagrange(reference, 0, variant)
         for dof_n, dof in enumerate(sub_e.dofs):
             p = sub_e.get_basis_function(dof_n).get_function()
             for component22 in [((1, 0), (0, 0)), ((0, 1), (0, 0)), ((0, 0), (0, 1))]:
                 dofs.append(IntegralMoment(
-                    reference, reference, tuple(tuple(p * j for j in i) for i in component22),
+                    reference, tuple(tuple(p * j for j in i) for i in component22),
                     dof, entity=(2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,

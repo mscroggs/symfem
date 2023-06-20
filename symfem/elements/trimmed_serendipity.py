@@ -92,7 +92,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
                     f = ScalarFunction(x[0] ** (order - 1 - i) * x[1] ** i).grad(2)
                     f2 = VectorFunction((f[1], -f[0])).subs(x, tuple(t))
                     dofs.append(IntegralAgainst(
-                        reference, face, f2, entity=(2, f_n), mapping="contravariant"))
+                        reference, f2, entity=(2, f_n), mapping="contravariant"))
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, reference.tdim
@@ -172,7 +172,7 @@ class TrimmedSerendipityHdiv(CiarletElement):
                       for i in range(order) for j in range(order - i)]
             for f in fs:
                 f2 = f.subs(x, tuple(t))
-                dofs.append(IntegralAgainst(reference, reference, f2, entity=(reference.tdim, 0),
+                dofs.append(IntegralAgainst(reference, f2, entity=(reference.tdim, 0),
                                             mapping="covariant"))
 
         super().__init__(

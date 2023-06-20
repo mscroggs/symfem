@@ -64,7 +64,7 @@ class Nedelec(CiarletElement):
                          space2.get_basis_function(j) * space1.get_basis_function(i)[1],
                          0)
                     dofs.append(IntegralAgainst(
-                        reference, reference, f, entity=(3, 0), mapping="covariant"))
+                        reference, f, entity=(3, 0), mapping="covariant"))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant

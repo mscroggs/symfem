@@ -41,7 +41,7 @@ class MorleyWangXu(CiarletElement):
                 dim = reference.tdim - 1
                 for facet_n in range(reference.sub_entity_count(dim)):
                     facet = reference.sub_entity(dim, facet_n)
-                    dofs.append(IntegralAgainst(reference, facet, 1 / facet.jacobian(),
+                    dofs.append(IntegralAgainst(reference, 1 / facet.jacobian(),
                                                 entity=(dim, facet_n)))
         elif order == 2:
             if reference.tdim == 2:
@@ -51,7 +51,7 @@ class MorleyWangXu(CiarletElement):
                 dim = reference.tdim - 2
                 for ridge_n in range(reference.sub_entity_count(dim)):
                     ridge = reference.sub_entity(dim, ridge_n)
-                    dofs.append(IntegralAgainst(reference, ridge, 1 / ridge.jacobian(),
+                    dofs.append(IntegralAgainst(reference, 1 / ridge.jacobian(),
                                                 entity=(dim, ridge_n)))
             dim = reference.tdim - 1
             for facet_n in range(reference.sub_entity_count(dim)):

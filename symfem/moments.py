@@ -102,6 +102,5 @@ def make_integral_moment_dofs(
             sub_element = SubElement(sub_ref.default_reference(), order, **kwargs)
             for dn, d in enumerate(sub_element.dofs):
                 f = sub_element.get_basis_function(dn)
-                dofs.append(IntegralMoment(
-                    reference, sub_ref, f, d, (dim, i), **m_kwargs))
+                dofs.append(IntegralMoment(reference, f, d, (dim, i), **m_kwargs))
     return dofs

@@ -60,9 +60,9 @@ class HuangZhang(CiarletElement):
         for i in range(order - 1):
             for j in range(order - 2):
                 dofs.append(IntegralAgainst(
-                    reference, reference, (x[0] ** i * x[1] ** j, 0), (2, 0)))
+                    reference, (x[0] ** i * x[1] ** j, 0), (2, 0)))
                 dofs.append(IntegralAgainst(
-                    reference, reference, (0, x[0] ** j * x[1] ** i), (2, 0)))
+                    reference, (0, x[0] ** j * x[1] ** i), (2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
