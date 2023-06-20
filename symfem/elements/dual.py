@@ -12,7 +12,7 @@ from ..finite_element import FiniteElement
 from ..functions import AnyFunction, FunctionInput, VectorFunction
 from ..geometry import PointType, SetOfPoints, SetOfPointsInput
 from ..piecewise_functions import PiecewiseFunction
-from ..references import NonDefaultReferenceError, DualPolygon
+from ..references import DualPolygon, NonDefaultReferenceError
 
 
 class DualCiarletElement(FiniteElement):
