@@ -2,8 +2,7 @@
 
 import sympy
 
-from .functions import (AnyFunction, FunctionInput, MatrixFunction, VectorFunction,
-                        parse_function_input)
+from .functions import AnyFunction, FunctionInput, MatrixFunction, parse_function_input
 from .geometry import PointType
 from .symbols import x
 
