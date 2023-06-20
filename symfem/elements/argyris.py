@@ -12,7 +12,7 @@ from ..functionals import (ListOfFunctionals, PointComponentSecondDerivativeEval
                            PointNormalDerivativeEvaluation)
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 
 
 class Argyris(CiarletElement):
@@ -27,6 +27,9 @@ class Argyris(CiarletElement):
         """
         assert order == 5
         assert reference.name == "triangle"
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         dofs: ListOfFunctionals = []
         for v_n, vs in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))

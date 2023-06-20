@@ -13,7 +13,7 @@ from ..functionals import (IntegralAgainst, IntegralMoment, ListOfFunctionals, N
 from ..functions import FunctionInput, ScalarFunction, VectorFunction
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import t, x
 from .dpc import DPC, VectorDPC
 
@@ -29,6 +29,9 @@ class TrimmedSerendipityHcurl(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
         if reference.tdim == 2:
@@ -108,7 +111,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(curl)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"
 
 
 class TrimmedSerendipityHdiv(CiarletElement):
@@ -122,6 +125,9 @@ class TrimmedSerendipityHdiv(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
         if reference.tdim == 2:
@@ -186,4 +192,4 @@ class TrimmedSerendipityHdiv(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(div)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

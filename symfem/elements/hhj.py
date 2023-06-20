@@ -11,7 +11,7 @@ from ..functionals import IntegralMoment, ListOfFunctionals, NormalInnerProductI
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from .lagrange import Lagrange, SymmetricMatrixLagrange
 
 
@@ -27,7 +27,7 @@ class HellanHerrmannJohnson(CiarletElement):
             variant: The variant of the element
         """
         if reference.vertices != reference.reference_vertices:
-            raise NotImplementedError()
+            raise NonDefaultReferenceError()
         assert reference.name == "triangle"
 
         poly: typing.List[FunctionInput] = []
@@ -59,4 +59,4 @@ class HellanHerrmannJohnson(CiarletElement):
     references = ["triangle"]
     min_order = 0
     continuity = "inner H(div)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

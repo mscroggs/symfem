@@ -15,7 +15,7 @@ from ..functionals import (DerivativeIntegralMoment, IntegralAgainst, ListOfFunc
 from ..functions import FunctionInput, ScalarFunction, VectorFunction
 from ..moments import make_integral_moment_dofs
 from ..polynomials import orthogonal_basis, quolynomial_set_1d, quolynomial_set_vector
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import t, x
 from .q import Q
 
@@ -62,6 +62,9 @@ class TNT(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_1d(reference.tdim, order)
         if reference.tdim == 2:
@@ -124,7 +127,7 @@ class TNT(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "C0"
-    last_updated = "2023.05"
+    last_updated = "2023.06"
 
 
 class TNTcurl(CiarletElement):
@@ -138,6 +141,9 @@ class TNTcurl(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
         if reference.tdim == 2:
@@ -242,7 +248,7 @@ class TNTcurl(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(curl)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"
 
 
 class TNTdiv(CiarletElement):
@@ -256,6 +262,9 @@ class TNTdiv(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
         if reference.tdim == 2:
@@ -353,4 +362,4 @@ class TNTdiv(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(div)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

@@ -11,7 +11,7 @@ from ..functionals import IntegralMoment, ListOfFunctionals, NormalIntegralMomen
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from .lagrange import Lagrange
 from .nedelec import NedelecFirstKind
 
@@ -27,6 +27,9 @@ class BDM(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
 
@@ -51,4 +54,4 @@ class BDM(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 1
     continuity = "H(div)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

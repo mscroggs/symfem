@@ -14,7 +14,7 @@ from ..functionals import ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..polynomials import pyramid_polynomial_set_1d
 from ..quadrature import get_quadrature
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 
 
 class Lagrange(CiarletElement):
@@ -28,6 +28,9 @@ class Lagrange(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         dofs: ListOfFunctionals = []
         if order == 0:
             dofs = [

@@ -15,9 +15,10 @@ from .functionals import ListOfFunctionals
 from .functions import (AnyFunction, FunctionInput, ScalarFunction, VectorFunction,
                         parse_function_input)
 from .geometry import PointType, SetOfPointsInput, parse_set_of_points_input
+from .mappings import MappingNotImplemented
 from .piecewise_functions import PiecewiseFunction
 from .plotting import Picture, colors
-from .references import Reference
+from .references import NonDefaultReferenceError, Reference
 from .symbols import x
 from .utils import allequal
 from .version import version
@@ -290,7 +291,7 @@ class FiniteElement(ABC):
 
     def test(self):
         """Run tests for this element."""
-        if self.order <= 4:
+        if self.order <= self._max_continuity_test_order:
             self.test_continuity()
 
     def test_continuity(self):
@@ -341,7 +342,7 @@ class FiniteElement(ABC):
                 basis = self.get_basis_functions()
                 try:
                     basis2 = self.map_to_cell(vertices)
-                except NotImplementedError:
+                except (MappingNotImplemented, NonDefaultReferenceError):
                     return "Mapping not implemented for this element."
 
                 f = basis[fi]
@@ -451,6 +452,14 @@ class FiniteElement(ABC):
                 raise ValueError(f"Unknown tensor product type: {t_type}")
         return [basis[i] for i in range(len(basis))]
 
+    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+        """Return the keyword arguments used to create this element.
+
+        Returns:
+            Keyword arguments dictionary
+        """
+        return {}
+
     @property
     def name(self) -> str:
         """Get the name of the element.
@@ -464,6 +473,7 @@ class FiniteElement(ABC):
     references: typing.List[str] = []
     last_updated = version
     cache = True
+    _max_continuity_test_order = 4
 
 
 class CiarletElement(FiniteElement):
@@ -551,8 +561,7 @@ class CiarletElement(FiniteElement):
         """
         if caching and self.cache:
             cid = (f"{self.__class__.__name__} {self.order} {self.reference.vertices} "
-                   f"{self.init_kwargs()} "
-                   f"{self.last_updated}")
+                   f"{self.init_kwargs()} {self.last_updated}")
             matrix_type = "dualinv" if inverse else "dual"
             mat = load_cached_matrix(matrix_type, cid, (len(self.dofs), len(self.dofs)))
             if mat is None:
@@ -566,14 +575,6 @@ class CiarletElement(FiniteElement):
                 return mat.inv("LU")
             else:
                 return mat
-
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
-        """Return the keyword arguments used to create this element.
-
-        Returns:
-            Keyword arguments dictionary
-        """
-        return {}
 
     def get_basis_functions(
         self, use_tensor_factorisation: bool = False
@@ -661,31 +662,36 @@ class CiarletElement(FiniteElement):
         if inverse_map is None:
             inverse_map = self.reference.get_inverse_map_to(vertices)
 
-        functions: typing.List[AnyFunction] = [ScalarFunction(0) for f in basis]
-        for dim in range(self.reference.tdim + 1):
-            for e in range(self.reference.sub_entity_count(dim)):
-                entity_dofs = self.entity_dofs(dim, e)
-                dofs_by_type: typing.Dict[
-                    typing.Tuple[typing.Type, typing.Union[str, None]], typing.List[int]
-                ] = {}
-                for d in entity_dofs:
-                    dof = self.dofs[d]
-                    t = (type(dof), dof.mapping)
-                    if t not in dofs_by_type:
-                        dofs_by_type[t] = []
-                    dofs_by_type[t].append(d)
-                for ds in dofs_by_type.values():
-                    mapped_dofs = self.dofs[ds[0]].perform_mapping(
-                        [basis[d] for d in ds],
-                        forward_map, inverse_map, self.reference.tdim)
-                    for d_n, mdof in zip(ds, mapped_dofs):
-                        functions[d_n] = mdof
+        try:
+            functions: typing.List[AnyFunction] = [ScalarFunction(0) for f in basis]
+            for dim in range(self.reference.tdim + 1):
+                for e in range(self.reference.sub_entity_count(dim)):
+                    entity_dofs = self.entity_dofs(dim, e)
+                    dofs_by_type: typing.Dict[
+                        typing.Tuple[typing.Type, typing.Union[str, None]], typing.List[int]
+                    ] = {}
+                    for d in entity_dofs:
+                        dof = self.dofs[d]
+                        t = (type(dof), dof.mapping)
+                        if t not in dofs_by_type:
+                            dofs_by_type[t] = []
+                        dofs_by_type[t].append(d)
+                    for ds in dofs_by_type.values():
+                        mapped_dofs = self.dofs[ds[0]].perform_mapping(
+                            [basis[d] for d in ds],
+                            forward_map, inverse_map, self.reference.tdim)
+                        for d_n, mdof in zip(ds, mapped_dofs):
+                            functions[d_n] = mdof
 
-        for fun in functions:
-            if isinstance(fun, PiecewiseFunction):
-                fun.map_pieces(forward_map)
+            for fun in functions:
+                if isinstance(fun, PiecewiseFunction):
+                    fun.map_pieces(forward_map)
 
-        return functions
+            return functions
+        except MappingNotImplemented:
+            element = self.__class__(
+                self.reference.__class__(vertices=vertices), self.order, **self.init_kwargs())
+            return element.get_basis_functions()
 
     def test(self):
         """Run tests for this element."""
@@ -861,7 +867,12 @@ class DirectElement(FiniteElement):
         Returns:
             The basis functions mapped to the cell
         """
-        raise NotImplementedError()
+        raise MappingNotImplemented()
+        # TODO: make this work
+        # vertices = parse_set_of_points_input(vertices_in)
+        # e = self.__class__(self.reference.__class__(vertices=vertices), self.order,
+        #                   **self.init_kwargs())
+        # return e.get_basis_functions()
 
     def get_polynomial_basis(self) -> typing.List[AnyFunction]:
         """Get the symbolic polynomial basis for the element.

@@ -12,7 +12,7 @@ from ..finite_element import CiarletElement
 from ..functionals import DerivativePointEvaluation, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput, ScalarFunction
 from ..piecewise_functions import PiecewiseFunction
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 
 
@@ -28,6 +28,9 @@ class ReducedHsiehCloughTocher(CiarletElement):
         """
         assert order == 3
         assert reference.name == "triangle"
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         dofs: ListOfFunctionals = []
         for v_n, vs in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, vs, entity=(0, v_n)))
@@ -60,6 +63,12 @@ class ReducedHsiehCloughTocher(CiarletElement):
             PiecewiseFunction({i: j for i, j in zip(subs, p)}, 2)
             for p in piece_list]
 
+        if reference != reference.default_reference():
+            invmap = reference.get_inverse_map_to_self()
+            for i, p in enumerate(poly):
+                assert isinstance(p, ScalarFunction)
+                poly[i] = p.subs(x, invmap)
+
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1
         )
@@ -70,4 +79,4 @@ class ReducedHsiehCloughTocher(CiarletElement):
     max_order = 3
     # continuity = "C1"
     continuity = "C0"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

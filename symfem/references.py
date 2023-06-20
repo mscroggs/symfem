@@ -17,6 +17,14 @@ IntLimits = typing.List[typing.Union[
     typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr]]]
 
 
+class NonDefaultReferenceError(NotImplementedError):
+    """Exception to be thrown when an element can only be created on the default reference."""
+
+    def __init__(self):
+        """Initialise the exception."""
+        super().__init__("Cannot create this element on a non-default reference")
+
+
 def _which_side(vs: SetOfPoints, p: PointType, q: PointType) -> typing.Optional[int]:
     """Check which side of a line or plane a set of points are.
 
@@ -148,7 +156,15 @@ def _vnormalise(v_in: PointTypeInput) -> PointType:
 class Reference(ABC):
     """A reference cell on which a finite element can be defined."""
 
-    def __init__(
+    @abstractmethod
+    def __init__(self, vertices: SetOfPointsInput = ()):
+        """Create a reference.
+
+        Args:
+            vertices: The vertices of the point.
+        """
+
+    def __build__(
         self, tdim: int, name: str, origin: PointTypeInput, axes: SetOfPointsInput,
         reference_vertices: SetOfPointsInput, vertices: SetOfPointsInput,
         edges: typing.Tuple[typing.Tuple[int, int], ...],
@@ -198,6 +214,16 @@ class Reference(ABC):
         """
         return self.vertices
 
+    def __eq__(self, other: object) -> bool:
+        """Check if two references are equal."""
+        if not isinstance(other, Reference):
+            return False
+        return type(self) == type(other) and self.vertices == other.vertices
+
+    def __hash__(self) -> int:
+        """Check if two references are equal."""
+        return hash((self.reference_vertices, self.vertices))
+
     def intersection(self, other: Reference) -> typing.Optional[Reference]:
         """Get the intersection of two references.
 
@@ -244,7 +270,6 @@ class Reference(ABC):
         Returns:
             The default reference
         """
-        pass
 
     @abstractmethod
     def make_lattice(self, n: int) -> SetOfPoints:
@@ -256,7 +281,6 @@ class Reference(ABC):
         Returns:
             A lattice of points offset from the edge of the cell
         """
-        pass
 
     @abstractmethod
     def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
@@ -269,7 +293,6 @@ class Reference(ABC):
             A lattice of points including the edges of the cell
             Pairs of point numbers that make a mesh of lines across the cell
         """
-        pass
 
     def make_lattice_float(self, n: int) -> SetOfPoints:
         """Make a lattice of points.
@@ -337,7 +360,6 @@ class Reference(ABC):
         Returns:
             Integration limits that can be passed into sympy.integrate
         """
-        pass
 
     @abstractmethod
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
@@ -349,7 +371,6 @@ class Reference(ABC):
         Returns:
             The map
         """
-        pass
 
     @abstractmethod
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
@@ -361,7 +382,6 @@ class Reference(ABC):
         Returns:
             The inverse map
         """
-        pass
 
     def get_map_to_self(self) -> PointType:
         """Get the map from the canonical reference to this reference.
@@ -381,7 +401,6 @@ class Reference(ABC):
         Returns:
             The map
         """
-        pass
 
     def get_inverse_map_to_self(self) -> PointType:
         """Get the inverse map from the canonical reference to this reference.
@@ -401,7 +420,6 @@ class Reference(ABC):
         Returns:
             The map
         """
-        pass
 
     @abstractmethod
     def volume(self) -> sympy.core.expr.Expr:
@@ -410,7 +428,6 @@ class Reference(ABC):
         Returns:
             The volume of the cell
         """
-        pass
 
     def midpoint(self) -> PointType:
         """Calculate the midpoint.
@@ -607,7 +624,6 @@ class Reference(ABC):
         Returns:
             Is the point contained in the reference?
         """
-        pass
 
     def plot_entity_diagrams(
         self, filename: typing.Union[str, typing.List[str]],
@@ -688,7 +704,7 @@ class Point(Reference):
             vertices: The vertices of the point.
         """
         assert len(vertices) == 1
-        super().__init__(
+        super().__build__(
             tdim=0,
             name="point",
             origin=vertices[0],
@@ -815,7 +831,7 @@ class Interval(Reference):
             vertices: The vertices of the interval.
         """
         assert len(vertices) == 2
-        super().__init__(
+        super().__build__(
             tdim=1,
             name="interval",
             origin=vertices[0],
@@ -951,7 +967,7 @@ class Triangle(Reference):
             vertices: The vertices of the triangle.
         """
         assert len(vertices) == 3
-        super().__init__(
+        super().__build__(
             tdim=2,
             name="triangle",
             origin=vertices[0],
@@ -1131,7 +1147,7 @@ class Tetrahedron(Reference):
             vertices: The vertices of the tetrahedron.
         """
         assert len(vertices) == 4
-        super().__init__(
+        super().__build__(
             tdim=3,
             name="tetrahedron",
             origin=vertices[0],
@@ -1312,7 +1328,7 @@ class Quadrilateral(Reference):
             vertices: The vertices of the quadrilateral.
         """
         assert len(vertices) == 4
-        super().__init__(
+        super().__build__(
             tdim=2,
             name="quadrilateral",
             origin=vertices[0],
@@ -1514,7 +1530,7 @@ class Hexahedron(Reference):
             vertices: The vertices of the hexahedron.
         """
         assert len(vertices) == 8
-        super().__init__(
+        super().__build__(
             tdim=3,
             name="hexahedron",
             origin=vertices[0],
@@ -1716,7 +1732,7 @@ class Prism(Reference):
             vertices: The vertices of the prism.
         """
         assert len(vertices) == 6
-        super().__init__(
+        super().__build__(
             tdim=3,
             name="prism",
             origin=vertices[0],
@@ -1918,7 +1934,7 @@ class Pyramid(Reference):
             vertices: The vertices of the pyramid.
         """
         assert len(vertices) == 5
-        super().__init__(
+        super().__build__(
             tdim=3,
             name="pyramid",
             origin=vertices[0],
@@ -2140,7 +2156,7 @@ class DualPolygon(Reference):
             origin = parse_point_input(vertices[0])
             vertices = vertices[1:]
 
-        super().__init__(
+        super().__build__(
             tdim=2,
             name="dual polygon",
             axes=(),

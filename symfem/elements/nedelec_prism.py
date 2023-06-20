@@ -7,7 +7,7 @@ from ..functionals import IntegralAgainst, IntegralMoment, ListOfFunctionals, Ta
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import Hcurl_polynomials, polynomial_set_1d, polynomial_set_vector
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 from .lagrange import Lagrange, VectorLagrange
 from .q import RaviartThomas as QRT
@@ -25,6 +25,9 @@ class Nedelec(CiarletElement):
             variant: The variant of the element
         """
         from .. import create_reference
+
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
 
         poly: typing.List[FunctionInput] = []
         poly += [
@@ -79,4 +82,4 @@ class Nedelec(CiarletElement):
     min_order = 1
     max_order = 2
     continuity = "H(curl)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

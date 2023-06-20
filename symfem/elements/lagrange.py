@@ -28,10 +28,10 @@ class Lagrange(CiarletElement):
         if order == 0:
             dofs = [
                 PointEvaluation(
-                    reference, tuple(
+                    reference, reference.get_point(tuple(
                         sympy.Rational(1, reference.tdim + 1)
                         for i in range(reference.tdim)
-                    ),
+                    )),
                     entity=(reference.tdim, 0)
                 )
             ]
@@ -39,14 +39,15 @@ class Lagrange(CiarletElement):
             points, _ = get_quadrature(variant, order + 1)
 
             for v_n, v in enumerate(reference.reference_vertices):
-                dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
+                dofs.append(PointEvaluation(reference, reference.get_point(v), entity=(0, v_n)))
             for edim in range(1, 4):
                 for e_n in range(reference.sub_entity_count(edim)):
                     entity = reference.sub_entity(edim, e_n)
                     for i in product(range(1, order), repeat=edim):
                         if sum(i) < order:
                             point = entity.get_point([sympy.Rational(j, order) for j in i[::-1]])
-                            dofs.append(PointEvaluation(reference, point, entity=(edim, e_n)))
+                            dofs.append(PointEvaluation(reference, point,
+                                                        entity=(edim, e_n)))
 
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
@@ -65,7 +66,7 @@ class Lagrange(CiarletElement):
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "C0"
-    last_updated = "2023.05"
+    last_updated = "2023.06"
 
 
 class VectorLagrange(CiarletElement):

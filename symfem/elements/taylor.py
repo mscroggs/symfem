@@ -40,4 +40,4 @@ class Taylor(CiarletElement):
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "L2"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

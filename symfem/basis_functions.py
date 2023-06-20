@@ -350,6 +350,13 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().with_floats()
 
+    def __iter__(self) -> typing.Iterator[AnyFunction]:
+        """Iterate through components of vector function."""
+        f = self.get_function()
+        if not hasattr(f, "__iter__"):
+            raise TypeError(f"'{self.__class__.__name__}' object is not iterable")
+        return f.__iter__()
+
 
 class SubbedBasisFunction(BasisFunction):
     """A basis function following a substitution."""
@@ -398,4 +405,4 @@ class SubbedBasisFunction(BasisFunction):
             value_scale: The factor to scale values by
             n: The number of plotting points
         """
-        self.f.plot_values(reference, img, value_scale, n)
+        self.get_function().plot_values(reference, img, value_scale, n)

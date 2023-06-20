@@ -9,7 +9,7 @@ from ..finite_element import CiarletElement
 from ..functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d, polynomial_set_vector
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from .lagrange import Lagrange
 
 
@@ -24,6 +24,9 @@ class DPC(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         if reference.name == "interval":
             points = [d.dof_point() for d in Lagrange(reference, order, variant).dofs]
         elif order == 0:
@@ -71,6 +74,9 @@ class VectorDPC(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         scalar_space = DPC(reference, order, variant)
         dofs: ListOfFunctionals = []
         if reference.tdim == 1:

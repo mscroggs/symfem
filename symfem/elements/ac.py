@@ -11,7 +11,7 @@ from ..functionals import IntegralAgainst, ListOfFunctionals, NormalIntegralMome
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import Hdiv_serendipity, polynomial_set_vector
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 from .dpc import DPC
 
@@ -27,6 +27,9 @@ class AC(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
         if order == 0:
@@ -72,4 +75,4 @@ class AC(CiarletElement):
     references = ["quadrilateral"]
     min_order = 0
     continuity = "H(div)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

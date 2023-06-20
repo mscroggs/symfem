@@ -13,7 +13,7 @@ from ..functionals import IntegralAgainst, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..geometry import SetOfPoints
 from ..piecewise_functions import PiecewiseFunction
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 
 
@@ -27,6 +27,9 @@ class P1Macro(CiarletElement):
             reference: The reference element
             order: The polynomial order
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         third = sympy.Rational(1, 3)
         zero = sympy.Integer(0)
         one = sympy.Integer(1)

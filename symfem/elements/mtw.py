@@ -13,7 +13,7 @@ from ..functionals import (IntegralMoment, ListOfFunctionals, NormalIntegralMome
 from ..functions import FunctionInput, VectorFunction
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 from .lagrange import Lagrange
 from .nedelec import NedelecFirstKind
@@ -31,6 +31,8 @@ class MardalTaiWinther(CiarletElement):
             variant: The variant of the element
         """
         assert order == 3
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference, facets=(NormalIntegralMoment, Lagrange, 1,
@@ -81,4 +83,4 @@ class MardalTaiWinther(CiarletElement):
     min_order = 3
     max_order = 3
     continuity = "H(div)"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

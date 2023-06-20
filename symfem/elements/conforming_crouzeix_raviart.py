@@ -12,7 +12,7 @@ from ..finite_element import CiarletElement
 from ..functionals import ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 
 
@@ -27,7 +27,7 @@ class ConformingCrouzeixRaviart(CiarletElement):
             order: The polynomial order
         """
         if reference.vertices != reference.reference_vertices:
-            raise NotImplementedError()
+            raise NonDefaultReferenceError()
         assert reference.name == "triangle"
 
         poly: typing.List[FunctionInput] = []

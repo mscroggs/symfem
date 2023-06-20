@@ -84,21 +84,24 @@ def make_integral_moment_dofs(
         (reference.tdim - 3, peaks), (reference.tdim - 2, ridges), (reference.tdim - 1, facets),
         (reference.tdim, cells),
     ]:
-        if moment_data is not None:
-            sub_type = reference.sub_entity_types[dim]
-            if sub_type is not None:
-                assert dim > 0
-                for i, vs in enumerate(reference.sub_entities(dim)):
-                    sub_ref = reference.sub_entity(dim, i, True)
-                    IntegralMoment, SubElement, order, mapping, kwargs = _extract_moment_data(
-                        moment_data, sub_ref.name)
-                    if order >= SubElement.min_order:
-                        sub_element = SubElement(sub_ref.default_reference(), order, **kwargs)
-                        for dn, d in enumerate(sub_element.dofs):
-                            f = sub_element.get_basis_function(dn)
-                            kwargs = {}
-                            if mapping is not None:
-                                kwargs["mapping"] = mapping
-                            dofs.append(IntegralMoment(
-                                reference, sub_ref, f, d, (dim, i), **kwargs))
+        if moment_data is None:
+            continue
+        sub_type = reference.sub_entity_types[dim]
+        if sub_type is None:
+            continue
+        assert dim > 0
+        for i, vs in enumerate(reference.sub_entities(dim)):
+            sub_ref = reference.sub_entity(dim, i, False)
+            IntegralMoment, SubElement, order, mapping, kwargs = _extract_moment_data(
+                moment_data, sub_ref.name)
+            m_kwargs = {}
+            if mapping is not None:
+                m_kwargs["mapping"] = mapping
+            if order < SubElement.min_order:
+                continue
+            sub_element = SubElement(sub_ref.default_reference(), order, **kwargs)
+            for dn, d in enumerate(sub_element.dofs):
+                f = sub_element.get_basis_function(dn)
+                dofs.append(IntegralMoment(
+                    reference, sub_ref, f, d, (dim, i), **m_kwargs))
     return dofs
