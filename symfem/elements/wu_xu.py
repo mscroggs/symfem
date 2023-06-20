@@ -84,7 +84,7 @@ class WuXu(CiarletElement):
                     raise NotImplementedError
                 for orders in derivatives(len(normals), len(normals)):
                     dofs.append(IntegralOfDirectionalMultiderivative(
-                        reference, subentity, tuple(normals), orders, (dim, e_n),
+                        reference, tuple(normals), orders, (dim, e_n),
                         scale=1 / volume))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)

@@ -51,7 +51,7 @@ class P1Macro(CiarletElement):
         dofs: ListOfFunctionals = []
         for v_n, v in enumerate(reference.reference_vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
-        dofs.append(IntegralAgainst(reference, reference, 1, entity=(2, 0)))
+        dofs.append(IntegralAgainst(reference, 1, entity=(2, 0)))
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1

@@ -47,10 +47,10 @@ class ArnoldBoffiFalk(CiarletElement):
 
         for i in range(order + 1):
             dofs.append(IntegralOfDivergenceAgainst(
-                reference, reference, x[0] ** (order + 1) * x[1] ** i,
+                reference, x[0] ** (order + 1) * x[1] ** i,
                 entity=(2, 0), mapping="contravariant"))
             dofs.append(IntegralOfDivergenceAgainst(
-                reference, reference, x[0] ** i * x[1] ** (order + 1),
+                reference, x[0] ** i * x[1] ** (order + 1),
                 entity=(2, 0), mapping="contravariant"))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

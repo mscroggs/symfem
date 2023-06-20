@@ -71,7 +71,7 @@ class Regge(CiarletElement):
                                 for a, b in zip(edge_e.vertices[0], edge_e.vertices[1]))
                 for f, dof in zip(basis, space.dofs):
                     dofs.append(InnerProductIntegralMoment(
-                        reference, edge_e, f, tangent, tangent, dof, entity=(1, e_n),
+                        reference, f, tangent, tangent, dof, entity=(1, e_n),
                         mapping="double_covariant"))
 
             if reference.tdim == 2:
@@ -90,7 +90,7 @@ class Regge(CiarletElement):
                         face = reference.sub_entity(2, f_n)
                         for f, dof in zip(basis, rspace.dofs):
                             dofs.append(IntegralMoment(
-                                reference, face, f * face.jacobian(), dof,
+                                reference, f * face.jacobian(), dof,
                                 entity=(2, f_n), mapping="double_covariant"))
 
                 if order > 1:
@@ -178,25 +178,24 @@ class ReggeTP(CiarletElement):
                                 for a, b in zip(edge.vertices[0], edge.vertices[1]))
                 for f, dof in zip(basis, space.dofs):
                     dofs.append(InnerProductIntegralMoment(
-                        reference, edge, f, tangent, tangent, dof, entity=(1, e_n),
+                        reference, f, tangent, tangent, dof, entity=(1, e_n),
                         mapping="double_covariant"))
 
             # DOFs on faces
             for f_n, vs in enumerate(reference.sub_entities(2)):
-                face = reference.sub_entity(2, f_n)
                 for i in range(order + 1):
                     for j in range(order + 1):
                         dofs.append(IntegralAgainst(
-                            reference, face,
+                            reference,
                             ((0, x[0] ** i * x[1] ** j), (x[0] ** i * x[1] ** j, 0)),
                             entity=(2, f_n), mapping="double_covariant"))
                 for i in range(1, order + 1):
                     for j in range(order + 1):
                         dofs.append(IntegralAgainst(
-                            reference, face, ((x[1] ** i * x[0] ** j * (1 - x[1]), 0), (0, 0)),
+                            reference, ((x[1] ** i * x[0] ** j * (1 - x[1]), 0), (0, 0)),
                             entity=(2, f_n), mapping="double_covariant"))
                         dofs.append(IntegralAgainst(
-                            reference, face, ((0, 0), (0, x[0] ** i * x[1] ** j * (1 - x[0]))),
+                            reference, ((0, 0), (0, x[0] ** i * x[1] ** j * (1 - x[0]))),
                             entity=(2, f_n), mapping="double_covariant"))
 
             if reference.tdim == 3:
@@ -207,17 +206,17 @@ class ReggeTP(CiarletElement):
                             f = x[0] ** i * x[1] ** j * x[2] ** k * (1 - x[0])
                             assert isinstance(f, sympy.core.expr.Expr)
                             dofs.append(IntegralAgainst(
-                                reference, reference, ((0, 0, 0), (0, 0, f), (0, f, 0)),
+                                reference, ((0, 0, 0), (0, 0, f), (0, f, 0)),
                                 entity=(3, 0), mapping="double_covariant"))
                             f = x[1] ** i * x[0] ** j * x[2] ** k * (1 - x[1])
                             assert isinstance(f, sympy.core.expr.Expr)
                             dofs.append(IntegralAgainst(
-                                reference, reference, ((0, 0, f), (0, 0, 0), (f, 0, 0)),
+                                reference, ((0, 0, f), (0, 0, 0), (f, 0, 0)),
                                 entity=(3, 0), mapping="double_covariant"))
                             f = x[2] ** i * x[0] ** j * x[1] ** k * (1 - x[2])
                             assert isinstance(f, sympy.core.expr.Expr)
                             dofs.append(IntegralAgainst(
-                                reference, reference, ((0, f, 0), (f, 0, 0), (0, 0, 0)),
+                                reference, ((0, f, 0), (f, 0, 0), (0, 0, 0)),
                                 entity=(3, 0), mapping="double_covariant"))
                 for i in range(order + 1):
                     for j in range(1, order + 1):
@@ -225,17 +224,17 @@ class ReggeTP(CiarletElement):
                             f = x[0] ** i * x[1] ** j * x[2] ** k * (1 - x[1]) * (1 - x[2])
                             assert isinstance(f, sympy.core.expr.Expr)
                             dofs.append(IntegralAgainst(
-                                reference, reference, ((f, 0, 0), (0, 0, 0), (0, 0, 0)),
+                                reference, ((f, 0, 0), (0, 0, 0), (0, 0, 0)),
                                 entity=(3, 0), mapping="double_covariant"))
                             f = x[1] ** i * x[0] ** j * x[2] ** k * (1 - x[0]) * (1 - x[2])
                             assert isinstance(f, sympy.core.expr.Expr)
                             dofs.append(IntegralAgainst(
-                                reference, reference, ((0, 0, 0), (0, f, 0), (0, 0, 0)),
+                                reference, ((0, 0, 0), (0, f, 0), (0, 0, 0)),
                                 entity=(3, 0), mapping="double_covariant"))
                             f = x[2] ** i * x[0] ** j * x[1] ** k * (1 - x[0]) * (1 - x[1])
                             assert isinstance(f, sympy.core.expr.Expr)
                             dofs.append(IntegralAgainst(
-                                reference, reference, ((0, 0, 0), (0, 0, 0), (0, 0, f)),
+                                reference, ((0, 0, 0), (0, 0, 0), (0, 0, f)),
                                 entity=(3, 0), mapping="double_covariant"))
         else:
             raise ValueError(f"Unknown variant: {variant}")

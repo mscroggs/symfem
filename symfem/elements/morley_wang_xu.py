@@ -41,7 +41,7 @@ class MorleyWangXu(CiarletElement):
                 dim = reference.tdim - 1
                 for facet_n in range(reference.sub_entity_count(dim)):
                     facet = reference.sub_entity(dim, facet_n)
-                    dofs.append(IntegralAgainst(reference, facet, 1 / facet.jacobian(),
+                    dofs.append(IntegralAgainst(reference, 1 / facet.jacobian(),
                                                 entity=(dim, facet_n)))
         elif order == 2:
             if reference.tdim == 2:
@@ -51,13 +51,13 @@ class MorleyWangXu(CiarletElement):
                 dim = reference.tdim - 2
                 for ridge_n in range(reference.sub_entity_count(dim)):
                     ridge = reference.sub_entity(dim, ridge_n)
-                    dofs.append(IntegralAgainst(reference, ridge, 1 / ridge.jacobian(),
+                    dofs.append(IntegralAgainst(reference, 1 / ridge.jacobian(),
                                                 entity=(dim, ridge_n)))
             dim = reference.tdim - 1
             for facet_n in range(reference.sub_entity_count(dim)):
                 facet = reference.sub_entity(dim, facet_n)
                 dofs.append(IntegralOfDirectionalMultiderivative(
-                    reference, facet, (facet.normal(), ), (1, ), (dim, facet_n),
+                    reference, (facet.normal(), ), (1, ), (dim, facet_n),
                     scale=1 / facet.jacobian()))
         else:
             assert order == reference.tdim == 3
@@ -73,13 +73,13 @@ class MorleyWangXu(CiarletElement):
                         normals.append(face.normal())
                 for orders in [(1, 0), (0, 1)]:
                     dofs.append(IntegralOfDirectionalMultiderivative(
-                        reference, subentity, tuple(normals), orders, (1, e_n),
+                        reference, tuple(normals), orders, (1, e_n),
                         scale=1 / volume))
             for f_n, vs in enumerate(reference.sub_entities(2)):
                 subentity = reference.sub_entity(2, f_n)
                 volume = subentity.jacobian()
                 dofs.append(IntegralOfDirectionalMultiderivative(
-                    reference, subentity, (subentity.normal(), ), (2, ), (2, f_n),
+                    reference, (subentity.normal(), ), (2, ), (2, f_n),
                     scale=1 / volume))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
