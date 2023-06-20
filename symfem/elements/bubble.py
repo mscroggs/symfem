@@ -13,7 +13,7 @@ from ..finite_element import CiarletElement
 from ..functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d, quolynomial_set_1d
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from .lagrange import Lagrange
 
 
@@ -29,6 +29,9 @@ class Bubble(CiarletElement):
             variant: The variant of the element
         """
         from .. import create_element
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         p1 = create_element(reference.name, "Lagrange", 1, vertices=reference.vertices)
         bubble = 1
         for f in p1.get_basis_functions():

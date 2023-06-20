@@ -59,7 +59,7 @@ def l2(
 def covariant(
     f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
     substitute: bool = True,
-) -> VectorFunction:
+) -> AnyFunction:
     """Map H(curl) functions.
 
     Args:
@@ -78,15 +78,13 @@ def covariant(
     assert f.is_vector
 
     j_inv = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
-    out = j_inv @ f
-    assert isinstance(out, VectorFunction)
-    return out
+    return j_inv @ f
 
 
 def contravariant(
     f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
     substitute: bool = True
-) -> VectorFunction:
+) -> AnyFunction:
     """Map H(div) functions.
 
     Args:
@@ -106,9 +104,7 @@ def contravariant(
 
     jacobian = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
     jacobian /= jacobian.det()
-    out = jacobian @ f
-    assert isinstance(out, VectorFunction)
-    return out
+    return jacobian @ f
 
 
 def double_covariant(
@@ -207,7 +203,7 @@ def l2_inverse_transpose(
 def covariant_inverse_transpose(
     f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
     substitute: bool = True,
-) -> VectorFunction:
+) -> AnyFunction:
     """Inverse transpose of covariant().
 
     Args:
@@ -226,15 +222,13 @@ def covariant_inverse_transpose(
     assert f.is_vector
 
     jacobian = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
-    out = jacobian @ f
-    assert isinstance(out, VectorFunction)
-    return out
+    return jacobian @ f
 
 
 def contravariant_inverse_transpose(
     f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
     substitute: bool = True,
-) -> VectorFunction:
+) -> AnyFunction:
     """Inverse transpose of contravariant().
 
     Args:
@@ -254,6 +248,4 @@ def contravariant_inverse_transpose(
 
     j_inv = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
     j_inv /= j_inv.det()
-    out = j_inv @ f
-    assert isinstance(out, VectorFunction)
-    return out
+    return j_inv @ f

@@ -12,7 +12,7 @@ from ..finite_element import CiarletElement
 from ..functionals import ListOfFunctionals, WeightedPointEvaluation
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 
 
@@ -75,6 +75,9 @@ class KongMulderVeldhuizen(CiarletElement):
             reference: The reference element
             order: The polynomial order
         """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
         dofs: ListOfFunctionals = []
         if reference.name == "triangle":
             if order == 1:
