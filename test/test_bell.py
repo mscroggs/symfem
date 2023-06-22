@@ -16,4 +16,3 @@ def test_bell_polyset():
             normal_deriv = gradp[0] * n[0] + gradp[1] * n[1]
             normal_deriv = normal_deriv.subs(x, variables)
             assert normal_deriv.diff(t[0]).diff(t[0]).diff(t[0]).diff(t[0]) == 0
-
