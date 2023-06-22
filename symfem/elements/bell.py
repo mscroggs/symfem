@@ -6,13 +6,11 @@ This element's definition is given in https://doi.org/10.1002/nme.1620010108 (Be
 import typing
 
 from ..finite_element import CiarletElement
-from ..functionals import (DerivativePointEvaluation, ListOfFunctionals,
-                           NormalDerivativeIntegralMoment, PointEvaluation)
+from ..functionals import DerivativePointEvaluation, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
-from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_1d
 from ..references import Reference
-from .lagrange import Lagrange
+from ..symbols import x
 
 
 class Bell(CiarletElement):
@@ -36,14 +34,13 @@ class Bell(CiarletElement):
             dofs.append(DerivativePointEvaluation(reference, v, (2, 0), entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(reference, v, (1, 1), entity=(0, v_n)))
             dofs.append(DerivativePointEvaluation(reference, v, (0, 2), entity=(0, v_n)))
-        dofs += make_integral_moment_dofs(
-            reference,
-            edges=(NormalDerivativeIntegralMoment, Lagrange, 0, {"variant": variant}),
-        )
         self.variant = variant
 
         poly: typing.List[FunctionInput] = []
-        poly += polynomial_set_1d(reference.tdim, order)
+        poly += polynomial_set_1d(reference.tdim, 4)
+        poly.append(x[0]**5 - x[1]**5)
+        poly.append(x[0]**3*x[1]**2 - x[0]**2*x[1]**3)
+        poly.append(5*x[0]**2*x[1]**3 - x[0]**5)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
