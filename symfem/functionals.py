@@ -1409,11 +1409,11 @@ class TangentIntegralMoment(IntegralMoment):
             entity: The entity the functional is associated with
             mapping: The type of mappping from the reference cell to a physical cell
         """
-        f = parse_function_input(f_in)
+        self._scalar_f = parse_function_input(f_in)
         integral_domain = reference.sub_entity(*entity)
-        assert f.is_scalar
+        assert self._scalar_f.is_scalar
         super().__init__(
-            reference, tuple(f * i for i in integral_domain.tangent()), dof,
+            reference, tuple(self._scalar_f * i for i in integral_domain.tangent()), dof,
             entity=entity, mapping=mapping, map_function=False)
 
     def dof_direction(self) -> typing.Union[PointType, None]:
@@ -1437,7 +1437,7 @@ class TangentIntegralMoment(IntegralMoment):
         desc += f"\\displaystyle\\int_{{{entity}}}"
         desc += "\\boldsymbol{v}\\cdot"
         if self.f != 1:
-            desc += "(" + _to_tex(self.f) + ")"
+            desc += "(" + _to_tex(self._scalar_f) + ")"
         desc += "\\hat{\\boldsymbol{t}}" + f"_{{{entity_n}}}"
         return desc, [
             entity_def,
@@ -1462,11 +1462,11 @@ class NormalIntegralMoment(IntegralMoment):
             entity: The entity the functional is associated with
             mapping: The type of mappping from the reference cell to a physical cell
         """
-        f = parse_function_input(f_in)
-        assert f.is_scalar
+        self._scalar_f = parse_function_input(f_in)
+        assert self._scalar_f.is_scalar
         integral_domain = reference.sub_entity(*entity)
         super().__init__(
-            reference, tuple(f * i for i in integral_domain.normal()), dof,
+            reference, tuple(self._scalar_f * i for i in integral_domain.normal()), dof,
             entity=entity, mapping=mapping, map_function=False)
 
     def dof_direction(self) -> typing.Union[PointType, None]:
@@ -1490,7 +1490,7 @@ class NormalIntegralMoment(IntegralMoment):
         desc += f"\\displaystyle\\int_{{{entity}}}"
         desc += "\\boldsymbol{v}\\cdot"
         if self.f != 1:
-            desc += "(" + _to_tex(self.f, True) + ")"
+            desc += "(" + _to_tex(self._scalar_f, True) + ")"
         desc += "\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}}"
         return desc, [
             entity_def,
