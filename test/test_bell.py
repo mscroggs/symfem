@@ -1,7 +1,7 @@
 """Test Bell elements."""
 
 import symfem
-from symfem.symbols import x, t
+from symfem.symbols import t, x
 
 
 def test_bell_polyset():
