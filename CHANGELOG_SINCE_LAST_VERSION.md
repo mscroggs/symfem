@@ -4,3 +4,4 @@
 - Added Alfeld-Sorokina element
 - Corrected C1 and higher order C tests
 - Allow element creation on non-default references
+- Corrected Bell element
