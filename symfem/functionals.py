@@ -1409,7 +1409,7 @@ class TangentIntegralMoment(IntegralMoment):
             entity: The entity the functional is associated with
             mapping: The type of mappping from the reference cell to a physical cell
         """
-        self._scalar_f = parse_function_input(f_in)
+        self._scalar_f = parse_function_input(f_in).subs(x, t)
         integral_domain = reference.sub_entity(*entity)
         assert self._scalar_f.is_scalar
         super().__init__(
@@ -1462,7 +1462,7 @@ class NormalIntegralMoment(IntegralMoment):
             entity: The entity the functional is associated with
             mapping: The type of mappping from the reference cell to a physical cell
         """
-        self._scalar_f = parse_function_input(f_in)
+        self._scalar_f = parse_function_input(f_in).subs(x, t)
         assert self._scalar_f.is_scalar
         integral_domain = reference.sub_entity(*entity)
         super().__init__(
