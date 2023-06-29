@@ -11,7 +11,7 @@ from ..functionals import (DerivativePointEvaluation, IntegralOfDirectionalMulti
                            ListOfFunctionals, PointEvaluation)
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
-from ..references import NonDefaultReferenceError, Reference
+from ..references import Reference
 from ..symbols import x
 
 
