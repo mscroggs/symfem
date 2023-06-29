@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 
 import sympy
 
+import symfem.functions
 from .geometry import (PointType, PointTypeInput, SetOfPoints, SetOfPointsInput, parse_point_input,
                        parse_set_of_points_input)
 from .symbols import AxisVariablesNotSingle, t, x
@@ -624,6 +625,17 @@ class Reference(ABC):
         Returns:
             Is the point contained in the reference?
         """
+
+    def map_polyset_from_default(
+        self, poly: typing.List[symfem.functions.FunctionInput]
+    ) -> typing.List[symfem.functions.FunctionInput]:
+        """Map the polynomials from the default reference element to this reference."""
+        from .functions import parse_function_input
+
+        if self == self.default_reference():
+            return poly
+        invmap = self.get_inverse_map_to_self()
+        return [parse_function_input(p).subs(x, invmap) for p in poly]
 
     def plot_entity_diagrams(
         self, filename: typing.Union[str, typing.List[str]],

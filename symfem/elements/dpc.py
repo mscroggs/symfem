@@ -10,7 +10,6 @@ from ..functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d, polynomial_set_vector
 from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
 from .lagrange import Lagrange
 
 
@@ -28,7 +27,8 @@ class DPC(CiarletElement):
         if reference.name == "interval":
             points = [d.dof_point() for d in Lagrange(reference, order, variant).dofs]
         elif order == 0:
-            points = [reference.get_point(tuple(sympy.Rational(1, 2) for _ in range(reference.tdim)))]
+            points = [reference.get_point(tuple(
+                sympy.Rational(1, 2) for _ in range(reference.tdim)))]
         else:
             points = [
                 reference.get_point(tuple(sympy.Rational(j, order) for j in i[::-1]))
@@ -38,16 +38,9 @@ class DPC(CiarletElement):
 
         dofs: ListOfFunctionals = [
             PointEvaluation(reference, d, entity=(reference.tdim, 0)) for d in points]
-
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
-
-        if reference != reference.default_reference():
-            invmap = reference.get_inverse_map_to_self()
-            print(invmap)
-            for i, p in enumerate(poly):
-                poly[i] = p.subs(x, invmap)
-        print(poly)
+        poly = reference.map_polyset_from_default(poly)
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1

@@ -12,8 +12,7 @@ import sympy
 from ..finite_element import CiarletElement
 from ..functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
-from ..polynomials import polynomial_set_1d, quolynomial_set_1d
-from ..references import NonDefaultReferenceError, Reference
+from ..references import Reference
 from .lagrange import Lagrange
 
 
@@ -29,29 +28,25 @@ class Bubble(CiarletElement):
             variant: The variant of the element
         """
         from .. import create_element
-        if reference.vertices != reference.reference_vertices:
-            raise NonDefaultReferenceError()
 
         p1 = create_element(reference.name, "Lagrange", 1, vertices=reference.vertices)
         bubble = 1
         for f in p1.get_basis_functions():
             bubble *= f
 
-        poly: typing.List[FunctionInput] = []
-
-        # TODO: variants
-        if reference.name == "interval":
-            poly += [bubble * p for p in polynomial_set_1d(reference.tdim, order - 2)]
+        if reference.name in ["interval", "quadrilateral", "hexahedron"]:
+            o = order - 2
         elif reference.name == "triangle":
-            poly += [bubble * p for p in polynomial_set_1d(reference.tdim, order - 3)]
+            o = order - 3
         elif reference.name == "tetrahedron":
-            poly += [bubble * p for p in polynomial_set_1d(reference.tdim, order - 4)]
-        elif reference.name == "quadrilateral":
-            poly += [bubble * p for p in quolynomial_set_1d(reference.tdim, order - 2)]
-        elif reference.name == "hexahedron":
-            poly += [bubble * p for p in quolynomial_set_1d(reference.tdim, order - 2)]
+            o = order - 4
         else:
             raise ValueError(f"Unsupported reference: {reference.name}")
+
+        pn = create_element(reference.name, "Lagrange", o, vertices=reference.vertices,
+                            variant=variant)
+
+        poly = [bubble * p for p in pn.get_basis_functions()]
 
         dofs: ListOfFunctionals = []
         if reference.name in ["interval", "triangle", "tetrahedron"]:
