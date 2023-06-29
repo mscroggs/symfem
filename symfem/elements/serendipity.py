@@ -146,4 +146,4 @@ class SerendipityDiv(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(div)"
-    last_updated = "2023.06"
+    last_updated = "2023.06.1"
