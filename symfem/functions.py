@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 import sympy
 
 import symfem.references
+
 from .geometry import PointType
 from .symbols import AxisVariables, AxisVariablesNotSingle, t, x
 
