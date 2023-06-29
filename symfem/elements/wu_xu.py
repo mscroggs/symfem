@@ -11,7 +11,7 @@ from ..functionals import (DerivativePointEvaluation, IntegralOfDirectionalMulti
                            ListOfFunctionals, PointEvaluation)
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
-from ..references import Reference
+from ..references import NonDefaultReferenceError, Reference
 from ..symbols import x
 
 
@@ -45,19 +45,21 @@ class WuXu(CiarletElement):
             order: The polynomial order
         """
         assert order == reference.tdim + 1
+        if reference.name == "tetrahedron" and reference != reference.default_reference():
+            raise NonDefaultReferenceError()
 
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
 
+        invmap = reference.get_inverse_map_to_self()
         if reference.name == "interval":
-            bubble = x[0] * (1 - x[0])
+            bubble = invmap[0] * (1 - invmap[0])
         elif reference.name == "triangle":
-            bubble = x[0] * x[1] * (1 - x[0] - x[1])
+            bubble = invmap[0] * invmap[1] * (1 - invmap[0] - invmap[1])
         elif reference.name == "tetrahedron":
-            bubble = x[0] * x[1] * x[2] * (1 - x[0] - x[1] - x[2])
+            bubble = invmap[0] * invmap[1] * invmap[2] * (1 - invmap[0] - invmap[1] - invmap[2])
 
         poly += [bubble * i for i in polynomial_set_1d(reference.tdim, 1)[1:]]
-        poly = reference.map_polyset_from_default(poly)
 
         dofs: ListOfFunctionals = []
         for v_n, v in enumerate(reference.vertices):
