@@ -12,7 +12,6 @@ from ..functionals import (DerivativePointEvaluation, IntegralOfDirectionalMulti
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
 from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
 
 
 def derivatives(dim: int, order: int) -> typing.List[typing.Tuple[int, ...]]:
