@@ -45,8 +45,6 @@ class WuXu(CiarletElement):
             order: The polynomial order
         """
         assert order == reference.tdim + 1
-        if reference.vertices != reference.reference_vertices:
-            raise NonDefaultReferenceError()
 
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
@@ -59,6 +57,7 @@ class WuXu(CiarletElement):
             bubble = x[0] * x[1] * x[2] * (1 - x[0] - x[1] - x[2])
 
         poly += [bubble * i for i in polynomial_set_1d(reference.tdim, 1)[1:]]
+        poly = reference.map_polyset_from_default(poly)
 
         dofs: ListOfFunctionals = []
         for v_n, v in enumerate(reference.vertices):
@@ -95,4 +94,4 @@ class WuXu(CiarletElement):
     max_order = {"interval": 2, "triangle": 3, "tetrahedron": 4}
     continuity = "C0"
     # continuity = "C{order}"
-    last_updated = "2023.05"
+    last_updated = "2023.06"
