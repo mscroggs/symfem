@@ -53,6 +53,11 @@ def test_push_forward(
     e = symfem.create_element(cell_type, element_type, order, **kwargs)
 
     try:
+        for i, j in zip(e.map_to_cell(vertices), e2.get_basis_functions()):
+            print(i)
+            print(j)
+            print(allequal(i, j))
+            print()
         assert allequal(e.map_to_cell(vertices), e2.get_basis_functions())
     except MappingNotImplemented:
         pytest.xfail("Mapping not implemented for this element.")
