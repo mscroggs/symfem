@@ -7,8 +7,9 @@ from abc import ABC, abstractmethod
 
 import sympy
 
+import symfem.references
+
 from .geometry import PointType
-from .references import Reference
 from .symbols import AxisVariables, AxisVariablesNotSingle, t, x
 
 SingleSympyFormat = typing.Union[
@@ -315,7 +316,7 @@ class AnyFunction(ABC):
 
     @abstractmethod
     def integral(
-        self, domain: Reference, vars: AxisVariablesNotSingle = x,
+        self, domain: symfem.references.Reference, vars: AxisVariablesNotSingle = x,
         dummy_vars: AxisVariablesNotSingle = t
     ) -> ScalarFunction:
         """Compute the integral of the function.
@@ -380,7 +381,7 @@ class AnyFunction(ABC):
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'shape'")
 
     def plot(
-        self, reference: Reference, filename: typing.Union[str, typing.List[str]],
+        self, reference: symfem.references.Reference, filename: typing.Union[str, typing.List[str]],
         dof_point: typing.Optional[PointType] = None,
         dof_direction: typing.Optional[PointType] = None,
         dof_entity: typing.Optional[typing.Tuple[int, int]] = None,
@@ -443,7 +444,7 @@ class AnyFunction(ABC):
         img.save(filename, plot_options=plot_options)
 
     def plot_values(
-        self, reference: Reference, img: typing.Any,
+        self, reference: symfem.references.Reference, img: typing.Any,
         value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
         """Plot the function's values.
@@ -525,7 +526,7 @@ class ScalarFunction(AnyFunction):
         else:
             self._f = f
         assert isinstance(self._f, sympy.core.expr.Expr)
-        self._plot_beziers: typing.Dict[typing.Tuple[Reference, int], typing.List[
+        self._plot_beziers: typing.Dict[typing.Tuple[symfem.references.Reference, int], typing.List[
             typing.Tuple[PointType, PointType, PointType, PointType]]] = {}
 
     def __add__(self, other: typing.Any) -> ScalarFunction:
@@ -763,7 +764,7 @@ class ScalarFunction(AnyFunction):
         return ScalarFunction(abs(self._f))
 
     def integral(
-        self, domain: Reference, vars: AxisVariablesNotSingle = x,
+        self, domain: symfem.references.Reference, vars: AxisVariablesNotSingle = x,
         dummy_vars: AxisVariablesNotSingle = t
     ) -> ScalarFunction:
         """Compute the integral of the function.
@@ -809,7 +810,7 @@ class ScalarFunction(AnyFunction):
         return ScalarFunction(self._f.integrate(*limits))
 
     def plot_values(
-        self, reference: Reference, img: typing.Any,
+        self, reference: symfem.references.Reference, img: typing.Any,
         value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
         """Plot the function's values.
@@ -896,7 +897,7 @@ class VectorFunction(AnyFunction):
         for i in self._vec:
             assert i.is_scalar
 
-        self._plot_arrows: typing.Dict[typing.Tuple[Reference, int], typing.List[
+        self._plot_arrows: typing.Dict[typing.Tuple[symfem.references.Reference, int], typing.List[
             typing.Tuple[typing.Tuple[sympy.core.expr.Expr, ...], VectorFunction, float]]] = {}
 
     def __len__(self):
@@ -1169,7 +1170,7 @@ class VectorFunction(AnyFunction):
         return ScalarFunction(sympy.sqrt(a))
 
     def integral(
-        self, domain: Reference, vars: AxisVariablesNotSingle = x,
+        self, domain: symfem.references.Reference, vars: AxisVariablesNotSingle = x,
         dummy_vars: AxisVariablesNotSingle = t
     ) -> ScalarFunction:
         """Compute the integral of the function.
@@ -1198,7 +1199,7 @@ class VectorFunction(AnyFunction):
             raise StopIteration
 
     def plot_values(
-        self, reference: Reference, img: typing.Any,
+        self, reference: symfem.references.Reference, img: typing.Any,
         value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
     ):
         """Plot the function's values.
@@ -1601,7 +1602,7 @@ class MatrixFunction(AnyFunction):
         raise NotImplementedError()
 
     def integral(
-        self, domain: Reference, vars: AxisVariablesNotSingle = x,
+        self, domain: symfem.references.Reference, vars: AxisVariablesNotSingle = x,
         dummy_vars: AxisVariablesNotSingle = t
     ) -> ScalarFunction:
         """Compute the integral of the function.

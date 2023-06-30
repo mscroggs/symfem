@@ -68,12 +68,7 @@ class HsiehCloughTocher(CiarletElement):
         poly += [
             PiecewiseFunction({i: j for i, j in zip(subs, p)}, 2)
             for p in piece_list]
-
-        if reference != reference.default_reference():
-            invmap = reference.get_inverse_map_to_self()
-            for i, p in enumerate(poly):
-                assert isinstance(p, ScalarFunction)
-                poly[i] = p.subs(x, invmap)
+        poly = reference.map_polyset_from_default(poly)
 
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1

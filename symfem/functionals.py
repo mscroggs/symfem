@@ -875,7 +875,7 @@ class IntegralAgainst(BaseFunctional):
         super().__init__(reference, entity, mapping)
         self.integral_domain = reference.sub_entity(*entity)
 
-        f = parse_function_input(f_in)
+        f = parse_function_input(f_in) / reference.jacobian()
         f = f.subs(x, t)
 
         if f.is_vector:

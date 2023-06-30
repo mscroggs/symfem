@@ -24,25 +24,24 @@ class DPC(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
-        if reference.vertices != reference.reference_vertices:
-            raise NonDefaultReferenceError()
-
         if reference.name == "interval":
             points = [d.dof_point() for d in Lagrange(reference, order, variant).dofs]
         elif order == 0:
-            points = [tuple(sympy.Rational(1, 2) for _ in range(reference.tdim))]
+            points = [reference.get_point(tuple(
+                sympy.Rational(1, 2) for _ in range(reference.tdim)))]
         else:
             points = [
-                tuple(sympy.Rational(j, order) for j in i[::-1])
+                reference.get_point(tuple(sympy.Rational(j, order) for j in i[::-1]))
                 for i in product(range(order + 1), repeat=reference.tdim)
                 if sum(i) <= order
             ]
 
         dofs: ListOfFunctionals = [
             PointEvaluation(reference, d, entity=(reference.tdim, 0)) for d in points]
-
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
+        poly = reference.map_polyset_from_default(poly)
+
         super().__init__(
             reference, order, poly, dofs, reference.tdim, 1
         )
@@ -60,7 +59,7 @@ class DPC(CiarletElement):
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
-    last_updated = "2023.05"
+    last_updated = "2023.06"
 
 
 class VectorDPC(CiarletElement):

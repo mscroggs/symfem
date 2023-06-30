@@ -28,12 +28,10 @@ class Serendipity(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
-        if reference.vertices != reference.reference_vertices:
-            raise NonDefaultReferenceError()
-
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
         poly += serendipity_set_1d(reference.tdim, order)
+        poly = reference.map_polyset_from_default(poly)
 
         dofs: ListOfFunctionals = []
         for v_n, p in enumerate(reference.vertices):
@@ -148,4 +146,4 @@ class SerendipityDiv(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(div)"
-    last_updated = "2023.06"
+    last_updated = "2023.06.1"

@@ -8,13 +8,12 @@ import sympy
 from ..finite_element import CiarletElement, FiniteElement
 from ..functionals import (DotPointEvaluation, IntegralMoment, ListOfFunctionals,
                            NormalIntegralMoment, PointEvaluation, TangentIntegralMoment)
-from ..functions import FunctionInput, ScalarFunction
+from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..polynomials import (Hcurl_quolynomials, Hdiv_quolynomials, quolynomial_set_1d,
                            quolynomial_set_vector)
 from ..quadrature import get_quadrature
 from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
 
 
 class Q(CiarletElement):
@@ -52,12 +51,7 @@ class Q(CiarletElement):
 
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_1d(reference.tdim, order)
-
-        if reference != reference.default_reference():
-            invmap = reference.get_inverse_map_to_self()
-            for n, p in enumerate(poly):
-                assert isinstance(p, ScalarFunction)
-                poly[n] = p.subs(x, invmap)
+        poly = reference.map_polyset_from_default(poly)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant

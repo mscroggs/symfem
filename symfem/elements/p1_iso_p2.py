@@ -13,7 +13,7 @@ from ..functionals import ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..geometry import SetOfPoints
 from ..piecewise_functions import PiecewiseFunction
-from ..references import NonDefaultReferenceError, Reference
+from ..references import Reference
 from ..symbols import x as x_variables
 
 
@@ -27,9 +27,6 @@ class P1IsoP2Tri(CiarletElement):
             reference: The reference element
             order: The polynomial order
         """
-        if reference.vertices != reference.reference_vertices:
-            raise NonDefaultReferenceError()
-
         half = sympy.Rational(1, 2)
         zero = sympy.Integer(0)
         one = sympy.Integer(1)
@@ -43,6 +40,7 @@ class P1IsoP2Tri(CiarletElement):
         x = x_variables[0]
         y = x_variables[1]
         c = 1 - x - y
+        invmap = reference.get_inverse_map_to_self()
         for pieces in [
             {0: 2 * c - 1},
             {1: 2 * x - 1},
@@ -52,7 +50,9 @@ class P1IsoP2Tri(CiarletElement):
             {1: 2 * y, 2: 2 * x, 3: 1 - 2 * c},
         ]:
             poly.append(PiecewiseFunction({
-                tuple(reference.get_point(pt) for pt in q): pieces[i] if i in pieces else 0
+                tuple(
+                    reference.get_point(pt) for pt in q
+                ): pieces[i].subs(x, invmap[0]).subs(y, invmap[1]) if i in pieces else 0
                 for i, q in enumerate(tris)
             }, 2))
 
@@ -72,7 +72,7 @@ class P1IsoP2Tri(CiarletElement):
     min_order = 1
     max_order = 1
     continuity = "C0"
-    last_updated = "2023.05"
+    last_updated = "2023.06"
 
 
 class P1IsoP2Quad(CiarletElement):
@@ -85,9 +85,6 @@ class P1IsoP2Quad(CiarletElement):
             reference: The reference element
             order: The polynomial order
         """
-        if reference.vertices != reference.reference_vertices:
-            raise NonDefaultReferenceError()
-
         half = sympy.Rational(1, 2)
         zero = sympy.Integer(0)
         one = sympy.Integer(1)
@@ -100,6 +97,7 @@ class P1IsoP2Quad(CiarletElement):
         poly: typing.List[FunctionInput] = []
         x = x_variables[0]
         y = x_variables[1]
+        invmap = reference.get_inverse_map_to_self()
         for pieces in [
             {0: (1 - 2 * x) * (1 - 2 * y)},
             {1: (2 * x - 1) * (1 - 2 * y)},
@@ -111,11 +109,14 @@ class P1IsoP2Quad(CiarletElement):
             {2: 2 * x * (2 * y - 1), 3: 2 * (1 - x) * (2 * y - 1)},
             {0: 4 * x * y, 1: 4 * (1 - x) * y, 2: 4 * x * (1 - y), 3: 4 * (1 - x) * (1 - y)},
         ]:
-            poly.append(PiecewiseFunction(
-                {q: pieces[i] if i in pieces else 0 for i, q in enumerate(quads)}, 2))
+            poly.append(PiecewiseFunction({
+                tuple(
+                    reference.get_point(pt) for pt in q
+                ): pieces[i].subs(x, invmap[0]).subs(y, invmap[1]) if i in pieces else 0
+                for i, q in enumerate(quads)}, 2))
 
         dofs: ListOfFunctionals = []
-        for v_n, v in enumerate(reference.reference_vertices):
+        for v_n, v in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
         for e_n in range(4):
             entity = reference.sub_entity(1, e_n)
@@ -131,4 +132,4 @@ class P1IsoP2Quad(CiarletElement):
     min_order = 1
     max_order = 1
     continuity = "C0"
-    last_updated = "2023.05"
+    last_updated = "2023.06"

@@ -103,11 +103,7 @@ class Transition(CiarletElement):
                         assert isinstance(f, ScalarFunction)
                         poly.append(f.subs(x, variables) * bubble)
 
-        if reference != reference.default_reference():
-            invmap = reference.get_inverse_map_to_self()
-            for i, p in enumerate(poly):
-                assert isinstance(p, ScalarFunction)
-                poly[i] = p.subs(x, invmap)
+        poly = reference.map_polyset_from_default(poly)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant
