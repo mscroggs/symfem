@@ -14,7 +14,7 @@ def lobatto_basis_interval(order: int) -> typing.List[ScalarFunction]:
     Args:
         order: The maximum polynomial degree
 
-    returns:
+    Returns:
         Lobatto polynomials
     """
     legendre = orthonormal_basis("interval", order - 1, 0)[0]
@@ -30,7 +30,7 @@ def lobatto_dual_basis_interval(order: int) -> typing.List[ScalarFunction]:
     Args:
         order: The maximum polynomial degree
 
-    returns:
+    Returns:
         Dual Lobatto polynomials
     """
     return l2_dual("interval", lobatto_basis_interval(order))
@@ -46,7 +46,7 @@ def lobatto_basis(
         order: The maximum polynomial degree
         include_endpoint: should polynomials that are non-zero on the boundary be included?
 
-    returns:
+    Returns:
         Lobatto polynomials
     """
     if cell == "interval":
@@ -74,7 +74,7 @@ def lobatto_dual_basis(
         order: The maximum polynomial degree
         include_endpoint: should polynomials that are non-zero on the boundary be included?
 
-    returns:
+    Returns:
         Lobatto polynomials
     """
     if cell == "interval":
