@@ -6,12 +6,12 @@ from itertools import product
 import sympy
 
 from ..finite_element import CiarletElement, FiniteElement
-from ..functionals import (DotPointEvaluation, IntegralMoment, ListOfFunctionals,
+from ..functionals import (DotPointEvaluation, IntegralAgainst, IntegralMoment, ListOfFunctionals,
                            NormalIntegralMoment, PointEvaluation, TangentIntegralMoment)
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
-from ..polynomials import (Hcurl_quolynomials, Hdiv_quolynomials, quolynomial_set_1d,
-                           quolynomial_set_vector)
+from ..polynomials import (Hcurl_quolynomials, Hdiv_quolynomials, lobatto_dual_basis,
+                           orthonormal_basis, quolynomial_set_1d, quolynomial_set_vector)
 from ..quadrature import get_quadrature
 from ..references import NonDefaultReferenceError, Reference
 
@@ -28,11 +28,24 @@ class Q(CiarletElement):
             variant: The variant of the element
         """
         dofs: ListOfFunctionals = []
-        if order == 0:
+        if variant == "legendre":
+            basis = orthonormal_basis(reference.name, order, 0)[0]
+            for f in basis:
+                dofs.append(IntegralAgainst(reference, f, (reference.tdim, 0)))
+        elif order == 0:
             dofs = [PointEvaluation(
                 reference,
                 reference.get_point(tuple(sympy.Rational(1, 2) for i in range(reference.tdim))),
                 entity=(reference.tdim, 0))]
+        elif variant == "lobatto":
+            for v_n, v in enumerate(reference.vertices):
+                dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
+            for edim in range(1, 4):
+                for e_n in range(reference.sub_entity_count(edim)):
+                    entity = reference.sub_entity(edim, e_n)
+                    basis = lobatto_dual_basis(entity.name, order, False)
+                    for f in basis:
+                        dofs.append(IntegralAgainst(reference, f, (edim, e_n)))
         else:
             points, _ = get_quadrature(variant, order + 1)
 
@@ -110,7 +123,7 @@ class Q(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "C0"
-    last_updated = "2023.06"
+    last_updated = "2023.07"
 
 
 class VectorQ(CiarletElement):

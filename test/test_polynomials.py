@@ -6,8 +6,8 @@ import pytest
 import sympy
 
 from symfem import create_element, create_reference
-from symfem.functions import VectorFunction
-from symfem.polynomials import (Hcurl_polynomials, Hdiv_polynomials, orthogonal_basis,
+from symfem.functions import ScalarFunction, VectorFunction
+from symfem.polynomials import (Hcurl_polynomials, Hdiv_polynomials, l2_dual, orthogonal_basis,
                                 orthonormal_basis)
 from symfem.symbols import t, x
 
@@ -136,3 +136,17 @@ def test_orthonormal_polynomials(reference, order, speed):
     ref = create_reference(reference)
     for p in polynomials:
         assert (p ** 2).integral(ref, x) == 1
+
+
+@pytest.mark.parametrize("reference, order", [
+    (r, o) for r, m in [("interval", 6), ("triangle", 3), ("quadrilateral", 3),
+                        ("tetrahedron", 2), ("hexahedron", 2), ("prism", 2),
+                        ("pyramid", 2)] for o in range(m)])
+def test_dual(reference, order):
+    ref = create_reference(reference)
+    poly = create_element(reference, "P", order).get_polynomial_basis()
+    dual = l2_dual(reference, poly)
+
+    for i, p in enumerate(poly):
+        for j, d in enumerate(dual):
+            assert (p * d).integrate(*ref.integration_limits(x)) == (1 if i == j else 0)
