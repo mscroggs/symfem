@@ -2,8 +2,8 @@
 
 import typing
 
-from ..functions import ScalarFunction, VectorFunction
-from ..symbols import AxisVariablesNotSingle, t, x
+from ..functions import ScalarFunction
+from ..symbols import x
 from .dual import l2_dual
 from .legendre import orthonormal_basis
 
@@ -22,6 +22,7 @@ def lobatto_basis_interval(order: int) -> typing.List[ScalarFunction]:
     for f in legendre:
         out.append(f.integrate((x[0], 0, x[0])))
     return out
+
 
 def lobatto_dual_basis_interval(order: int) -> typing.List[ScalarFunction]:
     """Get L2 dual of Lobatto polynomials on an interval.

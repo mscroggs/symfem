@@ -12,7 +12,7 @@ import sympy
 from ..finite_element import CiarletElement
 from ..functionals import IntegralAgainst, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
-from ..polynomials import lobatto_dual_basis, orthonormal_basis, pyramid_polynomial_set_1d
+from ..polynomials import orthonormal_basis, pyramid_polynomial_set_1d
 from ..quadrature import get_quadrature
 from ..references import NonDefaultReferenceError, Reference
 

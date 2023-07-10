@@ -3,8 +3,6 @@
 import typing
 from itertools import product
 
-import sympy
-
 from ..functions import ScalarFunction, VectorFunction
 from ..symbols import AxisVariablesNotSingle, x
 

@@ -6,7 +6,7 @@ import pytest
 import sympy
 
 from symfem import create_element, create_reference
-from symfem.functions import ScalarFunction, VectorFunction
+from symfem.functions import VectorFunction
 from symfem.polynomials import (Hcurl_polynomials, Hdiv_polynomials, l2_dual, orthogonal_basis,
                                 orthonormal_basis)
 from symfem.symbols import t, x

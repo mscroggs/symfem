@@ -1,11 +1,10 @@
 """Orthogonal (Legendre) polynomials."""
 
 import typing
-from itertools import product
 
 import sympy
 
-from ..functions import ScalarFunction, VectorFunction
+from ..functions import ScalarFunction
 from ..symbols import AxisVariablesNotSingle, x
 
 

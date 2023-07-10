@@ -10,8 +10,10 @@ def test_legendre(cell, order):
     e = symfem.create_element(cell, "P", order, variant="legendre")
     assert symfem.utils.allequal(e.get_basis_functions(), basis)
 
+
 @pytest.mark.parametrize("cell, order", [
-    (c, o) for c, m in [("interval", 5), ("quadrilateral", 4), ("hexahedron", 3)] for o in range(m)])
+    (c, o) for c, m in [("interval", 5), ("quadrilateral", 4), ("hexahedron", 3)]
+    for o in range(m)])
 def test_lobatto(cell, order):
     basis = symfem.polynomials.lobatto_basis(cell, order, False)
     e = symfem.create_element(cell, "P", order, variant="lobatto")

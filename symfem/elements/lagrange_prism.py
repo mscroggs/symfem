@@ -8,8 +8,7 @@ import sympy
 from ..finite_element import CiarletElement
 from ..functionals import DotPointEvaluation, IntegralAgainst, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
-from ..polynomials import (lobatto_dual_basis, orthonormal_basis, prism_polynomial_set_1d,
-                           prism_polynomial_set_vector)
+from ..polynomials import orthonormal_basis, prism_polynomial_set_1d, prism_polynomial_set_vector
 from ..quadrature import get_quadrature
 from ..references import NonDefaultReferenceError, Reference
 
@@ -99,6 +98,7 @@ class Lagrange(CiarletElement):
     min_order = 0
     continuity = "C0"
     last_updated = "2023.07"
+
 
 class VectorLagrange(CiarletElement):
     """Vector Lagrange finite element."""
