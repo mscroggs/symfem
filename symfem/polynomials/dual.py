@@ -5,7 +5,6 @@ import typing
 import sympy
 
 from ..functions import ScalarFunction
-from ..symbols import x
 
 
 def l2_dual(cell: str, poly: typing.List[ScalarFunction]) -> typing.List[ScalarFunction]:
