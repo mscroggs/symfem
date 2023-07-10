@@ -1,10 +1,11 @@
 """Lobatto polynomials."""
 
-from ..functions import ScalarFunction, VectorFunction
-from ..symbols import AxisVariablesNotSingle, x, t
-from .legendre import orthonormal_basis
-from .dual import l2_dual
 import typing
+
+from ..functions import ScalarFunction, VectorFunction
+from ..symbols import AxisVariablesNotSingle, t, x
+from .dual import l2_dual
+from .legendre import orthonormal_basis
 
 
 def lobatto_basis_interval(order: int) -> typing.List[ScalarFunction]:

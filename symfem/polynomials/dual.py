@@ -1,10 +1,12 @@
 """Dual polynomials."""
 
-from ..functions import ScalarFunction, VectorFunction
-from ..symbols import AxisVariablesNotSingle, x, t
-from .legendre import orthonormal_basis
 import typing
+
 import sympy
+
+from ..functions import ScalarFunction, VectorFunction
+from ..symbols import AxisVariablesNotSingle, t, x
+from .legendre import orthonormal_basis
 
 
 def l2_dual(cell: str, poly: typing.List[ScalarFunction]) -> typing.List[ScalarFunction]:
