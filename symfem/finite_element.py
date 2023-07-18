@@ -339,6 +339,7 @@ class FiniteElement(ABC):
 
         for dim, entities in entity_pairs:
             for fi, gi in zip(*[self.entity_dofs(dim, i) for i in entities]):
+                print(fi, gi)
                 basis = self.get_basis_functions()
                 try:
                     basis2 = self.map_to_cell(vertices)

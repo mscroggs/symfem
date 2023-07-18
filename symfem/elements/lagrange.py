@@ -99,7 +99,10 @@ class VectorLagrange(CiarletElement):
         poly: typing.List[FunctionInput] = []
         if reference.tdim == 1:
             for p in scalar_space.dofs:
-                dofs.append(PointEvaluation(reference, p.dof_point(), entity=p.entity))
+                if isinstance(p, PointEvaluation):
+                    dofs.append(PointEvaluation(reference, p.dof_point(), entity=p.entity))
+                elif isinstance(p, IntegralAgainst):
+                    dofs.append(IntegralAgainst(reference, p.f, entity=p.entity))
 
             poly += polynomial_set_1d(reference.tdim, order)
         else:
@@ -109,7 +112,12 @@ class VectorLagrange(CiarletElement):
             ]
             for p in scalar_space.dofs:
                 for d in directions:
-                    dofs.append(DotPointEvaluation(reference, p.dof_point(), d, entity=p.entity))
+                    if isinstance(p, PointEvaluation):
+                        dofs.append(DotPointEvaluation(
+                            reference, p.dof_point(), d, entity=p.entity))
+                    elif isinstance(p, IntegralAgainst):
+                        dofs.append(IntegralAgainst(
+                            reference, tuple(p.f * i for i in d), entity=p.entity))
 
             poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -127,7 +135,7 @@ class VectorLagrange(CiarletElement):
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "C0"
-    last_updated = "2023.05"
+    last_updated = "2023.07"
 
 
 class MatrixLagrange(CiarletElement):
@@ -173,7 +181,7 @@ class MatrixLagrange(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 0
     continuity = "L2"
-    last_updated = "2023.05"
+    last_updated = "2023.07"
 
 
 class SymmetricMatrixLagrange(CiarletElement):
