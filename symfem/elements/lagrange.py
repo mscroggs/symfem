@@ -102,7 +102,8 @@ class VectorLagrange(CiarletElement):
                 if isinstance(p, PointEvaluation):
                     dofs.append(PointEvaluation(reference, p.dof_point(), entity=p.entity))
                 elif isinstance(p, IntegralAgainst):
-                    dofs.append(IntegralAgainst(reference, p.f, entity=p.entity))
+                    dofs.append(IntegralAgainst(
+                        reference, p.f * reference.jacobian(), entity=p.entity))
 
             poly += polynomial_set_1d(reference.tdim, order)
         else:
@@ -120,6 +121,7 @@ class VectorLagrange(CiarletElement):
                             reference, tuple(p.f * i for i in d), entity=p.entity))
 
             poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
+
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
@@ -135,7 +137,7 @@ class VectorLagrange(CiarletElement):
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "C0"
-    last_updated = "2023.07"
+    last_updated = "2023.07.1"
 
 
 class MatrixLagrange(CiarletElement):

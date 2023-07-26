@@ -30,7 +30,8 @@ class DPC(CiarletElement):
                 if isinstance(d, PointEvaluation):
                     dofs.append(PointEvaluation(reference, d.point, entity=(reference.tdim, 0)))
                 elif isinstance(d, IntegralAgainst):
-                    dofs.append(IntegralAgainst(reference, d.f, entity=(reference.tdim, 0)))
+                    dofs.append(IntegralAgainst(
+                        reference, d.f * reference.jacobian(), entity=(reference.tdim, 0)))
         else:
             if order == 0:
                 points = [reference.get_point(tuple(
@@ -66,7 +67,7 @@ class DPC(CiarletElement):
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
-    last_updated = "2023.07"
+    last_updated = "2023.07.1"
 
 
 class VectorDPC(CiarletElement):

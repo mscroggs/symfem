@@ -38,6 +38,8 @@ class Q(CiarletElement):
                 reference.get_point(tuple(sympy.Rational(1, 2) for i in range(reference.tdim))),
                 entity=(reference.tdim, 0))]
         elif variant == "lobatto":
+            if reference != reference.default_reference():
+                raise NonDefaultReferenceError()
             for v_n, v in enumerate(reference.vertices):
                 dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
             for edim in range(1, 4):
@@ -77,6 +79,8 @@ class Q(CiarletElement):
         Returns:
             The tensor factorisation
         """
+        if self.variant == "lobatto":
+            return super().get_tensor_factorisation()
         from symfem import create_element
         interval_q = create_element("interval", "Lagrange", self.order)
 
@@ -123,7 +127,7 @@ class Q(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "C0"
-    last_updated = "2023.07"
+    last_updated = "2023.07.1"
 
 
 class VectorQ(CiarletElement):
