@@ -6,7 +6,7 @@ from itertools import product
 import sympy
 
 from ..finite_element import CiarletElement
-from ..functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
+from ..functionals import DotPointEvaluation, IntegralAgainst, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d, polynomial_set_vector
 from ..references import NonDefaultReferenceError, Reference
@@ -24,20 +24,28 @@ class DPC(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
+        dofs: ListOfFunctionals = []
         if reference.name == "interval":
-            points = [d.dof_point() for d in Lagrange(reference, order, variant).dofs]
-        elif order == 0:
-            points = [reference.get_point(tuple(
-                sympy.Rational(1, 2) for _ in range(reference.tdim)))]
+            for d in Lagrange(reference, order, variant).dofs:
+                if isinstance(d, PointEvaluation):
+                    dofs.append(PointEvaluation(reference, d.point, entity=(reference.tdim, 0)))
+                elif isinstance(d, IntegralAgainst):
+                    dofs.append(IntegralAgainst(
+                        reference, d.f * reference.jacobian(), entity=(reference.tdim, 0)))
         else:
-            points = [
-                reference.get_point(tuple(sympy.Rational(j, order) for j in i[::-1]))
-                for i in product(range(order + 1), repeat=reference.tdim)
-                if sum(i) <= order
-            ]
+            if order == 0:
+                points = [reference.get_point(tuple(
+                    sympy.Rational(1, 2) for _ in range(reference.tdim)))]
+            else:
+                points = [
+                    reference.get_point(tuple(sympy.Rational(j, order) for j in i[::-1]))
+                    for i in product(range(order + 1), repeat=reference.tdim)
+                    if sum(i) <= order
+                ]
 
-        dofs: ListOfFunctionals = [
-            PointEvaluation(reference, d, entity=(reference.tdim, 0)) for d in points]
+            dofs = [
+                PointEvaluation(reference, d, entity=(reference.tdim, 0)) for d in points]
+
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
         poly = reference.map_polyset_from_default(poly)
@@ -59,7 +67,7 @@ class DPC(CiarletElement):
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
-    last_updated = "2023.06"
+    last_updated = "2023.07.1"
 
 
 class VectorDPC(CiarletElement):
@@ -107,4 +115,4 @@ class VectorDPC(CiarletElement):
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
-    last_updated = "2023.05"
+    last_updated = "2023.07"

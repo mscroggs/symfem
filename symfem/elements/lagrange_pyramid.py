@@ -10,9 +10,9 @@ from itertools import product
 import sympy
 
 from ..finite_element import CiarletElement
-from ..functionals import ListOfFunctionals, PointEvaluation
+from ..functionals import IntegralAgainst, ListOfFunctionals, PointEvaluation
 from ..functions import FunctionInput
-from ..polynomials import pyramid_polynomial_set_1d
+from ..polynomials import orthonormal_basis, pyramid_polynomial_set_1d
 from ..quadrature import get_quadrature
 from ..references import NonDefaultReferenceError, Reference
 
@@ -32,7 +32,11 @@ class Lagrange(CiarletElement):
             raise NonDefaultReferenceError()
 
         dofs: ListOfFunctionals = []
-        if order == 0:
+        if variant == "legendre":
+            basis = orthonormal_basis(reference.name, order, 0)[0]
+            for f in basis:
+                dofs.append(IntegralAgainst(reference, f, (reference.tdim, 0)))
+        elif order == 0:
             dofs = [
                 PointEvaluation(
                     reference, tuple(
@@ -42,6 +46,8 @@ class Lagrange(CiarletElement):
                     entity=(reference.tdim, 0)
                 )
             ]
+        elif variant == "lobatto":
+            raise NotImplementedError()
         else:
             points, _ = get_quadrature(variant, order + 1)
 
@@ -97,4 +103,4 @@ class Lagrange(CiarletElement):
     references = ["pyramid"]
     min_order = 0
     continuity = "C0"
-    last_updated = "2023.05"
+    last_updated = "2023.07"

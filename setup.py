@@ -34,7 +34,7 @@ if __name__ == "__main__":
         author_email="symfem@mscroggs.co.uk",
         maintainer_email="symfem@mscroggs.co.uk",
         url="https://github.com/mscroggs/symfem",
-        packages=["symfem", "symfem.elements"],
+        packages=["symfem", "symfem.elements", "symfem.polynomials"],
         package_data={"symfem": ["py.typed"]},
         include_package_data=True,
         data_files=data_files,
