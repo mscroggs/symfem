@@ -1,3 +1,15 @@
+# Version 2023.8.0 (08 August 2023)
+
+- Corrected HCT and rHCT elements
+- Added caching of matrix inverses and dual matrices
+- Added P1 macro element
+- Added Alfeld-Sorokina element
+- Corrected C1 and higher order C tests
+- Allow element creation on non-default references
+- Corrected Bell element
+- Corrected legendre and lobatto variants of Lagrange
+- Add P1-iso-P2 elemen on interval
+
 # Version 2023.4.1 (26 April 2023)
 
 - Added enriched Galerkin element
