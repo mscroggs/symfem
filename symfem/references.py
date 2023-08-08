@@ -220,7 +220,7 @@ class Reference(ABC):
         """Check if two references are equal."""
         if not isinstance(other, Reference):
             return False
-        return type(self) == type(other) and self.vertices == other.vertices
+        return type(self) is type(other) and self.vertices == other.vertices
 
     def __hash__(self) -> int:
         """Check if two references are equal."""
