@@ -6,3 +6,4 @@
 - Allow element creation on non-default references
 - Corrected Bell element
 - Corrected legendre and lobatto variants of Lagrange
+- Add P1-iso-P2 elemen on interval

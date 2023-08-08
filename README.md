@@ -148,6 +148,7 @@ The reference interval has vertices (0,) and (1,). Its sub-entities are numbered
 - Hermite
 - Lagrange (alternative names: P)
 - Morley-Wang-Xu (alternative names: MWX)
+- P1-iso-P2 (alternative names: P2-iso-P1, iso-P2 P1)
 - serendipity (alternative names: S)
 - Taylor (alternative names: discontinuous Taylor)
 - vector Lagrange (alternative names: vP)

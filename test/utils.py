@@ -22,6 +22,7 @@ test_elements: typing.Dict[str, typing.Dict[
         "Wu-Xu": [({}, [2])],
         "MWX": [({}, [1])],
         "EG": [({}, range(1, 5))],
+        "P1-iso-P2": [({}, [1])],
     },
     "triangle": {
         "P": [({"variant": "equispaced"}, range(5))],
