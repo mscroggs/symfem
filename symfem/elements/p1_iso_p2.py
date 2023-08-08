@@ -26,15 +26,15 @@ class P1IsoP2Interval(CiarletElement):
             reference: The reference element
             order: The polynomial order
         """
-        half = sympy.Rational(1, 2)
-        zero = sympy.Integer(0)
-        one = sympy.Integer(1)
+        zero = reference.get_point((sympy.Integer(0), ))
+        half = reference.get_point((sympy.Rational(1, 2), ))
+        one = reference.get_point((sympy.Integer(1), ))
 
         x = reference.get_inverse_map_to_self()[0]
         poly: typing.List[FunctionInput] = [
-            PiecewiseFunction({((zero, ), (half, )): 1 - 2 * x, ((half, ), (one, )): 0}, 1),
-            PiecewiseFunction({((zero, ), (half, )): 2 * x, ((half, ), (one, )): 2 - 2 * x}, 1),
-            PiecewiseFunction({((zero, ), (half, )): 0, ((half, ), (one, )): 2 * x - 1}, 1),
+            PiecewiseFunction({(zero, half): 1 - 2 * x, (half, one): 0}, 1),
+            PiecewiseFunction({(zero, half): 2 * x, (half, one): 2 - 2 * x}, 1),
+            PiecewiseFunction({(zero, half): 0, (half, one): 2 * x - 1}, 1),
         ]
 
         dofs: ListOfFunctionals = []

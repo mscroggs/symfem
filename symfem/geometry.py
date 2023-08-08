@@ -87,6 +87,25 @@ def _vdot(v: PointType, w: PointType) -> sympy.core.expr.Expr:
     return out
 
 
+def point_in_interval(point: PointType, interval: SetOfPoints) -> bool:
+    """Check if a point is inside an interval.
+
+    Args:
+        point: The point
+        interval: The vertices of the interval
+
+    Returns:
+        Is the point inside the interval?
+    """
+    v = _vsub(point, interval[0])[0] / _vsub(interval[1], interval[0])[0]
+
+    if isinstance(v, sympy.Float) and _is_close(v, 0):
+        v = sympy.Integer(0)
+    if isinstance(v, sympy.Float) and _is_close(v, 1):
+        v = sympy.Integer(1)
+    return 0 <= v <= 1
+
+
 def point_in_triangle(point: PointType, triangle: SetOfPoints) -> bool:
     """Check if a point is inside a triangle.
 

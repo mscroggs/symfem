@@ -9,7 +9,8 @@ import sympy
 from .functions import (AnyFunction, FunctionInput, ScalarFunction, SympyFormat, ValuesToSubstitute,
                         VectorFunction, _to_sympy_format, parse_function_input)
 from .geometry import (PointType, SetOfPoints, SetOfPointsInput, parse_set_of_points_input,
-                       point_in_quadrilateral, point_in_tetrahedron, point_in_triangle)
+                       point_in_quadrilateral, point_in_tetrahedron, point_in_triangle,
+                       point_in_interval)
 from .references import Reference
 from .symbols import AxisVariables, AxisVariablesNotSingle, t, x
 
@@ -113,6 +114,10 @@ class PiecewiseFunction(AnyFunction):
         Returns:
             The piece of the function that is valid at that point
         """
+        if self.tdim == 1:
+            for cell, value in self._pieces.items():
+                if point_in_interval(point[:1], cell):
+                    return value
         if self.tdim == 2:
             for cell, value in self._pieces.items():
                 if len(cell) == 3:

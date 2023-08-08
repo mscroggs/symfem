@@ -347,7 +347,6 @@ class FiniteElement(ABC):
 
                 f = basis[fi]
                 g = basis2[gi]
-
                 def get_piece(f, point):
                     if isinstance(f, PiecewiseFunction):
                         return f.get_piece(point)
@@ -357,7 +356,10 @@ class FiniteElement(ABC):
                         return tuple(get_piece(g, point) for g in f)
                     return f
 
-                if self.reference.tdim == 2:
+                if self.reference.tdim == 1:
+                    f = get_piece(f, (0, ))
+                    g = get_piece(g, (0, ))
+                elif self.reference.tdim == 2:
                     f = get_piece(f, (0, sympy.Rational(1, 2)))
                     g = get_piece(g, (0, sympy.Rational(1, 2)))
                 elif self.reference.tdim == 3:
