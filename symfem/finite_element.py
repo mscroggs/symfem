@@ -347,6 +347,7 @@ class FiniteElement(ABC):
 
                 f = basis[fi]
                 g = basis2[gi]
+
                 def get_piece(f, point):
                     if isinstance(f, PiecewiseFunction):
                         return f.get_piece(point)
