@@ -86,7 +86,9 @@ class PiecewiseFunction(AnyFunction):
             joiner = "\\\\"
             out += f.as_tex().replace("\\frac", "\\tfrac")
             out += "&\\text{in }\\operatorname{"
-            if self.tdim == 2:
+            if self.tdim == 1:
+                out += "Interval"
+            elif self.tdim == 2:
                 if len(shape) == 3:
                     out += "Triangle"
                 elif len(shape) == 4:
@@ -532,7 +534,9 @@ class PiecewiseFunction(AnyFunction):
 def _piece_reference(tdim, shape):
     """Create a reference element for a single piece."""
     from .create import create_reference
-    if tdim == 2:
+    if tdim == 1:
+        return create_reference("interval", shape)
+    elif tdim == 2:
         if len(shape) == 3:
             return create_reference("triangle", shape)
         elif len(shape) == 4:

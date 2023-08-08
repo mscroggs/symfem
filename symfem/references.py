@@ -874,8 +874,8 @@ class Interval(Reference):
         Returns:
             A lattice of points offset from the edge of the cell
         """
-        assert self.vertices == self.reference_vertices
-        return tuple((sympy.Rational(2 * i + 1, 2 * (n + 1)), ) for i in range(n))
+        return tuple(tuple(a + (b - a) * sympy.Rational(2 * i + 1, 2 * (n + 1))
+                           for a, b in zip(*self.vertices)) for i in range(n))
 
     def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
@@ -887,8 +887,8 @@ class Interval(Reference):
             A lattice of points including the edges of the cell
             Pairs of point numbers that make a mesh of lines across the cell
         """
-        assert self.vertices == self.reference_vertices
-        pts = tuple((sympy.Rational(i, n - 1), ) for i in range(n))
+        pts = tuple(tuple(a + (b - a) * sympy.Rational(i, n - 1)
+                          for a, b in zip(*self.vertices)) for i in range(n))
         pairs = [(i, i + 1) for i in range(n - 1)]
         return pts, pairs
 
