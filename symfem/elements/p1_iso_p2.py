@@ -32,9 +32,9 @@ class P1IsoP2Interval(CiarletElement):
 
         x = reference.get_inverse_map_to_self()[0]
         poly = [
-            {((zero, ), (half, )): 1 - 2 * x, ((half, ), (one, )): 0},
-            {((zero, ), (half, )): 2 * x, ((half, ), (one, )): 2 - 2 * x},
-            {((zero, ), (half, )): 0, ((half, ), (one, )): 2 * x - 1},
+            PiecewiseFunction({((zero, ), (half, )): 1 - 2 * x, ((half, ), (one, )): 0}, 1),
+            PiecewiseFunction({((zero, ), (half, )): 2 * x, ((half, ), (one, )): 2 - 2 * x}, 1),
+            PiecewiseFunction({((zero, ), (half, )): 0, ((half, ), (one, )): 2 * x - 1}, 1),
         ]
 
         dofs: ListOfFunctionals = []
