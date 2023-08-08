@@ -1,9 +1,0 @@
-- Corrected HCT and rHCT elements
-- Added caching of matrix inverses and dual matrices
-- Added P1 macro element
-- Added Alfeld-Sorokina element
-- Corrected C1 and higher order C tests
-- Allow element creation on non-default references
-- Corrected Bell element
-- Corrected legendre and lobatto variants of Lagrange
-- Add P1-iso-P2 elemen on interval
