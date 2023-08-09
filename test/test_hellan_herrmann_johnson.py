@@ -3,9 +3,9 @@
 import pytest
 
 from symfem import create_element
+from symfem.functions import VectorFunction
 from symfem.symbols import x
 from symfem.utils import allequal
-from symfem.functions import VectorFunction
 
 
 @pytest.mark.parametrize('reference', ['triangle', 'tetrahedron'])
