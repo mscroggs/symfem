@@ -248,6 +248,7 @@ The reference tetrahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), and (0, 
 - enriched Galerkin (alternative names: EG)
 - enriched vector Galerkin (alternative names: locking-free enriched Galerkin, LFEG)
 - Guzman-Neilan
+- Hellan-Herrmann-Johnson (alternative names: HHJ)
 - Hermite
 - Kong-Mulder-Veldhuizen (alternative names: KMV)
 - Lagrange (alternative names: P)
