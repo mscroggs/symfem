@@ -99,7 +99,7 @@ class BaseFunctional(ABC):
             Mapped functions
         """
         assert self.mapping is not None
-        return [getattr(mappings, self.mapping)(f, map, inverse_map, tdim) for f in fs]
+        return [getattr(mappings, self.mapping)(f, map, inverse_map) for f in fs]
 
     def entity_tex(self) -> str:
         """Get the entity the DOF is associated with in TeX format.
