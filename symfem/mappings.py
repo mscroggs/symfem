@@ -12,7 +12,7 @@ class MappingNotImplemented(NotImplementedError):
 
 
 def identity(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Map functions.
@@ -33,7 +33,7 @@ def identity(
 
 
 def l2(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Map functions, scaling by the determinant of the jacobian.
