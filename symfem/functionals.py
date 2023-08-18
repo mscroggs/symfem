@@ -880,15 +880,13 @@ class IntegralAgainst(BaseFunctional):
             assert len(f) == self.integral_domain.tdim
             self.f = mappings.contravariant(
                 f, self.integral_domain.get_map_to_self(),
-                self.integral_domain.get_inverse_map_to_self(),
-                self.integral_domain.tdim)
+                self.integral_domain.get_inverse_map_to_self())
         elif f.is_matrix:
             assert f.shape[0] == self.integral_domain.tdim
             assert f.shape[1] == self.integral_domain.tdim
             self.f = mappings.double_contravariant(
                 f, self.integral_domain.get_map_to_self(),
-                self.integral_domain.get_inverse_map_to_self(),
-                self.integral_domain.tdim)
+                self.integral_domain.get_inverse_map_to_self())
         else:
             self.f = f
 
@@ -1152,13 +1150,13 @@ class IntegralMoment(BaseFunctional):
             if self.f.is_vector and len(self.f) != reference.gdim:
                 self.f = mappings.contravariant(
                     self.f, id_def.get_map_to_self(),
-                    id_def.get_inverse_map_to_self(), id_def.tdim)
+                    id_def.get_inverse_map_to_self())
             elif self.f.is_matrix:
                 assert self.f.shape[0] == id_def.tdim
                 assert self.f.shape[1] == id_def.tdim
                 self.f = mappings.double_contravariant(
                     self.f, id_def.get_map_to_self(),
-                    id_def.get_inverse_map_to_self(), id_def.tdim)
+                    id_def.get_inverse_map_to_self())
 
         # Map from default reference to reference
         if map_function and reference != reference.default_reference():
@@ -1167,7 +1165,7 @@ class IntegralMoment(BaseFunctional):
             mf = getattr(mappings, f"{mapping}_inverse_transpose")
             self.f = mf(self.f, reference.get_map_to_self(),
                         reference.get_inverse_map_to_self(),
-                        reference.tdim, substitute=False)
+                        substitute=False)
             self.f *= id_def.volume() / self.integral_domain.volume()
 
     def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
