@@ -85,7 +85,7 @@ class BaseFunctional(ABC):
         return self.entity[1]
 
     def perform_mapping(
-        self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType, tdim: int
+        self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType
     ) -> typing.List[AnyFunction]:
         """Map functions to a cell.
 
@@ -93,13 +93,12 @@ class BaseFunctional(ABC):
             fs: functions
             map: Map from the reference cell to a physical cell
             inverse_map: Map to the reference cell from a physical cell
-            tdim: The topological dimension of the cell
 
         Returns:
             Mapped functions
         """
         assert self.mapping is not None
-        return [getattr(mappings, self.mapping)(f, map, inverse_map, tdim) for f in fs]
+        return [getattr(mappings, self.mapping)(f, map, inverse_map) for f in fs]
 
     def entity_tex(self) -> str:
         """Get the entity the DOF is associated with in TeX format.
@@ -387,7 +386,7 @@ class DerivativePointEvaluation(BaseFunctional):
         return self.dof_point()
 
     def perform_mapping(
-        self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType, tdim: int
+        self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType
     ) -> typing.List[AnyFunction]:
         """Map functions to a cell.
 
@@ -395,7 +394,6 @@ class DerivativePointEvaluation(BaseFunctional):
             fs: functions
             map: Map from the reference cell to a physical cell
             inverse_map: Map to the reference cell from a physical cell
-            tdim: The topological dimension of the cell
 
         Returns:
             Mapped functions
@@ -882,15 +880,13 @@ class IntegralAgainst(BaseFunctional):
             assert len(f) == self.integral_domain.tdim
             self.f = mappings.contravariant(
                 f, self.integral_domain.get_map_to_self(),
-                self.integral_domain.get_inverse_map_to_self(),
-                self.integral_domain.tdim)
+                self.integral_domain.get_inverse_map_to_self())
         elif f.is_matrix:
             assert f.shape[0] == self.integral_domain.tdim
             assert f.shape[1] == self.integral_domain.tdim
             self.f = mappings.double_contravariant(
                 f, self.integral_domain.get_map_to_self(),
-                self.integral_domain.get_inverse_map_to_self(),
-                self.integral_domain.tdim)
+                self.integral_domain.get_inverse_map_to_self())
         else:
             self.f = f
 
@@ -1078,7 +1074,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         return integrand.integral(self.integral_domain)
 
     def perform_mapping(
-        self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType, tdim: int
+        self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType
     ) -> typing.List[AnyFunction]:
         """Map functions to a cell.
 
@@ -1086,7 +1082,6 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
             fs: functions
             map: Map from the reference cell to a physical cell
             inverse_map: Map to the reference cell from a physical cell
-            tdim: The topological dimension of the cell
 
         Returns:
             Mapped functions
@@ -1155,13 +1150,13 @@ class IntegralMoment(BaseFunctional):
             if self.f.is_vector and len(self.f) != reference.gdim:
                 self.f = mappings.contravariant(
                     self.f, id_def.get_map_to_self(),
-                    id_def.get_inverse_map_to_self(), id_def.tdim)
+                    id_def.get_inverse_map_to_self())
             elif self.f.is_matrix:
                 assert self.f.shape[0] == id_def.tdim
                 assert self.f.shape[1] == id_def.tdim
                 self.f = mappings.double_contravariant(
                     self.f, id_def.get_map_to_self(),
-                    id_def.get_inverse_map_to_self(), id_def.tdim)
+                    id_def.get_inverse_map_to_self())
 
         # Map from default reference to reference
         if map_function and reference != reference.default_reference():
@@ -1170,7 +1165,7 @@ class IntegralMoment(BaseFunctional):
             mf = getattr(mappings, f"{mapping}_inverse_transpose")
             self.f = mf(self.f, reference.get_map_to_self(),
                         reference.get_inverse_map_to_self(),
-                        reference.tdim, substitute=False)
+                        substitute=False)
             self.f *= id_def.volume() / self.integral_domain.volume()
 
     def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:

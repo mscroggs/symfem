@@ -12,7 +12,7 @@ class MappingNotImplemented(NotImplementedError):
 
 
 def identity(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Map functions.
@@ -21,7 +21,7 @@ def identity(
         f_in: The function
         map: The map from the reference cell to the physical cell
         inverse_map: The map to the reference cell from the physical cell
-        tdim: The topological dimension of the cell
+        substitute: Should the inverse map be substituted in?
 
     Returns:
         The mapped function
@@ -33,7 +33,7 @@ def identity(
 
 
 def l2(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Map functions, scaling by the determinant of the jacobian.
@@ -42,11 +42,12 @@ def l2(
         f_in: The function
         map: The map from the reference cell to the physical cell
         inverse_map: The map to the reference cell from the physical cell
-        tdim: The topological dimension of the cell
+        substitute: Should the inverse map be substituted in?
 
     Returns:
         The mapped function
     """
+    tdim = len(inverse_map)
     jdet = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map]).det().as_sympy()
     assert isinstance(jdet, sympy.core.expr.Expr)
     f = parse_function_input(f_in)
@@ -56,7 +57,7 @@ def l2(
 
 
 def covariant(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Map H(curl) functions.
@@ -65,11 +66,12 @@ def covariant(
         f_in: The function
         map: The map from the reference cell to the physical cell
         inverse_map: The map to the reference cell from the physical cell
-        tdim: The topological dimension of the cell
+        substitute: Should the inverse map be substituted in?
 
     Returns:
         The mapped function
     """
+    tdim = len(inverse_map)
     f = parse_function_input(f_in)
     if substitute:
         f = f.subs(x, inverse_map)
@@ -81,7 +83,7 @@ def covariant(
 
 
 def contravariant(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True
 ) -> AnyFunction:
     """Map H(div) functions.
@@ -90,11 +92,12 @@ def contravariant(
         f_in: The function
         map: The map from the reference cell to the physical cell
         inverse_map: The map to the reference cell from the physical cell
-        tdim: The topological dimension of the cell
+        substitute: Should the inverse map be substituted in?
 
     Returns:
         The mapped function
     """
+    tdim = len(inverse_map)
     f = parse_function_input(f_in)
     if substitute:
         f = f.subs(x, inverse_map)
@@ -107,7 +110,7 @@ def contravariant(
 
 
 def double_covariant(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
 ) -> MatrixFunction:
     """Map matrix functions.
@@ -116,11 +119,12 @@ def double_covariant(
         f_in: The function
         map: The map from the reference cell to the physical cell
         inverse_map: The map to the reference cell from the physical cell
-        tdim: The topological dimension of the cell
+        substitute: Should the inverse map be substituted in?
 
     Returns:
         The mapped function
     """
+    tdim = len(inverse_map)
     f = parse_function_input(f_in)
     if substitute:
         f = f.subs(x, inverse_map)
@@ -131,7 +135,7 @@ def double_covariant(
 
 
 def double_contravariant(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
 ) -> MatrixFunction:
     """Map matrix functions.
@@ -140,11 +144,12 @@ def double_contravariant(
         f_in: The function
         map: The map from the reference cell to the physical cell
         inverse_map: The map to the reference cell from the physical cell
-        tdim: The topological dimension of the cell
+        substitute: Should the inverse map be substituted in?
 
     Returns:
         The mapped function
     """
+    tdim = len(inverse_map)
     f = parse_function_input(f_in)
     if substitute:
         f = f.subs(x, inverse_map)
@@ -156,7 +161,7 @@ def double_contravariant(
 
 
 def identity_inverse_transpose(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Inverse transpose of identity().
@@ -165,7 +170,7 @@ def identity_inverse_transpose(
         f_in: The function
         map: The map from the reference cell to the physical cell
         inverse_map: The map to the reference cell from the physical cell
-        tdim: The topological dimension of the cell
+        substitute: Should the inverse map be substituted in?
 
     Returns:
         The mapped function
@@ -177,7 +182,7 @@ def identity_inverse_transpose(
 
 
 def l2_inverse_transpose(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Inverse transpose of l2().
@@ -186,11 +191,12 @@ def l2_inverse_transpose(
         f_in: The function
         map: The map from the reference cell to the physical cell
         inverse_map: The map to the reference cell from the physical cell
-        tdim: The topological dimension of the cell
+        substitute: Should the inverse map be substituted in?
 
     Returns:
         The mapped function
     """
+    tdim = len(inverse_map)
     f = parse_function_input(f_in)
     if substitute:
         f = f.subs(x, inverse_map)
@@ -200,7 +206,7 @@ def l2_inverse_transpose(
 
 
 def covariant_inverse_transpose(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Inverse transpose of covariant().
@@ -209,11 +215,12 @@ def covariant_inverse_transpose(
         f_in: The function
         map: The map from the reference cell to the physical cell
         inverse_map: The map to the reference cell from the physical cell
-        tdim: The topological dimension of the cell
+        substitute: Should the inverse map be substituted in?
 
     Returns:
         The mapped function
     """
+    tdim = len(inverse_map)
     f = parse_function_input(f_in)
     if substitute:
         f = f.subs(x, inverse_map)
@@ -225,7 +232,7 @@ def covariant_inverse_transpose(
 
 
 def contravariant_inverse_transpose(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Inverse transpose of contravariant().
@@ -234,11 +241,12 @@ def contravariant_inverse_transpose(
         f_in: The function
         map: The map from the reference cell to the physical cell
         inverse_map: The map to the reference cell from the physical cell
-        tdim: The topological dimension of the cell
+        substitute: Should the inverse map be substituted in?
 
     Returns:
         The mapped function
     """
+    tdim = len(inverse_map)
     f = parse_function_input(f_in)
     if substitute:
         f = f.subs(x, inverse_map)
@@ -251,7 +259,7 @@ def contravariant_inverse_transpose(
 
 
 def identity_inverse(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Inverse of identity().
@@ -260,16 +268,16 @@ def identity_inverse(
         f_in: The function
         map: The map from the reference cell to the physical cell
         inverse_map: The map to the reference cell from the physical cell
-        tdim: The topological dimension of the cell
+        substitute: Should the inverse map be substituted in?
 
     Returns:
         The mapped function
     """
-    return identity(f_in, inverse_map, map, tdim, substitute)
+    return identity(f_in, inverse_map, map, substitute)
 
 
 def l2_inverse(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Inverse of l2().
@@ -278,16 +286,16 @@ def l2_inverse(
         f_in: The function
         map: The map from the reference cell to the physical cell
         inverse_map: The map to the reference cell from the physical cell
-        tdim: The topological dimension of the cell
+        substitute: Should the inverse map be substituted in?
 
     Returns:
         The mapped function
     """
-    return l2(f_in, inverse_map, map, tdim, substitute)
+    return l2(f_in, inverse_map, map, substitute)
 
 
 def covariant_inverse(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Inverse of covariant().
@@ -296,16 +304,16 @@ def covariant_inverse(
         f_in: The function
         map: The map from the reference cell to the physical cell
         inverse_map: The map to the reference cell from the physical cell
-        tdim: The topological dimension of the cell
+        substitute: Should the inverse map be substituted in?
 
     Returns:
         The mapped function
     """
-    return covariant(f_in, inverse_map, map, tdim, substitute)
+    return covariant(f_in, inverse_map, map, substitute)
 
 
 def contravariant_inverse(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True
 ) -> AnyFunction:
     """Inverse of contravariant().
@@ -314,16 +322,16 @@ def contravariant_inverse(
         f_in: The function
         map: The map from the reference cell to the physical cell
         inverse_map: The map to the reference cell from the physical cell
-        tdim: The topological dimension of the cell
+        substitute: Should the inverse map be substituted in?
 
     Returns:
         The mapped function
     """
-    return contravariant(f_in, inverse_map, map, tdim, substitute)
+    return contravariant(f_in, inverse_map, map, substitute)
 
 
 def double_covariant_inverse(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Inverse of double_covariant().
@@ -332,16 +340,16 @@ def double_covariant_inverse(
         f_in: The function
         map: The map from the reference cell to the physical cell
         inverse_map: The map to the reference cell from the physical cell
-        tdim: The topological dimension of the cell
+        substitute: Should the inverse map be substituted in?
 
     Returns:
         The mapped function
     """
-    return double_covariant(f_in, inverse_map, map, tdim, substitute)
+    return double_covariant(f_in, inverse_map, map, substitute)
 
 
 def double_contravariant_inverse(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType, tdim: int,
+    f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True
 ) -> AnyFunction:
     """Inverse of double_contravariant().
@@ -350,9 +358,9 @@ def double_contravariant_inverse(
         f_in: The function
         map: The map from the reference cell to the physical cell
         inverse_map: The map to the reference cell from the physical cell
-        tdim: The topological dimension of the cell
+        substitute: Should the inverse map be substituted in?
 
     Returns:
         The mapped function
     """
-    return double_contravariant(f_in, inverse_map, map, tdim, substitute)
+    return double_contravariant(f_in, inverse_map, map, substitute)
