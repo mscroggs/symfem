@@ -1,3 +1,9 @@
+# Version 2023.8.1 (18 August 2023)
+
+- Bugfixes for piecewise functions on an interval
+- Added HHJ on a tetrahedron
+- Add inverse mapping functions
+
 # Version 2023.8.0 (08 August 2023)
 
 - Corrected HCT and rHCT elements
