@@ -1,2 +1,3 @@
 - Bugfixes for piecewise functions on an interval
 - Added HHJ on a tetrahedron
+- Add inverse mapping functions
