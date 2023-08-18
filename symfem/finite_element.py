@@ -682,7 +682,7 @@ class CiarletElement(FiniteElement):
                     for ds in dofs_by_type.values():
                         mapped_dofs = self.dofs[ds[0]].perform_mapping(
                             [basis[d] for d in ds],
-                            forward_map, inverse_map, self.reference.tdim)
+                            forward_map, inverse_map)
                         for d_n, mdof in zip(ds, mapped_dofs):
                             functions[d_n] = mdof
 

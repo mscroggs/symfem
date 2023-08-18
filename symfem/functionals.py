@@ -85,7 +85,7 @@ class BaseFunctional(ABC):
         return self.entity[1]
 
     def perform_mapping(
-        self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType, tdim: int
+        self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType
     ) -> typing.List[AnyFunction]:
         """Map functions to a cell.
 
@@ -93,7 +93,6 @@ class BaseFunctional(ABC):
             fs: functions
             map: Map from the reference cell to a physical cell
             inverse_map: Map to the reference cell from a physical cell
-            tdim: The topological dimension of the cell
 
         Returns:
             Mapped functions
@@ -387,7 +386,7 @@ class DerivativePointEvaluation(BaseFunctional):
         return self.dof_point()
 
     def perform_mapping(
-        self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType, tdim: int
+        self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType
     ) -> typing.List[AnyFunction]:
         """Map functions to a cell.
 
@@ -395,7 +394,6 @@ class DerivativePointEvaluation(BaseFunctional):
             fs: functions
             map: Map from the reference cell to a physical cell
             inverse_map: Map to the reference cell from a physical cell
-            tdim: The topological dimension of the cell
 
         Returns:
             Mapped functions
@@ -1078,7 +1076,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         return integrand.integral(self.integral_domain)
 
     def perform_mapping(
-        self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType, tdim: int
+        self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType
     ) -> typing.List[AnyFunction]:
         """Map functions to a cell.
 
@@ -1086,7 +1084,6 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
             fs: functions
             map: Map from the reference cell to a physical cell
             inverse_map: Map to the reference cell from a physical cell
-            tdim: The topological dimension of the cell
 
         Returns:
             Mapped functions
