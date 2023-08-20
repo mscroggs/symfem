@@ -1,3 +1,7 @@
+# Version 2023.8.2 (20 August 2023)
+
+- Remove tdim input from mappings functions
+
 # Version 2023.8.1 (18 August 2023)
 
 - Bugfixes for piecewise functions on an interval
