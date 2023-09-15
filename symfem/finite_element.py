@@ -206,6 +206,11 @@ class FiniteElement(ABC):
             for row in tabbed:
                 output.append(tuple(j for i in zip(*row) for j in i))
             return output
+        elif order == "xx,yy,zz":
+            output = []
+            for row in tabbed:
+                output.append(tuple(tuple(j for j in i) for i in zip(*row)))
+            return output
         elif order == "xyzxyz":
             output = []
             for row in tabbed:
