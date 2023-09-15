@@ -55,7 +55,7 @@ class Bubble(CiarletElement):
             def func(i): return max(i)
         for i in product(range(1, order), repeat=reference.tdim):
             if func(i) < order:
-                point = reference.get_point(tuple(sympy.Rational(j, order) for j in i))
+                point = reference.get_point(tuple(sympy.Rational(j, order) for j in i[::-1]))
                 dofs.append(PointEvaluation(reference, point, entity=(reference.tdim, 0)))
 
         self.variant = variant
