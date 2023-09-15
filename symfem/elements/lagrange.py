@@ -250,4 +250,4 @@ class SymmetricMatrixLagrange(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 0
     continuity = "L2"
-    last_updated = "2023.05"
+    last_updated = "2023.09"
