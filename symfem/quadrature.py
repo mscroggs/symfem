@@ -125,7 +125,7 @@ def get_quadrature(
 
     Args:
         rule: The quadrature rule.
-              Supported values: equispaced, lobatto, radau, legendre
+              Supported values: equispaced, lobatto, radau, legendre, gll
 
         n: Number of points
 
@@ -135,6 +135,8 @@ def get_quadrature(
     if rule == "equispaced":
         return equispaced(n)
     if rule == "lobatto":
+        return lobatto(n)
+    if rule == "gll":
         return lobatto(n)
     if rule == "radau":
         return radau(n)
