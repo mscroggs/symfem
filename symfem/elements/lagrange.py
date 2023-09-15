@@ -51,6 +51,8 @@ class Lagrange(CiarletElement):
                         dofs.append(IntegralAgainst(reference, f, (edim, e_n)))
         else:
             points, _ = get_quadrature(variant, order + 1)
+            if variant != "equispaced":
+                assert reference.name in ["interval", "quadrilateral", "hexahedron"]
 
             for v_n, v in enumerate(reference.vertices):
                 dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
@@ -59,7 +61,7 @@ class Lagrange(CiarletElement):
                     entity = reference.sub_entity(edim, e_n)
                     for i in product(range(1, order), repeat=edim):
                         if sum(i) < order:
-                            point = entity.get_point([sympy.Rational(j, order) for j in i[::-1]])
+                            point = entity.get_point([points[j] for j in i[::-1]])
                             dofs.append(PointEvaluation(reference, point,
                                                         entity=(edim, e_n)))
 
