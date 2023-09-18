@@ -118,62 +118,50 @@ class AnyFunction(ABC):
     @abstractmethod
     def __add__(self, other: typing.Any):
         """Add."""
-        pass
 
     @abstractmethod
     def __radd__(self, other: typing.Any):
         """Add."""
-        pass
 
     @abstractmethod
     def __sub__(self, other: typing.Any):
         """Subtract."""
-        pass
 
     @abstractmethod
     def __rsub__(self, other: typing.Any):
         """Subtract."""
-        pass
 
     @abstractmethod
     def __neg__(self):
         """Negate."""
-        pass
 
     @abstractmethod
     def __truediv__(self, other: typing.Any):
         """Divide."""
-        pass
 
     @abstractmethod
     def __rtruediv__(self, other: typing.Any):
         """Divide."""
-        pass
 
     @abstractmethod
     def __mul__(self, other: typing.Any):
         """Multiply."""
-        pass
 
     @abstractmethod
     def __rmul__(self, other: typing.Any):
         """Multiply."""
-        pass
 
     @abstractmethod
     def __matmul__(self, other: typing.Any):
         """Multiply."""
-        pass
 
     @abstractmethod
     def __rmatmul__(self, other: typing.Any):
         """Multiply."""
-        pass
 
     @abstractmethod
     def __pow__(self, other: typing.Any):
         """Raise to a power."""
-        pass
 
     @abstractmethod
     def as_sympy(self) -> SympyFormat:
@@ -182,7 +170,6 @@ class AnyFunction(ABC):
         Returns:
             A Sympy expression
         """
-        pass
 
     @abstractmethod
     def as_tex(self) -> str:
@@ -191,7 +178,6 @@ class AnyFunction(ABC):
         Returns:
             A TeX string
         """
-        pass
 
     @abstractmethod
     def subs(self, vars: AxisVariables, values: typing.Union[AnyFunction, _ValuesToSubstitute]):
@@ -204,7 +190,6 @@ class AnyFunction(ABC):
         Returns:
             The substituted function
         """
-        pass
 
     @abstractmethod
     def diff(self, variable: sympy.core.symbol.Symbol):
@@ -216,7 +201,6 @@ class AnyFunction(ABC):
         Returns:
             The differentiated function
         """
-        pass
 
     @abstractmethod
     def directional_derivative(self, direction: PointType):
@@ -228,7 +212,6 @@ class AnyFunction(ABC):
         Returns:
             The directional differentiate
         """
-        pass
 
     @abstractmethod
     def jacobian_component(self, component: typing.Tuple[int, int]):
@@ -240,7 +223,6 @@ class AnyFunction(ABC):
         Returns:
             The component of the jacobian
         """
-        pass
 
     @abstractmethod
     def jacobian(self, dim: int):
@@ -252,7 +234,6 @@ class AnyFunction(ABC):
         Returns:
             The jacobian
         """
-        pass
 
     @abstractmethod
     def dot(self, other_in: FunctionInput):
@@ -264,7 +245,6 @@ class AnyFunction(ABC):
         Returns:
             The product
         """
-        pass
 
     @abstractmethod
     def cross(self, other_in: FunctionInput):
@@ -276,7 +256,6 @@ class AnyFunction(ABC):
         Returns:
             The cross product
         """
-        pass
 
     @abstractmethod
     def div(self):
@@ -285,7 +264,6 @@ class AnyFunction(ABC):
         Returns:
             The divergence
         """
-        pass
 
     @abstractmethod
     def grad(self, dim: int):
@@ -294,7 +272,6 @@ class AnyFunction(ABC):
         Returns:
             The gradient
         """
-        pass
 
     @abstractmethod
     def curl(self):
@@ -303,7 +280,6 @@ class AnyFunction(ABC):
         Returns:
             The curl
         """
-        pass
 
     @abstractmethod
     def norm(self):
@@ -312,7 +288,6 @@ class AnyFunction(ABC):
         Returns:
             The norm
         """
-        pass
 
     @abstractmethod
     def integral(
@@ -329,7 +304,6 @@ class AnyFunction(ABC):
         Returns:
             The integral
         """
-        pass
 
     @abstractmethod
     def with_floats(self) -> AnyFunction:
@@ -338,7 +312,20 @@ class AnyFunction(ABC):
         Returns:
             A version the function with floats as coefficients
         """
-        pass
+
+    @abstractmethod
+    def maximum_degree(self, cell: symfem.references.Reference) -> int:
+        """Return the maximum degree of the function on a reference cell.
+
+        This function returns the order of the lowerst order Lagrange space on the input cell
+        that includes this function.
+
+        Args:
+            cell: The cell
+
+        Returns:
+            A version the function with floats as coefficients
+        """
 
     def __iter__(self) -> typing.Iterator[AnyFunction]:
         """Iterate through components of vector function."""
@@ -871,6 +858,37 @@ class ScalarFunction(AnyFunction):
             out += float(co) * term
         return ScalarFunction(out)
 
+    def maximum_degree(self, cell: symfem.references.Reference) -> int:
+        """Return the maximum degree of the function on a reference cell.
+
+        This function returns the order of the lowerst order Lagrange space on the input cell
+        that includes this function.
+
+        Args:
+            cell: The cell
+
+        Returns:
+            A version the function with floats as coefficients
+        """
+        if cell.name == "pyramid":
+            raise NotImplementedError()
+        degrees = []
+        for v in x:
+            f = 1 * self._f
+            d = 0
+            while f != 0:
+                d += 1
+                f = f.diff(v)
+            degrees.append(d - 1)
+        if cell.name in ["interval", "triangle", "tetrahedron"]:
+            return sum(degrees)
+        elif cell.name in ["quadrilateral", "hexahedron"]:
+            return max(degrees)
+        elif cell.name == "prism":
+            return max(degrees[0] + degrees[1], degrees[2])
+        else:
+            raise ValueError(f"Unrecognised cell: {cell.name}")
+
 
 class VectorFunction(AnyFunction):
     """A vector-valued function."""
@@ -1239,6 +1257,20 @@ class VectorFunction(AnyFunction):
             A version the function with floats as coefficients
         """
         return VectorFunction(tuple(f.with_floats() for f in self._vec))
+
+    def maximum_degree(self, cell: symfem.references.Reference) -> int:
+        """Return the maximum degree of the function on a reference cell.
+
+        This function returns the order of the lowerst order Lagrange space on the input cell
+        that includes this function.
+
+        Args:
+            cell: The cell
+
+        Returns:
+            A version the function with floats as coefficients
+        """
+        return max(f.maximum_degree(cell) for f in self._vec)
 
 
 class MatrixFunction(AnyFunction):
@@ -1652,6 +1684,20 @@ class MatrixFunction(AnyFunction):
             A version the function with floats as coefficients
         """
         return MatrixFunction(tuple(tuple(f.with_floats() for f in row) for row in self._mat))
+
+    def maximum_degree(self, cell: symfem.references.Reference) -> int:
+        """Return the maximum degree of the function on a reference cell.
+
+        This function returns the order of the lowerst order Lagrange space on the input cell
+        that includes this function.
+
+        Args:
+            cell: The cell
+
+        Returns:
+            A version the function with floats as coefficients
+        """
+        return max(f.maximum_degree(cell) for row in self._mat for f in row)
 
 
 FunctionInput = typing.Union[

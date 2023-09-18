@@ -6,6 +6,8 @@ import typing
 
 import sympy
 
+import symfem
+
 from .functions import (AnyFunction, FunctionInput, ScalarFunction, SympyFormat, ValuesToSubstitute,
                         VectorFunction, _to_sympy_format, parse_function_input)
 from .geometry import (PointType, SetOfPoints, SetOfPointsInput, parse_set_of_points_input,
@@ -529,6 +531,20 @@ class PiecewiseFunction(AnyFunction):
         """
         return PiecewiseFunction(
             {shape: f.with_floats() for shape, f in self._pieces.items()}, self.tdim)
+
+    def maximum_degree(self, cell: symfem.references.Reference) -> int:
+        """Return the maximum degree of the function on a reference cell.
+
+        This function returns the order of the lowerst order Lagrange space on the input cell
+        that includes this function.
+
+        Args:
+            cell: The cell
+
+        Returns:
+            A version the function with floats as coefficients
+        """
+        raise NotImplementedError()
 
 
 def _piece_reference(tdim, shape):
