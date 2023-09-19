@@ -62,6 +62,11 @@ class DualCiarletElement(FiniteElement):
         """
         raise ValueError("Polynomial basis not supported for barycentric dual elements.")
 
+    @property
+    def maximum_degree(self) -> int:
+        """Get the maximum degree of this polynomial set for the element."""
+        raise NotImplementedError()
+
     def get_dual_matrix(self) -> sympy.matrices.dense.MutableDenseMatrix:
         """Get the dual matrix.
 

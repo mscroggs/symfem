@@ -7,6 +7,8 @@ from abc import abstractmethod
 
 import sympy
 
+import symfem
+
 from .functions import AnyFunction, FunctionInput, ScalarFunction, SympyFormat, ValuesToSubstitute
 from .geometry import PointType
 from .references import Reference
@@ -355,6 +357,20 @@ class BasisFunction(AnyFunction):
         f = self.get_function()
         return f.__iter__()
 
+    def maximum_degree(self, cell: symfem.references.Reference) -> int:
+        """Return the maximum degree of the function on a reference cell.
+
+        This function returns the order of the lowerst order Lagrange space on the input cell
+        that includes this function.
+
+        Args:
+            cell: The cell
+
+        Returns:
+            A version the function with floats as coefficients
+        """
+        return self.get_function().maximum_degree(cell)
+
 
 class SubbedBasisFunction(BasisFunction):
     """A basis function following a substitution."""
@@ -404,3 +420,17 @@ class SubbedBasisFunction(BasisFunction):
             n: The number of plotting points
         """
         self.get_function().plot_values(reference, img, value_scale, n)
+
+    def maximum_degree(self, cell: symfem.references.Reference) -> int:
+        """Return the maximum degree of the function on a reference cell.
+
+        This function returns the order of the lowerst order Lagrange space on the input cell
+        that includes this function.
+
+        Args:
+            cell: The cell
+
+        Returns:
+            A version the function with floats as coefficients
+        """
+        raise ValueError("Cannot infer degree of a substituted basis function.")
