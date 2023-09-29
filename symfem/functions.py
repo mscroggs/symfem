@@ -1506,7 +1506,7 @@ class MatrixFunction(AnyFunction):
         out += "c" * self.shape[1]
         out += "}"
         out += "\\\\".join([
-            "&".join(["\\displaystyle" + j.as_tex() for j in i])
+            "&".join(["\\displaystyle " + j.as_tex() for j in i])
             for i in self._mat
         ])
         out += "\\end{array}\\right)"

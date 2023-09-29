@@ -1097,7 +1097,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         entity = self.entity_tex()
         entity_def = self.entity_definition()
         desc = "\\mathbf{V}\\mapsto"
-        desc += "\\displaystyle"
+        desc += "\\displaystyle "
         if self.scale != 1:
             desc += _to_tex(self.scale)
         desc += f"\\int_{{{entity}}}"
