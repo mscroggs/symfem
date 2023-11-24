@@ -175,11 +175,11 @@ def test_version_numbers():
     assert data["version"] == version
     date = data["dateModified"]
 
-    # setup.py
-    with open(os.path.join(root, "setup.py")) as f:
+    # pyproject.toml
+    with open(os.path.join(root, "pyproject.toml")) as f:
         for line in f:
-            if 'version="' in line:
-                assert line.split('version="')[1].split('"')[0] == version
+            if 'version = "' in line:
+                assert line.split('version = "')[1].split('"')[0] == version
 
     # symfem/version.py
     with open(os.path.join(root, "symfem/version.py")) as f:

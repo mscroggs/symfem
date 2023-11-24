@@ -1,0 +1,42 @@
+[build-system]
+build-backend = "flit_core.buildapi"
+requires = ["flit_core >=3.8.0,<4"]
+
+[project]
+name = "symfem"
+version = "2023.8.2"
+description = "a symbolic finite element definition library"
+readme = "README.md"
+requires-python = ">=3.8.0"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Matthew Scroggs", email = "symfem@mscroggs.co.uk" }
+]
+packages = ["symfem", "symfem.elements", "symfem.polynomials"]
+dependencies = ["sympy>=1.10", "appdirs"]
+
+[project.urls]
+homepage = "https://github.com/mscroggs/symfem"
+repository = "https://github.com/mscroggs/symfem"
+documentation = "https://symfem.readthedocs.io/en/latest/"
+
+[project.optional-dependencies]
+style = ["ruff", "flake8", "mypy", "isort"]
+docs = ["sphinx", "sphinx-autoapi"]
+optional = ["CairoSVG>=2.6.0"]
+test = ["pytest", "symfem[optional]", "numpy"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.isort]
+line_length = 100
