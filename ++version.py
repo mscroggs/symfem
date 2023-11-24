@@ -47,7 +47,7 @@ with open("codemeta.json", "w") as f:
 new_setup = ""
 with open("pyproject.toml") as f:
     for line in f:
-        if 'version ="' in line:
+        if 'version = "' in line:
             new_setup += f'version = "{new_version_str}"\n'
         else:
             new_setup += line
