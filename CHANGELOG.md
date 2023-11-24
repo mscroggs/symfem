@@ -1,3 +1,9 @@
+# Version 2023.11.0 (24 November 2023)
+
+- Use pyproject.toml for installation
+- Add xx,yy,zz ordering for tabulation
+- Correct Lagrange variants
+
 # Version 2023.8.2 (20 August 2023)
 
 - Remove tdim input from mappings functions
