@@ -43,17 +43,15 @@ data["dateModified"] = now.strftime("%Y-%m-%d")
 with open("codemeta.json", "w") as f:
     json.dump(data, f)
 
-# setup.py
+# pyproject.toml
 new_setup = ""
-with open("setup.py") as f:
+with open("pyproject.toml") as f:
     for line in f:
-        if 'version="' in line:
-            a, b = line.split('version="')
-            b = b.split('"', 1)[1]
-            new_setup += f'{a}version="{new_version_str}"{b}'
+        if 'version ="' in line:
+            new_setup += f'version = "{new_version_str}"\n'
         else:
             new_setup += line
-with open("setup.py", "w") as f:
+with open("pyproject.toml", "w") as f:
     f.write(new_setup)
 
 # symfem/version.py

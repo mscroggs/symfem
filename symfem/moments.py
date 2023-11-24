@@ -18,7 +18,7 @@ MomentTypeInput = typing.Union[
     typing.Dict[str, SingleMomentTypeInput]
 ]
 
-
+print()
 def _extract_moment_data(moment_data: MomentTypeInput, sub_type: str) -> MomentType:
     """Get the information for a moment.
 
