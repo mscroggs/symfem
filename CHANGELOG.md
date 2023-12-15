@@ -1,3 +1,7 @@
+# Version 2023.12.0 (15 December 2023)
+
+- Release to test new token
+
 # Version 2023.11.0 (24 November 2023)
 
 - Use pyproject.toml for installation
