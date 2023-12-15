@@ -39,7 +39,7 @@ class ArnoldWinther(CiarletElement):
         poly += [(((order - k + 1) * (order - k + 2) * x[0] ** k * x[1] ** (order - k),
                    -k * (order - k + 2) * x[0] ** (k - 1) * x[1] ** (order - k + 1)),
                   (-k * (order - k + 2) * x[0] ** (k - 1) * x[1] ** (order - k + 1),
-                   -k * (k - 1) * x[0] ** (k - 2) * x[1] ** (order - k + 2)))
+                   k * (k - 1) * x[0] ** (k - 2) * x[1] ** (order - k + 2)))
                  for k in range(order + 1)]
         poly += [((0, x[0] ** order), (x[0] ** order, -order * x[0] ** (order - 1) * x[1])),
                  ((0, 0), (0, x[0] ** order))]
