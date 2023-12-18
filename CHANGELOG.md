@@ -1,3 +1,7 @@
+# Version 2023.12.6 (18 December 2023)
+
+- Include full paths to images in README on PyPI
+
 # Version 2023.12.5 (18 December 2023)
 
 - New release to test trusted publisher
