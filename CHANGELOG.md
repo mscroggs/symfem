@@ -1,3 +1,7 @@
+# Version 2023.12.5 (18 December 2023)
+
+- New release to test trusted publisher
+
 # Version 2023.12.2 (18 December 2023)
 
 - Release to test workflow changes
