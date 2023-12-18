@@ -22,7 +22,7 @@ jobs:
         python-version: "3.12"
 
     - name: Install PyGitHub
-      run: pip3 install PyGitHub
+      run: python3 -m pip install PyGitHub
     - name: Check version number and make release if necessary
       run: python .github/scripts/version.py ${{ secrets.GITHUB_TOKEN }} >> $GITHUB_OUTPUT
       id: version-check
@@ -31,6 +31,8 @@ jobs:
       run: python .github/scripts/trigger_rtd_build.py ${{ secrets.RTDS_TOKEN }}
       if: steps.version-check.outputs.release == 'yes'
 
+    - name: Prepare release
+      run: python3 prepare_release.py
     - name: Build a wheel for PyPI
       run: |
         python3 -m pip install build

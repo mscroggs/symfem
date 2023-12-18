@@ -1,0 +1,1 @@
+- Include full paths to images in README on PyPI

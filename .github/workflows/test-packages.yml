@@ -18,7 +18,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: actions/checkout@v4
         with:
-          ref: v2023.12.5
+          ref: v2023.12.6
         name: Get latest Symfem version
       - run: rm -rf symfem VERSION
         name: Remove downloaded symfem
@@ -51,7 +51,7 @@ jobs:
           activate-environment: symfem
       - uses: actions/checkout@v4
         with:
-          ref: v2023.12.5
+          ref: v2023.12.6
         name: Get latest Symfem version
       - run: rm -rf symfem VERSION
         name: Remove downloaded symfem
@@ -82,7 +82,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: |
-          wget -O symfem.tar.gz https://pypi.io/packages/source/s/symfem/symfem-2023.12.5.tar.gz
+          wget -O symfem.tar.gz https://pypi.io/packages/source/s/symfem/symfem-2023.12.6.tar.gz
           tar -xvzf symfem.tar.gz
         name: Download and unpack latest version of Symfem
       - name: Install LaTeΧ
@@ -92,7 +92,7 @@ jobs:
       - run: pip install pytest
         name: Install pytest
       - run: |
-          cd symfem-2023.12.5
+          cd symfem-2023.12.6
           pip install .[optional]
           python3 -m pytest test/
         name: Install requirements, run tests and demos
