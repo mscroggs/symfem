@@ -33,6 +33,4 @@ jobs:
       if: steps.version-check.outputs.release == 'yes'
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        password: ${{ secrets.pypi_password }}
       if: steps.version-check.outputs.release == 'yes'
