@@ -29,15 +29,15 @@ jobs:
 
     - name: Trigger Read the Docs build
       run: python .github/scripts/trigger_rtd_build.py ${{ secrets.RTDS_TOKEN }}
-      if: steps.version-check.outputs.release == 'yes'
+      if: steps.version-check.outputs.release != 'no'
 
     - name: Prepare release
-      run: python3 prepare_release.py
+      run: python3 prepare_release.py --version ${{ steps.version-check.outputs.release }}
     - name: Build a wheel for PyPI
       run: |
         python3 -m pip install build
         python3 -m build .
-      if: steps.version-check.outputs.release == 'yes'
+      if: steps.version-check.outputs.release != 'no'
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      if: steps.version-check.outputs.release == 'yes'
+      if: steps.version-check.outputs.release != 'no'

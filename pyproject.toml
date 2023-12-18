@@ -4,7 +4,7 @@ requires = ["flit_core >=3.8.0,<4"]
 
 [project]
 name = "symfem"
-version = "2023.12.8"
+version = "2023.12.9"
 description = "a symbolic finite element definition library"
 readme = "README.md"
 requires-python = ">=3.8.0"
