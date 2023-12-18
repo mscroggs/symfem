@@ -1,3 +1,7 @@
+# Version 2023.12.2 (18 December 2023)
+
+- Release to test workflow changes
+
 # Version 2023.12.1 (18 December 2023)
 
 - Release to test new workflow
