@@ -1,3 +1,7 @@
+# Version 2023.12.8 (18 December 2023)
+
+- Fix readme on PyPI
+
 # Version 2023.12.5 (18 December 2023)
 
 - New release to test trusted publisher

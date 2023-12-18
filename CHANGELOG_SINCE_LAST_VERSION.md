@@ -1,1 +1,0 @@
-- Fix readme on PyPI
