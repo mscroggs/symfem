@@ -9,6 +9,9 @@ jobs:
   check-version:
     name: Check version number
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python 3.12
