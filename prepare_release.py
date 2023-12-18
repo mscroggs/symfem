@@ -5,7 +5,7 @@ import argparse
 parser = argparse.ArgumentParser(description="Build defelement.com")
 parser.add_argument('--version', metavar='version',
                     default="main", help="Symfem version.")
-version = parser.parse_args()["version"]
+version = parser.parse_args().version
 
 with open("README.md") as f:
     parts = f.read().split("](")
