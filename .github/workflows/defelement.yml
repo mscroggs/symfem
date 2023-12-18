@@ -18,12 +18,12 @@ jobs:
         with:
           path: /home/runner/.cache/symfem
           key: symfem-matrix-cache
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: pip install .[optional]
         name: Install Symfem
 
       - name: Clone DefElement
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ./defelement
           repository: mscroggs/defelement.com
