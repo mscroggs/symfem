@@ -1,0 +1,38 @@
+name: 📦 Releases and packaging
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-version:
+    name: Check version number
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v1
+      with:
+        python-version: "3.12"
+
+    - name: Install PyGitHub
+      run: pip3 install PyGitHub
+    - name: Check version number and make release if necessary
+      run: python .github/scripts/version.py ${{ secrets.GITHUB_TOKEN }} >> $GITHUB_OUTPUT
+      id: version-check
+
+    - name: Trigger Read the Docs build
+      run: python .github/scripts/trigger_rtd_build.py ${{ secrets.RTDS_TOKEN }}
+      if: steps.version-check.outputs.release == 'yes'
+
+    - name: Build a wheel for PyPI
+      run: |
+        python3 -m pip install build
+        python3 -m build .
+      if: steps.version-check.outputs.release == 'yes'
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.pypi_password }}
+      if: steps.version-check.outputs.release == 'yes'
