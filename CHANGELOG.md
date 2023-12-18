@@ -1,3 +1,7 @@
+# Version 2023.12.1 (18 December 2023)
+
+- Release to test new workflow
+
 # Version 2023.12.0 (15 December 2023)
 
 - Release to test new token
