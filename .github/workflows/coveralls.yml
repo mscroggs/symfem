@@ -30,7 +30,7 @@ jobs:
         name: Install Basix requirements
       - run: pip install coverage coveralls pytest-cov
         name: Install Coveralls
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: pip install .[test] pytest-xdist
         name: Install Symfem
       - run: pip install git+https://github.com/FEniCS/basix.git

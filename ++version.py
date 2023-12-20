@@ -90,4 +90,15 @@ with open("CITATION.cff") as f:
 with open("CITATION.cff", "w") as f:
     f.write(new_citation)
 
+# LICENSE
+new_license = ""
+with open("LICENSE") as f:
+    for line in f:
+        if "(c)" in line:
+            new_license += f"Copyright (c) 2020-{now.strftime('%Y')} Matthew Scroggs\n"
+        else:
+            new_license += line
+with open("LICENSE", "w") as f:
+    f.write(new_license)
+
 print(f"Updated version to {new_version_str}")

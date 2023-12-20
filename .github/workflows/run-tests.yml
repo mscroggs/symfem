@@ -28,7 +28,7 @@ jobs:
         with:
           path: /home/runner/.cache/symfem
           key: symfem-matrix-cache
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: pip install .[test] pytest-xdist
         name: Install Symfem
       - name: Install LaTeΧ
@@ -74,7 +74,7 @@ jobs:
             sudo apt-get install -y libopenblas-dev liblapack-dev ninja-build
             pip install pybind11
         name: Install Basix dependencies
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: pip install .[test] pytest-xdist
         name: Install Symfem
       - run: pip install git+https://github.com/FEniCS/basix.git

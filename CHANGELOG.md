@@ -1,3 +1,23 @@
+# Version 2023.12.11 (18 December 2023)
+
+- Link to images from correct version
+
+# Version 2023.12.8 (18 December 2023)
+
+- Fix readme on PyPI
+
+# Version 2023.12.5 (18 December 2023)
+
+- New release to test trusted publisher
+
+# Version 2023.12.2 (18 December 2023)
+
+- Release to test workflow changes
+
+# Version 2023.12.1 (18 December 2023)
+
+- Release to test new workflow
+
 # Version 2023.12.0 (15 December 2023)
 
 - Release to test new token

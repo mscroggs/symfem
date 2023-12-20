@@ -22,8 +22,10 @@ assert data["version"] == version
 
 for release in symfem.get_releases():
     if release.tag_name == f"v{version}":
+        print("release=no")
         break
 else:
+    print(f"release={version}")
     symfem.create_git_ref(ref=f"refs/heads/v{version}-changelog", sha=branch.commit.sha)
     new_branch = symfem.get_branch(f"v{version}-changelog")
     changelog_file = symfem.get_contents("CHANGELOG_SINCE_LAST_VERSION.md", new_branch.commit.sha)
