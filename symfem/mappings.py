@@ -1,7 +1,8 @@
 """Functions to map functions between cells."""
 
-import sympy
 from typing import Callable
+
+import sympy
 
 from .functions import AnyFunction, FunctionInput, MatrixFunction, parse_function_input
 from .geometry import PointType
