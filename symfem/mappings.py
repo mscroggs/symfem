@@ -369,7 +369,7 @@ def double_contravariant_inverse(
 
 def get_mapping(
     mapname: str, inverse: bool = False, transpose: bool = False
-) -> Callable[(FunctionInput, PointType, PointType, bool), AnyFunction]:
+) -> Callable[[FunctionInput, PointType, PointType, bool], AnyFunction]:
     """Get a mapping.
 
     Args:
