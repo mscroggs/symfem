@@ -382,11 +382,11 @@ def get_mapping(
     """
     function_name = mapname
     if inverse:
-        mapname += "_inverse"
+        function_name += "_inverse"
     if transpose:
-        mapname += "_transpose"
+        function_name += "_transpose"
 
-    if mapname not in globals():
-        raise ValueError(f"Invalid map name: {mapname}")
+    if function_name not in globals():
+        raise ValueError(f"Invalid map name: {function_name}")
 
-    return globals()[mapname]
+    return globals()[function_name]
