@@ -3,7 +3,7 @@ name: 📦 Releases and packaging
 on:
   push:
     branches:
-      - main
+      - none
 
 jobs:
   check-version:
