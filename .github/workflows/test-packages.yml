@@ -88,6 +88,7 @@ jobs:
       - name: Move tests and delete Symfem source
         run: |
           mv symfem-src/test .
+          mv symfem-src/README .
           rm -r symfem-src
       - run: |
           wget -O symfem.tar.gz https://pypi.io/packages/source/s/symfem/symfem-2024.1.1.tar.gz

@@ -115,6 +115,10 @@ def test_readme_elements():
                 elementlist[r] = []
             elementlist[r].append(e.names[0])
 
+    if not os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                          "../docs/index.rst")):
+        pytest.xfail("Could not find README.md")
+
     root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
     with open(os.path.join(root, "README.md")) as f:
         readme = f.read().split("# Available cells and elements")[1]
