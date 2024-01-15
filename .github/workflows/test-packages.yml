@@ -3,6 +3,9 @@ name: 🧪📦 Test packages
 on:
   schedule:
     - cron: "0 7 * * 1"
+  push:
+    branches:
+      - main
 
 jobs:
   run-tests-with-pip:
@@ -81,6 +84,14 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+      - uses: actions/checkout@v4
+        with:
+          ref: v2024.1.1
+          path: symfem-src
+      - name: Move tests and delete Symfem source
+        run: |
+          mv symfem-src/test .
+          rm -r symfem-src
       - run: |
           wget -O symfem.tar.gz https://pypi.io/packages/source/s/symfem/symfem-2024.1.1.tar.gz
           tar -xvzf symfem.tar.gz
