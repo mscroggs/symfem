@@ -3,7 +3,7 @@ name: 🧪 Tests
 on:
   push:
     branches:
-      - none
+      - "**"
   pull_request:
     branches:
       - main
