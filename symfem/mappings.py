@@ -1,5 +1,7 @@
 """Functions to map functions between cells."""
 
+from typing import Callable
+
 import sympy
 
 from .functions import AnyFunction, FunctionInput, MatrixFunction, parse_function_input
@@ -364,3 +366,28 @@ def double_contravariant_inverse(
         The mapped function
     """
     return double_contravariant(f_in, inverse_map, map, substitute)
+
+
+def get_mapping(
+    mapname: str, inverse: bool = False, transpose: bool = False
+) -> Callable[[FunctionInput, PointType, PointType, bool], AnyFunction]:
+    """Get a mapping.
+
+    Args:
+        mapname: The name of the mapping
+        inverse: Should the map be inverted
+        transpose: Should the map be transposed
+
+    Returns:
+        A function that performs the mapping
+    """
+    function_name = mapname
+    if inverse:
+        function_name += "_inverse"
+    if transpose:
+        function_name += "_transpose"
+
+    if function_name not in globals():
+        raise ValueError(f"Invalid map name: {function_name}")
+
+    return globals()[function_name]

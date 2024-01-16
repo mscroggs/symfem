@@ -138,9 +138,9 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
     ]
     for a in args:
         if a[0] == "LagrangeVariant":
-            parsed_args[0] = basix.variants.string_to_lagrange_variant(a[1])
+            parsed_args[0] = basix.finite_element.string_to_lagrange_variant(a[1])
         elif a[0] == "DPCVariant":
-            parsed_args[1] = basix.variants.string_to_dpc_variant(a[1])
+            parsed_args[1] = basix.finite_element.string_to_dpc_variant(a[1])
         elif a[0] == "bool":
             parsed_args[2] = a[1]
         else:

@@ -1,3 +1,7 @@
+# Version 2024.1.1 (04 January 2024)
+
+- Added get_mapping function
+
 # Version 2023.12.11 (18 December 2023)
 
 - Link to images from correct version
