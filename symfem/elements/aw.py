@@ -57,9 +57,6 @@ class ArnoldWinther(CiarletElement):
             for dof_n, dof in enumerate(sub_e.dofs):
                 p = sub_e.get_basis_function(dof_n).get_function()
                 for component in [sub_ref.normal(), sub_ref.tangent()]:
-                    InnerProductIntegralMoment(
-                        reference, p, component, sub_ref.normal(), dof,
-                        entity=(1, e_n), mapping="double_contravariant")
                     dofs.append(
                         InnerProductIntegralMoment(
                             reference, p, component, sub_ref.normal(), dof,
@@ -70,7 +67,7 @@ class ArnoldWinther(CiarletElement):
             for component22 in [((1, 0), (0, 0)), ((0, 1), (0, 0)), ((0, 0), (0, 1))]:
                 dofs.append(IntegralMoment(
                     reference, tuple(tuple(p * j for j in i) for i in component22),
-                    dof, entity=(2, 0)))
+                    dof, entity=(2, 0), mapping="double_contravariant"))
 
         if order >= 4:
             sub_e = Lagrange(reference, order - 4, variant)
@@ -97,7 +94,8 @@ class ArnoldWinther(CiarletElement):
     references = ["triangle"]
     min_order = 3
     continuity = "integral inner H(div)"
-    last_updated = "2023.05"
+    last_updated = "2024.01"
+    cache = False
 
 
 class NonConformingArnoldWinther(CiarletElement):
