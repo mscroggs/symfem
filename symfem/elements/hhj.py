@@ -51,7 +51,7 @@ class HellanHerrmannJohnson(CiarletElement):
                     for p in polynomial_set_vector(reference.tdim, 6, order)]
             directions = [((0, 1, 1), (1, 0, 1), (1, 1, 0)),
                           ((-6, 1, 1), (1, 0, 1), (1, 1, 0)),
-                          ((0, 1, 1), (1, -6, 1, (1, 1, 0)),
+                          ((0, 1, 1), (1, -6, 1), (1, 1, 0)),
                           ((0, 1, 1), (1, 0, 1), (1, 1, -6))]
             directions_extra = [((0, 0, -1), (0, 0, 1), (-1, 1, 0)),
                                 ((0, -1, 0), (-1, 0, 1), (0, 1, 0))]
