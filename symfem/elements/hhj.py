@@ -5,6 +5,8 @@ This element's definition appears in https://arxiv.org/abs/1909.09687
 
 For an alternative construction see (Sinwel, 2009) and sections 4.4.2.2 and 4.4.3.2
 https://numa.jku.at/media/filer_public/b7/42/b74263c9-f723-4076-b1b2-c2726126bf32/phd-sinwel.pdf
+or (Pechstein, Schöberl, 2018) for a more recent version for tetrahedra
+https://doi.org/10.1007/s00211-017-0933-3
 """
 
 import typing
@@ -47,10 +49,10 @@ class HellanHerrmannJohnson(CiarletElement):
         if reference.tdim == 3:
             poly = [((p[0], p[1], p[2]), (p[1], p[3], p[4]), (p[2], p[4], p[5]))
                     for p in polynomial_set_vector(reference.tdim, 6, order)]
-            directions = [((-2, 1, 0), (1, 0, 0), (0, 0, 0)),
-                          ((0, 1, -1), (1, -2, 1), (-1, 1, 0)),
-                          ((0, 0, 0), (0, 0, -1), (0, -1, 2)),
-                          ((0, 0, 1), (0, 0, 0), (1, 0, 0))]
+            directions = [((0, 1, 1), (1, 0, 1), (1, 1, 0)),
+                          ((-6, 1, 1), (1, 0, 1), (1, 1, 0)),
+                          ((0, 1, 1), (1, -6, 1), (1, 1, 0)),
+                          ((0, 1, 1), (1, 0, 1), (1, 1, -6))]
             directions_extra = [((0, 0, -1), (0, 0, 1), (-1, 1, 0)),
                                 ((0, -1, 0), (-1, 0, 1), (0, 1, 0))]
 
@@ -68,7 +70,7 @@ class HellanHerrmannJohnson(CiarletElement):
                 for d in directions:
                     dofs.append(IntegralMoment(
                         reference, p * MatrixFunction(d), dof, entity=(reference.tdim, 0),
-                        mapping="double_covariant"))
+                        mapping="double_contravariant"))
         # cell functions extra
         space_extra = Lagrange(reference, order, variant)
         basis_extra = space_extra.get_basis_functions()
@@ -76,7 +78,7 @@ class HellanHerrmannJohnson(CiarletElement):
             for d in directions_extra:
                 dofs.append(IntegralMoment(
                     reference, p * MatrixFunction(d), dof, entity=(reference.tdim, 0),
-                    mapping="double_covariant"))
+                    mapping="double_contravariant"))
 
         self.variant = variant
 
@@ -95,4 +97,4 @@ class HellanHerrmannJohnson(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 0
     continuity = "inner H(div)"
-    last_updated = "2023.08"
+    last_updated = "2024.02"
