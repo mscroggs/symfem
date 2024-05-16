@@ -607,7 +607,7 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
         desc += "}(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
         return desc, []
 
-    name = "Point evaluation of Jacobian component"
+    name = "Point evaluation of Hessian component"
 
 
 class PointInnerProduct(BaseFunctional):
