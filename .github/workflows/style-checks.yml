@@ -22,8 +22,6 @@ jobs:
         name: Run ruff checks
       - run: python3 -m mypy .
         name: Run mypy checks
-      - run: python3 -m isort --check .
-        name: Run isort checks
       - run: |
           cd docs
           make html SPHINXOPTS="-W"
