@@ -138,16 +138,16 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
     ]
     for a in args:
         if a[0] == "LagrangeVariant":
-            parsed_args[0] = basix.finite_element.string_to_lagrange_variant(a[1])
+            parsed_args[0] = basix.LagrangeVariant[a[1]]
         elif a[0] == "DPCVariant":
-            parsed_args[1] = basix.finite_element.string_to_dpc_variant(a[1])
+            parsed_args[1] = basix.DPCVariant[a[1]]
         elif a[0] == "bool":
             parsed_args[2] = a[1]
         else:
             raise ValueError(f"Unknown arg type: {a[0]}")
     space = basix.create_element(
         basix.finite_element.string_to_family(basix_type, cell),
-        basix.cell.string_to_type(cell), order, *parsed_args)
+        basix.CellType[cell], order, *parsed_args)
     result = space.tabulate(0, points)[0]
 
     element = create_element(cell, symfem_type, order)
