@@ -7,7 +7,7 @@ import sympy
 from symfem.functions import ScalarFunction
 from symfem.symbols import AxisVariablesNotSingle, x
 
-__all__ = []
+__all__: typing.List[str] = []
 
 
 def _jrc(

@@ -6,7 +6,7 @@ import sympy
 
 from symfem.functions import ScalarFunction
 
-__all__ = []
+__all__: typing.List[str] = []
 
 
 def l2_dual(cell: str, poly: typing.List[ScalarFunction]) -> typing.List[ScalarFunction]:

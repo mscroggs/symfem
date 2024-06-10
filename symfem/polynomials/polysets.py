@@ -6,7 +6,7 @@ from itertools import product
 from symfem.functions import ScalarFunction, VectorFunction
 from symfem.symbols import AxisVariablesNotSingle, x
 
-__all__ = []
+__all__: typing.List[str] = []
 
 
 def polynomial_set_1d(
