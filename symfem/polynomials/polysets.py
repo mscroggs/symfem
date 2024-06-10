@@ -3,8 +3,8 @@
 import typing
 from itertools import product
 
-from ..functions import ScalarFunction, VectorFunction
-from ..symbols import AxisVariablesNotSingle, x
+from symfem.functions import ScalarFunction, VectorFunction
+from symfem.symbols import AxisVariablesNotSingle, x
 
 
 def polynomial_set_1d(

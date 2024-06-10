@@ -20,8 +20,6 @@ jobs:
           python3 -m ruff check .
           python3 -m ruff format --check .
         name: Run ruff checks
-      - run: python3 -m flake8 .
-        name: Run flake8 checks
       - run: python3 -m mypy .
         name: Run mypy checks
       - run: python3 -m isort --check .

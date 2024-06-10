@@ -2,10 +2,10 @@
 
 import typing
 
-from ..functions import ScalarFunction
-from ..symbols import x
-from .dual import l2_dual
-from .legendre import orthonormal_basis
+from symfem.functions import ScalarFunction
+from symfem.symbols import x
+from symfem.polynomials.dual import l2_dual
+from symfem.polynomials.legendre import orthonormal_basis
 
 
 def lobatto_basis_interval(order: int) -> typing.List[ScalarFunction]:

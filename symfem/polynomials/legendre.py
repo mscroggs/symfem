@@ -4,8 +4,8 @@ import typing
 
 import sympy
 
-from ..functions import ScalarFunction
-from ..symbols import AxisVariablesNotSingle, x
+from symfem.functions import ScalarFunction
+from symfem.symbols import AxisVariablesNotSingle, x
 
 
 def _jrc(
@@ -670,7 +670,7 @@ def orthonormal_basis(
     Returns:
         A set of orthonormal polynomials
     """
-    from ..create import create_reference
+    from symfem.create import create_reference
 
     poly = orthogonal_basis(cell, order, derivs, variables)
     ref = create_reference(cell)

@@ -4,7 +4,7 @@ import typing
 
 import sympy
 
-from ..functions import ScalarFunction
+from symfem.functions import ScalarFunction
 
 
 def l2_dual(cell: str, poly: typing.List[ScalarFunction]) -> typing.List[ScalarFunction]:
