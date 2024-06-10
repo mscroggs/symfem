@@ -16,6 +16,8 @@ from symfem.piecewise_functions import PiecewiseFunction
 from symfem.references import Reference
 from symfem.symbols import x
 
+__all__ = ["P1Macro"]
+
 
 class P1Macro(CiarletElement):
     """P1 macro finite element on a triangle."""

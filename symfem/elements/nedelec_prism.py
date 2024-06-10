@@ -17,6 +17,8 @@ from symfem.symbols import x
 from symfem.elements.lagrange import Lagrange, VectorLagrange
 from symfem.elements.q import RaviartThomas as QRT
 
+__all__ = ["Nedelec"]
+
 
 class Nedelec(CiarletElement):
     """Nedelec Hcurl finite element."""

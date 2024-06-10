@@ -15,6 +15,8 @@ from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
 from symfem.elements.dpc import DPC
 
+__all__ = ["AC"]
+
 
 class AC(CiarletElement):
     """Arbogast-Correa Hdiv finite element."""

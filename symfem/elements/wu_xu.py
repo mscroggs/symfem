@@ -17,6 +17,8 @@ from symfem.functions import FunctionInput
 from symfem.polynomials import polynomial_set_1d
 from symfem.references import NonDefaultReferenceError, Reference
 
+__all__ = ["derivatives", "WuXu"]
+
 
 def derivatives(dim: int, order: int) -> typing.List[typing.Tuple[int, ...]]:
     """Return all the orders of a multidimensional derivative.

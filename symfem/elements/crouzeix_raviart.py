@@ -14,6 +14,8 @@ from symfem.polynomials import polynomial_set_1d
 from symfem.quadrature import get_quadrature
 from symfem.references import Reference
 
+__all__ = ["CrouzeixRaviart"]
+
 
 class CrouzeixRaviart(CiarletElement):
     """Crouzeix-Raviart finite element."""

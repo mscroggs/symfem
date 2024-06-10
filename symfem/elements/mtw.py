@@ -22,6 +22,8 @@ from symfem.symbols import x
 from symfem.elements.lagrange import Lagrange
 from symfem.elements.nedelec import NedelecFirstKind
 
+__all__ = ["MardalTaiWinther"]
+
 
 class MardalTaiWinther(CiarletElement):
     """Mardal-Tai-Winther Hdiv finite element."""

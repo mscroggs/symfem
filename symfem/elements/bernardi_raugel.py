@@ -22,6 +22,8 @@ from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
 from symfem.elements.lagrange import Lagrange
 
+__all__ = ["BernardiRaugel"]
+
 
 class BernardiRaugel(CiarletElement):
     """Bernardi-Raugel Hdiv finite element."""

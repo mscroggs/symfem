@@ -12,6 +12,8 @@ from symfem.polynomials import polynomial_set_1d
 from symfem.references import Reference
 from symfem.symbols import x
 
+__all__ = ["Bell"]
+
 
 class Bell(CiarletElement):
     """Bell finite element."""

@@ -22,6 +22,8 @@ from symfem.references import Reference
 from symfem.symbols import x
 from symfem.elements.lagrange import Lagrange
 
+__all__ = ["ArnoldWinther", "NonConformingArnoldWinther"]
+
 
 class ArnoldWinther(CiarletElement):
     """An Arnold-Winther element."""

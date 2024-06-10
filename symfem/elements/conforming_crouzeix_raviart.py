@@ -15,6 +15,8 @@ from symfem.polynomials import polynomial_set_1d
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
 
+__all__ = ["ConformingCrouzeixRaviart"]
+
 
 class ConformingCrouzeixRaviart(CiarletElement):
     """Conforming Crouzeix-Raviart finite element."""

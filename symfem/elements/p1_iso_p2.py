@@ -15,6 +15,8 @@ from symfem.geometry import SetOfPoints
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.references import Reference
 
+__all__ = ["P1IsoP2Interval", "P1IsoP2Tri", "P1IsoP2Quad"]
+
 
 class P1IsoP2Interval(CiarletElement):
     """P1-iso-P2 finite element on an interval."""

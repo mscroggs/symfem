@@ -15,6 +15,8 @@ from symfem.polynomials import polynomial_set_1d
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
 
+__all__ = ["kmv_tri_polyset", "kmv_tet_polyset", "KongMulderVeldhuizen"]
+
 
 def kmv_tri_polyset(m: int, mf: int) -> typing.List[FunctionInput]:
     """Create the polynomial set for a KMV space on a triangle.

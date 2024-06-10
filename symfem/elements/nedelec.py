@@ -15,6 +15,8 @@ from symfem.references import Reference
 from symfem.elements.lagrange import Lagrange, VectorLagrange
 from symfem.elements.rt import RaviartThomas
 
+__all__ = ["NedelecFirstKind", "NedelecSecondKind"]
+
 
 class NedelecFirstKind(CiarletElement):
     """Nedelec first kind Hcurl finite element."""

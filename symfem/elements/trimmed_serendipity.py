@@ -22,6 +22,8 @@ from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import t, x
 from symfem.elements.dpc import DPC, VectorDPC
 
+__all__ = ["TrimmedSerendipityHcurl", "TrimmedSerendipityHdiv"]
+
 
 class TrimmedSerendipityHcurl(CiarletElement):
     """Trimmed serendipity Hcurl finite element."""

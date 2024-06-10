@@ -22,6 +22,8 @@ from symfem.polynomials import (
 from symfem.quadrature import get_quadrature
 from symfem.references import Reference
 
+__all__ = ["Lagrange", "VectorLagrange", "MatrixLagrange", "SymmetricMatrixLagrange"]
+
 
 class Lagrange(CiarletElement):
     """Lagrange finite element."""

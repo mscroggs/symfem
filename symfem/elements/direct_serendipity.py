@@ -9,6 +9,8 @@ from symfem.references import Reference
 from symfem.symbols import x
 from symfem.elements.dpc import DPC
 
+__all__ = ["DirectSerendipity"]
+
 
 class DirectSerendipity(DirectElement):
     """A direct serendipity element."""

@@ -12,6 +12,8 @@ from symfem.functions import FunctionInput
 from symfem.polynomials import polynomial_set_1d
 from symfem.references import NonDefaultReferenceError, Reference
 
+__all__ = ["Morley"]
+
 
 class Morley(CiarletElement):
     """Morley finite element."""

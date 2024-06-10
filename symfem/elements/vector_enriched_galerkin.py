@@ -14,6 +14,8 @@ from symfem.symbols import x
 from symfem.elements.lagrange import VectorLagrange
 from symfem.elements.q import VectorQ
 
+__all__ = ["Enrichment", "VectorEnrichedGalerkin"]
+
 
 class Enrichment(CiarletElement):
     """An LF enriched Galerkin element."""

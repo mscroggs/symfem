@@ -16,6 +16,8 @@ from symfem.symbols import x
 from symfem.elements.dpc import DPC, VectorDPC
 from symfem.elements.lagrange import Lagrange, VectorLagrange
 
+__all__ = ["bdfm_polyset", "BDFM"]
+
 
 def bdfm_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]:
     """Create the polynomial basis for a BDFM element.

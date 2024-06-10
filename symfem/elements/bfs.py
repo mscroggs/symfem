@@ -12,6 +12,8 @@ from symfem.functions import FunctionInput
 from symfem.polynomials import quolynomial_set_1d
 from symfem.references import Reference
 
+__all__ = ["BognerFoxSchmit"]
+
 
 class BognerFoxSchmit(CiarletElement):
     """Bogner-Fox-Schmit finite element."""

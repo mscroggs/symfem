@@ -20,6 +20,8 @@ from symfem.symbols import x
 from symfem.elements.lagrange import Lagrange
 from symfem.elements.q import Nedelec
 
+__all__ = ["ArnoldBoffiFalk"]
+
 
 class ArnoldBoffiFalk(CiarletElement):
     """An Arnold-Boffi-Falk element."""

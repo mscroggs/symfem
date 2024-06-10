@@ -27,6 +27,8 @@ from symfem.references import Reference
 from symfem.symbols import t, x
 from symfem.elements.lagrange import Lagrange
 
+__all__ = ["Regge", "ReggeTP"]
+
 
 class Regge(CiarletElement):
     """A Regge element on a simplex."""

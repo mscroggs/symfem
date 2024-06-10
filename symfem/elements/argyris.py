@@ -18,6 +18,8 @@ from symfem.functions import FunctionInput
 from symfem.polynomials import polynomial_set_1d
 from symfem.references import NonDefaultReferenceError, Reference
 
+__all__ = ["Argyris"]
+
 
 class Argyris(CiarletElement):
     """Argyris finite element."""

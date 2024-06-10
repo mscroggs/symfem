@@ -9,6 +9,8 @@ from symfem.references import Reference
 from symfem.elements.lagrange import Lagrange
 from symfem.elements.q import Q
 
+__all__ = ["EnrichedGalerkin"]
+
 
 class EnrichedGalerkin(EnrichedElement):
     """An enriched Galerkin element."""

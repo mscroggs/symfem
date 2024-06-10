@@ -15,6 +15,8 @@ from symfem.references import NonDefaultReferenceError, Reference
 from symfem.elements.lagrange import Lagrange
 from symfem.elements.nedelec import NedelecFirstKind
 
+__all__ = ["BDM"]
+
 
 class BDM(CiarletElement):
     """Brezzi-Douglas-Marini Hdiv finite element."""

@@ -25,6 +25,8 @@ from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import t, x
 from symfem.elements.q import Q
 
+__all__ = ["p", "b", "TNT", "TNTcurl", "TNTdiv"]
+
 
 def p(k: int, v: sympy.core.symbol.Symbol) -> ScalarFunction:
     """Return the kth Legendre polynomial.

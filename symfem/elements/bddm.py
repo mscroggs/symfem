@@ -15,6 +15,8 @@ from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
 from symfem.elements.dpc import DPC, VectorDPC
 
+__all__ = ["bddf_polyset", "BDDF"]
+
 
 def bddf_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]:
     """Create the polynomial basis for a BDDF element.

@@ -20,6 +20,8 @@ from symfem.piecewise_functions import PiecewiseFunction
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
 
+__all__ = ["HsiehCloughTocher"]
+
 
 class HsiehCloughTocher(CiarletElement):
     """Hsieh-Clough-Tocher finite element."""

@@ -15,6 +15,8 @@ from symfem.functions import FunctionInput
 from symfem.references import Reference
 from symfem.elements.lagrange import Lagrange
 
+__all__ = ["Bubble", "BubbleEnrichedLagrange", "BubbleEnrichedVectorLagrange"]
+
 
 class Bubble(CiarletElement):
     """Bubble finite element."""

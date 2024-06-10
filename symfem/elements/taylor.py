@@ -11,6 +11,8 @@ from symfem.polynomials import polynomial_set_1d
 from symfem.references import Reference
 from symfem.elements.lagrange import Lagrange
 
+__all__ = ["Taylor"]
+
 
 class Taylor(CiarletElement):
     """Taylor finite element."""

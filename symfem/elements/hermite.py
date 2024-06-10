@@ -12,6 +12,8 @@ from symfem.functions import FunctionInput
 from symfem.polynomials import polynomial_set_1d
 from symfem.references import Reference
 
+__all__ = ["Hermite"]
+
 
 class Hermite(CiarletElement):
     """Hermite finite element."""

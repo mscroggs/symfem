@@ -16,6 +16,8 @@ from symfem.polynomials import orthonormal_basis, pyramid_polynomial_set_1d
 from symfem.quadrature import get_quadrature
 from symfem.references import NonDefaultReferenceError, Reference
 
+__all__ = ["Lagrange"]
+
 
 class Lagrange(CiarletElement):
     """Lagrange finite element."""

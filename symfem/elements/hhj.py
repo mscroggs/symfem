@@ -22,6 +22,8 @@ from symfem.polynomials import polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.elements.lagrange import Lagrange
 
+__all__ = ["HellanHerrmannJohnson"]
+
 
 class HellanHerrmannJohnson(CiarletElement):
     """A Hellan-Herrmann-Johnson element."""

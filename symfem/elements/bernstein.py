@@ -17,6 +17,8 @@ from symfem.polynomials import orthogonal_basis, polynomial_set_1d
 from symfem.references import Reference
 from symfem.symbols import AxisVariablesNotSingle, t, x
 
+__all__ = ["single_choose", "choose", "bernstein_polynomials", "BernsteinFunctional", "Bernstein"]
+
 
 def single_choose(n: int, k: int) -> sympy.core.expr.Expr:
     """Calculate choose function of a set of powers.

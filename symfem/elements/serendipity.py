@@ -26,6 +26,8 @@ from symfem.polynomials import (
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.elements.dpc import DPC, VectorDPC
 
+__all__ = ["Serendipity", "SerendipityCurl", "SerendipityDiv"]
+
 
 class Serendipity(CiarletElement):
     """A serendipity element."""

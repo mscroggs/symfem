@@ -12,6 +12,8 @@ from symfem.functions import FunctionInput
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
 
+__all__ = ["RannacherTurek"]
+
 
 class RannacherTurek(CiarletElement):
     """Rannacher-Turek finite element."""

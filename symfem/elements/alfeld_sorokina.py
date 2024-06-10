@@ -15,6 +15,8 @@ from symfem.piecewise_functions import PiecewiseFunction
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
 
+__all__ = ["AlfeldSorokina"]
+
 
 class AlfeldSorokina(CiarletElement):
     """Alfeld-Sorokina finite element."""

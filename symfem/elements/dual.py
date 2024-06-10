@@ -14,6 +14,8 @@ from symfem.geometry import PointType, SetOfPoints, SetOfPointsInput
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.references import DualPolygon, NonDefaultReferenceError
 
+__all__ = ["DualCiarletElement", "Dual", "BuffaChristiansen", "RotatedBuffaChristiansen"]
+
 
 class DualCiarletElement(FiniteElement):
     """Abstract barycentric finite element."""

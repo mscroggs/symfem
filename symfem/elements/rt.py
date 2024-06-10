@@ -14,6 +14,8 @@ from symfem.polynomials import Hdiv_polynomials, polynomial_set_vector
 from symfem.references import Reference
 from symfem.elements.lagrange import Lagrange, VectorLagrange
 
+__all__ = ["RaviartThomas"]
+
 
 class RaviartThomas(CiarletElement):
     """Raviart-Thomas Hdiv finite element."""
