@@ -42,10 +42,13 @@ class CrouzeixRaviart(CiarletElement):
                     dofs.append(
                         PointEvaluation(
                             reference,
-                            tuple(o + sum(a[j] * points[b]
-                                          for a, b in zip(entity.axes, i))
-                                  for j, o in enumerate(entity.origin)),
-                            entity=(reference.tdim - 1, e_n)))
+                            tuple(
+                                o + sum(a[j] * points[b] for a, b in zip(entity.axes, i))
+                                for j, o in enumerate(entity.origin)
+                            ),
+                            entity=(reference.tdim - 1, e_n),
+                        )
+                    )
 
         points, _ = get_quadrature(variant, order + reference.tdim - 1)
         for i in product(range(1, order), repeat=reference.tdim):
@@ -53,10 +56,13 @@ class CrouzeixRaviart(CiarletElement):
                 dofs.append(
                     PointEvaluation(
                         reference,
-                        tuple(o + sum(a[j] * points[b]
-                                      for a, b in zip(reference.axes, i))
-                              for j, o in enumerate(reference.origin)),
-                        entity=(reference.tdim, 0)))
+                        tuple(
+                            o + sum(a[j] * points[b] for a, b in zip(reference.axes, i))
+                            for j, o in enumerate(reference.origin)
+                        ),
+                        entity=(reference.tdim, 0),
+                    )
+                )
 
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)

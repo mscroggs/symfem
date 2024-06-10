@@ -7,8 +7,12 @@ Thse elements definitions appear in https://dx.doi.org/10.1137/S0036142903431924
 import typing
 
 from ..finite_element import CiarletElement
-from ..functionals import (IntegralMoment, IntegralOfDivergenceAgainst, ListOfFunctionals,
-                           NormalIntegralMoment)
+from ..functionals import (
+    IntegralMoment,
+    IntegralOfDivergenceAgainst,
+    ListOfFunctionals,
+    NormalIntegralMoment,
+)
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
 from ..references import NonDefaultReferenceError, Reference
@@ -33,25 +37,32 @@ class ArnoldBoffiFalk(CiarletElement):
             raise NonDefaultReferenceError()
 
         poly: typing.List[FunctionInput] = []
-        poly += [
-            (x[0] ** i * x[1] ** j, 0)
-            for i in range(order + 3) for j in range(order + 1)]
-        poly += [(0, x[0] ** i * x[1] ** j)
-                 for i in range(order + 1) for j in range(order + 3)]
+        poly += [(x[0] ** i * x[1] ** j, 0) for i in range(order + 3) for j in range(order + 1)]
+        poly += [(0, x[0] ** i * x[1] ** j) for i in range(order + 1) for j in range(order + 3)]
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
             edges=(NormalIntegralMoment, Lagrange, order, {"variant": variant}),
-            faces=(IntegralMoment, Nedelec, order, {"variant": variant})
+            faces=(IntegralMoment, Nedelec, order, {"variant": variant}),
         )
 
         for i in range(order + 1):
-            dofs.append(IntegralOfDivergenceAgainst(
-                reference, x[0] ** (order + 1) * x[1] ** i,
-                entity=(2, 0), mapping="contravariant"))
-            dofs.append(IntegralOfDivergenceAgainst(
-                reference, x[0] ** i * x[1] ** (order + 1),
-                entity=(2, 0), mapping="contravariant"))
+            dofs.append(
+                IntegralOfDivergenceAgainst(
+                    reference,
+                    x[0] ** (order + 1) * x[1] ** i,
+                    entity=(2, 0),
+                    mapping="contravariant",
+                )
+            )
+            dofs.append(
+                IntegralOfDivergenceAgainst(
+                    reference,
+                    x[0] ** i * x[1] ** (order + 1),
+                    entity=(2, 0),
+                    mapping="contravariant",
+                )
+            )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant

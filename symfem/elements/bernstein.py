@@ -72,20 +72,20 @@ def bernstein_polynomials(
         powers = [[n - i, i] for i in range(n + 1)]
     elif d == 2:
         lambdas = [1 - vars[0] - vars[1], vars[0], vars[1]]
-        powers = [[n - i - j, j, i]
-                  for i in range(n + 1)
-                  for j in range(n + 1 - i)]
+        powers = [[n - i - j, j, i] for i in range(n + 1) for j in range(n + 1 - i)]
     elif d == 3:
         lambdas = [1 - vars[0] - vars[1] - vars[2], vars[0], vars[1], vars[2]]
-        powers = [[n - i - j - k, k, j, i]
-                  for i in range(n + 1)
-                  for j in range(n + 1 - i)
-                  for k in range(n + 1 - i - j)]
+        powers = [
+            [n - i - j - k, k, j, i]
+            for i in range(n + 1)
+            for j in range(n + 1 - i)
+            for k in range(n + 1 - i - j)
+        ]
 
     for p in powers:
         f = choose(n, p)
         for a, b in zip(lambdas, p):
-            f *= a ** b
+            f *= a**b
         poly.append(f)
 
     return poly
@@ -94,8 +94,14 @@ def bernstein_polynomials(
 class BernsteinFunctional(BaseFunctional):
     """Functional for a Bernstein element."""
 
-    def __init__(self, reference: Reference, integral_domain: Reference, index: int,
-                 degree: int, entity: typing.Tuple[int, int]):
+    def __init__(
+        self,
+        reference: Reference,
+        integral_domain: Reference,
+        index: int,
+        degree: int,
+        entity: typing.Tuple[int, int],
+    ):
         """Create the functional.
 
         Args:
@@ -108,15 +114,14 @@ class BernsteinFunctional(BaseFunctional):
         super().__init__(reference, entity, "identity")
         orth = [
             o / sympy.sqrt((o * o).integral(integral_domain))
-            for o in orthogonal_basis(integral_domain.name, degree, 0, t[:integral_domain.tdim])[0]
+            for o in orthogonal_basis(integral_domain.name, degree, 0, t[: integral_domain.tdim])[0]
         ]
         self.ref = integral_domain
         self.index = index
         self.degree = degree
 
         bern = bernstein_polynomials(degree, integral_domain.tdim, t)
-        mat = sympy.Matrix(
-            [[(o * b).integral(integral_domain) for b in bern] for o in orth])
+        mat = sympy.Matrix([[(o * b).integral(integral_domain) for b in bern] for o in orth])
         minv = mat.inv()
         alpha = minv.row(index)
 
@@ -157,7 +162,7 @@ class BernsteinFunctional(BaseFunctional):
             return f"v\\mapsto c_{{{self.index}}}", [
                 "\\(v=\\sum_ic_iB_i\\)",
                 f"\\(B_1\\) to \\(B_n\\) "
-                f"are the degree {self.degree} Bernstein polynomials on the cell"
+                f"are the degree {self.degree} Bernstein polynomials on the cell",
             ]
         else:
             e = self.entity_tex()
@@ -165,7 +170,7 @@ class BernsteinFunctional(BaseFunctional):
                 f"\\(v=\\sum_ic^{{{e}}}_iB^{{{e}}}_i\\)",
                 f"\\(B^{{{e}}}_1\\) to \\(B^{{{e}}}_n\\) "
                 f"are the degree {self.degree} Bernstein polynomials on \\({e}\\)",
-                self.entity_definition()
+                self.entity_definition(),
             ]
 
 
@@ -184,13 +189,13 @@ class Bernstein(CiarletElement):
 
         dofs: ListOfFunctionals = []
         if order == 0:
-            dofs = [
-                PointEvaluation(reference, reference.midpoint(), (reference.tdim, 0))]
+            dofs = [PointEvaluation(reference, reference.midpoint(), (reference.tdim, 0))]
         else:
+
             def index(x: int, y: int = 0, z: int = 0) -> int:
                 """Compute the 1D index."""
                 return (
-                    z * (z ** 2 - 3 * z * order - 6 * z + 3 * order ** 2 + 12 * order + 11) // 6
+                    z * (z**2 - 3 * z * order - 6 * z + 3 * order**2 + 12 * order + 11) // 6
                     + y * (2 * (order - z) + 3 - y) // 2
                     + x
                 )
@@ -200,21 +205,30 @@ class Bernstein(CiarletElement):
 
             for en, _ in enumerate(reference.edges):
                 for i in range(1, order):
-                    dofs.append(BernsteinFunctional(
-                        reference, reference.sub_entity(1, en), i, order, (1, en)))
+                    dofs.append(
+                        BernsteinFunctional(
+                            reference, reference.sub_entity(1, en), i, order, (1, en)
+                        )
+                    )
 
             for fn, _ in enumerate(reference.faces):
                 for i in range(1, order):
                     for j in range(1, order - i):
-                        dofs.append(BernsteinFunctional(
-                            reference, reference.sub_entity(2, fn), index(i, j), order, (2, fn)))
+                        dofs.append(
+                            BernsteinFunctional(
+                                reference, reference.sub_entity(2, fn), index(i, j), order, (2, fn)
+                            )
+                        )
 
             if reference.name == "tetrahedon":
                 for i in range(1, order):
                     for j in range(1, order - i):
                         for k in range(1, order - i - j):
-                            dofs.append(BernsteinFunctional(
-                                reference, reference, index(i, j, k), order, (3, 0)))
+                            dofs.append(
+                                BernsteinFunctional(
+                                    reference, reference, index(i, j, k), order, (3, 0)
+                                )
+                            )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 

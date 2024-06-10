@@ -34,9 +34,9 @@ class RannacherTurek(CiarletElement):
 
         poly: typing.List[FunctionInput] = []
         if reference.name == "quadrilateral":
-            poly += [1, x[0], x[1], x[0]**2 - x[1]**2]
+            poly += [1, x[0], x[1], x[0] ** 2 - x[1] ** 2]
         else:
-            poly += [1, x[0], x[1], x[2], x[0]**2 - x[1]**2, x[1]**2 - x[2]**2]
+            poly += [1, x[0], x[1], x[2], x[0] ** 2 - x[1] ** 2, x[1] ** 2 - x[2] ** 2]
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 

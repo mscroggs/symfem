@@ -29,8 +29,11 @@ class Enrichment(CiarletElement):
         f = VectorFunction(tuple(x[i] - j for i, j in enumerate(reference.midpoint())))
         poly: typing.List[FunctionInput] = [f]
         size = f.dot(f).integral(reference, x)
-        dofs: typing.List[BaseFunctional] = [IntegralAgainst(
-            reference, tuple(i / size for i in f), (reference.tdim, 0), "contravariant")]
+        dofs: typing.List[BaseFunctional] = [
+            IntegralAgainst(
+                reference, tuple(i / size for i in f), (reference.tdim, 0), "contravariant"
+            )
+        ]
 
         super().__init__(reference, 1, poly, dofs, reference.tdim, reference.tdim)
 

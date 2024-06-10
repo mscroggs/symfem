@@ -3,8 +3,10 @@ import pytest
 import symfem
 
 
-@pytest.mark.parametrize("cell", ["interval", "triangle", "tetrahedron", "quadrilateral",
-                                  "hexahedron", "prism", "pyramid"])
+@pytest.mark.parametrize(
+    "cell",
+    ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron", "prism", "pyramid"],
+)
 @pytest.mark.parametrize("order", range(1, 4))
 def test_lagrange(cell, order):
     e = symfem.create_element(cell, "P", order)

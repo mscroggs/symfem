@@ -9,10 +9,16 @@ import sympy
 
 import symfem
 
-from .functions import AnyFunction, FunctionInput, ScalarFunction, SympyFormat, ValuesToSubstitute
-from .geometry import PointType
-from .references import Reference
-from .symbols import AxisVariables, AxisVariablesNotSingle, t, x
+from symfem.functions import (
+    AnyFunction,
+    FunctionInput,
+    ScalarFunction,
+    SympyFormat,
+    ValuesToSubstitute,
+)
+from symfem.geometry import PointType
+from symfem.references import Reference
+from symfem.symbols import AxisVariables, AxisVariablesNotSingle, t, x
 
 
 class BasisFunction(AnyFunction):
@@ -285,8 +291,10 @@ class BasisFunction(AnyFunction):
         raise self.get_function().norm()
 
     def integral(
-        self, domain: Reference, vars: AxisVariablesNotSingle = x,
-        dummy_vars: AxisVariablesNotSingle = t
+        self,
+        domain: Reference,
+        vars: AxisVariablesNotSingle = x,
+        dummy_vars: AxisVariablesNotSingle = t,
     ) -> ScalarFunction:
         """Compute the integral of the function.
 
@@ -375,9 +383,7 @@ class BasisFunction(AnyFunction):
 class SubbedBasisFunction(BasisFunction):
     """A basis function following a substitution."""
 
-    def __init__(
-        self, f: BasisFunction, vars: AxisVariables, values: ValuesToSubstitute
-    ):
+    def __init__(self, f: BasisFunction, vars: AxisVariables, values: ValuesToSubstitute):
         """Create a basis function following a substitution.
 
         Args:
@@ -408,8 +414,11 @@ class SubbedBasisFunction(BasisFunction):
         return self.f.get_function().shape
 
     def plot_values(
-        self, reference: Reference, img: typing.Any,
-        value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
+        self,
+        reference: Reference,
+        img: typing.Any,
+        value_scale: sympy.core.expr.Expr = sympy.Integer(1),
+        n: int = 6,
     ):
         """Plot the function's values.
 

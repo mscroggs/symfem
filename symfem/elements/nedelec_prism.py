@@ -33,19 +33,33 @@ class Nedelec(CiarletElement):
         poly += [
             (i[0] * j, i[1] * j, 0)
             for i in polynomial_set_vector(2, 2, order - 1) + Hcurl_polynomials(2, 2, order)
-            for j in polynomial_set_1d(1, order, x[2:])]
-        poly += [(0, 0, i * j)
-                 for i in polynomial_set_1d(2, order, x[:2])
-                 for j in polynomial_set_1d(1, order - 1, x[2:])]
+            for j in polynomial_set_1d(1, order, x[2:])
+        ]
+        poly += [
+            (0, 0, i * j)
+            for i in polynomial_set_1d(2, order, x[:2])
+            for j in polynomial_set_1d(1, order - 1, x[2:])
+        ]
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, Lagrange, order - 1,
-                   {"variant": variant}),
-            faces={"triangle": (IntegralMoment, VectorLagrange, order - 2,
-                                "covariant", {"variant": variant}),
-                   "quadrilateral": (IntegralMoment, QRT, order - 1, "covariant",
-                                     {"variant": variant})},
+            edges=(TangentIntegralMoment, Lagrange, order - 1, {"variant": variant}),
+            faces={
+                "triangle": (
+                    IntegralMoment,
+                    VectorLagrange,
+                    order - 2,
+                    "covariant",
+                    {"variant": variant},
+                ),
+                "quadrilateral": (
+                    IntegralMoment,
+                    QRT,
+                    order - 1,
+                    "covariant",
+                    {"variant": variant},
+                ),
+            },
         )
 
         triangle = create_reference("triangle")
@@ -60,11 +74,12 @@ class Nedelec(CiarletElement):
             # TODO: correct these for order > 2
             for i in range(space1.space_dim):
                 for j in range(space2.space_dim):
-                    f = (space2.get_basis_function(j) * space1.get_basis_function(i)[0],
-                         space2.get_basis_function(j) * space1.get_basis_function(i)[1],
-                         0)
-                    dofs.append(IntegralAgainst(
-                        reference, f, entity=(3, 0), mapping="covariant"))
+                    f = (
+                        space2.get_basis_function(j) * space1.get_basis_function(i)[0],
+                        space2.get_basis_function(j) * space1.get_basis_function(i)[1],
+                        0,
+                    )
+                    dofs.append(IntegralAgainst(reference, f, entity=(3, 0), mapping="covariant"))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant

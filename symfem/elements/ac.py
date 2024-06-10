@@ -36,8 +36,10 @@ class AC(CiarletElement):
             poly += [(x[0], 0), (0, x[1])]
         else:
             poly += Hdiv_serendipity(reference.tdim, reference.tdim, order)
-            poly += [(x[0] ** (i + 1) * x[1] ** (order - i), x[0] ** i * x[1] ** (1 + order - i))
-                     for i in range(order + 1)]
+            poly += [
+                (x[0] ** (i + 1) * x[1] ** (order - i), x[0] ** i * x[1] ** (1 + order - i))
+                for i in range(order + 1)
+            ]
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
@@ -48,17 +50,17 @@ class AC(CiarletElement):
             for j in range(order + 1 - i):
                 if i + j > 0:
                     f = (i * x[0] ** (i - 1) * x[1] ** j, j * x[0] ** i * x[1] ** (j - 1))
-                    dofs.append(IntegralAgainst(reference, f, entity=(2, 0),
-                                                mapping="contravariant"))
+                    dofs.append(
+                        IntegralAgainst(reference, f, entity=(2, 0), mapping="contravariant")
+                    )
 
         for i in range(1, order - 1):
             for j in range(1, order - i):
                 f = (
                     x[0] ** i * (1 - x[0]) * x[1] ** (j - 1) * (j * (1 - x[1]) - x[1]),
-                    -x[0] ** (i - 1) * (i * (1 - x[0]) - x[0]) * x[1] ** j * (1 - x[1])
+                    -(x[0] ** (i - 1)) * (i * (1 - x[0]) - x[0]) * x[1] ** j * (1 - x[1]),
                 )
-                dofs.append(IntegralAgainst(reference, f, entity=(2, 0),
-                                            mapping="contravariant"))
+                dofs.append(IntegralAgainst(reference, f, entity=(2, 0), mapping="contravariant"))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant

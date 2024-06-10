@@ -50,19 +50,19 @@ class DirectSerendipity(DirectElement):
             lambda_12 = xi_v * (1 - x[0]) + eta_v * x[0]
 
             for j in range(order - 1):
-                basis_functions.append((1 - x[1]) * x[1] * lambda_h ** j)
+                basis_functions.append((1 - x[1]) * x[1] * lambda_h**j)
                 basis_entities.append((1, 1))
             for j in range(order - 2):
-                basis_functions.append((1 - x[1]) * x[1] * lambda_12 * lambda_h ** j)
+                basis_functions.append((1 - x[1]) * x[1] * lambda_12 * lambda_h**j)
                 basis_entities.append((1, 2))
             basis_functions.append((1 - x[1]) * x[1] * r_v * lambda_h ** (order - 2))
             basis_entities.append((1, 2))
 
             for j in range(order - 1):
-                basis_functions.append((1 - x[0]) * x[0] * lambda_v ** j)
+                basis_functions.append((1 - x[0]) * x[0] * lambda_v**j)
                 basis_entities.append((1, 0))
             for j in range(order - 2):
-                basis_functions.append((1 - x[0]) * x[0] * lambda_34 * lambda_v ** j)
+                basis_functions.append((1 - x[0]) * x[0] * lambda_34 * lambda_v**j)
                 basis_entities.append((1, 3))
             basis_functions.append((1 - x[0]) * x[0] * r_h * lambda_v ** (order - 2))
             basis_entities.append((1, 3))
@@ -73,8 +73,7 @@ class DirectSerendipity(DirectElement):
                 basis_functions.append(f * x[0] * x[1] * (1 - x[0]) * (1 - x[1]))
                 basis_entities.append((2, 0))
 
-        super().__init__(reference, order, basis_functions, basis_entities,
-                         reference.tdim, 1)
+        super().__init__(reference, order, basis_functions, basis_entities, reference.tdim, 1)
 
     names = ["direct serendipity"]
     references = ["quadrilateral"]

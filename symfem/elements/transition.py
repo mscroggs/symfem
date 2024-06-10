@@ -18,10 +18,14 @@ from .lagrange import Lagrange
 class Transition(CiarletElement):
     """Transition finite element."""
 
-    def __init__(self, reference: Reference, order: int,
-                 edge_orders: typing.Optional[typing.List[int]] = None,
-                 face_orders: typing.Optional[typing.List[int]] = None,
-                 variant: str = "equispaced"):
+    def __init__(
+        self,
+        reference: Reference,
+        order: int,
+        edge_orders: typing.Optional[typing.List[int]] = None,
+        face_orders: typing.Optional[typing.List[int]] = None,
+        variant: str = "equispaced",
+    ):
         """Create the element.
 
         Args:
@@ -88,8 +92,9 @@ class Transition(CiarletElement):
                         for i, f in enumerate(bubble_space.get_basis_functions()):
                             if i in reference.edges[e_n]:
                                 bubble *= f
-                    space = Lagrange(entity.default_reference(), entity_order - edim - 1,
-                                     variant=variant)
+                    space = Lagrange(
+                        entity.default_reference(), entity_order - edim - 1, variant=variant
+                    )
                     variables = []
                     origin = ref_entity.vertices[0]
                     used = []
@@ -116,8 +121,11 @@ class Transition(CiarletElement):
         Returns:
             Keyword argument dictionary
         """
-        return {"variant": self.variant, "face_orders": self.face_orders,
-                "edge_orders": self.edge_orders}
+        return {
+            "variant": self.variant,
+            "face_orders": self.face_orders,
+            "edge_orders": self.edge_orders,
+        }
 
     names = ["transition"]
     references = ["triangle", "tetrahedron"]

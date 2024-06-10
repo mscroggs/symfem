@@ -23,19 +23,17 @@ def test_all_tested():
                 raise ValueError(f"{e.names[0]} on a {r} is not tested")
 
 
-@pytest.mark.parametrize("ref, element, order", [
-    ("triangle", "Hermite", 4),
-    ("tetrahedron", "Crouzeix-Raviart", 2)
-])
+@pytest.mark.parametrize(
+    "ref, element, order", [("triangle", "Hermite", 4), ("tetrahedron", "Crouzeix-Raviart", 2)]
+)
 def test_too_high_order(ref, element, order):
     with pytest.raises(ValueError):
         symfem.create_element(ref, element, order)
 
 
-@pytest.mark.parametrize("ref, element, order", [
-    ("triangle", "Hermite", 2),
-    ("tetrahedron", "bubble", 3)
-])
+@pytest.mark.parametrize(
+    "ref, element, order", [("triangle", "Hermite", 2), ("tetrahedron", "bubble", 3)]
+)
 def test_too_low_order(ref, element, order):
     with pytest.raises(ValueError):
         symfem.create_element(ref, element, order)
@@ -43,13 +41,15 @@ def test_too_low_order(ref, element, order):
 
 @pytest.mark.parametrize(
     ("cell_type", "element_type", "order", "kwargs"),
-    [[reference, element, order, kwargs]
-     for reference, i in test_elements.items() for element, j in i.items()
-     for kwargs, k in j for order in k])
-def test_element(
-    elements_to_test, cells_to_test, cell_type, element_type, order, kwargs,
-    speed
-):
+    [
+        [reference, element, order, kwargs]
+        for reference, i in test_elements.items()
+        for element, j in i.items()
+        for kwargs, k in j
+        for order in k
+    ],
+)
+def test_element(elements_to_test, cells_to_test, cell_type, element_type, order, kwargs, speed):
     """Run tests for each element."""
     if elements_to_test != "ALL" and element_type not in elements_to_test:
         pytest.skip()

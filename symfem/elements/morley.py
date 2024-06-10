@@ -34,7 +34,8 @@ class Morley(CiarletElement):
             sub_ref = reference.sub_entity(1, e_n)
             midpoint = sub_ref.midpoint()
             dofs.append(
-                PointNormalDerivativeEvaluation(reference, midpoint, sub_ref, entity=(1, e_n)))
+                PointNormalDerivativeEvaluation(reference, midpoint, sub_ref, entity=(1, e_n))
+            )
 
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)

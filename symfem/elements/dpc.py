@@ -30,12 +30,16 @@ class DPC(CiarletElement):
                 if isinstance(d, PointEvaluation):
                     dofs.append(PointEvaluation(reference, d.point, entity=(reference.tdim, 0)))
                 elif isinstance(d, IntegralAgainst):
-                    dofs.append(IntegralAgainst(
-                        reference, d.f * reference.jacobian(), entity=(reference.tdim, 0)))
+                    dofs.append(
+                        IntegralAgainst(
+                            reference, d.f * reference.jacobian(), entity=(reference.tdim, 0)
+                        )
+                    )
         else:
             if order == 0:
-                points = [reference.get_point(tuple(
-                    sympy.Rational(1, 2) for _ in range(reference.tdim)))]
+                points = [
+                    reference.get_point(tuple(sympy.Rational(1, 2) for _ in range(reference.tdim)))
+                ]
             else:
                 points = [
                     reference.get_point(tuple(sympy.Rational(j, order) for j in i[::-1]))
@@ -43,16 +47,13 @@ class DPC(CiarletElement):
                     if sum(i) <= order
                 ]
 
-            dofs = [
-                PointEvaluation(reference, d, entity=(reference.tdim, 0)) for d in points]
+            dofs = [PointEvaluation(reference, d, entity=(reference.tdim, 0)) for d in points]
 
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
         poly = reference.map_polyset_from_default(poly)
 
-        super().__init__(
-            reference, order, poly, dofs, reference.tdim, 1
-        )
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -87,7 +88,7 @@ class VectorDPC(CiarletElement):
         scalar_space = DPC(reference, order, variant)
         dofs: ListOfFunctionals = []
         if reference.tdim == 1:
-            directions: typing.List[typing.Tuple[int, ...]] = [(1, )]
+            directions: typing.List[typing.Tuple[int, ...]] = [(1,)]
         else:
             directions = [
                 tuple(1 if i == j else 0 for j in range(reference.tdim))

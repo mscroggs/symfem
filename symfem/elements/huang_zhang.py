@@ -7,8 +7,12 @@ This element's definition appears in https://doi.org/10.1007/s11464-011-0094-0
 import typing
 
 from ..finite_element import CiarletElement
-from ..functionals import (IntegralAgainst, ListOfFunctionals, NormalIntegralMoment,
-                           TangentIntegralMoment)
+from ..functionals import (
+    IntegralAgainst,
+    ListOfFunctionals,
+    NormalIntegralMoment,
+    TangentIntegralMoment,
+)
 from ..functions import FunctionInput, VectorFunction
 from ..moments import make_integral_moment_dofs
 from ..references import NonDefaultReferenceError, Reference
@@ -48,21 +52,17 @@ class HuangZhang(CiarletElement):
 
         dofs += make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Lagrange, order - 1,
-                    {"variant": variant}),
+            facets=(NormalIntegralMoment, Lagrange, order - 1, {"variant": variant}),
         )
         dofs += make_integral_moment_dofs(
             reference,
-            facets=(TangentIntegralMoment, Lagrange, order - 2,
-                    {"variant": variant}),
+            facets=(TangentIntegralMoment, Lagrange, order - 2, {"variant": variant}),
         )
 
         for i in range(order - 1):
             for j in range(order - 2):
-                dofs.append(IntegralAgainst(
-                    reference, (x[0] ** i * x[1] ** j, 0), (2, 0)))
-                dofs.append(IntegralAgainst(
-                    reference, (0, x[0] ** j * x[1] ** i), (2, 0)))
+                dofs.append(IntegralAgainst(reference, (x[0] ** i * x[1] ** j, 0), (2, 0)))
+                dofs.append(IntegralAgainst(reference, (0, x[0] ** j * x[1] ** i), (2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 

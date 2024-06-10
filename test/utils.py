@@ -2,20 +2,27 @@
 
 import typing
 
-test_elements: typing.Dict[str, typing.Dict[
-    str,
-    typing.List[typing.Tuple[typing.Dict[str, typing.Any], typing.Iterable]]
-]] = {
+test_elements: typing.Dict[
+    str, typing.Dict[str, typing.List[typing.Tuple[typing.Dict[str, typing.Any], typing.Iterable]]]
+] = {
     "interval": {
-        "P": [({"variant": "equispaced"}, range(6)), ({"variant": "lobatto"}, range(4)),
-              ({"variant": "legendre"}, range(5))],
-        "vP": [({"variant": "equispaced"}, range(6)), ({"variant": "lobatto"}, range(3)),
-               ({"variant": "radau"}, range(3)), ({"variant": "legendre"}, range(3))],
+        "P": [
+            ({"variant": "equispaced"}, range(6)),
+            ({"variant": "lobatto"}, range(4)),
+            ({"variant": "legendre"}, range(5)),
+        ],
+        "vP": [
+            ({"variant": "equispaced"}, range(6)),
+            ({"variant": "lobatto"}, range(3)),
+            ({"variant": "radau"}, range(3)),
+            ({"variant": "legendre"}, range(3)),
+        ],
         "dPc": [({"variant": "equispaced"}, range(6)), ({"variant": "lobatto"}, range(4))],
-        "bubble": [({"variant": "equispaced"}, range(2, 6)),
-                   ({"variant": "lobatto"}, range(2, 3))],
-        "serendipity": [({"variant": "equispaced"}, range(1, 6)),
-                        ({"variant": "lobatto"}, range(1, 3))],
+        "bubble": [({"variant": "equispaced"}, range(2, 6)), ({"variant": "lobatto"}, range(2, 3))],
+        "serendipity": [
+            ({"variant": "equispaced"}, range(1, 6)),
+            ({"variant": "lobatto"}, range(1, 3)),
+        ],
         "Hermite": [({}, [3])],
         "Bernstein": [({}, range(1, 4))],
         "Taylor": [({}, range(0, 5))],
@@ -28,12 +35,10 @@ test_elements: typing.Dict[str, typing.Dict[
         "P": [({"variant": "equispaced"}, range(5))],
         "vP": [({"variant": "equispaced"}, range(5))],
         "matrix Lagrange": [({"variant": "equispaced"}, range(3))],
-        "symmetric matrix Lagrange": [
-            ({"variant": "equispaced"}, range(3))],
+        "symmetric matrix Lagrange": [({"variant": "equispaced"}, range(3))],
         "bubble": [({"variant": "equispaced"}, range(3, 5))],
         "bubble enriched Lagrange": [({"variant": "equispaced"}, range(1, 3))],
-        "bubble enriched vector Lagrange":
-            [({"variant": "equispaced"}, range(1, 3))],
+        "bubble enriched vector Lagrange": [({"variant": "equispaced"}, range(1, 3))],
         "CR": [({"variant": "equispaced"}, [1, 3, 5])],
         "conforming CR": [({}, range(1, 6))],
         "HHJ": [({"variant": "equispaced"}, range(3))],
@@ -60,10 +65,12 @@ test_elements: typing.Dict[str, typing.Dict[
         "Bernardi-Raugel": [({}, [1])],
         "Guzman-Neilan": [({}, [1])],
         "Wu-Xu": [({}, [3])],
-        "transition": [({"edge_orders": [1, 1, 1], "variant": "equispaced"}, range(1, 6)),
-                       ({"edge_orders": [2, 2, 1], "variant": "equispaced"}, range(1, 6)),
-                       ({"edge_orders": [3, 3, 1], "variant": "equispaced"}, range(1, 6)),
-                       ({"edge_orders": [3, 3, 2], "variant": "equispaced"}, range(1, 6))],
+        "transition": [
+            ({"edge_orders": [1, 1, 1], "variant": "equispaced"}, range(1, 6)),
+            ({"edge_orders": [2, 2, 1], "variant": "equispaced"}, range(1, 6)),
+            ({"edge_orders": [3, 3, 1], "variant": "equispaced"}, range(1, 6)),
+            ({"edge_orders": [3, 3, 2], "variant": "equispaced"}, range(1, 6)),
+        ],
         "P1-iso-P2": [({}, [1])],
         "EG": [({}, range(1, 4))],
         "LFEG": [({}, range(1, 4))],
@@ -93,22 +100,72 @@ test_elements: typing.Dict[str, typing.Dict[
         "Bernardi-Raugel": [({}, [1, 2])],
         "Guzman-Neilan": [({}, [1, 2])],
         "Wu-Xu": [({}, [4])],
-        "transition": [({"edge_orders": [1, 1, 1, 1, 1, 1], "face_orders": [1, 1, 1, 1],
-                         "variant": "equispaced"}, range(1, 5)),
-                       ({"edge_orders": [1, 1, 1, 1, 1, 1], "face_orders": [3, 3, 1, 1],
-                         "variant": "equispaced"}, range(1, 5)),
-                       ({"edge_orders": [1, 1, 1, 1, 1, 1], "face_orders": [3, 3, 4, 2],
-                         "variant": "equispaced"}, range(1, 5)),
-                       ({"edge_orders": [1, 1, 1, 1, 1, 1], "face_orders": [4, 4, 1, 1],
-                         "variant": "equispaced"}, range(1, 5)),
-                       ({"edge_orders": [2, 2, 2, 2, 2, 2], "face_orders": [1, 1, 1, 1],
-                         "variant": "equispaced"}, range(1, 5)),
-                       ({"edge_orders": [3, 2, 1, 2, 1, 1], "face_orders": [1, 1, 1, 1],
-                         "variant": "equispaced"}, range(1, 5)),
-                       ({"edge_orders": [1, 1, 3, 1, 3, 1], "face_orders": [1, 1, 1, 1],
-                         "variant": "equispaced"}, range(1, 5)),
-                       ({"edge_orders": [1, 1, 2, 1, 2, 5], "face_orders": [3, 3, 2, 5],
-                         "variant": "equispaced"}, range(1, 5))],
+        "transition": [
+            (
+                {
+                    "edge_orders": [1, 1, 1, 1, 1, 1],
+                    "face_orders": [1, 1, 1, 1],
+                    "variant": "equispaced",
+                },
+                range(1, 5),
+            ),
+            (
+                {
+                    "edge_orders": [1, 1, 1, 1, 1, 1],
+                    "face_orders": [3, 3, 1, 1],
+                    "variant": "equispaced",
+                },
+                range(1, 5),
+            ),
+            (
+                {
+                    "edge_orders": [1, 1, 1, 1, 1, 1],
+                    "face_orders": [3, 3, 4, 2],
+                    "variant": "equispaced",
+                },
+                range(1, 5),
+            ),
+            (
+                {
+                    "edge_orders": [1, 1, 1, 1, 1, 1],
+                    "face_orders": [4, 4, 1, 1],
+                    "variant": "equispaced",
+                },
+                range(1, 5),
+            ),
+            (
+                {
+                    "edge_orders": [2, 2, 2, 2, 2, 2],
+                    "face_orders": [1, 1, 1, 1],
+                    "variant": "equispaced",
+                },
+                range(1, 5),
+            ),
+            (
+                {
+                    "edge_orders": [3, 2, 1, 2, 1, 1],
+                    "face_orders": [1, 1, 1, 1],
+                    "variant": "equispaced",
+                },
+                range(1, 5),
+            ),
+            (
+                {
+                    "edge_orders": [1, 1, 3, 1, 3, 1],
+                    "face_orders": [1, 1, 1, 1],
+                    "variant": "equispaced",
+                },
+                range(1, 5),
+            ),
+            (
+                {
+                    "edge_orders": [1, 1, 2, 1, 2, 5],
+                    "face_orders": [3, 3, 2, 5],
+                    "variant": "equispaced",
+                },
+                range(1, 5),
+            ),
+        ],
         "EG": [({}, range(1, 3))],
         "LFEG": [({}, range(1, 3))],
     },
@@ -118,8 +175,10 @@ test_elements: typing.Dict[str, typing.Dict[
         "vQ": [({"variant": "equispaced"}, range(4)), ({"variant": "lobatto"}, range(3))],
         "dPc": [({"variant": "equispaced"}, range(4)), ({"variant": "lobatto"}, range(3))],
         "vector dPc": [({"variant": "equispaced"}, range(4)), ({"variant": "lobatto"}, range(3))],
-        "serendipity": [({"variant": "equispaced"}, range(1, 4)),
-                        ({"variant": "lobatto"}, range(1, 3))],
+        "serendipity": [
+            ({"variant": "equispaced"}, range(1, 4)),
+            ({"variant": "lobatto"}, range(1, 3)),
+        ],
         "direct serendipity": [({}, range(1, 7))],
         "Scurl": [({"variant": "equispaced"}, range(1, 4)), ({"variant": "lobatto"}, range(1, 3))],
         "Sdiv": [({"variant": "equispaced"}, range(1, 4)), ({"variant": "lobatto"}, range(1, 3))],
@@ -147,8 +206,10 @@ test_elements: typing.Dict[str, typing.Dict[
         "vQ": [({"variant": "equispaced"}, range(3)), ({"variant": "lobatto"}, range(3))],
         "dPc": [({"variant": "equispaced"}, range(3)), ({"variant": "lobatto"}, range(3))],
         "vector dPc": [({"variant": "equispaced"}, range(3)), ({"variant": "lobatto"}, range(3))],
-        "serendipity": [({"variant": "equispaced"}, range(1, 3)),
-                        ({"variant": "lobatto"}, range(1, 3))],
+        "serendipity": [
+            ({"variant": "equispaced"}, range(1, 3)),
+            ({"variant": "lobatto"}, range(1, 3)),
+        ],
         "Scurl": [({"variant": "equispaced"}, range(1, 3)), ({"variant": "lobatto"}, range(1, 3))],
         "Sdiv": [({"variant": "equispaced"}, range(1, 3)), ({"variant": "lobatto"}, range(1, 3))],
         "Qcurl": [({"variant": "equispaced"}, range(1, 3))],
@@ -171,5 +232,5 @@ test_elements: typing.Dict[str, typing.Dict[
     },
     "pyramid": {
         "Lagrange": [({"variant": "equispaced"}, range(4))],
-    }
+    },
 }

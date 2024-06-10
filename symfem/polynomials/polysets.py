@@ -76,10 +76,15 @@ def Hdiv_polynomials(
     """
     assert domain_dim == range_dim
     if domain_dim == 2:
-        return [VectorFunction((
-            variables[0] * variables[0] ** (order - 1 - j) * variables[1] ** j,
-            variables[1] * variables[0] ** (order - 1 - j) * variables[1] ** j,
-        )) for j in range(order)]
+        return [
+            VectorFunction(
+                (
+                    variables[0] * variables[0] ** (order - 1 - j) * variables[1] ** j,
+                    variables[1] * variables[0] ** (order - 1 - j) * variables[1] ** j,
+                )
+            )
+            for j in range(order)
+        ]
     if domain_dim == 3:
         basis: typing.List[VectorFunction] = []
         for j in range(order):
@@ -107,24 +112,53 @@ def Hcurl_polynomials(
     """
     assert domain_dim == range_dim
     if domain_dim == 2:
-        return [VectorFunction((
-            variables[0] ** (order - 1 - j) * variables[1] ** (j + 1),
-            -variables[0] ** (order - j) * variables[1] ** j,
-        )) for j in range(order)]
+        return [
+            VectorFunction(
+                (
+                    variables[0] ** (order - 1 - j) * variables[1] ** (j + 1),
+                    -(variables[0] ** (order - j)) * variables[1] ** j,
+                )
+            )
+            for j in range(order)
+        ]
     if domain_dim == 3:
         poly: typing.List[VectorFunction] = []
-        poly += [VectorFunction((
-            variables[0] ** (m - 1) * variables[1] ** n * variables[2] ** (order - m - n + 1),
-            0, -variables[0] ** m * variables[1] ** n * variables[2] ** (order - m - n)
-        )) for n in range(order) for m in range(1, order + 1 - n)]
-        poly += [VectorFunction((
-            0, variables[0] ** m * variables[1] ** (n - 1) * variables[2] ** (order - m - n + 1),
-            -variables[0] ** m * variables[1] ** n * variables[2] ** (order - m - n)
-        )) for m in range(order) for n in range(1, order + 1 - m)]
-        poly += [VectorFunction((
-            variables[0] ** (order - n) * variables[1] ** n,
-            -variables[0] ** (order + 1 - n) * variables[1] ** (n - 1), 0
-        )) for n in range(1, order + 1)]
+        poly += [
+            VectorFunction(
+                (
+                    variables[0] ** (m - 1)
+                    * variables[1] ** n
+                    * variables[2] ** (order - m - n + 1),
+                    0,
+                    -(variables[0] ** m) * variables[1] ** n * variables[2] ** (order - m - n),
+                )
+            )
+            for n in range(order)
+            for m in range(1, order + 1 - n)
+        ]
+        poly += [
+            VectorFunction(
+                (
+                    0,
+                    variables[0] ** m
+                    * variables[1] ** (n - 1)
+                    * variables[2] ** (order - m - n + 1),
+                    -(variables[0] ** m) * variables[1] ** n * variables[2] ** (order - m - n),
+                )
+            )
+            for m in range(order)
+            for n in range(1, order + 1 - m)
+        ]
+        poly += [
+            VectorFunction(
+                (
+                    variables[0] ** (order - n) * variables[1] ** n,
+                    -(variables[0] ** (order + 1 - n)) * variables[1] ** (n - 1),
+                    0,
+                )
+            )
+            for n in range(1, order + 1)
+        ]
         return poly
     raise ValueError(f"Unsupported dimension: {domain_dim}")
 
@@ -146,7 +180,7 @@ def quolynomial_set_1d(
     for j in product(range(order + 1), repeat=dim):
         poly = ScalarFunction(1)
         for a, b in zip(variables, j):
-            poly *= a ** b
+            poly *= a**b
         basis.append(poly)
     return basis
 
@@ -193,7 +227,7 @@ def Hdiv_quolynomials(
         for j in product(range(order), repeat=domain_dim - 1):
             poly = 1
             for a, b in zip(variables, j[:d] + (order,) + j[d:]):
-                poly *= a ** b
+                poly *= a**b
             basis.append(VectorFunction([poly if i == d else 0 for i in range(domain_dim)]))
     return basis
 
@@ -222,7 +256,7 @@ def Hcurl_quolynomials(
                 continue
             poly = 1
             for a, b in zip(variables, j):
-                poly *= a ** b
+                poly *= a**b
             basis.append(VectorFunction([poly if i == d else 0 for i in range(domain_dim)]))
     return basis
 
@@ -272,7 +306,7 @@ def serendipity_set_1d(
         for i in serendipity_indices(s, s - order, dim):
             p = 1
             for j, k in zip(variables, i):
-                p *= j ** k
+                p *= j**k
             basis.append(ScalarFunction(p))
     return basis
 
@@ -316,10 +350,12 @@ def Hdiv_serendipity(
     assert domain_dim == range_dim
     if domain_dim == 2:
         return [
-            VectorFunction((variables[0] ** (order + 1),
-                            (order + 1) * variables[0] ** order * variables[1])),
-            VectorFunction(((order + 1) * variables[0] * variables[1] ** order,
-                            variables[1] ** (order + 1))),
+            VectorFunction(
+                (variables[0] ** (order + 1), (order + 1) * variables[0] ** order * variables[1])
+            ),
+            VectorFunction(
+                ((order + 1) * variables[0] * variables[1] ** order, variables[1] ** (order + 1))
+            ),
         ]
     if domain_dim == 3:
         a = []
@@ -329,16 +365,25 @@ def Hdiv_serendipity(
         else:
             for i in range(order + 1):
                 p = variables[1] ** i * variables[2] ** (order - i)
-                a.append(VectorFunction((0, variables[0] * variables[2] * p,
-                                         -variables[0] * variables[1] * p)))
+                a.append(
+                    VectorFunction(
+                        (0, variables[0] * variables[2] * p, -variables[0] * variables[1] * p)
+                    )
+                )
 
                 p = variables[0] ** i * variables[2] ** (order - i)
-                a.append(VectorFunction((variables[1] * variables[2] * p, 0,
-                                         -variables[0] * variables[1] * p)))
+                a.append(
+                    VectorFunction(
+                        (variables[1] * variables[2] * p, 0, -variables[0] * variables[1] * p)
+                    )
+                )
 
                 p = variables[0] ** i * variables[1] ** (order - i)
-                a.append(VectorFunction((variables[1] * variables[2] * p,
-                                         -variables[0] * variables[2] * p, 0)))
+                a.append(
+                    VectorFunction(
+                        (variables[1] * variables[2] * p, -variables[0] * variables[2] * p, 0)
+                    )
+                )
 
         return [i.curl() for i in a]
 
@@ -362,10 +407,12 @@ def Hcurl_serendipity(
     assert domain_dim == range_dim
     if domain_dim == 2:
         return [
-            VectorFunction(((order + 1) * variables[0] ** order * variables[1],
-                            -variables[0] ** (order + 1))),
-            VectorFunction((variables[1] ** (order + 1),
-                            (order + 1) * variables[0] * variables[1] ** order)),
+            VectorFunction(
+                ((order + 1) * variables[0] ** order * variables[1], -(variables[0] ** (order + 1)))
+            ),
+            VectorFunction(
+                (variables[1] ** (order + 1), (order + 1) * variables[0] * variables[1] ** order)
+            ),
         ]
     if domain_dim == 3:
         out: typing.List[VectorFunction] = []
@@ -377,16 +424,25 @@ def Hcurl_serendipity(
         else:
             for i in range(order):
                 p = variables[0] ** i * variables[2] ** (order - 1 - i)
-                out.append(VectorFunction((variables[1] * variables[2] * p, 0,
-                                           -variables[0] * variables[1] * p)))
+                out.append(
+                    VectorFunction(
+                        (variables[1] * variables[2] * p, 0, -variables[0] * variables[1] * p)
+                    )
+                )
 
                 p = variables[1] ** i * variables[2] ** (order - 1 - i)
-                out.append(VectorFunction((0, variables[0] * variables[2] * p,
-                                           -variables[0] * variables[1] * p)))
+                out.append(
+                    VectorFunction(
+                        (0, variables[0] * variables[2] * p, -variables[0] * variables[1] * p)
+                    )
+                )
 
                 p = variables[0] ** i * variables[1] ** (order - 1 - i)
-                out.append(VectorFunction((variables[1] * variables[2] * p,
-                                           -variables[0] * variables[2] * p, 0)))
+                out.append(
+                    VectorFunction(
+                        (variables[1] * variables[2] * p, -variables[0] * variables[2] * p, 0)
+                    )
+                )
 
         for p in serendipity_set_1d(domain_dim, order + 1):
             out.append(VectorFunction(tuple(p.diff(i) for i in variables)))

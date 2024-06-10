@@ -9,10 +9,9 @@ SetOfPoints = typing.Tuple[PointType, ...]
 PointTypeInput = typing.Union[
     typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...],
     typing.List[typing.Union[sympy.core.expr.Expr, int]],
-    sympy.matrices.dense.MutableDenseMatrix]
-SetOfPointsInput = typing.Union[
-    typing.Tuple[PointTypeInput, ...],
-    typing.List[PointTypeInput]]
+    sympy.matrices.dense.MutableDenseMatrix,
+]
+SetOfPointsInput = typing.Union[typing.Tuple[PointTypeInput, ...], typing.List[PointTypeInput]]
 
 
 def _is_close(a: sympy.core.expr.Expr, b: int) -> bool:
@@ -126,7 +125,7 @@ def point_in_triangle(point: PointType, triangle: SetOfPoints) -> bool:
     dot11 = _vdot(v1, v1)
     dot12 = _vdot(v1, v2)
 
-    det = (dot00 * dot11 - dot01 * dot01)
+    det = dot00 * dot11 - dot01 * dot01
     u = (dot11 * dot02 - dot01 * dot12) / det
     v = (dot00 * dot12 - dot01 * dot02) / det
 

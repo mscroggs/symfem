@@ -6,12 +6,25 @@ from itertools import product
 import sympy
 
 from ..finite_element import CiarletElement, FiniteElement
-from ..functionals import (DotPointEvaluation, IntegralAgainst, IntegralMoment, ListOfFunctionals,
-                           NormalIntegralMoment, PointEvaluation, TangentIntegralMoment)
+from ..functionals import (
+    DotPointEvaluation,
+    IntegralAgainst,
+    IntegralMoment,
+    ListOfFunctionals,
+    NormalIntegralMoment,
+    PointEvaluation,
+    TangentIntegralMoment,
+)
 from ..functions import FunctionInput
 from ..moments import make_integral_moment_dofs
-from ..polynomials import (Hcurl_quolynomials, Hdiv_quolynomials, lobatto_dual_basis,
-                           orthonormal_basis, quolynomial_set_1d, quolynomial_set_vector)
+from ..polynomials import (
+    Hcurl_quolynomials,
+    Hdiv_quolynomials,
+    lobatto_dual_basis,
+    orthonormal_basis,
+    quolynomial_set_1d,
+    quolynomial_set_vector,
+)
 from ..quadrature import get_quadrature
 from ..references import NonDefaultReferenceError, Reference
 
@@ -33,10 +46,13 @@ class Q(CiarletElement):
             for f in basis:
                 dofs.append(IntegralAgainst(reference, f, (reference.tdim, 0)))
         elif order == 0:
-            dofs = [PointEvaluation(
-                reference,
-                reference.get_point(tuple(sympy.Rational(1, 2) for i in range(reference.tdim))),
-                entity=(reference.tdim, 0))]
+            dofs = [
+                PointEvaluation(
+                    reference,
+                    reference.get_point(tuple(sympy.Rational(1, 2) for i in range(reference.tdim))),
+                    entity=(reference.tdim, 0),
+                )
+            ]
         elif variant == "lobatto":
             if reference != reference.default_reference():
                 raise NonDefaultReferenceError()
@@ -59,10 +75,14 @@ class Q(CiarletElement):
                     for i in product(range(1, order), repeat=edim):
                         dofs.append(
                             PointEvaluation(
-                                reference, tuple(o + sum(a[j] * points[b]
-                                                         for a, b in zip(entity.axes, i[::-1]))
-                                                 for j, o in enumerate(entity.origin)),
-                                entity=(edim, e_n)))
+                                reference,
+                                tuple(
+                                    o + sum(a[j] * points[b] for a, b in zip(entity.axes, i[::-1]))
+                                    for j, o in enumerate(entity.origin)
+                                ),
+                                entity=(edim, e_n),
+                            )
+                        )
 
         poly: typing.List[FunctionInput] = []
         poly += quolynomial_set_1d(reference.tdim, order)
@@ -72,7 +92,7 @@ class Q(CiarletElement):
         self.variant = variant
 
     def get_tensor_factorisation(
-        self
+        self,
     ) -> typing.List[typing.Tuple[str, typing.List[FiniteElement], typing.List[int]]]:
         """Get the representation of the element as a tensor product.
 
@@ -82,6 +102,7 @@ class Q(CiarletElement):
         if self.variant == "lobatto":
             return super().get_tensor_factorisation()
         from symfem import create_element
+
         interval_q = create_element("interval", "Lagrange", self.order)
 
         if self.order == 0:
@@ -98,20 +119,20 @@ class Q(CiarletElement):
             perm += [2, 6] + [8 + 6 * n + i for i in range(n)]
             for i in range(n):
                 perm += [8 + n + i, 8 + 9 * n + i]
-                perm += [8 + 12 * n + 2 * n ** 2 + i + n * j for j in range(n)]
+                perm += [8 + 12 * n + 2 * n**2 + i + n * j for j in range(n)]
             perm += [1, 5] + [8 + 4 * n + i for i in range(n)]
             perm += [3, 7] + [8 + 7 * n + i for i in range(n)]
             for i in range(n):
                 perm += [8 + 3 * n + i, 8 + 10 * n + i]
-                perm += [8 + 12 * n + 3 * n ** 2 + i + n * j for j in range(n)]
+                perm += [8 + 12 * n + 3 * n**2 + i + n * j for j in range(n)]
             for i in range(n):
                 perm += [8 + i, 8 + 8 * n + i]
-                perm += [8 + 12 * n + n ** 2 + i + n * j for j in range(n)]
+                perm += [8 + 12 * n + n**2 + i + n * j for j in range(n)]
                 perm += [8 + 5 * n + i, 8 + 11 * n + i]
-                perm += [8 + 12 * n + 4 * n ** 2 + i + n * j for j in range(n)]
+                perm += [8 + 12 * n + 4 * n**2 + i + n * j for j in range(n)]
                 for j in range(n):
-                    perm += [8 + 12 * n + i + n * j, 8 + 12 * n + 5 * n ** 2 + i + n * j]
-                    perm += [8 + 12 * n + 6 * n ** 2 + i + n * j + n ** 2 * k for k in range(n)]
+                    perm += [8 + 12 * n + i + n * j, 8 + 12 * n + 5 * n**2 + i + n * j]
+                    perm += [8 + 12 * n + 6 * n**2 + i + n * j + n**2 * k for k in range(n)]
 
         return [("scalar", [interval_q for i in range(self.reference.tdim)], perm)]
 

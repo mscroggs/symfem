@@ -28,9 +28,14 @@ class Hermite(CiarletElement):
         for v_n, v in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
             for i in range(reference.tdim):
-                dofs.append(DerivativePointEvaluation(
-                    reference, v, tuple(1 if i == j else 0 for j in range(reference.tdim)),
-                    entity=(0, v_n)))
+                dofs.append(
+                    DerivativePointEvaluation(
+                        reference,
+                        v,
+                        tuple(1 if i == j else 0 for j in range(reference.tdim)),
+                        entity=(0, v_n),
+                    )
+                )
         for e_n in range(reference.sub_entity_count(2)):
             sub_entity = reference.sub_entity(2, e_n)
             dofs.append(PointEvaluation(reference, sub_entity.midpoint(), entity=(2, e_n)))

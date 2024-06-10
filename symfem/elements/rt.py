@@ -32,10 +32,14 @@ class RaviartThomas(CiarletElement):
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Lagrange, order - 1,
-                    {"variant": variant}),
-            cells=(IntegralMoment, VectorLagrange, order - 2, "contravariant",
-                   {"variant": variant}),
+            facets=(NormalIntegralMoment, Lagrange, order - 1, {"variant": variant}),
+            cells=(
+                IntegralMoment,
+                VectorLagrange,
+                order - 2,
+                "contravariant",
+                {"variant": variant},
+            ),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

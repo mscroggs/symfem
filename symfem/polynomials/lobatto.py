@@ -59,9 +59,13 @@ def lobatto_basis(
         return [i * j.subs(x[0], x[1]) for i in interval for j in interval]
     if cell == "hexahedron":
         interval = lobatto_basis("interval", order, include_endpoints)
-        return [i * j.subs(x[0], x[1]) * k.subs(x[0], x[2])
-                for i in interval for j in interval for k in interval]
-    raise NotImplementedError(f"Lobatto polynomials not implemented for cell \"{cell}\"")
+        return [
+            i * j.subs(x[0], x[1]) * k.subs(x[0], x[2])
+            for i in interval
+            for j in interval
+            for k in interval
+        ]
+    raise NotImplementedError(f'Lobatto polynomials not implemented for cell "{cell}"')
 
 
 def lobatto_dual_basis(
@@ -87,6 +91,10 @@ def lobatto_dual_basis(
         return [i * j.subs(x[0], x[1]) for i in interval for j in interval]
     if cell == "hexahedron":
         interval = lobatto_dual_basis("interval", order, include_endpoints)
-        return [i * j.subs(x[0], x[1]) * k.subs(x[0], x[2])
-                for i in interval for j in interval for k in interval]
-    raise NotImplementedError(f"Lobatto polynomials not implemented for cell \"{cell}\"")
+        return [
+            i * j.subs(x[0], x[1]) * k.subs(x[0], x[2])
+            for i in interval
+            for j in interval
+            for k in interval
+        ]
+    raise NotImplementedError(f'Lobatto polynomials not implemented for cell "{cell}"')

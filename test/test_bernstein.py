@@ -5,9 +5,10 @@ import pytest
 import symfem
 
 
-@pytest.mark.parametrize("celltype, degree", [(c, i) for c, n in [
-    ("interval", 4), ("triangle", 3), ("tetrahedron", 2)
-] for i in range(n)])
+@pytest.mark.parametrize(
+    "celltype, degree",
+    [(c, i) for c, n in [("interval", 4), ("triangle", 3), ("tetrahedron", 2)] for i in range(n)],
+)
 def test_bernstein(celltype, degree):
     b = symfem.create_element(celltype, "Bernstein", degree)
     poly = symfem.elements.bernstein.bernstein_polynomials(degree, b.reference.tdim)

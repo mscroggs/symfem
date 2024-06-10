@@ -28,6 +28,7 @@ test = ["pytest", "symfem[optional]", "numpy"]
 
 [tool.ruff]
 line-length = 100
+indent-width = 4
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]

@@ -9,14 +9,23 @@ import sympy
 
 import symfem.functions
 
-from .geometry import (PointType, PointTypeInput, SetOfPoints, SetOfPointsInput, parse_point_input,
-                       parse_set_of_points_input)
-from .symbols import AxisVariablesNotSingle, t, x
+from symfem.geometry import (
+    PointType,
+    PointTypeInput,
+    SetOfPoints,
+    SetOfPointsInput,
+    parse_point_input,
+    parse_set_of_points_input,
+)
+from symfem.symbols import AxisVariablesNotSingle, t, x
 
 LatticeWithLines = typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]
-IntLimits = typing.List[typing.Union[
-    typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
-    typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr]]]
+IntLimits = typing.List[
+    typing.Union[
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
+        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
+    ]
+]
 
 
 class NonDefaultReferenceError(NotImplementedError):
@@ -167,13 +176,19 @@ class Reference(ABC):
         """
 
     def __build__(
-        self, tdim: int, name: str, origin: PointTypeInput, axes: SetOfPointsInput,
-        reference_vertices: SetOfPointsInput, vertices: SetOfPointsInput,
+        self,
+        tdim: int,
+        name: str,
+        origin: PointTypeInput,
+        axes: SetOfPointsInput,
+        reference_vertices: SetOfPointsInput,
+        vertices: SetOfPointsInput,
         edges: typing.Tuple[typing.Tuple[int, int], ...],
         faces: typing.Tuple[typing.Tuple[int, ...], ...],
         volumes: typing.Tuple[typing.Tuple[int, ...], ...],
         sub_entity_types: typing.List[typing.Union[typing.List[str], str, None]],
-        simplex: bool = False, tp: bool = False
+        simplex: bool = False,
+        tp: bool = False,
     ):
         """Create a reference cell.
 
@@ -445,7 +460,8 @@ class Reference(ABC):
         Returns:
             The Jacobian
         """
-        from .functions import VectorFunction
+        from symfem.functions import VectorFunction
+
         assert len(self.axes) == self.tdim
         vaxes = [VectorFunction(a) for a in self.axes]
         if self.tdim == 1:
@@ -474,7 +490,7 @@ class Reference(ABC):
             The tangent
         """
         if self.tdim == 1:
-            norm = sympy.sqrt(sum(i ** 2 for i in self.axes[0]))
+            norm = sympy.sqrt(sum(i**2 for i in self.axes[0]))
             return _vnormalise(tuple(i / norm for i in self.axes[0]))
 
         raise RuntimeError
@@ -511,7 +527,7 @@ class Reference(ABC):
             assert codim is not None
             dim = self.tdim - codim
         if dim == 0:
-            return tuple((i, ) for i, _ in enumerate(self.vertices))
+            return tuple((i,) for i, _ in enumerate(self.vertices))
         if dim == 1:
             return self.edges
         if dim == 2:
@@ -555,13 +571,15 @@ class Reference(ABC):
 
         if reference_vertices:
             return create_reference(
-                entity_type, tuple(self.reference_vertices[i] for i in self.sub_entities(dim)[n]))
+                entity_type, tuple(self.reference_vertices[i] for i in self.sub_entities(dim)[n])
+            )
         else:
             if self.tdim == dim:
                 return self
             else:
                 return create_reference(
-                    entity_type, tuple(self.vertices[i] for i in self.sub_entities(dim)[n]))
+                    entity_type, tuple(self.vertices[i] for i in self.sub_entities(dim)[n])
+                )
 
     def at_vertex(self, point: PointType) -> bool:
         """Check if a point is a vertex of the reference.
@@ -586,7 +604,8 @@ class Reference(ABC):
         Returns:
             Is the point on an edge?
         """
-        from .functions import VectorFunction
+        from symfem.functions import VectorFunction
+
         point = VectorFunction(point_in)
         for e in self.edges:
             v0 = VectorFunction(self.vertices[e[0]])
@@ -605,7 +624,8 @@ class Reference(ABC):
         Returns:
             Is the point on a face?
         """
-        from .functions import VectorFunction
+        from symfem.functions import VectorFunction
+
         point = VectorFunction(point_in)
         for f in self.faces:
             v0 = VectorFunction(self.vertices[f[0]])
@@ -631,7 +651,7 @@ class Reference(ABC):
         self, poly: typing.List[symfem.functions.FunctionInput]
     ) -> typing.List[symfem.functions.FunctionInput]:
         """Map the polynomials from the default reference element to this reference."""
-        from .functions import parse_function_input
+        from symfem.functions import parse_function_input
 
         if self == self.default_reference():
             return poly
@@ -639,17 +659,20 @@ class Reference(ABC):
         return [parse_function_input(p).subs(x, invmap) for p in poly]
 
     def plot_entity_diagrams(
-        self, filename: typing.Union[str, typing.List[str]],
-        plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
+        self,
+        filename: typing.Union[str, typing.List[str]],
+        plot_options: typing.Dict[str, typing.Any] = {},
+        **kwargs: typing.Any,
     ):
         """Plot diagrams showing the entity numbering of the reference."""
-        from .plotting import Picture, colors
+        from symfem.plotting import Picture, colors
 
         img = Picture(**kwargs)
 
         if self.tdim == 1:
-            offset_unit: typing.Tuple[typing.Union[
-                sympy.core.expr.Expr, int], ...] = (sympy.Rational(4, 3), )
+            offset_unit: typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...] = (
+                sympy.Rational(4, 3),
+            )
             img.add_arrow((-sympy.Rational(1, 2), 0), (-sympy.Rational(1, 3), 0))
             img.add_math((-sympy.Rational(8, 25), 0), "x", anchor="west")
         elif self.tdim == 2:
@@ -657,16 +680,20 @@ class Reference(ABC):
                 offset_unit = (sympy.Rational(9, 4), 0)
                 rt52 = sympy.sqrt(3) / 4
                 img.add_arrow((-sympy.Rational(3, 4), -rt52), (-sympy.Rational(7, 12), -rt52))
-                img.add_arrow((-sympy.Rational(3, 4), -rt52),
-                              (-sympy.Rational(3, 4), sympy.Rational(1, 6) - rt52))
+                img.add_arrow(
+                    (-sympy.Rational(3, 4), -rt52),
+                    (-sympy.Rational(3, 4), sympy.Rational(1, 6) - rt52),
+                )
                 img.add_math((-sympy.Rational(171, 300), -rt52), "x", anchor="west")
-                img.add_math((-sympy.Rational(3, 4), sympy.Rational(9, 50) - rt52), "y",
-                             anchor="south")
+                img.add_math(
+                    (-sympy.Rational(3, 4), sympy.Rational(9, 50) - rt52), "y", anchor="south"
+                )
             else:
                 offset_unit = (sympy.Rational(4, 3), 0)
                 img.add_arrow((-sympy.Rational(1, 2), 0), (-sympy.Rational(1, 3), 0))
-                img.add_arrow((-sympy.Rational(1, 2), 0),
-                              (-sympy.Rational(1, 2), sympy.Rational(1, 6)))
+                img.add_arrow(
+                    (-sympy.Rational(1, 2), 0), (-sympy.Rational(1, 2), sympy.Rational(1, 6))
+                )
                 img.add_math((-sympy.Rational(8, 25), 0), "x", anchor="west")
                 img.add_math((-sympy.Rational(1, 2), sympy.Rational(9, 50)), "y", anchor="south")
         elif self.tdim == 3:
@@ -676,17 +703,27 @@ class Reference(ABC):
                 offset_unit = (sympy.Rational(3, 2), sympy.Rational(9, 15), 0)
             else:
                 offset_unit = (1, sympy.Rational(2, 5), 0)
-            img.add_arrow((-sympy.Rational(3, 8), -sympy.Rational(3, 20), 0),
-                          (-sympy.Rational(5, 24), -sympy.Rational(3, 20), 0))
-            img.add_arrow((-sympy.Rational(3, 8), -sympy.Rational(3, 20), 0),
-                          (-sympy.Rational(3, 8), sympy.Rational(1, 60), 0))
-            img.add_arrow((-sympy.Rational(3, 8), -sympy.Rational(3, 20), 0),
-                          (-sympy.Rational(3, 8), -sympy.Rational(3, 20), sympy.Rational(1, 6)))
+            img.add_arrow(
+                (-sympy.Rational(3, 8), -sympy.Rational(3, 20), 0),
+                (-sympy.Rational(5, 24), -sympy.Rational(3, 20), 0),
+            )
+            img.add_arrow(
+                (-sympy.Rational(3, 8), -sympy.Rational(3, 20), 0),
+                (-sympy.Rational(3, 8), sympy.Rational(1, 60), 0),
+            )
+            img.add_arrow(
+                (-sympy.Rational(3, 8), -sympy.Rational(3, 20), 0),
+                (-sympy.Rational(3, 8), -sympy.Rational(3, 20), sympy.Rational(1, 6)),
+            )
             img.add_math((-sympy.Rational(39, 200), -sympy.Rational(3, 20), 0), "x", anchor="west")
-            img.add_math((-sympy.Rational(3, 8), sympy.Rational(1, 60), 0), "y",
-                         anchor="south west")
-            img.add_math((-sympy.Rational(3, 8), -sympy.Rational(3, 20), sympy.Rational(9, 50)),
-                         "z", anchor="south")
+            img.add_math(
+                (-sympy.Rational(3, 8), sympy.Rational(1, 60), 0), "y", anchor="south west"
+            )
+            img.add_math(
+                (-sympy.Rational(3, 8), -sympy.Rational(3, 20), sympy.Rational(9, 50)),
+                "z",
+                anchor="south",
+            )
         else:
             raise ValueError("Unsupported tdim")
 
@@ -710,7 +747,7 @@ class Reference(ABC):
 class Point(Reference):
     """A point."""
 
-    def __init__(self, vertices: SetOfPointsInput = ((), )):
+    def __init__(self, vertices: SetOfPointsInput = ((),)):
         """Create a point.
 
         Args:
@@ -722,13 +759,15 @@ class Point(Reference):
             name="point",
             origin=vertices[0],
             axes=(),
-            reference_vertices=((), ),
+            reference_vertices=((),),
             vertices=vertices,
             edges=(),
             faces=(),
             volumes=(),
             sub_entity_types=["point", None, None, None],
-            simplex=True, tp=True)
+            simplex=True,
+            tp=True,
+        )
 
     def default_reference(self) -> Reference:
         """Get the default reference for this cell type.
@@ -855,7 +894,9 @@ class Interval(Reference):
             faces=(),
             volumes=(),
             sub_entity_types=["point", "interval", None, None],
-            simplex=True, tp=True)
+            simplex=True,
+            tp=True,
+        )
 
     def default_reference(self) -> Reference:
         """Get the default reference for this cell type.
@@ -874,8 +915,12 @@ class Interval(Reference):
         Returns:
             A lattice of points offset from the edge of the cell
         """
-        return tuple(tuple(a + (b - a) * sympy.Rational(2 * i + 1, 2 * (n + 1))
-                           for a, b in zip(*self.vertices)) for i in range(n))
+        return tuple(
+            tuple(
+                a + (b - a) * sympy.Rational(2 * i + 1, 2 * (n + 1)) for a, b in zip(*self.vertices)
+            )
+            for i in range(n)
+        )
 
     def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
@@ -887,8 +932,10 @@ class Interval(Reference):
             A lattice of points including the edges of the cell
             Pairs of point numbers that make a mesh of lines across the cell
         """
-        pts = tuple(tuple(a + (b - a) * sympy.Rational(i, n - 1)
-                          for a, b in zip(*self.vertices)) for i in range(n))
+        pts = tuple(
+            tuple(a + (b - a) * sympy.Rational(i, n - 1) for a, b in zip(*self.vertices))
+            for i in range(n)
+        )
         pairs = [(i, i + 1) for i in range(n - 1)]
         return pts, pairs
 
@@ -928,7 +975,7 @@ class Interval(Reference):
         vertices = parse_set_of_points_input(vertices_in)
         p = _vsub(tuple(x), vertices[0])
         v = _vsub(vertices[1], vertices[0])
-        return (_vdot(p, v) * sympy.Integer(1) / _vdot(v, v), )
+        return (_vdot(p, v) * sympy.Integer(1) / _vdot(v, v),)
 
     def _compute_map_to_self(self) -> PointType:
         """Compute the map from the canonical reference to this reference.
@@ -946,7 +993,7 @@ class Interval(Reference):
         """
         p = _vsub(tuple(x), self.vertices[0])
         v = _vsub(self.vertices[1], self.vertices[0])
-        return (_vdot(p, v) * sympy.Integer(1) / _vdot(v, v), )
+        return (_vdot(p, v) * sympy.Integer(1) / _vdot(v, v),)
 
     def volume(self) -> sympy.core.expr.Expr:
         """Calculate the volume.
@@ -991,7 +1038,8 @@ class Triangle(Reference):
             faces=((0, 1, 2),),
             volumes=(),
             sub_entity_types=["point", "interval", "triangle", None],
-            simplex=True)
+            simplex=True,
+        )
 
     def default_reference(self) -> Reference:
         """Get the default reference for this cell type.
@@ -1010,10 +1058,14 @@ class Triangle(Reference):
         Returns:
             A lattice of points offset from the edge of the cell
         """
-        return tuple(tuple(
-            o + ((2 * i + 1) * a0 + (2 * j + 1) * a1) / 2 / (n + 1)
-            for o, a0, a1 in zip(self.origin, *self.axes)
-        ) for i in range(n) for j in range(n - i))
+        return tuple(
+            tuple(
+                o + ((2 * i + 1) * a0 + (2 * j + 1) * a1) / 2 / (n + 1)
+                for o, a0, a1 in zip(self.origin, *self.axes)
+            )
+            for i in range(n)
+            for j in range(n - i)
+        )
 
     def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
@@ -1025,13 +1077,14 @@ class Triangle(Reference):
             A lattice of points including the edges of the cell
             Pairs of point numbers that make a mesh of lines across the cell
         """
-        pts = tuple(tuple(
-            o + (i * a0 + j * a1) / (n - 1)
-            for o, a0, a1 in zip(self.origin, *self.axes)
-        ) for i in range(n) for j in range(n - i))
+        pts = tuple(
+            tuple(o + (i * a0 + j * a1) / (n - 1) for o, a0, a1 in zip(self.origin, *self.axes))
+            for i in range(n)
+            for j in range(n - i)
+        )
         pairs = []
         s = 0
-        for j in range(n-1, 0, -1):
+        for j in range(n - 1, 0, -1):
             pairs += [(i, i + 1) for i in range(s, s + j)]
             s += j + 1
         for k in range(n + 1):
@@ -1061,8 +1114,10 @@ class Triangle(Reference):
         Returns:
             Integration limits that can be passed into sympy.integrate
         """
-        return [(vars[1], sympy.Integer(0), 1 - vars[0]),
-                (vars[0], sympy.Integer(0), sympy.Integer(1))]
+        return [
+            (vars[1], sympy.Integer(0), 1 - vars[0]),
+            (vars[0], sympy.Integer(0), sympy.Integer(1)),
+        ]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell.
@@ -1091,8 +1146,7 @@ class Triangle(Reference):
         p = _vsub(tuple(x), vertices[0])
         v1 = _vsub(vertices[1], vertices[0])
         v2 = _vsub(vertices[2], vertices[0])
-        mat = sympy.Matrix([[v1[0], v2[0]],
-                            [v1[1], v2[1]]]).inv()
+        mat = sympy.Matrix([[v1[0], v2[0]], [v1[1], v2[1]]]).inv()
         return (_vdot(mat.row(0), p), _vdot(mat.row(1), p))
 
     def _compute_map_to_self(self) -> PointType:
@@ -1101,8 +1155,7 @@ class Triangle(Reference):
         Returns:
             The map
         """
-        return tuple(v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1]
-                     for v0, v1, v2 in zip(*self.vertices))
+        return tuple(v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1] for v0, v1, v2 in zip(*self.vertices))
 
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference.
@@ -1114,8 +1167,7 @@ class Triangle(Reference):
             p = _vsub(tuple(x), self.vertices[0])
             v1 = _vsub(self.vertices[1], self.vertices[0])
             v2 = _vsub(self.vertices[2], self.vertices[0])
-            mat = sympy.Matrix([[v1[0], v2[0]],
-                                [v1[1], v2[1]]]).inv()
+            mat = sympy.Matrix([[v1[0], v2[0]], [v1[1], v2[1]]]).inv()
             return (_vdot(mat.row(0), p), _vdot(mat.row(1), p))
 
         return tuple(
@@ -1175,7 +1227,8 @@ class Tetrahedron(Reference):
             faces=((1, 2, 3), (0, 2, 3), (0, 1, 3), (0, 1, 2)),
             volumes=((0, 1, 2, 3),),
             sub_entity_types=["point", "interval", "triangle", "tetrahedron"],
-            simplex=True)
+            simplex=True,
+        )
 
     @property
     def clockwise_vertices(self) -> SetOfPoints:
@@ -1195,7 +1248,7 @@ class Tetrahedron(Reference):
         return [
             [(2, 0), (2, 1), (2, 3), (1, 0), (1, 2), (1, 4), (0, 2)],
             [(3, 0)],
-            [(2, 2), (1, 1), (1, 3), (1, 5), (0, 0), (0, 1), (0, 3)]
+            [(2, 2), (1, 1), (1, 3), (1, 5), (0, 0), (0, 1), (0, 3)],
         ]
 
     def default_reference(self) -> Reference:
@@ -1215,10 +1268,15 @@ class Tetrahedron(Reference):
         Returns:
             A lattice of points offset from the edge of the cell
         """
-        return tuple(tuple(
-            o + ((2 * i + 1) * a0 + (2 * j + 1) * a1 + (2 * k + 1) * a2) / 2 / (n + 1)
-            for o, a0, a1, a2 in zip(self.origin, *self.axes)
-        ) for i in range(n) for j in range(n - i) for k in range(n - i - j))
+        return tuple(
+            tuple(
+                o + ((2 * i + 1) * a0 + (2 * j + 1) * a1 + (2 * k + 1) * a2) / 2 / (n + 1)
+                for o, a0, a1, a2 in zip(self.origin, *self.axes)
+            )
+            for i in range(n)
+            for j in range(n - i)
+            for k in range(n - i - j)
+        )
 
     def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
@@ -1241,9 +1299,11 @@ class Tetrahedron(Reference):
         Returns:
             Integration limits that can be passed into sympy.integrate
         """
-        return [(vars[0], sympy.Integer(0), 1 - vars[1] - vars[2]),
-                (vars[1], sympy.Integer(0), 1 - vars[2]),
-                (vars[2], sympy.Integer(0), sympy.Integer(1))]
+        return [
+            (vars[0], sympy.Integer(0), 1 - vars[1] - vars[2]),
+            (vars[1], sympy.Integer(0), 1 - vars[2]),
+            (vars[2], sympy.Integer(0), sympy.Integer(1)),
+        ]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell.
@@ -1255,8 +1315,10 @@ class Tetrahedron(Reference):
             The map
         """
         assert self.vertices == self.reference_vertices
-        return tuple(v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1] + (v3 - v0) * x[2]
-                     for v0, v1, v2, v3 in zip(*vertices))
+        return tuple(
+            v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1] + (v3 - v0) * x[2]
+            for v0, v1, v2, v3 in zip(*vertices)
+        )
 
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference.
@@ -1274,9 +1336,9 @@ class Tetrahedron(Reference):
         v1 = _vsub(vertices[1], vertices[0])
         v2 = _vsub(vertices[2], vertices[0])
         v3 = _vsub(vertices[3], vertices[0])
-        mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
-                            [v1[1], v2[1], v3[1]],
-                            [v1[2], v2[2], v3[2]]]).inv()
+        mat = sympy.Matrix(
+            [[v1[0], v2[0], v3[0]], [v1[1], v2[1], v3[1]], [v1[2], v2[2], v3[2]]]
+        ).inv()
         return (_vdot(mat.row(0), p), _vdot(mat.row(1), p), _vdot(mat.row(2), p))
 
     def _compute_map_to_self(self) -> PointType:
@@ -1285,8 +1347,10 @@ class Tetrahedron(Reference):
         Returns:
             The map
         """
-        return tuple(v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1] + (v3 - v0) * x[2]
-                     for v0, v1, v2, v3 in zip(*self.vertices))
+        return tuple(
+            v0 + (v1 - v0) * x[0] + (v2 - v0) * x[1] + (v3 - v0) * x[2]
+            for v0, v1, v2, v3 in zip(*self.vertices)
+        )
 
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference.
@@ -1298,9 +1362,9 @@ class Tetrahedron(Reference):
         v1 = _vsub(self.vertices[1], self.vertices[0])
         v2 = _vsub(self.vertices[2], self.vertices[0])
         v3 = _vsub(self.vertices[3], self.vertices[0])
-        mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
-                            [v1[1], v2[1], v3[1]],
-                            [v1[2], v2[2], v3[2]]]).inv()
+        mat = sympy.Matrix(
+            [[v1[0], v2[0], v3[0]], [v1[1], v2[1], v3[1]], [v1[2], v2[2], v3[2]]]
+        ).inv()
         return (_vdot(mat.row(0), p), _vdot(mat.row(1), p), _vdot(mat.row(2), p))
 
     def volume(self) -> sympy.core.expr.Expr:
@@ -1325,9 +1389,9 @@ class Tetrahedron(Reference):
         else:
             po = _vsub(point, self.origin)
             minv = sympy.Matrix([[a[i] for a in self.axes] for i in range(3)]).inv()
-            t0 = (minv[0, 0] * po[0] + minv[0, 1] * po[1] + minv[0, 2] * po[2])
-            t1 = (minv[1, 0] * po[0] + minv[1, 1] * po[1] + minv[1, 2] * po[2])
-            t2 = (minv[2, 0] * po[0] + minv[2, 1] * po[1] + minv[2, 2] * po[2])
+            t0 = minv[0, 0] * po[0] + minv[0, 1] * po[1] + minv[0, 2] * po[2]
+            t1 = minv[1, 0] * po[0] + minv[1, 1] * po[1] + minv[1, 2] * po[2]
+            t2 = minv[2, 0] * po[0] + minv[2, 1] * po[1] + minv[2, 2] * po[2]
             return 0 <= t0 and 0 <= t1 and 0 >= t2 and t0 + t1 + t2 <= 1
 
 
@@ -1352,7 +1416,8 @@ class Quadrilateral(Reference):
             faces=((0, 1, 2, 3),),
             volumes=(),
             sub_entity_types=["point", "interval", "quadrilateral", None],
-            tp=True)
+            tp=True,
+        )
 
     @property
     def clockwise_vertices(self) -> SetOfPoints:
@@ -1380,10 +1445,14 @@ class Quadrilateral(Reference):
         Returns:
             A lattice of points offset from the edge of the cell
         """
-        return tuple(tuple(
-            o + ((2 * i + 1) * a0 + (2 * j + 1) * a1) / 2 / (n + 1)
-            for o, a0, a1 in zip(self.origin, *self.axes)
-        ) for i in range(n + 1) for j in range(n + 1))
+        return tuple(
+            tuple(
+                o + ((2 * i + 1) * a0 + (2 * j + 1) * a1) / 2 / (n + 1)
+                for o, a0, a1 in zip(self.origin, *self.axes)
+            )
+            for i in range(n + 1)
+            for j in range(n + 1)
+        )
 
     def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
@@ -1395,10 +1464,11 @@ class Quadrilateral(Reference):
             A lattice of points including the edges of the cell
             Pairs of point numbers that make a mesh of lines across the cell
         """
-        pts = tuple(tuple(
-            o + (i * a0 + j * a1) / (n - 1)
-            for o, a0, a1 in zip(self.origin, *self.axes)
-        ) for i in range(n) for j in range(n))
+        pts = tuple(
+            tuple(o + (i * a0 + j * a1) / (n - 1) for o, a0, a1 in zip(self.origin, *self.axes))
+            for i in range(n)
+            for j in range(n)
+        )
         pairs = []
         for i in range(n):
             for j in range(n):
@@ -1428,8 +1498,10 @@ class Quadrilateral(Reference):
         Returns:
             Integration limits that can be passed into sympy.integrate
         """
-        return [(vars[1], sympy.Integer(0), sympy.Integer(1)),
-                (vars[0], sympy.Integer(0), sympy.Integer(1))]
+        return [
+            (vars[1], sympy.Integer(0), sympy.Integer(1)),
+            (vars[0], sympy.Integer(0), sympy.Integer(1)),
+        ]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell.
@@ -1443,7 +1515,8 @@ class Quadrilateral(Reference):
         assert self.vertices == self.reference_vertices
         return tuple(
             (1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1) + x[1] * ((1 - x[0]) * v2 + x[0] * v3)
-            for v0, v1, v2, v3 in zip(*vertices))
+            for v0, v1, v2, v3 in zip(*vertices)
+        )
 
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference.
@@ -1462,13 +1535,12 @@ class Quadrilateral(Reference):
         v2 = _vsub(vertices[2], vertices[0])
 
         if len(self.vertices[0]) == 2:
-            mat = sympy.Matrix([[v1[0], v2[0]],
-                                [v1[1], v2[1]]]).inv()
+            mat = sympy.Matrix([[v1[0], v2[0]], [v1[1], v2[1]]]).inv()
         elif len(self.vertices[0]) == 3:
             v3 = _vcross(v1, v2)
-            mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
-                                [v1[1], v2[1], v3[1]],
-                                [v1[2], v2[2], v3[2]]]).inv()
+            mat = sympy.Matrix(
+                [[v1[0], v2[0], v3[0]], [v1[1], v2[1], v3[1]], [v1[2], v2[2], v3[2]]]
+            ).inv()
         else:
             raise RuntimeError("Cannot get inverse map.")
 
@@ -1482,7 +1554,8 @@ class Quadrilateral(Reference):
         """
         return tuple(
             (1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1) + x[1] * ((1 - x[0]) * v2 + x[0] * v3)
-            for v0, v1, v2, v3 in zip(*self.vertices))
+            for v0, v1, v2, v3 in zip(*self.vertices)
+        )
 
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference.
@@ -1490,20 +1563,20 @@ class Quadrilateral(Reference):
         Returns:
             The map
         """
-        assert _vadd(
-            self.vertices[0], self.vertices[3]) == _vadd(self.vertices[1], self.vertices[2])
+        assert _vadd(self.vertices[0], self.vertices[3]) == _vadd(
+            self.vertices[1], self.vertices[2]
+        )
         p = _vsub(tuple(x), self.vertices[0])
         v1 = _vsub(self.vertices[1], self.vertices[0])
         v2 = _vsub(self.vertices[2], self.vertices[0])
 
         if len(self.vertices[0]) == 2:
-            mat = sympy.Matrix([[v1[0], v2[0]],
-                                [v1[1], v2[1]]]).inv()
+            mat = sympy.Matrix([[v1[0], v2[0]], [v1[1], v2[1]]]).inv()
         elif len(self.vertices[0]) == 3:
             v3 = _vcross(v1, v2)
-            mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
-                                [v1[1], v2[1], v3[1]],
-                                [v1[2], v2[2], v3[2]]]).inv()
+            mat = sympy.Matrix(
+                [[v1[0], v2[0], v3[0]], [v1[1], v2[1], v3[1]], [v1[2], v2[2], v3[2]]]
+            ).inv()
         else:
             raise RuntimeError("Cannot get inverse map.")
 
@@ -1534,8 +1607,18 @@ class Quadrilateral(Reference):
 class Hexahedron(Reference):
     """A hexahedron."""
 
-    def __init__(self, vertices: SetOfPointsInput = (
-        (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0), (0, 0, 1), (1, 0, 1), (0, 1, 1), (1, 1, 1))
+    def __init__(
+        self,
+        vertices: SetOfPointsInput = (
+            (0, 0, 0),
+            (1, 0, 0),
+            (0, 1, 0),
+            (1, 1, 0),
+            (0, 0, 1),
+            (1, 0, 1),
+            (0, 1, 1),
+            (1, 1, 1),
+        ),
     ):
         """Create a hexahedron.
 
@@ -1553,18 +1636,42 @@ class Hexahedron(Reference):
                 _vsub(vertices[4], vertices[0]),
             ),
             reference_vertices=(
-                (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0),
-                (0, 0, 1), (1, 0, 1), (0, 1, 1), (1, 1, 1)),
+                (0, 0, 0),
+                (1, 0, 0),
+                (0, 1, 0),
+                (1, 1, 0),
+                (0, 0, 1),
+                (1, 0, 1),
+                (0, 1, 1),
+                (1, 1, 1),
+            ),
             vertices=vertices,
             edges=(
-                (0, 1), (0, 2), (0, 4), (1, 3), (1, 5), (2, 3),
-                (2, 6), (3, 7), (4, 5), (4, 6), (5, 7), (6, 7)),
+                (0, 1),
+                (0, 2),
+                (0, 4),
+                (1, 3),
+                (1, 5),
+                (2, 3),
+                (2, 6),
+                (3, 7),
+                (4, 5),
+                (4, 6),
+                (5, 7),
+                (6, 7),
+            ),
             faces=(
-                (0, 1, 2, 3), (0, 1, 4, 5), (0, 2, 4, 6),
-                (1, 3, 5, 7), (2, 3, 6, 7), (4, 5, 6, 7)),
+                (0, 1, 2, 3),
+                (0, 1, 4, 5),
+                (0, 2, 4, 6),
+                (1, 3, 5, 7),
+                (2, 3, 6, 7),
+                (4, 5, 6, 7),
+            ),
             volumes=((0, 1, 2, 3, 4, 5, 6, 7),),
             sub_entity_types=["point", "interval", "quadrilateral", "hexahedron"],
-            tp=True)
+            tp=True,
+        )
 
     @property
     def clockwise_vertices(self) -> SetOfPoints:
@@ -1573,8 +1680,14 @@ class Hexahedron(Reference):
         Returns:
             A list of vertices
         """
-        return (self.vertices[0], self.vertices[1], self.vertices[3], self.vertices[7],
-                self.vertices[6], self.vertices[4])
+        return (
+            self.vertices[0],
+            self.vertices[1],
+            self.vertices[3],
+            self.vertices[7],
+            self.vertices[6],
+            self.vertices[4],
+        )
 
     def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
         """Get the subentities of the cell in back-to-front plotting order.
@@ -1587,7 +1700,7 @@ class Hexahedron(Reference):
             [(3, 0)],
             [(2, 3), (1, 3), (1, 7), (0, 3)],
             [(2, 1), (1, 0), (1, 2), (1, 4), (0, 0), (0, 1)],
-            [(2, 5), (1, 8), (1, 9), (1, 10), (1, 11), (0, 4), (0, 5), (0, 6), (0, 7)]
+            [(2, 5), (1, 8), (1, 9), (1, 10), (1, 11), (0, 4), (0, 5), (0, 6), (0, 7)],
         ]
 
     def default_reference(self) -> Reference:
@@ -1608,11 +1721,16 @@ class Hexahedron(Reference):
             A lattice of points offset from the edge of the cell
         """
         assert self.vertices == self.reference_vertices
-        return tuple((
-            sympy.Rational(2 * i + 1, 2 * (n + 1)),
-            sympy.Rational(2 * j + 1, 2 * (n + 1)),
-            sympy.Rational(2 * k + 1, 2 * (n + 1))
-        ) for i in range(n + 1) for j in range(n + 1) for k in range(n + 1))
+        return tuple(
+            (
+                sympy.Rational(2 * i + 1, 2 * (n + 1)),
+                sympy.Rational(2 * j + 1, 2 * (n + 1)),
+                sympy.Rational(2 * k + 1, 2 * (n + 1)),
+            )
+            for i in range(n + 1)
+            for j in range(n + 1)
+            for k in range(n + 1)
+        )
 
     def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
@@ -1635,9 +1753,11 @@ class Hexahedron(Reference):
         Returns:
             Integration limits that can be passed into sympy.integrate
         """
-        return [(vars[2], sympy.Integer(0), sympy.Integer(1)),
-                (vars[1], sympy.Integer(0), sympy.Integer(1)),
-                (vars[0], sympy.Integer(0), sympy.Integer(1))]
+        return [
+            (vars[2], sympy.Integer(0), sympy.Integer(1)),
+            (vars[1], sympy.Integer(0), sympy.Integer(1)),
+            (vars[0], sympy.Integer(0), sympy.Integer(1)),
+        ]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell.
@@ -1650,11 +1770,12 @@ class Hexahedron(Reference):
         """
         assert self.vertices == self.reference_vertices
         return tuple(
-            (1 - x[2]) * ((1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1)
-                          + x[1] * ((1 - x[0]) * v2 + x[0] * v3))
-            + x[2] * ((1 - x[1]) * ((1 - x[0]) * v4 + x[0] * v5)
-                      + x[1] * ((1 - x[0]) * v6 + x[0] * v7))
-            for v0, v1, v2, v3, v4, v5, v6, v7 in zip(*vertices))
+            (1 - x[2])
+            * ((1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1) + x[1] * ((1 - x[0]) * v2 + x[0] * v3))
+            + x[2]
+            * ((1 - x[1]) * ((1 - x[0]) * v4 + x[0] * v5) + x[1] * ((1 - x[0]) * v6 + x[0] * v7))
+            for v0, v1, v2, v3, v4, v5, v6, v7 in zip(*vertices)
+        )
 
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference.
@@ -1674,9 +1795,9 @@ class Hexahedron(Reference):
         v1 = _vsub(vertices[1], vertices[0])
         v2 = _vsub(vertices[2], vertices[0])
         v3 = _vsub(vertices[4], vertices[0])
-        mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
-                            [v1[1], v2[1], v3[1]],
-                            [v1[2], v2[2], v3[2]]]).inv()
+        mat = sympy.Matrix(
+            [[v1[0], v2[0], v3[0]], [v1[1], v2[1], v3[1]], [v1[2], v2[2], v3[2]]]
+        ).inv()
         return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def _compute_map_to_self(self) -> PointType:
@@ -1686,11 +1807,12 @@ class Hexahedron(Reference):
             The map
         """
         return tuple(
-            (1 - x[2]) * ((1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1)
-                          + x[1] * ((1 - x[0]) * v2 + x[0] * v3))
-            + x[2] * ((1 - x[1]) * ((1 - x[0]) * v4 + x[0] * v5)
-                      + x[1] * ((1 - x[0]) * v6 + x[0] * v7))
-            for v0, v1, v2, v3, v4, v5, v6, v7 in zip(*self.vertices))
+            (1 - x[2])
+            * ((1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1) + x[1] * ((1 - x[0]) * v2 + x[0] * v3))
+            + x[2]
+            * ((1 - x[1]) * ((1 - x[0]) * v4 + x[0] * v5) + x[1] * ((1 - x[0]) * v6 + x[0] * v7))
+            for v0, v1, v2, v3, v4, v5, v6, v7 in zip(*self.vertices)
+        )
 
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference.
@@ -1700,15 +1822,16 @@ class Hexahedron(Reference):
         """
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces:
-            assert _vadd(
-                self.vertices[a], self.vertices[d]) == _vadd(self.vertices[b], self.vertices[c])
+            assert _vadd(self.vertices[a], self.vertices[d]) == _vadd(
+                self.vertices[b], self.vertices[c]
+            )
         p = _vsub(tuple(x), self.vertices[0])
         v1 = _vsub(self.vertices[1], self.vertices[0])
         v2 = _vsub(self.vertices[2], self.vertices[0])
         v3 = _vsub(self.vertices[4], self.vertices[0])
-        mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
-                            [v1[1], v2[1], v3[1]],
-                            [v1[2], v2[2], v3[2]]]).inv()
+        mat = sympy.Matrix(
+            [[v1[0], v2[0], v3[0]], [v1[1], v2[1], v3[1]], [v1[2], v2[2], v3[2]]]
+        ).inv()
         return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def volume(self) -> sympy.core.expr.Expr:
@@ -1736,8 +1859,16 @@ class Hexahedron(Reference):
 class Prism(Reference):
     """A (triangular) prism."""
 
-    def __init__(self, vertices: SetOfPointsInput = (
-        (0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (1, 0, 1), (0, 1, 1))
+    def __init__(
+        self,
+        vertices: SetOfPointsInput = (
+            (0, 0, 0),
+            (1, 0, 0),
+            (0, 1, 0),
+            (0, 0, 1),
+            (1, 0, 1),
+            (0, 1, 1),
+        ),
     ):
         """Create a prism.
 
@@ -1754,22 +1885,19 @@ class Prism(Reference):
                 _vsub(vertices[2], vertices[0]),
                 _vsub(vertices[3], vertices[0]),
             ),
-            reference_vertices=(
-                (0, 0, 0), (1, 0, 0), (0, 1, 0),
-                (0, 0, 1), (1, 0, 1), (0, 1, 1)),
+            reference_vertices=((0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (1, 0, 1), (0, 1, 1)),
             vertices=vertices,
-            edges=(
-                (0, 1), (0, 2), (0, 3), (1, 2), (1, 4),
-                (2, 5), (3, 4), (3, 5), (4, 5)),
-            faces=(
-                (0, 1, 2), (0, 1, 3, 4), (0, 2, 3, 5),
-                (1, 2, 4, 5), (3, 4, 5)),
+            edges=((0, 1), (0, 2), (0, 3), (1, 2), (1, 4), (2, 5), (3, 4), (3, 5), (4, 5)),
+            faces=((0, 1, 2), (0, 1, 3, 4), (0, 2, 3, 5), (1, 2, 4, 5), (3, 4, 5)),
             volumes=((0, 1, 2, 3, 4, 5),),
             sub_entity_types=[
-                "point", "interval",
+                "point",
+                "interval",
                 ["triangle", "quadrilateral", "quadrilateral", "quadrilateral", "triangle"],
-                "prism"],
-            tp=True)
+                "prism",
+            ],
+            tp=True,
+        )
 
     @property
     def clockwise_vertices(self) -> SetOfPoints:
@@ -1778,8 +1906,13 @@ class Prism(Reference):
         Returns:
             A list of vertices
         """
-        return (self.vertices[0], self.vertices[1], self.vertices[4], self.vertices[5],
-                self.vertices[3])
+        return (
+            self.vertices[0],
+            self.vertices[1],
+            self.vertices[4],
+            self.vertices[5],
+            self.vertices[3],
+        )
 
     def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
         """Get the subentities of the cell in back-to-front plotting order.
@@ -1792,7 +1925,7 @@ class Prism(Reference):
             [(2, 2), (1, 1), (1, 5), (0, 2)],
             [(3, 0)],
             [(2, 1), (1, 0), (1, 2), (1, 4), (0, 0), (0, 1)],
-            [(2, 4), (1, 6), (1, 7), (1, 8), (0, 3), (0, 4), (0, 5)]
+            [(2, 4), (1, 6), (1, 7), (1, 8), (0, 3), (0, 4), (0, 5)],
         ]
 
     def default_reference(self) -> Reference:
@@ -1813,11 +1946,16 @@ class Prism(Reference):
             A lattice of points offset from the edge of the cell
         """
         assert self.vertices == self.reference_vertices
-        return tuple((
-            sympy.Rational(2 * i + 1, 2 * (n + 1)),
-            sympy.Rational(2 * j + 1, 2 * (n + 1)),
-            sympy.Rational(2 * k + 1, 2 * (n + 1))
-        ) for i in range(n + 1) for j in range(n + 1 - i) for k in range(n + 1))
+        return tuple(
+            (
+                sympy.Rational(2 * i + 1, 2 * (n + 1)),
+                sympy.Rational(2 * j + 1, 2 * (n + 1)),
+                sympy.Rational(2 * k + 1, 2 * (n + 1)),
+            )
+            for i in range(n + 1)
+            for j in range(n + 1 - i)
+            for k in range(n + 1)
+        )
 
     def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
@@ -1840,9 +1978,11 @@ class Prism(Reference):
         Returns:
             Integration limits that can be passed into sympy.integrate
         """
-        return [(vars[2], sympy.Integer(0), sympy.Integer(1)),
-                (vars[1], sympy.Integer(0), sympy.Integer(1) - vars[0]),
-                (vars[0], sympy.Integer(0), sympy.Integer(1))]
+        return [
+            (vars[2], sympy.Integer(0), sympy.Integer(1)),
+            (vars[1], sympy.Integer(0), sympy.Integer(1) - vars[0]),
+            (vars[0], sympy.Integer(0), sympy.Integer(1)),
+        ]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell.
@@ -1857,7 +1997,8 @@ class Prism(Reference):
         return tuple(
             (1 - x[2]) * (v0 + x[0] * (v1 - v0) + x[1] * (v2 - v0))
             + x[2] * (v3 + x[0] * (v4 - v3) + x[1] * (v5 - v3))
-            for v0, v1, v2, v3, v4, v5 in zip(*vertices))
+            for v0, v1, v2, v3, v4, v5 in zip(*vertices)
+        )
 
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference.
@@ -1877,9 +2018,9 @@ class Prism(Reference):
         v1 = _vsub(vertices[1], vertices[0])
         v2 = _vsub(vertices[2], vertices[0])
         v3 = _vsub(vertices[3], vertices[0])
-        mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
-                            [v1[1], v2[1], v3[1]],
-                            [v1[2], v2[2], v3[2]]]).inv()
+        mat = sympy.Matrix(
+            [[v1[0], v2[0], v3[0]], [v1[1], v2[1], v3[1]], [v1[2], v2[2], v3[2]]]
+        ).inv()
         return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def _compute_map_to_self(self) -> PointType:
@@ -1891,7 +2032,8 @@ class Prism(Reference):
         return tuple(
             (1 - x[2]) * (v0 + x[0] * (v1 - v0) + x[1] * (v2 - v0))
             + x[2] * (v3 + x[0] * (v4 - v3) + x[1] * (v5 - v3))
-            for v0, v1, v2, v3, v4, v5 in zip(*self.vertices))
+            for v0, v1, v2, v3, v4, v5 in zip(*self.vertices)
+        )
 
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference.
@@ -1901,15 +2043,16 @@ class Prism(Reference):
         """
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces[1:4]:
-            assert _vadd(
-                self.vertices[a], self.vertices[d]) == _vadd(self.vertices[b], self.vertices[c])
+            assert _vadd(self.vertices[a], self.vertices[d]) == _vadd(
+                self.vertices[b], self.vertices[c]
+            )
         p = _vsub(tuple(x), self.vertices[0])
         v1 = _vsub(self.vertices[1], self.vertices[0])
         v2 = _vsub(self.vertices[2], self.vertices[0])
         v3 = _vsub(self.vertices[3], self.vertices[0])
-        mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
-                            [v1[1], v2[1], v3[1]],
-                            [v1[2], v2[2], v3[2]]]).inv()
+        mat = sympy.Matrix(
+            [[v1[0], v2[0], v3[0]], [v1[1], v2[1], v3[1]], [v1[2], v2[2], v3[2]]]
+        ).inv()
         return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def volume(self) -> sympy.core.expr.Expr:
@@ -1931,15 +2074,20 @@ class Prism(Reference):
         """
         if self.vertices != self.reference_vertices:
             raise NotImplementedError()
-        return (point[0] >= 0 and point[1] >= 0 and point[2] >= 0
-                and point[2] <= 1 and point[0] + point[1] <= 1)
+        return (
+            point[0] >= 0
+            and point[1] >= 0
+            and point[2] >= 0
+            and point[2] <= 1
+            and point[0] + point[1] <= 1
+        )
 
 
 class Pyramid(Reference):
     """A (square-based) pyramid."""
 
-    def __init__(self, vertices: SetOfPointsInput = (
-        (0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0), (0, 0, 1))
+    def __init__(
+        self, vertices: SetOfPointsInput = ((0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0), (0, 0, 1))
     ):
         """Create a pyramid.
 
@@ -1956,22 +2104,19 @@ class Pyramid(Reference):
                 _vsub(vertices[2], vertices[0]),
                 _vsub(vertices[4], vertices[0]),
             ),
-            reference_vertices=(
-                (0, 0, 0), (1, 0, 0), (0, 1, 0),
-                (1, 1, 0), (0, 0, 1)),
+            reference_vertices=((0, 0, 0), (1, 0, 0), (0, 1, 0), (1, 1, 0), (0, 0, 1)),
             vertices=vertices,
-            edges=(
-                (0, 1), (0, 2), (0, 4), (1, 3),
-                (1, 4), (2, 3), (2, 4), (3, 4)),
-            faces=(
-                (0, 1, 2, 3), (0, 1, 4), (0, 2, 4),
-                (1, 3, 4), (2, 3, 4)),
+            edges=((0, 1), (0, 2), (0, 4), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)),
+            faces=((0, 1, 2, 3), (0, 1, 4), (0, 2, 4), (1, 3, 4), (2, 3, 4)),
             volumes=((0, 1, 2, 3, 4),),
             sub_entity_types=[
-                "point", "interval",
+                "point",
+                "interval",
                 ["quadrilateral", "triangle", "triangle", "triangle", "triangle"],
-                "pyramid"],
-            tp=True)
+                "pyramid",
+            ],
+            tp=True,
+        )
 
     @property
     def clockwise_vertices(self) -> SetOfPoints:
@@ -1993,7 +2138,7 @@ class Pyramid(Reference):
             [(2, 2), (1, 1), (1, 6), (0, 2)],
             [(3, 0)],
             [(2, 3), (1, 3), (1, 7), (0, 3)],
-            [(2, 1), (1, 0), (1, 2), (1, 4), (0, 0), (0, 1), (0, 4)]
+            [(2, 1), (1, 0), (1, 2), (1, 4), (0, 0), (0, 1), (0, 4)],
         ]
 
     def default_reference(self) -> Reference:
@@ -2036,9 +2181,11 @@ class Pyramid(Reference):
         Returns:
             Integration limits that can be passed into sympy.integrate
         """
-        return [(vars[0], sympy.Integer(0), 1 - vars[2]),
-                (vars[1], sympy.Integer(0), 1 - vars[2]),
-                (vars[2], sympy.Integer(0), sympy.Integer(1))]
+        return [
+            (vars[0], sympy.Integer(0), 1 - vars[2]),
+            (vars[1], sympy.Integer(0), 1 - vars[2]),
+            (vars[2], sympy.Integer(0), sympy.Integer(1)),
+        ]
 
     def get_map_to(self, vertices: SetOfPointsInput) -> PointType:
         """Get the map from the reference to a cell.
@@ -2051,11 +2198,11 @@ class Pyramid(Reference):
         """
         assert self.vertices == self.reference_vertices
         return tuple(
-            (1 - x[2]) * (
-                (1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1)
-                + x[1] * ((1 - x[0]) * v2 + x[0] * v3)
-            ) + x[2] * v4
-            for v0, v1, v2, v3, v4 in zip(*vertices))
+            (1 - x[2])
+            * ((1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1) + x[1] * ((1 - x[0]) * v2 + x[0] * v3))
+            + x[2] * v4
+            for v0, v1, v2, v3, v4 in zip(*vertices)
+        )
 
     def get_inverse_map_to(self, vertices_in: SetOfPointsInput) -> PointType:
         """Get the inverse map from a cell to the reference.
@@ -2075,9 +2222,9 @@ class Pyramid(Reference):
         v1 = _vsub(vertices[1], vertices[0])
         v2 = _vsub(vertices[2], vertices[0])
         v3 = _vsub(vertices[4], vertices[0])
-        mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
-                            [v1[1], v2[1], v3[1]],
-                            [v1[2], v2[2], v3[2]]]).inv()
+        mat = sympy.Matrix(
+            [[v1[0], v2[0], v3[0]], [v1[1], v2[1], v3[1]], [v1[2], v2[2], v3[2]]]
+        ).inv()
         return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def _compute_map_to_self(self) -> PointType:
@@ -2087,11 +2234,11 @@ class Pyramid(Reference):
             The map
         """
         return tuple(
-            (1 - x[2]) * (
-                (1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1)
-                + x[1] * ((1 - x[0]) * v2 + x[0] * v3)
-            ) + x[2] * v4
-            for v0, v1, v2, v3, v4 in zip(*self.vertices))
+            (1 - x[2])
+            * ((1 - x[1]) * ((1 - x[0]) * v0 + x[0] * v1) + x[1] * ((1 - x[0]) * v2 + x[0] * v3))
+            + x[2] * v4
+            for v0, v1, v2, v3, v4 in zip(*self.vertices)
+        )
 
     def _compute_inverse_map_to_self(self) -> PointType:
         """Compute the inverse map from the canonical reference to this reference.
@@ -2101,15 +2248,16 @@ class Pyramid(Reference):
         """
         assert len(self.vertices[0]) == 3
         for a, b, c, d in self.faces[:1]:
-            assert _vadd(
-                self.vertices[a], self.vertices[d]) == _vadd(self.vertices[b], self.vertices[c])
+            assert _vadd(self.vertices[a], self.vertices[d]) == _vadd(
+                self.vertices[b], self.vertices[c]
+            )
         p = _vsub(tuple(x), self.vertices[0])
         v1 = _vsub(self.vertices[1], self.vertices[0])
         v2 = _vsub(self.vertices[2], self.vertices[0])
         v3 = _vsub(self.vertices[4], self.vertices[0])
-        mat = sympy.Matrix([[v1[0], v2[0], v3[0]],
-                            [v1[1], v2[1], v3[1]],
-                            [v1[2], v2[2], v3[2]]]).inv()
+        mat = sympy.Matrix(
+            [[v1[0], v2[0], v3[0]], [v1[1], v2[1], v3[1]], [v1[2], v2[2], v3[2]]]
+        ).inv()
         return tuple(_vdot(mat.row(i), p) for i in range(mat.rows))
 
     def volume(self) -> sympy.core.expr.Expr:
@@ -2131,8 +2279,13 @@ class Pyramid(Reference):
         """
         if self.vertices != self.reference_vertices:
             raise NotImplementedError()
-        return (point[0] >= 0 and point[1] >= 0 and point[2] >= 0
-                and point[0] + point[2] <= 1 and point[1] + point[2] <= 1)
+        return (
+            point[0] >= 0
+            and point[1] >= 0
+            and point[2] >= 0
+            and point[0] + point[2] <= 1
+            and point[1] + point[2] <= 1
+        )
 
 
 class DualPolygon(Reference):
@@ -2158,8 +2311,11 @@ class DualPolygon(Reference):
 
             reference_vertices.append((sympy.cos(angle), sympy.sin(angle)))
             reference_vertices.append(
-                ((sympy.cos(next_angle) + sympy.cos(angle)) / 2,
-                 (sympy.sin(next_angle) + sympy.sin(angle)) / 2))
+                (
+                    (sympy.cos(next_angle) + sympy.cos(angle)) / 2,
+                    (sympy.sin(next_angle) + sympy.sin(angle)) / 2,
+                )
+            )
 
         origin: PointType = self.reference_origin
         if vertices is None:
@@ -2176,12 +2332,12 @@ class DualPolygon(Reference):
             origin=origin,
             vertices=vertices,
             reference_vertices=tuple(reference_vertices),
-            edges=tuple((i, (i + 1) % (2 * number_of_triangles))
-                        for i in range(2 * number_of_triangles)),
-            faces=(tuple(range(2 * number_of_triangles)), ),
+            edges=tuple(
+                (i, (i + 1) % (2 * number_of_triangles)) for i in range(2 * number_of_triangles)
+            ),
+            faces=(tuple(range(2 * number_of_triangles)),),
             volumes=(),
             sub_entity_types=["point", "interval", f"dual polygon({number_of_triangles})", None],
-
         )
 
     def contains(self, point: PointType) -> bool:
@@ -2270,9 +2426,10 @@ class DualPolygon(Reference):
             A lattice of points offset from the edge of the cell
         """
         assert self.vertices == self.reference_vertices
-        from .create import create_reference
+        from symfem.create import create_reference
+
         lattice: SetOfPoints = ()
-        for v1, v2 in zip(self.vertices, self.vertices[1:] + (self.vertices[0], )):
+        for v1, v2 in zip(self.vertices, self.vertices[1:] + (self.vertices[0],)):
             ref = create_reference("triangle", (self.origin, v1, v2))
             lattice += ref.make_lattice(n // 2)
         return lattice
@@ -2299,5 +2456,5 @@ class DualPolygon(Reference):
         n = (self.number_of_triangles + 1) // 2 * 2
         return [
             [(1, i) for i in range(n)] + [(0, i) for i in range(1, n)],
-            [(2, 0)] + [(1, i) for i in range(n, N)] + [(0, 0)] + [(0, i) for i in range(n, N)]
+            [(2, 0)] + [(1, i) for i in range(n, N)] + [(0, 0)] + [(0, i) for i in range(n, N)],
         ]

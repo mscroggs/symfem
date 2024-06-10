@@ -38,7 +38,7 @@ class FortinSoulie(CiarletElement):
             PointEvaluation(reference, (0, third), entity=(1, 1)),
             PointEvaluation(reference, (0, two_thirds), entity=(1, 1)),
             PointEvaluation(reference, (sympy.Rational(1, 2), 0), entity=(1, 2)),
-            PointEvaluation(reference, (third, third), entity=(2, 0))
+            PointEvaluation(reference, (third, third), entity=(2, 0)),
         ]
 
         poly: typing.List[FunctionInput] = []

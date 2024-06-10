@@ -4,10 +4,10 @@ import importlib as _il
 import os as _os
 import typing as _typing
 
-from . import references as _references
-from .finite_element import FiniteElement as _FiniteElement
-from .geometry import SetOfPointsInput as _SetOfPointsInput
-from .geometry import parse_set_of_points_input as _parse_set_of_points_input
+import symfem.references as _references
+from symfem.finite_element import FiniteElement as _FiniteElement
+from symfem.geometry import SetOfPointsInput as _SetOfPointsInput
+from symfem.geometry import parse_set_of_points_input as _parse_set_of_points_input
 
 _folder = _os.path.dirname(_os.path.realpath(__file__))
 
@@ -98,8 +98,11 @@ def create_reference(
 
 
 def create_element(
-    cell_type: str, element_type: str, order: int,
-    vertices: _typing.Optional[_SetOfPointsInput] = None, **kwargs: _typing.Any
+    cell_type: str,
+    element_type: str,
+    order: int,
+    vertices: _typing.Optional[_SetOfPointsInput] = None,
+    **kwargs: _typing.Any,
 ) -> _FiniteElement:
     """Make a finite element.
 
@@ -178,8 +181,9 @@ def create_element(
     reference = create_reference(cell_type, vertices=vertices)
 
     if reference.tdim != reference.gdim:
-        raise ValueError("Cannot create element on cell with different "
-                         "topological and geometric dimensions.")
+        raise ValueError(
+            "Cannot create element on cell with different " "topological and geometric dimensions."
+        )
 
     if element_type in _elementmap:
         if reference.name not in _elementmap[element_type]:
@@ -192,9 +196,7 @@ def create_element(
     raise ValueError(f"Unsupported element type: {element_type}")
 
 
-def _order_is_allowed(
-    element_class: _typing.Type, ref: str, order: int
-) -> bool:
+def _order_is_allowed(element_class: _typing.Type, ref: str, order: int) -> bool:
     """Check that an order is valid for an element.
 
     Args:

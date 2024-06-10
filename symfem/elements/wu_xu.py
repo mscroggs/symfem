@@ -7,8 +7,12 @@ This element's definition appears in https://doi.org/10.1090/mcom/3361
 import typing
 
 from ..finite_element import CiarletElement
-from ..functionals import (DerivativePointEvaluation, IntegralOfDirectionalMultiderivative,
-                           ListOfFunctionals, PointEvaluation)
+from ..functionals import (
+    DerivativePointEvaluation,
+    IntegralOfDirectionalMultiderivative,
+    ListOfFunctionals,
+    PointEvaluation,
+)
 from ..functions import FunctionInput
 from ..polynomials import polynomial_set_1d
 from ..references import NonDefaultReferenceError, Reference
@@ -25,11 +29,11 @@ def derivatives(dim: int, order: int) -> typing.List[typing.Tuple[int, ...]]:
         List of derivative order tuples
     """
     if dim == 1:
-        return [(order, )]
+        return [(order,)]
 
     out = []
     for i in range(order + 1):
-        out += [(i, ) + j for j in derivatives(dim - 1, order - i)]
+        out += [(i,) + j for j in derivatives(dim - 1, order - i)]
     return out
 
 
@@ -64,9 +68,14 @@ class WuXu(CiarletElement):
         for v_n, v in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
             for i in range(reference.tdim):
-                dofs.append(DerivativePointEvaluation(
-                    reference, v, tuple(1 if i == j else 0 for j in range(reference.tdim)),
-                    entity=(0, v_n)))
+                dofs.append(
+                    DerivativePointEvaluation(
+                        reference,
+                        v,
+                        tuple(1 if i == j else 0 for j in range(reference.tdim)),
+                        entity=(0, v_n),
+                    )
+                )
         for codim in range(1, reference.tdim):
             dim = reference.tdim - codim
             for e_n, vs in enumerate(reference.sub_entities(codim=codim)):
@@ -83,9 +92,11 @@ class WuXu(CiarletElement):
                 else:
                     raise NotImplementedError
                 for orders in derivatives(len(normals), len(normals)):
-                    dofs.append(IntegralOfDirectionalMultiderivative(
-                        reference, tuple(normals), orders, (dim, e_n),
-                        scale=1 / volume))
+                    dofs.append(
+                        IntegralOfDirectionalMultiderivative(
+                            reference, tuple(normals), orders, (dim, e_n), scale=1 / volume
+                        )
+                    )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 

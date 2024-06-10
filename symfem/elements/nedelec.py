@@ -32,12 +32,9 @@ class NedelecFirstKind(CiarletElement):
         poly += Hcurl_polynomials(reference.tdim, reference.tdim, order)
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, Lagrange, order - 1,
-                   {"variant": variant}),
-            faces=(IntegralMoment, VectorLagrange, order - 2, "covariant",
-                   {"variant": variant}),
-            volumes=(IntegralMoment, VectorLagrange, order - 3, "covariant",
-                     {"variant": variant}),
+            edges=(TangentIntegralMoment, Lagrange, order - 1, {"variant": variant}),
+            faces=(IntegralMoment, VectorLagrange, order - 2, "covariant", {"variant": variant}),
+            volumes=(IntegralMoment, VectorLagrange, order - 3, "covariant", {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

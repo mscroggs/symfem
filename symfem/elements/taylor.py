@@ -28,8 +28,11 @@ class Taylor(CiarletElement):
         )
         for i in product(range(order + 1), repeat=reference.tdim):
             if 1 <= sum(i) <= order:
-                dofs.append(DerivativePointEvaluation(
-                    reference, reference.midpoint(), i, entity=(reference.tdim, 0)))
+                dofs.append(
+                    DerivativePointEvaluation(
+                        reference, reference.midpoint(), i, entity=(reference.tdim, 0)
+                    )
+                )
 
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)

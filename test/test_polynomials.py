@@ -7,8 +7,13 @@ import sympy
 
 from symfem import create_element, create_reference
 from symfem.functions import VectorFunction
-from symfem.polynomials import (Hcurl_polynomials, Hdiv_polynomials, l2_dual, orthogonal_basis,
-                                orthonormal_basis)
+from symfem.polynomials import (
+    Hcurl_polynomials,
+    Hdiv_polynomials,
+    l2_dual,
+    orthogonal_basis,
+    orthonormal_basis,
+)
 from symfem.symbols import t, x
 
 
@@ -28,7 +33,7 @@ def test_Hcurl_space(reference, order):
     ref = create_reference(reference)
     polynomials = Hcurl_polynomials(ref.tdim, ref.tdim, order)
     for p in polynomials:
-        assert p.dot(VectorFunction(x[:ref.tdim])) == 0
+        assert p.dot(VectorFunction(x[: ref.tdim])) == 0
 
 
 @pytest.mark.parametrize("reference", ["triangle"])
@@ -38,16 +43,15 @@ def test_MTW_space(reference):
     for p in polynomials:
         assert p.div().as_sympy().is_real
         for vs in e.reference.sub_entities(1):
-            sub_ref = create_reference(e.reference.sub_entity_types[1],
-                                       [e.reference.vertices[i] for i in vs])
-            p_edge = p.subs(x, [i + t[0] * j
-                                for i, j in zip(sub_ref.origin, sub_ref.axes[0])])
+            sub_ref = create_reference(
+                e.reference.sub_entity_types[1], [e.reference.vertices[i] for i in vs]
+            )
+            p_edge = p.subs(x, [i + t[0] * j for i, j in zip(sub_ref.origin, sub_ref.axes[0])])
             poly = p_edge.dot(sub_ref.normal()).as_sympy().expand().simplify()
             assert poly.is_real or sympy.Poly(poly).degree() <= 1
 
 
-@pytest.mark.parametrize("reference", ["triangle", "quadrilateral",
-                                       "tetrahedron", "hexahedron"])
+@pytest.mark.parametrize("reference", ["triangle", "quadrilateral", "tetrahedron", "hexahedron"])
 @pytest.mark.parametrize("order", range(1, 5))
 def test_BDFM_space(reference, order):
     e = create_element(reference, "BDFM", order)
@@ -55,23 +59,27 @@ def test_BDFM_space(reference, order):
     tdim = e.reference.tdim
     for p in polynomials:
         for vs in e.reference.sub_entities(tdim - 1):
-            sub_ref = create_reference(e.reference.sub_entity_types[tdim - 1],
-                                       [e.reference.vertices[i] for i in vs])
+            sub_ref = create_reference(
+                e.reference.sub_entity_types[tdim - 1], [e.reference.vertices[i] for i in vs]
+            )
             if tdim == 2:
-                p_edge = p.subs(x, [i + t[0] * j
-                                    for i, j in zip(sub_ref.origin, sub_ref.axes[0])])
+                p_edge = p.subs(x, [i + t[0] * j for i, j in zip(sub_ref.origin, sub_ref.axes[0])])
             else:
-                p_edge = p.subs(x, [i + t[0] * j + t[1] * k
-                                    for i, j, k in zip(sub_ref.origin, sub_ref.axes[0],
-                                                       sub_ref.axes[1])])
+                p_edge = p.subs(
+                    x,
+                    [
+                        i + t[0] * j + t[1] * k
+                        for i, j, k in zip(sub_ref.origin, sub_ref.axes[0], sub_ref.axes[1])
+                    ],
+                )
             poly = p_edge.dot(sub_ref.normal()).as_sympy().expand().simplify()
             assert poly.is_real or sympy.Poly(poly).degree() <= order - 1
 
 
-@pytest.mark.parametrize("reference", [
-    "interval", "triangle", "quadrilateral",
-    "tetrahedron", "hexahedron", "prism",
-    "pyramid"])
+@pytest.mark.parametrize(
+    "reference",
+    ["interval", "triangle", "quadrilateral", "tetrahedron", "hexahedron", "prism", "pyramid"],
+)
 @pytest.mark.parametrize("order", range(5))
 def test_orthogonal_polynomials(reference, order, speed):
     if speed == "fast" and order > 2:
@@ -91,13 +99,10 @@ def test_orthogonal_polynomials(reference, order, speed):
                 assert (p * q).integral(ref, x) == 0
 
 
-@pytest.mark.parametrize("reference", [
-    "interval",
-    "triangle", "quadrilateral",
-    "tetrahedron",
-    "hexahedron", "prism",
-    "pyramid"
-])
+@pytest.mark.parametrize(
+    "reference",
+    ["interval", "triangle", "quadrilateral", "tetrahedron", "hexahedron", "prism", "pyramid"],
+)
 @pytest.mark.parametrize("order", range(5))
 def test_orthogonal_polynomial_derivatives(reference, order):
     polynomials = orthogonal_basis(reference, order, 2)
@@ -123,10 +128,10 @@ def test_orthogonal_polynomial_derivatives(reference, order):
             assert p.diff(x[j]).diff(x[k]) == q
 
 
-@pytest.mark.parametrize("reference", [
-    "interval", "triangle", "quadrilateral",
-    "tetrahedron", "hexahedron", "prism",
-    "pyramid"])
+@pytest.mark.parametrize(
+    "reference",
+    ["interval", "triangle", "quadrilateral", "tetrahedron", "hexahedron", "prism", "pyramid"],
+)
 @pytest.mark.parametrize("order", range(3))
 def test_orthonormal_polynomials(reference, order, speed):
     if speed == "fast" and order > 2:
@@ -135,13 +140,25 @@ def test_orthonormal_polynomials(reference, order, speed):
     polynomials = orthonormal_basis(reference, order, 0)[0]
     ref = create_reference(reference)
     for p in polynomials:
-        assert (p ** 2).integral(ref, x) == 1
+        assert (p**2).integral(ref, x) == 1
 
 
-@pytest.mark.parametrize("reference, order", [
-    (r, o) for r, m in [("interval", 6), ("triangle", 3), ("quadrilateral", 3),
-                        ("tetrahedron", 2), ("hexahedron", 2), ("prism", 2),
-                        ("pyramid", 2)] for o in range(m)])
+@pytest.mark.parametrize(
+    "reference, order",
+    [
+        (r, o)
+        for r, m in [
+            ("interval", 6),
+            ("triangle", 3),
+            ("quadrilateral", 3),
+            ("tetrahedron", 2),
+            ("hexahedron", 2),
+            ("prism", 2),
+            ("pyramid", 2),
+        ]
+        for o in range(m)
+    ],
+)
 def test_dual(reference, order):
     ref = create_reference(reference)
     poly = create_element(reference, "P", order).get_polynomial_basis()

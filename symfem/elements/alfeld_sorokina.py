@@ -47,40 +47,81 @@ class AlfeldSorokina(CiarletElement):
         subs = [
             (reference.vertices[0], reference.vertices[1], mid),
             (reference.vertices[1], reference.vertices[2], mid),
-            (reference.vertices[2], reference.vertices[0], mid)]
+            (reference.vertices[2], reference.vertices[0], mid),
+        ]
 
-        piece_list = [tuple(VectorFunction((p, 0)) for _ in range(3))
-                      for p in [1, x[0], x[1], x[0]**2, x[0]*x[1], x[1]**2]]
-        piece_list += [tuple(VectorFunction((0, p)) for _ in range(3))
-                       for p in [1, x[0], x[1], x[0]**2, x[0]*x[1], x[1]**2]]
+        piece_list = [
+            tuple(VectorFunction((p, 0)) for _ in range(3))
+            for p in [1, x[0], x[1], x[0] ** 2, x[0] * x[1], x[1] ** 2]
+        ]
+        piece_list += [
+            tuple(VectorFunction((0, p)) for _ in range(3))
+            for p in [1, x[0], x[1], x[0] ** 2, x[0] * x[1], x[1] ** 2]
+        ]
 
-        piece_list.append((
-            VectorFunction((4*x[0] + 12*x[1]**2 - 4*x[1], 6*x[0]*x[1] - 4*x[1])),
-            VectorFunction((3*x[0]**2 + 2*x[0] + 4*x[1] - 1, -3*x[0]**2 + 4*x[0] - 2*x[1] - 1)),
-            VectorFunction((3*x[0]**2 + 6*x[0]*x[1] + 3*x[1]**2, 9*x[0]**2 - 4*x[0] - 3*x[1]**2))))
-        piece_list.append((
-            VectorFunction((144*x[0]*x[1] + 10*x[0] + 12*x[1]**2 - 10*x[1],
-                            -30*x[0]*x[1] + 36*x[1]**2 - 10*x[1])),
-            VectorFunction((-69*x[0]**2 + 104*x[0] + 46*x[1] - 25,
-                            24*x[0]**2 - 26*x[0] + 4*x[1] + 2)),
-            VectorFunction((39*x[0]**2 + 96*x[0]*x[1] + 21*x[1]**2,
-                            -10*x[0] + 6*x[1]**2))))
-        piece_list.append((
-            VectorFunction((-14*x[0] + 12*x[1]**2 + 14*x[1],
-                            42*x[0]*x[1] - 108*x[1]**2 + 14*x[1])),
-            VectorFunction((3*x[0]**2 - 16*x[0] + 22*x[1] - 1,
-                            24*x[0]**2 + 144*x[0]*x[1] - 50*x[0] - 92*x[1] + 26)),
-            VectorFunction((-33*x[0]**2 + 24*x[0]*x[1] + 21*x[1]**2,
-                            14*x[0] - 66*x[1]**2))))
+        piece_list.append(
+            (
+                VectorFunction((4 * x[0] + 12 * x[1] ** 2 - 4 * x[1], 6 * x[0] * x[1] - 4 * x[1])),
+                VectorFunction(
+                    (
+                        3 * x[0] ** 2 + 2 * x[0] + 4 * x[1] - 1,
+                        -3 * x[0] ** 2 + 4 * x[0] - 2 * x[1] - 1,
+                    )
+                ),
+                VectorFunction(
+                    (
+                        3 * x[0] ** 2 + 6 * x[0] * x[1] + 3 * x[1] ** 2,
+                        9 * x[0] ** 2 - 4 * x[0] - 3 * x[1] ** 2,
+                    )
+                ),
+            )
+        )
+        piece_list.append(
+            (
+                VectorFunction(
+                    (
+                        144 * x[0] * x[1] + 10 * x[0] + 12 * x[1] ** 2 - 10 * x[1],
+                        -30 * x[0] * x[1] + 36 * x[1] ** 2 - 10 * x[1],
+                    )
+                ),
+                VectorFunction(
+                    (
+                        -69 * x[0] ** 2 + 104 * x[0] + 46 * x[1] - 25,
+                        24 * x[0] ** 2 - 26 * x[0] + 4 * x[1] + 2,
+                    )
+                ),
+                VectorFunction(
+                    (39 * x[0] ** 2 + 96 * x[0] * x[1] + 21 * x[1] ** 2, -10 * x[0] + 6 * x[1] ** 2)
+                ),
+            )
+        )
+        piece_list.append(
+            (
+                VectorFunction(
+                    (
+                        -14 * x[0] + 12 * x[1] ** 2 + 14 * x[1],
+                        42 * x[0] * x[1] - 108 * x[1] ** 2 + 14 * x[1],
+                    )
+                ),
+                VectorFunction(
+                    (
+                        3 * x[0] ** 2 - 16 * x[0] + 22 * x[1] - 1,
+                        24 * x[0] ** 2 + 144 * x[0] * x[1] - 50 * x[0] - 92 * x[1] + 26,
+                    )
+                ),
+                VectorFunction(
+                    (
+                        -33 * x[0] ** 2 + 24 * x[0] * x[1] + 21 * x[1] ** 2,
+                        14 * x[0] - 66 * x[1] ** 2,
+                    )
+                ),
+            )
+        )
 
         poly: typing.List[FunctionInput] = []
-        poly += [
-            PiecewiseFunction({i: j for i, j in zip(subs, p)}, 2)
-            for p in piece_list]
+        poly += [PiecewiseFunction({i: j for i, j in zip(subs, p)}, 2) for p in piece_list]
 
-        super().__init__(
-            reference, order, poly, dofs, reference.tdim, 1
-        )
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     names = ["Alfeld-Sorokina", "AS"]
     references = ["triangle"]
