@@ -5,6 +5,8 @@ import typing
 from symfem.functionals import BaseFunctional
 from symfem.references import Reference
 
+__all__ = ["MomentType", "SingleMomentTypeInput", "MomentTypeInput", "make_integral_moment_dofs"]
+
 MomentType = typing.Tuple[
     typing.Type, typing.Type, int, typing.Union[str, None], typing.Dict[str, typing.Any]
 ]

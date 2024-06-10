@@ -20,6 +20,8 @@ from symfem.geometry import PointType
 from symfem.references import Reference
 from symfem.symbols import AxisVariables, AxisVariablesNotSingle, t, x
 
+__all__ = ["BasisFunction", "SubbedBasisFunction"]
+
 
 class BasisFunction(AnyFunction):
     """A basis function of a finite element.

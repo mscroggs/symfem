@@ -20,6 +20,30 @@ from symfem.symbols import t, x
 
 ScalarValueOrFloat = typing.Union[sympy.core.expr.Expr, float]
 
+__all__ = [
+    "BaseFunctional",
+    "PointEvaluation",
+    "WeightedPointEvaluation",
+    "DerivativePointEvaluation",
+    "PointDirectionalDerivativeEvaluation",
+    "PointNormalDerivativeEvaluation",
+    "PointComponentSecondDerivativeEvaluation",
+    "PointInnerProduct",
+    "DotPointEvaluation",
+    "PointDivergenceEvaluation",
+    "IntegralAgainst",
+    "IntegralOfDivergenceAgainst",
+    "IntegralOfDirectionalMultiderivative",
+    "IntegralMoment",
+    "DerivativeIntegralMoment",
+    "DivergenceIntegralMoment",
+    "TangentIntegralMoment",
+    "NormalIntegralMoment",
+    "NormalDerivativeIntegralMoment",
+    "InnerProductIntegralMoment",
+    "NormalInnerProductIntegralMoment",
+]
+
 
 def _to_tex(f: FunctionInput, tfrac: bool = False) -> str:
     r"""Convert an expresson to TeX.

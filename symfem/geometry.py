@@ -4,6 +4,19 @@ import typing
 
 import sympy
 
+__all__ = [
+    "PointType",
+    "SetOfPoints",
+    "PointTypeInput",
+    "SetOfPointsInput",
+    "parse_set_of_points_input",
+    "parse_point_input",
+    "point_in_interval",
+    "point_in_triangle",
+    "point_in_quadrilateral",
+    "point_in_tetrahedron",
+]
+
 PointType = typing.Tuple[sympy.core.expr.Expr, ...]
 SetOfPoints = typing.Tuple[PointType, ...]
 PointTypeInput = typing.Union[

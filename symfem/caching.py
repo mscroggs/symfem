@@ -18,6 +18,8 @@ if not os.path.isdir(CACHE_DIR):
 
 assert os.path.isdir(CACHE_DIR)
 
+__all__ = ["load_cached_matrix", "save_cached_matrix", "matrix_to_string", "matrix_from_string"]
+
 
 def load_cached_matrix(
     matrix_type: str, cache_id: str, size: typing.Tuple[int, int]

@@ -31,6 +31,8 @@ from symfem.geometry import (
 from symfem.references import Reference
 from symfem.symbols import AxisVariables, AxisVariablesNotSingle, t, x
 
+__all__ = ["PiecewiseFunction"]
+
 
 class PiecewiseFunction(AnyFunction):
     """A piecewise function."""

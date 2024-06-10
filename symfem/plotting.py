@@ -15,6 +15,22 @@ from symfem.geometry import (
     parse_set_of_points_input,
 )
 
+__all__ = [
+    "PointOrFunction",
+    "SetOfPointsOrFunctions",
+    "tex_font_size",
+    "Colors",
+    "colors",
+    "PictureElement",
+    "Line",
+    "Bezier",
+    "Arrow",
+    "NCircle",
+    "Fill",
+    "Math",
+    "Picture",
+]
+
 PointOrFunction = typing.Union[PointTypeInput, AnyFunction]
 SetOfPointsOrFunctions = typing.Union[
     typing.List[PointOrFunction], typing.Tuple[PointOrFunction, ...]

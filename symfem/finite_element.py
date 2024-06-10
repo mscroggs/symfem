@@ -28,6 +28,16 @@ from symfem.symbols import x
 from symfem.utils import allequal
 from symfem.version import version
 
+__all__ = [
+    "TabulatedBasis",
+    "NoTensorProduct",
+    "FiniteElement",
+    "CiarletElement",
+    "DirectElement",
+    "EnrichedElement",
+    "ElementBasisFunction",
+]
+
 TabulatedBasis = typing.Union[
     typing.List[typing.Union[sympy.core.expr.Expr, int]],
     typing.List[typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...]],

@@ -6,6 +6,8 @@ import sympy
 
 from symfem.functions import ScalarFunction
 
+__all__ = ["allequal"]
+
 
 def allequal(a: typing.Any, b: typing.Any) -> bool:
     """Test if two items that may be nested lists/tuples are equal.

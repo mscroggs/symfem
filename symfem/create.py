@@ -14,6 +14,8 @@ _folder = _os.path.dirname(_os.path.realpath(__file__))
 _elementmap: _typing.Dict[str, _typing.Dict[str, _typing.Type]] = {}
 _elementlist: _typing.List[_typing.Type] = []
 
+__all__ = ["add_element", "create_reference", "create_element"]
+
 
 def add_element(element_class: _typing.Type):
     """Add an element to Symfem.

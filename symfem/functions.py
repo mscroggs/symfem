@@ -12,6 +12,19 @@ import symfem.references
 from symfem.geometry import PointType
 from symfem.symbols import AxisVariables, AxisVariablesNotSingle, t, x
 
+__all__ = [
+    "SingleSympyFormat",
+    "SympyFormat",
+    "ValuesToSubstitute",
+    "AnyFunction",
+    "ScalarFunction",
+    "VectorFunction",
+    "MatrixFunction",
+    "FunctionInput",
+    "parse_function_input",
+    "parse_function_list_input",
+]
+
 SingleSympyFormat = typing.Union[
     sympy.core.expr.Expr,
     typing.Tuple[sympy.core.expr.Expr, ...],

@@ -19,6 +19,22 @@ from symfem.geometry import (
 )
 from symfem.symbols import AxisVariablesNotSingle, t, x
 
+__all__ = [
+    "LatticeWithLines",
+    "IntLimits",
+    "NonDefaultReferenceError",
+    "Reference",
+    "Point",
+    "Interval",
+    "Triangle",
+    "Tetrahedron",
+    "Quadrilateral",
+    "Hexahedron",
+    "Prism",
+    "Pyramid",
+    "DualPolygon",
+]
+
 LatticeWithLines = typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]
 IntLimits = typing.List[
     typing.Union[

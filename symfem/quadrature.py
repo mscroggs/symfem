@@ -4,6 +4,8 @@ import typing
 
 import sympy
 
+__all__ = ["Scalar", "equispaced", "lobatto", "radau", "legendre", "get_quadrature"]
+
 Scalar = typing.Union[sympy.core.expr.Expr, int]
 
 
