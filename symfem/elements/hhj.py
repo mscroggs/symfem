@@ -9,6 +9,8 @@ or (Pechstein, Schöberl, 2018) for a more recent version for tetrahedra
 https://doi.org/10.1007/s00211-017-0933-3
 """
 
+from __future__ import annotations
+
 import typing
 
 from ..finite_element import CiarletElement

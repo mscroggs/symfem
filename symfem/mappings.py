@@ -1,5 +1,7 @@
 """Functions to map functions between cells."""
 
+from __future__ import annotations
+
 from typing import Callable
 
 import sympy
