@@ -7,6 +7,8 @@ from symfem.symbols import x
 from symfem.polynomials.dual import l2_dual
 from symfem.polynomials.legendre import orthonormal_basis
 
+__all__ = []
+
 
 def lobatto_basis_interval(order: int) -> typing.List[ScalarFunction]:
     """Get Lobatto polynomials on an interval.

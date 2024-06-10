@@ -6,6 +6,8 @@ import sympy
 
 from symfem.functions import ScalarFunction
 
+__all__ = []
+
 
 def l2_dual(cell: str, poly: typing.List[ScalarFunction]) -> typing.List[ScalarFunction]:
     """Compute the L2 dual of a set of polynomials.
