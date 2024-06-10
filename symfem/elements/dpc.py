@@ -17,7 +17,7 @@ from symfem.polynomials import polynomial_set_1d, polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.elements.lagrange import Lagrange
 
-__all__ = ["DP", "VectorDPC"]
+__all__ = ["DPC", "VectorDPC"]
 
 
 class DPC(CiarletElement):

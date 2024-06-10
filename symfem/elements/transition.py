@@ -14,7 +14,7 @@ from symfem.references import Reference
 from symfem.symbols import x
 from symfem.elements.lagrange import Lagrange
 
-__all__ = ["Transistion"]
+__all__ = ["Transition"]
 
 
 class Transition(CiarletElement):
