@@ -15,7 +15,8 @@ import typing
 
 from ..finite_element import CiarletElement
 from ..functionals import IntegralMoment, ListOfFunctionals, NormalInnerProductIntegralMoment
-from ..functions import FunctionInput, MatrixFunction
+from ..functions import FunctionInput
+from ..functions import MatrixFunction as _MatrixFunction
 from ..moments import make_integral_moment_dofs
 from ..polynomials import polynomial_set_vector
 from ..references import NonDefaultReferenceError, Reference
@@ -71,7 +72,7 @@ class HellanHerrmannJohnson(CiarletElement):
             for p, dof in zip(basis, space.dofs):
                 for d in directions:
                     dofs.append(IntegralMoment(
-                        reference, p * MatrixFunction(d), dof, entity=(reference.tdim, 0),
+                        reference, p * _MatrixFunction(d), dof, entity=(reference.tdim, 0),
                         mapping="double_contravariant"))
         # cell functions extra
         space_extra = Lagrange(reference, order, variant)
@@ -79,7 +80,7 @@ class HellanHerrmannJohnson(CiarletElement):
         for p, dof in zip(basis_extra, space_extra.dofs):
             for d in directions_extra:
                 dofs.append(IntegralMoment(
-                    reference, p * MatrixFunction(d), dof, entity=(reference.tdim, 0),
+                    reference, p * _MatrixFunction(d), dof, entity=(reference.tdim, 0),
                     mapping="double_contravariant"))
 
         self.variant = variant
