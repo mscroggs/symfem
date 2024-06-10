@@ -6,7 +6,9 @@ from typing import Callable
 
 import sympy
 
-from .functions import AnyFunction, FunctionInput, MatrixFunction, parse_function_input
+from .functions import AnyFunction, FunctionInput
+from .functions import MatrixFunction as _MatrixFunction
+from .functions import parse_function_input
 from .geometry import PointType
 from .symbols import x
 
@@ -52,7 +54,7 @@ def l2(
         The mapped function
     """
     tdim = len(inverse_map)
-    jdet = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map]).det().as_sympy()
+    jdet = _MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map]).det().as_sympy()
     assert isinstance(jdet, sympy.core.expr.Expr)
     f = parse_function_input(f_in)
     if substitute:
@@ -82,7 +84,7 @@ def covariant(
 
     assert f.is_vector
 
-    j_inv = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
+    j_inv = _MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
     return j_inv @ f
 
 
@@ -108,7 +110,7 @@ def contravariant(
 
     assert f.is_vector
 
-    jacobian = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
+    jacobian = _MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
     jacobian /= jacobian.det()
     return jacobian @ f
 
@@ -116,7 +118,7 @@ def contravariant(
 def double_covariant(
     f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
-) -> MatrixFunction:
+) -> _MatrixFunction:
     """Map matrix functions.
 
     Args:
@@ -134,14 +136,14 @@ def double_covariant(
         f = f.subs(x, inverse_map)
     assert f.is_matrix
 
-    j_inv = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
+    j_inv = _MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
     return j_inv @ f @ j_inv.transpose()
 
 
 def double_contravariant(
     f_in: FunctionInput, map: PointType, inverse_map: PointType,
     substitute: bool = True,
-) -> MatrixFunction:
+) -> _MatrixFunction:
     """Map matrix functions.
 
     Args:
@@ -159,7 +161,7 @@ def double_contravariant(
         f = f.subs(x, inverse_map)
     assert f.is_matrix
 
-    jacobian = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
+    jacobian = _MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
     jacobian /= jacobian.det()
     return jacobian @ f @ jacobian.transpose()
 
@@ -204,7 +206,7 @@ def l2_inverse_transpose(
     f = parse_function_input(f_in)
     if substitute:
         f = f.subs(x, inverse_map)
-    jdet = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map]).det().as_sympy()
+    jdet = _MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map]).det().as_sympy()
     assert isinstance(jdet, sympy.core.expr.Expr)
     return f * abs(jdet)
 
@@ -231,7 +233,7 @@ def covariant_inverse_transpose(
 
     assert f.is_vector
 
-    jacobian = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
+    jacobian = _MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
     return jacobian @ f
 
 
@@ -257,7 +259,7 @@ def contravariant_inverse_transpose(
 
     assert f.is_vector
 
-    j_inv = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
+    j_inv = _MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
     j_inv /= j_inv.det()
     return j_inv @ f
 
