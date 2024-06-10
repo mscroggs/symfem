@@ -10,6 +10,27 @@ from symfem.functions import AnyFunction, FunctionInput, MatrixFunction, parse_f
 from symfem.geometry import PointType
 from symfem.symbols import x
 
+__all__ = [
+    "MappingNotImplemented",
+    "identity",
+    "l2",
+    "covariant",
+    "contravariant",
+    "double_covariant",
+    "double_contravariant",
+    "identity_inverse_transpose",
+    "l2_inverse_transpose",
+    "covariant_inverse_transpose",
+    "contravariant_inverse_transpose",
+    "identity_inverse",
+    "l2_inverse",
+    "covariant_inverse",
+    "contravariant_inverse",
+    "double_covariant_inverse",
+    "double_contravariant_inverse",
+    "get_mapping",
+]
+
 
 class MappingNotImplemented(NotImplementedError):
     """Exception thrown when a mapping is not implemented for an element."""
