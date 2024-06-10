@@ -8,12 +8,14 @@ import typing
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput
-from ..polynomials import polynomial_set_1d
-from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
+from symfem.finite_element import CiarletElement
+from symfem.functionals import ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput
+from symfem.polynomials import polynomial_set_1d
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import x
+
+__all__ = ["ConformingCrouzeixRaviart"]
 
 
 class ConformingCrouzeixRaviart(CiarletElement):
@@ -33,10 +35,7 @@ class ConformingCrouzeixRaviart(CiarletElement):
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
 
-        poly += [
-            x[0] ** i * x[1] ** (order - i) * (x[0] + x[1])
-            for i in range(1, order)
-        ]
+        poly += [x[0] ** i * x[1] ** (order - i) * (x[0] + x[1]) for i in range(1, order)]
 
         dofs: ListOfFunctionals = []
         for i, v in enumerate(reference.vertices):
@@ -44,14 +43,16 @@ class ConformingCrouzeixRaviart(CiarletElement):
         if order >= 2:
             for i, edge in enumerate(reference.edges):
                 for p in range(1, order):
-                    v = tuple(sympy.Rational((order - p) * a + p * b, order) for a, b in zip(
-                        reference.vertices[edge[0]], reference.vertices[edge[1]]))
+                    v = tuple(
+                        sympy.Rational((order - p) * a + p * b, order)
+                        for a, b in zip(reference.vertices[edge[0]], reference.vertices[edge[1]])
+                    )
                     dofs.append(PointEvaluation(reference, v, entity=(1, i)))
             for i in range(1, order):
                 for j in range(1, order + 1 - i):
                     point = (
                         sympy.Rational(3 * i - 1, 3 * order),
-                        sympy.Rational(3 * j - 1, 3 * order)
+                        sympy.Rational(3 * j - 1, 3 * order),
                     )
                     dofs.append(PointEvaluation(reference, point, entity=(2, 0)))
 

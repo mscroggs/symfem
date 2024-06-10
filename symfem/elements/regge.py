@@ -12,15 +12,22 @@ from itertools import product
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import (InnerProductIntegralMoment, IntegralAgainst, IntegralMoment,
-                           ListOfFunctionals, PointInnerProduct)
-from ..functions import FunctionInput
-from ..moments import make_integral_moment_dofs
-from ..polynomials import polynomial_set_vector
-from ..references import Reference
-from ..symbols import t, x
-from .lagrange import Lagrange
+from symfem.finite_element import CiarletElement
+from symfem.functionals import (
+    InnerProductIntegralMoment,
+    IntegralAgainst,
+    IntegralMoment,
+    ListOfFunctionals,
+    PointInnerProduct,
+)
+from symfem.functions import FunctionInput
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import polynomial_set_vector
+from symfem.references import Reference
+from symfem.symbols import t, x
+from symfem.elements.lagrange import Lagrange
+
+__all__ = ["Regge", "ReggeTP"]
 
 
 class Regge(CiarletElement):
@@ -35,13 +42,18 @@ class Regge(CiarletElement):
             variant: The variant of the element
         """
         from symfem import create_reference
+
         poly: typing.List[FunctionInput] = []
         if reference.tdim == 2:
-            poly = [((p[0], p[1]), (p[1], p[2]))
-                    for p in polynomial_set_vector(reference.tdim, 3, order)]
+            poly = [
+                ((p[0], p[1]), (p[1], p[2]))
+                for p in polynomial_set_vector(reference.tdim, 3, order)
+            ]
         if reference.tdim == 3:
-            poly = [((p[0], p[1], p[3]), (p[1], p[2], p[4]), (p[3], p[4], p[5]))
-                    for p in polynomial_set_vector(reference.tdim, 6, order)]
+            poly = [
+                ((p[0], p[1], p[3]), (p[1], p[2], p[4]), (p[3], p[4], p[5]))
+                for p in polynomial_set_vector(reference.tdim, 6, order)
+            ]
 
         dofs: ListOfFunctionals = []
         if variant == "point":
@@ -53,33 +65,63 @@ class Regge(CiarletElement):
                     for i in product(range(1, order + 2), repeat=edim):
                         if sum(i) < order + 2:
                             for edge in entity.edges[::-1]:
-                                tangent = tuple(b - a for a, b in zip(
-                                    entity.vertices[edge[0]], entity.vertices[edge[1]]))
-                                dofs.append(PointInnerProduct(
-                                    reference, tuple(o + sum(sympy.Rational(a[j] * b, order + 2)
-                                                             for a, b in zip(entity.axes, i[::-1]))
-                                                     for j, o in enumerate(entity.origin)),
-                                    tangent, tangent, entity=(edim, e_n),
-                                    mapping="double_covariant"))
+                                tangent = tuple(
+                                    b - a
+                                    for a, b in zip(
+                                        entity.vertices[edge[0]], entity.vertices[edge[1]]
+                                    )
+                                )
+                                dofs.append(
+                                    PointInnerProduct(
+                                        reference,
+                                        tuple(
+                                            o
+                                            + sum(
+                                                sympy.Rational(a[j] * b, order + 2)
+                                                for a, b in zip(entity.axes, i[::-1])
+                                            )
+                                            for j, o in enumerate(entity.origin)
+                                        ),
+                                        tangent,
+                                        tangent,
+                                        entity=(edim, e_n),
+                                        mapping="double_covariant",
+                                    )
+                                )
 
         elif variant == "integral":
             space = Lagrange(create_reference("interval"), order, "equispaced")
             basis = [f.subs(x, t) for f in space.get_basis_functions()]
             for e_n, vs in enumerate(reference.sub_entities(1)):
                 edge_e = reference.sub_entity(1, e_n)
-                tangent = tuple((b - a) / edge_e.jacobian()
-                                for a, b in zip(edge_e.vertices[0], edge_e.vertices[1]))
+                tangent = tuple(
+                    (b - a) / edge_e.jacobian()
+                    for a, b in zip(edge_e.vertices[0], edge_e.vertices[1])
+                )
                 for f, dof in zip(basis, space.dofs):
-                    dofs.append(InnerProductIntegralMoment(
-                        reference, f, tangent, tangent, dof, entity=(1, e_n),
-                        mapping="double_covariant"))
+                    dofs.append(
+                        InnerProductIntegralMoment(
+                            reference,
+                            f,
+                            tangent,
+                            tangent,
+                            dof,
+                            entity=(1, e_n),
+                            mapping="double_covariant",
+                        )
+                    )
 
             if reference.tdim == 2:
                 if order > 0:
                     dofs += make_integral_moment_dofs(
                         reference,
-                        cells=(IntegralMoment, Regge, order - 1, "double_covariant",
-                               {"variant": "integral"}),
+                        cells=(
+                            IntegralMoment,
+                            Regge,
+                            order - 1,
+                            "double_covariant",
+                            {"variant": "integral"},
+                        ),
                     )
 
             elif reference.tdim == 3:
@@ -89,22 +131,40 @@ class Regge(CiarletElement):
                     for f_n, vs in enumerate(reference.sub_entities(2)):
                         face = reference.sub_entity(2, f_n)
                         for f, dof in zip(basis, rspace.dofs):
-                            dofs.append(IntegralMoment(
-                                reference, f * face.jacobian(), dof,
-                                entity=(2, f_n), mapping="double_covariant"))
+                            dofs.append(
+                                IntegralMoment(
+                                    reference,
+                                    f * face.jacobian(),
+                                    dof,
+                                    entity=(2, f_n),
+                                    mapping="double_covariant",
+                                )
+                            )
 
                 if order > 1:
                     dofs += make_integral_moment_dofs(
                         reference,
-                        cells=(IntegralMoment, Regge, order - 2, "double_covariant",
-                               {"variant": "integral"}),
+                        cells=(
+                            IntegralMoment,
+                            Regge,
+                            order - 2,
+                            "double_covariant",
+                            {"variant": "integral"},
+                        ),
                     )
 
         else:
             raise ValueError(f"Unknown variant: {variant}")
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
-                         (reference.tdim, reference.tdim))
+        super().__init__(
+            reference,
+            order,
+            poly,
+            dofs,
+            reference.tdim,
+            reference.tdim**2,
+            (reference.tdim, reference.tdim),
+        )
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
@@ -149,23 +209,38 @@ class ReggeTP(CiarletElement):
                 for j in range(order + 2):
                     for k in range(order + 2):
                         poly.append(
-                            ((x[0] ** i * x[1] ** j * x[2] ** k, 0, 0), (0, 0, 0), (0, 0, 0)))
+                            ((x[0] ** i * x[1] ** j * x[2] ** k, 0, 0), (0, 0, 0), (0, 0, 0))
+                        )
                         poly.append(
-                            ((0, 0, 0), (0, x[1] ** i * x[0] ** j * x[2] ** k, 0), (0, 0, 0)))
+                            ((0, 0, 0), (0, x[1] ** i * x[0] ** j * x[2] ** k, 0), (0, 0, 0))
+                        )
                         poly.append(
-                            ((0, 0, 0), (0, 0, 0), (0, 0, x[2] ** i * x[0] ** j * x[1] ** k)))
+                            ((0, 0, 0), (0, 0, 0), (0, 0, x[2] ** i * x[0] ** j * x[1] ** k))
+                        )
             for i in range(order + 1):
                 for j in range(order + 1):
                     for k in range(order + 2):
-                        poly.append(((0, x[0] ** i * x[1] ** j * x[2] ** k, 0),
-                                     (x[0] ** i * x[1] ** j * x[2] ** k, 0, 0),
-                                     (0, 0, 0)))
-                        poly.append(((0, 0, x[0] ** i * x[2] ** j * x[1] ** k),
-                                     (0, 0, 0),
-                                     (x[0] ** i * x[2] ** j * x[1] ** k, 0, 0)))
-                        poly.append(((0, 0, 0),
-                                     (0, 0, x[1] ** i * x[2] ** j * x[0] ** k),
-                                     (0, x[1] ** i * x[2] ** j * x[0] ** k, 0)))
+                        poly.append(
+                            (
+                                (0, x[0] ** i * x[1] ** j * x[2] ** k, 0),
+                                (x[0] ** i * x[1] ** j * x[2] ** k, 0, 0),
+                                (0, 0, 0),
+                            )
+                        )
+                        poly.append(
+                            (
+                                (0, 0, x[0] ** i * x[2] ** j * x[1] ** k),
+                                (0, 0, 0),
+                                (x[0] ** i * x[2] ** j * x[1] ** k, 0, 0),
+                            )
+                        )
+                        poly.append(
+                            (
+                                (0, 0, 0),
+                                (0, 0, x[1] ** i * x[2] ** j * x[0] ** k),
+                                (0, x[1] ** i * x[2] ** j * x[0] ** k, 0),
+                            )
+                        )
 
         dofs: ListOfFunctionals = []
         if variant == "integral":
@@ -174,29 +249,52 @@ class ReggeTP(CiarletElement):
             basis = [f.subs(x, t) for f in space.get_basis_functions()]
             for e_n, vs in enumerate(reference.sub_entities(1)):
                 edge = reference.sub_entity(1, e_n)
-                tangent = tuple((b - a) / edge.jacobian()
-                                for a, b in zip(edge.vertices[0], edge.vertices[1]))
+                tangent = tuple(
+                    (b - a) / edge.jacobian() for a, b in zip(edge.vertices[0], edge.vertices[1])
+                )
                 for f, dof in zip(basis, space.dofs):
-                    dofs.append(InnerProductIntegralMoment(
-                        reference, f, tangent, tangent, dof, entity=(1, e_n),
-                        mapping="double_covariant"))
+                    dofs.append(
+                        InnerProductIntegralMoment(
+                            reference,
+                            f,
+                            tangent,
+                            tangent,
+                            dof,
+                            entity=(1, e_n),
+                            mapping="double_covariant",
+                        )
+                    )
 
             # DOFs on faces
             for f_n, vs in enumerate(reference.sub_entities(2)):
                 for i in range(order + 1):
                     for j in range(order + 1):
-                        dofs.append(IntegralAgainst(
-                            reference,
-                            ((0, x[0] ** i * x[1] ** j), (x[0] ** i * x[1] ** j, 0)),
-                            entity=(2, f_n), mapping="double_covariant"))
+                        dofs.append(
+                            IntegralAgainst(
+                                reference,
+                                ((0, x[0] ** i * x[1] ** j), (x[0] ** i * x[1] ** j, 0)),
+                                entity=(2, f_n),
+                                mapping="double_covariant",
+                            )
+                        )
                 for i in range(1, order + 1):
                     for j in range(order + 1):
-                        dofs.append(IntegralAgainst(
-                            reference, ((x[1] ** i * x[0] ** j * (1 - x[1]), 0), (0, 0)),
-                            entity=(2, f_n), mapping="double_covariant"))
-                        dofs.append(IntegralAgainst(
-                            reference, ((0, 0), (0, x[0] ** i * x[1] ** j * (1 - x[0]))),
-                            entity=(2, f_n), mapping="double_covariant"))
+                        dofs.append(
+                            IntegralAgainst(
+                                reference,
+                                ((x[1] ** i * x[0] ** j * (1 - x[1]), 0), (0, 0)),
+                                entity=(2, f_n),
+                                mapping="double_covariant",
+                            )
+                        )
+                        dofs.append(
+                            IntegralAgainst(
+                                reference,
+                                ((0, 0), (0, x[0] ** i * x[1] ** j * (1 - x[0]))),
+                                entity=(2, f_n),
+                                mapping="double_covariant",
+                            )
+                        )
 
             if reference.tdim == 3:
                 # DOFs on cell
@@ -205,42 +303,79 @@ class ReggeTP(CiarletElement):
                         for k in range(order + 1):
                             f = x[0] ** i * x[1] ** j * x[2] ** k * (1 - x[0])
                             assert isinstance(f, sympy.core.expr.Expr)
-                            dofs.append(IntegralAgainst(
-                                reference, ((0, 0, 0), (0, 0, f), (0, f, 0)),
-                                entity=(3, 0), mapping="double_covariant"))
+                            dofs.append(
+                                IntegralAgainst(
+                                    reference,
+                                    ((0, 0, 0), (0, 0, f), (0, f, 0)),
+                                    entity=(3, 0),
+                                    mapping="double_covariant",
+                                )
+                            )
                             f = x[1] ** i * x[0] ** j * x[2] ** k * (1 - x[1])
                             assert isinstance(f, sympy.core.expr.Expr)
-                            dofs.append(IntegralAgainst(
-                                reference, ((0, 0, f), (0, 0, 0), (f, 0, 0)),
-                                entity=(3, 0), mapping="double_covariant"))
+                            dofs.append(
+                                IntegralAgainst(
+                                    reference,
+                                    ((0, 0, f), (0, 0, 0), (f, 0, 0)),
+                                    entity=(3, 0),
+                                    mapping="double_covariant",
+                                )
+                            )
                             f = x[2] ** i * x[0] ** j * x[1] ** k * (1 - x[2])
                             assert isinstance(f, sympy.core.expr.Expr)
-                            dofs.append(IntegralAgainst(
-                                reference, ((0, f, 0), (f, 0, 0), (0, 0, 0)),
-                                entity=(3, 0), mapping="double_covariant"))
+                            dofs.append(
+                                IntegralAgainst(
+                                    reference,
+                                    ((0, f, 0), (f, 0, 0), (0, 0, 0)),
+                                    entity=(3, 0),
+                                    mapping="double_covariant",
+                                )
+                            )
                 for i in range(order + 1):
                     for j in range(1, order + 1):
                         for k in range(1, order + 1):
                             f = x[0] ** i * x[1] ** j * x[2] ** k * (1 - x[1]) * (1 - x[2])
                             assert isinstance(f, sympy.core.expr.Expr)
-                            dofs.append(IntegralAgainst(
-                                reference, ((f, 0, 0), (0, 0, 0), (0, 0, 0)),
-                                entity=(3, 0), mapping="double_covariant"))
+                            dofs.append(
+                                IntegralAgainst(
+                                    reference,
+                                    ((f, 0, 0), (0, 0, 0), (0, 0, 0)),
+                                    entity=(3, 0),
+                                    mapping="double_covariant",
+                                )
+                            )
                             f = x[1] ** i * x[0] ** j * x[2] ** k * (1 - x[0]) * (1 - x[2])
                             assert isinstance(f, sympy.core.expr.Expr)
-                            dofs.append(IntegralAgainst(
-                                reference, ((0, 0, 0), (0, f, 0), (0, 0, 0)),
-                                entity=(3, 0), mapping="double_covariant"))
+                            dofs.append(
+                                IntegralAgainst(
+                                    reference,
+                                    ((0, 0, 0), (0, f, 0), (0, 0, 0)),
+                                    entity=(3, 0),
+                                    mapping="double_covariant",
+                                )
+                            )
                             f = x[2] ** i * x[0] ** j * x[1] ** k * (1 - x[0]) * (1 - x[1])
                             assert isinstance(f, sympy.core.expr.Expr)
-                            dofs.append(IntegralAgainst(
-                                reference, ((0, 0, 0), (0, 0, 0), (0, 0, f)),
-                                entity=(3, 0), mapping="double_covariant"))
+                            dofs.append(
+                                IntegralAgainst(
+                                    reference,
+                                    ((0, 0, 0), (0, 0, 0), (0, 0, f)),
+                                    entity=(3, 0),
+                                    mapping="double_covariant",
+                                )
+                            )
         else:
             raise ValueError(f"Unknown variant: {variant}")
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
-                         (reference.tdim, reference.tdim))
+        super().__init__(
+            reference,
+            order,
+            poly,
+            dofs,
+            reference.tdim,
+            reference.tdim**2,
+            (reference.tdim, reference.tdim),
+        )
         self.variant = variant
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:

@@ -20,7 +20,7 @@ def test_c1_continuity(family):
         f2 = f.get_piece((half, half))
         grad_f1 = f1.grad(2)
         grad_f2 = f2.grad(2)
-        line = ((1 - 2 * t[0], t[0]))
+        line = (1 - 2 * t[0], t[0])
         f1 = f1.subs(x[:2], line)
         f2 = f2.subs(x[:2], line)
         grad_f1 = grad_f1.subs(x[:2], line)
@@ -33,7 +33,7 @@ def test_c1_continuity(family):
         f2 = f.get_piece((0, half))
         grad_f1 = f1.grad(2)
         grad_f2 = f2.grad(2)
-        line = ((t[0], 1 - 2 * t[0]))
+        line = (t[0], 1 - 2 * t[0])
         f1 = f1.subs(x[:2], line)
         f2 = f2.subs(x[:2], line)
         grad_f1 = grad_f1.subs(x[:2], line)
@@ -46,7 +46,7 @@ def test_c1_continuity(family):
         f2 = f.get_piece((half, 0))
         grad_f1 = f1.grad(2)
         grad_f2 = f2.grad(2)
-        line = ((t[0], t[0]))
+        line = (t[0], t[0])
         f1 = f1.subs(x[:2], line)
         f2 = f2.subs(x[:2], line)
         grad_f1 = grad_f1.subs(x[:2], line)
@@ -82,5 +82,6 @@ def test_rhct_integral():
     expr = integrand.pieces[((0, 1), (0, 0), (third, third))].as_sympy()
     assert len(integrand.pieces) == 3
 
-    assert sympy.integrate(sympy.integrate(
-        expr, (x[1], x[0], 1 - 2 * x[0])), (x[0], 0, third)) == integrand.integral(ref, x)
+    assert sympy.integrate(
+        sympy.integrate(expr, (x[1], x[0], 1 - 2 * x[0])), (x[0], 0, third)
+    ) == integrand.integral(ref, x)

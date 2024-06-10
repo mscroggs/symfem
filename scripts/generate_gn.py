@@ -43,7 +43,6 @@ def find_solution(mat, aim):
 
 
 for ref in ["triangle", "tetrahedron"]:
-
     # TODO: work out why tetrahedron fails on github but passes locally
     if TESTING and ref == "tetrahedron":
         break
@@ -59,7 +58,8 @@ for ref in ["triangle", "tetrahedron"]:
         sub_cells = [
             (reference.vertices[0], reference.vertices[1], mid),
             (reference.vertices[0], reference.vertices[2], mid),
-            (reference.vertices[1], reference.vertices[2], mid)]
+            (reference.vertices[1], reference.vertices[2], mid),
+        ]
         xx, yy, zz = x
         terms = [1, xx, yy]
     if ref == "tetrahedron":
@@ -68,27 +68,21 @@ for ref in ["triangle", "tetrahedron"]:
             (reference.vertices[0], reference.vertices[1], reference.vertices[2], mid),
             (reference.vertices[0], reference.vertices[1], reference.vertices[3], mid),
             (reference.vertices[0], reference.vertices[2], reference.vertices[3], mid),
-            (reference.vertices[1], reference.vertices[2], reference.vertices[3], mid)]
+            (reference.vertices[1], reference.vertices[2], reference.vertices[3], mid),
+        ]
         xx, yy, zz = x
-        terms = [1, xx, yy, zz, xx**2, yy**2, zz**2, xx*yy, xx*zz, yy*zz]
+        terms = [1, xx, yy, zz, xx**2, yy**2, zz**2, xx * yy, xx * zz, yy * zz]
 
     sub_basis = make_piecewise_lagrange(sub_cells, ref, br.reference.tdim, True)
 
     filename = os.path.join(folder, f"_guzman_neilan_{ref}.py")
-    output = (
-        "\"\"\"Values for Guzman-Neilan element.\"\"\"\n"
-        "\n"
-        "import sympy\n"
-        "\n"
-        "coeffs = [\n")
+    output = '"""Values for Guzman-Neilan element."""\n' "\n" "import sympy\n" "\n" "coeffs = [\n"
 
     for f in fs:
         assert isinstance(f, VectorFunction)
         output += "    [\n"
         integrand = f.div().subs(x, t)
-        fun_s = (
-            f.div() - integrand.integral(reference) / reference.volume()
-        ).as_sympy()
+        fun_s = (f.div() - integrand.integral(reference) / reference.volume()).as_sympy()
         assert isinstance(fun_s, sympy.core.expr.Expr)
         fun = fun_s.as_coefficients_dict()
 
@@ -97,7 +91,8 @@ for ref in ["triangle", "tetrahedron"]:
         aim = [fun[term] if term in fun else 0 for term in terms] * (br.reference.tdim + 1)
 
         mat: typing.List[typing.List[symfem.functions.ScalarFunction]] = [
-            [] for t in terms for p in sub_basis[0].pieces]
+            [] for t in terms for p in sub_basis[0].pieces
+        ]
         for b in sub_basis:
             i = 0
             for p in b.pieces.values():

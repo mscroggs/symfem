@@ -7,16 +7,22 @@ and https://doi.org/10.1007/s10092-006-0124-6 (Tail, Mardal, 2006)
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import (IntegralMoment, ListOfFunctionals, NormalIntegralMoment,
-                           TangentIntegralMoment)
-from ..functions import FunctionInput, VectorFunction
-from ..moments import make_integral_moment_dofs
-from ..polynomials import polynomial_set_vector
-from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
-from .lagrange import Lagrange
-from .nedelec import NedelecFirstKind
+from symfem.finite_element import CiarletElement
+from symfem.functionals import (
+    IntegralMoment,
+    ListOfFunctionals,
+    NormalIntegralMoment,
+    TangentIntegralMoment,
+)
+from symfem.functions import FunctionInput, VectorFunction
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import polynomial_set_vector
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import x
+from symfem.elements.lagrange import Lagrange
+from symfem.elements.nedelec import NedelecFirstKind
+
+__all__ = ["MardalTaiWinther"]
 
 
 class MardalTaiWinther(CiarletElement):
@@ -35,37 +41,51 @@ class MardalTaiWinther(CiarletElement):
             raise NonDefaultReferenceError()
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
-            reference, facets=(NormalIntegralMoment, Lagrange, 1,
-                               "contravariant", {"variant": variant}))
+            reference,
+            facets=(NormalIntegralMoment, Lagrange, 1, "contravariant", {"variant": variant}),
+        )
 
         poly: typing.List[FunctionInput] = []
         if reference.name == "triangle":
-            poly += [(1, 0), (x[0], 0), (x[1], 0),
-                     (0, 1), (0, x[0]), (0, x[1]),
-                     # (x**2 + 2*x*y, -2*x*y - y**2)
-                     (x[0] ** 2 + 2 * x[0] * x[1],
-                      -2 * x[0] * x[1] - x[1] ** 2),
-                     # (-x**3 + 2*x**2 + 3*x*y**2, 3*x**2*y - 4*x*y - y**3)
-                     (-x[0] ** 3 + 2 * x[0] ** 2 + 3 * x[0] * x[1] ** 2,
-                      3 * x[0] ** 2 * x[1] - 4 * x[0] * x[1] - x[1] ** 3),
-                     # (2*x**2*y + x**2 + 3*x*y**2, -2*x*y**2 - 2*x*y - y**3)
-                     (2 * x[0] ** 2 * x[1] + x[0] ** 2 + 3 * x[0] * x[1] ** 2,
-                      -2 * x[0] * x[1] ** 2 - 2 * x[0] * x[1] - x[1] ** 3)]
+            poly += [
+                (1, 0),
+                (x[0], 0),
+                (x[1], 0),
+                (0, 1),
+                (0, x[0]),
+                (0, x[1]),
+                # (x**2 + 2*x*y, -2*x*y - y**2)
+                (x[0] ** 2 + 2 * x[0] * x[1], -2 * x[0] * x[1] - x[1] ** 2),
+                # (-x**3 + 2*x**2 + 3*x*y**2, 3*x**2*y - 4*x*y - y**3)
+                (
+                    -(x[0] ** 3) + 2 * x[0] ** 2 + 3 * x[0] * x[1] ** 2,
+                    3 * x[0] ** 2 * x[1] - 4 * x[0] * x[1] - x[1] ** 3,
+                ),
+                # (2*x**2*y + x**2 + 3*x*y**2, -2*x*y**2 - 2*x*y - y**3)
+                (
+                    2 * x[0] ** 2 * x[1] + x[0] ** 2 + 3 * x[0] * x[1] ** 2,
+                    -2 * x[0] * x[1] ** 2 - 2 * x[0] * x[1] - x[1] ** 3,
+                ),
+            ]
             dofs += make_integral_moment_dofs(
-                reference, facets=(TangentIntegralMoment, Lagrange, 0,
-                                   "contravariant", {"variant": variant}))
+                reference,
+                facets=(TangentIntegralMoment, Lagrange, 0, "contravariant", {"variant": variant}),
+            )
         else:
             assert reference.name == "tetrahedron"
 
             poly += polynomial_set_vector(reference.tdim, reference.tdim, 1)
             for p in polynomial_set_vector(reference.tdim, reference.tdim, 1):
-                poly.append(VectorFunction(tuple(
-                    i * x[0] * x[1] * x[2] * (1 - x[0] - x[1] - x[2])
-                    for i in p)).curl())
+                poly.append(
+                    VectorFunction(
+                        tuple(i * x[0] * x[1] * x[2] * (1 - x[0] - x[1] - x[2]) for i in p)
+                    ).curl()
+                )
 
             dofs += make_integral_moment_dofs(
-                reference, facets=(IntegralMoment, NedelecFirstKind, 1, "contravariant",
-                                   {"variant": variant}))
+                reference,
+                facets=(IntegralMoment, NedelecFirstKind, 1, "contravariant", {"variant": variant}),
+            )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant

@@ -71,8 +71,9 @@ def test_basis_continuity_tetrahedron(order):
                     if value is None:
                         value = p[1].subs(x, pt)
                     assert value == p[1].subs(x, pt)
-    for pts in combinations([(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1),
-                             (quarter, quarter, quarter)], 2):
+    for pts in combinations(
+        [(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (quarter, quarter, quarter)], 2
+    ):
         for i in range(N + 1):
             pt = tuple(a + (b - a) * i * one / N for a, b in zip(*pts))
             for f in e.get_polynomial_basis():
@@ -82,12 +83,14 @@ def test_basis_continuity_tetrahedron(order):
                         if value is None:
                             value = p[1].subs(x, pt)
                         assert value == p[1].subs(x, pt)
-    for pts in combinations([(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1),
-                             (quarter, quarter, quarter)], 3):
+    for pts in combinations(
+        [(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (quarter, quarter, quarter)], 3
+    ):
         for i in range(N + 1):
             for j in range(N + 1 - i):
-                pt = tuple(a + (b - a) * i * one / N + (c - a) * j * one / N
-                           for a, b, c in zip(*pts))
+                pt = tuple(
+                    a + (b - a) * i * one / N + (c - a) * j * one / N for a, b, c in zip(*pts)
+                )
                 for f in e.get_polynomial_basis():
                     value = None
                     for p in f.pieces.items():
@@ -104,14 +107,15 @@ def test_piecewise_lagrange_triangle(order):
     sub_tris = [
         (reference.vertices[0], reference.vertices[1], mid),
         (reference.vertices[0], reference.vertices[2], mid),
-        (reference.vertices[1], reference.vertices[2], mid)]
+        (reference.vertices[1], reference.vertices[2], mid),
+    ]
 
     N = 5
     fs = make_piecewise_lagrange(sub_tris, "triangle", order, zero_on_boundary=True)
     for e_n in range(reference.sub_entity_count(1)):
         edge = reference.sub_entity(1, e_n)
         for i in range(N + 1):
-            point = edge.get_point((sympy.Rational(i, N), ))
+            point = edge.get_point((sympy.Rational(i, N),))
             for f in fs:
                 assert f.subs(x, point) == (0, 0)
 
@@ -128,7 +132,8 @@ def test_piecewise_lagrange_tetrahedron(order):
         (reference.vertices[0], reference.vertices[1], reference.vertices[2], mid),
         (reference.vertices[0], reference.vertices[1], reference.vertices[3], mid),
         (reference.vertices[0], reference.vertices[2], reference.vertices[3], mid),
-        (reference.vertices[1], reference.vertices[2], reference.vertices[3], mid)]
+        (reference.vertices[1], reference.vertices[2], reference.vertices[3], mid),
+    ]
 
     N = 5
     fs = make_piecewise_lagrange(sub_tets, "tetrahedron", order, zero_on_boundary=True)
@@ -136,8 +141,7 @@ def test_piecewise_lagrange_tetrahedron(order):
         face = reference.sub_entity(2, f_n)
         for i in range(N + 1):
             for j in range(N + 1 - i):
-                point = face.get_point((sympy.Rational(i, N),
-                                        sympy.Rational(j, N)))
+                point = face.get_point((sympy.Rational(i, N), sympy.Rational(j, N)))
                 for f in fs:
                     assert f.subs(x, point) == (0, 0, 0)
 

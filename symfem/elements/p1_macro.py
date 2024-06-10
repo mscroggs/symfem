@@ -8,13 +8,15 @@ import typing
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import IntegralAgainst, ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput
-from ..geometry import SetOfPoints
-from ..piecewise_functions import PiecewiseFunction
-from ..references import Reference
-from ..symbols import x
+from symfem.finite_element import CiarletElement
+from symfem.functionals import IntegralAgainst, ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput
+from symfem.geometry import SetOfPoints
+from symfem.piecewise_functions import PiecewiseFunction
+from symfem.references import Reference
+from symfem.symbols import x
+
+__all__ = ["P1Macro"]
 
 
 class P1Macro(CiarletElement):
@@ -41,20 +43,22 @@ class P1Macro(CiarletElement):
             PiecewiseFunction({q: 1 for q in tris}, 2),
             PiecewiseFunction({q: x[0] for q in tris}, 2),
             PiecewiseFunction({q: x[1] for q in tris}, 2),
-            PiecewiseFunction({
-                tris[0]: 3 * invmap[1],
-                tris[1]: 3 * (1 - invmap[0] - invmap[1]),
-                tris[2]: 3 * invmap[0],
-            }, 2)]
+            PiecewiseFunction(
+                {
+                    tris[0]: 3 * invmap[1],
+                    tris[1]: 3 * (1 - invmap[0] - invmap[1]),
+                    tris[2]: 3 * invmap[0],
+                },
+                2,
+            ),
+        ]
 
         dofs: ListOfFunctionals = []
         for v_n, v in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
         dofs.append(IntegralAgainst(reference, 1, entity=(2, 0)))
 
-        super().__init__(
-            reference, order, poly, dofs, reference.tdim, 1
-        )
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     names = ["P1 macro"]
     references = ["triangle"]

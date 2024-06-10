@@ -6,14 +6,16 @@ This element's definition appears in https://doi.org/10.1007/BF01389710
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import IntegralMoment, ListOfFunctionals, NormalIntegralMoment
-from ..functions import FunctionInput
-from ..moments import make_integral_moment_dofs
-from ..polynomials import polynomial_set_vector
-from ..references import NonDefaultReferenceError, Reference
-from .lagrange import Lagrange
-from .nedelec import NedelecFirstKind
+from symfem.finite_element import CiarletElement
+from symfem.functionals import IntegralMoment, ListOfFunctionals, NormalIntegralMoment
+from symfem.functions import FunctionInput
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import polynomial_set_vector
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.elements.lagrange import Lagrange
+from symfem.elements.nedelec import NedelecFirstKind
+
+__all__ = ["BDM"]
 
 
 class BDM(CiarletElement):

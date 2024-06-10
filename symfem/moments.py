@@ -2,21 +2,21 @@
 
 import typing
 
-from .functionals import BaseFunctional
-from .references import Reference
+from symfem.functionals import BaseFunctional
+from symfem.references import Reference
 
-MomentType = typing.Tuple[typing.Type, typing.Type, int, typing.Union[str, None],
-                          typing.Dict[str, typing.Any]]
+__all__ = ["MomentType", "SingleMomentTypeInput", "MomentTypeInput", "make_integral_moment_dofs"]
+
+MomentType = typing.Tuple[
+    typing.Type, typing.Type, int, typing.Union[str, None], typing.Dict[str, typing.Any]
+]
 SingleMomentTypeInput = typing.Union[
     MomentType,
     typing.Tuple[typing.Type, typing.Type, int, str],
     typing.Tuple[typing.Type, typing.Type, int, typing.Dict[str, typing.Any]],
     typing.Tuple[typing.Type, typing.Type, int],
 ]
-MomentTypeInput = typing.Union[
-    SingleMomentTypeInput,
-    typing.Dict[str, SingleMomentTypeInput]
-]
+MomentTypeInput = typing.Union[SingleMomentTypeInput, typing.Dict[str, SingleMomentTypeInput]]
 
 
 def _extract_moment_data(moment_data: MomentTypeInput, sub_type: str) -> MomentType:
@@ -58,7 +58,7 @@ def make_integral_moment_dofs(
     cells: typing.Optional[MomentTypeInput] = None,
     facets: typing.Optional[MomentTypeInput] = None,
     ridges: typing.Optional[MomentTypeInput] = None,
-    peaks: typing.Optional[MomentTypeInput] = None
+    peaks: typing.Optional[MomentTypeInput] = None,
 ) -> typing.List[BaseFunctional]:
     """Generate DOFs due to integral moments on sub entities.
 
@@ -80,8 +80,13 @@ def make_integral_moment_dofs(
 
     # DOFs per dimension
     for dim, moment_data in [
-        (0, vertices), (1, edges), (2, faces), (3, volumes),
-        (reference.tdim - 3, peaks), (reference.tdim - 2, ridges), (reference.tdim - 1, facets),
+        (0, vertices),
+        (1, edges),
+        (2, faces),
+        (3, volumes),
+        (reference.tdim - 3, peaks),
+        (reference.tdim - 2, ridges),
+        (reference.tdim - 1, facets),
         (reference.tdim, cells),
     ]:
         if moment_data is None:
@@ -93,7 +98,8 @@ def make_integral_moment_dofs(
         for i, vs in enumerate(reference.sub_entities(dim)):
             sub_ref = reference.sub_entity(dim, i, False)
             IntegralMoment, SubElement, order, mapping, kwargs = _extract_moment_data(
-                moment_data, sub_ref.name)
+                moment_data, sub_ref.name
+            )
             m_kwargs = {}
             if mapping is not None:
                 m_kwargs["mapping"] = mapping

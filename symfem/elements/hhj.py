@@ -13,13 +13,16 @@ from __future__ import annotations
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import IntegralMoment, ListOfFunctionals, NormalInnerProductIntegralMoment
-from ..functions import FunctionInput, MatrixFunction
-from ..moments import make_integral_moment_dofs
-from ..polynomials import polynomial_set_vector
-from ..references import NonDefaultReferenceError, Reference
-from .lagrange import Lagrange
+from symfem.finite_element import CiarletElement
+from symfem.functionals import IntegralMoment, ListOfFunctionals, NormalInnerProductIntegralMoment
+from symfem.functions import FunctionInput
+from symfem.functions import MatrixFunction as _MatrixFunction
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import polynomial_set_vector
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.elements.lagrange import Lagrange
+
+__all__ = ["HellanHerrmannJohnson"]
 
 
 class HellanHerrmannJohnson(CiarletElement):
@@ -42,26 +45,31 @@ class HellanHerrmannJohnson(CiarletElement):
         directions_extra: typing.List[typing.Tuple[typing.Tuple[int, ...], ...]] = []
 
         if reference.tdim == 2:
-            poly = [((p[0], p[1]), (p[1], p[2]))
-                    for p in polynomial_set_vector(reference.tdim, 3, order)]
-            directions = [((0, 1), (1, 0)),
-                          ((-2, 1), (1, 0)),
-                          ((0, -1), (-1, 2))]
+            poly = [
+                ((p[0], p[1]), (p[1], p[2]))
+                for p in polynomial_set_vector(reference.tdim, 3, order)
+            ]
+            directions = [((0, 1), (1, 0)), ((-2, 1), (1, 0)), ((0, -1), (-1, 2))]
             directions_extra = []
         if reference.tdim == 3:
-            poly = [((p[0], p[1], p[2]), (p[1], p[3], p[4]), (p[2], p[4], p[5]))
-                    for p in polynomial_set_vector(reference.tdim, 6, order)]
-            directions = [((0, 1, 1), (1, 0, 1), (1, 1, 0)),
-                          ((-6, 1, 1), (1, 0, 1), (1, 1, 0)),
-                          ((0, 1, 1), (1, -6, 1), (1, 1, 0)),
-                          ((0, 1, 1), (1, 0, 1), (1, 1, -6))]
-            directions_extra = [((0, 0, -1), (0, 0, 1), (-1, 1, 0)),
-                                ((0, -1, 0), (-1, 0, 1), (0, 1, 0))]
+            poly = [
+                ((p[0], p[1], p[2]), (p[1], p[3], p[4]), (p[2], p[4], p[5]))
+                for p in polynomial_set_vector(reference.tdim, 6, order)
+            ]
+            directions = [
+                ((0, 1, 1), (1, 0, 1), (1, 1, 0)),
+                ((-6, 1, 1), (1, 0, 1), (1, 1, 0)),
+                ((0, 1, 1), (1, -6, 1), (1, 1, 0)),
+                ((0, 1, 1), (1, 0, 1), (1, 1, -6)),
+            ]
+            directions_extra = [
+                ((0, 0, -1), (0, 0, 1), (-1, 1, 0)),
+                ((0, -1, 0), (-1, 0, 1), (0, 1, 0)),
+            ]
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
-            facets=(NormalInnerProductIntegralMoment, Lagrange, order,
-                    {"variant": variant}),
+            facets=(NormalInnerProductIntegralMoment, Lagrange, order, {"variant": variant}),
         )
 
         # cell functions
@@ -70,22 +78,41 @@ class HellanHerrmannJohnson(CiarletElement):
             basis = space.get_basis_functions()
             for p, dof in zip(basis, space.dofs):
                 for d in directions:
-                    dofs.append(IntegralMoment(
-                        reference, p * MatrixFunction(d), dof, entity=(reference.tdim, 0),
-                        mapping="double_contravariant"))
+                    dofs.append(
+                        IntegralMoment(
+                            reference,
+                            p * _MatrixFunction(d),
+                            dof,
+                            entity=(reference.tdim, 0),
+                            mapping="double_contravariant",
+                        )
+                    )
         # cell functions extra
         space_extra = Lagrange(reference, order, variant)
         basis_extra = space_extra.get_basis_functions()
         for p, dof in zip(basis_extra, space_extra.dofs):
             for d in directions_extra:
-                dofs.append(IntegralMoment(
-                    reference, p * MatrixFunction(d), dof, entity=(reference.tdim, 0),
-                    mapping="double_contravariant"))
+                dofs.append(
+                    IntegralMoment(
+                        reference,
+                        p * _MatrixFunction(d),
+                        dof,
+                        entity=(reference.tdim, 0),
+                        mapping="double_contravariant",
+                    )
+                )
 
         self.variant = variant
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim ** 2,
-                         (reference.tdim, reference.tdim))
+        super().__init__(
+            reference,
+            order,
+            poly,
+            dofs,
+            reference.tdim,
+            reference.tdim**2,
+            (reference.tdim, reference.tdim),
+        )
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element.

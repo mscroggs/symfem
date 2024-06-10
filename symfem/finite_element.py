@@ -9,19 +9,34 @@ from itertools import product
 
 import sympy
 
-from .basis_functions import BasisFunction
-from .caching import load_cached_matrix, save_cached_matrix
-from .functionals import ListOfFunctionals
-from .functions import (AnyFunction, FunctionInput, ScalarFunction, VectorFunction,
-                        parse_function_input)
-from .geometry import PointType, SetOfPointsInput, parse_set_of_points_input
-from .mappings import MappingNotImplemented
-from .piecewise_functions import PiecewiseFunction
-from .plotting import Picture, colors
-from .references import NonDefaultReferenceError, Reference
-from .symbols import x
-from .utils import allequal
-from .version import version
+from symfem.basis_functions import BasisFunction
+from symfem.caching import load_cached_matrix, save_cached_matrix
+from symfem.functionals import ListOfFunctionals
+from symfem.functions import (
+    AnyFunction,
+    FunctionInput,
+    ScalarFunction,
+    VectorFunction,
+    parse_function_input,
+)
+from symfem.geometry import PointType, SetOfPointsInput, parse_set_of_points_input
+from symfem.mappings import MappingNotImplemented
+from symfem.piecewise_functions import PiecewiseFunction
+from symfem.plotting import Picture, colors
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import x
+from symfem.utils import allequal
+from symfem.version import version
+
+__all__ = [
+    "TabulatedBasis",
+    "NoTensorProduct",
+    "FiniteElement",
+    "CiarletElement",
+    "DirectElement",
+    "EnrichedElement",
+    "ElementBasisFunction",
+]
 
 TabulatedBasis = typing.Union[
     typing.List[typing.Union[sympy.core.expr.Expr, int]],
@@ -46,8 +61,13 @@ class FiniteElement(ABC):
     _value_scale: typing.Union[None, sympy.core.expr.Expr]
 
     def __init__(
-        self, reference: Reference, order: int, space_dim: int, domain_dim: int, range_dim: int,
-        range_shape: typing.Optional[typing.Tuple[int, ...]] = None
+        self,
+        reference: Reference,
+        order: int,
+        space_dim: int,
+        domain_dim: int,
+        range_dim: int,
+        range_shape: typing.Optional[typing.Tuple[int, ...]] = None,
     ):
         """Create a finite element.
 
@@ -93,8 +113,10 @@ class FiniteElement(ABC):
         """
 
     def plot_dof_diagram(
-        self, filename: typing.Union[str, typing.List[str]],
-        plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
+        self,
+        filename: typing.Union[str, typing.List[str]],
+        plot_options: typing.Dict[str, typing.Any] = {},
+        **kwargs: typing.Any,
     ):
         """Plot a diagram showing the DOFs of the element.
 
@@ -121,8 +143,10 @@ class FiniteElement(ABC):
                     img.add_fill(pts, colors.WHITE, 0.5)
 
             for dim, e in entities:
-                dofs = [(dof_positions[i], dof_directions[i], dof_entities[i], i)
-                        for i in self.entity_dofs(dim, e)]
+                dofs = [
+                    (dof_positions[i], dof_directions[i], dof_entities[i], i)
+                    for i in self.entity_dofs(dim, e)
+                ]
                 dofs.sort(key=lambda d: img.z(d[0]))
                 for d in dofs:
                     direction = d[1]
@@ -132,11 +156,9 @@ class FiniteElement(ABC):
                             if d != d2 and d[0] == p:
                                 shifted = True
                                 break
-                        img.add_dof_arrow(d[0], direction, d[3],
-                                          colors.entity(d[2][0]), shifted)
+                        img.add_dof_arrow(d[0], direction, d[3], colors.entity(d[2][0]), shifted)
                     else:
-                        img.add_dof_marker(
-                            d[0], d[3], colors.entity(d[2][0]))
+                        img.add_dof_marker(d[0], d[3], colors.entity(d[2][0]))
 
         img.save(filename, plot_options=plot_options)
 
@@ -177,7 +199,9 @@ class FiniteElement(ABC):
         return ElementBasisFunction(self, n)
 
     def tabulate_basis(
-        self, points_in: SetOfPointsInput, order: str = "xyzxyz",
+        self,
+        points_in: SetOfPointsInput,
+        order: str = "xyzxyz",
     ) -> TabulatedBasis:
         """Evaluate the basis functions of the element at the given points.
 
@@ -189,8 +213,9 @@ class FiniteElement(ABC):
             The tabulated basis functions
         """
         points = parse_set_of_points_input(points_in)
-        tabbed = [tuple(b.subs(x, p).as_sympy() for b in self.get_basis_functions())
-                  for p in points]
+        tabbed = [
+            tuple(b.subs(x, p).as_sympy() for b in self.get_basis_functions()) for p in points
+        ]
         if self.range_dim == 1:
             return tabbed
 
@@ -231,8 +256,11 @@ class FiniteElement(ABC):
         return [tuple(b.subs(x, p).as_sympy() for b in self._float_basis_functions) for p in points]
 
     def plot_basis_function(
-        self, n: int, filename: typing.Union[str, typing.List[str]],
-        cell: typing.Optional[Reference] = None, **kwargs: typing.Any
+        self,
+        n: int,
+        filename: typing.Union[str, typing.List[str]],
+        cell: typing.Optional[Reference] = None,
+        **kwargs: typing.Any,
     ):
         """Plot a diagram showing a basis function.
 
@@ -262,10 +290,11 @@ class FiniteElement(ABC):
 
     @abstractmethod
     def map_to_cell(
-        self, vertices_in: SetOfPointsInput,
+        self,
+        vertices_in: SetOfPointsInput,
         basis: typing.Optional[typing.List[AnyFunction]] = None,
         forward_map: typing.Optional[PointType] = None,
-        inverse_map: typing.Optional[PointType] = None
+        inverse_map: typing.Optional[PointType] = None,
     ) -> typing.List[AnyFunction]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
@@ -304,37 +333,71 @@ class FiniteElement(ABC):
 
         # Test continuity
         if self.reference.name == "interval":
-            vertices = ((-1, ), (0, ))
+            vertices = ((-1,), (0,))
             entity_pairs = [[0, (0, 1)]]
         elif self.reference.name == "triangle":
             vertices = ((-1, 0), (0, 0), (0, 1))
             entity_pairs = [[0, (0, 1)], [0, (2, 2)], [1, (1, 0)]]
         elif self.reference.name == "tetrahedron":
             vertices = ((-1, 0, 0), (0, 0, 0), (0, 1, 0), (0, 0, 1))
-            entity_pairs = [[0, (0, 1)], [0, (2, 2)], [0, (3, 3)],
-                            [1, (0, 0)], [1, (3, 1)], [1, (4, 2)],
-                            [2, (1, 0)]]
+            entity_pairs = [
+                [0, (0, 1)],
+                [0, (2, 2)],
+                [0, (3, 3)],
+                [1, (0, 0)],
+                [1, (3, 1)],
+                [1, (4, 2)],
+                [2, (1, 0)],
+            ]
         elif self.reference.name == "quadrilateral":
             vertices = ((0, 0), (0, 1), (-1, 0), (-1, 1))
             entity_pairs = [[0, (0, 0)], [0, (2, 1)], [1, (1, 0)]]
         elif self.reference.name == "hexahedron":
-            vertices = ((0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 1, 1),
-                        (-1, 0, 0), (-1, 0, 1), (-1, 1, 0), (-1, 1, 1))
-            entity_pairs = [[0, (0, 0)], [0, (2, 2)], [0, (4, 1)], [0, (6, 3)],
-                            [1, (1, 1)], [1, (2, 0)], [1, (6, 5)], [1, (9, 3)],
-                            [2, (0, 2)]]
+            vertices = (
+                (0, 0, 0),
+                (0, 0, 1),
+                (0, 1, 0),
+                (0, 1, 1),
+                (-1, 0, 0),
+                (-1, 0, 1),
+                (-1, 1, 0),
+                (-1, 1, 1),
+            )
+            entity_pairs = [
+                [0, (0, 0)],
+                [0, (2, 2)],
+                [0, (4, 1)],
+                [0, (6, 3)],
+                [1, (1, 1)],
+                [1, (2, 0)],
+                [1, (6, 5)],
+                [1, (9, 3)],
+                [2, (0, 2)],
+            ]
         elif self.reference.name == "prism":
-            vertices = ((-1, 0, 0), (0, 0, 0), (0, 1, 0),
-                        (-1, 0, 1), (0, 0, 1), (0, 1, 1))
-            entity_pairs = [[0, (0, 1)], [0, (2, 2)], [0, (3, 4)], [0, (5, 5)],
-                            [1, (1, 3)], [1, (2, 4)], [1, (6, 6)], [1, (7, 8)],
-                            [2, (2, 3)]]
+            vertices = ((-1, 0, 0), (0, 0, 0), (0, 1, 0), (-1, 0, 1), (0, 0, 1), (0, 1, 1))
+            entity_pairs = [
+                [0, (0, 1)],
+                [0, (2, 2)],
+                [0, (3, 4)],
+                [0, (5, 5)],
+                [1, (1, 3)],
+                [1, (2, 4)],
+                [1, (6, 6)],
+                [1, (7, 8)],
+                [2, (2, 3)],
+            ]
         elif self.reference.name == "pyramid":
-            vertices = ((-1, 0, 0), (0, 0, 0), (-1, 1, 0),
-                        (0, 1, 0), (0, 0, 1))
-            entity_pairs = [[0, (0, 1)], [0, (2, 3)], [0, (4, 4)],
-                            [1, (1, 3)], [1, (2, 4)], [1, (6, 7)],
-                            [2, (2, 3)]]
+            vertices = ((-1, 0, 0), (0, 0, 0), (-1, 1, 0), (0, 1, 0), (0, 0, 1))
+            entity_pairs = [
+                [0, (0, 1)],
+                [0, (2, 3)],
+                [0, (4, 4)],
+                [1, (1, 3)],
+                [1, (2, 4)],
+                [1, (6, 7)],
+                [2, (2, 3)],
+            ]
 
         if continuity == "L2":
             return
@@ -360,8 +423,8 @@ class FiniteElement(ABC):
                     return f
 
                 if self.reference.tdim == 1:
-                    f = get_piece(f, (0, ))
-                    g = get_piece(g, (0, ))
+                    f = get_piece(f, (0,))
+                    g = get_piece(g, (0,))
                 elif self.reference.tdim == 2:
                     f = get_piece(f, (0, sympy.Rational(1, 2)))
                     g = get_piece(g, (0, sympy.Rational(1, 2)))
@@ -376,9 +439,9 @@ class FiniteElement(ABC):
                     f = [f]
                     g = [g]
                     for _ in range(order):
-                        deriv_f = [d.diff(i) for d in deriv_f for i in x[:self.reference.tdim]]
+                        deriv_f = [d.diff(i) for d in deriv_f for i in x[: self.reference.tdim]]
                         f += deriv_f
-                        deriv_g = [d.diff(i) for d in deriv_g for i in x[:self.reference.tdim]]
+                        deriv_g = [d.diff(i) for d in deriv_g for i in x[: self.reference.tdim]]
                         g += deriv_g
 
                     f = [i.subs(x[0], 0) for i in f]
@@ -409,12 +472,16 @@ class FiniteElement(ABC):
                             v0 = self.reference.vertices[vs[0]]
                             v1 = self.reference.vertices[vs[1]]
                             tangent = VectorFunction(v1) - VectorFunction(v0)
-                            f = sum(i * f[ni, nj] * j
-                                    for ni, i in enumerate(tangent)
-                                    for nj, j in enumerate(tangent))
-                            g = sum(i * g[ni, nj] * j
-                                    for ni, i in enumerate(tangent)
-                                    for nj, j in enumerate(tangent))
+                            f = sum(
+                                i * f[ni, nj] * j
+                                for ni, i in enumerate(tangent)
+                                for nj, j in enumerate(tangent)
+                            )
+                            g = sum(
+                                i * g[ni, nj] * j
+                                for ni, i in enumerate(tangent)
+                                for nj, j in enumerate(tangent)
+                            )
                         else:
                             assert dim == 2
                             f = [f[1, 1], f[2, 2]]
@@ -428,7 +495,7 @@ class FiniteElement(ABC):
                 assert allequal(f, g)
 
     def get_tensor_factorisation(
-        self
+        self,
     ) -> typing.List[typing.Tuple[str, typing.List[FiniteElement], typing.List[int]]]:
         """Get the representation of the element as a tensor product.
 
@@ -447,8 +514,10 @@ class FiniteElement(ABC):
         basis = {}
         for t_type, factors, perm in factorisation:
             if t_type == "scalar":
-                tensor_bases = [[i.subs(x[0], x_i) for i in f.get_basis_functions()]
-                                for x_i, f in zip(x, factors)]
+                tensor_bases = [
+                    [i.subs(x[0], x_i) for i in f.get_basis_functions()]
+                    for x_i, f in zip(x, factors)
+                ]
                 for p, k in zip(perm, product(*tensor_bases)):
                     basis[p] = ScalarFunction(1)
                     for i in k:
@@ -485,9 +554,14 @@ class CiarletElement(FiniteElement):
     """Finite element defined using the Ciarlet definition."""
 
     def __init__(
-        self, reference: Reference, order: int, basis: typing.List[FunctionInput],
-        dofs: ListOfFunctionals, domain_dim: int, range_dim: int,
-        range_shape: typing.Optional[typing.Tuple[int, ...]] = None
+        self,
+        reference: Reference,
+        order: int,
+        basis: typing.List[FunctionInput],
+        dofs: ListOfFunctionals,
+        domain_dim: int,
+        range_dim: int,
+        range_shape: typing.Optional[typing.Tuple[int, ...]] = None,
     ):
         """Create a Ciarlet element.
 
@@ -575,8 +649,10 @@ class CiarletElement(FiniteElement):
             The dual matrix
         """
         if caching and self.cache:
-            cid = (f"{self.__class__.__name__} {self.order} {self.reference.vertices} "
-                   f"{self.init_kwargs()} {self.last_updated}")
+            cid = (
+                f"{self.__class__.__name__} {self.order} {self.reference.vertices} "
+                f"{self.init_kwargs()} {self.last_updated}"
+            )
             matrix_type = "dualinv" if inverse else "dual"
             mat = load_cached_matrix(matrix_type, cid, (len(self.dofs), len(self.dofs)))
             if mat is None:
@@ -584,8 +660,12 @@ class CiarletElement(FiniteElement):
                 save_cached_matrix(matrix_type, cid, mat)
             return mat
         else:
-            mat = sympy.Matrix([[d.eval_symbolic(b).as_sympy() for d in self.dofs]
-                                for b in self.get_polynomial_basis()])
+            mat = sympy.Matrix(
+                [
+                    [d.eval_symbolic(b).as_sympy() for d in self.dofs]
+                    for b in self.get_polynomial_basis()
+                ]
+            )
             if inverse:
                 return mat.inv("LU")
             else:
@@ -623,8 +703,11 @@ class CiarletElement(FiniteElement):
         return self._basis_functions
 
     def plot_basis_function(
-        self, n: int, filename: typing.Union[str, typing.List[str]],
-        cell: typing.Optional[Reference] = None, **kwargs: typing.Any
+        self,
+        n: int,
+        filename: typing.Union[str, typing.List[str]],
+        cell: typing.Optional[Reference] = None,
+        **kwargs: typing.Any,
     ):
         """Plot a diagram showing a basis function.
 
@@ -649,14 +732,23 @@ class CiarletElement(FiniteElement):
         f = self.get_basis_functions()[n]
         d = self.dofs[n]
         assert self._value_scale is not None
-        f.plot(self.reference, filename, d.dof_point(), d.dof_direction(), d.entity, n,
-               self._value_scale, **kwargs)
+        f.plot(
+            self.reference,
+            filename,
+            d.dof_point(),
+            d.dof_direction(),
+            d.entity,
+            n,
+            self._value_scale,
+            **kwargs,
+        )
 
     def map_to_cell(
-        self, vertices_in: SetOfPointsInput,
+        self,
+        vertices_in: SetOfPointsInput,
         basis: typing.Optional[typing.List[AnyFunction]] = None,
         forward_map: typing.Optional[PointType] = None,
-        inverse_map: typing.Optional[PointType] = None
+        inverse_map: typing.Optional[PointType] = None,
     ) -> typing.List[AnyFunction]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
@@ -693,8 +785,8 @@ class CiarletElement(FiniteElement):
                         dofs_by_type[t].append(d)
                     for ds in dofs_by_type.values():
                         mapped_dofs = self.dofs[ds[0]].perform_mapping(
-                            [basis[d] for d in ds],
-                            forward_map, inverse_map)
+                            [basis[d] for d in ds], forward_map, inverse_map
+                        )
                         for d_n, mdof in zip(ds, mapped_dofs):
                             functions[d_n] = mdof
 
@@ -705,7 +797,8 @@ class CiarletElement(FiniteElement):
             return functions
         except MappingNotImplemented:
             element = self.__class__(
-                self.reference.__class__(vertices=vertices), self.order, **self.init_kwargs())
+                self.reference.__class__(vertices=vertices), self.order, **self.init_kwargs()
+            )
             return element.get_basis_functions()
 
     def test(self):
@@ -753,9 +846,14 @@ class DirectElement(FiniteElement):
     _basis_functions: typing.List[AnyFunction]
 
     def __init__(
-        self, reference: Reference, order: int, basis_functions: typing.List[FunctionInput],
+        self,
+        reference: Reference,
+        order: int,
+        basis_functions: typing.List[FunctionInput],
         basis_entities: typing.List[typing.Tuple[int, int]],
-        domain_dim: int, range_dim: int, range_shape: typing.Optional[typing.Tuple[int, ...]] = None
+        domain_dim: int,
+        range_dim: int,
+        range_shape: typing.Optional[typing.Tuple[int, ...]] = None,
     ):
         """Create a direct element.
 
@@ -768,8 +866,7 @@ class DirectElement(FiniteElement):
             range_dim: The dimension of the range
             range_shape: The shape of the range
         """
-        super().__init__(reference, order, len(basis_functions), domain_dim, range_dim,
-                         range_shape)
+        super().__init__(reference, order, len(basis_functions), domain_dim, range_dim, range_shape)
         self._basis_entities = basis_entities
         self._basis_functions = [parse_function_input(f) for f in basis_functions]
 
@@ -801,9 +898,12 @@ class DirectElement(FiniteElement):
                 assert entity_n == 0
                 positions.append(sub_ref.vertices[0])
             elif dim == 1:
-                positions.append(tuple(
-                    o + sympy.Rational((entity_n + 1) * a, dof_count + 1)
-                    for o, a in zip(sub_ref.origin, *sub_ref.axes)))
+                positions.append(
+                    tuple(
+                        o + sympy.Rational((entity_n + 1) * a, dof_count + 1)
+                        for o, a in zip(sub_ref.origin, *sub_ref.axes)
+                    )
+                )
             elif dim == 2:
                 ne = 1
                 while ne * (ne + 1) // 2 < dof_count:
@@ -812,9 +912,12 @@ class DirectElement(FiniteElement):
                 while entity_n >= ne - i:
                     entity_n -= ne - i
                     i += 1
-                positions.append(tuple(
-                    o + sympy.Rational((entity_n + 1) * a + (i + 1) * b, ne + 1)
-                    for o, a, b in zip(sub_ref.origin, *sub_ref.axes)))
+                positions.append(
+                    tuple(
+                        o + sympy.Rational((entity_n + 1) * a + (i + 1) * b, ne + 1)
+                        for o, a, b in zip(sub_ref.origin, *sub_ref.axes)
+                    )
+                )
             elif dim == 3:
                 ne = 1
                 while ne * (ne + 1) * (ne + 2) // 6 < n:
@@ -827,9 +930,12 @@ class DirectElement(FiniteElement):
                 while entity_n >= ne - j:
                     entity_n -= ne - j
                     j += 1
-                positions.append(tuple(
-                    o + sympy.Rational((entity_n + 1) * a + (j + 1) * b + (i + 1) * c, n + 1)
-                    for o, a, b, c in zip(sub_ref.origin, *sub_ref.axes)))
+                positions.append(
+                    tuple(
+                        o + sympy.Rational((entity_n + 1) * a + (j + 1) * b + (i + 1) * c, n + 1)
+                        for o, a, b, c in zip(sub_ref.origin, *sub_ref.axes)
+                    )
+                )
 
         return positions
 
@@ -866,10 +972,11 @@ class DirectElement(FiniteElement):
         return self._basis_functions
 
     def map_to_cell(
-        self, vertices_in: SetOfPointsInput,
+        self,
+        vertices_in: SetOfPointsInput,
         basis: typing.Optional[typing.List[AnyFunction]] = None,
         forward_map: typing.Optional[PointType] = None,
-        inverse_map: typing.Optional[PointType] = None
+        inverse_map: typing.Optional[PointType] = None,
     ) -> typing.List[AnyFunction]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
@@ -954,7 +1061,8 @@ class EnrichedElement(FiniteElement):
     _basis_functions: typing.Optional[typing.List[AnyFunction]]
 
     def __init__(
-        self, subelements: typing.List[FiniteElement],
+        self,
+        subelements: typing.List[FiniteElement],
     ):
         """Create an enriched element.
 
@@ -974,8 +1082,14 @@ class EnrichedElement(FiniteElement):
         self._basis_functions = None
         self._subelements = subelements
 
-        super().__init__(reference, order, sum(e.space_dim for e in subelements),
-                         domain_dim, range_dim, range_shape)
+        super().__init__(
+            reference,
+            order,
+            sum(e.space_dim for e in subelements),
+            domain_dim,
+            range_dim,
+            range_shape,
+        )
 
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
         """Get the numbers of the DOFs associated with the given entity.
@@ -1049,10 +1163,11 @@ class EnrichedElement(FiniteElement):
         return self._basis_functions
 
     def map_to_cell(
-        self, vertices_in: SetOfPointsInput,
+        self,
+        vertices_in: SetOfPointsInput,
         basis: typing.Optional[typing.List[AnyFunction]] = None,
         forward_map: typing.Optional[PointType] = None,
-        inverse_map: typing.Optional[PointType] = None
+        inverse_map: typing.Optional[PointType] = None,
     ) -> typing.List[AnyFunction]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 

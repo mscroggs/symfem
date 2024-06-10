@@ -26,7 +26,7 @@ def test_stiffness_matrix():
         [1, -half, -half, 0],
         [-half, 1, 0, -half],
         [-half, 0, 1, -half],
-        [0, -half, -half, 1]
+        [0, -half, -half, 1],
     ]
 
     for row1, row2 in zip(matrix, actual_matrix):

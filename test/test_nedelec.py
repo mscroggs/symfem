@@ -12,16 +12,13 @@ def test_nedelec_2d():
 
     tdim = 2
 
-    for i, edge in enumerate([
-        ((1, 0), (0, 1)),
-        ((0, 0), (0, 1)),
-        ((0, 0), (1, 0))
-    ]):
+    for i, edge in enumerate([((1, 0), (0, 1)), ((0, 0), (0, 1)), ((0, 0), (1, 0))]):
         for j, f in enumerate(space.get_basis_functions()):
             norm = sympy.sqrt(sum((edge[0][i] - edge[1][i]) ** 2 for i in range(tdim)))
             tangent = tuple((edge[1][i] - edge[0][i]) / norm for i in range(tdim))
-            line = sympy.Curve([(1 - k) * edge[0][i] + k * edge[1][i] for i in range(tdim)],
-                               (k, 0, 1))
+            line = sympy.Curve(
+                [(1 - k) * edge[0][i] + k * edge[1][i] for i in range(tdim)], (k, 0, 1)
+            )
 
             result = sympy.line_integrate(f.dot(tangent), line, x[:tdim])
             if i == j:
@@ -36,14 +33,16 @@ def test_nedelec_3d():
 
     tdim = 3
 
-    for i, edge in enumerate([
-        ((0, 1, 0), (0, 0, 1)),
-        ((1, 0, 0), (0, 0, 1)),
-        ((1, 0, 0), (0, 1, 0)),
-        ((0, 0, 0), (0, 0, 1)),
-        ((0, 0, 0), (0, 1, 0)),
-        ((0, 0, 0), (1, 0, 0))
-    ]):
+    for i, edge in enumerate(
+        [
+            ((0, 1, 0), (0, 0, 1)),
+            ((1, 0, 0), (0, 0, 1)),
+            ((1, 0, 0), (0, 1, 0)),
+            ((0, 0, 0), (0, 0, 1)),
+            ((0, 0, 0), (0, 1, 0)),
+            ((0, 0, 0), (1, 0, 0)),
+        ]
+    ):
         for j, f in enumerate(space.get_basis_functions()):
             norm = sympy.sqrt(sum((edge[0][i] - edge[1][i]) ** 2 for i in range(tdim)))
             tangent = tuple((edge[1][i] - edge[0][i]) / norm for i in range(tdim))

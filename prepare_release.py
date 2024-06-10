@@ -3,8 +3,7 @@
 import argparse
 
 parser = argparse.ArgumentParser(description="Build defelement.com")
-parser.add_argument('--version', metavar='version',
-                    default="main", help="Symfem version.")
+parser.add_argument("--version", metavar="version", default="main", help="Symfem version.")
 version = parser.parse_args().version
 if version != "main":
     version = "v" + version

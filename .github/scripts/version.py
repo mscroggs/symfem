@@ -35,22 +35,35 @@ else:
         raise RuntimeError("CHANGELOG_SINCE_LAST_VERSION.md should not be empty")
 
     symfem.create_git_tag_and_release(
-        f"v{version}", f"Version {version}", f"Version {version}", changes,
-        branch.commit.sha, "commit")
+        f"v{version}",
+        f"Version {version}",
+        f"Version {version}",
+        changes,
+        branch.commit.sha,
+        "commit",
+    )
 
     old_changelog_file = symfem.get_contents("CHANGELOG.md", new_branch.commit.sha)
     old_changes = old_changelog_file.decoded_content.decode("utf8").strip()
 
-    new_changelog = (f"# Version {version} ({datetime.now().strftime('%d %B %Y')})\n\n"
-                     f"{changes}\n\n{old_changes}\n")
+    new_changelog = (
+        f"# Version {version} ({datetime.now().strftime('%d %B %Y')})\n\n"
+        f"{changes}\n\n{old_changes}\n"
+    )
 
     symfem.update_file(
-        "CHANGELOG.md", "Update CHANGELOG.md", new_changelog, sha=old_changelog_file.sha,
-        branch=f"v{version}-changelog"
+        "CHANGELOG.md",
+        "Update CHANGELOG.md",
+        new_changelog,
+        sha=old_changelog_file.sha,
+        branch=f"v{version}-changelog",
     )
     symfem.update_file(
-        "CHANGELOG_SINCE_LAST_VERSION.md", "Reset CHANGELOG_SINCE_LAST_VERSION.md", "",
-        sha=changelog_file.sha, branch=f"v{version}-changelog"
+        "CHANGELOG_SINCE_LAST_VERSION.md",
+        "Reset CHANGELOG_SINCE_LAST_VERSION.md",
+        "",
+        sha=changelog_file.sha,
+        branch=f"v{version}-changelog",
     )
 
     symfem.create_pull(

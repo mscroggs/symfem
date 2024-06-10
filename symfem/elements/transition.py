@@ -5,23 +5,29 @@ from itertools import product
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput, ScalarFunction
-from ..polynomials import polynomial_set_1d
-from ..quadrature import get_quadrature
-from ..references import Reference
-from ..symbols import x
-from .lagrange import Lagrange
+from symfem.finite_element import CiarletElement
+from symfem.functionals import ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput, ScalarFunction
+from symfem.polynomials import polynomial_set_1d
+from symfem.quadrature import get_quadrature
+from symfem.references import Reference
+from symfem.symbols import x
+from symfem.elements.lagrange import Lagrange
+
+__all__ = ["Transition"]
 
 
 class Transition(CiarletElement):
     """Transition finite element."""
 
-    def __init__(self, reference: Reference, order: int,
-                 edge_orders: typing.Optional[typing.List[int]] = None,
-                 face_orders: typing.Optional[typing.List[int]] = None,
-                 variant: str = "equispaced"):
+    def __init__(
+        self,
+        reference: Reference,
+        order: int,
+        edge_orders: typing.Optional[typing.List[int]] = None,
+        face_orders: typing.Optional[typing.List[int]] = None,
+        variant: str = "equispaced",
+    ):
         """Create the element.
 
         Args:
@@ -88,8 +94,9 @@ class Transition(CiarletElement):
                         for i, f in enumerate(bubble_space.get_basis_functions()):
                             if i in reference.edges[e_n]:
                                 bubble *= f
-                    space = Lagrange(entity.default_reference(), entity_order - edim - 1,
-                                     variant=variant)
+                    space = Lagrange(
+                        entity.default_reference(), entity_order - edim - 1, variant=variant
+                    )
                     variables = []
                     origin = ref_entity.vertices[0]
                     used = []
@@ -116,8 +123,11 @@ class Transition(CiarletElement):
         Returns:
             Keyword argument dictionary
         """
-        return {"variant": self.variant, "face_orders": self.face_orders,
-                "edge_orders": self.edge_orders}
+        return {
+            "variant": self.variant,
+            "face_orders": self.face_orders,
+            "edge_orders": self.edge_orders,
+        }
 
     names = ["transition"]
     references = ["triangle", "tetrahedron"]

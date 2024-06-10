@@ -9,22 +9,34 @@ import sympy
 
 import symfem.references
 
-from .geometry import PointType
-from .symbols import AxisVariables, AxisVariablesNotSingle, t, x
+from symfem.geometry import PointType
+from symfem.symbols import AxisVariables, AxisVariablesNotSingle, t, x
+
+__all__ = [
+    "SingleSympyFormat",
+    "SympyFormat",
+    "ValuesToSubstitute",
+    "AnyFunction",
+    "ScalarFunction",
+    "VectorFunction",
+    "MatrixFunction",
+    "FunctionInput",
+    "parse_function_input",
+    "parse_function_list_input",
+]
 
 SingleSympyFormat = typing.Union[
     sympy.core.expr.Expr,
     typing.Tuple[sympy.core.expr.Expr, ...],
-    sympy.matrices.dense.MutableDenseMatrix
+    sympy.matrices.dense.MutableDenseMatrix,
 ]
 SympyFormat = typing.Union[
     SingleSympyFormat,
-    typing.Dict[typing.Tuple[typing.Tuple[sympy.core.expr.Expr, ...], ...], SingleSympyFormat]
+    typing.Dict[typing.Tuple[typing.Tuple[sympy.core.expr.Expr, ...], ...], SingleSympyFormat],
 ]
 _ValuesToSubstitute = typing.Union[
-    typing.Tuple[typing.Any, ...],
-    typing.List[typing.Any],
-    typing.Any]
+    typing.Tuple[typing.Any, ...], typing.List[typing.Any], typing.Any
+]
 
 
 def _to_sympy_format(item: typing.Any) -> SympyFormat:
@@ -81,9 +93,7 @@ def _check_equal(first: SympyFormat, second: SympyFormat) -> bool:
                 return False
         return True
 
-    if isinstance(
-        first, sympy.matrices.dense.MutableDenseMatrix
-    ) and isinstance(
+    if isinstance(first, sympy.matrices.dense.MutableDenseMatrix) and isinstance(
         second, sympy.matrices.dense.MutableDenseMatrix
     ):
         if first.rows != second.rows:
@@ -291,8 +301,10 @@ class AnyFunction(ABC):
 
     @abstractmethod
     def integral(
-        self, domain: symfem.references.Reference, vars: AxisVariablesNotSingle = x,
-        dummy_vars: AxisVariablesNotSingle = t
+        self,
+        domain: symfem.references.Reference,
+        vars: AxisVariablesNotSingle = x,
+        dummy_vars: AxisVariablesNotSingle = t,
     ) -> ScalarFunction:
         """Compute the integral of the function.
 
@@ -331,11 +343,14 @@ class AnyFunction(ABC):
         """Iterate through components of vector function."""
         raise TypeError(f"'{self.__class__.__name__}' object is not iterable")
 
-    def integrate(self, *limits: typing.Tuple[
-        sympy.core.symbol.Symbol,
-        typing.Union[int, sympy.core.expr.Expr],
-        typing.Union[int, sympy.core.expr.Expr]
-    ]):
+    def integrate(
+        self,
+        *limits: typing.Tuple[
+            sympy.core.symbol.Symbol,
+            typing.Union[int, sympy.core.expr.Expr],
+            typing.Union[int, sympy.core.expr.Expr],
+        ],
+    ):
         """Integrate the function.
 
         Args:
@@ -372,12 +387,16 @@ class AnyFunction(ABC):
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'shape'")
 
     def plot(
-        self, reference: symfem.references.Reference, filename: typing.Union[str, typing.List[str]],
+        self,
+        reference: symfem.references.Reference,
+        filename: typing.Union[str, typing.List[str]],
         dof_point: typing.Optional[PointType] = None,
         dof_direction: typing.Optional[PointType] = None,
         dof_entity: typing.Optional[typing.Tuple[int, int]] = None,
-        dof_n: typing.Optional[int] = None, value_scale: sympy.core.expr.Expr = sympy.Integer(1),
-        plot_options: typing.Dict[str, typing.Any] = {}, **kwargs: typing.Any
+        dof_n: typing.Optional[int] = None,
+        value_scale: sympy.core.expr.Expr = sympy.Integer(1),
+        plot_options: typing.Dict[str, typing.Any] = {},
+        **kwargs: typing.Any,
     ):
         """Plot the function.
 
@@ -392,11 +411,11 @@ class AnyFunction(ABC):
             plot_options: Options for the plot
             kwargs: Keyword arguments
         """
-        from .plotting import Picture, colors
+        from symfem.plotting import Picture, colors
 
         extra: typing.Tuple[int, ...] = tuple()
         if self.is_scalar:
-            extra = (0, )
+            extra = (0,)
 
         img = Picture(**kwargs)
 
@@ -417,7 +436,9 @@ class AnyFunction(ABC):
                         c = colors.BLUE
                     img.add_line(
                         reference.vertices[reference.edges[entity][0]] + extra,
-                        reference.vertices[reference.edges[entity][1]] + extra, c)
+                        reference.vertices[reference.edges[entity][1]] + extra,
+                        c,
+                    )
 
             for dim, entity in ze:
                 if dim == reference.tdim:
@@ -426,8 +447,9 @@ class AnyFunction(ABC):
             if (dim, entity) in ze:
                 if dof_direction is not None:
                     assert dof_point is not None and dof_n is not None
-                    img.add_dof_arrow(dof_point + extra, dof_direction + extra, dof_n,
-                                      colors.PURPLE, bold=False)
+                    img.add_dof_arrow(
+                        dof_point + extra, dof_direction + extra, dof_n, colors.PURPLE, bold=False
+                    )
                 elif dof_point is not None:
                     assert dof_n is not None
                     img.add_dof_marker(dof_point + extra, dof_n, colors.PURPLE, bold=False)
@@ -435,8 +457,11 @@ class AnyFunction(ABC):
         img.save(filename, plot_options=plot_options)
 
     def plot_values(
-        self, reference: symfem.references.Reference, img: typing.Any,
-        value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
+        self,
+        reference: symfem.references.Reference,
+        img: typing.Any,
+        value_scale: sympy.core.expr.Expr = sympy.Integer(1),
+        n: int = 6,
     ):
         """Plot the function's values.
 
@@ -517,8 +542,10 @@ class ScalarFunction(AnyFunction):
         else:
             self._f = f
         assert isinstance(self._f, sympy.core.expr.Expr)
-        self._plot_beziers: typing.Dict[typing.Tuple[symfem.references.Reference, int], typing.List[
-            typing.Tuple[PointType, PointType, PointType, PointType]]] = {}
+        self._plot_beziers: typing.Dict[
+            typing.Tuple[symfem.references.Reference, int],
+            typing.List[typing.Tuple[PointType, PointType, PointType, PointType]],
+        ] = {}
 
     def __add__(self, other: typing.Any) -> ScalarFunction:
         """Add."""
@@ -594,7 +621,7 @@ class ScalarFunction(AnyFunction):
 
     def __pow__(self, other: typing.Any) -> ScalarFunction:
         """Raise to a power."""
-        return ScalarFunction(self._f ** other)
+        return ScalarFunction(self._f**other)
 
     def __neg__(self) -> ScalarFunction:
         """Negate."""
@@ -689,9 +716,9 @@ class ScalarFunction(AnyFunction):
         Returns:
             The jacobian
         """
-        return MatrixFunction(tuple(
-            tuple(self.jacobian_component((i, j)) for j in range(dim))
-            for i in range(dim)))
+        return MatrixFunction(
+            tuple(tuple(self.jacobian_component((i, j)) for j in range(dim)) for i in range(dim))
+        )
 
     def dot(self, other_in: FunctionInput) -> ScalarFunction:
         """Compute the dot product with another function.
@@ -755,8 +782,10 @@ class ScalarFunction(AnyFunction):
         return ScalarFunction(abs(self._f))
 
     def integral(
-        self, domain: symfem.references.Reference, vars: AxisVariablesNotSingle = x,
-        dummy_vars: AxisVariablesNotSingle = t
+        self,
+        domain: symfem.references.Reference,
+        vars: AxisVariablesNotSingle = x,
+        dummy_vars: AxisVariablesNotSingle = t,
     ) -> ScalarFunction:
         """Compute the integral of the function.
 
@@ -785,11 +814,14 @@ class ScalarFunction(AnyFunction):
         out *= domain.jacobian()
         return ScalarFunction(out.integrate(*limits))
 
-    def integrate(self, *limits: typing.Tuple[
-        sympy.core.symbol.Symbol,
-        typing.Union[int, sympy.core.expr.Expr],
-        typing.Union[int, sympy.core.expr.Expr]
-    ]):
+    def integrate(
+        self,
+        *limits: typing.Tuple[
+            sympy.core.symbol.Symbol,
+            typing.Union[int, sympy.core.expr.Expr],
+            typing.Union[int, sympy.core.expr.Expr],
+        ],
+    ):
         """Integrate the function.
 
         Args:
@@ -801,8 +833,11 @@ class ScalarFunction(AnyFunction):
         return ScalarFunction(self._f.integrate(*limits))
 
     def plot_values(
-        self, reference: symfem.references.Reference, img: typing.Any,
-        value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
+        self,
+        reference: symfem.references.Reference,
+        img: typing.Any,
+        value_scale: sympy.core.expr.Expr = sympy.Integer(1),
+        n: int = 6,
     ):
         """Plot the function's values.
 
@@ -812,7 +847,8 @@ class ScalarFunction(AnyFunction):
             value_scale: The scale factor for the function values
             n: The number of points per side for plotting
         """
-        from .plotting import Picture, colors
+        from symfem.plotting import Picture, colors
+
         assert isinstance(img, Picture)
 
         if (reference, n) not in self._plot_beziers:
@@ -840,9 +876,14 @@ class ScalarFunction(AnyFunction):
                 dj = deriv.subs(x, pj).dot(d_pj - pts[j]).as_sympy()
                 assert isinstance(di, sympy.core.expr.Expr)
                 assert isinstance(dj, sympy.core.expr.Expr)
-                self._plot_beziers[(reference, n)].append((
-                    tuple(pi) + (evals[i], ), tuple(d_pi) + (evals[i] + di * value_scale, ),
-                    tuple(d_pj) + (evals[j] + dj * value_scale, ), tuple(pj) + (evals[j], )))
+                self._plot_beziers[(reference, n)].append(
+                    (
+                        tuple(pi) + (evals[i],),
+                        tuple(d_pi) + (evals[i] + di * value_scale,),
+                        tuple(d_pj) + (evals[j] + dj * value_scale,),
+                        tuple(pj) + (evals[j],),
+                    )
+                )
 
         for s, m1, m2, e in self._plot_beziers[(reference, n)]:
             img.add_bezier(s, m1, m2, e, colors.ORANGE)
@@ -895,16 +936,20 @@ class VectorFunction(AnyFunction):
 
     _vec: tuple[ScalarFunction, ...]
 
-    def __init__(self, vec: typing.Union[
-        typing.Tuple[typing.Union[AnyFunction, int, sympy.core.expr.Expr], ...],
-        typing.List[typing.Union[AnyFunction, int, sympy.core.expr.Expr]]
-    ]):
+    def __init__(
+        self,
+        vec: typing.Union[
+            typing.Tuple[typing.Union[AnyFunction, int, sympy.core.expr.Expr], ...],
+            typing.List[typing.Union[AnyFunction, int, sympy.core.expr.Expr]],
+        ],
+    ):
         """Create a vector-valued function.
 
         Args:
             vec: The sympy representation of the function.
         """
-        from .basis_functions import BasisFunction
+        from symfem.basis_functions import BasisFunction
+
         super().__init__(vector=True)
         vec_l = []
         for i in vec:
@@ -919,8 +964,12 @@ class VectorFunction(AnyFunction):
         for i in self._vec:
             assert i.is_scalar
 
-        self._plot_arrows: typing.Dict[typing.Tuple[symfem.references.Reference, int], typing.List[
-            typing.Tuple[typing.Tuple[sympy.core.expr.Expr, ...], VectorFunction, float]]] = {}
+        self._plot_arrows: typing.Dict[
+            typing.Tuple[symfem.references.Reference, int],
+            typing.List[
+                typing.Tuple[typing.Tuple[sympy.core.expr.Expr, ...], VectorFunction, float]
+            ],
+        ] = {}
 
     def __len__(self):
         """Get the length of the vector."""
@@ -933,7 +982,7 @@ class VectorFunction(AnyFunction):
         Returns:
             The value shape
         """
-        return (len(self), )
+        return (len(self),)
 
     def __getitem__(self, key) -> typing.Union[ScalarFunction, VectorFunction]:
         """Get a component or slice of the function."""
@@ -1027,9 +1076,9 @@ class VectorFunction(AnyFunction):
     def __pow__(self, other: typing.Any) -> VectorFunction:
         """Raise to a power."""
         if isinstance(other, ScalarFunction):
-            return VectorFunction(tuple(i._f ** other._f for i in self._vec))
+            return VectorFunction(tuple(i._f**other._f for i in self._vec))
         if isinstance(other, (int, sympy.core.expr.Expr)):
-            return VectorFunction(tuple(i._f ** other for i in self._vec))
+            return VectorFunction(tuple(i._f**other for i in self._vec))
         return NotImplemented
 
     def as_sympy(self) -> SympyFormat:
@@ -1046,9 +1095,11 @@ class VectorFunction(AnyFunction):
         Returns:
             A TeX string
         """
-        return "\\left(\\begin{array}{c}" + "\\\\".join([
-            "\\displaystyle " + i.as_tex() for i in self._vec
-        ]) + "\\end{array}\\right)"
+        return (
+            "\\left(\\begin{array}{c}"
+            + "\\\\".join(["\\displaystyle " + i.as_tex() for i in self._vec])
+            + "\\end{array}\\right)"
+        )
 
     def subs(self, vars: AxisVariables, values: ValuesToSubstitute) -> VectorFunction:
         """Substitute values into the function.
@@ -1144,9 +1195,13 @@ class VectorFunction(AnyFunction):
             return self[0] * other[1] - self[1] * other[0]
         else:
             assert len(self) == 3
-            return VectorFunction([self[1] * other[2] - self[2] * other[1],
-                                   self[2] * other[0] - self[0] * other[2],
-                                   self[0] * other[1] - self[1] * other[0]])
+            return VectorFunction(
+                [
+                    self[1] * other[2] - self[2] * other[1],
+                    self[2] * other[0] - self[0] * other[2],
+                    self[0] * other[1] - self[1] * other[0],
+                ]
+            )
 
     def div(self) -> ScalarFunction:
         """Compute the div of the function.
@@ -1174,11 +1229,13 @@ class VectorFunction(AnyFunction):
             The curl
         """
         assert len(self._vec) == 3
-        return VectorFunction([
-            self._vec[2].diff(x[1]) - self._vec[1].diff(x[2]),
-            self._vec[0].diff(x[2]) - self._vec[2].diff(x[0]),
-            self._vec[1].diff(x[0]) - self._vec[0].diff(x[1])
-        ])
+        return VectorFunction(
+            [
+                self._vec[2].diff(x[1]) - self._vec[1].diff(x[2]),
+                self._vec[0].diff(x[2]) - self._vec[2].diff(x[0]),
+                self._vec[1].diff(x[0]) - self._vec[0].diff(x[1]),
+            ]
+        )
 
     def norm(self) -> ScalarFunction:
         """Compute the norm of the function.
@@ -1188,12 +1245,14 @@ class VectorFunction(AnyFunction):
         """
         a = sympy.Integer(0)
         for i in self._vec:
-            a += i._f ** 2
+            a += i._f**2
         return ScalarFunction(sympy.sqrt(a))
 
     def integral(
-        self, domain: symfem.references.Reference, vars: AxisVariablesNotSingle = x,
-        dummy_vars: AxisVariablesNotSingle = t
+        self,
+        domain: symfem.references.Reference,
+        vars: AxisVariablesNotSingle = x,
+        dummy_vars: AxisVariablesNotSingle = t,
     ) -> ScalarFunction:
         """Compute the integral of the function.
 
@@ -1221,8 +1280,11 @@ class VectorFunction(AnyFunction):
             raise StopIteration
 
     def plot_values(
-        self, reference: symfem.references.Reference, img: typing.Any,
-        value_scale: sympy.core.expr.Expr = sympy.Integer(1), n: int = 6
+        self,
+        reference: symfem.references.Reference,
+        img: typing.Any,
+        value_scale: sympy.core.expr.Expr = sympy.Integer(1),
+        n: int = 6,
     ):
         """Plot the function's values.
 
@@ -1232,7 +1294,8 @@ class VectorFunction(AnyFunction):
             value_scale: The scale factor for the function values
             n: The number of points per side for plotting
         """
-        from .plotting import Picture, colors
+        from symfem.plotting import Picture, colors
+
         assert isinstance(img, Picture)
 
         if (reference, n) not in self._plot_arrows:
@@ -1278,20 +1341,25 @@ class MatrixFunction(AnyFunction):
 
     _mat: typing.Tuple[typing.Tuple[ScalarFunction, ...], ...]
 
-    def __init__(self, mat: typing.Union[
-        typing.Tuple[typing.Tuple[typing.Union[AnyFunction, int, sympy.core.expr.Expr],
-                                  ...], ...],
-        typing.Tuple[typing.List[typing.Union[AnyFunction, int, sympy.core.expr.Expr]], ...],
-        typing.List[typing.Tuple[typing.Union[AnyFunction, int, sympy.core.expr.Expr], ...]],
-        typing.List[typing.List[typing.Union[AnyFunction, int, sympy.core.expr.Expr]]],
-        sympy.matrices.dense.MutableDenseMatrix
-    ]):
+    def __init__(
+        self,
+        mat: typing.Union[
+            typing.Tuple[
+                typing.Tuple[typing.Union[AnyFunction, int, sympy.core.expr.Expr], ...], ...
+            ],
+            typing.Tuple[typing.List[typing.Union[AnyFunction, int, sympy.core.expr.Expr]], ...],
+            typing.List[typing.Tuple[typing.Union[AnyFunction, int, sympy.core.expr.Expr], ...]],
+            typing.List[typing.List[typing.Union[AnyFunction, int, sympy.core.expr.Expr]]],
+            sympy.matrices.dense.MutableDenseMatrix,
+        ],
+    ):
         """Create a matrix-valued function.
 
         Args:
             mat: The sympy representation of the function.
         """
-        from .basis_functions import BasisFunction
+        from symfem.basis_functions import BasisFunction
+
         super().__init__(matrix=True)
         if isinstance(mat, sympy.matrices.dense.MutableDenseMatrix):
             mat = tuple(tuple(mat[i, j] for j in range(mat.cols)) for i in range(mat.rows))
@@ -1358,8 +1426,12 @@ class MatrixFunction(AnyFunction):
         """Add."""
         if isinstance(other, MatrixFunction):
             assert self.shape == other.shape
-            return MatrixFunction(tuple(tuple(
-                ii._f + jj._f for ii, jj in zip(i, j)) for i, j in zip(self._mat, other._mat)))
+            return MatrixFunction(
+                tuple(
+                    tuple(ii._f + jj._f for ii, jj in zip(i, j))
+                    for i, j in zip(self._mat, other._mat)
+                )
+            )
         if isinstance(other, (list, tuple)):
             data = []
             for i, j in zip(self._mat, other):
@@ -1369,16 +1441,24 @@ class MatrixFunction(AnyFunction):
         if isinstance(other, sympy.matrices.dense.MutableDenseMatrix):
             assert other.rows == self.shape[0]
             assert other.cols == self.shape[1]
-            return MatrixFunction([[self._mat[i][j]._f + other[i, j]
-                                    for j in range(self.shape[1])] for i in range(self.shape[0])])
+            return MatrixFunction(
+                [
+                    [self._mat[i][j]._f + other[i, j] for j in range(self.shape[1])]
+                    for i in range(self.shape[0])
+                ]
+            )
         return NotImplemented
 
     def __radd__(self, other: typing.Any) -> MatrixFunction:
         """Add."""
         if isinstance(other, MatrixFunction):
             assert self.shape == other.shape
-            return MatrixFunction(tuple(tuple(
-                ii._f + jj._f for ii, jj in zip(i, j)) for i, j in zip(other._mat, self._mat)))
+            return MatrixFunction(
+                tuple(
+                    tuple(ii._f + jj._f for ii, jj in zip(i, j))
+                    for i, j in zip(other._mat, self._mat)
+                )
+            )
         if isinstance(other, (list, tuple)):
             data = []
             for i, j in zip(other, self._mat):
@@ -1388,16 +1468,24 @@ class MatrixFunction(AnyFunction):
         if isinstance(other, sympy.matrices.dense.MutableDenseMatrix):
             assert other.rows == self.shape[0]
             assert other.cols == self.shape[1]
-            return MatrixFunction([[other[i, j] + self._mat[i][j]._f
-                                    for j in range(self.shape[1])] for i in range(self.shape[0])])
+            return MatrixFunction(
+                [
+                    [other[i, j] + self._mat[i][j]._f for j in range(self.shape[1])]
+                    for i in range(self.shape[0])
+                ]
+            )
         return NotImplemented
 
     def __sub__(self, other: typing.Any) -> MatrixFunction:
         """Subtract."""
         if isinstance(other, MatrixFunction):
             assert self.shape == other.shape
-            return MatrixFunction(tuple(tuple(
-                ii._f - jj._f for ii, jj in zip(i, j)) for i, j in zip(self._mat, other._mat)))
+            return MatrixFunction(
+                tuple(
+                    tuple(ii._f - jj._f for ii, jj in zip(i, j))
+                    for i, j in zip(self._mat, other._mat)
+                )
+            )
         if isinstance(other, (list, tuple)):
             data = []
             for i, j in zip(self._mat, other):
@@ -1407,16 +1495,24 @@ class MatrixFunction(AnyFunction):
         if isinstance(other, sympy.matrices.dense.MutableDenseMatrix):
             assert other.rows == self.shape[0]
             assert other.cols == self.shape[1]
-            return MatrixFunction([[self._mat[i][j]._f - other[i, j]
-                                    for j in range(self.shape[1])] for i in range(self.shape[0])])
+            return MatrixFunction(
+                [
+                    [self._mat[i][j]._f - other[i, j] for j in range(self.shape[1])]
+                    for i in range(self.shape[0])
+                ]
+            )
         return NotImplemented
 
     def __rsub__(self, other: typing.Any) -> MatrixFunction:
         """Subtract."""
         if isinstance(other, MatrixFunction):
             assert self.shape == other.shape
-            return MatrixFunction(tuple(tuple(
-                ii._f - jj._f for ii, jj in zip(i, j)) for i, j in zip(other._mat, self._mat)))
+            return MatrixFunction(
+                tuple(
+                    tuple(ii._f - jj._f for ii, jj in zip(i, j))
+                    for i, j in zip(other._mat, self._mat)
+                )
+            )
         if isinstance(other, (list, tuple)):
             data = []
             for i, j in zip(other, self._mat):
@@ -1426,8 +1522,12 @@ class MatrixFunction(AnyFunction):
         if isinstance(other, sympy.matrices.dense.MutableDenseMatrix):
             assert other.rows == self.shape[0]
             assert other.cols == self.shape[1]
-            return MatrixFunction([[other[i, j] - self._mat[i][j]._f
-                                    for j in range(self.shape[1])] for i in range(self.shape[0])])
+            return MatrixFunction(
+                [
+                    [other[i, j] - self._mat[i][j]._f for j in range(self.shape[1])]
+                    for i in range(self.shape[0])
+                ]
+            )
         return NotImplemented
 
     def __neg__(self) -> MatrixFunction:
@@ -1466,26 +1566,32 @@ class MatrixFunction(AnyFunction):
         """Multiply."""
         if isinstance(other, MatrixFunction):
             assert other.shape[0] == self.shape[1]
-            return MatrixFunction(tuple(
-                tuple(self.row(i).dot(other.col(j)) for j in range(other.shape[1]))
-                for i in range(self.shape[0])))
+            return MatrixFunction(
+                tuple(
+                    tuple(self.row(i).dot(other.col(j)) for j in range(other.shape[1]))
+                    for i in range(self.shape[0])
+                )
+            )
         return NotImplemented
 
     def __rmatmul__(self, other: typing.Any) -> MatrixFunction:
         """Multiply."""
         if isinstance(other, MatrixFunction):
             assert self.shape[0] == other.shape[1]
-            return MatrixFunction(tuple(
-                tuple(other.row(i).dot(self.col(j)) for j in range(self.shape[1]))
-                for i in range(other.shape[0])))
+            return MatrixFunction(
+                tuple(
+                    tuple(other.row(i).dot(self.col(j)) for j in range(self.shape[1]))
+                    for i in range(other.shape[0])
+                )
+            )
         return NotImplemented
 
     def __pow__(self, other: typing.Any) -> MatrixFunction:
         """Raise to a power."""
         if isinstance(other, ScalarFunction):
-            return MatrixFunction(tuple(tuple(j._f ** other._f for j in i) for i in self._mat))
+            return MatrixFunction(tuple(tuple(j._f**other._f for j in i) for i in self._mat))
         if isinstance(other, (int, sympy.core.expr.Expr)):
-            return MatrixFunction(tuple(tuple(j._f ** other for j in i) for i in self._mat))
+            return MatrixFunction(tuple(tuple(j._f**other for j in i) for i in self._mat))
         return NotImplemented
 
     def as_sympy(self) -> SympyFormat:
@@ -1505,10 +1611,9 @@ class MatrixFunction(AnyFunction):
         out = "\\left(\\begin{array}{"
         out += "c" * self.shape[1]
         out += "}"
-        out += "\\\\".join([
-            "&".join(["\\displaystyle " + j.as_tex() for j in i])
-            for i in self._mat
-        ])
+        out += "\\\\".join(
+            ["&".join(["\\displaystyle " + j.as_tex() for j in i]) for i in self._mat]
+        )
         out += "\\end{array}\\right)"
         return out
 
@@ -1534,9 +1639,12 @@ class MatrixFunction(AnyFunction):
         Returns:
             The differentiated function
         """
-        return MatrixFunction(tuple(
-            tuple(self._mat[i][j].diff(variable) for j in range(self.shape[1]))
-            for i in range(self.shape[0])))
+        return MatrixFunction(
+            tuple(
+                tuple(self._mat[i][j].diff(variable) for j in range(self.shape[1]))
+                for i in range(self.shape[0])
+            )
+        )
 
     def directional_derivative(self, direction: PointType):
         """Compute a directional derivative.
@@ -1638,8 +1746,10 @@ class MatrixFunction(AnyFunction):
         raise NotImplementedError()
 
     def integral(
-        self, domain: symfem.references.Reference, vars: AxisVariablesNotSingle = x,
-        dummy_vars: AxisVariablesNotSingle = t
+        self,
+        domain: symfem.references.Reference,
+        vars: AxisVariablesNotSingle = x,
+        dummy_vars: AxisVariablesNotSingle = t,
     ) -> ScalarFunction:
         """Compute the integral of the function.
 
@@ -1702,14 +1812,16 @@ class MatrixFunction(AnyFunction):
 
 FunctionInput = typing.Union[
     AnyFunction,
-    sympy.core.expr.Expr, int,
+    sympy.core.expr.Expr,
+    int,
     typing.Tuple[typing.Union[sympy.core.expr.Expr, int, AnyFunction], ...],
     typing.List[typing.Union[sympy.core.expr.Expr, int, AnyFunction]],
     typing.Tuple[typing.Tuple[typing.Union[sympy.core.expr.Expr, int, AnyFunction], ...], ...],
     typing.Tuple[typing.List[typing.Union[sympy.core.expr.Expr, int, AnyFunction]], ...],
     typing.List[typing.Tuple[typing.Union[sympy.core.expr.Expr, int, AnyFunction], ...]],
     typing.List[typing.List[typing.Union[sympy.core.expr.Expr, int, AnyFunction]]],
-    sympy.matrices.dense.MutableDenseMatrix]
+    sympy.matrices.dense.MutableDenseMatrix,
+]
 
 
 def parse_function_input(f: FunctionInput) -> AnyFunction:
@@ -1742,7 +1854,7 @@ def parse_function_input(f: FunctionInput) -> AnyFunction:
 
 
 def parse_function_list_input(
-    functions: typing.Union[typing.List[FunctionInput], typing.Tuple[FunctionInput, ...]]
+    functions: typing.Union[typing.List[FunctionInput], typing.Tuple[FunctionInput, ...]],
 ) -> typing.List[AnyFunction]:
     """Parse a list of functions.
 

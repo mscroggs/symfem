@@ -3,13 +3,15 @@
 import typing
 from itertools import product
 
-from ..finite_element import CiarletElement
-from ..functionals import DerivativePointEvaluation, IntegralMoment, ListOfFunctionals
-from ..functions import FunctionInput
-from ..moments import make_integral_moment_dofs
-from ..polynomials import polynomial_set_1d
-from ..references import Reference
-from .lagrange import Lagrange
+from symfem.finite_element import CiarletElement
+from symfem.functionals import DerivativePointEvaluation, IntegralMoment, ListOfFunctionals
+from symfem.functions import FunctionInput
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import polynomial_set_1d
+from symfem.references import Reference
+from symfem.elements.lagrange import Lagrange
+
+__all__ = ["Taylor"]
 
 
 class Taylor(CiarletElement):
@@ -28,8 +30,11 @@ class Taylor(CiarletElement):
         )
         for i in product(range(order + 1), repeat=reference.tdim):
             if 1 <= sum(i) <= order:
-                dofs.append(DerivativePointEvaluation(
-                    reference, reference.midpoint(), i, entity=(reference.tdim, 0)))
+                dofs.append(
+                    DerivativePointEvaluation(
+                        reference, reference.midpoint(), i, entity=(reference.tdim, 0)
+                    )
+                )
 
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)

@@ -8,11 +8,13 @@ import typing
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput
-from ..polynomials import polynomial_set_1d
-from ..references import NonDefaultReferenceError, Reference
+from symfem.finite_element import CiarletElement
+from symfem.functionals import ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput
+from symfem.polynomials import polynomial_set_1d
+from symfem.references import NonDefaultReferenceError, Reference
+
+__all__ = ["FortinSoulie"]
 
 
 class FortinSoulie(CiarletElement):
@@ -38,7 +40,7 @@ class FortinSoulie(CiarletElement):
             PointEvaluation(reference, (0, third), entity=(1, 1)),
             PointEvaluation(reference, (0, two_thirds), entity=(1, 1)),
             PointEvaluation(reference, (sympy.Rational(1, 2), 0), entity=(1, 2)),
-            PointEvaluation(reference, (third, third), entity=(2, 0))
+            PointEvaluation(reference, (third, third), entity=(2, 0)),
         ]
 
         poly: typing.List[FunctionInput] = []

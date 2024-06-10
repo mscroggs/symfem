@@ -6,14 +6,16 @@ This element's definition appears in https://doi.org/10.1007/BF01396752
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import IntegralMoment, ListOfFunctionals, NormalIntegralMoment
-from ..functions import FunctionInput, VectorFunction
-from ..moments import make_integral_moment_dofs
-from ..polynomials import polynomial_set_vector
-from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
-from .dpc import DPC, VectorDPC
+from symfem.finite_element import CiarletElement
+from symfem.functionals import IntegralMoment, ListOfFunctionals, NormalIntegralMoment
+from symfem.functions import FunctionInput, VectorFunction
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import polynomial_set_vector
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import x
+from symfem.elements.dpc import DPC, VectorDPC
+
+__all__ = ["bddf_polyset", "BDDF"]
 
 
 def bddf_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]:
@@ -61,7 +63,7 @@ class BDDF(CiarletElement):
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
             facets=(NormalIntegralMoment, DPC, order, {"variant": variant}),
-            cells=(IntegralMoment, VectorDPC, order - 2, {"variant": variant})
+            cells=(IntegralMoment, VectorDPC, order - 2, {"variant": variant}),
         )
 
         self.variant = variant

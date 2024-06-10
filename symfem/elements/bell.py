@@ -5,12 +5,14 @@ This element's definition is given in https://doi.org/10.1002/nme.1620010108 (Be
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import DerivativePointEvaluation, ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput
-from ..polynomials import polynomial_set_1d
-from ..references import Reference
-from ..symbols import x
+from symfem.finite_element import CiarletElement
+from symfem.functionals import DerivativePointEvaluation, ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput
+from symfem.polynomials import polynomial_set_1d
+from symfem.references import Reference
+from symfem.symbols import x
+
+__all__ = ["Bell"]
 
 
 class Bell(CiarletElement):
@@ -38,9 +40,9 @@ class Bell(CiarletElement):
 
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, 4)
-        poly.append(x[0]**5 - x[1]**5)
-        poly.append(x[0]**3*x[1]**2 - x[0]**2*x[1]**3)
-        poly.append(5*x[0]**2*x[1]**3 - x[0]**5)
+        poly.append(x[0] ** 5 - x[1] ** 5)
+        poly.append(x[0] ** 3 * x[1] ** 2 - x[0] ** 2 * x[1] ** 3)
+        poly.append(5 * x[0] ** 2 * x[1] ** 3 - x[0] ** 5)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
