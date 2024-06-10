@@ -8,12 +8,12 @@ import typing
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import DerivativePointEvaluation, ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput, ScalarFunction
-from ..piecewise_functions import PiecewiseFunction
-from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
+from symfem.finite_element import CiarletElement
+from symfem.functionals import DerivativePointEvaluation, ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput, ScalarFunction
+from symfem.piecewise_functions import PiecewiseFunction
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import x
 
 
 class ReducedHsiehCloughTocher(CiarletElement):

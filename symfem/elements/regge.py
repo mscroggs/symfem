@@ -12,20 +12,20 @@ from itertools import product
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import (
+from symfem.finite_element import CiarletElement
+from symfem.functionals import (
     InnerProductIntegralMoment,
     IntegralAgainst,
     IntegralMoment,
     ListOfFunctionals,
     PointInnerProduct,
 )
-from ..functions import FunctionInput
-from ..moments import make_integral_moment_dofs
-from ..polynomials import polynomial_set_vector
-from ..references import Reference
-from ..symbols import t, x
-from .lagrange import Lagrange
+from symfem.functions import FunctionInput
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import polynomial_set_vector
+from symfem.references import Reference
+from symfem.symbols import t, x
+from symfem.elements.lagrange import Lagrange
 
 
 class Regge(CiarletElement):

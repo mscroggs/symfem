@@ -9,12 +9,12 @@ from itertools import product
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import IntegralAgainst, ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput
-from ..polynomials import orthonormal_basis, pyramid_polynomial_set_1d
-from ..quadrature import get_quadrature
-from ..references import NonDefaultReferenceError, Reference
+from symfem.finite_element import CiarletElement
+from symfem.functionals import IntegralAgainst, ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput
+from symfem.polynomials import orthonormal_basis, pyramid_polynomial_set_1d
+from symfem.quadrature import get_quadrature
+from symfem.references import NonDefaultReferenceError, Reference
 
 
 class Lagrange(CiarletElement):

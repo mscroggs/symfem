@@ -5,17 +5,22 @@ from itertools import product
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import DotPointEvaluation, IntegralAgainst, ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput
-from ..polynomials import (
+from symfem.finite_element import CiarletElement
+from symfem.functionals import (
+    DotPointEvaluation,
+    IntegralAgainst,
+    ListOfFunctionals,
+    PointEvaluation,
+)
+from symfem.functions import FunctionInput
+from symfem.polynomials import (
     lobatto_dual_basis,
     orthonormal_basis,
     polynomial_set_1d,
     polynomial_set_vector,
 )
-from ..quadrature import get_quadrature
-from ..references import Reference
+from symfem.quadrature import get_quadrature
+from symfem.references import Reference
 
 
 class Lagrange(CiarletElement):

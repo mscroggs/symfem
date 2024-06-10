@@ -6,11 +6,11 @@ This element's definition appears in http://contrails.iit.edu/reports/8569
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import DerivativePointEvaluation, ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput
-from ..polynomials import quolynomial_set_1d
-from ..references import Reference
+from symfem.finite_element import CiarletElement
+from symfem.functionals import DerivativePointEvaluation, ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput
+from symfem.polynomials import quolynomial_set_1d
+from symfem.references import Reference
 
 
 class BognerFoxSchmit(CiarletElement):

@@ -5,12 +5,12 @@ This element's definition is given in https://doi.org/10.1002/nme.1620010108 (Be
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import DerivativePointEvaluation, ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput
-from ..polynomials import polynomial_set_1d
-from ..references import Reference
-from ..symbols import x
+from symfem.finite_element import CiarletElement
+from symfem.functionals import DerivativePointEvaluation, ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput
+from symfem.polynomials import polynomial_set_1d
+from symfem.references import Reference
+from symfem.symbols import x
 
 
 class Bell(CiarletElement):

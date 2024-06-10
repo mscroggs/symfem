@@ -9,18 +9,18 @@ import typing
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import (
+from symfem.finite_element import CiarletElement
+from symfem.functionals import (
     InnerProductIntegralMoment,
     IntegralMoment,
     ListOfFunctionals,
     PointInnerProduct,
 )
-from ..functions import FunctionInput
-from ..polynomials import polynomial_set_vector
-from ..references import Reference
-from ..symbols import x
-from .lagrange import Lagrange
+from symfem.functions import FunctionInput
+from symfem.polynomials import polynomial_set_vector
+from symfem.references import Reference
+from symfem.symbols import x
+from symfem.elements.lagrange import Lagrange
 
 
 class ArnoldWinther(CiarletElement):

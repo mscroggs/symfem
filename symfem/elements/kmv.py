@@ -8,12 +8,12 @@ import typing
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import ListOfFunctionals, WeightedPointEvaluation
-from ..functions import FunctionInput
-from ..polynomials import polynomial_set_1d
-from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
+from symfem.finite_element import CiarletElement
+from symfem.functionals import ListOfFunctionals, WeightedPointEvaluation
+from symfem.functions import FunctionInput
+from symfem.polynomials import polynomial_set_1d
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import x
 
 
 def kmv_tri_polyset(m: int, mf: int) -> typing.List[FunctionInput]:

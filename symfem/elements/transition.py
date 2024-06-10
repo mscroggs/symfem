@@ -5,14 +5,14 @@ from itertools import product
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput, ScalarFunction
-from ..polynomials import polynomial_set_1d
-from ..quadrature import get_quadrature
-from ..references import Reference
-from ..symbols import x
-from .lagrange import Lagrange
+from symfem.finite_element import CiarletElement
+from symfem.functionals import ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput, ScalarFunction
+from symfem.polynomials import polynomial_set_1d
+from symfem.quadrature import get_quadrature
+from symfem.references import Reference
+from symfem.symbols import x
+from symfem.elements.lagrange import Lagrange
 
 
 class Transition(CiarletElement):

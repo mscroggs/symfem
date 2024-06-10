@@ -7,12 +7,12 @@ This element's definition appears in https://doi.org/10.1051/m2an/197307R300331
 import typing
 from itertools import product
 
-from ..finite_element import CiarletElement
-from ..functionals import ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput
-from ..polynomials import polynomial_set_1d
-from ..quadrature import get_quadrature
-from ..references import Reference
+from symfem.finite_element import CiarletElement
+from symfem.functionals import ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput
+from symfem.polynomials import polynomial_set_1d
+from symfem.quadrature import get_quadrature
+from symfem.references import Reference
 
 
 class CrouzeixRaviart(CiarletElement):

@@ -2,15 +2,20 @@
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import IntegralAgainst, IntegralMoment, ListOfFunctionals, TangentIntegralMoment
-from ..functions import FunctionInput
-from ..moments import make_integral_moment_dofs
-from ..polynomials import Hcurl_polynomials, polynomial_set_1d, polynomial_set_vector
-from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
-from .lagrange import Lagrange, VectorLagrange
-from .q import RaviartThomas as QRT
+from symfem.finite_element import CiarletElement
+from symfem.functionals import (
+    IntegralAgainst,
+    IntegralMoment,
+    ListOfFunctionals,
+    TangentIntegralMoment,
+)
+from symfem.functions import FunctionInput
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import Hcurl_polynomials, polynomial_set_1d, polynomial_set_vector
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import x
+from symfem.elements.lagrange import Lagrange, VectorLagrange
+from symfem.elements.q import RaviartThomas as QRT
 
 
 class Nedelec(CiarletElement):
@@ -24,7 +29,7 @@ class Nedelec(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
-        from .. import create_reference
+        from symfem import create_reference
 
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()

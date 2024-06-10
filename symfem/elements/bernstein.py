@@ -9,13 +9,13 @@ import typing
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import BaseFunctional, ListOfFunctionals, PointEvaluation
-from ..functions import AnyFunction, FunctionInput
-from ..geometry import PointType
-from ..polynomials import orthogonal_basis, polynomial_set_1d
-from ..references import Reference
-from ..symbols import AxisVariablesNotSingle, t, x
+from symfem.finite_element import CiarletElement
+from symfem.functionals import BaseFunctional, ListOfFunctionals, PointEvaluation
+from symfem.functions import AnyFunction, FunctionInput
+from symfem.geometry import PointType
+from symfem.polynomials import orthogonal_basis, polynomial_set_1d
+from symfem.references import Reference
+from symfem.symbols import AxisVariablesNotSingle, t, x
 
 
 def single_choose(n: int, k: int) -> sympy.core.expr.Expr:

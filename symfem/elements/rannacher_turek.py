@@ -6,11 +6,11 @@ This element's definition appears in https://doi.org/10.1002/num.1690080202
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput
-from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
+from symfem.finite_element import CiarletElement
+from symfem.functionals import ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import x
 
 
 class RannacherTurek(CiarletElement):

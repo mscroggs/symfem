@@ -9,8 +9,8 @@ from itertools import product
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import (
+from symfem.finite_element import CiarletElement
+from symfem.functionals import (
     DerivativeIntegralMoment,
     IntegralAgainst,
     ListOfFunctionals,
@@ -18,12 +18,12 @@ from ..functionals import (
     PointEvaluation,
     TangentIntegralMoment,
 )
-from ..functions import FunctionInput, ScalarFunction, VectorFunction
-from ..moments import make_integral_moment_dofs
-from ..polynomials import orthogonal_basis, quolynomial_set_1d, quolynomial_set_vector
-from ..references import NonDefaultReferenceError, Reference
-from ..symbols import t, x
-from .q import Q
+from symfem.functions import FunctionInput, ScalarFunction, VectorFunction
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import orthogonal_basis, quolynomial_set_1d, quolynomial_set_vector
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import t, x
+from symfem.elements.q import Q
 
 
 def p(k: int, v: sympy.core.symbol.Symbol) -> ScalarFunction:

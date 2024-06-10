@@ -8,11 +8,11 @@ import typing
 
 import sympy
 
-from ..finite_element import FiniteElement
-from ..functions import AnyFunction, FunctionInput, VectorFunction
-from ..geometry import PointType, SetOfPoints, SetOfPointsInput
-from ..piecewise_functions import PiecewiseFunction
-from ..references import DualPolygon, NonDefaultReferenceError
+from symfem.finite_element import FiniteElement
+from symfem.functions import AnyFunction, FunctionInput, VectorFunction
+from symfem.geometry import PointType, SetOfPoints, SetOfPointsInput
+from symfem.piecewise_functions import PiecewiseFunction
+from symfem.references import DualPolygon, NonDefaultReferenceError
 
 
 class DualCiarletElement(FiniteElement):

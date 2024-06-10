@@ -5,8 +5,8 @@ from itertools import product
 
 import sympy
 
-from ..finite_element import CiarletElement, FiniteElement
-from ..functionals import (
+from symfem.finite_element import CiarletElement, FiniteElement
+from symfem.functionals import (
     DotPointEvaluation,
     IntegralAgainst,
     IntegralMoment,
@@ -15,9 +15,9 @@ from ..functionals import (
     PointEvaluation,
     TangentIntegralMoment,
 )
-from ..functions import FunctionInput
-from ..moments import make_integral_moment_dofs
-from ..polynomials import (
+from symfem.functions import FunctionInput
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import (
     Hcurl_quolynomials,
     Hdiv_quolynomials,
     lobatto_dual_basis,
@@ -25,8 +25,8 @@ from ..polynomials import (
     quolynomial_set_1d,
     quolynomial_set_vector,
 )
-from ..quadrature import get_quadrature
-from ..references import NonDefaultReferenceError, Reference
+from symfem.quadrature import get_quadrature
+from symfem.references import NonDefaultReferenceError, Reference
 
 
 class Q(CiarletElement):

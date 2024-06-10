@@ -9,11 +9,11 @@ from itertools import product
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput
-from ..references import Reference
-from .lagrange import Lagrange
+from symfem.finite_element import CiarletElement
+from symfem.functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput
+from symfem.references import Reference
+from symfem.elements.lagrange import Lagrange
 
 
 class Bubble(CiarletElement):
@@ -27,7 +27,7 @@ class Bubble(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
-        from .. import create_element
+        from symfem import create_element
 
         p1 = create_element(reference.name, "Lagrange", 1, vertices=reference.vertices)
         bubble = 1

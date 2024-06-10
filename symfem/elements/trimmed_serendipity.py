@@ -7,20 +7,20 @@ These elements' definitions appear in https://doi.org/10.1137/16M1073352
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import (
+from symfem.finite_element import CiarletElement
+from symfem.functionals import (
     IntegralAgainst,
     IntegralMoment,
     ListOfFunctionals,
     NormalIntegralMoment,
     TangentIntegralMoment,
 )
-from ..functions import FunctionInput, ScalarFunction, VectorFunction
-from ..moments import make_integral_moment_dofs
-from ..polynomials import polynomial_set_vector
-from ..references import NonDefaultReferenceError, Reference
-from ..symbols import t, x
-from .dpc import DPC, VectorDPC
+from symfem.functions import FunctionInput, ScalarFunction, VectorFunction
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import polynomial_set_vector
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import t, x
+from symfem.elements.dpc import DPC, VectorDPC
 
 
 class TrimmedSerendipityHcurl(CiarletElement):

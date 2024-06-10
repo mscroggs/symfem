@@ -8,15 +8,15 @@ import typing
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import DotPointEvaluation, ListOfFunctionals, NormalIntegralMoment
-from ..functions import FunctionInput, VectorFunction
-from ..geometry import SetOfPoints, SetOfPointsInput
-from ..moments import make_integral_moment_dofs
-from ..piecewise_functions import PiecewiseFunction
-from ..references import NonDefaultReferenceError, Reference
-from .bernardi_raugel import BernardiRaugel
-from .lagrange import Lagrange, VectorLagrange
+from symfem.finite_element import CiarletElement
+from symfem.functionals import DotPointEvaluation, ListOfFunctionals, NormalIntegralMoment
+from symfem.functions import FunctionInput, VectorFunction
+from symfem.geometry import SetOfPoints, SetOfPointsInput
+from symfem.moments import make_integral_moment_dofs
+from symfem.piecewise_functions import PiecewiseFunction
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.elements.bernardi_raugel import BernardiRaugel
+from symfem.elements.lagrange import Lagrange, VectorLagrange
 
 
 class GuzmanNeilan(CiarletElement):
@@ -121,7 +121,7 @@ class GuzmanNeilan(CiarletElement):
         """
         assert order == 1
 
-        from ._guzman_neilan_triangle import coeffs
+        from symfem.elements._guzman_neilan_triangle import coeffs
 
         mid = reference.midpoint()
 
@@ -165,7 +165,7 @@ class GuzmanNeilan(CiarletElement):
             The polynomial set
         """
         assert order in [1, 2]
-        from ._guzman_neilan_tetrahedron import coeffs
+        from symfem.elements._guzman_neilan_tetrahedron import coeffs
 
         mid = reference.midpoint()
 

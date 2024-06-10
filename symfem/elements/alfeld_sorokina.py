@@ -8,12 +8,12 @@ import typing
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import DotPointEvaluation, ListOfFunctionals, PointDivergenceEvaluation
-from ..functions import FunctionInput, VectorFunction
-from ..piecewise_functions import PiecewiseFunction
-from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
+from symfem.finite_element import CiarletElement
+from symfem.functionals import DotPointEvaluation, ListOfFunctionals, PointDivergenceEvaluation
+from symfem.functions import FunctionInput, VectorFunction
+from symfem.piecewise_functions import PiecewiseFunction
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import x
 
 
 class AlfeldSorokina(CiarletElement):

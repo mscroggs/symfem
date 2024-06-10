@@ -6,18 +6,18 @@ This element's definition appears in https://doi.org/10.1007/s11464-011-0094-0
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import (
+from symfem.finite_element import CiarletElement
+from symfem.functionals import (
     IntegralAgainst,
     ListOfFunctionals,
     NormalIntegralMoment,
     TangentIntegralMoment,
 )
-from ..functions import FunctionInput, VectorFunction
-from ..moments import make_integral_moment_dofs
-from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
-from .lagrange import Lagrange
+from symfem.functions import FunctionInput, VectorFunction
+from symfem.moments import make_integral_moment_dofs
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import x
+from symfem.elements.lagrange import Lagrange
 
 
 class HuangZhang(CiarletElement):

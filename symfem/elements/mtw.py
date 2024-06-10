@@ -7,20 +7,20 @@ and https://doi.org/10.1007/s10092-006-0124-6 (Tail, Mardal, 2006)
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import (
+from symfem.finite_element import CiarletElement
+from symfem.functionals import (
     IntegralMoment,
     ListOfFunctionals,
     NormalIntegralMoment,
     TangentIntegralMoment,
 )
-from ..functions import FunctionInput, VectorFunction
-from ..moments import make_integral_moment_dofs
-from ..polynomials import polynomial_set_vector
-from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
-from .lagrange import Lagrange
-from .nedelec import NedelecFirstKind
+from symfem.functions import FunctionInput, VectorFunction
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import polynomial_set_vector
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import x
+from symfem.elements.lagrange import Lagrange
+from symfem.elements.nedelec import NedelecFirstKind
 
 
 class MardalTaiWinther(CiarletElement):

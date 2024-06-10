@@ -6,14 +6,14 @@ These elements' definitions appear in https://doi.org/10.1007/BF01396415
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import IntegralMoment, ListOfFunctionals, TangentIntegralMoment
-from ..functions import FunctionInput
-from ..moments import make_integral_moment_dofs
-from ..polynomials import Hcurl_polynomials, polynomial_set_vector
-from ..references import Reference
-from .lagrange import Lagrange, VectorLagrange
-from .rt import RaviartThomas
+from symfem.finite_element import CiarletElement
+from symfem.functionals import IntegralMoment, ListOfFunctionals, TangentIntegralMoment
+from symfem.functions import FunctionInput
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import Hcurl_polynomials, polynomial_set_vector
+from symfem.references import Reference
+from symfem.elements.lagrange import Lagrange, VectorLagrange
+from symfem.elements.rt import RaviartThomas
 
 
 class NedelecFirstKind(CiarletElement):

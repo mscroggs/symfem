@@ -8,19 +8,19 @@ import typing
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import (
+from symfem.finite_element import CiarletElement
+from symfem.functionals import (
     DivergenceIntegralMoment,
     DotPointEvaluation,
     ListOfFunctionals,
     NormalIntegralMoment,
 )
-from ..functions import FunctionInput
-from ..moments import make_integral_moment_dofs
-from ..polynomials import polynomial_set_vector
-from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
-from .lagrange import Lagrange
+from symfem.functions import FunctionInput
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import polynomial_set_vector
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import x
+from symfem.elements.lagrange import Lagrange
 
 
 class BernardiRaugel(CiarletElement):

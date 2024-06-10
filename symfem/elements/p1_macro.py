@@ -8,13 +8,13 @@ import typing
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import IntegralAgainst, ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput
-from ..geometry import SetOfPoints
-from ..piecewise_functions import PiecewiseFunction
-from ..references import Reference
-from ..symbols import x
+from symfem.finite_element import CiarletElement
+from symfem.functionals import IntegralAgainst, ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput
+from symfem.geometry import SetOfPoints
+from symfem.piecewise_functions import PiecewiseFunction
+from symfem.references import Reference
+from symfem.symbols import x
 
 
 class P1Macro(CiarletElement):
