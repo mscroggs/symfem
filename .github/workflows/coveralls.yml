@@ -10,9 +10,6 @@ jobs:
   coveralls:
     name: Run coverage checks
     runs-on: ubuntu-latest
-    env:
-      CC: gcc-10
-      CXX: g++-10
     steps:
       - name: Set up Python
         uses: actions/setup-python@v4
