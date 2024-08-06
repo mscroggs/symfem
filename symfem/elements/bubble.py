@@ -9,11 +9,13 @@ from itertools import product
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput
-from ..references import Reference
-from .lagrange import Lagrange
+from symfem.finite_element import CiarletElement
+from symfem.functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput
+from symfem.references import Reference
+from symfem.elements.lagrange import Lagrange
+
+__all__ = ["Bubble", "BubbleEnrichedLagrange", "BubbleEnrichedVectorLagrange"]
 
 
 class Bubble(CiarletElement):
@@ -27,7 +29,7 @@ class Bubble(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
-        from .. import create_element
+        from symfem import create_element
 
         p1 = create_element(reference.name, "Lagrange", 1, vertices=reference.vertices)
         bubble = 1
@@ -43,16 +45,22 @@ class Bubble(CiarletElement):
         else:
             raise ValueError(f"Unsupported reference: {reference.name}")
 
-        pn = create_element(reference.name, "Lagrange", o, vertices=reference.vertices,
-                            variant=variant)
+        pn = create_element(
+            reference.name, "Lagrange", o, vertices=reference.vertices, variant=variant
+        )
 
         poly = [bubble * p for p in pn.get_basis_functions()]
 
         dofs: ListOfFunctionals = []
         if reference.name in ["interval", "triangle", "tetrahedron"]:
-            def func(i): return sum(i)
+
+            def func(i):
+                return sum(i)
         else:
-            def func(i): return max(i)
+
+            def func(i):
+                return max(i)
+
         for i in product(range(1, order), repeat=reference.tdim):
             if func(i) < order:
                 point = reference.get_point(tuple(sympy.Rational(j, order) for j in i[::-1]))
@@ -60,9 +68,7 @@ class Bubble(CiarletElement):
 
         self.variant = variant
 
-        super().__init__(
-            reference, order, poly, dofs, reference.tdim, 1
-        )
+        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element.
@@ -74,8 +80,13 @@ class Bubble(CiarletElement):
 
     names = ["bubble"]
     references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
-    min_order = {"interval": 2, "triangle": 3, "tetrahedron": 4,
-                 "quadrilateral": 2, "hexahedron": 2}
+    min_order = {
+        "interval": 2,
+        "triangle": 3,
+        "tetrahedron": 4,
+        "quadrilateral": 2,
+        "hexahedron": 2,
+    }
     continuity = "C0"
     last_updated = "2023.09"
 
@@ -101,10 +112,7 @@ class BubbleEnrichedLagrange(CiarletElement):
 
         self.variant = variant
 
-        super().__init__(
-            reference, order, poly,
-            lagrange.dofs + bubble.dofs, reference.tdim, 1
-        )
+        super().__init__(reference, order, poly, lagrange.dofs + bubble.dofs, reference.tdim, 1)
 
     def init_kwargs(self) -> typing.Dict[str, typing.Any]:
         """Return the kwargs used to create this element.
@@ -141,9 +149,11 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
                 poly.append((p, 0))
                 poly.append((0, p))
 
-        dofs: ListOfFunctionals = [DotPointEvaluation(reference, d.dof_point(), v, entity=d.entity)
-                                   for d in lagrange.dofs + bubble.dofs
-                                   for v in [(1, 0), (0, 1)]]
+        dofs: ListOfFunctionals = [
+            DotPointEvaluation(reference, d.dof_point(), v, entity=d.entity)
+            for d in lagrange.dofs + bubble.dofs
+            for v in [(1, 0), (0, 1)]
+        ]
 
         self.variant = variant
 

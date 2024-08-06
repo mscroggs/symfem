@@ -19,15 +19,21 @@ symbolically evaluate the basis functions of a finite element space. Symfem can:
 You can find details of recent changes to Symfem in [the changelog](CHANGELOG.md).
 
 # Installing Symfem
-## Installing from source
+## Installing from source using pip
 Symfem can be installed by downloading the [GitHub repo](https://github.com/mscroggs/symfem)
 and running:
 
 ```bash
-python3 setup.py install
+pip3 install .
 ```
 
-## Installing using pip
+You may also use `-e` to install in editable mode:
+
+```bash
+pip3 install -e .
+```
+
+## Installing from PyPI using pip
 The latest release of Symfem can be installed by running:
 
 ```bash
@@ -67,7 +73,7 @@ nedelec = symfem.create_element("triangle", "N2curl", 1)
 qcurl = symfem.create_element("quadrilateral", "Qcurl", 2)
 ```
 
-The polynomial basis of an element can be obtained by calling `get_polynomial_basis()`:
+The basis functions of an element can be obtained by calling `get_basis_functions()`:
 
 ```python
 
@@ -81,8 +87,7 @@ print(lagrange.get_basis_functions())
 Each basis function will be a [Sympy](https://www.sympy.org) symbolic expression.
 
 Derivative of these basis functions can be computed using the functions in
-[`symfem.calculus`](symfem/calculus.py). Vector-valued basis functions can
-be manipulated using the functions in [`symfem.vector`](symfem/vectors.py).
+[`symfem.functions`](symfem/functions.py).
 
 The function `map_to_cell` can be used to map the basis functions of a finite element
 to a non-default cell:

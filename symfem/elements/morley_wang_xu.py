@@ -6,12 +6,18 @@ This element's definition appears in https://doi.org/10.1090/S0025-5718-2012-026
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import (IntegralAgainst, IntegralOfDirectionalMultiderivative, ListOfFunctionals,
-                           PointEvaluation)
-from ..functions import FunctionInput
-from ..polynomials import polynomial_set_1d
-from ..references import NonDefaultReferenceError, Reference
+from symfem.finite_element import CiarletElement
+from symfem.functionals import (
+    IntegralAgainst,
+    IntegralOfDirectionalMultiderivative,
+    ListOfFunctionals,
+    PointEvaluation,
+)
+from symfem.functions import FunctionInput
+from symfem.polynomials import polynomial_set_1d
+from symfem.references import NonDefaultReferenceError, Reference
+
+__all__ = ["MorleyWangXu"]
 
 
 class MorleyWangXu(CiarletElement):
@@ -41,8 +47,9 @@ class MorleyWangXu(CiarletElement):
                 dim = reference.tdim - 1
                 for facet_n in range(reference.sub_entity_count(dim)):
                     facet = reference.sub_entity(dim, facet_n)
-                    dofs.append(IntegralAgainst(reference, 1 / facet.jacobian(),
-                                                entity=(dim, facet_n)))
+                    dofs.append(
+                        IntegralAgainst(reference, 1 / facet.jacobian(), entity=(dim, facet_n))
+                    )
         elif order == 2:
             if reference.tdim == 2:
                 for v_n, v in enumerate(reference.vertices):
@@ -51,14 +58,21 @@ class MorleyWangXu(CiarletElement):
                 dim = reference.tdim - 2
                 for ridge_n in range(reference.sub_entity_count(dim)):
                     ridge = reference.sub_entity(dim, ridge_n)
-                    dofs.append(IntegralAgainst(reference, 1 / ridge.jacobian(),
-                                                entity=(dim, ridge_n)))
+                    dofs.append(
+                        IntegralAgainst(reference, 1 / ridge.jacobian(), entity=(dim, ridge_n))
+                    )
             dim = reference.tdim - 1
             for facet_n in range(reference.sub_entity_count(dim)):
                 facet = reference.sub_entity(dim, facet_n)
-                dofs.append(IntegralOfDirectionalMultiderivative(
-                    reference, (facet.normal(), ), (1, ), (dim, facet_n),
-                    scale=1 / facet.jacobian()))
+                dofs.append(
+                    IntegralOfDirectionalMultiderivative(
+                        reference,
+                        (facet.normal(),),
+                        (1,),
+                        (dim, facet_n),
+                        scale=1 / facet.jacobian(),
+                    )
+                )
         else:
             assert order == reference.tdim == 3
             for v_n, v in enumerate(reference.vertices):
@@ -72,15 +86,19 @@ class MorleyWangXu(CiarletElement):
                         face = reference.sub_entity(2, f_n)
                         normals.append(face.normal())
                 for orders in [(1, 0), (0, 1)]:
-                    dofs.append(IntegralOfDirectionalMultiderivative(
-                        reference, tuple(normals), orders, (1, e_n),
-                        scale=1 / volume))
+                    dofs.append(
+                        IntegralOfDirectionalMultiderivative(
+                            reference, tuple(normals), orders, (1, e_n), scale=1 / volume
+                        )
+                    )
             for f_n, vs in enumerate(reference.sub_entities(2)):
                 subentity = reference.sub_entity(2, f_n)
                 volume = subentity.jacobian()
-                dofs.append(IntegralOfDirectionalMultiderivative(
-                    reference, (subentity.normal(), ), (2, ), (2, f_n),
-                    scale=1 / volume))
+                dofs.append(
+                    IntegralOfDirectionalMultiderivative(
+                        reference, (subentity.normal(),), (2,), (2, f_n), scale=1 / volume
+                    )
+                )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 

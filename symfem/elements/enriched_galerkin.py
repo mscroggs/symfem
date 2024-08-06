@@ -4,10 +4,12 @@ This element's definition appears in https://doi.org/10.1137/080722953
 (Sun, Liu, 2009).
 """
 
-from ..finite_element import EnrichedElement
-from ..references import Reference
-from .lagrange import Lagrange
-from .q import Q
+from symfem.finite_element import EnrichedElement
+from symfem.references import Reference
+from symfem.elements.lagrange import Lagrange
+from symfem.elements.q import Q
+
+__all__ = ["EnrichedGalerkin"]
 
 
 class EnrichedGalerkin(EnrichedElement):

@@ -8,10 +8,9 @@ from symfem.symbols import x
 from symfem.utils import allequal
 
 
-@pytest.mark.parametrize('reference', ['triangle', 'tetrahedron'])
-@pytest.mark.parametrize('order', [0, 1, 2])
+@pytest.mark.parametrize("reference", ["triangle", "tetrahedron"])
+@pytest.mark.parametrize("order", [0, 1, 2])
 def test_create(reference, order):
-
     element = create_element(reference, "HHJ", order)
 
     # Get the basis functions associated with the interior

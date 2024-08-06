@@ -6,13 +6,15 @@ This element's definition appears in https://doi.org/10.1007/BF01396415
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import IntegralMoment, ListOfFunctionals, NormalIntegralMoment
-from ..functions import FunctionInput
-from ..moments import make_integral_moment_dofs
-from ..polynomials import Hdiv_polynomials, polynomial_set_vector
-from ..references import Reference
-from .lagrange import Lagrange, VectorLagrange
+from symfem.finite_element import CiarletElement
+from symfem.functionals import IntegralMoment, ListOfFunctionals, NormalIntegralMoment
+from symfem.functions import FunctionInput
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import Hdiv_polynomials, polynomial_set_vector
+from symfem.references import Reference
+from symfem.elements.lagrange import Lagrange, VectorLagrange
+
+__all__ = ["RaviartThomas"]
 
 
 class RaviartThomas(CiarletElement):
@@ -32,10 +34,14 @@ class RaviartThomas(CiarletElement):
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Lagrange, order - 1,
-                    {"variant": variant}),
-            cells=(IntegralMoment, VectorLagrange, order - 2, "contravariant",
-                   {"variant": variant}),
+            facets=(NormalIntegralMoment, Lagrange, order - 1, {"variant": variant}),
+            cells=(
+                IntegralMoment,
+                VectorLagrange,
+                order - 2,
+                "contravariant",
+                {"variant": variant},
+            ),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

@@ -6,13 +6,15 @@ This element's definition appears in https://doi.org/10.1016/j.camwa.2022.06.018
 
 import typing
 
-from ..finite_element import CiarletElement, EnrichedElement
-from ..functionals import BaseFunctional, IntegralAgainst
-from ..functions import FunctionInput, VectorFunction
-from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
-from .lagrange import VectorLagrange
-from .q import VectorQ
+from symfem.finite_element import CiarletElement, EnrichedElement
+from symfem.functionals import BaseFunctional, IntegralAgainst
+from symfem.functions import FunctionInput, VectorFunction
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import x
+from symfem.elements.lagrange import VectorLagrange
+from symfem.elements.q import VectorQ
+
+__all__ = ["Enrichment", "VectorEnrichedGalerkin"]
 
 
 class Enrichment(CiarletElement):
@@ -29,8 +31,11 @@ class Enrichment(CiarletElement):
         f = VectorFunction(tuple(x[i] - j for i, j in enumerate(reference.midpoint())))
         poly: typing.List[FunctionInput] = [f]
         size = f.dot(f).integral(reference, x)
-        dofs: typing.List[BaseFunctional] = [IntegralAgainst(
-            reference, tuple(i / size for i in f), (reference.tdim, 0), "contravariant")]
+        dofs: typing.List[BaseFunctional] = [
+            IntegralAgainst(
+                reference, tuple(i / size for i in f), (reference.tdim, 0), "contravariant"
+            )
+        ]
 
         super().__init__(reference, 1, poly, dofs, reference.tdim, reference.tdim)
 

@@ -4,7 +4,9 @@ import typing
 
 import sympy
 
-from .functions import ScalarFunction
+from symfem.functions import ScalarFunction
+
+__all__ = ["allequal"]
 
 
 def allequal(a: typing.Any, b: typing.Any) -> bool:

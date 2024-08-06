@@ -6,14 +6,16 @@ This element's definition appears in https://dx.doi.org/10.1137/15M1013705
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import IntegralAgainst, ListOfFunctionals, NormalIntegralMoment
-from ..functions import FunctionInput
-from ..moments import make_integral_moment_dofs
-from ..polynomials import Hdiv_serendipity, polynomial_set_vector
-from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
-from .dpc import DPC
+from symfem.finite_element import CiarletElement
+from symfem.functionals import IntegralAgainst, ListOfFunctionals, NormalIntegralMoment
+from symfem.functions import FunctionInput
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import Hdiv_serendipity, polynomial_set_vector
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import x
+from symfem.elements.dpc import DPC
+
+__all__ = ["AC"]
 
 
 class AC(CiarletElement):
@@ -36,8 +38,10 @@ class AC(CiarletElement):
             poly += [(x[0], 0), (0, x[1])]
         else:
             poly += Hdiv_serendipity(reference.tdim, reference.tdim, order)
-            poly += [(x[0] ** (i + 1) * x[1] ** (order - i), x[0] ** i * x[1] ** (1 + order - i))
-                     for i in range(order + 1)]
+            poly += [
+                (x[0] ** (i + 1) * x[1] ** (order - i), x[0] ** i * x[1] ** (1 + order - i))
+                for i in range(order + 1)
+            ]
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
@@ -48,17 +52,17 @@ class AC(CiarletElement):
             for j in range(order + 1 - i):
                 if i + j > 0:
                     f = (i * x[0] ** (i - 1) * x[1] ** j, j * x[0] ** i * x[1] ** (j - 1))
-                    dofs.append(IntegralAgainst(reference, f, entity=(2, 0),
-                                                mapping="contravariant"))
+                    dofs.append(
+                        IntegralAgainst(reference, f, entity=(2, 0), mapping="contravariant")
+                    )
 
         for i in range(1, order - 1):
             for j in range(1, order - i):
                 f = (
                     x[0] ** i * (1 - x[0]) * x[1] ** (j - 1) * (j * (1 - x[1]) - x[1]),
-                    -x[0] ** (i - 1) * (i * (1 - x[0]) - x[0]) * x[1] ** j * (1 - x[1])
+                    -(x[0] ** (i - 1)) * (i * (1 - x[0]) - x[0]) * x[1] ** j * (1 - x[1]),
                 )
-                dofs.append(IntegralAgainst(reference, f, entity=(2, 0),
-                                            mapping="contravariant"))
+                dofs.append(IntegralAgainst(reference, f, entity=(2, 0), mapping="contravariant"))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant

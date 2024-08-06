@@ -1,12 +1,35 @@
 """Functions to map functions between cells."""
 
+from __future__ import annotations
+
 from typing import Callable
 
 import sympy
 
-from .functions import AnyFunction, FunctionInput, MatrixFunction, parse_function_input
-from .geometry import PointType
-from .symbols import x
+from symfem.functions import AnyFunction, FunctionInput, MatrixFunction, parse_function_input
+from symfem.geometry import PointType
+from symfem.symbols import x
+
+__all__ = [
+    "MappingNotImplemented",
+    "identity",
+    "l2",
+    "covariant",
+    "contravariant",
+    "double_covariant",
+    "double_contravariant",
+    "identity_inverse_transpose",
+    "l2_inverse_transpose",
+    "covariant_inverse_transpose",
+    "contravariant_inverse_transpose",
+    "identity_inverse",
+    "l2_inverse",
+    "covariant_inverse",
+    "contravariant_inverse",
+    "double_covariant_inverse",
+    "double_contravariant_inverse",
+    "get_mapping",
+]
 
 
 class MappingNotImplemented(NotImplementedError):
@@ -14,7 +37,9 @@ class MappingNotImplemented(NotImplementedError):
 
 
 def identity(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType,
+    f_in: FunctionInput,
+    map: PointType,
+    inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Map functions.
@@ -35,7 +60,9 @@ def identity(
 
 
 def l2(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType,
+    f_in: FunctionInput,
+    map: PointType,
+    inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Map functions, scaling by the determinant of the jacobian.
@@ -59,7 +86,9 @@ def l2(
 
 
 def covariant(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType,
+    f_in: FunctionInput,
+    map: PointType,
+    inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Map H(curl) functions.
@@ -85,8 +114,7 @@ def covariant(
 
 
 def contravariant(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType,
-    substitute: bool = True
+    f_in: FunctionInput, map: PointType, inverse_map: PointType, substitute: bool = True
 ) -> AnyFunction:
     """Map H(div) functions.
 
@@ -112,7 +140,9 @@ def contravariant(
 
 
 def double_covariant(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType,
+    f_in: FunctionInput,
+    map: PointType,
+    inverse_map: PointType,
     substitute: bool = True,
 ) -> MatrixFunction:
     """Map matrix functions.
@@ -137,7 +167,9 @@ def double_covariant(
 
 
 def double_contravariant(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType,
+    f_in: FunctionInput,
+    map: PointType,
+    inverse_map: PointType,
     substitute: bool = True,
 ) -> MatrixFunction:
     """Map matrix functions.
@@ -163,7 +195,9 @@ def double_contravariant(
 
 
 def identity_inverse_transpose(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType,
+    f_in: FunctionInput,
+    map: PointType,
+    inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Inverse transpose of identity().
@@ -184,7 +218,9 @@ def identity_inverse_transpose(
 
 
 def l2_inverse_transpose(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType,
+    f_in: FunctionInput,
+    map: PointType,
+    inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Inverse transpose of l2().
@@ -208,7 +244,9 @@ def l2_inverse_transpose(
 
 
 def covariant_inverse_transpose(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType,
+    f_in: FunctionInput,
+    map: PointType,
+    inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Inverse transpose of covariant().
@@ -234,7 +272,9 @@ def covariant_inverse_transpose(
 
 
 def contravariant_inverse_transpose(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType,
+    f_in: FunctionInput,
+    map: PointType,
+    inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Inverse transpose of contravariant().
@@ -261,7 +301,9 @@ def contravariant_inverse_transpose(
 
 
 def identity_inverse(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType,
+    f_in: FunctionInput,
+    map: PointType,
+    inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Inverse of identity().
@@ -279,7 +321,9 @@ def identity_inverse(
 
 
 def l2_inverse(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType,
+    f_in: FunctionInput,
+    map: PointType,
+    inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Inverse of l2().
@@ -297,7 +341,9 @@ def l2_inverse(
 
 
 def covariant_inverse(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType,
+    f_in: FunctionInput,
+    map: PointType,
+    inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Inverse of covariant().
@@ -315,8 +361,7 @@ def covariant_inverse(
 
 
 def contravariant_inverse(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType,
-    substitute: bool = True
+    f_in: FunctionInput, map: PointType, inverse_map: PointType, substitute: bool = True
 ) -> AnyFunction:
     """Inverse of contravariant().
 
@@ -333,7 +378,9 @@ def contravariant_inverse(
 
 
 def double_covariant_inverse(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType,
+    f_in: FunctionInput,
+    map: PointType,
+    inverse_map: PointType,
     substitute: bool = True,
 ) -> AnyFunction:
     """Inverse of double_covariant().
@@ -351,8 +398,7 @@ def double_covariant_inverse(
 
 
 def double_contravariant_inverse(
-    f_in: FunctionInput, map: PointType, inverse_map: PointType,
-    substitute: bool = True
+    f_in: FunctionInput, map: PointType, inverse_map: PointType, substitute: bool = True
 ) -> AnyFunction:
     """Inverse of double_contravariant().
 

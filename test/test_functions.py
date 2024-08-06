@@ -125,8 +125,12 @@ def test_matrix_function_neg():
     m3 = [[1, 2], [0, 1]]
     m3_neg = [[-1, -2], [0, -1]]
     a = [m3, MatrixFunction(m3), sympy.Matrix(m3), MatrixFunction(sympy.Matrix(m3))]
-    a_neg = [m3_neg, MatrixFunction(m3_neg), sympy.Matrix(m3_neg),
-             MatrixFunction(sympy.Matrix(m3_neg))]
+    a_neg = [
+        m3_neg,
+        MatrixFunction(m3_neg),
+        sympy.Matrix(m3_neg),
+        MatrixFunction(sympy.Matrix(m3_neg)),
+    ]
     for i in a:
         for j in a_neg:
             if isinstance(i, MatrixFunction) or isinstance(j, MatrixFunction):
@@ -141,26 +145,15 @@ def test_matrix_function_subs():
 
 
 def test_piecewise_scalar_function_add_sub():
-    f1 = PiecewiseFunction({
-        ((0, 0), (1, 0), (0, 1)): x[0],
-        ((1, 0), (1, 1), (0, 1)): x[1]
-    }, 2)
-    f2 = PiecewiseFunction({
-        ((0, 0), (1, 0), (0, 1)): 0,
-        ((1, 0), (1, 1), (0, 1)): x[0]
-    }, 2)
-    f3 = PiecewiseFunction({
-        ((0, 0), (1, 0), (0, 1)): x[0],
-        ((1, 0), (1, 1), (0, 1)): x[0] + x[1]
-    }, 2)
-    f4 = PiecewiseFunction({
-        ((0, 0), (1, 0), (0, 1)): x[1],
-        ((1, 0), (1, 1), (0, 1)): x[0] + x[1]
-    }, 2)
-    x1_pw = PiecewiseFunction({
-        ((0, 0), (1, 0), (0, 1)): x[1],
-        ((1, 0), (1, 1), (0, 1)): x[1]
-    }, 2)
+    f1 = PiecewiseFunction({((0, 0), (1, 0), (0, 1)): x[0], ((1, 0), (1, 1), (0, 1)): x[1]}, 2)
+    f2 = PiecewiseFunction({((0, 0), (1, 0), (0, 1)): 0, ((1, 0), (1, 1), (0, 1)): x[0]}, 2)
+    f3 = PiecewiseFunction(
+        {((0, 0), (1, 0), (0, 1)): x[0], ((1, 0), (1, 1), (0, 1)): x[0] + x[1]}, 2
+    )
+    f4 = PiecewiseFunction(
+        {((0, 0), (1, 0), (0, 1)): x[1], ((1, 0), (1, 1), (0, 1)): x[0] + x[1]}, 2
+    )
+    x1_pw = PiecewiseFunction({((0, 0), (1, 0), (0, 1)): x[1], ((1, 0), (1, 1), (0, 1)): x[1]}, 2)
 
     assert f1 + f2 == f3
     assert f3 - f1 == f2
@@ -173,19 +166,10 @@ def test_piecewise_scalar_function_add_sub():
 
 
 def test_piecewise_scalar_function_mult_div():
-    f2 = PiecewiseFunction({
-        ((0, 0), (1, 0), (0, 1)): 0,
-        ((1, 0), (1, 1), (0, 1)): x[0]
-    }, 2)
-    f5 = PiecewiseFunction({
-        ((0, 0), (1, 0), (0, 1)): 0,
-        ((1, 0), (1, 1), (0, 1)): 2 * x[0]
-    }, 2)
+    f2 = PiecewiseFunction({((0, 0), (1, 0), (0, 1)): 0, ((1, 0), (1, 1), (0, 1)): x[0]}, 2)
+    f5 = PiecewiseFunction({((0, 0), (1, 0), (0, 1)): 0, ((1, 0), (1, 1), (0, 1)): 2 * x[0]}, 2)
 
-    two_pw = PiecewiseFunction({
-        ((0, 0), (1, 0), (0, 1)): 2,
-        ((1, 0), (1, 1), (0, 1)): 2
-    }, 2)
+    two_pw = PiecewiseFunction({((0, 0), (1, 0), (0, 1)): 2, ((1, 0), (1, 1), (0, 1)): 2}, 2)
 
     for two in [2, ScalarFunction(2), two_pw]:
         assert f2 * two == f5
@@ -193,27 +177,15 @@ def test_piecewise_scalar_function_mult_div():
 
 
 def test_piecewise_scalar_function_neg():
-    f2 = PiecewiseFunction({
-        ((0, 0), (1, 0), (0, 1)): 0,
-        ((1, 0), (1, 1), (0, 1)): x[0]
-    }, 2)
-    f6 = PiecewiseFunction({
-        ((0, 0), (1, 0), (0, 1)): 0,
-        ((1, 0), (1, 1), (0, 1)): -x[0]
-    }, 2)
+    f2 = PiecewiseFunction({((0, 0), (1, 0), (0, 1)): 0, ((1, 0), (1, 1), (0, 1)): x[0]}, 2)
+    f6 = PiecewiseFunction({((0, 0), (1, 0), (0, 1)): 0, ((1, 0), (1, 1), (0, 1)): -x[0]}, 2)
 
     assert f6 == -f2
 
 
 def test_piecewise_scalar_function_subs():
-    f2 = PiecewiseFunction({
-        ((0, 0), (1, 0), (0, 1)): 0,
-        ((1, 0), (1, 1), (0, 1)): x[0]
-    }, 2)
-    f7 = PiecewiseFunction({
-        ((0, 0), (1, 0), (0, 1)): 0,
-        ((1, 0), (1, 1), (0, 1)): 2
-    }, 2)
+    f2 = PiecewiseFunction({((0, 0), (1, 0), (0, 1)): 0, ((1, 0), (1, 1), (0, 1)): x[0]}, 2)
+    f7 = PiecewiseFunction({((0, 0), (1, 0), (0, 1)): 0, ((1, 0), (1, 1), (0, 1)): 2}, 2)
 
     assert f2.subs(x[0], 2) == f7
     assert f2.subs(x[:2], (1, 1)) == 1

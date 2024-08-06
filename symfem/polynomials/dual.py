@@ -4,7 +4,9 @@ import typing
 
 import sympy
 
-from ..functions import ScalarFunction
+from symfem.functions import ScalarFunction
+
+__all__: typing.List[str] = []
 
 
 def l2_dual(cell: str, poly: typing.List[ScalarFunction]) -> typing.List[ScalarFunction]:
@@ -18,6 +20,7 @@ def l2_dual(cell: str, poly: typing.List[ScalarFunction]) -> typing.List[ScalarF
         The L2 dual polynomials
     """
     from ..create import create_reference
+
     reference = create_reference(cell)
 
     matrix = sympy.Matrix([[(p * q).integral(reference) for q in poly] for p in poly])

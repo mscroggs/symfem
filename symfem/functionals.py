@@ -5,15 +5,44 @@ from abc import ABC, abstractmethod
 
 import sympy
 
-from . import mappings
-from .functions import (AnyFunction, FunctionInput, ScalarFunction, VectorFunction,
-                        parse_function_input)
-from .geometry import PointType, SetOfPoints
-from .piecewise_functions import PiecewiseFunction
-from .references import Interval, NonDefaultReferenceError, Reference
-from .symbols import t, x
+from symfem import mappings
+from symfem.functions import (
+    AnyFunction,
+    FunctionInput,
+    ScalarFunction,
+    VectorFunction,
+    parse_function_input,
+)
+from symfem.geometry import PointType, SetOfPoints
+from symfem.piecewise_functions import PiecewiseFunction
+from symfem.references import Interval, NonDefaultReferenceError, Reference
+from symfem.symbols import t, x
 
 ScalarValueOrFloat = typing.Union[sympy.core.expr.Expr, float]
+
+__all__ = [
+    "BaseFunctional",
+    "PointEvaluation",
+    "WeightedPointEvaluation",
+    "DerivativePointEvaluation",
+    "PointDirectionalDerivativeEvaluation",
+    "PointNormalDerivativeEvaluation",
+    "PointComponentSecondDerivativeEvaluation",
+    "PointInnerProduct",
+    "DotPointEvaluation",
+    "PointDivergenceEvaluation",
+    "IntegralAgainst",
+    "IntegralOfDivergenceAgainst",
+    "IntegralOfDirectionalMultiderivative",
+    "IntegralMoment",
+    "DerivativeIntegralMoment",
+    "DivergenceIntegralMoment",
+    "TangentIntegralMoment",
+    "NormalIntegralMoment",
+    "NormalDerivativeIntegralMoment",
+    "InnerProductIntegralMoment",
+    "NormalInnerProductIntegralMoment",
+]
 
 
 def _to_tex(f: FunctionInput, tfrac: bool = False) -> str:
@@ -55,8 +84,9 @@ def _nth(n: int) -> str:
 class BaseFunctional(ABC):
     """A functional."""
 
-    def __init__(self, reference: Reference, entity: typing.Tuple[int, int],
-                 mapping: typing.Union[str, None]):
+    def __init__(
+        self, reference: Reference, entity: typing.Tuple[int, int], mapping: typing.Union[str, None]
+    ):
         """Create the functional.
 
         Args:
@@ -121,7 +151,7 @@ class BaseFunctional(ABC):
             return "\\(R\\) is the reference element"
         else:
             desc = f"\\({self.entity_tex()}\\) is the {_nth(self.entity[1])} "
-            desc += ['vertex', 'edge', 'face', 'volume'][self.entity[0]]
+            desc += ["vertex", "edge", "face", "volume"][self.entity[0]]
             return desc
 
     def dof_direction(self) -> typing.Union[PointType, None]:
@@ -132,9 +162,9 @@ class BaseFunctional(ABC):
         """
         return None
 
-    def eval(self, function: AnyFunction, symbolic: bool = True) -> typing.Union[
-        ScalarFunction, float
-    ]:
+    def eval(
+        self, function: AnyFunction, symbolic: bool = True
+    ) -> typing.Union[ScalarFunction, float]:
         """Apply to the functional to a function.
 
         Args:
@@ -170,9 +200,7 @@ class BaseFunctional(ABC):
             return point
 
         midpoint = self.reference.sub_entity(*self.entity).midpoint()
-        return tuple(
-            m + sympy.Rational(7, 10) * (p - m)
-            for m, p in zip(midpoint, point))
+        return tuple(m + sympy.Rational(7, 10) * (p - m) for m, p in zip(midpoint, point))
 
     def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
         """Symbolically apply the functional to a function.
@@ -217,8 +245,13 @@ class BaseFunctional(ABC):
 class PointEvaluation(BaseFunctional):
     """A point evaluation."""
 
-    def __init__(self, reference: Reference, point_in: FunctionInput,
-                 entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+    def __init__(
+        self,
+        reference: Reference,
+        point_in: FunctionInput,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "identity",
+    ):
         """Create the functional.
 
         Args:
@@ -275,8 +308,14 @@ class PointEvaluation(BaseFunctional):
 class WeightedPointEvaluation(BaseFunctional):
     """A point evaluation."""
 
-    def __init__(self, reference: Reference, point_in: FunctionInput, weight: sympy.core.expr.Expr,
-                 entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+    def __init__(
+        self,
+        reference: Reference,
+        point_in: FunctionInput,
+        weight: sympy.core.expr.Expr,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "identity",
+    ):
         """Create the functional.
 
         Args:
@@ -327,8 +366,10 @@ class WeightedPointEvaluation(BaseFunctional):
             Representation of the functional as TeX, and list of terms involved
         """
         assert isinstance(self.point, VectorFunction)
-        return (f"v\\mapsto {_to_tex(self.weight)} "
-                f"v({','.join([_to_tex(i, True) for i in self.point])})"), []
+        return (
+            f"v\\mapsto {_to_tex(self.weight)} "
+            f"v({','.join([_to_tex(i, True) for i in self.point])})"
+        ), []
 
     name = "Weighted point evaluation"
 
@@ -336,9 +377,14 @@ class WeightedPointEvaluation(BaseFunctional):
 class DerivativePointEvaluation(BaseFunctional):
     """A point evaluation of a given derivative."""
 
-    def __init__(self, reference: Reference, point_in: FunctionInput,
-                 derivative: typing.Tuple[int, ...],
-                 entity: typing.Tuple[int, int], mapping: typing.Optional[str] = None):
+    def __init__(
+        self,
+        reference: Reference,
+        point_in: FunctionInput,
+        derivative: typing.Tuple[int, ...],
+        entity: typing.Tuple[int, int],
+        mapping: typing.Optional[str] = None,
+    ):
         """Create the functional.
 
         Args:
@@ -431,8 +477,14 @@ class DerivativePointEvaluation(BaseFunctional):
 class PointDirectionalDerivativeEvaluation(BaseFunctional):
     """A point evaluation of a derivative in a fixed direction."""
 
-    def __init__(self, reference: Reference, point_in: FunctionInput, direction_in: FunctionInput,
-                 entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+    def __init__(
+        self,
+        reference: Reference,
+        point_in: FunctionInput,
+        direction_in: FunctionInput,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "identity",
+    ):
         """Create the functional.
 
         Args:
@@ -513,8 +565,14 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
 class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
     """A point evaluation of a normal derivative."""
 
-    def __init__(self, reference: Reference, point_in: FunctionInput, edge: Reference,
-                 entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+    def __init__(
+        self,
+        reference: Reference,
+        point_in: FunctionInput,
+        edge: Reference,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "identity",
+    ):
         """Create the functional.
 
         Args:
@@ -548,9 +606,14 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
 class PointComponentSecondDerivativeEvaluation(BaseFunctional):
     """A point evaluation of a component of a second derivative."""
 
-    def __init__(self, reference: Reference, point_in: FunctionInput,
-                 component: typing.Tuple[int, int],
-                 entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+    def __init__(
+        self,
+        reference: Reference,
+        point_in: FunctionInput,
+        component: typing.Tuple[int, int],
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "identity",
+    ):
         """Create the functional.
 
         Args:
@@ -607,15 +670,21 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
         desc += "}(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
         return desc, []
 
-    name = "Point evaluation of Jacobian component"
+    name = "Point evaluation of Hessian component"
 
 
 class PointInnerProduct(BaseFunctional):
     """An evaluation of an inner product at a point."""
 
-    def __init__(self, reference: Reference, point_in: FunctionInput, lvec: FunctionInput,
-                 rvec: FunctionInput,
-                 entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+    def __init__(
+        self,
+        reference: Reference,
+        point_in: FunctionInput,
+        lvec: FunctionInput,
+        rvec: FunctionInput,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "identity",
+    ):
         """Create the functional.
 
         Args:
@@ -701,8 +770,14 @@ class PointInnerProduct(BaseFunctional):
 class DotPointEvaluation(BaseFunctional):
     """A point evaluation in a given direction."""
 
-    def __init__(self, reference: Reference, point_in: FunctionInput, vector_in: FunctionInput,
-                 entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+    def __init__(
+        self,
+        reference: Reference,
+        point_in: FunctionInput,
+        vector_in: FunctionInput,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "identity",
+    ):
         """Create the functional.
 
         Args:
@@ -782,8 +857,13 @@ class DotPointEvaluation(BaseFunctional):
 class PointDivergenceEvaluation(BaseFunctional):
     """A point evaluation of the divergence."""
 
-    def __init__(self, reference: Reference, point_in: FunctionInput,
-                 entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+    def __init__(
+        self,
+        reference: Reference,
+        point_in: FunctionInput,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "identity",
+    ):
         """Create the functional.
 
         Args:
@@ -860,8 +940,13 @@ class IntegralAgainst(BaseFunctional):
 
     f: AnyFunction
 
-    def __init__(self, reference: Reference, f_in: FunctionInput,
-                 entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+    def __init__(
+        self,
+        reference: Reference,
+        f_in: FunctionInput,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "identity",
+    ):
         """Create the functional.
 
         Args:
@@ -879,14 +964,18 @@ class IntegralAgainst(BaseFunctional):
         if f.is_vector:
             assert len(f) == self.integral_domain.tdim
             self.f = mappings.contravariant(
-                f, self.integral_domain.get_map_to_self(),
-                self.integral_domain.get_inverse_map_to_self())
+                f,
+                self.integral_domain.get_map_to_self(),
+                self.integral_domain.get_inverse_map_to_self(),
+            )
         elif f.is_matrix:
             assert f.shape[0] == self.integral_domain.tdim
             assert f.shape[1] == self.integral_domain.tdim
             self.f = mappings.double_contravariant(
-                f, self.integral_domain.get_map_to_self(),
-                self.integral_domain.get_inverse_map_to_self())
+                f,
+                self.integral_domain.get_map_to_self(),
+                self.integral_domain.get_inverse_map_to_self(),
+            )
         else:
             self.f = f
 
@@ -953,8 +1042,13 @@ class IntegralAgainst(BaseFunctional):
 class IntegralOfDivergenceAgainst(BaseFunctional):
     """An integral of the divergence against a function."""
 
-    def __init__(self, reference: Reference, f_in: FunctionInput,
-                 entity: typing.Tuple[int, int], mapping: typing.Union[str, None] = "identity"):
+    def __init__(
+        self,
+        reference: Reference,
+        f_in: FunctionInput,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "identity",
+    ):
         """Create the functional.
 
         Args:
@@ -1026,9 +1120,15 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
 class IntegralOfDirectionalMultiderivative(BaseFunctional):
     """An integral of a directional derivative of a scalar function."""
 
-    def __init__(self, reference: Reference, directions: SetOfPoints,
-                 orders: typing.Tuple[int, ...], entity: typing.Tuple[int, int], scale: int = 1,
-                 mapping: typing.Union[str, None] = "identity"):
+    def __init__(
+        self,
+        reference: Reference,
+        directions: SetOfPoints,
+        orders: typing.Tuple[int, ...],
+        entity: typing.Tuple[int, int],
+        scale: int = 1,
+        mapping: typing.Union[str, None] = "identity",
+    ):
         """Create the functional.
 
         Args:
@@ -1122,9 +1222,15 @@ class IntegralMoment(BaseFunctional):
 
     f: AnyFunction
 
-    def __init__(self, reference: Reference,
-                 f_in: FunctionInput, dof: BaseFunctional, entity: typing.Tuple[int, int],
-                 mapping: typing.Union[str, None] = "identity", map_function: bool = True):
+    def __init__(
+        self,
+        reference: Reference,
+        f_in: FunctionInput,
+        dof: BaseFunctional,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "identity",
+        map_function: bool = True,
+    ):
         """Create the functional.
 
         Args:
@@ -1149,23 +1255,26 @@ class IntegralMoment(BaseFunctional):
         if id_def.default_reference() != id_def:
             if self.f.is_vector and len(self.f) != reference.gdim:
                 self.f = mappings.contravariant(
-                    self.f, id_def.get_map_to_self(),
-                    id_def.get_inverse_map_to_self())
+                    self.f, id_def.get_map_to_self(), id_def.get_inverse_map_to_self()
+                )
             elif self.f.is_matrix:
                 assert self.f.shape[0] == id_def.tdim
                 assert self.f.shape[1] == id_def.tdim
                 self.f = mappings.double_contravariant(
-                    self.f, id_def.get_map_to_self(),
-                    id_def.get_inverse_map_to_self())
+                    self.f, id_def.get_map_to_self(), id_def.get_inverse_map_to_self()
+                )
 
         # Map from default reference to reference
         if map_function and reference != reference.default_reference():
             if mapping is None or not hasattr(mappings, f"{mapping}_inverse_transpose"):
                 raise NonDefaultReferenceError()
             mf = getattr(mappings, f"{mapping}_inverse_transpose")
-            self.f = mf(self.f, reference.get_map_to_self(),
-                        reference.get_inverse_map_to_self(),
-                        substitute=False)
+            self.f = mf(
+                self.f,
+                reference.get_map_to_self(),
+                reference.get_inverse_map_to_self(),
+                substitute=False,
+            )
             self.f *= id_def.volume() / self.integral_domain.volume()
 
     def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
@@ -1248,9 +1357,9 @@ class IntegralMoment(BaseFunctional):
                 desc += "\\\\".join([_to_tex(i) for i in self.f])
                 desc += "\\end{array}\\right)"
             else:
-                if len(self.f) == self.integral_domain.tdim ** 2:
+                if len(self.f) == self.integral_domain.tdim**2:
                     size = self.integral_domain.tdim
-                elif len(self.f) == self.reference.tdim ** 2:
+                elif len(self.f) == self.reference.tdim**2:
                     size = self.reference.tdim
                 else:
                     raise NotImplementedError()
@@ -1258,9 +1367,12 @@ class IntegralMoment(BaseFunctional):
                 desc += f"\\displaystyle\\int_{{{entity}}}"
                 desc += "\\mathbf{V}:"
                 desc += "\\left(\\begin{array}{" + "c" * size + "}"
-                desc += "\\\\".join(["&".join(
-                    [_to_tex(self.f[i]) for i in range(size * row, size * (row + 1))]
-                ) for row in range(size)])
+                desc += "\\\\".join(
+                    [
+                        "&".join([_to_tex(self.f[i]) for i in range(size * row, size * (row + 1))])
+                        for row in range(size)
+                    ]
+                )
                 desc += "\\end{array}\\right)"
         else:
             desc = "v\\mapsto"
@@ -1276,9 +1388,15 @@ class IntegralMoment(BaseFunctional):
 class DerivativeIntegralMoment(IntegralMoment):
     """An integral moment of the derivative of a scalar function."""
 
-    def __init__(self, reference: Reference, f: FunctionInput,
-                 dot_with_in: FunctionInput, dof: BaseFunctional, entity: typing.Tuple[int, int],
-                 mapping: typing.Union[str, None] = "identity"):
+    def __init__(
+        self,
+        reference: Reference,
+        f: FunctionInput,
+        dot_with_in: FunctionInput,
+        dof: BaseFunctional,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "identity",
+    ):
         """Create the functional.
 
         Args:
@@ -1338,9 +1456,14 @@ class DerivativeIntegralMoment(IntegralMoment):
 class DivergenceIntegralMoment(IntegralMoment):
     """An integral moment of the divergence of a vector function."""
 
-    def __init__(self, reference: Reference, f_in: FunctionInput,
-                 dof: BaseFunctional, entity: typing.Tuple[int, int],
-                 mapping: typing.Union[str, None] = "identity"):
+    def __init__(
+        self,
+        reference: Reference,
+        f_in: FunctionInput,
+        dof: BaseFunctional,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "identity",
+    ):
         """Create the functional.
 
         Args:
@@ -1392,9 +1515,14 @@ class DivergenceIntegralMoment(IntegralMoment):
 class TangentIntegralMoment(IntegralMoment):
     """An integral moment in the tangential direction."""
 
-    def __init__(self, reference: Reference, f_in: FunctionInput,
-                 dof: BaseFunctional, entity: typing.Tuple[int, int],
-                 mapping: typing.Union[str, None] = "covariant"):
+    def __init__(
+        self,
+        reference: Reference,
+        f_in: FunctionInput,
+        dof: BaseFunctional,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "covariant",
+    ):
         """Create the functional.
 
         Args:
@@ -1408,8 +1536,13 @@ class TangentIntegralMoment(IntegralMoment):
         integral_domain = reference.sub_entity(*entity)
         assert self._scalar_f.is_scalar
         super().__init__(
-            reference, tuple(self._scalar_f * i for i in integral_domain.tangent()), dof,
-            entity=entity, mapping=mapping, map_function=False)
+            reference,
+            tuple(self._scalar_f * i for i in integral_domain.tangent()),
+            dof,
+            entity=entity,
+            mapping=mapping,
+            map_function=False,
+        )
 
     def dof_direction(self) -> typing.Union[PointType, None]:
         """Get the direction of the DOF.
@@ -1436,7 +1569,7 @@ class TangentIntegralMoment(IntegralMoment):
         desc += "\\hat{\\boldsymbol{t}}" + f"_{{{entity_n}}}"
         return desc, [
             entity_def,
-            f"\\(\\hat{{\\boldsymbol{{t}}}}_{{{entity_n}}}\\) is the tangent to edge {entity_n}"
+            f"\\(\\hat{{\\boldsymbol{{t}}}}_{{{entity_n}}}\\) is the tangent to edge {entity_n}",
         ]
 
     name = "Tangential integral moment"
@@ -1445,9 +1578,14 @@ class TangentIntegralMoment(IntegralMoment):
 class NormalIntegralMoment(IntegralMoment):
     """An integral moment in the normal direction."""
 
-    def __init__(self, reference: Reference, f_in: FunctionInput,
-                 dof: BaseFunctional, entity: typing.Tuple[int, int],
-                 mapping: typing.Union[str, None] = "contravariant"):
+    def __init__(
+        self,
+        reference: Reference,
+        f_in: FunctionInput,
+        dof: BaseFunctional,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "contravariant",
+    ):
         """Create the functional.
 
         Args:
@@ -1461,8 +1599,13 @@ class NormalIntegralMoment(IntegralMoment):
         assert self._scalar_f.is_scalar
         integral_domain = reference.sub_entity(*entity)
         super().__init__(
-            reference, tuple(self._scalar_f * i for i in integral_domain.normal()), dof,
-            entity=entity, mapping=mapping, map_function=False)
+            reference,
+            tuple(self._scalar_f * i for i in integral_domain.normal()),
+            dof,
+            entity=entity,
+            mapping=mapping,
+            map_function=False,
+        )
 
     def dof_direction(self) -> typing.Union[PointType, None]:
         """Get the direction of the DOF.
@@ -1489,7 +1632,7 @@ class NormalIntegralMoment(IntegralMoment):
         desc += "\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}}"
         return desc, [
             entity_def,
-            f"\\(\\hat{{\\boldsymbol{{n}}}}_{{{entity_n}}}\\) is the normal to facet {entity_n}"
+            f"\\(\\hat{{\\boldsymbol{{n}}}}_{{{entity_n}}}\\) is the normal to facet {entity_n}",
         ]
 
     name = "Normal integral moment"
@@ -1498,9 +1641,14 @@ class NormalIntegralMoment(IntegralMoment):
 class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
     """An integral moment in the normal direction."""
 
-    def __init__(self, reference: Reference, f_in: FunctionInput,
-                 dof: BaseFunctional, entity: typing.Tuple[int, int],
-                 mapping: typing.Union[str, None] = "identity"):
+    def __init__(
+        self,
+        reference: Reference,
+        f_in: FunctionInput,
+        dof: BaseFunctional,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "identity",
+    ):
         """Create the functional.
 
         Args:
@@ -1513,8 +1661,9 @@ class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
         f = parse_function_input(f_in)
         assert f.is_scalar
         integral_domain = reference.sub_entity(*entity)
-        super().__init__(reference, f, integral_domain.normal(), dof,
-                         entity=entity, mapping=mapping)
+        super().__init__(
+            reference, f, integral_domain.normal(), dof, entity=entity, mapping=mapping
+        )
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved.
@@ -1533,7 +1682,7 @@ class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
         desc += "{\\partial\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}}" + "}"
         return desc, [
             entity_def,
-            f"\\(\\hat{{\\boldsymbol{{n}}}}_{{{entity_n}}}\\) is the normal to facet {entity_n}"
+            f"\\(\\hat{{\\boldsymbol{{n}}}}_{{{entity_n}}}\\) is the normal to facet {entity_n}",
         ]
 
     name = "Normal derivative integral moment"
@@ -1542,10 +1691,16 @@ class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
 class InnerProductIntegralMoment(IntegralMoment):
     """An integral moment of the inner product with a vector."""
 
-    def __init__(self, reference: Reference, f_in: FunctionInput,
-                 inner_with_left_in: FunctionInput, inner_with_right_in: FunctionInput,
-                 dof: BaseFunctional, entity: typing.Tuple[int, int],
-                 mapping: typing.Union[str, None] = "identity"):
+    def __init__(
+        self,
+        reference: Reference,
+        f_in: FunctionInput,
+        inner_with_left_in: FunctionInput,
+        inner_with_right_in: FunctionInput,
+        dof: BaseFunctional,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "identity",
+    ):
         """Create the functional.
 
         Args:
@@ -1578,8 +1733,11 @@ class InnerProductIntegralMoment(IntegralMoment):
             The inner product of the function and the moment direction
         """
         assert function.is_matrix
-        return self.inner_with_left.dot(
-            function @ self.inner_with_right) * self.f * self.integral_domain.jacobian()
+        return (
+            self.inner_with_left.dot(function @ self.inner_with_right)
+            * self.f
+            * self.integral_domain.jacobian()
+        )
 
     def dof_direction(self) -> typing.Union[PointType, None]:
         """Get the direction of the DOF.
@@ -1616,9 +1774,14 @@ class InnerProductIntegralMoment(IntegralMoment):
 class NormalInnerProductIntegralMoment(InnerProductIntegralMoment):
     """An integral moment of the inner product with the normal direction."""
 
-    def __init__(self, reference: Reference, f_in: FunctionInput,
-                 dof: BaseFunctional, entity: typing.Tuple[int, int],
-                 mapping: typing.Union[str, None] = "double_contravariant"):
+    def __init__(
+        self,
+        reference: Reference,
+        f_in: FunctionInput,
+        dof: BaseFunctional,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "double_contravariant",
+    ):
         """Create the functional.
 
         Args:
@@ -1631,8 +1794,15 @@ class NormalInnerProductIntegralMoment(InnerProductIntegralMoment):
         f = parse_function_input(f_in)
         assert f.is_scalar
         integral_domain = reference.sub_entity(*entity)
-        super().__init__(reference, f, integral_domain.normal(),
-                         integral_domain.normal(), dof, entity=entity, mapping=mapping)
+        super().__init__(
+            reference,
+            f,
+            integral_domain.normal(),
+            integral_domain.normal(),
+            dof,
+            entity=entity,
+            mapping=mapping,
+        )
 
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved.
@@ -1653,7 +1823,7 @@ class NormalInnerProductIntegralMoment(InnerProductIntegralMoment):
         desc += "\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}}"
         return desc, [
             entity_def,
-            f"\\(\\hat{{\\boldsymbol{{n}}}}_{{{entity_n}}}\\) is the normal to facet {entity_n}"
+            f"\\(\\hat{{\\boldsymbol{{n}}}}_{{{entity_n}}}\\) is the normal to facet {entity_n}",
         ]
 
     name = "Normal inner product integral moment"

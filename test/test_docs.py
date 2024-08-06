@@ -19,10 +19,8 @@ doc_data = []
 outputlines: typing.List[str] = []
 codelines: typing.List[str] = []
 
-if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                  "../docs/index.rst")):
-    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-              "../docs/index.rst")) as f:
+if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../docs/index.rst")):
+    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../docs/index.rst")) as f:
         for line in f:
             if line.strip() == ".. code-block:: python":
                 code = True
@@ -45,10 +43,8 @@ if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),
                         output = False
                         code = False
                         doc_data.append(("\n".join(codelines), "\n".join(outputlines)))
-if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                  "../README.md")):
-    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-              "../README.md")) as f:
+if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../README.md")):
+    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../README.md")) as f:
         for line in f:
             if line.strip() != "":
                 if line.strip() == "```python":
@@ -115,8 +111,9 @@ def test_readme_elements():
                 elementlist[r] = []
             elementlist[r].append(e.names[0])
 
-    if not os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                          "../docs/index.rst")):
+    if not os.path.isfile(
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), "../docs/index.rst")
+    ):
         pytest.xfail("Could not find README.md")
 
     root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
@@ -128,8 +125,7 @@ def test_readme_elements():
         cell = r.split("\n")[0].strip().lower()
         cells.append(cell)
         lines = r.split("### List of supported elements")[1].strip().split("\n")
-        elements = [i[2:].split("(alternative names:")[0].strip()
-                    for i in lines if i.strip() != ""]
+        elements = [i[2:].split("(alternative names:")[0].strip() for i in lines if i.strip() != ""]
 
         for line in r.split("\n"):
             if "(alternative names:" in line:

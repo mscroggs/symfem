@@ -6,15 +6,23 @@ import pytest
 
 from symfem import create_element
 
-elements: typing.Dict[str, typing.List[typing.Tuple[
-    str, str, typing.Iterable, typing.List[typing.Tuple[str, typing.Any]]
-]]] = {
+elements: typing.Dict[
+    str,
+    typing.List[
+        typing.Tuple[str, str, typing.Iterable, typing.List[typing.Tuple[str, typing.Any]]]
+    ],
+] = {
     "interval": [
         ("P", "Lagrange", range(1, 4), [("LagrangeVariant", "equispaced")]),
-        ("serendipity", "Serendipity", range(1, 5), [("LagrangeVariant", "equispaced"),
-                                                     ("DPCVariant", "simplex_equispaced")]),
+        (
+            "serendipity",
+            "Serendipity",
+            range(1, 5),
+            [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")],
+        ),
         ("bubble", "Bubble", range(2, 5), []),
-        ("dPc", "DPC", range(0, 5), [("LagrangeVariant", "equispaced"), ("bool", True)])],
+        ("dPc", "DPC", range(0, 5), [("LagrangeVariant", "equispaced"), ("bool", True)]),
+    ],
     "triangle": [
         ("P", "Lagrange", range(1, 4), [("LagrangeVariant", "equispaced")]),
         ("bubble", "Bubble", range(3, 5), []),
@@ -24,7 +32,8 @@ elements: typing.Dict[str, typing.List[typing.Tuple[
         ("N2div", "Brezzi-Douglas-Marini", range(1, 4), [("LagrangeVariant", "equispaced")]),
         # ("Regge", "Regge", range(0, 4), []),
         # ("HHJ", "Hellan-Herrmann-Johnson", range(0, 4), []),
-        ("Crouzeix-Raviart", "Crouzeix-Raviart", [1], [])],
+        ("Crouzeix-Raviart", "Crouzeix-Raviart", [1], []),
+    ],
     "tetrahedron": [
         ("P", "Lagrange", range(1, 4), [("LagrangeVariant", "equispaced")]),
         ("bubble", "Bubble", range(4, 6), []),
@@ -33,32 +42,57 @@ elements: typing.Dict[str, typing.List[typing.Tuple[
         ("N1div", "Raviart-Thomas", range(1, 3), [("LagrangeVariant", "equispaced")]),
         ("N2div", "Brezzi-Douglas-Marini", range(1, 3), [("LagrangeVariant", "equispaced")]),
         # ("Regge", "Regge", range(0, 3), []),
-        ("Crouzeix-Raviart", "Crouzeix-Raviart", [1], [])],
+        ("Crouzeix-Raviart", "Crouzeix-Raviart", [1], []),
+    ],
     "quadrilateral": [
         ("Q", "Lagrange", range(1, 4), [("LagrangeVariant", "equispaced")]),
         ("dPc", "DPC", range(0, 4), [("DPCVariant", "simplex_equispaced"), ("bool", True)]),
-        ("serendipity", "Serendipity", range(1, 5),
-         [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")]),
+        (
+            "serendipity",
+            "Serendipity",
+            range(1, 5),
+            [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")],
+        ),
         ("Qdiv", "Raviart-Thomas", range(1, 4), [("LagrangeVariant", "equispaced")]),
         ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 4), [("LagrangeVariant", "equispaced")]),
-        ("Sdiv", "Brezzi-Douglas-Marini", range(1, 4),
-         [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")]),
-        ("Scurl", "Nedelec 2nd kind H(curl)", range(1, 4),
-         [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")])],
+        (
+            "Sdiv",
+            "Brezzi-Douglas-Marini",
+            range(1, 4),
+            [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")],
+        ),
+        (
+            "Scurl",
+            "Nedelec 2nd kind H(curl)",
+            range(1, 4),
+            [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")],
+        ),
+    ],
     "hexahedron": [
         ("Q", "Lagrange", range(1, 3), [("LagrangeVariant", "equispaced")]),
-        ("dPc", "DPC", range(0, 3),
-         [("DPCVariant", "simplex_equispaced"), ("bool", True)]),
-        ("serendipity", "Serendipity", range(1, 5),
-         [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")]),
+        ("dPc", "DPC", range(0, 3), [("DPCVariant", "simplex_equispaced"), ("bool", True)]),
+        (
+            "serendipity",
+            "Serendipity",
+            range(1, 5),
+            [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")],
+        ),
         ("Qdiv", "Raviart-Thomas", range(1, 3), [("LagrangeVariant", "equispaced")]),
         ("Qcurl", "Nedelec 1st kind H(curl)", range(1, 3), [("LagrangeVariant", "equispaced")]),
-        ("Sdiv", "Brezzi-Douglas-Marini", range(1, 3),
-         [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")]),
-        ("Scurl", "Nedelec 2nd kind H(curl)", range(1, 3),
-         [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")])],
-    "prism": [
-        ("Lagrange", "Lagrange", range(1, 4), [("LagrangeVariant", "equispaced")])]
+        (
+            "Sdiv",
+            "Brezzi-Douglas-Marini",
+            range(1, 3),
+            [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")],
+        ),
+        (
+            "Scurl",
+            "Nedelec 2nd kind H(curl)",
+            range(1, 3),
+            [("LagrangeVariant", "equispaced"), ("DPCVariant", "simplex_equispaced")],
+        ),
+    ],
+    "prism": [("Lagrange", "Lagrange", range(1, 4), [("LagrangeVariant", "equispaced")])],
 }
 
 
@@ -71,6 +105,7 @@ def to_float(a):
 
 def to_nparray(a):
     import numpy as np
+
     try:
         return float(a)
     except:  # noqa: E722
@@ -79,33 +114,63 @@ def to_nparray(a):
 
 def make_lattice(cell, N=3):
     import numpy as np
+
     if cell == "interval":
         return np.array([[i / N] for i in range(N + 1)])
     if cell == "triangle":
         return np.array([[i / N, j / N] for i in range(N + 1) for j in range(N + 1 - i)])
     if cell == "tetrahedron":
-        return np.array([[i / N, j / N, k / N]
-                         for i in range(N + 1) for j in range(N + 1 - i)
-                         for k in range(N + 1 - i - j)])
+        return np.array(
+            [
+                [i / N, j / N, k / N]
+                for i in range(N + 1)
+                for j in range(N + 1 - i)
+                for k in range(N + 1 - i - j)
+            ]
+        )
     if cell == "quadrilateral":
         return np.array([[i / N, j / N] for i in range(N + 1) for j in range(N + 1)])
     if cell == "hexahedron":
-        return np.array([[i / N, j / N, k / N]
-                         for i in range(N + 1) for j in range(N + 1) for k in range(N + 1)])
+        return np.array(
+            [
+                [i / N, j / N, k / N]
+                for i in range(N + 1)
+                for j in range(N + 1)
+                for k in range(N + 1)
+            ]
+        )
     if cell == "prism":
-        return np.array([[i / N, j / N, k / N]
-                         for i in range(N + 1) for j in range(N + 1 - i) for k in range(N + 1)])
+        return np.array(
+            [
+                [i / N, j / N, k / N]
+                for i in range(N + 1)
+                for j in range(N + 1 - i)
+                for k in range(N + 1)
+            ]
+        )
     if cell == "pyramid":
-        return np.array([[i / N, j / N, k / N]
-                         for i in range(N + 1) for j in range(N + 1)
-                         for k in range(N + 1 - max(i, j))])
+        return np.array(
+            [
+                [i / N, j / N, k / N]
+                for i in range(N + 1)
+                for j in range(N + 1)
+                for k in range(N + 1 - max(i, j))
+            ]
+        )
 
 
-@pytest.mark.parametrize(("cell", "symfem_type", "basix_type", "order", "args"),
-                         [(cell, a, b, order, args) for cell, ls in elements.items()
-                          for a, b, orders, args in ls for order in orders])
-def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_type,
-                       basix_type, order, args, speed):
+@pytest.mark.parametrize(
+    ("cell", "symfem_type", "basix_type", "order", "args"),
+    [
+        (cell, a, b, order, args)
+        for cell, ls in elements.items()
+        for a, b, orders, args in ls
+        for order in orders
+    ],
+)
+def test_against_basix(
+    has_basix, elements_to_test, cells_to_test, cell, symfem_type, basix_type, order, args, speed
+):
     if elements_to_test != "ALL" and symfem_type not in elements_to_test:
         pytest.skip()
     if cells_to_test != "ALL" and cell not in cells_to_test:
@@ -131,23 +196,22 @@ def test_against_basix(has_basix, elements_to_test, cells_to_test, cell, symfem_
     import numpy as np
 
     points = make_lattice(cell, 2)
-    parsed_args = [
-        basix.LagrangeVariant.unset,
-        basix.DPCVariant.unset,
-        False
-    ]
+    parsed_args = [basix.LagrangeVariant.unset, basix.DPCVariant.unset, False]
     for a in args:
         if a[0] == "LagrangeVariant":
-            parsed_args[0] = basix.finite_element.string_to_lagrange_variant(a[1])
+            parsed_args[0] = basix.LagrangeVariant[a[1]]
         elif a[0] == "DPCVariant":
-            parsed_args[1] = basix.finite_element.string_to_dpc_variant(a[1])
+            parsed_args[1] = basix.DPCVariant[a[1]]
         elif a[0] == "bool":
             parsed_args[2] = a[1]
         else:
             raise ValueError(f"Unknown arg type: {a[0]}")
     space = basix.create_element(
         basix.finite_element.string_to_family(basix_type, cell),
-        basix.cell.string_to_type(cell), order, *parsed_args)
+        basix.CellType[cell],
+        order,
+        *parsed_args,
+    )
     result = space.tabulate(0, points)[0]
 
     element = create_element(cell, symfem_type, order)

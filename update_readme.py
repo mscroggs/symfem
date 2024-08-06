@@ -4,8 +4,16 @@ import typing
 
 import symfem
 
-cells = ["interval", "triangle", "quadrilateral", "tetrahedron",
-         "hexahedron", "prism", "pyramid", "dual polygon"]
+cells = [
+    "interval",
+    "triangle",
+    "quadrilateral",
+    "tetrahedron",
+    "hexahedron",
+    "prism",
+    "pyramid",
+    "dual polygon",
+]
 elementlist: typing.Dict[str, typing.List[str]] = {i: [] for i in cells}
 
 for e in symfem.create._elementlist:
@@ -22,7 +30,6 @@ with open("README.md") as f:
     pre = f.read().split("# Available cells and elements")[0]
 
 with open("README.md", "w") as f:
-
     f.write(pre)
     f.write("# Available cells and elements\n")
     for cell in cells:
@@ -39,8 +46,10 @@ with open("README.md", "w") as f:
         else:
             f.write(", and ".join([", ".join(str_v[:-1]), str_v[-1]]))
         f.write(". Its sub-entities are numbered as follows.\n\n")
-        f.write(f"![The numbering of a reference {cell}]"
-                f"(img/{cell.replace(' ', '_')}_numbering.png)\n\n")
+        f.write(
+            f"![The numbering of a reference {cell}]"
+            f"(img/{cell.replace(' ', '_')}_numbering.png)\n\n"
+        )
 
         f.write("### List of supported elements\n")
         f.write("\n".join([f"- {i}" for i in elementlist[cell]]))

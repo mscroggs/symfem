@@ -21,13 +21,14 @@ repository = "https://github.com/mscroggs/symfem"
 documentation = "https://symfem.readthedocs.io/en/latest/"
 
 [project.optional-dependencies]
-style = ["ruff", "flake8", "mypy", "isort"]
+style = ["ruff", "mypy"]
 docs = ["sphinx", "sphinx-autoapi"]
 optional = ["CairoSVG>=2.6.0"]
 test = ["pytest", "symfem[optional]", "numpy"]
 
 [tool.ruff]
 line-length = 100
+indent-width = 4
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
@@ -37,6 +38,3 @@ convention = "google"
 
 [tool.mypy]
 ignore_missing_imports = true
-
-[tool.isort]
-line_length = 100

@@ -8,15 +8,17 @@ import typing
 
 import sympy
 
-from ..finite_element import CiarletElement
-from ..functionals import DotPointEvaluation, ListOfFunctionals, NormalIntegralMoment
-from ..functions import FunctionInput, VectorFunction
-from ..geometry import SetOfPoints, SetOfPointsInput
-from ..moments import make_integral_moment_dofs
-from ..piecewise_functions import PiecewiseFunction
-from ..references import NonDefaultReferenceError, Reference
-from .bernardi_raugel import BernardiRaugel
-from .lagrange import Lagrange, VectorLagrange
+from symfem.finite_element import CiarletElement
+from symfem.functionals import DotPointEvaluation, ListOfFunctionals, NormalIntegralMoment
+from symfem.functions import FunctionInput, VectorFunction
+from symfem.geometry import SetOfPoints, SetOfPointsInput
+from symfem.moments import make_integral_moment_dofs
+from symfem.piecewise_functions import PiecewiseFunction
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.elements.bernardi_raugel import BernardiRaugel
+from symfem.elements.lagrange import Lagrange, VectorLagrange
+
+__all__ = ["GuzmanNeilan", "make_piecewise_lagrange"]
 
 
 class GuzmanNeilan(CiarletElement):
@@ -42,10 +44,15 @@ class GuzmanNeilan(CiarletElement):
         for n in range(reference.sub_entity_count(reference.tdim - 1)):
             facet = reference.sub_entity(reference.tdim - 1, n)
             for v in facet.vertices:
-                dofs.append(DotPointEvaluation(
-                    reference, v, tuple(i * facet.jacobian() for i in facet.normal()),
-                    entity=(reference.tdim - 1, n),
-                    mapping="contravariant"))
+                dofs.append(
+                    DotPointEvaluation(
+                        reference,
+                        v,
+                        tuple(i * facet.jacobian() for i in facet.normal()),
+                        entity=(reference.tdim - 1, n),
+                        mapping="contravariant",
+                    )
+                )
 
         if order == 2:
             assert reference.name == "tetrahedron"
@@ -53,26 +60,38 @@ class GuzmanNeilan(CiarletElement):
             # Midpoints of edges
             for n in range(reference.sub_entity_count(1)):
                 edge = reference.sub_entity(1, n)
-                dofs.append(DotPointEvaluation(
-                    reference, edge.midpoint(), tuple(i * edge.jacobian() for i in edge.tangent()),
-                    entity=(1, n), mapping="contravariant"))
+                dofs.append(
+                    DotPointEvaluation(
+                        reference,
+                        edge.midpoint(),
+                        tuple(i * edge.jacobian() for i in edge.tangent()),
+                        entity=(1, n),
+                        mapping="contravariant",
+                    )
+                )
 
             # Midpoints of edges of faces
             for n in range(reference.sub_entity_count(2)):
                 face = reference.sub_entity(2, n)
                 for m in range(3):
                     edge = face.sub_entity(1, m)
-                    dofs.append(DotPointEvaluation(
-                        reference, edge.midpoint(),
-                        tuple(i * face.jacobian() for i in face.normal()),
-                        entity=(2, n), mapping="contravariant"))
+                    dofs.append(
+                        DotPointEvaluation(
+                            reference,
+                            edge.midpoint(),
+                            tuple(i * face.jacobian() for i in face.normal()),
+                            entity=(2, n),
+                            mapping="contravariant",
+                        )
+                    )
 
             # Interior edges
             for v in reference.vertices:
                 p = tuple((i + sympy.Rational(1, 4)) / 2 for i in v)
                 for d in [(1, 0, 0), (0, 1, 0), (0, 0, 1)]:
-                    dofs.append(DotPointEvaluation(
-                        reference, p, d, entity=(3, 0), mapping="contravariant"))
+                    dofs.append(
+                        DotPointEvaluation(reference, p, d, entity=(3, 0), mapping="contravariant")
+                    )
 
         dofs += make_integral_moment_dofs(
             reference,
@@ -82,8 +101,11 @@ class GuzmanNeilan(CiarletElement):
         mid = reference.midpoint()
         for i in range(reference.tdim):
             direction = tuple(1 if i == j else 0 for j in range(reference.tdim))
-            dofs.append(DotPointEvaluation(reference, mid, direction, entity=(reference.tdim, 0),
-                                           mapping="contravariant"))
+            dofs.append(
+                DotPointEvaluation(
+                    reference, mid, direction, entity=(reference.tdim, 0), mapping="contravariant"
+                )
+            )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
@@ -101,14 +123,15 @@ class GuzmanNeilan(CiarletElement):
         """
         assert order == 1
 
-        from ._guzman_neilan_triangle import coeffs
+        from symfem.elements._guzman_neilan_triangle import coeffs
 
         mid = reference.midpoint()
 
         sub_tris: typing.List[SetOfPoints] = [
             (reference.vertices[0], reference.vertices[1], mid),
             (reference.vertices[0], reference.vertices[2], mid),
-            (reference.vertices[1], reference.vertices[2], mid)]
+            (reference.vertices[1], reference.vertices[2], mid),
+        ]
 
         basis: typing.List[FunctionInput] = []
         basis += make_piecewise_lagrange(sub_tris, "triangle", order)
@@ -144,7 +167,7 @@ class GuzmanNeilan(CiarletElement):
             The polynomial set
         """
         assert order in [1, 2]
-        from ._guzman_neilan_tetrahedron import coeffs
+        from symfem.elements._guzman_neilan_tetrahedron import coeffs
 
         mid = reference.midpoint()
 
@@ -152,7 +175,8 @@ class GuzmanNeilan(CiarletElement):
             (reference.vertices[0], reference.vertices[1], reference.vertices[2], mid),
             (reference.vertices[0], reference.vertices[1], reference.vertices[3], mid),
             (reference.vertices[0], reference.vertices[2], reference.vertices[3], mid),
-            (reference.vertices[1], reference.vertices[2], reference.vertices[3], mid)]
+            (reference.vertices[1], reference.vertices[2], reference.vertices[3], mid),
+        ]
 
         basis: typing.List[FunctionInput] = []
         basis += make_piecewise_lagrange(sub_tets, "tetrahedron", order)
@@ -184,8 +208,11 @@ class GuzmanNeilan(CiarletElement):
 
 
 def make_piecewise_lagrange(
-    sub_cells: typing.List[SetOfPoints], cell_name, order: int, zero_on_boundary: bool = False,
-    zero_at_centre: bool = False
+    sub_cells: typing.List[SetOfPoints],
+    cell_name,
+    order: int,
+    zero_on_boundary: bool = False,
+    zero_at_centre: bool = False,
 ) -> typing.List[PiecewiseFunction]:
     """Make the basis functions of a piecewise Lagrange space.
 
@@ -200,6 +227,7 @@ def make_piecewise_lagrange(
         The basis functions
     """
     from symfem import create_reference
+
     lagrange_space = VectorLagrange(create_reference(cell_name), order)
     lagrange_bases: typing.List[typing.List[VectorFunction]] = []
     for c in sub_cells:
@@ -211,17 +239,17 @@ def make_piecewise_lagrange(
         lagrange_bases.append(row)
 
     basis_dofs: typing.List[typing.Tuple[int, ...]] = []
-    zero: typing.Tuple[int, ...] = (0, )
+    zero: typing.Tuple[int, ...] = (0,)
     if cell_name == "triangle":
         cell_tdim = 2
-        for dim, tri_entities in enumerate([
-            [(0, 0, -1), (1, -1, 0), (-1, 1, 1), (2, 2, 2)],
-            [(0, -1, 1), (1, 1, -1), (-1, 0, 0),
-             (2, -1, -1), (-1, 2, -1), (-1, -1, 2)],
-            [(0, -1, -1), (-1, 0, -1), (-1, -1, 0)]
-        ]):
-            nones = [
-                -1 for i in lagrange_space.entity_dofs(dim, 0)]
+        for dim, tri_entities in enumerate(
+            [
+                [(0, 0, -1), (1, -1, 0), (-1, 1, 1), (2, 2, 2)],
+                [(0, -1, 1), (1, 1, -1), (-1, 0, 0), (2, -1, -1), (-1, 2, -1), (-1, -1, 2)],
+                [(0, -1, -1), (-1, 0, -1), (-1, -1, 0)],
+            ]
+        ):
+            nones = [-1 for i in lagrange_space.entity_dofs(dim, 0)]
             for tri_e in tri_entities:
                 if dim == 0:
                     if zero_on_boundary and (0 in tri_e or 1 in tri_e):
@@ -231,26 +259,44 @@ def make_piecewise_lagrange(
                 elif dim == 1:
                     if zero_on_boundary and (2 in tri_e):
                         continue
-                doflist = [
-                    nones if i == -1 else lagrange_space.entity_dofs(dim, i) for i in tri_e
-                ]
+                doflist = [nones if i == -1 else lagrange_space.entity_dofs(dim, i) for i in tri_e]
                 for dofs in zip(*doflist):
                     basis_dofs.append(dofs)
         zero = (0, 0)
 
     elif cell_name == "tetrahedron":
         cell_tdim = 3
-        for dim, tet_entities in enumerate([
-            [(0, 0, 0, -1), (1, 1, -1, 0), (2, -1, 1, 1), (-1, 2, 2, 2), (3, 3, 3, 3)],
-            [(2, -1, -1, 5), (5, 5, -1, -1), (4, -1, 5, -1), (-1, 2, -1, 4),
-             (-1, 4, 4, -1), (-1, -1, 2, 2), (3, 3, 3, -1), (-1, 0, 0, 0), (0, -1, 1, 1),
-             (1, 1, -1, 3)],
-            [(0, -1, -1, 2), (1, -1, 2, -1), (2, 2, -1, -1), (3, -1, -1, -1), (-1, 0, -1, 1),
-             (-1, 1, 1, -1), (-1, 3, -1, -1), (-1, -1, 0, 0), (-1, -1, 3, -1), (-1, -1, -1, 3)],
-            [(0, -1, -1, -1), (-1, 0, -1, -1), (-1, -1, 0, -1), (-1, -1, -1, 0)]
-        ]):
-            nones = [
-                -1 for i in lagrange_space.entity_dofs(dim, 0)]
+        for dim, tet_entities in enumerate(
+            [
+                [(0, 0, 0, -1), (1, 1, -1, 0), (2, -1, 1, 1), (-1, 2, 2, 2), (3, 3, 3, 3)],
+                [
+                    (2, -1, -1, 5),
+                    (5, 5, -1, -1),
+                    (4, -1, 5, -1),
+                    (-1, 2, -1, 4),
+                    (-1, 4, 4, -1),
+                    (-1, -1, 2, 2),
+                    (3, 3, 3, -1),
+                    (-1, 0, 0, 0),
+                    (0, -1, 1, 1),
+                    (1, 1, -1, 3),
+                ],
+                [
+                    (0, -1, -1, 2),
+                    (1, -1, 2, -1),
+                    (2, 2, -1, -1),
+                    (3, -1, -1, -1),
+                    (-1, 0, -1, 1),
+                    (-1, 1, 1, -1),
+                    (-1, 3, -1, -1),
+                    (-1, -1, 0, 0),
+                    (-1, -1, 3, -1),
+                    (-1, -1, -1, 3),
+                ],
+                [(0, -1, -1, -1), (-1, 0, -1, -1), (-1, -1, 0, -1), (-1, -1, -1, 0)],
+            ]
+        ):
+            nones = [-1 for i in lagrange_space.entity_dofs(dim, 0)]
             for tet_e in tet_entities:
                 if dim == 0:
                     if zero_on_boundary and (0 in tet_e or 1 in tet_e or 2 in tet_e):
@@ -263,9 +309,7 @@ def make_piecewise_lagrange(
                 elif dim == 2:
                     if zero_on_boundary and (3 in tet_e):
                         continue
-                doflist = [
-                    nones if i == -1 else lagrange_space.entity_dofs(dim, i) for i in tet_e
-                ]
+                doflist = [nones if i == -1 else lagrange_space.entity_dofs(dim, i) for i in tet_e]
                 for dofs in zip(*doflist):
                     basis_dofs.append(dofs)
         zero = (0, 0, 0)

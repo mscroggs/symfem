@@ -7,12 +7,14 @@ This element's definition appears in https://doi.org/10.1051/m2an/197307R300331
 import typing
 from itertools import product
 
-from ..finite_element import CiarletElement
-from ..functionals import ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput
-from ..polynomials import polynomial_set_1d
-from ..quadrature import get_quadrature
-from ..references import Reference
+from symfem.finite_element import CiarletElement
+from symfem.functionals import ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput
+from symfem.polynomials import polynomial_set_1d
+from symfem.quadrature import get_quadrature
+from symfem.references import Reference
+
+__all__ = ["CrouzeixRaviart"]
 
 
 class CrouzeixRaviart(CiarletElement):
@@ -42,10 +44,13 @@ class CrouzeixRaviart(CiarletElement):
                     dofs.append(
                         PointEvaluation(
                             reference,
-                            tuple(o + sum(a[j] * points[b]
-                                          for a, b in zip(entity.axes, i))
-                                  for j, o in enumerate(entity.origin)),
-                            entity=(reference.tdim - 1, e_n)))
+                            tuple(
+                                o + sum(a[j] * points[b] for a, b in zip(entity.axes, i))
+                                for j, o in enumerate(entity.origin)
+                            ),
+                            entity=(reference.tdim - 1, e_n),
+                        )
+                    )
 
         points, _ = get_quadrature(variant, order + reference.tdim - 1)
         for i in product(range(1, order), repeat=reference.tdim):
@@ -53,10 +58,13 @@ class CrouzeixRaviart(CiarletElement):
                 dofs.append(
                     PointEvaluation(
                         reference,
-                        tuple(o + sum(a[j] * points[b]
-                                      for a, b in zip(reference.axes, i))
-                              for j, o in enumerate(reference.origin)),
-                        entity=(reference.tdim, 0)))
+                        tuple(
+                            o + sum(a[j] * points[b] for a, b in zip(reference.axes, i))
+                            for j, o in enumerate(reference.origin)
+                        ),
+                        entity=(reference.tdim, 0),
+                    )
+                )
 
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)

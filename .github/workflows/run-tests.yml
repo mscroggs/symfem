@@ -55,10 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-    env:
-      CC: gcc-10
-      CXX: g++-10
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
       - name: Set up Python
         uses: actions/setup-python@v4

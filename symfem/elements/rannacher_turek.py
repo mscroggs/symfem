@@ -6,11 +6,13 @@ This element's definition appears in https://doi.org/10.1002/num.1690080202
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import ListOfFunctionals, PointEvaluation
-from ..functions import FunctionInput
-from ..references import NonDefaultReferenceError, Reference
-from ..symbols import x
+from symfem.finite_element import CiarletElement
+from symfem.functionals import ListOfFunctionals, PointEvaluation
+from symfem.functions import FunctionInput
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import x
+
+__all__ = ["RannacherTurek"]
 
 
 class RannacherTurek(CiarletElement):
@@ -34,9 +36,9 @@ class RannacherTurek(CiarletElement):
 
         poly: typing.List[FunctionInput] = []
         if reference.name == "quadrilateral":
-            poly += [1, x[0], x[1], x[0]**2 - x[1]**2]
+            poly += [1, x[0], x[1], x[0] ** 2 - x[1] ** 2]
         else:
-            poly += [1, x[0], x[1], x[2], x[0]**2 - x[1]**2, x[1]**2 - x[2]**2]
+            poly += [1, x[0], x[1], x[2], x[0] ** 2 - x[1] ** 2, x[1] ** 2 - x[2] ** 2]
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 

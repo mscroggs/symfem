@@ -6,15 +6,27 @@ This element's definition appears in https://doi.org/10.1007/s10208-011-9087-3
 
 import typing
 
-from ..finite_element import CiarletElement
-from ..functionals import (IntegralMoment, ListOfFunctionals, NormalIntegralMoment, PointEvaluation,
-                           TangentIntegralMoment)
-from ..functions import FunctionInput
-from ..moments import make_integral_moment_dofs
-from ..polynomials import (Hcurl_serendipity, Hdiv_serendipity, polynomial_set_1d,
-                           polynomial_set_vector, serendipity_set_1d)
-from ..references import NonDefaultReferenceError, Reference
-from .dpc import DPC, VectorDPC
+from symfem.finite_element import CiarletElement
+from symfem.functionals import (
+    IntegralMoment,
+    ListOfFunctionals,
+    NormalIntegralMoment,
+    PointEvaluation,
+    TangentIntegralMoment,
+)
+from symfem.functions import FunctionInput
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import (
+    Hcurl_serendipity,
+    Hdiv_serendipity,
+    polynomial_set_1d,
+    polynomial_set_vector,
+    serendipity_set_1d,
+)
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.elements.dpc import DPC, VectorDPC
+
+__all__ = ["Serendipity", "SerendipityCurl", "SerendipityDiv"]
 
 
 class Serendipity(CiarletElement):
@@ -82,10 +94,8 @@ class SerendipityCurl(CiarletElement):
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, DPC, order, {"variant": variant}),
-            faces=(IntegralMoment, VectorDPC, order - 2, "covariant",
-                   {"variant": variant}),
-            volumes=(IntegralMoment, VectorDPC, order - 4, "covariant",
-                     {"variant": variant}),
+            faces=(IntegralMoment, VectorDPC, order - 2, "covariant", {"variant": variant}),
+            volumes=(IntegralMoment, VectorDPC, order - 4, "covariant", {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -127,8 +137,7 @@ class SerendipityDiv(CiarletElement):
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
             facets=(NormalIntegralMoment, DPC, order, {"variant": variant}),
-            cells=(IntegralMoment, VectorDPC, order - 2, "contravariant",
-                   {"variant": variant}),
+            cells=(IntegralMoment, VectorDPC, order - 2, "contravariant", {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
