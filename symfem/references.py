@@ -674,6 +674,25 @@ class Reference(ABC):
         invmap = self.get_inverse_map_to_self()
         return [parse_function_input(p).subs(x, invmap) for p in poly]
 
+    def derivative_count(self, order: int) -> int:
+        """Number of derivatives up to given order.
+
+        Args:
+            order: Max derivative order
+
+        Returns:
+            Number of derivatives
+        """
+        if self.tdim == 0:
+            return 1
+        if self.tdim == 1:
+            return order + 1
+        if self.tdim == 2:
+            return (order + 1) * (order + 2) // 2
+        if self.tdim == 2:
+            return (order + 1) * (order + 2) * (order + 3) // 6
+        raise ValueError(f"Unsupported reference: {self.name}")
+
     def plot_entity_diagrams(
         self,
         filename: typing.Union[str, typing.List[str]],
