@@ -2,7 +2,6 @@
 
 import typing
 from symfem.finite_element import CiarletElement
-from symfem.references import Reference
 from symfem.symbols import x
 from symfem.polynomials import degree
 
@@ -12,6 +11,17 @@ try:
     import basix
 except ModuleNotFoundError:
     exit()
+
+sobolev_spaces = {
+    "C0": basix.SobolevSpace.H1,
+    "L2": basix.SobolevSpace.L2,
+}
+
+map_types = {
+    "identity": basix.MapType.identity,
+    "covariant": basix.MapType.covariantPiola,
+    "contravariant": basix.MapType.contravariantPiola,
+}
 
 
 def get_embedded_degrees(poly, reference) -> typing.Tuple[int, int]:
@@ -42,15 +52,8 @@ def create_basix_element(
     for dof in element.dofs[1:]:
         assert dof.mapping == element.dofs[0].mapping
 
-    map_type = {
-        "identity": basix.MapType.identity,
-        "covariant": basix.MapType.covariantPiola,
-        "contravariant": basix.MapType.contravariantPiola,
-    }[element.dofs[0].mapping]
-
-    sobolev_space = {
-        "C0": basix.SobolevSpace.H1,
-    }[element.continuity]
+    map_type = map_types[element.dofs[0].mapping]
+    sobolev_space = sobolev_spaces[element.continuity]
 
     poly = element.get_polynomial_basis()
     subdegree, superdegree = get_embedded_degrees(poly, element.reference)
@@ -79,22 +82,27 @@ def create_basix_element(
     for dof in element.dofs:
         dof_p, _dof_w = dof.discrete(superdegree)
         dof_w = np.array(_dof_w)
+        shape = dof_wts[dof.entity[0]][dof.entity[1]].shape
+        new_dof_wts = np.zeros((shape[0] + 1, shape[1], shape[2], shape[3]))
+        new_dof_wts[: shape[0], :, :, :] = dof_wts[dof.entity[0]][dof.entity[1]]
         for p_i, p in enumerate(dof_p):
-            shape = dof_wts[dof.entity[0]][dof.entity[1]].shape
-            dof_wts[dof.entity[0]][dof.entity[1]].resize(
-                (shape[0] + 1, shape[1], shape[2], shape[3])
-            )
+            dof_wts[dof.entity[0]][dof.entity[1]] = new_dof_wts
             for i, q in enumerate(dof_pts[dof.entity[0]][dof.entity[1]]):
                 if np.allclose(p, q):
                     point_n = i
                     break
             else:
                 point_n = dof_pts[dof.entity[0]][dof.entity[1]].shape[0]
-                dof_pts[dof.entity[0]][dof.entity[1]].resize((point_n + 1, ref.gdim))
-                dof_pts[dof.entity[0]][dof.entity[1]][point_n, :] = p
-                dof_wts[dof.entity[0]][dof.entity[1]].resize(
-                    (shape[0] + 1, shape[1], shape[2] + 1, shape[3])
-                )
+
+                new_dof_pts = np.zeros((point_n + 1, ref.gdim))
+                new_dof_pts[:point_n, :] = dof_pts[dof.entity[0]][dof.entity[1]]
+                new_dof_pts[point_n, :] = p
+                dof_pts[dof.entity[0]][dof.entity[1]] = new_dof_pts
+
+                shape = dof_wts[dof.entity[0]][dof.entity[1]].shape
+                new_dof_wts = np.zeros((shape[0], shape[1], shape[2] + 1, shape[3]))
+                new_dof_wts[:, :, : shape[2], :] = dof_wts[dof.entity[0]][dof.entity[1]]
+                dof_wts[dof.entity[0]][dof.entity[1]] = new_dof_wts
             dof_wts[dof.entity[0]][dof.entity[1]][-1, :, point_n, :] = dof_w[:, p_i, :]
 
     return basix.create_custom_element(

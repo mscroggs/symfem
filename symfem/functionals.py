@@ -1228,20 +1228,15 @@ class IntegralAgainst(BaseFunctional):
             import basix
         except ModuleNotFoundError:
             raise ModuleNotFoundError("Basix is required to create this discrete DOF.")
-        pts, wts = basix.make_quadrature(
+        _pts, wts = basix.make_quadrature(
             getattr(basix.CellType, self.integral_domain.name),
             poly_degree + degree(self.integral_domain, self.f),
         )
 
-        pt_map = self.integral_domain.get_map_to_self()
+        pt_map = self.integral_domain.get_map_to_self()  # TODO
+        pts = [[c for c in p] for p in _pts]
 
-        return pts, [[[i] for i in wts]]
-
-        from IPython import embed
-
-        embed()()
-        print(self)
-        raise NotImplementedError()
+        return pts, [[[float(w * float(self.f.subs(t, p).as_sympy()))] for p, w in zip(pts, wts)]]
 
     name = "Integral against"
 

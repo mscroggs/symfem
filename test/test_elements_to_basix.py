@@ -4,7 +4,6 @@ import pytest
 
 from symfem.basix_interface import create_basix_element
 from symfem import create_element
-from symfem.symbols import x
 from symfem.finite_element import DirectElement, EnrichedElement
 
 from .utils import test_elements
