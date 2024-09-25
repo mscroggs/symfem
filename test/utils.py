@@ -54,7 +54,7 @@ test_elements: typing.Dict[
         "BDFM": [({"variant": "equispaced"}, range(1, 4))],
         "Argyris": [({}, [5])],
         "MTW": [({"variant": "equispaced"}, [3])],
-        "KMV": [({}, [1, 3])],
+        "KMV": [({}, [1, 2])],
         "Hermite": [({}, [3])],
         "BDM": [({"variant": "equispaced"}, range(1, 4))],
         "Bernstein": [({}, range(1, 4))],

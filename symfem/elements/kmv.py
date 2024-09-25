@@ -88,7 +88,7 @@ class KongMulderVeldhuizen(CiarletElement):
                     )
                 poly = kmv_tri_polyset(1, 1)
 
-            elif order == 3:
+            elif order == 2:
                 for v_n, v in enumerate(reference.vertices):
                     dofs.append(
                         WeightedPointEvaluation(
@@ -115,7 +115,7 @@ class KongMulderVeldhuizen(CiarletElement):
                 )
                 poly = kmv_tri_polyset(2, 3)
 
-            elif order == 4:
+            elif order == 3:
                 for v_n, v in enumerate(reference.vertices):
                     dofs.append(
                         WeightedPointEvaluation(
@@ -177,7 +177,7 @@ class KongMulderVeldhuizen(CiarletElement):
                     )
                 poly = kmv_tet_polyset(1, 1, 1)
 
-            elif order == 4:
+            elif order == 2:
                 for v_n, v in enumerate(reference.vertices):
                     dofs.append(
                         WeightedPointEvaluation(
