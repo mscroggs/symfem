@@ -553,7 +553,7 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
             desc += f"v'({','.join([_to_tex(i, True) for i in self.point])})"
             return desc, []
         desc = "v\\mapsto"
-        desc += f"\\nabla{{v}}({','.join([_to_tex(i, True) for i in self.point])})"
+        desc += f"\\nabla {{v}}({','.join([_to_tex(i, True) for i in self.point])})"
         desc += "\\cdot\\left(\\begin{array}{c}"
         desc += "\\\\".join([_to_tex(i) for i in self.dir])
         desc += "\\end{array}\\right)"
@@ -593,7 +593,7 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
             Representation of the functional as TeX, and list of terms involved
         """
         desc = "v\\mapsto"
-        desc += "\\nabla{v}(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
+        desc += "\\nabla {v}(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
         entity_n = self.entity_number()
         desc += "\\cdot\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}}"
         return desc, [
@@ -928,7 +928,7 @@ class PointDivergenceEvaluation(BaseFunctional):
             Representation of the functional as TeX, and list of terms involved
         """
         desc = "\\boldsymbol{v}\\mapsto"
-        desc += "\\nablaa\\cdot\\boldsymbol{v}"
+        desc += "\\nabla a\\cdot\\boldsymbol{v}"
         desc += "(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
         return desc, []
 
