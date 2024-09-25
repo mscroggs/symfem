@@ -51,7 +51,7 @@ class ArnoldWinther(CiarletElement):
                 ),
                 (
                     -k * (order - k + 2) * x[0] ** (k - 1) * x[1] ** (order - k + 1),
-                    -k * (k - 1) * x[0] ** (k - 2) * x[1] ** (order - k + 2),
+                    k * (k - 1) * x[0] ** (k - 2) * x[1] ** (order - k + 2),
                 ),
             )
             for k in range(order + 1)
@@ -75,15 +75,6 @@ class ArnoldWinther(CiarletElement):
             for dof_n, dof in enumerate(sub_e.dofs):
                 p = sub_e.get_basis_function(dof_n).get_function()
                 for component in [sub_ref.normal(), sub_ref.tangent()]:
-                    InnerProductIntegralMoment(
-                        reference,
-                        p,
-                        component,
-                        sub_ref.normal(),
-                        dof,
-                        entity=(1, e_n),
-                        mapping="double_contravariant",
-                    )
                     dofs.append(
                         InnerProductIntegralMoment(
                             reference,
@@ -105,6 +96,7 @@ class ArnoldWinther(CiarletElement):
                         tuple(tuple(p * j for j in i) for i in component22),
                         dof,
                         entity=(2, 0),
+                        mapping="double_contravariant",
                     )
                 )
 
@@ -114,8 +106,13 @@ class ArnoldWinther(CiarletElement):
                 if sympy.Poly(p.as_sympy(), x[:2]).degree() != order - 4:
                     continue
                 f = p * x[0] ** 2 * x[1] ** 2 * (1 - x[0] - x[1]) ** 2
-                J = tuple(tuple(f.diff(x[i]).diff(x[j]) for j in range(2)) for i in range(2))
-                dofs.append(IntegralMoment(reference, J, dof, entity=(2, 0)))
+                J = [
+                    [f.diff(x[1]).diff(x[1]), -f.diff(x[0]).diff(x[1])],
+                    [-f.diff(x[1]).diff(x[0]), f.diff(x[0]).diff(x[0])],
+                ]
+                dofs.append(
+                    IntegralMoment(reference, J, dof, entity=(2, 0), mapping="double_contravariant")
+                )
 
         super().__init__(
             reference,
@@ -139,7 +136,7 @@ class ArnoldWinther(CiarletElement):
     references = ["triangle"]
     min_order = 3
     continuity = "integral inner H(div)"
-    last_updated = "2023.05"
+    last_updated = "2024.09"
 
 
 class NonConformingArnoldWinther(CiarletElement):
