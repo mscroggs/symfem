@@ -20,6 +20,11 @@ from symfem.symbols import x
 from symfem.elements.lagrange import Lagrange
 from symfem.elements.q import Nedelec
 
+try:
+    from typing import override
+except ImportError:
+    from typing_extensions import override
+
 __all__ = ["ArnoldBoffiFalk"]
 
 
@@ -76,6 +81,33 @@ class ArnoldBoffiFalk(CiarletElement):
             Keyword argument dictionary
         """
         return {"variant": self.variant}
+
+    def a(self) -> int:
+        return 1
+
+    @property
+    def value_type(self) -> str:
+        return "vector"
+
+    @override
+    @property
+    def lagrange_subdegree(self) -> int:
+        return 1
+
+    @override
+    @property
+    def lagrange_superdegree(self) -> int:
+        return 1
+
+    @override
+    @property
+    def polynomial_subdegree(self) -> int:
+        return 1
+
+    @override
+    @property
+    def polynomial_superdegree(self) -> int:
+        return 1
 
     names = ["Arnold-Boffi-Falk", "ABF"]
     references = ["quadrilateral"]

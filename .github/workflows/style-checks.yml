@@ -20,6 +20,8 @@ jobs:
           python3 -m ruff check .
           python3 -m ruff format --check .
         name: Run ruff checks
+      - run: python3 -m pydocstyle symfem --ignore-decorators=override
+        name: Run pydocstyle checks
       - run: python3 -m mypy .
         name: Run mypy checks
       - run: |
