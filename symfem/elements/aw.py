@@ -106,8 +106,13 @@ class ArnoldWinther(CiarletElement):
                 if sympy.Poly(p.as_sympy(), x[:2]).degree() != order - 4:
                     continue
                 f = p * x[0] ** 2 * x[1] ** 2 * (1 - x[0] - x[1]) ** 2
-                J = tuple(tuple(f.diff(x[i]).diff(x[j]) for j in range(2)) for i in range(2))
-                dofs.append(IntegralMoment(reference, J, dof, entity=(2, 0)))
+                J = [
+                    [f.diff(x[1]).diff(x[1]), -f.diff(x[0]).diff(x[1])],
+                    [-f.diff(x[1]).diff(x[0]), f.diff(x[0]).diff(x[0])],
+                ]
+                dofs.append(
+                    IntegralMoment(reference, J, dof, entity=(2, 0), mapping="double_contravariant")
+                )
 
         super().__init__(
             reference,
