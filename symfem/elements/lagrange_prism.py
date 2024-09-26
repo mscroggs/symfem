@@ -119,24 +119,25 @@ class Lagrange(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order * 2
 
     names = ["Lagrange", "P"]
     references = ["prism"]
     min_order = 0
     continuity = "C0"
+    value_type = "scalar"
     last_updated = "2023.07"
 
 
@@ -183,22 +184,23 @@ class VectorLagrange(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order * 2
 
     names: typing.List[str] = []
     references = ["prism"]
     min_order = 0
     continuity = "C0"
+    value_type = "vector"
     last_updated = "2023.05"

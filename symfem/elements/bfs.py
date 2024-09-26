@@ -52,19 +52,19 @@ class BognerFoxSchmit(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order * 2
 
     names = ["Bogner-Fox-Schmit", "BFS"]
     references = ["quadrilateral"]
@@ -72,4 +72,5 @@ class BognerFoxSchmit(CiarletElement):
     max_order = 3
     continuity = "C0"
     # continuity = "C1"
+    value_type = "scalar"
     last_updated = "2023.05"

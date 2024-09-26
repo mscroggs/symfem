@@ -49,25 +49,26 @@ class P1IsoP2Interval(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        raise NotImplementedError()
 
     names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
     references = ["interval"]
     min_order = 1
     max_order = 1
     continuity = "C0"
+    value_type = "scalar macro"
     last_updated = "2023.08"
 
 
@@ -124,25 +125,26 @@ class P1IsoP2Tri(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        raise NotImplementedError()
 
     names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
     references = ["triangle"]
     min_order = 1
     max_order = 1
     continuity = "C0"
+    value_type = "scalar macro"
     last_updated = "2023.06"
 
 
@@ -202,23 +204,24 @@ class P1IsoP2Quad(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        raise NotImplementedError()
 
     names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
     references = ["quadrilateral"]
     min_order = 1
     max_order = 1
     continuity = "C0"
+    value_type = "scalar macro"
     last_updated = "2023.06"

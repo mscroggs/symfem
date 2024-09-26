@@ -26,28 +26,33 @@ def make_into_value_type(poly, element):
         return [MatrixFunction([[p if (i0 == j0 and i1 == j1) or (i1 == j0 and i0 == j1) else 0 for j1 in range(element.range_shape[1])] for j0 in range(element.range_shape[0])]) for i0 in range(element.range_shape[0]) for i1 in range(i0, element.range_shape[1]) for p in poly]
 
 
-def polydict(f, element):
-    if element.value_type == "unknown":
-        pytest.xfail("TODO: remove this xfail")
-
-    if element.reference.name == "pyramid":
-        f *= (1 - x[2]) ** element.lagrange_superdegree
+def polydict(f, element, pyramid_mult=None):
+    if element.reference.name == "pyramid" and pyramid_mult is None:
+            pyramid_mult = element.lagrange_superdegree + 1
+    if hasattr(f, "as_sympy"):
+        f = f.as_sympy()
 
     if element.value_type == "scalar" or element.reference.gdim == 1:
-        return f.as_sympy().expand().as_coefficients_dict()
+        if element.reference.name == "pyramid":
+            f *= (1 - x[2]) ** pyramid_mult
+        return f.expand().as_poly(*x).as_dict()
     if element.value_type == "vector":
+        if element.reference.name == "pyramid":
+            f = [i * (1 - x[2]) ** pyramid_mult for i in f]
         out = {}
-        for i, f_i in enumerate(f.as_sympy()):
-            for term, coeff in f_i.expand().as_coefficients_dict().items():
-                t = tuple(term if i == j else 0 for j, _ in enumerate(f.as_sympy()))
+        for i, f_i in enumerate(f):
+            for term, coeff in f_i.expand().as_poly(*x).as_dict().items():
+                t = tuple(term if i == j else 0 for j, _ in enumerate(f))
                 assert t not in out
                 out[t] = coeff
         return out
     if element.value_type in ["matrix", "symmetric matrix"]:
+        if element.reference.name == "pyramid":
+            f = [i * (1 - x[2]) ** pyramid_mult for i in f]
         out = {}
-        for i, f_i in enumerate(f.as_sympy()):
-            for term, coeff in f_i.expand().as_coefficients_dict().items():
-                t = tuple(term if i == j else 0 for j, _ in enumerate(f.as_sympy()))
+        for i, f_i in enumerate(f):
+            for term, coeff in f_i.expand().as_poly(*x).as_dict().items():
+                t = tuple(term if i == j else 0 for j, _ in enumerate(f))
                 assert t not in out
                 assert len(t) == element.range_dim
                 out[t] = coeff
@@ -56,16 +61,20 @@ def polydict(f, element):
 
 
 def run_subdegree_test(element, subdegree, pfunc, pargs):
+    if "non-polynomial" in element.value_type:
+        pytest.xfail("Cannot test non-polynomial elements yet")
+    if "dual" in element.value_type:
+        pytest.xfail("Cannot test dual elements yet")
+    if "macro" in element.value_type:
+        pytest.xfail("Cannot test macro elements yet")
+
     try:
-        print(element.get_polynomial_basis())
         basis_coeff = [polydict(p, element) for p in element.get_polynomial_basis()]
     except NotImplementedError:
         basis_coeff = [polydict(p, element) for p in element.get_basis_functions()]
 
     if subdegree > -1:
         poly = pfunc(*[subdegree if p == "SUBDEGREE" else p for p in pargs])
-        print(poly)
-        print(make_into_value_type(poly, element))
         poly_coeff = [polydict(p, element) for p in make_into_value_type(poly, element)]
 
         monomials = list(set([m for p in poly_coeff + basis_coeff for m in p]))
@@ -87,6 +96,13 @@ def run_subdegree_test(element, subdegree, pfunc, pargs):
 
 
 def run_superdegree_test(element, superdegree, pfunc, pargs):
+    if "non-polynomial" in element.value_type:
+        pytest.xfail("Cannot test non-polynomial elements yet")
+    if "dual" in element.value_type:
+        pytest.xfail("Cannot test dual elements yet")
+    if "macro" in element.value_type:
+        pytest.xfail("Cannot test macro elements yet")
+
     try:
         basis_coeff = [polydict(p, element) for p in element.get_polynomial_basis()]
     except NotImplementedError:
@@ -104,7 +120,7 @@ def run_superdegree_test(element, superdegree, pfunc, pargs):
         assert mat.rank() == mat2.rank()
 
     poly = pfunc(*[(10 if superdegree is None else superdegree - 1) if p == "SUPERDEGREE" else p for p in pargs])
-    poly_coeff = [polydict(p, element) for p in make_into_value_type(poly, element)]
+    poly_coeff = [polydict(p, element, 10 if superdegree is None else None) for p in make_into_value_type(poly, element)]
 
     monomials = list(set([m for p in poly_coeff + basis_coeff for m in p]))
 
@@ -124,7 +140,7 @@ def run_superdegree_test(element, superdegree, pfunc, pargs):
         for order in k
     ],
 )
-def test_lagrange_subdegree(elements_to_test, cells_to_test, cell_type, element_type, order, kwargs, speed):
+def test_degrees(elements_to_test, cells_to_test, cell_type, element_type, order, kwargs, speed):
     """Check Lagrange subdegrees of each element."""
     if elements_to_test != "ALL" and element_type not in elements_to_test:
         pytest.skip()
@@ -137,83 +153,15 @@ def test_lagrange_subdegree(elements_to_test, cells_to_test, cell_type, element_
             pytest.skip()
 
     element = create_element(cell_type, element_type, order, **kwargs)
+    if "non-polynomial" in element.value_type:
+        pytest.xfail("Cannot test non-polynomial elements yet")
+    if "dual" in element.value_type:
+        pytest.xfail("Cannot test dual elements yet")
+    if "macro" in element.value_type:
+        pytest.xfail("Cannot test macro elements yet")
+
     run_subdegree_test(element, element.lagrange_subdegree, polynomial_set, (cell_type, "SUBDEGREE"))
-
-
-@pytest.mark.parametrize(
-    ("cell_type", "element_type", "order", "kwargs"),
-    [
-        [reference, element, order, kwargs]
-        for reference, i in test_elements.items()
-        for element, j in i.items()
-        for kwargs, k in j
-        for order in k
-    ],
-)
-def test_polynomial_subdegree(elements_to_test, cells_to_test, cell_type, element_type, order, kwargs, speed):
-    """Check polynomial subdegrees of each element."""
-    if elements_to_test != "ALL" and element_type not in elements_to_test:
-        pytest.skip()
-    if cells_to_test != "ALL" and cell_type not in cells_to_test:
-        pytest.skip()
-    if speed == "fast":
-        if order > 2:
-            pytest.skip()
-        if order == 2 and cell_type in ["tetrahedron", "hexahedron", "prism", "pyramid"]:
-            pytest.skip()
-
-    element = create_element(cell_type, element_type, order, **kwargs)
     run_subdegree_test(element, element.polynomial_subdegree, polynomial_set_1d, (element.reference.tdim, "SUBDEGREE"))
-
-
-@pytest.mark.parametrize(
-    ("cell_type", "element_type", "order", "kwargs"),
-    [
-        [reference, element, order, kwargs]
-        for reference, i in test_elements.items()
-        for element, j in i.items()
-        for kwargs, k in j
-        for order in k
-    ],
-)
-def test_lagrange_superdegree(elements_to_test, cells_to_test, cell_type, element_type, order, kwargs, speed):
-    """Check Lagrange superdegrees of each element."""
-    if elements_to_test != "ALL" and element_type not in elements_to_test:
-        pytest.skip()
-    if cells_to_test != "ALL" and cell_type not in cells_to_test:
-        pytest.skip()
-    if speed == "fast":
-        if order > 2:
-            pytest.skip()
-        if order == 2 and cell_type in ["tetrahedron", "hexahedron", "prism", "pyramid"]:
-            pytest.skip()
-
-    element = create_element(cell_type, element_type, order, **kwargs)
     run_superdegree_test(element, element.lagrange_superdegree, polynomial_set, (cell_type, "SUPERDEGREE"))
-
-
-@pytest.mark.parametrize(
-    ("cell_type", "element_type", "order", "kwargs"),
-    [
-        [reference, element, order, kwargs]
-        for reference, i in test_elements.items()
-        for element, j in i.items()
-        for kwargs, k in j
-        for order in k
-    ],
-)
-def test_polynomial_superdegree(elements_to_test, cells_to_test, cell_type, element_type, order, kwargs, speed):
-    """Check polynomial superdegrees of each element."""
-    if elements_to_test != "ALL" and element_type not in elements_to_test:
-        pytest.skip()
-    if cells_to_test != "ALL" and cell_type not in cells_to_test:
-        pytest.skip()
-    if speed == "fast":
-        if order > 2:
-            pytest.skip()
-        if order == 2 and cell_type in ["tetrahedron", "hexahedron", "prism", "pyramid"]:
-            pytest.skip()
-
-    element = create_element(cell_type, element_type, order, **kwargs)
     run_superdegree_test(element, element.polynomial_superdegree, polynomial_set_1d, (element.reference.tdim, "SUPERDEGREE"))
 

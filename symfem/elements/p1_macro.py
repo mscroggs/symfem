@@ -62,23 +62,24 @@ class P1Macro(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        raise NotImplementedError()
 
     names = ["P1 macro"]
     references = ["triangle"]
     min_order = 1
     max_order = 1
     continuity = "C0"
+    value_type = "scalar macro"
     last_updated = "2023.06"

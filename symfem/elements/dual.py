@@ -256,25 +256,26 @@ class Dual(DualCiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        raise NotImplementedError()
 
     names = ["dual polynomial", "dual P", "dual"]
     references = ["dual polygon"]
     min_order = 0
     max_order = 1
     continuity = "C0"
+    value_type = "scalar dual"
     last_updated = "2023.05"
 
 
@@ -324,25 +325,26 @@ class BuffaChristiansen(DualCiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        raise NotImplementedError()
 
     names = ["Buffa-Christiansen", "BC"]
     references = ["dual polygon"]
     min_order = 1
     max_order = 1
     continuity = "H(div)"
+    value_type = "vector dual"
     last_updated = "2023.05"
 
 
@@ -392,23 +394,24 @@ class RotatedBuffaChristiansen(DualCiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        raise NotImplementedError()
 
     names = ["rotated Buffa-Christiansen", "RBC"]
     references = ["dual polygon"]
     min_order = 1
     max_order = 1
     continuity = "H(div)"
+    value_type = "vector dual"
     last_updated = "2023.05"

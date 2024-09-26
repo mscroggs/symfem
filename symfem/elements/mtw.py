@@ -100,23 +100,24 @@ class MardalTaiWinther(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        return 1
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order + self.reference.tdim - 2
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return self.lagrange_subdegree
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.lagrange_superdegree
 
     names = ["Mardal-Tai-Winther", "MTW"]
     references = ["triangle", "tetrahedron"]
     min_order = 3
     max_order = 3
     continuity = "H(div)"
+    value_type = "vector"
     last_updated = "2023.06"

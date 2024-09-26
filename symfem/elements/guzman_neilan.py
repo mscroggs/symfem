@@ -201,25 +201,26 @@ class GuzmanNeilan(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        raise NotImplementedError()
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        raise NotImplementedError()
 
     names = ["Guzman-Neilan"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
     max_order = {"triangle": 1, "tetrahedron": 2}
     continuity = "H(div)"
+    value_type = "vector macro"
     last_updated = "2023.06"
 
 

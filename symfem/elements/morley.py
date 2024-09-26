@@ -46,23 +46,24 @@ class Morley(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order
 
     names = ["Morley"]
     references = ["triangle"]
     min_order = 2
     max_order = 2
     continuity = "L2"
+    value_type = "scalar"
     last_updated = "2023.05"

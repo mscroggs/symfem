@@ -60,22 +60,27 @@ class ConformingCrouzeixRaviart(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        if self.order == 1:
+            return 1
+        return self.order + 1
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        if self.order == 1:
+            return 1
+        return self.order + 1
 
     names = ["conforming Crouzeix-Raviart", "conforming CR"]
     references = ["triangle"]
     min_order = 1
     continuity = "L2"
+    value_type = "scalar"
     last_updated = "2023.05"

@@ -114,22 +114,23 @@ class Lagrange(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return None
 
     names = ["Lagrange", "P"]
     references = ["pyramid"]
     min_order = 0
     continuity = "C0"
+    value_type = "scalar"
     last_updated = "2023.07"

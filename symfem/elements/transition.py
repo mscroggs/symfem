@@ -131,22 +131,31 @@ class Transition(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        # TODO
+        print(self.order, self.edge_orders, self.face_orders)
+        if self.reference.name == "triangle":
+            return max([self.order] + self.edge_orders)
+        elif self.reference.name == "tetrahedron":
+            return max([self.order] + self.edge_orders + self.face_orders)
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        if self.reference.name == "triangle":
+            return max(self.edge_orders)
+        elif self.reference.name == "tetrahedron":
+            return max(self.edge_orders + self.face_orders)
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return self.lagrange_subdegree
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.lagrange_superdegree
 
     names = ["transition"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
     continuity = "C0"
+    value_type = "scalar"
     last_updated = "2023.06"

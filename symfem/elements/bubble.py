@@ -13,6 +13,7 @@ from symfem.finite_element import CiarletElement
 from symfem.functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
 from symfem.functions import FunctionInput
 from symfem.references import Reference
+from symfem.symbols import x
 from symfem.elements.lagrange import Lagrange
 
 __all__ = ["Bubble", "BubbleEnrichedLagrange", "BubbleEnrichedVectorLagrange"]
@@ -33,8 +34,12 @@ class Bubble(CiarletElement):
 
         p1 = create_element(reference.name, "Lagrange", 1, vertices=reference.vertices)
         bubble = 1
-        for f in p1.get_basis_functions():
-            bubble *= f
+        if reference.name in ["interval", "quadrilateral", "hexahedron"]:
+            for v in x[:reference.tdim]:
+                bubble *= v * (1 - v)
+        else:
+            for f in p1.get_basis_functions():
+                bubble *= f
 
         if reference.name in ["interval", "quadrilateral", "hexahedron"]:
             o = order - 2
@@ -80,19 +85,21 @@ class Bubble(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        return -1
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return -1
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        if self.reference.name in ["quadrilateral", "hexahedron"]:
+            return self.order * self.reference.tdim
+        return self.order
 
     names = ["bubble"]
     references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
@@ -104,6 +111,7 @@ class Bubble(CiarletElement):
         "hexahedron": 2,
     }
     continuity = "C0"
+    value_type = "scalar"
     last_updated = "2023.09"
 
 
@@ -140,24 +148,25 @@ class BubbleEnrichedLagrange(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order + 2
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order + 2
 
     names = ["bubble enriched Lagrange"]
     references = ["triangle"]
     min_order = 1
     continuity = "C0"
+    value_type = "scalar"
     last_updated = "2023.09"
 
 
@@ -201,22 +210,23 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order + 2
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order + 2
 
     names = ["bubble enriched vector Lagrange"]
     references = ["triangle"]
     min_order = 1
     continuity = "C0"
+    value_type = "vector"
     last_updated = "2023.09"

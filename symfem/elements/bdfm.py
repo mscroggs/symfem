@@ -99,22 +99,26 @@ class BDFM(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        if self.reference.name in ["triangle", "tetrahedron"]:
+            return self.order - 1
+        else:
+            return self.order // self.reference.tdim
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return self.order - 1
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order
 
     names = ["Brezzi-Douglas-Fortin-Marini", "BDFM"]
     references = ["triangle", "quadrilateral", "hexahedron", "tetrahedron"]
     min_order = 1
     continuity = "H(div)"
+    value_type = "vector"
     last_updated = "2023.06"
