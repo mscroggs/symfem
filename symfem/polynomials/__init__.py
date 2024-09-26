@@ -10,6 +10,7 @@ from symfem.polynomials.polysets import (
     Hdiv_polynomials,
     Hdiv_quolynomials,
     Hdiv_serendipity,
+    polynomial_set,
     polynomial_set_1d,
     polynomial_set_vector,
     prism_polynomial_set_1d,
