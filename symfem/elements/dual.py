@@ -254,6 +254,22 @@ class Dual(DualCiarletElement):
             dual_coefficients, fine_space, reference, order, dof_entities, reference.tdim, 1
         )
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
     names = ["dual polynomial", "dual P", "dual"]
     references = ["dual polygon"]
     min_order = 0
@@ -306,6 +322,22 @@ class BuffaChristiansen(DualCiarletElement):
             dof_directions=tuple(dof_directions),
         )
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
     names = ["Buffa-Christiansen", "BC"]
     references = ["dual polygon"]
     min_order = 1
@@ -357,6 +389,22 @@ class RotatedBuffaChristiansen(DualCiarletElement):
             2,
             dof_directions=tuple(dof_directions),
         )
+
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
 
     names = ["rotated Buffa-Christiansen", "RBC"]
     references = ["dual polygon"]

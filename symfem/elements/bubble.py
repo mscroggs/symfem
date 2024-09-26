@@ -78,6 +78,22 @@ class Bubble(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
     names = ["bubble"]
     references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
     min_order = {
@@ -121,6 +137,22 @@ class BubbleEnrichedLagrange(CiarletElement):
             Keyword argument dictionary
         """
         return {"variant": self.variant}
+
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
 
     names = ["bubble enriched Lagrange"]
     references = ["triangle"]
@@ -166,6 +198,22 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
             Keyword argument dictionary
         """
         return {"variant": self.variant}
+
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
 
     names = ["bubble enriched vector Lagrange"]
     references = ["triangle"]

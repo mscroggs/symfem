@@ -122,6 +122,22 @@ class HellanHerrmannJohnson(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
     names = ["Hellan-Herrmann-Johnson", "HHJ"]
     references = ["triangle", "tetrahedron"]
     min_order = 0

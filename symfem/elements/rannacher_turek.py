@@ -50,6 +50,22 @@ class RannacherTurek(CiarletElement):
         """
         return {}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
     names = ["Rannacher-Turek"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1

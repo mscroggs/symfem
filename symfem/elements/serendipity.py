@@ -66,6 +66,22 @@ class Serendipity(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
     names = ["serendipity", "S"]
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 1
@@ -109,6 +125,22 @@ class SerendipityCurl(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
@@ -150,6 +182,22 @@ class SerendipityDiv(CiarletElement):
             Keyword argument dictionary
         """
         return {"variant": self.variant}
+
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
 
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]
     references = ["quadrilateral", "hexahedron"]

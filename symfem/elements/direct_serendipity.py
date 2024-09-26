@@ -4,6 +4,8 @@ This element's definition appears in https://arxiv.org/abs/1809.02192
 (Arbogast, Tao, 2018)
 """
 
+import typing
+
 from symfem.finite_element import DirectElement
 from symfem.references import Reference
 from symfem.symbols import x
@@ -76,6 +78,22 @@ class DirectSerendipity(DirectElement):
                 basis_entities.append((2, 0))
 
         super().__init__(reference, order, basis_functions, basis_entities, reference.tdim, 1)
+
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
 
     names = ["direct serendipity"]
     references = ["quadrilateral"]

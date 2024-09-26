@@ -47,6 +47,22 @@ class P1IsoP2Interval(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
     names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
     references = ["interval"]
     min_order = 1
@@ -105,6 +121,22 @@ class P1IsoP2Tri(CiarletElement):
             dofs.append(PointEvaluation(reference, entity.midpoint(), entity=(1, e_n)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
 
     names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
     references = ["triangle"]
@@ -167,6 +199,22 @@ class P1IsoP2Quad(CiarletElement):
         dofs.append(PointEvaluation(reference, reference.midpoint(), entity=(2, 0)))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
 
     names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
     references = ["quadrilateral"]

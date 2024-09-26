@@ -129,6 +129,22 @@ class Transition(CiarletElement):
             "edge_orders": self.edge_orders,
         }
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
     names = ["transition"]
     references = ["triangle", "tetrahedron"]
     min_order = 1

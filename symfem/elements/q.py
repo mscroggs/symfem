@@ -214,10 +214,27 @@ class VectorQ(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order * self.reference.tdim
+
     names = ["vector Q", "vQ"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "C0"
+    value_type = "vector"
     last_updated = "2023.06"
 
 
@@ -257,10 +274,27 @@ class Nedelec(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order - 1
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order - 1
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order * self.reference.tdim - 1
+
     names = ["NCE", "RTCE", "Qcurl", "Nedelec", "Ncurl"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(curl)"
+    value_type = "vector"
     last_updated = "2023.06"
 
 
@@ -299,8 +333,25 @@ class RaviartThomas(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order - 1
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order - 1
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return (self.order - 1) * self.reference.tdim + 1
+
     names = ["NCF", "RTCF", "Qdiv"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(div)"
+    value_type = "vector"
     last_updated = "2023.06"

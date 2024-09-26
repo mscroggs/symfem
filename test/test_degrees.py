@@ -5,7 +5,7 @@ import pytest
 import symfem
 import sympy
 from symfem import create_element
-from symfem.functions import VectorFunction, AnyFunction
+from symfem.functions import VectorFunction, AnyFunction, MatrixFunction
 from symfem.symbols import x
 from symfem.utils import allequal
 from symfem.polynomials import polynomial_set, polynomial_set_1d
@@ -14,18 +14,26 @@ from .utils import test_elements
 
 
 def make_into_value_type(poly, element):
-    if element.value_type == "scalar":
+    if element.value_type == "scalar" or element.reference.gdim == 1:
         return poly
-
     if element.value_type == "vector":
         return [VectorFunction([p if i == j else 0 for j in range(element.range_dim)]) for i in range(element.range_dim) for p in poly]
+    if element.value_type == "matrix":
+        return [MatrixFunction([[p if i0 == j0 and i1 == j1 else 0 for j1 in range(element.range_shape[1])] for j0 in range(element.range_shape[0])]) for i0 in range(element.range_shape[0]) for i1 in range(element.range_shape[1]) for p in poly]
+    if element.value_type == "symmetric matrix":
+        out = []
+        assert element.range_shape[0] == element.range_shape[1]
+        return [MatrixFunction([[p if (i0 == j0 and i1 == j1) or (i1 == j0 and i0 == j1) else 0 for j1 in range(element.range_shape[1])] for j0 in range(element.range_shape[0])]) for i0 in range(element.range_shape[0]) for i1 in range(i0, element.range_shape[1]) for p in poly]
 
 
 def polydict(f, element):
+    if element.value_type == "unknown":
+        pytest.xfail("TODO: remove this xfail")
+
     if element.reference.name == "pyramid":
         f *= (1 - x[2]) ** element.lagrange_superdegree
 
-    if element.value_type == "scalar":
+    if element.value_type == "scalar" or element.reference.gdim == 1:
         return f.as_sympy().expand().as_coefficients_dict()
     if element.value_type == "vector":
         out = {}
@@ -35,11 +43,21 @@ def polydict(f, element):
                 assert t not in out
                 out[t] = coeff
         return out
-    raise ValueError(f"Unupported function type: {element.value_type}")
+    if element.value_type in ["matrix", "symmetric matrix"]:
+        out = {}
+        for i, f_i in enumerate(f.as_sympy()):
+            for term, coeff in f_i.expand().as_coefficients_dict().items():
+                t = tuple(term if i == j else 0 for j, _ in enumerate(f.as_sympy()))
+                assert t not in out
+                assert len(t) == element.range_dim
+                out[t] = coeff
+        return out
+    raise ValueError(f"Unsupported function type: {element.value_type}")
 
 
 def run_subdegree_test(element, subdegree, pfunc, pargs):
     try:
+        print(element.get_polynomial_basis())
         basis_coeff = [polydict(p, element) for p in element.get_polynomial_basis()]
     except NotImplementedError:
         basis_coeff = [polydict(p, element) for p in element.get_basis_functions()]

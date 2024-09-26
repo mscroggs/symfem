@@ -118,6 +118,22 @@ class BernardiRaugel(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
     names = ["Bernardi-Raugel"]
     references = ["triangle", "tetrahedron"]
     min_order = 1

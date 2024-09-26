@@ -50,6 +50,22 @@ class NedelecFirstKind(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
     names = ["Nedelec", "Nedelec1", "N1curl"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
@@ -88,6 +104,22 @@ class NedelecSecondKind(CiarletElement):
             Keyword argument dictionary
         """
         return {"variant": self.variant}
+
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
 
     names = ["Nedelec2", "N2curl"]
     references = ["triangle", "tetrahedron"]

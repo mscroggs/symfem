@@ -58,6 +58,22 @@ class ConformingCrouzeixRaviart(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
     names = ["conforming Crouzeix-Raviart", "conforming CR"]
     references = ["triangle"]
     min_order = 1

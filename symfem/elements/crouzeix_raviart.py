@@ -80,6 +80,22 @@ class CrouzeixRaviart(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
     names = ["Crouzeix-Raviart", "CR", "Crouzeix-Falk", "CF"]
     references = ["triangle", "tetrahedron"]
     min_order = 1

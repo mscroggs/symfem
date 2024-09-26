@@ -4,6 +4,8 @@ This element's definition appears in https://doi.org/10.1137/080722953
 (Sun, Liu, 2009).
 """
 
+import typing
+
 from symfem.finite_element import EnrichedElement
 from symfem.references import Reference
 from symfem.elements.lagrange import Lagrange
@@ -26,6 +28,22 @@ class EnrichedGalerkin(EnrichedElement):
             super().__init__([Q(reference, order), Q(reference, 0)])
         else:
             super().__init__([Lagrange(reference, order), Lagrange(reference, 0)])
+
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
 
     names = ["enriched Galerkin", "EG"]
     references = ["interval", "triangle", "quadrilateral", "tetrahedron", "hexahedron"]

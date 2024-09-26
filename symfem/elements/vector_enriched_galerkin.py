@@ -39,6 +39,22 @@ class Enrichment(CiarletElement):
 
         super().__init__(reference, 1, poly, dofs, reference.tdim, reference.tdim)
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
     names: typing.List[str] = []
     references = ["triangle", "quadrilateral", "tetrahedron", "hexahedron"]
     min_order = 1
@@ -61,6 +77,22 @@ class VectorEnrichedGalerkin(EnrichedElement):
             super().__init__([VectorQ(reference, order), Enrichment(reference)])
         else:
             super().__init__([VectorLagrange(reference, order), Enrichment(reference)])
+
+    @property
+    def lagrange_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        pass  # TODO
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        pass  # TODO
 
     names = ["enriched vector Galerkin", "locking-free enriched Galerkin", "LFEG"]
     references = ["triangle", "quadrilateral", "tetrahedron", "hexahedron"]

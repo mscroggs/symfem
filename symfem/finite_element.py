@@ -88,8 +88,7 @@ class FiniteElement(ABC):
         self._float_basis_functions = None
         self._value_scale = None
 
-    @property
-    # @abstractproperty
+    @abstractproperty
     def lagrange_subdegree(self) -> int:
         """Get the Lagrange subdegree of the element.
 
@@ -98,8 +97,7 @@ class FiniteElement(ABC):
         """
         return -1
 
-    @property
-    # @abstractproperty
+    @abstractproperty
     def lagrange_superdegree(self) -> typing.Optional[int]:
         """Get the Lagrange superdegree of the element.
 
@@ -107,8 +105,7 @@ class FiniteElement(ABC):
         superspace of this element's polynomial space.
         """
 
-    @property
-    # @abstractproperty
+    @abstractproperty
     def polynomial_subdegree(self) -> int:
         """Get the polynomial subdegree of the element.
 
@@ -117,8 +114,7 @@ class FiniteElement(ABC):
         """
         return -1
 
-    @property
-    # @abstractproperty
+    @abstractproperty
     def polynomial_superdegree(self) -> typing.Optional[int]:
         """Get the polynomial superdegree of the element.
 
