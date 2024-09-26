@@ -35,7 +35,7 @@ class Bubble(CiarletElement):
         p1 = create_element(reference.name, "Lagrange", 1, vertices=reference.vertices)
         bubble = 1
         if reference.name in ["interval", "quadrilateral", "hexahedron"]:
-            for v in x[:reference.tdim]:
+            for v in x[: reference.tdim]:
                 bubble *= v * (1 - v)
         else:
             for f in p1.get_basis_functions():
