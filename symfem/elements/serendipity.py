@@ -68,24 +68,27 @@ class Serendipity(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        if self.order < self.reference.tdim:
+            return 1
+        return self.order // self.reference.tdim
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order + self.reference.tdim - 1
 
     names = ["serendipity", "S"]
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "C0"
+    value_type = "scalar"
     last_updated = "2023.06"
 
 
@@ -127,24 +130,27 @@ class SerendipityCurl(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        if self.order == 2 and self.reference.tdim == 3:
+            return 1
+        return self.order // self.reference.tdim
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order + 1
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order + self.reference.tdim - 1
 
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(curl)"
+    value_type = "vector"
     last_updated = "2023.07"
 
 
@@ -185,22 +191,23 @@ class SerendipityDiv(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        return self.order // self.reference.tdim
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order + 1
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order + 1
 
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(div)"
+    value_type = "vector"
     last_updated = "2023.07"

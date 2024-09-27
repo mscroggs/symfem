@@ -122,24 +122,25 @@ class TrimmedSerendipityHcurl(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        return (self.order + self.reference.tdim - 1) // (self.reference.tdim + 1)
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return self.order - 1
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order + self.reference.tdim - 2
 
     names = ["trimmed serendipity Hcurl", "TScurl"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(curl)"
+    value_type = "vector"
     last_updated = "2023.06"
 
 
@@ -222,22 +223,23 @@ class TrimmedSerendipityHdiv(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        pass  # TODO
+        return (self.order + 1) // (self.reference.tdim + 1)
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order
 
     @property
     def polynomial_subdegree(self) -> int:
-        pass  # TODO
+        return self.order - 1
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        pass  # TODO
+        return self.order
 
     names = ["trimmed serendipity Hdiv", "TSdiv"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(div)"
+    value_type = "vector"
     last_updated = "2023.06"
