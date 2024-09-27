@@ -97,7 +97,7 @@ class FiniteElement(ABC):
         """
         raise NotImplementedError()
 
-    @Property
+    @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
         """Get the Lagrange superdegree of the element.
 
