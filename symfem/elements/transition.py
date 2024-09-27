@@ -131,11 +131,11 @@ class Transition(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        poly_coeff = [p.as_sympy().expand().as_poly(*x).as_dict() for p in self._basis]
+        poly_coeff = [p.as_sympy().expand().as_poly(*x).as_dict() for p in self._basis]  # type: ignore
         degree = 0
         while True:
             basis_coeff = [
-                p.as_sympy().expand().as_poly(*x).as_dict()
+                p.as_sympy().expand().as_poly(*x).as_dict()  # type: ignore
                 for p in polynomial_set_1d(self.reference.tdim, degree)
             ]
             monomials = list(set([m for p in poly_coeff + basis_coeff for m in p]))
