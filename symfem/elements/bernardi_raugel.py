@@ -116,7 +116,6 @@ class BernardiRaugel(CiarletElement):
                     )
                 )
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
-        print(poly, self.lagrange_superdegree)
 
     @property
     def lagrange_subdegree(self) -> int:

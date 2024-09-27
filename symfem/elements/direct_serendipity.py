@@ -79,8 +79,6 @@ class DirectSerendipity(DirectElement):
 
         super().__init__(reference, order, basis_functions, basis_entities, reference.tdim, 1)
 
-        print(basis_functions)
-
     @property
     def lagrange_subdegree(self) -> int:
         raise NotImplementedError()
