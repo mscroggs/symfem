@@ -511,9 +511,6 @@ def pyramid_polynomial_set_1d(
         A set of polynomials
     """
     assert dim == 3
-    if order == 0:
-        return [ScalarFunction(1)]
-
     return [
         variables[0] ** i * variables[1] ** j * variables[2] ** k / (1 - variables[2]) ** min(i, j)
         for k in range(order + 1)

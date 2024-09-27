@@ -112,7 +112,7 @@ class Bubble(CiarletElement):
     }
     continuity = "C0"
     value_type = "scalar"
-    last_updated = "2023.09"
+    last_updated = "2024.09"
 
 
 class BubbleEnrichedLagrange(CiarletElement):
@@ -167,7 +167,7 @@ class BubbleEnrichedLagrange(CiarletElement):
     min_order = 1
     continuity = "C0"
     value_type = "scalar"
-    last_updated = "2023.09"
+    last_updated = "2024.09"
 
 
 class BubbleEnrichedVectorLagrange(CiarletElement):
@@ -229,4 +229,4 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
     min_order = 1
     continuity = "C0"
     value_type = "vector"
-    last_updated = "2023.09"
+    last_updated = "2024.09"

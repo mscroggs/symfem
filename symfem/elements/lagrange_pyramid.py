@@ -133,4 +133,4 @@ class Lagrange(CiarletElement):
     min_order = 0
     continuity = "C0"
     value_type = "scalar"
-    last_updated = "2023.07"
+    last_updated = "2024.09"
