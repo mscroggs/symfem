@@ -13,7 +13,6 @@ from symfem.finite_element import CiarletElement
 from symfem.functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
 from symfem.functions import FunctionInput
 from symfem.references import Reference
-from symfem.symbols import x
 from symfem.elements.lagrange import Lagrange
 
 __all__ = ["Bubble", "BubbleEnrichedLagrange", "BubbleEnrichedVectorLagrange"]
