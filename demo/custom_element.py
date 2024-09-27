@@ -40,6 +40,7 @@ class CustomElement(CiarletElement):
     min_order = 1
     max_order = 1
     continuity = "L2"
+    value_type = "scalar"
     mapping = "identity"
 
 
