@@ -37,12 +37,14 @@ class Bubble(CiarletElement):
         if reference.name in "quadrilateral":
             bubble *= basis[0]
             bubble *= basis[3]
-        if reference.name in "hexahedron":
+        elif reference.name in "hexahedron":
             bubble *= basis[0]
             bubble *= basis[7]
         else:
             for f in basis:
                 bubble *= f
+
+        print(bubble)
 
         if reference.name in ["interval", "quadrilateral", "hexahedron"]:
             o = order - 2
