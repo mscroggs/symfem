@@ -131,19 +131,23 @@ class Transition(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        # TODO
-        print(self.order, self.edge_orders, self.face_orders)
-        if self.reference.name == "triangle":
-            return max([self.order] + self.edge_orders)
-        elif self.reference.name == "tetrahedron":
-            return max([self.order] + self.edge_orders + self.face_orders)
+
+        poly_coeff = [p.as_sympy().expand().as_poly(*x).as_dict() for p in self._basis]
+        degree = 0
+        while True:
+            basis_coeff = [p.as_sympy().expand().as_poly(*x).as_dict() for p in polynomial_set_1d(self.reference.tdim, degree)]
+            monomials = list(set([m for p in poly_coeff + basis_coeff for m in p]))
+            mat = sympy.Matrix([[p[m] if m in p else 0 for m in monomials] for p in poly_coeff])
+            mat2 = sympy.Matrix(
+                [[p[m] if m in p else 0 for m in monomials] for p in poly_coeff + basis_coeff]
+            )
+            if mat.rank() < mat2.rank():
+                return degree - 1
+            degree += 1
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        if self.reference.name == "triangle":
-            return max(self.edge_orders)
-        elif self.reference.name == "tetrahedron":
-            return max(self.edge_orders + self.face_orders)
+        return max(p.subs(x[2], x[0]).subs(x[1], x[0]).as_sympy().as_poly(x[0]).degree() for p in self._basis)
 
     @property
     def polynomial_subdegree(self) -> int:
