@@ -95,7 +95,7 @@ class FiniteElement(ABC):
         This is the degree of the highest degree Lagrange space whose polynomial space is a
         subspace of this element's polynomial space.
         """
-        raise NotImplemenedError()
+        raise NotImplementedError()
 
     @Property
     def lagrange_superdegree(self) -> typing.Optional[int]:
@@ -104,7 +104,7 @@ class FiniteElement(ABC):
         This is the degree of the highest degree Lagrange space whose polynomial space is a
         superspace of this element's polynomial space.
         """
-        raise NotImplemenedError()
+        raise NotImplementedError()
 
     @property
     def polynomial_subdegree(self) -> int:
@@ -113,7 +113,7 @@ class FiniteElement(ABC):
         This is the degree of the highest degree complete polynomial space that is a
         subspace of this element's polynomial space.
         """
-        raise NotImplemenedError()
+        raise NotImplementedError()
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
@@ -122,7 +122,7 @@ class FiniteElement(ABC):
         This is the degree of the highest degree complete polynomial space that is a
         superspace of this element's polynomial space.
         """
-        raise NotImplemenedError()
+        raise NotImplementedError()
 
     @abstractmethod
     def dof_plot_positions(self) -> typing.List[PointType]:
