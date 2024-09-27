@@ -33,12 +33,16 @@ class Bubble(CiarletElement):
         from symfem import create_element
 
         p1 = create_element(reference.name, "Lagrange", 1, vertices=reference.vertices)
+        basis = p1.get_basis_functions()
         bubble = 1
-        if reference.name in ["interval", "quadrilateral", "hexahedron"]:
-            for v in x[: reference.tdim]:
-                bubble *= v * (1 - v)
+        if reference.name in "quadrilateral":
+            bubble *= basis[0]
+            bubble *= basis[3]
+        if reference.name in "hexahedron":
+            bubble *= basis[0]
+            bubble *= basis[7]
         else:
-            for f in p1.get_basis_functions():
+            for f in basis:
                 bubble *= f
 
         if reference.name in ["interval", "quadrilateral", "hexahedron"]:

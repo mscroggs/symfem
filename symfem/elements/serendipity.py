@@ -89,7 +89,7 @@ class Serendipity(CiarletElement):
     min_order = 1
     continuity = "C0"
     value_type = "scalar"
-    last_updated = "2023.06"
+    last_updated = "2024.09"
 
 
 class SerendipityCurl(CiarletElement):
