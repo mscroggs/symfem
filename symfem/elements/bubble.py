@@ -44,8 +44,6 @@ class Bubble(CiarletElement):
             for f in basis:
                 bubble *= f
 
-        print(bubble)
-
         if reference.name in ["interval", "quadrilateral", "hexahedron"]:
             o = order - 2
         elif reference.name == "triangle":
