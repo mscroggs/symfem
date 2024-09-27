@@ -54,9 +54,26 @@ class Bell(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return 4
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return 5
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return 4
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return 5
+
     names = ["Bell"]
     references = ["triangle"]
     min_order = 5
     max_order = 5
     continuity = "C1"
+    value_type = "scalar"
     last_updated = "2023.05"

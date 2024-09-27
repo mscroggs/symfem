@@ -55,8 +55,25 @@ class RaviartThomas(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order - 1
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order - 1
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["Raviart-Thomas", "RT", "N1div"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
     continuity = "H(div)"
+    value_type = "vector"
     last_updated = "2023.06"

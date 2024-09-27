@@ -254,11 +254,28 @@ class Dual(DualCiarletElement):
             dual_coefficients, fine_space, reference, order, dof_entities, reference.tdim, 1
         )
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
     names = ["dual polynomial", "dual P", "dual"]
     references = ["dual polygon"]
     min_order = 0
     max_order = 1
     continuity = "C0"
+    value_type = "scalar dual"
     last_updated = "2023.05"
 
 
@@ -306,11 +323,28 @@ class BuffaChristiansen(DualCiarletElement):
             dof_directions=tuple(dof_directions),
         )
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
     names = ["Buffa-Christiansen", "BC"]
     references = ["dual polygon"]
     min_order = 1
     max_order = 1
     continuity = "H(div)"
+    value_type = "vector dual"
     last_updated = "2023.05"
 
 
@@ -358,9 +392,26 @@ class RotatedBuffaChristiansen(DualCiarletElement):
             dof_directions=tuple(dof_directions),
         )
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
     names = ["rotated Buffa-Christiansen", "RBC"]
     references = ["dual polygon"]
     min_order = 1
     max_order = 1
     continuity = "H(div)"
+    value_type = "vector dual"
     last_updated = "2023.05"

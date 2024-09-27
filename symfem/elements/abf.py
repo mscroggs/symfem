@@ -77,8 +77,25 @@ class ArnoldBoffiFalk(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 2
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order * 2 + 2
+
     names = ["Arnold-Boffi-Falk", "ABF"]
     references = ["quadrilateral"]
     min_order = 0
     continuity = "H(div)"
+    value_type = "vector"
     last_updated = "2023.06"

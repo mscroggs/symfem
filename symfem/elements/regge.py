@@ -175,10 +175,27 @@ class Regge(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["Regge"]
     references = ["triangle", "tetrahedron"]
     min_order = 0
     continuity = "inner H(curl)"
+    value_type = "symmetric matrix"
     last_updated = "2023.06"
 
 
@@ -386,8 +403,25 @@ class ReggeTP(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return (self.order + 1) * self.reference.tdim - 1
+
     names = ["Regge"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "inner H(curl)"
+    value_type = "symmetric matrix"
     last_updated = "2023.06"

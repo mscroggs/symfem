@@ -112,8 +112,25 @@ class Lagrange(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return None
+
     names = ["Lagrange", "P"]
     references = ["pyramid"]
     min_order = 0
     continuity = "C0"
-    last_updated = "2023.07"
+    value_type = "scalar"
+    last_updated = "2024.09"

@@ -99,9 +99,26 @@ class Nedelec(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order - 1
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order - 1
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order * 2
+
     names = ["Nedelec", "Ncurl"]
     references = ["prism"]
     min_order = 1
     max_order = 2
     continuity = "H(curl)"
+    value_type = "vector"
     last_updated = "2023.06"

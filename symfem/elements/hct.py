@@ -127,10 +127,27 @@ class HsiehCloughTocher(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
     names = ["Hsieh-Clough-Tocher", "Clough-Tocher", "HCT", "CT"]
     references = ["triangle"]
     min_order = 3
     max_order = 3
     # continuity = "C1"
     continuity = "C0"
+    value_type = "scalar macro"
     last_updated = "2023.06"

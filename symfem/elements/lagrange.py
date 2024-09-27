@@ -88,10 +88,27 @@ class Lagrange(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["Lagrange", "P"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "C0"
+    value_type = "scalar"
     last_updated = "2023.09"
 
 
@@ -148,10 +165,27 @@ class VectorLagrange(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["vector Lagrange", "vP"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "C0"
+    value_type = "vector"
     last_updated = "2023.09"
 
 
@@ -201,10 +235,27 @@ class MatrixLagrange(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["matrix Lagrange"]
     references = ["triangle", "tetrahedron"]
     min_order = 0
     continuity = "L2"
+    value_type = "matrix"
     last_updated = "2023.09"
 
 
@@ -277,8 +328,25 @@ class SymmetricMatrixLagrange(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["symmetric matrix Lagrange"]
     references = ["triangle", "tetrahedron"]
     min_order = 0
     continuity = "L2"
+    value_type = "symmetric matrix"
     last_updated = "2023.09"

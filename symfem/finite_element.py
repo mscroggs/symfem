@@ -88,6 +88,42 @@ class FiniteElement(ABC):
         self._float_basis_functions = None
         self._value_scale = None
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        """Get the Lagrange subdegree of the element.
+
+        This is the degree of the highest degree Lagrange space whose polynomial space is a
+        subspace of this element's polynomial space.
+        """
+        raise NotImplementedError()
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        """Get the Lagrange superdegree of the element.
+
+        This is the degree of the highest degree Lagrange space whose polynomial space is a
+        superspace of this element's polynomial space.
+        """
+        raise NotImplementedError()
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        """Get the polynomial subdegree of the element.
+
+        This is the degree of the highest degree complete polynomial space that is a
+        subspace of this element's polynomial space.
+        """
+        raise NotImplementedError()
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        """Get the polynomial superdegree of the element.
+
+        This is the degree of the highest degree complete polynomial space that is a
+        superspace of this element's polynomial space.
+        """
+        raise NotImplementedError()
+
     @abstractmethod
     def dof_plot_positions(self) -> typing.List[PointType]:
         """Get the points to plot each DOF at on a DOF diagram.
@@ -547,6 +583,7 @@ class FiniteElement(ABC):
     references: typing.List[str] = []
     last_updated = version
     cache = True
+    value_type = "unknown"
     _max_continuity_test_order = 4
 
 

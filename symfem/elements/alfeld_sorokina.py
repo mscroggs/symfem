@@ -125,9 +125,26 @@ class AlfeldSorokina(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
     names = ["Alfeld-Sorokina", "AS"]
     references = ["triangle"]
     min_order = 2
     max_order = 2
     continuity = "C0"
+    value_type = "scalar macro"
     last_updated = "2023.05"

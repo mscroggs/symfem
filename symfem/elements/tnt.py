@@ -130,10 +130,27 @@ class TNT(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order + 1
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return max(self.order * self.reference.tdim, self.order + self.reference.tdim)
+
     names = ["tiniest tensor", "TNT"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "C0"
+    value_type = "scalar"
     last_updated = "2023.06"
 
 
@@ -291,10 +308,27 @@ class TNTcurl(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order * self.reference.tdim + 1
+
     names = ["tiniest tensor Hcurl", "TNTcurl"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(curl)"
+    value_type = "vector"
     last_updated = "2023.06"
 
 
@@ -445,8 +479,25 @@ class TNTdiv(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order * self.reference.tdim + 1
+
     names = ["tiniest tensor Hdiv", "TNTdiv"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(div)"
+    value_type = "vector"
     last_updated = "2023.06"

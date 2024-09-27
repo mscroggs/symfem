@@ -122,8 +122,25 @@ class HellanHerrmannJohnson(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["Hellan-Herrmann-Johnson", "HHJ"]
     references = ["triangle", "tetrahedron"]
     min_order = 0
     continuity = "inner H(div)"
+    value_type = "symmetric matrix"
     last_updated = "2024.02"
