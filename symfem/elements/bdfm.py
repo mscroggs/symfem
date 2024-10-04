@@ -8,14 +8,15 @@ https://doi.org/10.1007/978-1-4612-3172-1 (Brezzi, Fortin, 1991)
 import typing
 
 from symfem.finite_element import CiarletElement
-from symfem.functionals import IntegralMoment, ListOfFunctionals, NormalIntegralMoment, IntegralAgainst
+from symfem.functionals import IntegralMoment, ListOfFunctionals, NormalIntegralMoment
 from symfem.functions import FunctionInput
 from symfem.moments import make_integral_moment_dofs
-from symfem.polynomials import polynomial_set_vector, polynomial_set
+from symfem.polynomials import polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
 from symfem.elements.dpc import DPC, VectorDPC
-from symfem.elements.lagrange import Lagrange, VectorLagrange
+from symfem.elements.lagrange import Lagrange
+from symfem.elements.nedelec import NedelecFirstKind
 
 __all__ = ["bdfm_polyset", "BDFM"]
 
@@ -40,14 +41,11 @@ def bdfm_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]
             pset.append((0, x[1] ** i * x[0] ** j))
     elif reference.name == "triangle":
         for i in range(order - 1):
-            p = x[1] ** i * x[0] ** (order - 2 - i)
-            pset.append((x[0] * (x[0] + x[1]) * p, 0 * x[0]))
-            pset.append((0 * x[0], x[1] * (x[0] + x[1]) * p))
-        if order > 1:
-            p = x[0] * x[1] ** (order - 2)
-            pset.append((x[0] * p, x[1] * p))
-        else:
-            pset.append((x[0], x[1]))
+            p = x[0] ** i * x[1] ** (order - 2 - i)
+            pset.append((x[0] * (x[0] + x[1]) * p, 0))
+            pset.append((0, x[1] * (x[0] + x[1]) * p))
+        p = x[0] ** (order - 1)
+        pset.append((x[0] * p, x[1] * p))
     elif reference.name == "hexahedron":
         for i in range(1, order + 1):
             for j in range(order + 1 - i):
@@ -56,10 +54,18 @@ def bdfm_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]
                 pset.append((0, x[1] ** i * x[0] ** j * x[2] ** k, 0))
                 pset.append((0, 0, x[2] ** i * x[0] ** j * x[1] ** k))
     elif reference.name == "tetrahedron":
+        for i in range(order - 1):
+            for j in range(order - i - 1):
+                p = x[0] ** i * x[1] ** j * x[2] ** (order - 2 - i - j)
+                pset.append((x[0] * (x[0] + x[1] + x[2]) * p, 0, 0))
+                pset.append((0, x[1] * (x[0] + x[1] + x[2]) * p, 0))
+                pset.append((0, 0, x[2] * (x[0] + x[1] + x[2]) * p))
         for i in range(order):
-            for j in range(order - i):
-                p = x[0] ** i * x[1] ** j * x[2] ** (order - 1 - i - j)
-                pset.append((x[0] * p, x[1] * p, x[2] * p))
+            p = x[0] ** i * x[1] ** (order - 1 - i)
+            pset.append((x[0] * p, x[1] * p, x[2] * p))
+        if order >= 2:
+            pset.append((x[0] ** (order - 1) * (x[0] + x[1]), 0, x[1] * x[0] ** (order - 1)))
+
     return pset
 
 
@@ -84,15 +90,8 @@ class BDFM(CiarletElement):
             dofs = make_integral_moment_dofs(
                 reference,
                 facets=(NormalIntegralMoment, Lagrange, order - 1, {"variant": variant}),
-#                cells=(IntegralMoment, VectorLagrange, order - 2, {"variant": variant}),
+                cells=(IntegralMoment, NedelecFirstKind, order - 1, {"variant": variant}),
             )
-            for p in polynomial_set(reference.name, order - 1)[1:]:
-                grad = (p.diff(x[0]), p.diff(x[1]))
-                dofs.append(IntegralAgainst(reference, grad, entity=(2, 0), mapping="contravariant"))
-            for p in polynomial_set(reference.name, order - 2):
-                p *= x[0] * x[1] * (1 - x[0] - x[1])
-                curl = (p.diff(x[1]), -p.diff(x[0]))
-                dofs.append(IntegralAgainst(reference, curl, entity=(2, 0), mapping="contravariant"))
         else:
             dofs = make_integral_moment_dofs(
                 reference,
