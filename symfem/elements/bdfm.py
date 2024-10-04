@@ -1,7 +1,8 @@
 """Brezzi-Douglas-Fortin-Marini elements.
 
 This element's definition appears in https://doi.org/10.1051/m2an/1987210405811
-(Brezzi, Douglas, Fortin, Marini, 1987)
+(Brezzi, Douglas, Fortin, Marini, 1987) and
+https://doi.org/10.1007/978-1-4612-3172-1 (Brezzi, Fortin, 1991)
 """
 
 import typing
@@ -14,7 +15,8 @@ from symfem.polynomials import polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
 from symfem.elements.dpc import DPC, VectorDPC
-from symfem.elements.lagrange import Lagrange, VectorLagrange
+from symfem.elements.lagrange import Lagrange
+from symfem.elements.nedelec import NedelecFirstKind
 
 __all__ = ["bdfm_polyset", "BDFM"]
 
@@ -38,9 +40,12 @@ def bdfm_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]
             pset.append((x[0] ** i * x[1] ** j, 0))
             pset.append((0, x[1] ** i * x[0] ** j))
     elif reference.name == "triangle":
-        for i in range(order):
-            p = x[0] ** i * x[1] ** (order - 1 - i)
-            pset.append((x[0] * p, x[1] * p))
+        for i in range(order - 1):
+            p = x[0] ** i * x[1] ** (order - 2 - i)
+            pset.append((x[0] * (x[0] + x[1]) * p, 0))
+            pset.append((0, x[1] * (x[0] + x[1]) * p))
+        p = x[0] ** (order - 1)
+        pset.append((x[0] * p, x[1] * p))
     elif reference.name == "hexahedron":
         for i in range(1, order + 1):
             for j in range(order + 1 - i):
@@ -49,10 +54,19 @@ def bdfm_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]
                 pset.append((0, x[1] ** i * x[0] ** j * x[2] ** k, 0))
                 pset.append((0, 0, x[2] ** i * x[0] ** j * x[1] ** k))
     elif reference.name == "tetrahedron":
+        for i in range(order - 1):
+            for j in range(order - i - 1):
+                p = x[0] ** i * x[1] ** j * x[2] ** (order - 2 - i - j)
+                pset.append((x[0] * (x[0] + x[1] + x[2]) * p, 0, 0))
+                pset.append((0, x[1] * (x[0] + x[1] + x[2]) * p, 0))
+                pset.append((0, 0, x[2] * (x[0] + x[1] + x[2]) * p))
         for i in range(order):
-            for j in range(order - i):
-                p = x[0] ** i * x[1] ** j * x[2] ** (order - 1 - i - j)
-                pset.append((x[0] * p, x[1] * p, x[2] * p))
+            p = x[0] ** i * x[1] ** (order - 1 - i)
+            pset.append((x[0] * p, x[1] * p, x[2] * p))
+        for i in range(1, order):
+            p = x[0] ** i * x[1] ** (order - 1 - i)
+            pset.append((p * (x[0] + x[1]), 0, x[1] * p))
+
     return pset
 
 
@@ -77,7 +91,7 @@ class BDFM(CiarletElement):
             dofs = make_integral_moment_dofs(
                 reference,
                 facets=(NormalIntegralMoment, Lagrange, order - 1, {"variant": variant}),
-                cells=(IntegralMoment, VectorLagrange, order - 2, {"variant": variant}),
+                cells=(IntegralMoment, NedelecFirstKind, order - 1, {"variant": variant}),
             )
         else:
             dofs = make_integral_moment_dofs(
@@ -121,4 +135,4 @@ class BDFM(CiarletElement):
     min_order = 1
     continuity = "H(div)"
     value_type = "vector"
-    last_updated = "2023.06"
+    last_updated = "2024.10"

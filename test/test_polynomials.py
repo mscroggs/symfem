@@ -48,7 +48,7 @@ def test_MTW_space(reference):
             )
             p_edge = p.subs(x, [i + t[0] * j for i, j in zip(sub_ref.origin, sub_ref.axes[0])])
             poly = p_edge.dot(sub_ref.normal()).as_sympy().expand().simplify()
-            assert poly.is_real or sympy.Poly(poly).degree() <= 1
+            assert poly.is_real or sympy.Poly(poly, x).degree() <= 1
 
 
 @pytest.mark.parametrize("reference", ["triangle", "quadrilateral", "tetrahedron", "hexahedron"])
@@ -73,7 +73,7 @@ def test_BDFM_space(reference, order):
                     ],
                 )
             poly = p_edge.dot(sub_ref.normal()).as_sympy().expand().simplify()
-            assert poly.is_real or sympy.Poly(poly).degree() <= order - 1
+            assert poly.is_real or sympy.Poly(poly, x).degree() <= order - 1
 
 
 @pytest.mark.parametrize(
