@@ -63,8 +63,9 @@ def bdfm_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]
         for i in range(order):
             p = x[0] ** i * x[1] ** (order - 1 - i)
             pset.append((x[0] * p, x[1] * p, x[2] * p))
-        if order >= 2:
-            pset.append((x[0] ** (order - 1) * (x[0] + x[1]), 0, x[1] * x[0] ** (order - 1)))
+        for i in range(1, order):
+            p = x[0] ** i * x[1] ** (order - 1 - i)
+            pset.append((p * (x[0] + x[1]), 0, x[1] * p))
 
     return pset
 
