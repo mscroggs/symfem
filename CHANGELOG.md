@@ -1,3 +1,8 @@
+# Version 2024.10.0 (05 October 2024)
+
+- Corrected polyset for Arnold-Winther element
+- Added sub- and superdegree functions
+
 # Version 2024.1.1 (04 January 2024)
 
 - Added get_mapping function
