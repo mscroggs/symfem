@@ -1,2 +1,0 @@
-- Corrected polyset for Arnold-Winther element
-- Added sub- and superdegree functions
