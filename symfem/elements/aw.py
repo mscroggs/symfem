@@ -179,9 +179,9 @@ class NonConformingArnoldWinther(CiarletElement):
             ((0, x[1] ** 2), (x[1] ** 2, -2 * x[1] ** 2)),
             ((-2 * x[0] ** 2, x[0] ** 2), (x[0] ** 2, 0)),
             ((-2 * x[0] * x[1], x[0] * x[1]), (x[0] * x[1], 0)),
-            ((x[0] * (x[0] - x[1]), 0), (0, 0)),
+            ((x[0] * (x[0] + x[1]), 0), (0, 0)),
             ((x[0] ** 2, 0), (0, x[0] * x[1])),
-            ((x[0] ** 2, 0), (0, x[1] ** 2)),
+            ((x[0] ** 2, 0), (0, -(x[1] ** 2))),
         ]
 
         dofs: ListOfFunctionals = []
@@ -255,4 +255,4 @@ class NonConformingArnoldWinther(CiarletElement):
     max_order = 2
     continuity = "integral inner H(div)"
     value_type = "symmetric matrix"
-    last_updated = "2023.06"
+    last_updated = "2024.10"

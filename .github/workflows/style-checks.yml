@@ -13,9 +13,12 @@ jobs:
     name: Run style checks
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
       - uses: actions/checkout@v4
-      - run: sudo apt-get install -y python3-setuptools
-      - run: pip3 install -e .[style,docs]
+      - run: python3 -m pip install -e .[style,docs]
       - run: |
           python3 -m ruff check .
           python3 -m ruff format --check .
