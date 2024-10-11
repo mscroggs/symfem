@@ -18,11 +18,159 @@ from symfem.references import NonDefaultReferenceError, Reference
 from symfem.elements.bernardi_raugel import BernardiRaugel
 from symfem.elements.lagrange import Lagrange, VectorLagrange
 
-__all__ = ["GuzmanNeilanSecondKind", "make_piecewise_lagrange"]
+__all__ = ["GuzmanNeilanFirstKind", "GuzmanNeilanSecondKind", "make_piecewise_lagrange"]
+
+
+class GuzmanNeilanFirstKind(CiarletElement):
+    """Guzman-Neilan finite element."""
+
+    def __init__(self, reference: Reference, order: int):
+        """Create the element.
+
+        Args:
+            reference: The reference element
+            order: The polynomial order
+        """
+        if reference.vertices != reference.reference_vertices:
+            raise NonDefaultReferenceError()
+
+        if reference.name == "triangle":
+            poly = self._make_polyset_triangle(reference, order)
+        else:
+            poly = self._make_polyset_tetrahedron(reference, order)
+
+        br = BernardiRaugel(reference, order)
+        if order == 1:
+            dofs = br.dofs
+        else:
+            assert order == 2 and reference.name == "tetrahedron"
+            dofs = br.dofs[:-3]
+
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+
+    def _make_polyset_triangle(
+        self, reference: Reference, order: int
+    ) -> typing.List[FunctionInput]:
+        """Make the polyset for a triangle.
+
+        Args:
+            reference: The reference cell
+            order: The polynomial order
+
+        Returns:
+            The polynomial set
+        """
+        assert order == 1
+
+        from symfem.elements._guzman_neilan_triangle import coeffs
+
+        mid = reference.midpoint()
+
+        sub_tris: typing.List[SetOfPoints] = [
+            (reference.vertices[0], reference.vertices[1], mid),
+            (reference.vertices[0], reference.vertices[2], mid),
+            (reference.vertices[1], reference.vertices[2], mid),
+        ]
+
+        lagrange = VectorLagrange(reference, order)
+        basis: typing.List[FunctionInput] = [
+            PiecewiseFunction({i: p for i in sub_tris}, 2)
+            for p in lagrange.get_polynomial_basis()
+        ]
+
+        sub_basis = make_piecewise_lagrange(sub_tris, "triangle", reference.tdim, True)
+        fs = BernardiRaugel(reference, 1).get_basis_functions()[-3:]
+        for c, f in zip(coeffs, fs):
+            assert isinstance(f, VectorFunction)
+            pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+            for tri in sub_tris:
+                function: typing.List[sympy.core.expr.Expr] = []
+                for j in range(reference.tdim):
+                    component = f[j]
+                    for k, b in zip(c, sub_basis):
+                        component -= k * b.pieces[tri][j]
+                    c_sym = component.as_sympy()
+                    assert isinstance(c_sym, sympy.core.expr.Expr)
+                    function.append(c_sym)
+                pieces[tri] = VectorFunction(tuple(function))
+            basis.append(PiecewiseFunction(pieces, 2))
+        return basis
+
+    def _make_polyset_tetrahedron(
+        self, reference: Reference, order: int
+    ) -> typing.List[FunctionInput]:
+        """Make the polyset for a tetrahedron.
+
+        Args:
+            reference: The reference cell
+            order: The polynomial order
+
+        Returns:
+            The polynomial set
+        """
+        assert order in [1, 2]
+        from symfem.elements._guzman_neilan_tetrahedron import coeffs
+
+        mid = reference.midpoint()
+
+        sub_tets: typing.List[SetOfPoints] = [
+            (reference.vertices[0], reference.vertices[1], reference.vertices[2], mid),
+            (reference.vertices[0], reference.vertices[1], reference.vertices[3], mid),
+            (reference.vertices[0], reference.vertices[2], reference.vertices[3], mid),
+            (reference.vertices[1], reference.vertices[2], reference.vertices[3], mid),
+        ]
+
+        lagrange = VectorLagrange(reference, order)
+        basis: typing.List[FunctionInput] = [
+            PiecewiseFunction({i: p for i in sub_tets}, 3)
+            for p in lagrange.get_polynomial_basis()
+        ]
+
+        sub_basis = make_piecewise_lagrange(sub_tets, "tetrahedron", reference.tdim, True)
+        fs = BernardiRaugel(reference, 1).get_basis_functions()[-4:]
+        for c, f in zip(coeffs, fs):
+            assert isinstance(f, VectorFunction)
+            pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+            for tet in sub_tets:
+                function: typing.List[sympy.core.expr.Expr] = []
+                for j in range(reference.tdim):
+                    component = f[j]
+                    for k, b in zip(c, sub_basis):
+                        component -= k * b.pieces[tet][j]
+                    c_sym = component.as_sympy()
+                    assert isinstance(c_sym, sympy.core.expr.Expr)
+                    function.append(c_sym)
+                pieces[tet] = VectorFunction(tuple(function))
+            basis.append(PiecewiseFunction(pieces, 3))
+        return basis
+
+    @property
+    def lagrange_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
+    names = ["Guzman-Neilan first kind", "Guzman-Neilan"]
+    references = ["triangle", "tetrahedron"]
+    min_order = 1
+    max_order = {"triangle": 1, "tetrahedron": 2}
+    continuity = "L2"
+    value_type = "vector macro"
+    last_updated = "2024.10"
 
 
 class GuzmanNeilanSecondKind(CiarletElement):
-    """Guzman-Neilan finite element."""
+    """Guzman-Neilan second kind finite element."""
 
     def __init__(self, reference: Reference, order: int):
         """Create the element.

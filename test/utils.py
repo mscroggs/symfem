@@ -63,6 +63,7 @@ test_elements: typing.Dict[
         "FS": [({}, [2])],
         "Taylor": [({}, range(0, 5))],
         "Bernardi-Raugel": [({}, [1])],
+        "Guzman-Neilan first kind": [({}, [1])],
         "Guzman-Neilan second kind": [({}, [1])],
         "Wu-Xu": [({}, [3])],
         "transition": [
@@ -98,6 +99,7 @@ test_elements: typing.Dict[
         "Bernstein": [({}, range(1, 3))],
         "Taylor": [({}, range(0, 5))],
         "Bernardi-Raugel": [({}, [1, 2])],
+        "Guzman-Neilan first kind": [({}, [1, 2])],
         "Guzman-Neilan second kind": [({}, [1, 2])],
         "Wu-Xu": [({}, [4])],
         "transition": [

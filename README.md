@@ -180,6 +180,7 @@ The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities
 - enriched Galerkin (alternative names: EG)
 - enriched vector Galerkin (alternative names: locking-free enriched Galerkin, LFEG)
 - Fortin-Soulie (alternative names: FS)
+- Guzman-Neilan first kind (alternative names: Guzman-Neilan)
 - Guzman-Neilan second kind
 - Hellan-Herrmann-Johnson (alternative names: HHJ)
 - Hermite
@@ -251,6 +252,7 @@ The reference tetrahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), and (0, 
 - Crouzeix-Raviart (alternative names: CR, Crouzeix-Falk, CF)
 - enriched Galerkin (alternative names: EG)
 - enriched vector Galerkin (alternative names: locking-free enriched Galerkin, LFEG)
+- Guzman-Neilan first kind (alternative names: Guzman-Neilan)
 - Guzman-Neilan second kind
 - Hellan-Herrmann-Johnson (alternative names: HHJ)
 - Hermite

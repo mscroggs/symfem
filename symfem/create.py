@@ -161,6 +161,7 @@ def create_element(
                       Bernardi-Raugel,
                       Wu-Xu,
                       transition,
+                      Guzman-Neilan first kind, Guzman-Neilan,
                       Guzman-Neilan second kind,
                       nonconforming Arnold-Winther, nonconforming AW,
                       TScurl, trimmed serendipity Hcurl,
