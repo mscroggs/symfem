@@ -204,7 +204,7 @@ def test_function_plots_piecewise_scalar(reference):
     ],
 )
 def test_function_plots_piecewise_vector(reference):
-    e = symfem.create_element(reference, "Guzman-Neilan", 1)
+    e = symfem.create_element(reference, "Guzman-Neilan second kind", 1)
     for ext in ["svg", "png", "tex"]:
         e.plot_basis_function(
             0, os.path.join(folder, f"test_function_plots_piecewise_vector-{reference}.{ext}")
