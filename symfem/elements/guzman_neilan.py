@@ -214,7 +214,6 @@ class GuzmanNeilanSecondKind(CiarletElement):
     continuity = "L2"
     value_type = "vector macro"
     last_updated = "2024.10"
-    cache = False
 
 
 def make_piecewise_lagrange(
