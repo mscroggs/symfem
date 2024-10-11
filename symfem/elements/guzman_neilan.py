@@ -21,8 +21,8 @@ from symfem.elements.lagrange import Lagrange, VectorLagrange
 __all__ = ["GuzmanNeilan", "make_piecewise_lagrange"]
 
 
-class GuzmanNeilan(CiarletElement):
-    """Guzman-Neilan Hdiv finite element."""
+class GuzmanNeilanSecondKind(CiarletElement):
+    """Guzman-Neilan finite element."""
 
     def __init__(self, reference: Reference, order: int):
         """Create the element.
@@ -41,16 +41,21 @@ class GuzmanNeilan(CiarletElement):
 
         dofs: ListOfFunctionals = []
 
-        for n in range(reference.sub_entity_count(reference.tdim - 1)):
-            facet = reference.sub_entity(reference.tdim - 1, n)
-            for v in facet.vertices:
+        tdim = reference.tdim
+
+        # Evaluation at vertices
+        for n in range(reference.sub_entity_count(0)):
+            vertex = reference.sub_entity(0, n)
+            v = vertex.vertices[0]
+            for i in range(tdim):
+                direction = tuple(1 if i == j else 0 for j in range(tdim))
                 dofs.append(
                     DotPointEvaluation(
                         reference,
                         v,
-                        tuple(i * facet.jacobian() for i in facet.normal()),
-                        entity=(reference.tdim - 1, n),
-                        mapping="contravariant",
+                        direction,
+                        entity=(0, n),
+                        mapping="identity",
                     )
                 )
 
@@ -60,28 +65,15 @@ class GuzmanNeilan(CiarletElement):
             # Midpoints of edges
             for n in range(reference.sub_entity_count(1)):
                 edge = reference.sub_entity(1, n)
-                dofs.append(
-                    DotPointEvaluation(
-                        reference,
-                        edge.midpoint(),
-                        tuple(i * edge.jacobian() for i in edge.tangent()),
-                        entity=(1, n),
-                        mapping="contravariant",
-                    )
-                )
-
-            # Midpoints of edges of faces
-            for n in range(reference.sub_entity_count(2)):
-                face = reference.sub_entity(2, n)
-                for m in range(3):
-                    edge = face.sub_entity(1, m)
+                for i in range(tdim):
+                    direction = tuple(1 if i == j else 0 for j in range(tdim))
                     dofs.append(
                         DotPointEvaluation(
                             reference,
                             edge.midpoint(),
-                            tuple(i * face.jacobian() for i in face.normal()),
-                            entity=(2, n),
-                            mapping="contravariant",
+                            direction,
+                            entity=(1, n),
+                            mapping="identity",
                         )
                     )
 
@@ -90,12 +82,12 @@ class GuzmanNeilan(CiarletElement):
                 p = tuple((i + sympy.Rational(1, 4)) / 2 for i in v)
                 for d in [(1, 0, 0), (0, 1, 0), (0, 0, 1)]:
                     dofs.append(
-                        DotPointEvaluation(reference, p, d, entity=(3, 0), mapping="contravariant")
+                        DotPointEvaluation(reference, p, d, entity=(3, 0), mapping="identity")
                     )
 
         dofs += make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Lagrange, 0, "contravariant"),
+            facets=(NormalIntegralMoment, Lagrange, 0, "identity"),
         )
 
         mid = reference.midpoint()
@@ -103,7 +95,7 @@ class GuzmanNeilan(CiarletElement):
             direction = tuple(1 if i == j else 0 for j in range(reference.tdim))
             dofs.append(
                 DotPointEvaluation(
-                    reference, mid, direction, entity=(reference.tdim, 0), mapping="contravariant"
+                    reference, mid, direction, entity=(reference.tdim, 0), mapping="identity"
                 )
             )
 
@@ -215,13 +207,14 @@ class GuzmanNeilan(CiarletElement):
     def polynomial_superdegree(self) -> typing.Optional[int]:
         raise NotImplementedError()
 
-    names = ["Guzman-Neilan"]
+    names = ["Guzman-Neilan second kind"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
     max_order = {"triangle": 1, "tetrahedron": 2}
-    continuity = "H(div)"
+    continuity = "L2"
     value_type = "vector macro"
-    last_updated = "2023.06"
+    last_updated = "2024.10"
+    cache = False
 
 
 def make_piecewise_lagrange(
