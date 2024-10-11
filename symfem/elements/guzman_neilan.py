@@ -87,19 +87,19 @@ class GuzmanNeilanSecondKind(CiarletElement):
 
         dofs += make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Lagrange, 0, "identity"),
+            facets=(NormalIntegralMoment, Lagrange, 0, "contravariant"),
         )
 
         mid = reference.midpoint()
-        for i in range(reference.tdim):
-            direction = tuple(1 if i == j else 0 for j in range(reference.tdim))
+        for i in range(tdim):
+            direction = tuple(1 if i == j else 0 for j in range(tdim))
             dofs.append(
                 DotPointEvaluation(
-                    reference, mid, direction, entity=(reference.tdim, 0), mapping="identity"
+                    reference, mid, direction, entity=(tdim, 0), mapping="identity"
                 )
             )
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+        super().__init__(reference, order, poly, dofs, tdim, tdim)
 
     def _make_polyset_triangle(
         self, reference: Reference, order: int
