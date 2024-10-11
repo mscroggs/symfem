@@ -123,7 +123,7 @@ class AlfeldSorokina(CiarletElement):
         poly: typing.List[FunctionInput] = []
         poly += [PiecewiseFunction({i: j for i, j in zip(subs, p)}, 2) for p in piece_list]
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
     @property
     def lagrange_subdegree(self) -> int:

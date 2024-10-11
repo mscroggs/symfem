@@ -1,1 +1,2 @@
 - Corrected nonconforming Arnold-Winther polyset
+- Correct Alfeld-Sorokina range dim
