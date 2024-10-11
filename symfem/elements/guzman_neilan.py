@@ -94,9 +94,7 @@ class GuzmanNeilanSecondKind(CiarletElement):
         for i in range(tdim):
             direction = tuple(1 if i == j else 0 for j in range(tdim))
             dofs.append(
-                DotPointEvaluation(
-                    reference, mid, direction, entity=(tdim, 0), mapping="identity"
-                )
+                DotPointEvaluation(reference, mid, direction, entity=(tdim, 0), mapping="identity")
             )
 
         super().__init__(reference, order, poly, dofs, tdim, tdim)
