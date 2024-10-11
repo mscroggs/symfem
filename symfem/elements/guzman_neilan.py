@@ -18,7 +18,7 @@ from symfem.references import NonDefaultReferenceError, Reference
 from symfem.elements.bernardi_raugel import BernardiRaugel
 from symfem.elements.lagrange import Lagrange, VectorLagrange
 
-__all__ = ["GuzmanNeilan", "make_piecewise_lagrange"]
+__all__ = ["GuzmanNeilanSecondKind", "make_piecewise_lagrange"]
 
 
 class GuzmanNeilanSecondKind(CiarletElement):
