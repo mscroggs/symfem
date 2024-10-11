@@ -74,8 +74,7 @@ class GuzmanNeilanFirstKind(CiarletElement):
 
         lagrange = VectorLagrange(reference, order)
         basis: typing.List[FunctionInput] = [
-            PiecewiseFunction({i: p for i in sub_tris}, 2)
-            for p in lagrange.get_polynomial_basis()
+            PiecewiseFunction({i: p for i in sub_tris}, 2) for p in lagrange.get_polynomial_basis()
         ]
 
         sub_basis = make_piecewise_lagrange(sub_tris, "triangle", reference.tdim, True)
@@ -122,8 +121,7 @@ class GuzmanNeilanFirstKind(CiarletElement):
 
         lagrange = VectorLagrange(reference, order)
         basis: typing.List[FunctionInput] = [
-            PiecewiseFunction({i: p for i in sub_tets}, 3)
-            for p in lagrange.get_polynomial_basis()
+            PiecewiseFunction({i: p for i in sub_tets}, 3) for p in lagrange.get_polynomial_basis()
         ]
 
         sub_basis = make_piecewise_lagrange(sub_tets, "tetrahedron", reference.tdim, True)
