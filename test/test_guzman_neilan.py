@@ -12,7 +12,7 @@ from symfem.symbols import x
 
 @pytest.mark.parametrize("order", [1])
 def test_guzman_neilan_triangle(order):
-    e = symfem.create_element("triangle", "Guzman-Neilan", order)
+    e = symfem.create_element("triangle", "Guzman-Neilan second kind", order)
 
     for p in e._basis[-3:]:
         for piece in p.pieces.values():
@@ -21,7 +21,7 @@ def test_guzman_neilan_triangle(order):
 
 @pytest.mark.parametrize("order", [1, 2])
 def test_guzman_neilan_tetrahedron(order):
-    e = symfem.create_element("tetrahedron", "Guzman-Neilan", order)
+    e = symfem.create_element("tetrahedron", "Guzman-Neilan second kind", order)
 
     mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*e.reference.vertices))
     for p in e._basis[-4:]:
@@ -34,7 +34,7 @@ def test_guzman_neilan_tetrahedron(order):
 @pytest.mark.parametrize("order", [1])
 def test_basis_continuity_triangle(order):
     N = 5
-    e = symfem.create_element("triangle", "Guzman-Neilan", order)
+    e = symfem.create_element("triangle", "Guzman-Neilan second kind", order)
     third = sympy.Rational(1, 3)
     one = sympy.Integer(1)
     for pt in [(0, 0), (1, 0), (0, 1), (third, third)]:
@@ -60,7 +60,7 @@ def test_basis_continuity_triangle(order):
 @pytest.mark.parametrize("order", [1, 2])
 def test_basis_continuity_tetrahedron(order):
     N = 5
-    e = symfem.create_element("tetrahedron", "Guzman-Neilan", order)
+    e = symfem.create_element("tetrahedron", "Guzman-Neilan second kind", order)
     quarter = sympy.Rational(1, 4)
     one = sympy.Integer(1)
     for pt in [(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (quarter, quarter, quarter)]:

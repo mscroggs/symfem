@@ -1,2 +1,4 @@
 - Corrected nonconforming Arnold-Winther polyset
 - Correct Alfeld-Sorokina range dim
+- Correct Guzman-Neilan second kind element
+- Add Guzman-Neilan first kind element
