@@ -39,6 +39,8 @@ class BernardiRaugel(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
+        tdim = reference.tdim
+
         poly: typing.List[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
 
@@ -53,16 +55,19 @@ class BernardiRaugel(CiarletElement):
 
         dofs: ListOfFunctionals = []
 
-        for n in range(reference.sub_entity_count(reference.tdim - 1)):
-            facet = reference.sub_entity(reference.tdim - 1, n)
-            for v in facet.vertices:
+        # Evaluation at vertices
+        for n in range(reference.sub_entity_count(0)):
+            vertex = reference.sub_entity(0, n)
+            v = vertex.vertices[0]
+            for i in range(tdim):
+                direction = tuple(1 if i == j else 0 for j in range(tdim))
                 dofs.append(
                     DotPointEvaluation(
                         reference,
                         v,
-                        tuple(i * facet.jacobian() for i in facet.normal()),
+                        direction,
                         entity=(reference.tdim - 1, n),
-                        mapping="contravariant",
+                        mapping="identity",
                     )
                 )
 
@@ -87,34 +92,22 @@ class BernardiRaugel(CiarletElement):
                 v1 = reference.vertices[edge[0]]
                 v2 = reference.vertices[edge[1]]
                 midpoint = tuple(sympy.Rational(i + j, 2) for i, j in zip(v1, v2))
-                d = tuple(j - i for i, j in zip(v1, v2))
-                dofs.append(
-                    DotPointEvaluation(
-                        reference, midpoint, d, entity=(1, e_n), mapping="contravariant"
-                    )
-                )
-            for f_n in range(reference.sub_entity_count(2)):
-                face = reference.sub_entity(2, f_n)
-                normal = tuple(i * face.jacobian() for i in face.normal())
-                for e_n in range(3):
-                    edge_entity = face.sub_entity(1, e_n)
-                    midpoint = tuple(
-                        sympy.Rational(i + j, 2) for i, j in zip(*edge_entity.vertices)
-                    )
+                for i in range(tdim):
+                    direction = tuple(1 if i == j else 0 for j in range(tdim))
                     dofs.append(
                         DotPointEvaluation(
-                            reference, midpoint, normal, entity=(2, f_n), mapping="contravariant"
+                            reference, midpoint, direction, entity=(1, e_n), mapping="identity"
                         )
                     )
 
             p = Lagrange(reference, 0, variant="equispaced")
-
             for i in range(3):
                 dofs.append(
                     DivergenceIntegralMoment(
-                        reference, x[i], p.dofs[0], entity=(3, 0), mapping="contravariant"
+                        reference, x[i], p.dofs[0], entity=(3, 0), mapping="identity"
                     )
                 )
+
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
     @property
@@ -137,6 +130,6 @@ class BernardiRaugel(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 1
     max_order = {"triangle": 1, "tetrahedron": 2}
-    continuity = "H(div)"
+    continuity = "L2"
     value_type = "vector"
-    last_updated = "2023.06"
+    last_updated = "2024.10"
