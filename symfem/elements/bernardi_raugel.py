@@ -66,7 +66,7 @@ class BernardiRaugel(CiarletElement):
                         reference,
                         v,
                         direction,
-                        entity=(reference.tdim - 1, n),
+                        entity=(0, n),
                         mapping="identity",
                     )
                 )
