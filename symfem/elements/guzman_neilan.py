@@ -164,7 +164,7 @@ class GuzmanNeilanFirstKind(CiarletElement):
     max_order = {"triangle": 1, "tetrahedron": 2}
     continuity = "L2"
     value_type = "vector macro"
-    last_updated = "2024.10"
+    last_updated = "2024.10.2"
 
 
 class GuzmanNeilanSecondKind(CiarletElement):
