@@ -104,7 +104,7 @@ for ref in ["triangle", "tetrahedron"]:
                     assert term == 0 or term in terms
                 for term in terms:
                     if i < len(mat):
-                        mat[i].append(symfem.functions.ScalarFunction(d[term]) if term in d else 0)
+                        mat[i].append(d[term] if term in d else 0)  # type: ignore
                     i += 1
 
         if ref == "triangle":
