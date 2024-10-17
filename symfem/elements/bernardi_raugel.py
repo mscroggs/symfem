@@ -67,7 +67,7 @@ class BernardiRaugel(CiarletElement):
                         v,
                         direction,
                         entity=(0, n),
-                        mapping="identity",
+                        mapping="contravariant",
                     )
                 )
 
@@ -88,15 +88,17 @@ class BernardiRaugel(CiarletElement):
                     )
                 )
 
-            for e_n, edge in enumerate(reference.edges):
-                v1 = reference.vertices[edge[0]]
-                v2 = reference.vertices[edge[1]]
-                midpoint = tuple(sympy.Rational(i + j, 2) for i, j in zip(v1, v2))
+            for e_n in range(reference.sub_entity_count(1)):
+                edge = reference.sub_entity(1, e_n)
                 for i in range(tdim):
                     direction = tuple(1 if i == j else 0 for j in range(tdim))
                     dofs.append(
                         DotPointEvaluation(
-                            reference, midpoint, direction, entity=(1, e_n), mapping="identity"
+                            reference,
+                            edge.midpoint(),
+                            direction,
+                            entity=(1, e_n),
+                            mapping="contravariant",
                         )
                     )
 
@@ -104,7 +106,7 @@ class BernardiRaugel(CiarletElement):
             for i in range(3):
                 dofs.append(
                     DivergenceIntegralMoment(
-                        reference, x[i], p.dofs[0], entity=(3, 0), mapping="identity"
+                        reference, x[i], p.dofs[0], entity=(3, 0), mapping="contravariant"
                     )
                 )
 
@@ -130,6 +132,6 @@ class BernardiRaugel(CiarletElement):
     references = ["triangle", "tetrahedron"]
     min_order = 1
     max_order = {"triangle": 1, "tetrahedron": 2}
-    continuity = "L2"
+    continuity = "C0"
     value_type = "vector"
     last_updated = "2024.10"
