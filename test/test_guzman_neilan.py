@@ -10,6 +10,18 @@ from symfem.elements.guzman_neilan import make_piecewise_lagrange
 from symfem.symbols import x
 
 
+def test_triangle_bubbles():
+    from symfem.elements._guzman_neilan_triangle import bubbles
+
+    for b in bubbles:
+        div = None
+        for part in b.values():
+            value = (part[0].diff(x[0]) + part[1].diff(x[1])).expand()
+            if div is None:
+                div = value
+            assert div == value
+
+
 @pytest.mark.parametrize("order", [1])
 def test_guzman_neilan_triangle(order):
     e = symfem.create_element("triangle", "Guzman-Neilan second kind", order)

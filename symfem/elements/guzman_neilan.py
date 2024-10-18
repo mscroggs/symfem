@@ -62,7 +62,7 @@ class GuzmanNeilanFirstKind(CiarletElement):
         """
         assert order == 1
 
-        from symfem.elements._guzman_neilan_triangle import coeffs
+        from symfem.elements._guzman_neilan_triangle import bubbles
 
         mid = reference.midpoint()
 
@@ -75,24 +75,7 @@ class GuzmanNeilanFirstKind(CiarletElement):
         lagrange = VectorLagrange(reference, order)
         basis: typing.List[FunctionInput] = [
             PiecewiseFunction({i: p for i in sub_tris}, 2) for p in lagrange.get_polynomial_basis()
-        ]
-
-        sub_basis = make_piecewise_lagrange(sub_tris, "triangle", reference.tdim, True)
-        fs = BernardiRaugel(reference, 1).get_basis_functions()[-3:]
-        for c, f in zip(coeffs, fs):
-            assert isinstance(f, VectorFunction)
-            pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
-            for tri in sub_tris:
-                function: typing.List[sympy.core.expr.Expr] = []
-                for j in range(reference.tdim):
-                    component = f[j]
-                    for k, b in zip(c, sub_basis):
-                        component -= k * b.pieces[tri][j]
-                    c_sym = component.as_sympy()
-                    assert isinstance(c_sym, sympy.core.expr.Expr)
-                    function.append(c_sym)
-                pieces[tri] = VectorFunction(tuple(function))
-            basis.append(PiecewiseFunction(pieces, 2))
+        ] + [PiecewiseFunction(b, 2) for b in bubbles]
         return basis
 
     def _make_polyset_tetrahedron(
@@ -165,6 +148,7 @@ class GuzmanNeilanFirstKind(CiarletElement):
     continuity = "L2"
     value_type = "vector macro"
     last_updated = "2024.10.2"
+    cache = False
 
 
 class GuzmanNeilanSecondKind(CiarletElement):
@@ -358,6 +342,7 @@ class GuzmanNeilanSecondKind(CiarletElement):
     continuity = "L2"
     value_type = "vector macro"
     last_updated = "2024.10"
+    cache = False
 
 
 def make_piecewise_lagrange(
