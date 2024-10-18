@@ -12,13 +12,249 @@ from symfem.elements.bernardi_raugel import BernardiRaugel
 from symfem.elements.lagrange import Lagrange, VectorLagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import DotPointEvaluation, ListOfFunctionals, NormalIntegralMoment
-from symfem.functions import FunctionInput, VectorFunction
+from symfem.functions import FunctionInput, VectorFunction, ScalarFunction, AnyFunction
 from symfem.geometry import SetOfPoints, SetOfPointsInput
 from symfem.moments import make_integral_moment_dofs
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import x, t
 
 __all__ = ["GuzmanNeilanFirstKind", "GuzmanNeilanSecondKind", "make_piecewise_lagrange"]
+
+
+def poly(reference: Reference, k: int) -> typing.List[VectorFunction]:
+    """Generate the P^perp polynomial set."""
+    if k < 2:
+        if reference.name == "triangle":
+            return [
+                VectorFunction(
+                    [x[0] ** i0 * x[1] ** i1 if d2 == d else 0 for d2 in range(reference.tdim)]
+                )
+                for d in range(reference.tdim)
+                for i0 in range(k + 1)
+                for i1 in range(k + 1 - i0)
+            ]
+        else:
+            assert reference.name == "tetrahedron"
+            return [
+                VectorFunction(
+                    [
+                        x[0] ** i0 * x[1] ** i1 * x[2] ** i2 if d2 == d else 0
+                        for d2 in range(reference.tdim)
+                    ]
+                )
+                for d in range(reference.tdim)
+                for i0 in range(k + 1)
+                for i1 in range(k + 1 - i0)
+                for i2 in range(k + 1 - i0 - i1)
+            ]
+    if k == 2:
+        assert reference.name == "tetrahedron"
+
+        poly = [
+            VectorFunction(
+                [
+                    x[0] ** i0 * x[1] ** i1 * x[2] ** i2 if d2 == d else 0
+                    for d2 in range(reference.tdim)
+                ]
+            )
+            for d in range(reference.tdim)
+            for i0 in range(k + 1)
+            for i1 in range(k + 1 - i0)
+            for i2 in range(k + 1 - i0 - i1)
+        ]
+
+        poly[1] -= poly[0] / 4
+        poly[2] -= poly[0] / 10
+        poly[3] -= poly[0] / 4
+        poly[4] -= poly[0] / 20
+        poly[5] -= poly[0] / 10
+        poly[6] -= poly[0] / 4
+        poly[7] -= poly[0] / 20
+        poly[8] -= poly[0] / 20
+        poly[9] -= poly[0] / 10
+        poly = poly[1:]
+
+        poly[10] -= poly[9] / 4
+        poly[11] -= poly[9] / 10
+        poly[12] -= poly[9] / 4
+        poly[13] -= poly[9] / 20
+        poly[14] -= poly[9] / 10
+        poly[15] -= poly[9] / 4
+        poly[16] -= poly[9] / 20
+        poly[17] -= poly[9] / 20
+        poly[18] -= poly[9] / 10
+        poly = poly[:9] + poly[10:]
+
+        poly[19] -= poly[18] / 4
+        poly[20] -= poly[18] / 10
+        poly[21] -= poly[18] / 4
+        poly[22] -= poly[18] / 20
+        poly[23] -= poly[18] / 10
+        poly[24] -= poly[18] / 4
+        poly[25] -= poly[18] / 20
+        poly[26] -= poly[18] / 20
+        poly[27] -= poly[18] / 10
+        poly = poly[:18] + poly[19:]
+
+        poly[1] -= poly[0] * 2 / 3
+        poly[2] += poly[0] / 3
+        poly[3] -= poly[0] / 9
+        poly[4] += poly[0] * 2 / 9
+        poly[5] += poly[0] / 3
+        poly[6] -= poly[0] / 9
+        poly[7] += poly[0] / 9
+        poly[8] += poly[0] * 2 / 9
+        poly[18] -= poly[0] / 3
+        poly[19] -= poly[0] * 2 / 9
+        poly[20] -= poly[0] / 3
+        poly[21] -= poly[0] / 9
+        poly[22] -= poly[0] * 2 / 9
+        poly[23] += poly[0]
+        poly[24] += poly[0] / 9
+        poly[25] += poly[0] / 9
+        poly[26] += poly[0] * 2 / 3
+        poly = poly[1:]
+
+        poly[9] -= poly[8] * 2 / 3
+        poly[10] += poly[8] / 3
+        poly[11] -= poly[8] / 9
+        poly[12] += poly[8] * 2 / 9
+        poly[13] += poly[8] / 3
+        poly[14] -= poly[8] / 9
+        poly[15] += poly[8] / 9
+        poly[16] += poly[8] * 2 / 9
+        poly[17] -= poly[8] / 3
+        poly[18] -= poly[8] * 2 / 9
+        poly[19] += poly[8]
+        poly[20] += poly[8] / 9
+        poly[21] += poly[8] * 2 / 3
+        poly[22] -= poly[8] / 3
+        poly[23] -= poly[8] / 9
+        poly[24] += poly[8] / 9
+        poly[25] -= poly[8] * 2 / 9
+        poly = poly[:8] + poly[9:]
+
+        poly[2] -= poly[1] / 6
+        poly[3] -= poly[1] * 2 / 3
+        poly[4] += poly[1] / 2
+        poly[5] += poly[1] / 12
+        poly[6] -= poly[1] / 12
+        poly[7] += poly[1] / 3
+        poly[9] -= poly[1] / 2
+        poly[10] -= poly[1] / 12
+        poly[11] -= poly[1] / 3
+        poly[12] += poly[1]
+        poly[13] += poly[1] / 6
+        poly[14] += poly[1] / 12
+        poly[15] += poly[1] * 2 / 3
+        poly[18] -= poly[1] / 2
+        poly[19] -= poly[1] / 12
+        poly[20] -= poly[1] / 3
+        poly[21] += poly[1] / 2
+        poly[22] += poly[1] / 12
+        poly[24] += poly[1] / 3
+        poly = poly[:1] + poly[2:]
+
+        return poly
+
+    raise NotImplementedError()
+
+
+def get_sub_cells(reference):
+    """Get sub cells."""
+    mid = reference.midpoint()
+    if reference.name == "triangle":
+        return [
+            (reference.vertices[0], reference.vertices[1], mid),
+            (reference.vertices[0], reference.vertices[2], mid),
+            (reference.vertices[1], reference.vertices[2], mid),
+        ]
+    if reference.name == "tetrahedron":
+        return [
+            (reference.vertices[0], reference.vertices[1], reference.vertices[2], mid),
+            (reference.vertices[0], reference.vertices[1], reference.vertices[3], mid),
+            (reference.vertices[0], reference.vertices[2], reference.vertices[3], mid),
+            (reference.vertices[1], reference.vertices[2], reference.vertices[3], mid),
+        ]
+
+
+def bubbles(reference: Reference) -> typing.List[AnyFunction]:
+    """Generate divergence-free bubbles."""
+    br = BernardiRaugel(reference, 1)
+
+    sub_cells = get_sub_cells(reference)
+    xx, yy, zz = x
+
+    if reference.name == "triangle":
+        fs = br.get_basis_functions()[-3:]
+        terms = [1, xx, yy]
+
+        lamb = PiecewiseFunction(
+            {sub_cells[0]: 3 * x[1], sub_cells[1]: 3 * x[0], sub_cells[2]: 3 * (1 - x[0] - x[1])}, 2
+        )
+
+    if reference.name == "tetrahedron":
+        fs = br.get_basis_functions()[-4:]
+        terms = [1, xx, yy, zz, xx**2, yy**2, zz**2, xx * yy, xx * zz, yy * zz]
+
+        lamb = PiecewiseFunction(
+            {
+                sub_cells[0]: 4 * x[2],
+                sub_cells[1]: 4 * x[1],
+                sub_cells[2]: 4 * x[0],
+                sub_cells[3]: 4 * (1 - x[0] - x[1] - x[2]),
+            },
+            3,
+        )
+
+    sub_basis = [
+        p * lamb**j
+        for j in range(1, reference.tdim + 1)
+        for p in poly(reference, reference.tdim - j)
+    ]
+
+    bubbles = []
+
+    for f in fs:
+        assert isinstance(f, VectorFunction)
+        integrand = f.div().subs(x, t)
+        fun_s = (f.div() - integrand.integral(reference) / reference.volume()).as_sympy()
+
+        assert isinstance(fun_s, sympy.core.expr.Expr)
+        fun = fun_s.as_coefficients_dict()
+
+        for term in fun:
+            assert term in terms
+        aim = [fun[term] if term in fun else 0 for term in terms] * (br.reference.tdim + 1)
+
+        mat: typing.List[typing.List[ScalarFunction]] = [[] for t in terms for p in lamb.pieces]
+        for b in sub_basis:
+            assert isinstance(b, PiecewiseFunction)
+            i = 0
+            for p in b.pieces.values():
+                assert isinstance(p, VectorFunction)
+                d_s = p.div().as_sympy()
+                assert isinstance(d_s, sympy.core.expr.Expr)
+                d = d_s.expand().as_coefficients_dict()
+                for term in d:
+                    assert term == 0 or term in terms
+                for term in terms:
+                    if i < len(mat):
+                        mat[i].append(d[term] if term in d else 0)  # type: ignore
+                    i += 1
+
+        s_mat = sympy.Matrix(mat)
+        solution = (s_mat.T @ s_mat).inv() @ s_mat.T @ sympy.Matrix(aim)
+        assert s_mat @ solution == sympy.Matrix(aim)
+        coeffs = list(solution)
+
+        bubble: AnyFunction = f
+        for i, j in zip(coeffs, sub_basis):
+            bubble -= i * j
+
+        bubbles.append(bubble)
+    return bubbles
 
 
 class GuzmanNeilanFirstKind(CiarletElement):
@@ -34,27 +270,13 @@ class GuzmanNeilanFirstKind(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
-        if reference.name == "triangle":
-            from symfem.elements._guzman_neilan_triangle import bubbles, lambda_0
-        else:
-            from symfem.elements._guzman_neilan_tetrahedron import bubbles, lambda_0  # type: ignore
-
-        lamb = PiecewiseFunction(lambda_0, reference.tdim)  # type: ignore
-
-        sub_cells = list(lambda_0.keys())
+        sub_cells = get_sub_cells(reference)
 
         lagrange = VectorLagrange(reference, order)
         poly = [
             PiecewiseFunction({i: p for i in sub_cells}, reference.tdim)
             for p in lagrange.get_polynomial_basis()
-        ]
-
-        br1 = BernardiRaugel(reference, 1)
-
-        for bubble, correction in zip(br1.get_basis_functions()[-len(bubbles) :], bubbles):
-            for i, p in correction.items():
-                bubble -= VectorFunction(p) * lamb**i
-            poly.append(bubble)  # type: ignore
+        ] + bubbles(reference)
 
         br = BernardiRaugel(reference, order)
         if order == 1:
@@ -88,6 +310,7 @@ class GuzmanNeilanFirstKind(CiarletElement):
     continuity = "L2"
     value_type = "vector macro"
     last_updated = "2024.10.3"
+    cache = False
 
 
 class GuzmanNeilanSecondKind(CiarletElement):
@@ -103,23 +326,9 @@ class GuzmanNeilanSecondKind(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
-        if reference.name == "triangle":
-            from symfem.elements._guzman_neilan_triangle import bubbles, lambda_0
-        else:
-            from symfem.elements._guzman_neilan_tetrahedron import bubbles, lambda_0  # type: ignore
+        sub_cells = get_sub_cells(reference)
 
-        lamb = PiecewiseFunction(lambda_0, reference.tdim)  # type: ignore
-
-        sub_cells = list(lambda_0.keys())
-
-        poly = make_piecewise_lagrange(sub_cells, reference.name, order)  # type: ignore
-
-        br1 = BernardiRaugel(reference, 1)
-
-        for bubble, correction in zip(br1.get_basis_functions()[-len(bubbles) :], bubbles):
-            for i, p in correction.items():
-                bubble -= VectorFunction(p) * lamb**i
-            poly.append(bubble)  # type: ignore
+        poly = make_piecewise_lagrange(sub_cells, reference.name, order) + bubbles(reference)
 
         dofs: ListOfFunctionals = []
 
@@ -204,6 +413,7 @@ class GuzmanNeilanSecondKind(CiarletElement):
     continuity = "L2"
     value_type = "vector macro"
     last_updated = "2024.10.1"
+    cache = False
 
 
 def make_piecewise_lagrange(

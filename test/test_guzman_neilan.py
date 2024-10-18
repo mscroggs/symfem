@@ -7,34 +7,7 @@ import sympy
 
 import symfem
 from symfem.elements.guzman_neilan import make_piecewise_lagrange
-from symfem.functions import VectorFunction
-from symfem.piecewise_functions import PiecewiseFunction
 from symfem.symbols import x
-
-
-@pytest.mark.parametrize("cell", ["triangle", "tetrahedron"])
-def test_bubbles(cell):
-    if cell == "triangle":
-        from symfem.elements._guzman_neilan_triangle import bubbles, lambda_0
-
-        tdim = 2
-    else:
-        from symfem.elements._guzman_neilan_triangle import bubbles, lambda_0
-
-        tdim = 3
-    lamb = PiecewiseFunction(lambda_0, tdim)
-
-    br = symfem.create_element("triangle", "Bernardi-Raugel", 1)
-
-    for br_bubble, correction in zip(br.get_basis_functions()[-len(bubbles) :], bubbles):
-        for i, p in correction.items():
-            br_bubble -= VectorFunction(p) * lamb**i
-        div = None
-        for part in br_bubble.pieces.values():
-            value = part.div().as_sympy().expand()
-            if div is None:
-                div = value
-            assert div == value
 
 
 @pytest.mark.parametrize("cell,order", [("triangle", 1), ("tetrahedron", 1), ("tetrahedron", 2)])
