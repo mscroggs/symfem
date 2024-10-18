@@ -9,6 +9,7 @@ import typing
 import sympy
 
 from symfem.elements.bernardi_raugel import BernardiRaugel
+from symfem.elements.bdm import BDM
 from symfem.elements.lagrange import Lagrange, VectorLagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import DotPointEvaluation, ListOfFunctionals, NormalIntegralMoment
@@ -48,117 +49,9 @@ def poly(reference: Reference, k: int) -> typing.List[VectorFunction]:
                 for i1 in range(k + 1 - i0)
                 for i2 in range(k + 1 - i0 - i1)
             ]
-    if k == 2:
-        assert reference.name == "tetrahedron"
 
-        poly = [
-            VectorFunction(
-                [
-                    x[0] ** i0 * x[1] ** i1 * x[2] ** i2 if d2 == d else 0
-                    for d2 in range(reference.tdim)
-                ]
-            )
-            for d in range(reference.tdim)
-            for i0 in range(k + 1)
-            for i1 in range(k + 1 - i0)
-            for i2 in range(k + 1 - i0 - i1)
-        ]
-
-        poly[1] -= poly[0] / 4
-        poly[2] -= poly[0] / 10
-        poly[3] -= poly[0] / 4
-        poly[4] -= poly[0] / 20
-        poly[5] -= poly[0] / 10
-        poly[6] -= poly[0] / 4
-        poly[7] -= poly[0] / 20
-        poly[8] -= poly[0] / 20
-        poly[9] -= poly[0] / 10
-        poly = poly[1:]
-
-        poly[10] -= poly[9] / 4
-        poly[11] -= poly[9] / 10
-        poly[12] -= poly[9] / 4
-        poly[13] -= poly[9] / 20
-        poly[14] -= poly[9] / 10
-        poly[15] -= poly[9] / 4
-        poly[16] -= poly[9] / 20
-        poly[17] -= poly[9] / 20
-        poly[18] -= poly[9] / 10
-        poly = poly[:9] + poly[10:]
-
-        poly[19] -= poly[18] / 4
-        poly[20] -= poly[18] / 10
-        poly[21] -= poly[18] / 4
-        poly[22] -= poly[18] / 20
-        poly[23] -= poly[18] / 10
-        poly[24] -= poly[18] / 4
-        poly[25] -= poly[18] / 20
-        poly[26] -= poly[18] / 20
-        poly[27] -= poly[18] / 10
-        poly = poly[:18] + poly[19:]
-
-        poly[1] -= poly[0] * 2 / 3
-        poly[2] += poly[0] / 3
-        poly[3] -= poly[0] / 9
-        poly[4] += poly[0] * 2 / 9
-        poly[5] += poly[0] / 3
-        poly[6] -= poly[0] / 9
-        poly[7] += poly[0] / 9
-        poly[8] += poly[0] * 2 / 9
-        poly[18] -= poly[0] / 3
-        poly[19] -= poly[0] * 2 / 9
-        poly[20] -= poly[0] / 3
-        poly[21] -= poly[0] / 9
-        poly[22] -= poly[0] * 2 / 9
-        poly[23] += poly[0]
-        poly[24] += poly[0] / 9
-        poly[25] += poly[0] / 9
-        poly[26] += poly[0] * 2 / 3
-        poly = poly[1:]
-
-        poly[9] -= poly[8] * 2 / 3
-        poly[10] += poly[8] / 3
-        poly[11] -= poly[8] / 9
-        poly[12] += poly[8] * 2 / 9
-        poly[13] += poly[8] / 3
-        poly[14] -= poly[8] / 9
-        poly[15] += poly[8] / 9
-        poly[16] += poly[8] * 2 / 9
-        poly[17] -= poly[8] / 3
-        poly[18] -= poly[8] * 2 / 9
-        poly[19] += poly[8]
-        poly[20] += poly[8] / 9
-        poly[21] += poly[8] * 2 / 3
-        poly[22] -= poly[8] / 3
-        poly[23] -= poly[8] / 9
-        poly[24] += poly[8] / 9
-        poly[25] -= poly[8] * 2 / 9
-        poly = poly[:8] + poly[9:]
-
-        poly[2] -= poly[1] / 6
-        poly[3] -= poly[1] * 2 / 3
-        poly[4] += poly[1] / 2
-        poly[5] += poly[1] / 12
-        poly[6] -= poly[1] / 12
-        poly[7] += poly[1] / 3
-        poly[9] -= poly[1] / 2
-        poly[10] -= poly[1] / 12
-        poly[11] -= poly[1] / 3
-        poly[12] += poly[1]
-        poly[13] += poly[1] / 6
-        poly[14] += poly[1] / 12
-        poly[15] += poly[1] * 2 / 3
-        poly[18] -= poly[1] / 2
-        poly[19] -= poly[1] / 12
-        poly[20] -= poly[1] / 3
-        poly[21] += poly[1] / 2
-        poly[22] += poly[1] / 12
-        poly[24] += poly[1] / 3
-        poly = poly[:1] + poly[2:]
-
-        return poly
-
-    raise NotImplementedError()
+    e = BDM(reference, k)
+    return [i for (i, j) in zip(e.get_basis_functions(), e.dofs) if j.entity != (reference.tdim, 0)]
 
 
 def get_sub_cells(reference):
@@ -309,8 +202,7 @@ class GuzmanNeilanFirstKind(CiarletElement):
     max_order = {"triangle": 1, "tetrahedron": 2}
     continuity = "L2"
     value_type = "vector macro"
-    last_updated = "2024.10.3"
-    cache = False
+    last_updated = "2024.10.4"
 
 
 class GuzmanNeilanSecondKind(CiarletElement):
@@ -412,8 +304,7 @@ class GuzmanNeilanSecondKind(CiarletElement):
     max_order = {"triangle": 1, "tetrahedron": 2}
     continuity = "L2"
     value_type = "vector macro"
-    last_updated = "2024.10.1"
-    cache = False
+    last_updated = "2024.10.2"
 
 
 def make_piecewise_lagrange(
