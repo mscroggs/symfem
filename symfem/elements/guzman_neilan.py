@@ -23,7 +23,7 @@ from symfem.symbols import x, t
 __all__ = ["GuzmanNeilanFirstKind", "GuzmanNeilanSecondKind", "make_piecewise_lagrange"]
 
 
-def poly(reference: Reference, k: int) -> typing.List[VectorFunction]:
+def poly(reference: Reference, k: int) -> typing.List[AnyFunction]:
     """Generate the P^perp polynomial set."""
     if k < 2:
         if reference.name == "triangle":
