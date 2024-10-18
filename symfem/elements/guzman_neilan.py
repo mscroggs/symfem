@@ -235,8 +235,8 @@ class GuzmanNeilanSecondKind(CiarletElement):
         ]
 
         return make_piecewise_lagrange(sub_tris, "triangle", order) + [
-            PiecewiseFunction(b, 2)
-            for b in bubbles  # type: ignore
+            PiecewiseFunction(b, 2)  # type: ignore
+            for b in bubbles
         ]
 
     def _make_polyset_tetrahedron(
@@ -264,8 +264,8 @@ class GuzmanNeilanSecondKind(CiarletElement):
         ]
 
         return make_piecewise_lagrange(sub_tets, "tetrahedron", order) + [
-            PiecewiseFunction(b, 3)
-            for b in bubbles  # type: ignore
+            PiecewiseFunction(b, 3)  # type: ignore
+            for b in bubbles
         ]
 
     @property
