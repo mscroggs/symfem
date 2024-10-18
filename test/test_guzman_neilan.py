@@ -22,6 +22,18 @@ def test_triangle_bubbles():
             assert div == value
 
 
+def test_tetrahedron_bubbles():
+    from symfem.elements._guzman_neilan_tetrahedron import bubbles
+
+    for b in bubbles:
+        div = None
+        for part in b.values():
+            value = (part[0].diff(x[0]) + part[1].diff(x[1]) + part[2].diff(x[2])).expand()
+            if div is None:
+                div = value
+            assert div == value
+
+
 @pytest.mark.parametrize("order", [1])
 def test_guzman_neilan_triangle(order):
     e = symfem.create_element("triangle", "Guzman-Neilan second kind", order)
