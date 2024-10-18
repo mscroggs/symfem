@@ -35,7 +35,7 @@ def test_tetrahedron_bubbles():
 
 
 @pytest.mark.parametrize("cell,order", [("triangle", 1), ("tetrahedron", 1), ("tetrahedron", 2)])
-def test_guzman_neilan_triangle(cell, order):
+def test_guzman_neilan(cell, order):
     e = symfem.create_element(cell, "Guzman-Neilan second kind", order)
 
     if cell == "triangle":
@@ -48,8 +48,13 @@ def test_guzman_neilan_triangle(cell, order):
     mid = e.reference.midpoint()
 
     for p in e._basis[-nb:]:
+        value = None
         for piece in p.pieces.values():
-            float(piece.div().as_sympy().expand())
+            div = piece.div().as_sympy().expand()
+            float(div)
+            if value is None:
+                value = div
+            assert value == div
 
         for v in e.reference.vertices:
             assert p.subs(x, v) == tuple(0 for _ in range(e.reference.tdim))
