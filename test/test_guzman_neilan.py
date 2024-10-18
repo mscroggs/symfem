@@ -34,25 +34,31 @@ def test_tetrahedron_bubbles():
             assert div == value
 
 
-@pytest.mark.parametrize("order", [1])
-def test_guzman_neilan_triangle(order):
-    e = symfem.create_element("triangle", "Guzman-Neilan second kind", order)
+@pytest.mark.parametrize("cell,order", [("triangle", 1), ("tetrahedron", 1), ("tetrahedron", 2)])
+def test_guzman_neilan_triangle(cell, order):
+    e = symfem.create_element(cell, "Guzman-Neilan second kind", order)
 
-    for p in e._basis[-3:]:
-        for piece in p.pieces.values():
-            float(piece.div().as_sympy().expand())
+    if cell == "triangle":
+        nb = 3
+    elif cell == "tetrahedron":
+        nb = 4
+    else:
+        raise ValueError(f"Unsupported cell: {cell}")
 
+    mid = e.reference.midpoint()
 
-@pytest.mark.parametrize("order", [1, 2])
-def test_guzman_neilan_tetrahedron(order):
-    e = symfem.create_element("tetrahedron", "Guzman-Neilan second kind", order)
-
-    for p in e._basis[-4:]:
+    for p in e._basis[-nb:]:
         for piece in p.pieces.values():
             float(piece.div().as_sympy().expand())
 
         for v in e.reference.vertices:
-            assert p.subs(x, v) == (0, 0, 0)
+            assert p.subs(x, v) == tuple(0 for _ in range(e.reference.tdim))
+
+        value = None
+        for piece in p.pieces.values():
+            if value is None:
+                value = piece.subs(x, mid)
+            assert value == piece.subs(x, mid)
 
 
 @pytest.mark.parametrize("order", [1])
