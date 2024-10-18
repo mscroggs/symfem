@@ -220,16 +220,35 @@ for ref in ["triangle", "tetrahedron"]:
             assert f.subs(x, c[3]) == 1
 
     sub_basis = [
-        p * lamb**j
-        for j in range(1, reference.tdim + 1)
-        for p in poly(reference, reference.tdim - j)
+        (p, j) for j in range(1, reference.tdim + 1) for p in poly(reference, reference.tdim - j)
     ]
 
     filename = os.path.join(folder, f"_guzman_neilan_{ref}.py")
     output = '"""Values for Guzman-Neilan element."""\n\n'
-    output += "import sympy\n\nbubbles = [\n"
+    output += "import sympy\n\n"
+
+    output += "lambda_0 = {\n"
+    for cell, f in lamb.pieces.items():
+        output += (
+            "    ("
+            + ", ".join(
+                [
+                    "("
+                    + ", ".join(
+                        [f"{c}" if isinstance(c, sympy.Integer) else f"sympy.S('{c}')" for c in p]
+                    )
+                    + ")"
+                    for p in cell
+                ]
+            )
+            + f"): sympy.S('{f.as_sympy()}'),\n"
+        )
+    output += "}\n"
+
+    output += "bubbles = [\n"
 
     for f in fs:
+        output += "    {\n"
         assert isinstance(f, VectorFunction)
         integrand = f.div().subs(x, t)
         fun_s = (f.div() - integrand.integral(reference) / reference.volume()).as_sympy()
@@ -242,11 +261,11 @@ for ref in ["triangle", "tetrahedron"]:
         aim = [fun[term] if term in fun else 0 for term in terms] * (br.reference.tdim + 1)
 
         mat: typing.List[typing.List[symfem.functions.ScalarFunction]] = [
-            [] for t in terms for p in sub_basis[0].pieces
+            [] for t in terms for p in lamb.pieces
         ]
         for b in sub_basis:
             i = 0
-            for p in b.pieces.values():
+            for p in (b[0] * lamb ** b[1]).pieces.values():
                 assert isinstance(p, VectorFunction)
                 d_s = p.div().as_sympy()
                 assert isinstance(d_s, sympy.core.expr.Expr)
@@ -259,40 +278,19 @@ for ref in ["triangle", "tetrahedron"]:
                     i += 1
 
         coeffs = find_solution(mat, aim)
+        bubble_terms = {
+            i: VectorFunction([0] * reference.tdim) for i in range(1, reference.tdim + 1)
+        }
         bubble: AnyFunction = f
         for i, j in zip(coeffs, sub_basis):
-            bubble -= i * j
+            bubble_terms[j[1]] += i * j[0]
 
-        assert isinstance(bubble, PiecewiseFunction)
-
-        output += "    {\n"
-        for cell, f in bubble.pieces.items():
-            output += "        "
+        for ii, jj in bubble_terms.items():
             output += (
-                "("
-                + ", ".join(
-                    [
-                        "("
-                        + ", ".join(
-                            [
-                                f"{c}" if isinstance(c, sympy.Integer) else f"sympy.S('{c}')"
-                                for c in p
-                            ]
-                        )
-                        + ")"
-                        for p in cell
-                    ]
-                )
-                + ")"
+                f"        {ii}: ("
+                + ", ".join([f"sympy.S('{t.expand()}')" for t in jj.as_sympy()])  # type: ignore
+                + "),\n"
             )
-            output += ": (\n"
-            output += ",\n".join(
-                [
-                    "            sympy.S('" + f"{c.as_sympy().expand()}".replace(" ", "") + "')"  # type:ignore
-                    for c in f
-                ]
-            )
-            output += "),\n"
         output += "    },\n"
 
     output += "]\n"

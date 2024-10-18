@@ -7,36 +7,40 @@ import sympy
 
 import symfem
 from symfem.elements.guzman_neilan import make_piecewise_lagrange
+from symfem.functions import VectorFunction
+from symfem.piecewise_functions import PiecewiseFunction
 from symfem.symbols import x
 
 
-def test_triangle_bubbles():
-    from symfem.elements._guzman_neilan_triangle import bubbles
+@pytest.mark.parametrize("cell", ["triangle", "tetrahedron"])
+def test_bubbles(cell):
+    if cell == "triangle":
+        from symfem.elements._guzman_neilan_triangle import bubbles, lambda_0
 
-    for b in bubbles:
+        tdim = 2
+    else:
+        from symfem.elements._guzman_neilan_triangle import bubbles, lambda_0
+
+        tdim = 3
+    lamb = PiecewiseFunction(lambda_0, tdim)
+
+    br = symfem.create_element("triangle", "Bernardi-Raugel", 1)
+
+    for br_bubble, correction in zip(br.get_basis_functions()[-len(bubbles) :], bubbles):
+        for i, p in correction.items():
+            br_bubble -= VectorFunction(p) * lamb**i
         div = None
-        for part in b.values():
-            value = (part[0].diff(x[0]) + part[1].diff(x[1])).expand()
-            if div is None:
-                div = value
-            assert div == value
-
-
-def test_tetrahedron_bubbles():
-    from symfem.elements._guzman_neilan_tetrahedron import bubbles
-
-    for b in bubbles:
-        div = None
-        for part in b.values():
-            value = (part[0].diff(x[0]) + part[1].diff(x[1]) + part[2].diff(x[2])).expand()
+        for part in br_bubble.pieces.values():
+            value = part.div().as_sympy().expand()
             if div is None:
                 div = value
             assert div == value
 
 
 @pytest.mark.parametrize("cell,order", [("triangle", 1), ("tetrahedron", 1), ("tetrahedron", 2)])
-def test_guzman_neilan(cell, order):
-    e = symfem.create_element(cell, "Guzman-Neilan second kind", order)
+@pytest.mark.parametrize("etype", ["first", "second"])
+def test_guzman_neilan(cell, order, etype):
+    e = symfem.create_element(cell, f"Guzman-Neilan {etype} kind", order)
 
     if cell == "triangle":
         nb = 3
@@ -67,9 +71,10 @@ def test_guzman_neilan(cell, order):
 
 
 @pytest.mark.parametrize("order", [1])
-def test_basis_continuity_triangle(order):
+@pytest.mark.parametrize("etype", ["first", "second"])
+def test_basis_continuity_triangle(order, etype):
     N = 5
-    e = symfem.create_element("triangle", "Guzman-Neilan second kind", order)
+    e = symfem.create_element("triangle", f"Guzman-Neilan {etype} kind", order)
     third = sympy.Rational(1, 3)
     one = sympy.Integer(1)
     for pt in [(0, 0), (1, 0), (0, 1), (third, third)]:
@@ -93,9 +98,10 @@ def test_basis_continuity_triangle(order):
 
 
 @pytest.mark.parametrize("order", [1, 2])
-def test_basis_continuity_tetrahedron(order):
+@pytest.mark.parametrize("etype", ["first", "second"])
+def test_basis_continuity_tetrahedron(order, etype):
     N = 5
-    e = symfem.create_element("tetrahedron", "Guzman-Neilan second kind", order)
+    e = symfem.create_element("tetrahedron", f"Guzman-Neilan {etype} kind", order)
     quarter = sympy.Rational(1, 4)
     one = sympy.Integer(1)
     for pt in [(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (quarter, quarter, quarter)]:

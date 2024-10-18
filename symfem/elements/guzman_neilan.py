@@ -35,9 +35,26 @@ class GuzmanNeilanFirstKind(CiarletElement):
             raise NonDefaultReferenceError()
 
         if reference.name == "triangle":
-            poly = self._make_polyset_triangle(reference, order)
+            from symfem.elements._guzman_neilan_triangle import bubbles, lambda_0
         else:
-            poly = self._make_polyset_tetrahedron(reference, order)
+            from symfem.elements._guzman_neilan_tetrahedron import bubbles, lambda_0  # type: ignore
+
+        lamb = PiecewiseFunction(lambda_0, reference.tdim)  # type: ignore
+
+        sub_cells = list(lambda_0.keys())
+
+        lagrange = VectorLagrange(reference, order)
+        poly = [
+            PiecewiseFunction({i: p for i in sub_cells}, reference.tdim)
+            for p in lagrange.get_polynomial_basis()
+        ]
+
+        br1 = BernardiRaugel(reference, 1)
+
+        for bubble, correction in zip(br1.get_basis_functions()[-len(bubbles) :], bubbles):
+            for i, p in correction.items():
+                bubble -= VectorFunction(p) * lamb**i
+            poly.append(bubble)  # type: ignore
 
         br = BernardiRaugel(reference, order)
         if order == 1:
@@ -47,64 +64,6 @@ class GuzmanNeilanFirstKind(CiarletElement):
             dofs = br.dofs[:-3]
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)  # type: ignore
-
-    def _make_polyset_triangle(
-        self, reference: Reference, order: int
-    ) -> typing.List[PiecewiseFunction]:
-        """Make the polyset for a triangle.
-
-        Args:
-            reference: The reference cell
-            order: The polynomial order
-
-        Returns:
-            The polynomial set
-        """
-        assert order == 1
-
-        from symfem.elements._guzman_neilan_triangle import bubbles
-
-        mid = reference.midpoint()
-
-        sub_tris: typing.List[SetOfPoints] = [
-            (reference.vertices[0], reference.vertices[1], mid),
-            (reference.vertices[0], reference.vertices[2], mid),
-            (reference.vertices[1], reference.vertices[2], mid),
-        ]
-
-        lagrange = VectorLagrange(reference, order)
-        return [
-            PiecewiseFunction({i: p for i in sub_tris}, 2) for p in lagrange.get_polynomial_basis()
-        ] + [PiecewiseFunction(b, 2) for b in bubbles]  # type: ignore
-
-    def _make_polyset_tetrahedron(
-        self, reference: Reference, order: int
-    ) -> typing.List[PiecewiseFunction]:
-        """Make the polyset for a tetrahedron.
-
-        Args:
-            reference: The reference cell
-            order: The polynomial order
-
-        Returns:
-            The polynomial set
-        """
-        assert order in [1, 2]
-        from symfem.elements._guzman_neilan_tetrahedron import bubbles
-
-        mid = reference.midpoint()
-
-        sub_tets: typing.List[SetOfPoints] = [
-            (reference.vertices[0], reference.vertices[1], reference.vertices[2], mid),
-            (reference.vertices[0], reference.vertices[1], reference.vertices[3], mid),
-            (reference.vertices[0], reference.vertices[2], reference.vertices[3], mid),
-            (reference.vertices[1], reference.vertices[2], reference.vertices[3], mid),
-        ]
-
-        lagrange = VectorLagrange(reference, order)
-        return [
-            PiecewiseFunction({i: p for i in sub_tets}, 3) for p in lagrange.get_polynomial_basis()
-        ] + [PiecewiseFunction(b, 3) for b in bubbles]  # type: ignore
 
     @property
     def lagrange_subdegree(self) -> int:
@@ -145,9 +104,22 @@ class GuzmanNeilanSecondKind(CiarletElement):
             raise NonDefaultReferenceError()
 
         if reference.name == "triangle":
-            poly = self._make_polyset_triangle(reference, order)
+            from symfem.elements._guzman_neilan_triangle import bubbles, lambda_0
         else:
-            poly = self._make_polyset_tetrahedron(reference, order)
+            from symfem.elements._guzman_neilan_tetrahedron import bubbles, lambda_0  # type: ignore
+
+        lamb = PiecewiseFunction(lambda_0, reference.tdim)  # type: ignore
+
+        sub_cells = list(lambda_0.keys())
+
+        poly = make_piecewise_lagrange(sub_cells, reference.name, order)  # type: ignore
+
+        br1 = BernardiRaugel(reference, 1)
+
+        for bubble, correction in zip(br1.get_basis_functions()[-len(bubbles) :], bubbles):
+            for i, p in correction.items():
+                bubble -= VectorFunction(p) * lamb**i
+            poly.append(bubble)  # type: ignore
 
         dofs: ListOfFunctionals = []
 
@@ -208,64 +180,6 @@ class GuzmanNeilanSecondKind(CiarletElement):
             )
 
         super().__init__(reference, order, poly, dofs, tdim, tdim)  # type: ignore
-
-    def _make_polyset_triangle(
-        self, reference: Reference, order: int
-    ) -> typing.List[PiecewiseFunction]:
-        """Make the polyset for a triangle.
-
-        Args:
-            reference: The reference cell
-            order: The polynomial order
-
-        Returns:
-            The polynomial set
-        """
-        assert order == 1
-
-        from symfem.elements._guzman_neilan_triangle import bubbles
-
-        mid = reference.midpoint()
-
-        sub_tris: typing.List[SetOfPoints] = [
-            (reference.vertices[0], reference.vertices[1], mid),
-            (reference.vertices[0], reference.vertices[2], mid),
-            (reference.vertices[1], reference.vertices[2], mid),
-        ]
-
-        return make_piecewise_lagrange(sub_tris, "triangle", order) + [
-            PiecewiseFunction(b, 2)  # type: ignore
-            for b in bubbles
-        ]
-
-    def _make_polyset_tetrahedron(
-        self, reference: Reference, order: int
-    ) -> typing.List[PiecewiseFunction]:
-        """Make the polyset for a tetrahedron.
-
-        Args:
-            reference: The reference cell
-            order: The polynomial order
-
-        Returns:
-            The polynomial set
-        """
-        assert order in [1, 2]
-        from symfem.elements._guzman_neilan_tetrahedron import bubbles
-
-        mid = reference.midpoint()
-
-        sub_tets: typing.List[SetOfPoints] = [
-            (reference.vertices[0], reference.vertices[1], reference.vertices[2], mid),
-            (reference.vertices[0], reference.vertices[1], reference.vertices[3], mid),
-            (reference.vertices[0], reference.vertices[2], reference.vertices[3], mid),
-            (reference.vertices[1], reference.vertices[2], reference.vertices[3], mid),
-        ]
-
-        return make_piecewise_lagrange(sub_tets, "tetrahedron", order) + [
-            PiecewiseFunction(b, 3)  # type: ignore
-            for b in bubbles
-        ]
 
     @property
     def lagrange_subdegree(self) -> int:
