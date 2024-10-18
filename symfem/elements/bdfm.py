@@ -7,6 +7,9 @@ https://doi.org/10.1007/978-1-4612-3172-1 (Brezzi, Fortin, 1991)
 
 import typing
 
+from symfem.elements.dpc import DPC, VectorDPC
+from symfem.elements.lagrange import Lagrange
+from symfem.elements.nedelec import NedelecFirstKind
 from symfem.finite_element import CiarletElement
 from symfem.functionals import IntegralMoment, ListOfFunctionals, NormalIntegralMoment
 from symfem.functions import FunctionInput
@@ -14,9 +17,6 @@ from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
-from symfem.elements.dpc import DPC, VectorDPC
-from symfem.elements.lagrange import Lagrange
-from symfem.elements.nedelec import NedelecFirstKind
 
 __all__ = ["bdfm_polyset", "BDFM"]
 

@@ -10,25 +10,55 @@ from symfem.elements.guzman_neilan import make_piecewise_lagrange
 from symfem.symbols import x
 
 
-@pytest.mark.parametrize("order", [1])
-def test_guzman_neilan_triangle(order):
-    e = symfem.create_element("triangle", "Guzman-Neilan second kind", order)
+def test_triangle_bubbles():
+    from symfem.elements._guzman_neilan_triangle import bubbles
 
-    for p in e._basis[-3:]:
+    for b in bubbles:
+        div = None
+        for part in b.values():
+            value = (part[0].diff(x[0]) + part[1].diff(x[1])).expand()
+            if div is None:
+                div = value
+            assert div == value
+
+
+def test_tetrahedron_bubbles():
+    from symfem.elements._guzman_neilan_tetrahedron import bubbles
+
+    for b in bubbles:
+        div = None
+        for part in b.values():
+            value = (part[0].diff(x[0]) + part[1].diff(x[1]) + part[2].diff(x[2])).expand()
+            if div is None:
+                div = value
+            assert div == value
+
+
+@pytest.mark.parametrize("cell,order", [("triangle", 1), ("tetrahedron", 1), ("tetrahedron", 2)])
+def test_guzman_neilan_triangle(cell, order):
+    e = symfem.create_element(cell, "Guzman-Neilan second kind", order)
+
+    if cell == "triangle":
+        nb = 3
+    elif cell == "tetrahedron":
+        nb = 4
+    else:
+        raise ValueError(f"Unsupported cell: {cell}")
+
+    mid = e.reference.midpoint()
+
+    for p in e._basis[-nb:]:
         for piece in p.pieces.values():
             float(piece.div().as_sympy().expand())
 
+        for v in e.reference.vertices:
+            assert p.subs(x, v) == tuple(0 for _ in range(e.reference.tdim))
 
-@pytest.mark.parametrize("order", [1, 2])
-def test_guzman_neilan_tetrahedron(order):
-    e = symfem.create_element("tetrahedron", "Guzman-Neilan second kind", order)
-
-    mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*e.reference.vertices))
-    for p in e._basis[-4:]:
+        value = None
         for piece in p.pieces.values():
-            float(piece.div().as_sympy().expand())
-
-        assert p.subs(x, mid) == (0, 0, 0)
+            if value is None:
+                value = piece.subs(x, mid)
+            assert value == piece.subs(x, mid)
 
 
 @pytest.mark.parametrize("order", [1])

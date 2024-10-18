@@ -1,12 +1,12 @@
 """Test every element."""
 
 import pytest
-
 import sympy
+
 from symfem import create_element
-from symfem.functions import VectorFunction, MatrixFunction
-from symfem.symbols import x
+from symfem.functions import MatrixFunction, VectorFunction
 from symfem.polynomials import polynomial_set, polynomial_set_1d
+from symfem.symbols import x
 
 from .utils import test_elements
 

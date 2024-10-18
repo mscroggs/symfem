@@ -8,7 +8,6 @@ from abc import ABC, abstractmethod
 import sympy
 
 import symfem.functions
-
 from symfem.geometry import (
     PointType,
     PointTypeInput,

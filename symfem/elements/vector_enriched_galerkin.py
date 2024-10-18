@@ -6,13 +6,13 @@ This element's definition appears in https://doi.org/10.1016/j.camwa.2022.06.018
 
 import typing
 
+from symfem.elements.lagrange import VectorLagrange
+from symfem.elements.q import VectorQ
 from symfem.finite_element import CiarletElement, EnrichedElement
 from symfem.functionals import BaseFunctional, IntegralAgainst
 from symfem.functions import FunctionInput, VectorFunction
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
-from symfem.elements.lagrange import VectorLagrange
-from symfem.elements.q import VectorQ
 
 __all__ = ["Enrichment", "VectorEnrichedGalerkin"]
 

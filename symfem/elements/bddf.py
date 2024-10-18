@@ -6,6 +6,7 @@ This element's definition appears in https://doi.org/10.1007/BF01396752
 
 import typing
 
+from symfem.elements.dpc import DPC, VectorDPC
 from symfem.finite_element import CiarletElement
 from symfem.functionals import IntegralMoment, ListOfFunctionals, NormalIntegralMoment
 from symfem.functions import FunctionInput, VectorFunction
@@ -13,7 +14,6 @@ from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
-from symfem.elements.dpc import DPC, VectorDPC
 
 __all__ = ["bddf_polyset", "BDDF"]
 

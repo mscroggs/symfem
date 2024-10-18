@@ -8,6 +8,7 @@ import typing
 
 import sympy
 
+from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     DivergenceIntegralMoment,
@@ -20,7 +21,6 @@ from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
-from symfem.elements.lagrange import Lagrange
 
 __all__ = ["BernardiRaugel"]
 
@@ -132,4 +132,4 @@ class BernardiRaugel(CiarletElement):
     max_order = {"triangle": 1, "tetrahedron": 2}
     continuity = "L2"
     value_type = "vector"
-    last_updated = "2024.10"
+    last_updated = "2024.10.1"

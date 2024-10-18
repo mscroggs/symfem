@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import typing
 
+from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import IntegralMoment, ListOfFunctionals, NormalInnerProductIntegralMoment
 from symfem.functions import FunctionInput
@@ -20,7 +21,6 @@ from symfem.functions import MatrixFunction as _MatrixFunction
 from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
-from symfem.elements.lagrange import Lagrange
 
 __all__ = ["HellanHerrmannJohnson"]
 

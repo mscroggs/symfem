@@ -5,6 +5,7 @@ from itertools import product
 
 import sympy
 
+from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import ListOfFunctionals, PointEvaluation
 from symfem.functions import FunctionInput, ScalarFunction
@@ -12,7 +13,6 @@ from symfem.polynomials import polynomial_set_1d
 from symfem.quadrature import get_quadrature
 from symfem.references import Reference
 from symfem.symbols import x
-from symfem.elements.lagrange import Lagrange
 
 __all__ = ["Transition"]
 

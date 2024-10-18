@@ -9,6 +9,7 @@ import typing
 
 import sympy
 
+from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     InnerProductIntegralMoment,
@@ -20,7 +21,6 @@ from symfem.functions import FunctionInput
 from symfem.polynomials import polynomial_set_vector
 from symfem.references import Reference
 from symfem.symbols import x
-from symfem.elements.lagrange import Lagrange
 
 __all__ = ["ArnoldWinther", "NonConformingArnoldWinther"]
 

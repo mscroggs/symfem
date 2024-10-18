@@ -7,6 +7,7 @@ These elements' definitions appear in https://doi.org/10.1137/16M1073352
 
 import typing
 
+from symfem.elements.dpc import DPC, VectorDPC
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     IntegralAgainst,
@@ -20,7 +21,6 @@ from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import t, x
-from symfem.elements.dpc import DPC, VectorDPC
 
 __all__ = ["TrimmedSerendipityHcurl", "TrimmedSerendipityHdiv"]
 

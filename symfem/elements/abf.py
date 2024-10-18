@@ -6,6 +6,8 @@ Thse elements definitions appear in https://dx.doi.org/10.1137/S0036142903431924
 
 import typing
 
+from symfem.elements.lagrange import Lagrange
+from symfem.elements.q import Nedelec
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     IntegralMoment,
@@ -17,8 +19,6 @@ from symfem.functions import FunctionInput
 from symfem.moments import make_integral_moment_dofs
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
-from symfem.elements.lagrange import Lagrange
-from symfem.elements.q import Nedelec
 
 __all__ = ["ArnoldBoffiFalk"]
 

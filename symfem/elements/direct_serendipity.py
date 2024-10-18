@@ -6,10 +6,10 @@ This element's definition appears in https://arxiv.org/abs/1809.02192
 
 import typing
 
+from symfem.elements.dpc import DPC
 from symfem.finite_element import DirectElement
 from symfem.references import Reference
 from symfem.symbols import x
-from symfem.elements.dpc import DPC
 
 __all__ = ["DirectSerendipity"]
 

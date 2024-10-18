@@ -3,13 +3,13 @@
 import typing
 from itertools import product
 
+from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import DerivativePointEvaluation, IntegralMoment, ListOfFunctionals
 from symfem.functions import FunctionInput
 from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import polynomial_set_1d
 from symfem.references import Reference
-from symfem.elements.lagrange import Lagrange
 
 __all__ = ["Taylor"]
 

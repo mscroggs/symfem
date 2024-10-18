@@ -7,7 +7,6 @@ import typing
 import sympy
 
 import symfem
-
 from symfem.functions import (
     AnyFunction,
     FunctionInput,
