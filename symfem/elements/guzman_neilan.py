@@ -128,8 +128,7 @@ class GuzmanNeilanFirstKind(CiarletElement):
     max_order = {"triangle": 1, "tetrahedron": 2}
     continuity = "L2"
     value_type = "vector macro"
-    last_updated = "2024.10.2"
-    cache = False
+    last_updated = "2024.10.3"
 
 
 class GuzmanNeilanSecondKind(CiarletElement):
@@ -290,8 +289,7 @@ class GuzmanNeilanSecondKind(CiarletElement):
     max_order = {"triangle": 1, "tetrahedron": 2}
     continuity = "L2"
     value_type = "vector macro"
-    last_updated = "2024.10"
-    cache = False
+    last_updated = "2024.10.1"
 
 
 def make_piecewise_lagrange(
