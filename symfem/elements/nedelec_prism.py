@@ -2,6 +2,8 @@
 
 import typing
 
+from symfem.elements.lagrange import Lagrange, VectorLagrange
+from symfem.elements.q import RaviartThomas as QRT
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     IntegralAgainst,
@@ -14,8 +16,6 @@ from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import Hcurl_polynomials, polynomial_set_1d, polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
-from symfem.elements.lagrange import Lagrange, VectorLagrange
-from symfem.elements.q import RaviartThomas as QRT
 
 __all__ = ["Nedelec"]
 

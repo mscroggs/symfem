@@ -9,6 +9,7 @@ from itertools import product
 
 import sympy
 
+from symfem.elements.q import Q
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     DerivativeIntegralMoment,
@@ -23,7 +24,6 @@ from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import orthogonal_basis, quolynomial_set_1d, quolynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import t, x
-from symfem.elements.q import Q
 
 __all__ = ["p", "b", "TNT", "TNTcurl", "TNTdiv"]
 

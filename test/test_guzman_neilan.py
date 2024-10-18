@@ -47,12 +47,12 @@ def test_guzman_neilan_triangle(order):
 def test_guzman_neilan_tetrahedron(order):
     e = symfem.create_element("tetrahedron", "Guzman-Neilan second kind", order)
 
-    mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*e.reference.vertices))
     for p in e._basis[-4:]:
         for piece in p.pieces.values():
             float(piece.div().as_sympy().expand())
 
-        assert p.subs(x, mid) == (0, 0, 0)
+        for v in e.reference.vertices:
+            assert p.subs(x, v) == (0, 0, 0)
 
 
 @pytest.mark.parametrize("order", [1])

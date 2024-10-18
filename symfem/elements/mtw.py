@@ -7,6 +7,8 @@ and https://doi.org/10.1007/s10092-006-0124-6 (Tail, Mardal, 2006)
 
 import typing
 
+from symfem.elements.lagrange import Lagrange
+from symfem.elements.nedelec import NedelecFirstKind
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     IntegralMoment,
@@ -19,8 +21,6 @@ from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
-from symfem.elements.lagrange import Lagrange
-from symfem.elements.nedelec import NedelecFirstKind
 
 __all__ = ["MardalTaiWinther"]
 

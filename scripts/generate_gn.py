@@ -4,12 +4,10 @@ import os
 import sys
 import typing
 
-import numpy as np
 import sympy
 
 import symfem
-from symfem.elements.guzman_neilan import make_piecewise_lagrange
-from symfem.functions import MatrixFunction, VectorFunction
+from symfem.functions import VectorFunction, AnyFunction
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.symbols import t, x
 
@@ -17,6 +15,7 @@ TESTING = "test" in sys.argv
 
 
 def poly(reference, k):
+    """Generate the P^perp polynomial set."""
     if k < 2:
         if reference.name == "triangle":
             return [
@@ -155,6 +154,7 @@ def poly(reference, k):
 
 
 def find_solution(mat, aim):
+    """Solve mat @ x = aim."""
     s_mat = sympy.Matrix(mat)
     solution = (s_mat.T @ s_mat).inv() @ s_mat.T @ sympy.Matrix(aim)
     assert s_mat @ solution == sympy.Matrix(aim)
@@ -259,9 +259,11 @@ for ref in ["triangle", "tetrahedron"]:
                     i += 1
 
         coeffs = find_solution(mat, aim)
-        bubble = f
+        bubble: AnyFunction = f
         for i, j in zip(coeffs, sub_basis):
             bubble -= i * j
+
+        assert isinstance(bubble, PiecewiseFunction)
 
         output += "    {\n"
         for cell, f in bubble.pieces.items():
@@ -273,9 +275,7 @@ for ref in ["triangle", "tetrahedron"]:
                         "("
                         + ", ".join(
                             [
-                                f"{c}"
-                                if isinstance(c, sympy.Integer)
-                                else f"sympy.S('{c}')"
+                                f"{c}" if isinstance(c, sympy.Integer) else f"sympy.S('{c}')"
                                 for c in p
                             ]
                         )
@@ -288,7 +288,7 @@ for ref in ["triangle", "tetrahedron"]:
             output += ": (\n"
             output += ",\n".join(
                 [
-                    "            sympy.S('" + f"{c.as_sympy().expand()}".replace(" ", "") + "')"
+                    "            sympy.S('" + f"{c.as_sympy().expand()}".replace(" ", "") + "')"  # type:ignore
                     for c in f
                 ]
             )

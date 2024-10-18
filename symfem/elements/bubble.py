@@ -9,11 +9,11 @@ from itertools import product
 
 import sympy
 
+from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
 from symfem.functions import FunctionInput
 from symfem.references import Reference
-from symfem.elements.lagrange import Lagrange
 
 __all__ = ["Bubble", "BubbleEnrichedLagrange", "BubbleEnrichedVectorLagrange"]
 

@@ -6,6 +6,7 @@ This element's definition appears in https://dx.doi.org/10.1137/15M1013705
 
 import typing
 
+from symfem.elements.dpc import DPC
 from symfem.finite_element import CiarletElement
 from symfem.functionals import IntegralAgainst, ListOfFunctionals, NormalIntegralMoment
 from symfem.functions import FunctionInput
@@ -13,7 +14,6 @@ from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import Hdiv_serendipity, polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
-from symfem.elements.dpc import DPC
 
 __all__ = ["AC"]
 

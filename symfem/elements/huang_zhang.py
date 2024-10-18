@@ -6,6 +6,7 @@ This element's definition appears in https://doi.org/10.1007/s11464-011-0094-0
 
 import typing
 
+from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     IntegralAgainst,
@@ -17,7 +18,6 @@ from symfem.functions import FunctionInput, VectorFunction
 from symfem.moments import make_integral_moment_dofs
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
-from symfem.elements.lagrange import Lagrange
 
 __all__ = ["HuangZhang"]
 

@@ -6,6 +6,7 @@ This element's definition appears in https://doi.org/10.1007/s10208-011-9087-3
 
 import typing
 
+from symfem.elements.dpc import DPC, VectorDPC
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     IntegralMoment,
@@ -24,7 +25,6 @@ from symfem.polynomials import (
     serendipity_set_1d,
 )
 from symfem.references import NonDefaultReferenceError, Reference
-from symfem.elements.dpc import DPC, VectorDPC
 
 __all__ = ["Serendipity", "SerendipityCurl", "SerendipityDiv"]
 
