@@ -120,7 +120,7 @@ def bubbles(reference: Reference) -> typing.List[AnyFunction]:
         fun_s = (f.div() - integrand.integral(reference) / reference.volume()).as_sympy()
 
         assert isinstance(fun_s, sympy.core.expr.Expr)
-        fun = {x[0]**i[0] * x[1]**i[1] * x[2]**i[2]: j for i, j in fun_s.as_poly(x).terms()}
+        fun = {x[0] ** i[0] * x[1] ** i[1] * x[2] ** i[2]: j for i, j in fun_s.as_poly(x).terms()}
 
         for term in fun:
             assert term in terms
