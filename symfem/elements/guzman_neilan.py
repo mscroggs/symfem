@@ -74,13 +74,19 @@ def get_sub_cells(reference):
 
 def bubbles(reference: Reference) -> typing.List[AnyFunction]:
     """Generate divergence-free bubbles."""
-    br = BernardiRaugel(reference, 1)
+    br_bubbles = []
+    p = Lagrange(reference, 1, variant="equispaced")
+    for i in range(reference.sub_entity_count(reference.tdim - 1)):
+        sub_e = reference.sub_entity(reference.tdim - 1, i)
+        bubble = 1
+        for j in reference.sub_entities(reference.tdim - 1)[i]:
+            bubble *= p.get_basis_function(j)
+        br_bubbles.append(VectorFunction(tuple(bubble * j for j in sub_e.normal())))
 
     sub_cells = get_sub_cells(reference)
     xx, yy, zz = x
 
     if reference.name == "triangle":
-        fs = br.get_basis_functions()[-3:]
         terms = [1, xx, yy]
 
         lamb = PiecewiseFunction(
@@ -88,7 +94,6 @@ def bubbles(reference: Reference) -> typing.List[AnyFunction]:
         )
 
     if reference.name == "tetrahedron":
-        fs = br.get_basis_functions()[-4:]
         terms = [1, xx, yy, zz, xx**2, yy**2, zz**2, xx * yy, xx * zz, yy * zz]
 
         lamb = PiecewiseFunction(
@@ -109,17 +114,17 @@ def bubbles(reference: Reference) -> typing.List[AnyFunction]:
 
     bubbles = []
 
-    for f in fs:
+    for f in br_bubbles:
         assert isinstance(f, VectorFunction)
         integrand = f.div().subs(x, t)
         fun_s = (f.div() - integrand.integral(reference) / reference.volume()).as_sympy()
 
         assert isinstance(fun_s, sympy.core.expr.Expr)
-        fun = fun_s.as_coefficients_dict()
+        fun = {x[0]**i[0] * x[1]**i[1] * x[2]**i[2]: j for i, j in fun_s.as_poly(x).terms()}
 
         for term in fun:
             assert term in terms
-        aim = [fun[term] if term in fun else 0 for term in terms] * (br.reference.tdim + 1)
+        aim = [fun[term] if term in fun else 0 for term in terms] * (reference.tdim + 1)
 
         mat: typing.List[typing.List[ScalarFunction]] = [[] for t in terms for p in lamb.pieces]
         for b in sub_basis:
