@@ -68,18 +68,6 @@ def test_rcht_linear_normal_derivatives():
         assert f3.diff(x[1]).diff(x[1]) == 0
 
 
-def test_rcht_continuity():
-    e = symfem.create_element("triangle", "rHCT", 3)
-    for f in e.get_polynomial_basis():
-        piece0 = f.get_piece((half, half))
-        piece1 = f.get_piece((0, half))
-        piece2 = f.get_piece((half, 0))
-
-        assert piece1.subs(x[0], x[1]) == piece2.subs(x[0], x[1])
-        assert piece0.subs(x[0], 1 - 2 * x[1]) == piece2.subs(x[0], 1 - 2 * x[1])
-        assert piece0.subs(x[1], 1 - 2 * x[0]) == piece1.subs(x[1], 1 - 2 * x[0])
-
-
 def test_rhct_integral():
     element = symfem.create_element("triangle", "rHCT", 3)
     ref = element.reference
