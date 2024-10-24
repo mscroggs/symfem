@@ -72,15 +72,15 @@ def get_sub_cells(reference):
         ]
 
 
-def bubbles(reference: Reference) -> typing.List[AnyFunction]:
+def bubbles(reference: Reference) -> typing.List[VectorFunction]:
     """Generate divergence-free bubbles."""
     br_bubbles = []
-    p = Lagrange(reference, 1, variant="equispaced")
+    p1 = Lagrange(reference, 1, variant="equispaced")
     for i in range(reference.sub_entity_count(reference.tdim - 1)):
         sub_e = reference.sub_entity(reference.tdim - 1, i)
-        bubble = 1
+        bubble = ScalarFunction(1)
         for j in reference.sub_entities(reference.tdim - 1)[i]:
-            bubble *= p.get_basis_function(j)
+            bubble *= p1.get_basis_function(j)
         br_bubbles.append(VectorFunction(tuple(bubble * j for j in sub_e.normal())))
 
     sub_cells = get_sub_cells(reference)
@@ -147,11 +147,10 @@ def bubbles(reference: Reference) -> typing.List[AnyFunction]:
         assert s_mat @ solution == sympy.Matrix(aim)
         coeffs = list(solution)
 
-        bubble: AnyFunction = f
-        for i, j in zip(coeffs, sub_basis):
-            bubble -= i * j
+        for coeff, basis_f in zip(coeffs, sub_basis):
+            f -= coeff * basis_f
+        bubbles.append(f)
 
-        bubbles.append(bubble)
     return bubbles
 
 
