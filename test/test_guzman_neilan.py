@@ -7,7 +7,7 @@ import sympy
 
 import symfem
 from symfem.elements.guzman_neilan import make_piecewise_lagrange
-from symfem.symbols import x
+from symfem.symbols import x, t
 
 
 @pytest.mark.parametrize("cell,order", [("triangle", 1), ("tetrahedron", 1), ("tetrahedron", 2)])
@@ -46,10 +46,8 @@ def test_guzman_neilan(cell, order, etype):
 @pytest.mark.parametrize("order", [1])
 @pytest.mark.parametrize("etype", ["first", "second"])
 def test_basis_continuity_triangle(order, etype):
-    N = 5
     e = symfem.create_element("triangle", f"Guzman-Neilan {etype} kind", order)
     third = sympy.Rational(1, 3)
-    one = sympy.Integer(1)
     for pt in [(0, 0), (1, 0), (0, 1), (third, third)]:
         for f in e.get_polynomial_basis():
             value = None
@@ -59,24 +57,21 @@ def test_basis_continuity_triangle(order, etype):
                         value = p[1].subs(x, pt)
                     assert value == p[1].subs(x, pt)
     for pts in combinations([(0, 0), (1, 0), (1, 0), (third, third)], 2):
-        for i in range(N + 1):
-            pt = tuple(a + (b - a) * i * one / N for a, b in zip(*pts))
-            for f in e.get_polynomial_basis():
-                value = None
-                for p in f.pieces.items():
-                    if pts[0] in p[0] and pts[1] in p[0]:
-                        if value is None:
-                            value = p[1].subs(x, pt)
-                        assert value == p[1].subs(x, pt)
+        pt = tuple(a + (b - a) * t[0] for a, b in zip(*pts))
+        for f in e.get_polynomial_basis():
+            value = None
+            for p in f.pieces.items():
+                if pts[0] in p[0] and pts[1] in p[0]:
+                    if value is None:
+                        value = p[1].subs(x, pt)
+                    assert value == p[1].subs(x, pt)
 
 
 @pytest.mark.parametrize("order", [1, 2])
 @pytest.mark.parametrize("etype", ["first", "second"])
 def test_basis_continuity_tetrahedron(order, etype):
-    N = 5
     e = symfem.create_element("tetrahedron", f"Guzman-Neilan {etype} kind", order)
     quarter = sympy.Rational(1, 4)
-    one = sympy.Integer(1)
     for pt in [(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (quarter, quarter, quarter)]:
         for f in e.get_polynomial_basis():
             value = None
@@ -88,30 +83,25 @@ def test_basis_continuity_tetrahedron(order, etype):
     for pts in combinations(
         [(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (quarter, quarter, quarter)], 2
     ):
-        for i in range(N + 1):
-            pt = tuple(a + (b - a) * i * one / N for a, b in zip(*pts))
-            for f in e.get_polynomial_basis():
-                value = None
-                for p in f.pieces.items():
-                    if pts[0] in p[0] and pts[1] in p[0]:
-                        if value is None:
-                            value = p[1].subs(x, pt)
-                        assert value == p[1].subs(x, pt)
+        pt = tuple(a + (b - a) * t[0] for a, b in zip(*pts))
+        for f in e.get_polynomial_basis():
+            value = None
+            for p in f.pieces.items():
+                if pts[0] in p[0] and pts[1] in p[0]:
+                    if value is None:
+                        value = p[1].subs(x, pt)
+                    assert value == p[1].subs(x, pt)
     for pts in combinations(
         [(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (quarter, quarter, quarter)], 3
     ):
-        for i in range(N + 1):
-            for j in range(N + 1 - i):
-                pt = tuple(
-                    a + (b - a) * i * one / N + (c - a) * j * one / N for a, b, c in zip(*pts)
-                )
-                for f in e.get_polynomial_basis():
-                    value = None
-                    for p in f.pieces.items():
-                        if pts[0] in p[0] and pts[1] in p[0] and pts[2] in p[0]:
-                            if value is None:
-                                value = p[1].subs(x, pt)
-                            assert value == p[1].subs(x, pt)
+        pt = tuple(a + (b - a) * t[0] + (c - a) * t[1] for a, b, c in zip(*pts))
+        for f in e.get_polynomial_basis():
+            value = None
+            for p in f.pieces.items():
+                if pts[0] in p[0] and pts[1] in p[0] and pts[2] in p[0]:
+                    if value is None:
+                        value = p[1].subs(x, pt)
+                    assert value == p[1].subs(x, pt)
 
 
 @pytest.mark.parametrize("order", [1, 2])
