@@ -48,7 +48,6 @@ def test_guzman_neilan(cell, order, etype):
 def test_basis_continuity_triangle(order, etype):
     e = symfem.create_element("triangle", f"Guzman-Neilan {etype} kind", order)
     third = sympy.Rational(1, 3)
-    one = sympy.Integer(1)
     for pt in [(0, 0), (1, 0), (0, 1), (third, third)]:
         for f in e.get_polynomial_basis():
             value = None
@@ -73,7 +72,6 @@ def test_basis_continuity_triangle(order, etype):
 def test_basis_continuity_tetrahedron(order, etype):
     e = symfem.create_element("tetrahedron", f"Guzman-Neilan {etype} kind", order)
     quarter = sympy.Rational(1, 4)
-    one = sympy.Integer(1)
     for pt in [(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1), (quarter, quarter, quarter)]:
         for f in e.get_polynomial_basis():
             value = None
