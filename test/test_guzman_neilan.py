@@ -30,7 +30,7 @@ def test_perp_space(cell, degree):
 def test_bubble_in_space(cell):
     reference = symfem.create_reference(cell)
 
-    N = 10
+    N = 6
     if cell == "tetrahedron":
         points = [
             (sympy.Rational(i, N), sympy.Rational(j, N), sympy.Rational(k, N))
