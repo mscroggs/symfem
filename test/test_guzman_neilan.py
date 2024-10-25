@@ -6,8 +6,68 @@ import pytest
 import sympy
 
 import symfem
-from symfem.elements.guzman_neilan import make_piecewise_lagrange
-from symfem.symbols import x, t
+from symfem.elements.guzman_neilan import bubbles, make_piecewise_lagrange, poly
+from symfem.functions import VectorFunction
+from symfem.symbols import t, x
+
+
+@pytest.mark.parametrize("cell", ["triangle", "tetrahedron"])
+@pytest.mark.parametrize("degree", [1, 2])
+def test_perp_space(cell, degree):
+    reference = symfem.create_reference(cell)
+    p_perp = poly(reference, degree)
+    if degree == 1:
+        nedelec = [VectorFunction([0 for _ in range(reference.tdim)])]
+    else:
+        nedelec = symfem.create_element(cell, "Nedelec", degree - 1).get_basis_functions()
+
+    for p in p_perp:
+        for n in nedelec:
+            assert p.dot(n).integral(reference) == 0
+
+
+@pytest.mark.parametrize("cell", ["triangle", "tetrahedron"])
+def test_bubble_in_space(cell):
+    if cell == "tetrahedron":
+        pytest.skip("Test too slow")
+
+    reference = symfem.create_reference(cell)
+
+    N = 8
+    if cell == "tetrahedron":
+        points = [
+            (sympy.Rational(i, N), sympy.Rational(j, N), sympy.Rational(k, N))
+            for i in range(N + 1)
+            for j in range(N + 1 - i)
+            for k in range(N + 1 - i - j)
+        ]
+        lamb = [min(x[0], x[1], x[2], 1 - x[0] - x[1] - x[2]) for x in points]
+    elif cell == "triangle":
+        points = [
+            (sympy.Rational(i, N), sympy.Rational(j, N))
+            for i in range(N + 1)
+            for j in range(N + 1 - i)
+        ]
+        lamb = [min(x[0], x[1], 1 - x[0] - x[1]) for x in points]
+    else:
+        raise ValueError(f"Unsupported cell: {cell}")
+
+    space = []
+    for i in range(1, reference.tdim + 1):
+        for q in poly(reference, reference.tdim - i):
+            space.append([j for lv, p in zip(lamb, points) for j in q.subs(x, p) * lv**i])
+
+    br = symfem.create_element(cell, "Bernardi-Raugel", 1)
+    for b in br.get_basis_functions()[-reference.tdim - 1 :]:
+        space.append([j for p in points for j in b.subs(x, p)])
+
+    b_space = []
+    for b in bubbles(reference):
+        b_space.append([j for p in points for j in b.subs(x, p)])
+
+    m = sympy.Matrix(space)
+    m2 = sympy.Matrix(b_space + space)
+    assert m.rank() == m2.rank()
 
 
 @pytest.mark.parametrize("cell,order", [("triangle", 1), ("tetrahedron", 1), ("tetrahedron", 2)])
