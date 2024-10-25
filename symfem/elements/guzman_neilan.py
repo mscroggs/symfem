@@ -8,17 +8,17 @@ import typing
 
 import sympy
 
-from symfem.elements.bernardi_raugel import BernardiRaugel
 from symfem.elements.bdm import BDM
+from symfem.elements.bernardi_raugel import BernardiRaugel
 from symfem.elements.lagrange import Lagrange, VectorLagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import DotPointEvaluation, ListOfFunctionals, NormalIntegralMoment
-from symfem.functions import FunctionInput, VectorFunction, ScalarFunction, AnyFunction
+from symfem.functions import AnyFunction, FunctionInput, ScalarFunction, VectorFunction
 from symfem.geometry import SetOfPoints, SetOfPointsInput
 from symfem.moments import make_integral_moment_dofs
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.references import NonDefaultReferenceError, Reference
-from symfem.symbols import x, t
+from symfem.symbols import t, x
 
 __all__ = ["GuzmanNeilanFirstKind", "GuzmanNeilanSecondKind", "make_piecewise_lagrange"]
 
