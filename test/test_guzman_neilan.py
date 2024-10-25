@@ -28,9 +28,12 @@ def test_perp_space(cell, degree):
 
 @pytest.mark.parametrize("cell", ["triangle", "tetrahedron"])
 def test_bubble_in_space(cell):
+    if cell == "tetrahedron":
+        pytest.skip("Test too slow")
+
     reference = symfem.create_reference(cell)
 
-    N = 6
+    N = 8
     if cell == "tetrahedron":
         points = [
             (sympy.Rational(i, N), sympy.Rational(j, N), sympy.Rational(k, N))
