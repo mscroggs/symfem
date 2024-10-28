@@ -164,51 +164,20 @@ def test_basis_continuity_tetrahedron(order, etype):
                     assert value == p[1].subs(x, pt)
 
 
-@pytest.mark.parametrize("order", [1, 2])
-def test_piecewise_lagrange_triangle(order):
-    reference = symfem.create_reference("triangle")
-    mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
-    sub_tris = [
-        (reference.vertices[0], reference.vertices[1], mid),
-        (reference.vertices[0], reference.vertices[2], mid),
-        (reference.vertices[1], reference.vertices[2], mid),
-    ]
-
-    N = 5
-    fs = make_piecewise_lagrange(sub_tris, "triangle", order, zero_on_boundary=True)
-    for e_n in range(reference.sub_entity_count(1)):
-        edge = reference.sub_entity(1, e_n)
-        for i in range(N + 1):
-            point = edge.get_point((sympy.Rational(i, N),))
-            for f in fs:
-                assert f.subs(x, point) == (0, 0)
-
-    fs = make_piecewise_lagrange(sub_tris, "triangle", order, zero_at_centre=True)
-    for f in fs:
-        assert f.subs(x, mid) == (0, 0)
-
-
 @pytest.mark.parametrize("order", [1, 2, 3])
 def test_piecewise_lagrange_tetrahedron(order):
     reference = symfem.create_reference("tetrahedron")
     mid = tuple(sympy.Rational(sum(i), len(i)) for i in zip(*reference.vertices))
-    sub_tets = [
+    sub_cells = [
         (reference.vertices[0], reference.vertices[1], reference.vertices[2], mid),
         (reference.vertices[0], reference.vertices[1], reference.vertices[3], mid),
         (reference.vertices[0], reference.vertices[2], reference.vertices[3], mid),
         (reference.vertices[1], reference.vertices[2], reference.vertices[3], mid),
     ]
-
-    N = 5
-    fs = make_piecewise_lagrange(sub_tets, "tetrahedron", order, zero_on_boundary=True)
-    for f_n in range(reference.sub_entity_count(2)):
-        face = reference.sub_entity(2, f_n)
-        for i in range(N + 1):
-            for j in range(N + 1 - i):
-                point = face.get_point((sympy.Rational(i, N), sympy.Rational(j, N)))
-                for f in fs:
-                    assert f.subs(x, point) == (0, 0, 0)
-
-    fs = make_piecewise_lagrange(sub_tets, "tetrahedron", order, zero_at_centre=True)
-    for f in fs:
-        assert f.subs(x, mid) == (0, 0, 0)
+    for f in make_piecewise_lagrange(sub_cells, "tetrahedron", order):
+        values = {}
+        for subcell, function in f.pieces.items():
+            for pt in subcell:
+                if pt not in values:
+                    values[pt] = function.subs(x, pt)
+                assert values[pt] == function.subs(x, pt)

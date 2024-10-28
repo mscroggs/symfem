@@ -315,8 +315,6 @@ def make_piecewise_lagrange(
     sub_cells: typing.List[SetOfPoints],
     cell_name,
     order: int,
-    zero_on_boundary: bool = False,
-    zero_at_centre: bool = False,
 ) -> typing.List[PiecewiseFunction]:
     """Make the basis functions of a piecewise Lagrange space.
 
@@ -324,8 +322,6 @@ def make_piecewise_lagrange(
         sub_cells: A list of vertices of sub cells
         cell_name: The cell type of the sub cells
         order: The polynomial order
-        zero_in_boundary: Should the functions be zero on the boundary?
-        zero_at_centre: Should the functions be zero at the centre?
 
     Returns:
         The basis functions
@@ -355,14 +351,6 @@ def make_piecewise_lagrange(
         ):
             nones = [-1 for i in lagrange_space.entity_dofs(dim, 0)]
             for tri_e in tri_entities:
-                if dim == 0:
-                    if zero_on_boundary and (0 in tri_e or 1 in tri_e):
-                        continue
-                    if zero_at_centre and (2 in tri_e):
-                        continue
-                elif dim == 1:
-                    if zero_on_boundary and (2 in tri_e):
-                        continue
                 doflist = [nones if i == -1 else lagrange_space.entity_dofs(dim, i) for i in tri_e]
                 for dofs in zip(*doflist):
                     basis_dofs.append(dofs)
@@ -402,17 +390,6 @@ def make_piecewise_lagrange(
         ):
             nones = [-1 for i in lagrange_space.entity_dofs(dim, 0)]
             for tet_e in tet_entities:
-                if dim == 0:
-                    if zero_on_boundary and (0 in tet_e or 1 in tet_e or 2 in tet_e):
-                        continue
-                    if zero_at_centre and (3 in tet_e):
-                        continue
-                elif dim == 1:
-                    if zero_on_boundary and (2 in tet_e or 4 in tet_e or 5 in tet_e):
-                        continue
-                elif dim == 2:
-                    if zero_on_boundary and (3 in tet_e):
-                        continue
                 doflist = [nones if i == -1 else lagrange_space.entity_dofs(dim, i) for i in tet_e]
                 for dofs in zip(*doflist):
                     basis_dofs.append(dofs)
