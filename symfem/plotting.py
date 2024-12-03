@@ -135,7 +135,7 @@ colors = Colors()
 class PictureElement(ABC):
     """An element in a picture."""
 
-    def __init__(self, midpoint: typing.Tuple[float] = ()):
+    def __init__(self, midpoint: typing.Tuple[float,...] = ()):
         """Create an element."""
         self.midpoint = midpoint
 
