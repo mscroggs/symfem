@@ -135,9 +135,9 @@ colors = Colors()
 class PictureElement(ABC):
     """An element in a picture."""
 
-    def __init__(self):
+    def __init__(self, midpoint: typing.Tuple[float, ...] = ()):
         """Create an element."""
-        pass
+        self.midpoint = midpoint
 
     @abstractmethod
     def as_svg(self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]) -> str:
@@ -218,7 +218,7 @@ class Line(PictureElement):
             color: The color
             width: The width of the line
         """
-        super().__init__()
+        super().__init__(tuple(sum(i) for i in zip(start, end)))
         self.start = start
         self.end = end
         self.color = color
@@ -288,7 +288,7 @@ class Bezier(PictureElement):
             color: The color
             width: The width of the line
         """
-        super().__init__()
+        super().__init__(tuple(sum(i) for i in zip(start, end)))
         self.start = start
         self.mid1 = mid1
         self.mid2 = mid2
@@ -356,7 +356,7 @@ class Arrow(PictureElement):
             color: The color
             width: The width of the line
         """
-        super().__init__()
+        super().__init__(tuple(sum(i) for i in zip(start, end)))
         self.start = start
         self.end = end
         self.color = color
@@ -454,6 +454,7 @@ class NCircle(PictureElement):
             width: The width of the line
             font: The font to use for the number
         """
+        super().__init__(centre)
         self.centre = centre
         self.number = number
         self.color = color
@@ -530,6 +531,7 @@ class Fill(PictureElement):
             color: The colour to fill the polygon
             opacity: The opacity
         """
+        super().__init__(tuple(sum(i) for i in zip(*vertices)))
         self.vertices = vertices
         self.color = color
         self.opacity = opacity
@@ -585,6 +587,7 @@ class Math(PictureElement):
             font_size: The font size
             anchor: The point on the equation to anchor to
         """
+        super().__init__(point)
         self.point = parse_point_input(point)
         self.math = math
         self.color = color
@@ -1056,6 +1059,8 @@ class Picture:
             img += f"<desc>{self.desc}</desc>\n"
         if self.svg_metadata is not None:
             img += self.svg_metadata + "\n"
+
+        self.elements.sort(key=lambda e: self.z(e.midpoint))
 
         for e in self.elements:
             img += e.as_svg(map_pt)
