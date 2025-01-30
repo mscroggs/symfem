@@ -410,13 +410,14 @@ class AnyFunction(ABC):
             plot_options: Options for the plot
             kwargs: Keyword arguments
         """
-        from symfem.plotting import Picture, colors
+        from symfem.plotting import Picture
 
         extra: typing.Tuple[int, ...] = tuple()
         if self.is_scalar:
             extra = (0,)
 
         img = Picture(**kwargs)
+        colors = img.colors
 
         if dof_entity is not None and dof_entity[0] > 1:
             sub_e = reference.sub_entity(*dof_entity)
@@ -846,9 +847,10 @@ class ScalarFunction(AnyFunction):
             value_scale: The scale factor for the function values
             n: The number of points per side for plotting
         """
-        from symfem.plotting import Picture, colors
+        from symfem.plotting import Picture
 
         assert isinstance(img, Picture)
+        colors = img.colors
 
         if (reference, n) not in self._plot_beziers:
             self._plot_beziers[(reference, n)] = []
@@ -1293,9 +1295,10 @@ class VectorFunction(AnyFunction):
             value_scale: The scale factor for the function values
             n: The number of points per side for plotting
         """
-        from symfem.plotting import Picture, colors
+        from symfem.plotting import Picture
 
         assert isinstance(img, Picture)
+        colors = img.colors
 
         if (reference, n) not in self._plot_arrows:
             self._plot_arrows[(reference, n)] = []

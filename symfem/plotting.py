@@ -20,7 +20,6 @@ __all__ = [
     "SetOfPointsOrFunctions",
     "tex_font_size",
     "Colors",
-    "colors",
     "PictureElement",
     "Line",
     "Bezier",
@@ -77,6 +76,7 @@ class Colors:
     GREEN = "#55FF00"
     PURPLE = "#DD2299"
     GRAY = "#AAAAAA"
+    RED = "#FF0000"
 
     def __init__(self):
         """Initialise."""
@@ -129,15 +129,13 @@ class Colors:
         return out
 
 
-colors = Colors()
-
-
 class PictureElement(ABC):
     """An element in a picture."""
 
-    def __init__(self, midpoint: typing.Tuple[float, ...] = ()):
+    def __init__(self, colors: Colors, midpoint: typing.Tuple[float, ...] = ()):
         """Create an element."""
         self.midpoint = midpoint
+        self.colors = colors
 
     @abstractmethod
     def as_svg(self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]) -> str:
@@ -209,16 +207,17 @@ class PictureElement(ABC):
 class Line(PictureElement):
     """A line."""
 
-    def __init__(self, start: PointType, end: PointType, color: str, width: float):
+    def __init__(self, colors: Colors, start: PointType, end: PointType, color: str, width: float):
         """Create a line.
 
         Args:
+            colors: Colors object for the current picture
             start: The start point
             end: The end point
             color: The color
             width: The width of the line
         """
-        super().__init__(tuple(sum(i) for i in zip(start, end)))
+        super().__init__(colors, tuple(sum(i) for i in zip(start, end)))
         self.start = start
         self.end = end
         self.color = color
@@ -252,7 +251,7 @@ class Line(PictureElement):
         s = map_pt(self.start)
         e = map_pt(self.end)
         return (
-            f"\\draw[{colors.get_tikz_name(self.color)},line width={self.width * 0.2}pt,"
+            f"\\draw[{self.colors.get_tikz_name(self.color)},line width={self.width * 0.2}pt,"
             f"line cap=round] ({s[0]},{s[1]}) -- ({e[0]},{e[1]});\n"
         )
 
@@ -271,6 +270,7 @@ class Bezier(PictureElement):
 
     def __init__(
         self,
+        colors: Colors,
         start: PointType,
         mid1: PointType,
         mid2: PointType,
@@ -281,6 +281,7 @@ class Bezier(PictureElement):
         """Create a Bezier curve.
 
         Args:
+            colors: Colors object for the current picture
             start: The start point
             mid1: The first control point
             mid2: The second control point
@@ -288,7 +289,7 @@ class Bezier(PictureElement):
             color: The color
             width: The width of the line
         """
-        super().__init__(tuple(sum(i) for i in zip(start, end)))
+        super().__init__(colors, tuple(sum(i) for i in zip(start, end)))
         self.start = start
         self.mid1 = mid1
         self.mid2 = mid2
@@ -329,7 +330,7 @@ class Bezier(PictureElement):
         m2 = map_pt(self.mid2)
         e = map_pt(self.end)
         return (
-            f"\\draw[{colors.get_tikz_name(self.color)},line width={self.width * 0.2}pt,"
+            f"\\draw[{self.colors.get_tikz_name(self.color)},line width={self.width * 0.2}pt,"
             f"line cap=round] ({s[0]},{s[1]}) .. controls ({m1[0]},{m1[1]}) "
             f"and ({m2[0]},{m2[1]}) .. ({e[0]},{e[1]});\n"
         )
@@ -347,16 +348,17 @@ class Bezier(PictureElement):
 class Arrow(PictureElement):
     """An arrow."""
 
-    def __init__(self, start: PointType, end: PointType, color: str, width: float):
+    def __init__(self, colors: Colors, start: PointType, end: PointType, color: str, width: float):
         """Create an arrow.
 
         Args:
+            colors: Colors object for the current picture
             start: The start point
             end: The end point
             color: The color
             width: The width of the line
         """
-        super().__init__(tuple(sum(i) for i in zip(start, end)))
+        super().__init__(colors, tuple(sum(i) for i in zip(start, end)))
         self.start = start
         self.end = end
         self.color = color
@@ -411,7 +413,7 @@ class Arrow(PictureElement):
         s = map_pt(self.start)
         e = map_pt(self.end)
         return (
-            f"\\draw[-stealth,{colors.get_tikz_name(self.color)},"
+            f"\\draw[-stealth,{self.colors.get_tikz_name(self.color)},"
             f"line width={self.width * 0.2}pt,line cap=round] "
             f"({s[0]},{s[1]}) -- ({e[0]},{e[1]});\n"
         )
@@ -431,6 +433,7 @@ class NCircle(PictureElement):
 
     def __init__(
         self,
+        colors: Colors,
         centre: PointType,
         number: int,
         color: str,
@@ -444,6 +447,7 @@ class NCircle(PictureElement):
         """Create a circle containing a number.
 
         Args:
+            colors: Colors object for the current picture
             centre: The centre of the circle
             number: The number to print inside the circle
             color: The colour of the circle's line
@@ -454,7 +458,7 @@ class NCircle(PictureElement):
             width: The width of the line
             font: The font to use for the number
         """
-        super().__init__(centre)
+        super().__init__(colors, centre)
         self.centre = centre
         self.number = number
         self.color = color
@@ -503,11 +507,11 @@ class NCircle(PictureElement):
         """
         c = map_pt(self.centre)
         return (
-            f"\\draw[{colors.get_tikz_name(self.color)},line width={self.width * 0.2}pt,"
-            f"fill={colors.get_tikz_name(self.fill_color)}] "
+            f"\\draw[{self.colors.get_tikz_name(self.color)},line width={self.width * 0.2}pt,"
+            f"fill={self.colors.get_tikz_name(self.fill_color)}] "
             f"({c[0]},{c[1]}) circle ({self.radius * 0.2}pt);\n"
-            f"\\node[{colors.get_tikz_name(self.text_color)},anchor=center] "
-            f"at ({c[0]},{c[1]}) {{{tex_font_size(self.font_size)} {self.number}}};"
+            f"\\node[{self.colors.get_tikz_name(self.text_color)},anchor=center] "
+            f"at ({c[0]},{c[1]}) {{{tex_font_size(self.font_size)} {self.number}}};\n"
         )
 
     @property
@@ -523,15 +527,16 @@ class NCircle(PictureElement):
 class Fill(PictureElement):
     """A filled polygon."""
 
-    def __init__(self, vertices: SetOfPoints, color: str, opacity: float):
+    def __init__(self, colors: Colors, vertices: SetOfPoints, color: str, opacity: float):
         """Create a filled polygon.
 
         Args:
+            colors: Colors object for the current picture
             vertices: The vertices of the polygon in clockwise or anticlockwise order
             color: The colour to fill the polygon
             opacity: The opacity
         """
-        super().__init__(tuple(sum(i) for i in zip(*vertices)))
+        super().__init__(colors, tuple(sum(i) for i in zip(*vertices)))
         self.vertices = vertices
         self.color = color
         self.opacity = opacity
@@ -560,8 +565,8 @@ class Fill(PictureElement):
         """
         vs = [map_pt(v) for v in self.vertices]
         return (
-            f"\\fill[{colors.get_tikz_name(self.color)},opacity={self.opacity}]"
-            " " + " -- ".join([f"({v[0]},{v[1]})" for v in vs]) + " -- cycle;"
+            f"\\fill[{self.colors.get_tikz_name(self.color)},opacity={self.opacity}]"
+            " " + " -- ".join([f"({v[0]},{v[1]})" for v in vs]) + " -- cycle;\n"
         )
 
     @property
@@ -577,17 +582,20 @@ class Fill(PictureElement):
 class Math(PictureElement):
     """A mathematical symbol."""
 
-    def __init__(self, point: PointType, math: str, color: str, font_size: int, anchor: str):
+    def __init__(
+        self, colors: Colors, point: PointType, math: str, color: str, font_size: int, anchor: str
+    ):
         """Create a filled polygon.
 
         Args:
+            colors: Colors object for the current picture
             point: The point to put the math
             math: The math
             color: The color of the math
             font_size: The font size
             anchor: The point on the equation to anchor to
         """
-        super().__init__(point)
+        super().__init__(colors, point)
         self.point = parse_point_input(point)
         self.math = math
         self.color = color
@@ -651,8 +659,8 @@ class Math(PictureElement):
         """
         p = map_pt(self.point)
         return (
-            f"\\node[{colors.get_tikz_name(self.color)},anchor={self.anchor}] "
-            f"at ({p[0]},{p[1]}) {{{tex_font_size(self.font_size)}${self.math}$}};"
+            f"\\;node[{self.colors.get_tikz_name(self.color)},anchor={self.anchor}] "
+            f"at ({p[0]},{p[1]}) {{{tex_font_size(self.font_size)}${self.math}$}};\n"
         )
 
     @property
@@ -743,6 +751,7 @@ class Picture:
             self.axes_3d = self._default_axes
         else:
             self.axes_3d = parse_set_of_points_input(axes_3d)
+        self.colors = Colors()
 
     def z(self, p_in: PointOrFunction) -> sympy.core.expr.Expr:
         """Get the into/out-of-the-page component of a point.
@@ -802,7 +811,7 @@ class Picture:
         self,
         start: PointOrFunction,
         end: PointOrFunction,
-        color: str = colors.BLACK,
+        color: typing.Optional[str] = None,
         width: float = 4.0,
     ):
         """Add a line to the picture.
@@ -813,7 +822,15 @@ class Picture:
             color: The color of the line
             width: The width of the line
         """
-        self.elements.append(Line(self.parse_point(start), self.parse_point(end), color, width))
+        self.elements.append(
+            Line(
+                self.colors,
+                self.parse_point(start),
+                self.parse_point(end),
+                self.colors.BLACK if color is None else color,
+                width,
+            )
+        )
 
     def add_bezier(
         self,
@@ -821,7 +838,7 @@ class Picture:
         mid1: PointOrFunction,
         mid2: PointOrFunction,
         end: PointOrFunction,
-        color: str = colors.BLACK,
+        color: typing.Optional[str] = None,
         width: float = 4.0,
     ):
         """Add a Bezier curve to the picture.
@@ -836,11 +853,12 @@ class Picture:
         """
         self.elements.append(
             Bezier(
+                self.colors,
                 self.parse_point(start),
                 self.parse_point(mid1),
                 self.parse_point(mid2),
                 self.parse_point(end),
-                color,
+                self.colors.BLACK if color is None else color,
                 width,
             )
         )
@@ -849,7 +867,7 @@ class Picture:
         self,
         start: PointOrFunction,
         end: PointOrFunction,
-        color: str = colors.BLACK,
+        color: typing.Optional[str] = None,
         width: float = 4.0,
     ):
         """Add an arrow to the picture.
@@ -860,7 +878,15 @@ class Picture:
             color: The color of the arrow
             width: The width of the arrow
         """
-        self.elements.append(Arrow(self.parse_point(start), self.parse_point(end), color, width))
+        self.elements.append(
+            Arrow(
+                self.colors,
+                self.parse_point(start),
+                self.parse_point(end),
+                self.colors.BLACK if color is None else color,
+                width,
+            )
+        )
 
     def add_dof_marker(self, point: PointOrFunction, number: int, color: str, bold: bool = True):
         """Add a DOF marker.
@@ -872,16 +898,16 @@ class Picture:
             bold: Should the marker be bold?
         """
         if bold:
-            self.add_ncircle(point, number, colors.BLACK, colors.BLACK, color)
+            self.add_ncircle(point, number, self.colors.BLACK, self.colors.BLACK, color)
         else:
-            self.add_ncircle(point, number, color, color, colors.WHITE)
+            self.add_ncircle(point, number, color, color, self.colors.WHITE)
 
     def add_dof_arrow(
         self,
         point: PointOrFunction,
         direction: PointOrFunction,
         number: int,
-        color: str = colors.PURPLE,
+        color: typing.Optional[str] = None,
         shifted: bool = False,
         bold: bool = True,
     ):
@@ -901,16 +927,17 @@ class Picture:
         start = VectorFunction(self.parse_point(point))
         if shifted:
             start += vdirection / 3
-        self.add_arrow(start, start + vdirection, color)
-        self.add_dof_marker(start, number, color, bold)
+        c = self.colors.PURPLE if color is None else color
+        self.add_arrow(start, start + vdirection, c)
+        self.add_dof_marker(start, number, c, bold)
 
     def add_ncircle(
         self,
         centre: PointOrFunction,
         number: int,
-        color: str = "red",
-        text_color: str = colors.BLACK,
-        fill_color: str = colors.WHITE,
+        color: typing.Optional[str] = None,
+        text_color: typing.Optional[str] = None,
+        fill_color: typing.Optional[str] = None,
         radius: float = 20.0,
         font_size: typing.Optional[int] = None,
         width: float = 4.0,
@@ -931,11 +958,12 @@ class Picture:
         """
         self.elements.append(
             NCircle(
+                self.colors,
                 self.parse_point(centre),
                 number,
-                color,
-                text_color,
-                fill_color,
+                self.colors.RED if color is None else color,
+                self.colors.BLACK if text_color is None else text_color,
+                self.colors.WHITE if fill_color is None else fill_color,
                 radius,
                 font_size,
                 width,
@@ -947,7 +975,7 @@ class Picture:
         self,
         point: PointTypeInput,
         math: str,
-        color: str = colors.BLACK,
+        color: typing.Optional[str] = None,
         font_size: int = 35,
         anchor="center",
     ):
@@ -960,9 +988,23 @@ class Picture:
             font_size: The font size
             anchor: The point on the equation to anchor to
         """
-        self.elements.append(Math(self.parse_point(point), math, color, font_size, anchor))
+        self.elements.append(
+            Math(
+                self.colors,
+                self.parse_point(point),
+                math,
+                self.colors.BLACK if color is None else color,
+                font_size,
+                anchor,
+            )
+        )
 
-    def add_fill(self, vertices: SetOfPointsOrFunctions, color: str = "red", opacity: float = 1.0):
+    def add_fill(
+        self,
+        vertices: SetOfPointsOrFunctions,
+        color: typing.Optional[str] = None,
+        opacity: float = 1.0,
+    ):
         """Add a filled polygon to the picture.
 
         Args:
@@ -970,7 +1012,14 @@ class Picture:
             color: The color of the polygon
             opacity: The opacity of the polygon
         """
-        self.elements.append(Fill(tuple(self.parse_point(p) for p in vertices), color, opacity))
+        self.elements.append(
+            Fill(
+                self.colors,
+                tuple(self.parse_point(p) for p in vertices),
+                self.colors.RED if color is None else color,
+                opacity,
+            )
+        )
 
     def compute_scale(
         self, unit: str = "px", reverse_y: bool = True
@@ -1091,7 +1140,7 @@ class Picture:
         try:
             from cairosvg import svg2png
         except ImportError:
-            raise ImportError("CairoSVG is needed for plotting PNGs" " (pip install CairoSVG)")
+            raise ImportError("CairoSVG is needed for plotting PNGs (pip install CairoSVG)")
 
         if png_scale is not None:
             assert png_width is None
@@ -1125,7 +1174,7 @@ class Picture:
         for e in self.elements:
             inner_tikz += e.as_tikz(map_pt)
 
-        tikz += colors.get_tikz_definitions() + inner_tikz
+        tikz += self.colors.get_tikz_definitions() + inner_tikz
 
         tikz += "\\end{tikzpicture}\n"
 

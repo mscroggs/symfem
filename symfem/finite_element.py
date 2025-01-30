@@ -22,7 +22,7 @@ from symfem.functions import (
 from symfem.geometry import PointType, SetOfPointsInput, parse_set_of_points_input
 from symfem.mappings import MappingNotImplemented
 from symfem.piecewise_functions import PiecewiseFunction
-from symfem.plotting import Picture, colors
+from symfem.plotting import Picture
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
 from symfem.utils import allequal
@@ -162,6 +162,7 @@ class FiniteElement(ABC):
             kwargs: Keyword arguments
         """
         img = Picture(**kwargs)
+        colors = img.colors
 
         dof_positions = self.dof_plot_positions()
         dof_directions = self.dof_directions()

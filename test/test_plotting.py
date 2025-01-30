@@ -299,6 +299,45 @@ def test_metadata():
     img.add_line(
         (sympy.Integer(0), sympy.Integer(0)),
         (sympy.Integer(1), sympy.Integer(1)),
-        symfem.plotting.colors.ORANGE,
+        img.colors.ORANGE,
     )
     img.save(os.path.join(folder, "test_metadata.svg"))
+
+
+@pytest.mark.parametrize(
+    "reference,element,degree",
+    [
+        ("triangle", "Lagrange", 2),
+        ("tetrahedron", "Raviart-Thomas", 2),
+    ],
+)
+def test_tikz_newlines(reference, element, degree):
+    e = symfem.create_element(reference, element, degree)
+    filename = os.path.join(folder, f"test_tikz_newlines-{reference}-{element}-{degree}.tex")
+
+    e.plot_dof_diagram(filename)
+    with open(filename) as f:
+        tikz = f.read()
+    tikz = tikz.replace(";\n", "")
+    assert ";" not in tikz
+
+    e.plot_basis_function(0, filename)
+    with open(filename) as f:
+        tikz = f.read()
+    tikz = tikz.replace(";\n", "")
+    assert ";" not in tikz
+
+
+def test_custom_colors():
+    e = symfem.create_element("triangle", "Lagrange", 2)
+    filename1 = os.path.join(folder, "test_custom_colors-1.tex")
+    filename2 = os.path.join(folder, "test_custom_colors-2.tex")
+
+    e.reference.plot_entity_diagrams(filename2)
+    e.plot_dof_diagram(filename1)
+
+    for filename in [filename1, filename2]:
+        with open(filename) as f:
+            content = f.read()
+        for i in range(10):
+            assert content.count(f"customcolor{i}") != 1
