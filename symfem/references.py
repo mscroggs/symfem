@@ -680,9 +680,10 @@ class Reference(ABC):
         **kwargs: typing.Any,
     ):
         """Plot diagrams showing the entity numbering of the reference."""
-        from symfem.plotting import Picture, colors
+        from symfem.plotting import Picture
 
         img = Picture(**kwargs)
+        colors = img.colors
 
         if self.tdim == 1:
             offset_unit: typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...] = (

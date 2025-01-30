@@ -185,7 +185,7 @@ def create_element(
 
     if reference.tdim != reference.gdim:
         raise ValueError(
-            "Cannot create element on cell with different " "topological and geometric dimensions."
+            "Cannot create element on cell with different topological and geometric dimensions."
         )
 
     if element_type in _elementmap:
