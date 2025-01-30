@@ -507,7 +507,7 @@ class NCircle(PictureElement):
             f"fill={colors.get_tikz_name(self.fill_color)}] "
             f"({c[0]},{c[1]}) circle ({self.radius * 0.2}pt);\n"
             f"\\node[{colors.get_tikz_name(self.text_color)},anchor=center] "
-            f"at ({c[0]},{c[1]}) {{{tex_font_size(self.font_size)} {self.number}}};"
+            f"at ({c[0]},{c[1]}) {{{tex_font_size(self.font_size)} {self.number}}};\n"
         )
 
     @property
@@ -561,7 +561,7 @@ class Fill(PictureElement):
         vs = [map_pt(v) for v in self.vertices]
         return (
             f"\\fill[{colors.get_tikz_name(self.color)},opacity={self.opacity}]"
-            " " + " -- ".join([f"({v[0]},{v[1]})" for v in vs]) + " -- cycle;"
+            " " + " -- ".join([f"({v[0]},{v[1]})" for v in vs]) + " -- cycle;\n"
         )
 
     @property
@@ -651,8 +651,8 @@ class Math(PictureElement):
         """
         p = map_pt(self.point)
         return (
-            f"\\node[{colors.get_tikz_name(self.color)},anchor={self.anchor}] "
-            f"at ({p[0]},{p[1]}) {{{tex_font_size(self.font_size)}${self.math}$}};"
+            f"\\;node[{colors.get_tikz_name(self.color)},anchor={self.anchor}] "
+            f"at ({p[0]},{p[1]}) {{{tex_font_size(self.font_size)}${self.math}$}};\n"
         )
 
     @property
@@ -1091,7 +1091,7 @@ class Picture:
         try:
             from cairosvg import svg2png
         except ImportError:
-            raise ImportError("CairoSVG is needed for plotting PNGs" " (pip install CairoSVG)")
+            raise ImportError("CairoSVG is needed for plotting PNGs (pip install CairoSVG)")
 
         if png_scale is not None:
             assert png_width is None

@@ -302,3 +302,27 @@ def test_metadata():
         symfem.plotting.colors.ORANGE,
     )
     img.save(os.path.join(folder, "test_metadata.svg"))
+
+
+@pytest.mark.parametrize(
+    "reference,element,degree",
+    [
+        ("triangle", "Lagrange", 2),
+        ("tetrahedron", "Raviart-Thomas", 2),
+    ],
+)
+def test_tikz_newlines(reference, element, degree):
+    e = symfem.create_element(reference, element, degree)
+    filename = os.path.join(folder, f"test_tikz_newlines-{reference}-{element}-{degree}.tex")
+
+    e.plot_dof_diagram(filename)
+    with open(filename) as f:
+        tikz = f.read()
+    tikz = tikz.replace(";\n", "")
+    assert ";" not in tikz
+
+    e.plot_basis_function(0, filename)
+    with open(filename) as f:
+        tikz = f.read()
+    tikz = tikz.replace(";\n", "")
+    assert ";" not in tikz

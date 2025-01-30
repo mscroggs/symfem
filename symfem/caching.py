@@ -70,7 +70,7 @@ def matrix_to_string(m: sympy.matrices.dense.MutableDenseMatrix) -> str:
     Returns:
         A representation of the matrix as a string
     """
-    return ";".join(",".join(f"{m[i,j]!r}" for j in range(m.cols)) for i in range(m.rows))
+    return ";".join(",".join(f"{m[i, j]!r}" for j in range(m.cols)) for i in range(m.rows))
 
 
 def matrix_from_string(mstr: str) -> sympy.matrices.dense.MutableDenseMatrix:
