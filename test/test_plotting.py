@@ -330,8 +330,8 @@ def test_tikz_newlines(reference, element, degree):
 
 def test_custom_colors():
     e = symfem.create_element("triangle", "Lagrange", 2)
-    filename1 = os.path.join(folder, f"test_custom_colors-1.tex")
-    filename2 = os.path.join(folder, f"test_custom_colors-2.tex")
+    filename1 = os.path.join(folder, "test_custom_colors-1.tex")
+    filename2 = os.path.join(folder, "test_custom_colors-2.tex")
 
     e.reference.plot_entity_diagrams(filename2)
     e.plot_dof_diagram(filename1)
