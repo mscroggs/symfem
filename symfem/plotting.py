@@ -76,6 +76,7 @@ class Colors:
     GREEN = "#55FF00"
     PURPLE = "#DD2299"
     GRAY = "#AAAAAA"
+    RED = "#FF0000"
 
     def __init__(self):
         """Initialise."""
