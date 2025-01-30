@@ -326,3 +326,18 @@ def test_tikz_newlines(reference, element, degree):
         tikz = f.read()
     tikz = tikz.replace(";\n", "")
     assert ";" not in tikz
+
+
+def test_custom_colors():
+    e = symfem.create_element("triangle", "Lagrange", 2)
+    filename1 = os.path.join(folder, f"test_custom_colors-1.tex")
+    filename2 = os.path.join(folder, f"test_custom_colors-2.tex")
+
+    e.reference.plot_entity_diagrams(filename2)
+    e.plot_dof_diagram(filename1)
+
+    for filename in [filename1, filename2]:
+        with open(filename) as f:
+            content = f.read()
+        for i in range(10):
+            assert content.count(f"customcolor{i}") != 1
