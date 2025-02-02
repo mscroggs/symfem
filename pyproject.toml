@@ -21,7 +21,7 @@ repository = "https://github.com/mscroggs/symfem"
 documentation = "https://symfem.readthedocs.io/en/latest/"
 
 [project.optional-dependencies]
-style = ["ruff", "mypy"]
+style = ["ruff", "mypy", "FawltyDeps"]
 docs = ["sphinx", "sphinx-autoapi"]
 optional = ["CairoSVG>=2.6.0"]
 test = ["pytest", "symfem[optional]", "numpy", "fenics-basix"]
