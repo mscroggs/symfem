@@ -24,7 +24,7 @@ documentation = "https://symfem.readthedocs.io/en/latest/"
 style = ["ruff", "mypy"]
 docs = ["sphinx", "sphinx-autoapi"]
 optional = ["CairoSVG>=2.6.0"]
-test = ["pytest", "symfem[optional]", "numpy"]
+test = ["pytest", "symfem[optional]", "numpy", "fenics-basix"]
 
 [tool.ruff]
 line-length = 100
