@@ -585,6 +585,7 @@ class FiniteElement(ABC):
     last_updated = version
     cache = True
     value_type = "unknown"
+    continuity: typing.Optional[str] = None
     _max_continuity_test_order = 4
 
 
