@@ -6,6 +6,7 @@ import typing as _typing
 
 import symfem.references as _references
 from symfem.finite_element import FiniteElement as _FiniteElement
+from symfem.finite_element import CiarletElement as _CiarletElement
 from symfem.geometry import SetOfPointsInput as _SetOfPointsInput
 from symfem.geometry import parse_set_of_points_input as _parse_set_of_points_input
 
@@ -195,6 +196,16 @@ def create_element(
         if not _order_is_allowed(element_class, reference.name, order):
             raise ValueError(f"Order {order} {element_type} element cannot be created.")
         return element_class(reference, order, **kwargs)
+
+    if element_type.startswith("discontinuous "):
+        e = create_element(cell_type, element_type[14:], order, vertices, **kwargs)
+        if isinstance(e, _CiarletElement):
+            for d in e.dofs:
+                d.entity = (reference.tdim, 0)
+            e.continuity = "L2"
+            e.names = ["discontinuous " + i for i in e.names]
+
+            return e
 
     raise ValueError(f"Unsupported element type: {element_type}")
 
