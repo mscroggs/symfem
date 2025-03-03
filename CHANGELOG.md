@@ -1,3 +1,12 @@
+# Version 2025.3.0 (03 March 2025)
+
+- Corrected nonconforming Arnold-Winther polyset
+- Correct Alfeld-Sorokina range dim
+- Correct Guzman-Neilan second kind element
+- Add Guzman-Neilan first kind element
+- Correct Guzman-Neilan bubbles
+- Add discontinuous elements
+
 # Version 2024.10.0 (05 October 2024)
 
 - Corrected polyset for Arnold-Winther element
