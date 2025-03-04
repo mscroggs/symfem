@@ -39,7 +39,7 @@ class Lagrange(CiarletElement):
             raise NonDefaultReferenceError()
 
         dofs: ListOfFunctionals = []
-        if variant == "legendre-polynomials":
+        if variant == "legendre":
             basis = orthonormal_basis(reference.name, order, 0)[0]
             for f in basis:
                 dofs.append(IntegralAgainst(reference, f, (reference.tdim, 0)))
@@ -54,7 +54,10 @@ class Lagrange(CiarletElement):
         elif variant == "lobatto":
             raise NotImplementedError()
         else:
-            points, _ = get_quadrature(variant, order + 1)
+            if variant == "gl":
+                points, _ = get_quadrature("legendre", order + 1)
+            else:
+                points, _ = get_quadrature(variant, order + 1)
 
             # Vertices
             for v_n, v in enumerate(reference.vertices):
