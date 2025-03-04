@@ -34,7 +34,7 @@ class Lagrange(CiarletElement):
             raise NonDefaultReferenceError()
 
         dofs: ListOfFunctionals = []
-        if variant == "legendre":
+        if variant == "legendre-polynomials":
             basis = orthonormal_basis(reference.name, order, 0)[0]
             for f in basis:
                 dofs.append(IntegralAgainst(reference, f, (reference.tdim, 0)))

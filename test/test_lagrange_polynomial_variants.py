@@ -21,7 +21,7 @@ import symfem
 )
 def test_legendre(cell, order):
     basis = symfem.polynomials.orthonormal_basis(cell, order, 0)[0]
-    e = symfem.create_element(cell, "P", order, variant="legendre")
+    e = symfem.create_element(cell, "P", order, variant="legendre-polynomials")
     assert symfem.utils.allequal(e.get_basis_functions(), basis)
 
 

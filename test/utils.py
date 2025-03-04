@@ -9,13 +9,15 @@ test_elements: typing.Dict[
         "P": [
             ({"variant": "equispaced"}, range(6)),
             ({"variant": "lobatto"}, range(4)),
-            ({"variant": "legendre"}, range(5)),
+            ({"variant": "legendre"}, [0, 1]),
+            ({"variant": "legendre-polynomials"}, range(5)),
         ],
         "vP": [
             ({"variant": "equispaced"}, range(6)),
             ({"variant": "lobatto"}, range(3)),
             ({"variant": "radau"}, range(3)),
-            ({"variant": "legendre"}, range(3)),
+            ({"variant": "legendre"}, [0, 1]),
+            ({"variant": "legendre-polynomials"}, range(3)),
         ],
         "dPc": [({"variant": "equispaced"}, range(6)), ({"variant": "lobatto"}, range(4))],
         "bubble": [({"variant": "equispaced"}, range(2, 6)), ({"variant": "lobatto"}, range(2, 3))],
