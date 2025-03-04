@@ -9,12 +9,14 @@ test_elements: typing.Dict[
         "P": [
             ({"variant": "equispaced"}, range(6)),
             ({"variant": "lobatto"}, range(4)),
+            ({"variant": "gl"}, [0, 1]),
             ({"variant": "legendre"}, range(5)),
         ],
         "vP": [
             ({"variant": "equispaced"}, range(6)),
             ({"variant": "lobatto"}, range(3)),
             ({"variant": "radau"}, range(3)),
+            ({"variant": "gl"}, [0, 1]),
             ({"variant": "legendre"}, range(3)),
         ],
         "dPc": [({"variant": "equispaced"}, range(6)), ({"variant": "lobatto"}, range(4))],

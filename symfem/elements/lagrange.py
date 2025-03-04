@@ -61,7 +61,10 @@ class Lagrange(CiarletElement):
                     for f in basis:
                         dofs.append(IntegralAgainst(reference, f, (edim, e_n)))
         else:
-            points, _ = get_quadrature(variant, order + 1)
+            if variant == "gl":
+                points, _ = get_quadrature("legendre", order + 1)
+            else:
+                points, _ = get_quadrature(variant, order + 1)
             if variant != "equispaced":
                 assert reference.name in ["interval", "quadrilateral", "hexahedron"]
 
