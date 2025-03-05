@@ -192,15 +192,15 @@ def test_piecewise_scalar_function_subs():
 
 
 def test_vector_grad():
-    f = VectorFunction([x[0], x[1], x[1] - 3 * x[2]])
-    d = f.grad()
+    f = VectorFunction([x[0], x[1], x[1] ** 2 - 3 * x[2]])
+    d = f.grad(3)
 
-    assert f[0, 0] == 1
-    assert f[0, 1] == 0
-    assert f[0, 2] == 0
-    assert f[1, 0] == 0
-    assert f[1, 1] == 1
-    assert f[1, 2] == 0
-    assert f[1, 0] == 0
-    assert f[1, 1] == 1
-    assert f[1, 2] == -3
+    assert d[0, 0] == 1
+    assert d[0, 1] == 0
+    assert d[0, 2] == 0
+    assert d[1, 0] == 0
+    assert d[1, 1] == 1
+    assert d[1, 2] == 0
+    assert d[2, 0] == 0
+    assert d[2, 1] == 2 * x[1]
+    assert d[2, 2] == -3
