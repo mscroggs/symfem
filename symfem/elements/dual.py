@@ -9,7 +9,7 @@ import typing
 import sympy
 
 from symfem.finite_element import FiniteElement
-from symfem.functions import AnyFunction, FunctionInput, VectorFunction
+from symfem.functions import Function, FunctionInput, VectorFunction
 from symfem.geometry import PointType, SetOfPoints, SetOfPointsInput
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.references import DualPolygon, NonDefaultReferenceError
@@ -56,11 +56,11 @@ class DualCiarletElement(FiniteElement):
         super().__init__(
             reference, order, len(dual_coefficients), domain_dim, range_dim, range_shape=range_shape
         )
-        self._basis_functions: typing.Union[typing.List[AnyFunction], None] = None
+        self._basis_functions: typing.Union[typing.List[Function], None] = None
         self._dof_entities = dof_entities
         self._dof_directions = dof_directions
 
-    def get_polynomial_basis(self, reshape: bool = True) -> typing.List[AnyFunction]:
+    def get_polynomial_basis(self, reshape: bool = True) -> typing.List[Function]:
         """Get the symbolic polynomial basis for the element.
 
         Returns:
@@ -83,7 +83,7 @@ class DualCiarletElement(FiniteElement):
 
     def get_basis_functions(
         self, use_tensor_factorisation: bool = False
-    ) -> typing.List[AnyFunction]:
+    ) -> typing.List[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -97,7 +97,7 @@ class DualCiarletElement(FiniteElement):
         if self._basis_functions is None:
             from symfem import create_element
 
-            bfs: typing.List[AnyFunction] = []
+            bfs: typing.List[Function] = []
             sub_e = create_element("triangle", self.fine_space, self.order)
             for coeff_list in self.dual_coefficients:
                 v0 = self.reference.origin
@@ -194,10 +194,10 @@ class DualCiarletElement(FiniteElement):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.Optional[typing.List[AnyFunction]] = None,
+        basis: typing.Optional[typing.List[Function]] = None,
         forward_map: typing.Optional[PointType] = None,
         inverse_map: typing.Optional[PointType] = None,
-    ) -> typing.List[AnyFunction]:
+    ) -> typing.List[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
         Args:
