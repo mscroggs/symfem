@@ -1265,7 +1265,10 @@ class VectorFunction(Function):
         Returns:
             The integral
         """
-        raise NotImplementedError()
+        return VectorFunction([
+            f.integral(domain, vars, dummy_vars)
+            for f in self._vec
+        ])
 
     def __iter__(self):
         """Get iterable."""
@@ -1763,7 +1766,10 @@ class MatrixFunction(Function):
         Returns:
             The integral
         """
-        raise NotImplementedError()
+        return MatrixFunction([
+            [f.integral(domain, vars, dummy_vars) for f in row]
+            for row in self._mat
+        ])
 
     def det(self) -> ScalarFunction:
         """Compute the determinant.

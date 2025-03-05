@@ -5,6 +5,7 @@ import sympy
 from symfem.functions import MatrixFunction, ScalarFunction, VectorFunction
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.symbols import x
+from symfem import create_reference
 
 
 def test_scalar_function_add_sub():
@@ -189,3 +190,22 @@ def test_piecewise_scalar_function_subs():
 
     assert f2.subs(x[0], 2) == f7
     assert f2.subs(x[:2], (1, 1)) == 1
+
+
+def test_vector_integral():
+    f = VectorFunction([1, x[0], x[0] * x[1] ** 2])
+    i = f.integral(create_reference("triangle"))
+
+    assert i[0] == sympy.Rational(1, 2)
+    assert i[1] == sympy.Rational(1, 6)
+    assert i[2] == sympy.Rational(1, 60)
+
+
+def test_matrix_integral():
+    f = MatrixFunction([[1, x[0]], [x[0] * x[1] ** 2, 1]])
+    i = f.integral(create_reference("triangle"))
+
+    assert i[0, 0] == sympy.Rational(1, 2)
+    assert i[0, 1] == sympy.Rational(1, 6)
+    assert i[1, 0] == sympy.Rational(1, 60)
+    assert i[1, 1] == sympy.Rational(1, 2)

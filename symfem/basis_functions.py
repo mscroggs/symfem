@@ -296,7 +296,7 @@ class BasisFunction(Function):
         domain: Reference,
         vars: AxisVariablesNotSingle = x,
         dummy_vars: AxisVariablesNotSingle = t,
-    ) -> ScalarFunction:
+    ) -> Function:
         """Compute the integral of the function.
 
         Args:
