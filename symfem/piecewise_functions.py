@@ -8,7 +8,7 @@ import sympy
 
 import symfem
 from symfem.functions import (
-    AnyFunction,
+    Function,
     FunctionInput,
     ScalarFunction,
     SympyFormat,
@@ -33,10 +33,10 @@ from symfem.symbols import AxisVariables, AxisVariablesNotSingle, t, x
 __all__ = ["PiecewiseFunction"]
 
 
-class PiecewiseFunction(AnyFunction):
+class PiecewiseFunction(Function):
     """A piecewise function."""
 
-    _pieces: typing.Dict[SetOfPoints, AnyFunction]
+    _pieces: typing.Dict[SetOfPoints, Function]
 
     def __init__(self, pieces: typing.Dict[SetOfPointsInput, FunctionInput], tdim: int):
         """Create a piecewise function.
@@ -125,7 +125,7 @@ class PiecewiseFunction(AnyFunction):
         out += "\\end{cases}"
         return out
 
-    def get_piece(self, point: PointType) -> AnyFunction:
+    def get_piece(self, point: PointType) -> Function:
         """Get a piece of the function.
 
         Args:
@@ -178,7 +178,7 @@ class PiecewiseFunction(AnyFunction):
         return True
 
     @property
-    def pieces(self) -> typing.Dict[SetOfPoints, AnyFunction]:
+    def pieces(self) -> typing.Dict[SetOfPoints, Function]:
         """Get the pieces of the function.
 
         Returns:
@@ -310,7 +310,7 @@ class PiecewiseFunction(AnyFunction):
         Returns:
             The substituted function
         """
-        if isinstance(values, AnyFunction):
+        if isinstance(values, Function):
             values = values.as_sympy()
 
         if isinstance(values, (tuple, list)) and len(values) == self.tdim:
@@ -539,7 +539,7 @@ class PiecewiseFunction(AnyFunction):
             ref = _piece_reference(self.tdim, shape)
             f.plot_values(ref, img, value_scale, n // 2)
 
-    def with_floats(self) -> AnyFunction:
+    def with_floats(self) -> Function:
         """Return a version the function with floats as coefficients.
 
         Returns:

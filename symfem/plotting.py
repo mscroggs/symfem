@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 
 import sympy
 
-from symfem.functions import AnyFunction, VectorFunction
+from symfem.functions import Function, VectorFunction
 from symfem.geometry import (
     PointType,
     PointTypeInput,
@@ -30,7 +30,7 @@ __all__ = [
     "Picture",
 ]
 
-PointOrFunction = typing.Union[PointTypeInput, AnyFunction]
+PointOrFunction = typing.Union[PointTypeInput, Function]
 SetOfPointsOrFunctions = typing.Union[
     typing.List[PointOrFunction], typing.Tuple[PointOrFunction, ...]
 ]
@@ -800,7 +800,7 @@ class Picture:
         Returns:
             The point as a tuple of Sympy expressions
         """
-        if isinstance(p, AnyFunction):
+        if isinstance(p, Function):
             p_s = p.as_sympy()
             assert isinstance(p_s, tuple)
             p = p_s

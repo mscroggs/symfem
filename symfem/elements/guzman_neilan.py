@@ -13,7 +13,7 @@ from symfem.elements.bernardi_raugel import BernardiRaugel
 from symfem.elements.lagrange import Lagrange, VectorLagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import DotPointEvaluation, ListOfFunctionals, NormalIntegralMoment
-from symfem.functions import AnyFunction, FunctionInput, ScalarFunction, VectorFunction
+from symfem.functions import Function, FunctionInput, ScalarFunction, VectorFunction
 from symfem.geometry import SetOfPoints, SetOfPointsInput
 from symfem.moments import make_integral_moment_dofs
 from symfem.piecewise_functions import PiecewiseFunction
@@ -23,7 +23,7 @@ from symfem.symbols import t, x
 __all__ = ["GuzmanNeilanFirstKind", "GuzmanNeilanSecondKind", "make_piecewise_lagrange"]
 
 
-def poly(reference: Reference, k: int) -> typing.List[AnyFunction]:
+def poly(reference: Reference, k: int) -> typing.List[Function]:
     """Generate the P^perp polynomial set."""
     if k < 2:
         if reference.name == "triangle":
