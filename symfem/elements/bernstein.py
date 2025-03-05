@@ -11,7 +11,7 @@ import sympy
 
 from symfem.finite_element import CiarletElement
 from symfem.functionals import BaseFunctional, ListOfFunctionals, PointEvaluation
-from symfem.functions import AnyFunction, FunctionInput
+from symfem.functions import Function, FunctionInput
 from symfem.geometry import PointType
 from symfem.polynomials import orthogonal_basis, polynomial_set_1d
 from symfem.references import Reference
@@ -137,7 +137,7 @@ class BernsteinFunctional(BaseFunctional):
         """
         return self.ref.sub_entity(*self.entity).midpoint()
 
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply the functional to a function.
 
         Args:

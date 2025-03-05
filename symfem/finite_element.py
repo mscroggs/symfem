@@ -13,7 +13,7 @@ from symfem.basis_functions import BasisFunction
 from symfem.caching import load_cached_matrix, save_cached_matrix
 from symfem.functionals import ListOfFunctionals
 from symfem.functions import (
-    AnyFunction,
+    Function,
     FunctionInput,
     ScalarFunction,
     VectorFunction,
@@ -57,7 +57,7 @@ class NoTensorProduct(Exception):
 class FiniteElement(ABC):
     """Abstract finite element."""
 
-    _float_basis_functions: typing.Union[None, typing.List[AnyFunction]]
+    _float_basis_functions: typing.Union[None, typing.List[Function]]
     _value_scale: typing.Union[None, sympy.core.expr.Expr]
 
     def __init__(
@@ -212,9 +212,7 @@ class FiniteElement(ABC):
         """
 
     @abstractmethod
-    def get_basis_functions(
-        self, use_tensor_factorisation: bool = False
-    ) -> typing.List[AnyFunction]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -329,10 +327,10 @@ class FiniteElement(ABC):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.Optional[typing.List[AnyFunction]] = None,
+        basis: typing.Optional[typing.List[Function]] = None,
         forward_map: typing.Optional[PointType] = None,
         inverse_map: typing.Optional[PointType] = None,
-    ) -> typing.List[AnyFunction]:
+    ) -> typing.List[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
         Args:
@@ -346,7 +344,7 @@ class FiniteElement(ABC):
         """
 
     @abstractmethod
-    def get_polynomial_basis(self) -> typing.List[AnyFunction]:
+    def get_polynomial_basis(self) -> typing.List[Function]:
         """Get the symbolic polynomial basis for the element.
 
         Returns:
@@ -541,7 +539,7 @@ class FiniteElement(ABC):
         """
         raise NoTensorProduct()
 
-    def _get_basis_functions_tensor(self) -> typing.List[AnyFunction]:
+    def _get_basis_functions_tensor(self) -> typing.List[Function]:
         """Compute the basis functions using the space's tensor product factorisation.
 
         Returns:
@@ -617,9 +615,9 @@ class CiarletElement(FiniteElement):
         assert len(basis) == len(dofs)
         self._basis = [parse_function_input(b) for b in basis]
         for b in self._basis:
-            assert isinstance(b, AnyFunction)
+            assert isinstance(b, Function)
         self.dofs = dofs
-        self._basis_functions: typing.Union[typing.List[AnyFunction], None] = None
+        self._basis_functions: typing.Union[typing.List[Function], None] = None
         self._maximum_degree = None
         if reference.name == "pyramid":
             self._maximum_degree = order
@@ -660,7 +658,7 @@ class CiarletElement(FiniteElement):
         """
         return [d.entity for d in self.dofs]
 
-    def get_polynomial_basis(self) -> typing.List[AnyFunction]:
+    def get_polynomial_basis(self) -> typing.List[Function]:
         """Get the symbolic polynomial basis for the element.
 
         Returns:
@@ -710,9 +708,7 @@ class CiarletElement(FiniteElement):
             else:
                 return mat
 
-    def get_basis_functions(
-        self, use_tensor_factorisation: bool = False
-    ) -> typing.List[AnyFunction]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -727,7 +723,7 @@ class CiarletElement(FiniteElement):
             else:
                 minv = self.get_dual_matrix(inverse=True)
 
-                sfs: typing.List[AnyFunction] = []
+                sfs: typing.List[Function] = []
                 pb = self.get_polynomial_basis()
                 for i, dof in enumerate(self.dofs):
                     sf = ScalarFunction(minv[i, 0]) * pb[0]
@@ -785,10 +781,10 @@ class CiarletElement(FiniteElement):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.Optional[typing.List[AnyFunction]] = None,
+        basis: typing.Optional[typing.List[Function]] = None,
         forward_map: typing.Optional[PointType] = None,
         inverse_map: typing.Optional[PointType] = None,
-    ) -> typing.List[AnyFunction]:
+    ) -> typing.List[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
         Args:
@@ -809,7 +805,7 @@ class CiarletElement(FiniteElement):
             inverse_map = self.reference.get_inverse_map_to(vertices)
 
         try:
-            functions: typing.List[AnyFunction] = [ScalarFunction(0) for f in basis]
+            functions: typing.List[Function] = [ScalarFunction(0) for f in basis]
             for dim in range(self.reference.tdim + 1):
                 for e in range(self.reference.sub_entity_count(dim)):
                     entity_dofs = self.entity_dofs(dim, e)
@@ -882,7 +878,7 @@ class CiarletElement(FiniteElement):
 class DirectElement(FiniteElement):
     """Finite element defined directly."""
 
-    _basis_functions: typing.List[AnyFunction]
+    _basis_functions: typing.List[Function]
 
     def __init__(
         self,
@@ -994,9 +990,7 @@ class DirectElement(FiniteElement):
         """
         return self._basis_entities
 
-    def get_basis_functions(
-        self, use_tensor_factorisation: bool = False
-    ) -> typing.List[AnyFunction]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -1013,10 +1007,10 @@ class DirectElement(FiniteElement):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.Optional[typing.List[AnyFunction]] = None,
+        basis: typing.Optional[typing.List[Function]] = None,
         forward_map: typing.Optional[PointType] = None,
         inverse_map: typing.Optional[PointType] = None,
-    ) -> typing.List[AnyFunction]:
+    ) -> typing.List[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
         Args:
@@ -1035,7 +1029,7 @@ class DirectElement(FiniteElement):
         #                   **self.init_kwargs())
         # return e.get_basis_functions()
 
-    def get_polynomial_basis(self) -> typing.List[AnyFunction]:
+    def get_polynomial_basis(self) -> typing.List[Function]:
         """Get the symbolic polynomial basis for the element.
 
         Returns:
@@ -1097,7 +1091,7 @@ class DirectElement(FiniteElement):
 class EnrichedElement(FiniteElement):
     """Finite element defined directly."""
 
-    _basis_functions: typing.Optional[typing.List[AnyFunction]]
+    _basis_functions: typing.Optional[typing.List[Function]]
 
     def __init__(
         self,
@@ -1180,9 +1174,7 @@ class EnrichedElement(FiniteElement):
             positions += e.dof_entities()
         return positions
 
-    def get_basis_functions(
-        self, use_tensor_factorisation: bool = False
-    ) -> typing.List[AnyFunction]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -1204,10 +1196,10 @@ class EnrichedElement(FiniteElement):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.Optional[typing.List[AnyFunction]] = None,
+        basis: typing.Optional[typing.List[Function]] = None,
         forward_map: typing.Optional[PointType] = None,
         inverse_map: typing.Optional[PointType] = None,
-    ) -> typing.List[AnyFunction]:
+    ) -> typing.List[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
         Args:
@@ -1224,7 +1216,7 @@ class EnrichedElement(FiniteElement):
             out += e.map_to_cell(vertices_in, basis, forward_map, inverse_map)
         return out
 
-    def get_polynomial_basis(self) -> typing.List[AnyFunction]:
+    def get_polynomial_basis(self) -> typing.List[Function]:
         """Get the symbolic polynomial basis for the element.
 
         Returns:
@@ -1263,7 +1255,7 @@ class ElementBasisFunction(BasisFunction):
         self.element = element
         self.n = n
 
-    def get_function(self) -> AnyFunction:
+    def get_function(self) -> Function:
         """Get the actual basis function.
 
         Returns:

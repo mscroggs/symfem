@@ -9,7 +9,7 @@ import sympy
 
 import symfem
 from symfem.functions import (
-    AnyFunction,
+    Function,
     FunctionInput,
     ScalarFunction,
     SympyFormat,
@@ -22,7 +22,7 @@ from symfem.symbols import AxisVariables, AxisVariablesNotSingle, t, x
 __all__ = ["BasisFunction", "SubbedBasisFunction"]
 
 
-class BasisFunction(AnyFunction):
+class BasisFunction(Function):
     """A basis function of a finite element.
 
     This basis function can be used before the element's basis functions have been computed. When
@@ -40,7 +40,7 @@ class BasisFunction(AnyFunction):
         super().__init__(scalar=scalar, vector=vector, matrix=matrix)
 
     @abstractmethod
-    def get_function(self) -> AnyFunction:
+    def get_function(self) -> Function:
         """Get the actual basis function.
 
         Returns:
@@ -48,7 +48,7 @@ class BasisFunction(AnyFunction):
         """
         pass
 
-    def __add__(self, other: typing.Any) -> AnyFunction:
+    def __add__(self, other: typing.Any) -> Function:
         """Add.
 
         Args:
@@ -59,7 +59,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().__add__(other)
 
-    def __radd__(self, other: typing.Any) -> AnyFunction:
+    def __radd__(self, other: typing.Any) -> Function:
         """Add.
 
         Args:
@@ -70,7 +70,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().__radd__(other)
 
-    def __sub__(self, other: typing.Any) -> AnyFunction:
+    def __sub__(self, other: typing.Any) -> Function:
         """Subtract.
 
         Args:
@@ -81,7 +81,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().__sub__(other)
 
-    def __rsub__(self, other: typing.Any) -> AnyFunction:
+    def __rsub__(self, other: typing.Any) -> Function:
         """Subtract.
 
         Args:
@@ -92,7 +92,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().__rsub__(other)
 
-    def __neg__(self) -> AnyFunction:
+    def __neg__(self) -> Function:
         """Negate.
 
         Returns:
@@ -100,7 +100,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().__neg__()
 
-    def __truediv__(self, other: typing.Any) -> AnyFunction:
+    def __truediv__(self, other: typing.Any) -> Function:
         """Divide.
 
         Args:
@@ -111,7 +111,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().__truediv__(other)
 
-    def __rtruediv__(self, other: typing.Any) -> AnyFunction:
+    def __rtruediv__(self, other: typing.Any) -> Function:
         """Divide.
 
         Args:
@@ -122,7 +122,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().__rtruediv__(other)
 
-    def __mul__(self, other: typing.Any) -> AnyFunction:
+    def __mul__(self, other: typing.Any) -> Function:
         """Multiply.
 
         Args:
@@ -133,7 +133,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().__mul__(other)
 
-    def __rmul__(self, other: typing.Any) -> AnyFunction:
+    def __rmul__(self, other: typing.Any) -> Function:
         """Multiply.
 
         Args:
@@ -144,7 +144,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().__rmul__(other)
 
-    def __matmul__(self, other: typing.Any) -> AnyFunction:
+    def __matmul__(self, other: typing.Any) -> Function:
         """Multiply.
 
         Args:
@@ -155,7 +155,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().__matmul__(other)
 
-    def __rmatmul__(self, other: typing.Any) -> AnyFunction:
+    def __rmatmul__(self, other: typing.Any) -> Function:
         """Multiply.
 
         Args:
@@ -166,7 +166,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().__rmatmul__(other)
 
-    def __pow__(self, other: typing.Any) -> AnyFunction:
+    def __pow__(self, other: typing.Any) -> Function:
         """Raise to a power.
 
         Args:
@@ -193,7 +193,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().as_tex()
 
-    def diff(self, variable: sympy.core.symbol.Symbol) -> AnyFunction:
+    def diff(self, variable: sympy.core.symbol.Symbol) -> Function:
         """Differentiate the function.
 
         Args:
@@ -204,7 +204,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().diff(variable)
 
-    def directional_derivative(self, direction: PointType) -> AnyFunction:
+    def directional_derivative(self, direction: PointType) -> Function:
         """Compute a directional derivative.
 
         Args:
@@ -215,7 +215,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().directional_derivative(direction)
 
-    def jacobian_component(self, component: typing.Tuple[int, int]) -> AnyFunction:
+    def jacobian_component(self, component: typing.Tuple[int, int]) -> Function:
         """Compute a component of the jacobian.
 
         Args:
@@ -226,7 +226,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().jacobian_component(component)
 
-    def jacobian(self, dim: int) -> AnyFunction:
+    def jacobian(self, dim: int) -> Function:
         """Compute the jacobian.
 
         Args:
@@ -237,7 +237,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().jacobian(dim)
 
-    def dot(self, other_in: FunctionInput) -> AnyFunction:
+    def dot(self, other_in: FunctionInput) -> Function:
         """Compute the dot product with another function.
 
         Args:
@@ -248,7 +248,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().dot(other_in)
 
-    def cross(self, other_in: FunctionInput) -> AnyFunction:
+    def cross(self, other_in: FunctionInput) -> Function:
         """Compute the cross product with another function.
 
         Args:
@@ -259,7 +259,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().cross(other_in)
 
-    def div(self) -> AnyFunction:
+    def div(self) -> Function:
         """Compute the divergence of the function.
 
         Returns:
@@ -267,7 +267,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().div()
 
-    def grad(self, dim: int) -> AnyFunction:
+    def grad(self, dim: int) -> Function:
         """Compute the gradient of the function.
 
         Returns:
@@ -275,7 +275,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().grad(dim)
 
-    def curl(self) -> AnyFunction:
+    def curl(self) -> Function:
         """Compute the curl of the function.
 
         Returns:
@@ -296,7 +296,7 @@ class BasisFunction(AnyFunction):
         domain: Reference,
         vars: AxisVariablesNotSingle = x,
         dummy_vars: AxisVariablesNotSingle = t,
-    ) -> ScalarFunction:
+    ) -> Function:
         """Compute the integral of the function.
 
         Args:
@@ -321,7 +321,7 @@ class BasisFunction(AnyFunction):
         """
         return SubbedBasisFunction(self, vars, values)
 
-    def __getitem__(self, key) -> AnyFunction:
+    def __getitem__(self, key) -> Function:
         """Forward all other function calls to symbolic function."""
         return self.get_function().__getitem__(key)
 
@@ -353,7 +353,7 @@ class BasisFunction(AnyFunction):
             raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'transpose'")
         return self.get_function().transpose()
 
-    def with_floats(self) -> AnyFunction:
+    def with_floats(self) -> Function:
         """Return a version the function with floats as coefficients.
 
         Returns:
@@ -361,7 +361,7 @@ class BasisFunction(AnyFunction):
         """
         return self.get_function().with_floats()
 
-    def __iter__(self) -> typing.Iterator[AnyFunction]:
+    def __iter__(self) -> typing.Iterator[Function]:
         """Iterate through components of vector function."""
         f = self.get_function()
         return f.__iter__()
@@ -397,7 +397,7 @@ class SubbedBasisFunction(BasisFunction):
         self._vars = vars
         self._values = values
 
-    def get_function(self) -> AnyFunction:
+    def get_function(self) -> Function:
         """Return the symbolic function.
 
         Returns:
