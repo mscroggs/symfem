@@ -1221,10 +1221,7 @@ class VectorFunction(Function):
         Returns:
             The gradient
         """
-        return MatrixFunction([
-            f.grad(dim)._vec
-            for f in self._vec
-        ])
+        return MatrixFunction([f.grad(dim)._vec for f in self._vec])
 
     def curl(self) -> VectorFunction:
         """Compute the curl of the function.
