@@ -1265,10 +1265,7 @@ class VectorFunction(Function):
         Returns:
             The integral
         """
-        return VectorFunction([
-            f.integral(domain, vars, dummy_vars)
-            for f in self._vec
-        ])
+        return VectorFunction([f.integral(domain, vars, dummy_vars) for f in self._vec])
 
     def __iter__(self):
         """Get iterable."""
@@ -1349,9 +1346,7 @@ class MatrixFunction(Function):
     def __init__(
         self,
         mat: typing.Union[
-            typing.Tuple[
-                typing.Tuple[typing.Union[Function, int, sympy.core.expr.Expr], ...], ...
-            ],
+            typing.Tuple[typing.Tuple[typing.Union[Function, int, sympy.core.expr.Expr], ...], ...],
             typing.Tuple[typing.List[typing.Union[Function, int, sympy.core.expr.Expr]], ...],
             typing.List[typing.Tuple[typing.Union[Function, int, sympy.core.expr.Expr], ...]],
             typing.List[typing.List[typing.Union[Function, int, sympy.core.expr.Expr]]],
@@ -1766,10 +1761,9 @@ class MatrixFunction(Function):
         Returns:
             The integral
         """
-        return MatrixFunction([
-            [f.integral(domain, vars, dummy_vars) for f in row]
-            for row in self._mat
-        ])
+        return MatrixFunction(
+            [[f.integral(domain, vars, dummy_vars) for f in row] for row in self._mat]
+        )
 
     def det(self) -> ScalarFunction:
         """Compute the determinant.

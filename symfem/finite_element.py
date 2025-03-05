@@ -212,9 +212,7 @@ class FiniteElement(ABC):
         """
 
     @abstractmethod
-    def get_basis_functions(
-        self, use_tensor_factorisation: bool = False
-    ) -> typing.List[Function]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -710,9 +708,7 @@ class CiarletElement(FiniteElement):
             else:
                 return mat
 
-    def get_basis_functions(
-        self, use_tensor_factorisation: bool = False
-    ) -> typing.List[Function]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -994,9 +990,7 @@ class DirectElement(FiniteElement):
         """
         return self._basis_entities
 
-    def get_basis_functions(
-        self, use_tensor_factorisation: bool = False
-    ) -> typing.List[Function]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -1180,9 +1174,7 @@ class EnrichedElement(FiniteElement):
             positions += e.dof_entities()
         return positions
 
-    def get_basis_functions(
-        self, use_tensor_factorisation: bool = False
-    ) -> typing.List[Function]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
         """Get the basis functions of the element.
 
         Args:

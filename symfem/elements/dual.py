@@ -81,9 +81,7 @@ class DualCiarletElement(FiniteElement):
         """
         raise ValueError("Dual matrix not supported for barycentric dual elements.")
 
-    def get_basis_functions(
-        self, use_tensor_factorisation: bool = False
-    ) -> typing.List[Function]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
         """Get the basis functions of the element.
 
         Args:
