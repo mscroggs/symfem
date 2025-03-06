@@ -275,7 +275,7 @@ class Function(ABC):
         """
 
     @abstractmethod
-    def grad(self, dim: int):
+    def grad(self, dim: int) -> Function:
         """Compute the grad of the function.
 
         Returns:
@@ -757,7 +757,7 @@ class ScalarFunction(Function):
         """
         raise ValueError("Cannot compute the div of a scalar-valued function.")
 
-    def grad(self, dim: int) -> VectorFunction:
+    def grad(self, dim: int) -> Function:
         """Compute the grad of the function.
 
         Returns:
@@ -1215,13 +1215,13 @@ class VectorFunction(Function):
             out += i.diff(j)
         return out
 
-    def grad(self):
+    def grad(self, dim: int) -> Function:
         """Compute the grad of the function.
 
         Returns:
             The gradient
         """
-        raise ValueError("Cannot compute the grad of a vector-valued function.")
+        return MatrixFunction([f.grad(dim) for f in self._vec])
 
     def curl(self) -> VectorFunction:
         """Compute the curl of the function.
@@ -1721,7 +1721,7 @@ class MatrixFunction(Function):
         """
         raise ValueError("Cannot compute the div of a matrix-valued function.")
 
-    def grad(self):
+    def grad(self, dim: int) -> Function:
         """Compute the grad of the function.
 
         Returns:

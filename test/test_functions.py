@@ -192,6 +192,21 @@ def test_piecewise_scalar_function_subs():
     assert f2.subs(x[:2], (1, 1)) == 1
 
 
+def test_vector_grad():
+    f = VectorFunction([x[0], x[1], x[1] ** 2 - 3 * x[2]])
+    d = f.grad(3)
+
+    assert d[0, 0] == 1
+    assert d[0, 1] == 0
+    assert d[0, 2] == 0
+    assert d[1, 0] == 0
+    assert d[1, 1] == 1
+    assert d[1, 2] == 0
+    assert d[2, 0] == 0
+    assert d[2, 1] == 2 * x[1]
+    assert d[2, 2] == -3
+
+
 def test_vector_integral():
     f = VectorFunction([1, x[0], x[0] * x[1] ** 2])
     i = f.integral(create_reference("triangle"))
