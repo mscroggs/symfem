@@ -521,6 +521,28 @@ class FiniteElement(ABC):
                             assert dim == 2
                             f = [f[1, 1], f[2, 2]]
                             g = [g[1, 1], g[2, 2]]
+                elif continuity == "inner H(curl div)":
+                    if len(vertices[0]) == 2:
+                        f = f[1, 0]
+                        g = g[1, 0]
+                    if len(vertices[0]) == 3:
+                        if dim == 1:
+                            vs = self.reference.sub_entities(1)[entities[0]]
+                            v0 = self.reference.vertices[vs[0]]
+                            v1 = self.reference.vertices[vs[1]]
+                            tangent = VectorFunction(v1) - VectorFunction(v0)
+                            f = sum(
+                                f[0, nj] * j
+                                for nj, j in enumerate(tangent)
+                            )
+                            g = sum(
+                                g[0, nj] * j
+                                for nj, j in enumerate(tangent)
+                            )
+                        else:
+                            assert dim == 2
+                            f = [f[0, 1], f[0, 2]]
+                            g = [g[0, 1], g[0, 2]]
                 elif continuity == "integral inner H(div)":
                     f = f[0, 0].integrate((x[1], 0, 1))
                     g = g[0, 0].integrate((x[1], 0, 1))

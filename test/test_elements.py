@@ -62,6 +62,7 @@ def test_element(elements_to_test, cells_to_test, cell_type, element_type, order
             pytest.skip()
 
     space = create_element(cell_type, element_type, order, **kwargs)
+    print(space.get_basis_functions())
     space.test()
 
 

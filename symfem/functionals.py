@@ -39,6 +39,7 @@ __all__ = [
     "DivergenceIntegralMoment",
     "TangentIntegralMoment",
     "NormalIntegralMoment",
+    "TraceIntegralMoment",
     "NormalDerivativeIntegralMoment",
     "InnerProductIntegralMoment",
     "NormalInnerProductIntegralMoment",
@@ -1636,6 +1637,70 @@ class NormalIntegralMoment(IntegralMoment):
         ]
 
     name = "Normal integral moment"
+
+
+class TraceIntegralMoment(IntegralMoment):
+    """An integral moment of the trace of a matrix."""
+
+    def __init__(
+        self,
+        reference: Reference,
+        f_in: FunctionInput,
+        dof: BaseFunctional,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "contravariant",
+    ):
+        """Create the functional.
+
+        Args:
+            reference: The reference cell
+            f_in: The function to multiply with
+            dof: The DOF in a moment space that the function is associated with
+            entity: The entity the functional is associated with
+            mapping: The type of mappping from the reference cell to a physical cell
+        """
+        scalar_f = parse_function_input(f_in).subs(x, t)
+        assert scalar_f.is_scalar
+        integral_domain = reference.sub_entity(*entity)
+        super().__init__(
+            reference,
+            scalar_f,
+            dof,
+            entity=entity,
+            mapping=mapping,
+            map_function=False,
+        )
+
+    def dot(self, function: Function) -> ScalarFunction:
+        """Take the product of a function with the trace of the matrix.
+
+        Args:
+            function: The function
+
+        Returns:
+            The inner product of the function and the matrix's trace
+        """
+        assert function.is_matrix and function.shape[0] == function.shape[1]
+        trace = sum(function[i, i] for i in range(function.shape[0]))
+        return trace * self.f * self.integral_domain.jacobian()
+
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
+        """Get a representation of the functional as TeX, and list of terms involved.
+
+        Returns:
+            Representation of the functional as TeX, and list of terms involved
+        """
+        entity = self.entity_tex()
+        entity_n = self.entity_number()
+        entity_def = self.entity_definition()
+        desc = "\\boldsymbol{V}\\mapsto"
+        desc += f"\\displaystyle\\int_{{{entity}}}"
+        desc += "\\operatorname{tr}(\\boldsymbol{V})"
+        if self.f != 1:
+            desc += "(" + _to_tex(self._scalar_f, True) + ")"
+        return desc, [entity_def]
+
+    name = "Trace integral moment"
 
 
 class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
