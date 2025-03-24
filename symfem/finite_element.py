@@ -531,14 +531,8 @@ class FiniteElement(ABC):
                             v0 = self.reference.vertices[vs[0]]
                             v1 = self.reference.vertices[vs[1]]
                             tangent = VectorFunction(v1) - VectorFunction(v0)
-                            f = sum(
-                                f[0, nj] * j
-                                for nj, j in enumerate(tangent)
-                            )
-                            g = sum(
-                                g[0, nj] * j
-                                for nj, j in enumerate(tangent)
-                            )
+                            f = sum(f[0, nj] * j for nj, j in enumerate(tangent))
+                            g = sum(g[0, nj] * j for nj, j in enumerate(tangent))
                         else:
                             assert dim == 2
                             f = [f[0, 1], f[0, 2]]

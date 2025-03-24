@@ -42,15 +42,15 @@ class LedererSchoberl(CiarletElement):
 
         tdim = reference.tdim
         poly: typing.List[FunctionInput] = [
-            tuple(tuple(p[i * tdim:(i + 1) * tdim]) for i in range(tdim))
-            for p in polynomial_set_vector(tdim, tdim ** 2, order)
+            tuple(tuple(p[i * tdim : (i + 1) * tdim]) for i in range(tdim))
+            for p in polynomial_set_vector(tdim, tdim**2, order)
         ]
 
         dofs: ListOfFunctionals = []
         facet_dim = reference.tdim - 1
-        space = Lagrange(create_reference([
-            "point", "interval", "triangle"
-        ][facet_dim]), order, "equispaced")
+        space = Lagrange(
+            create_reference(["point", "interval", "triangle"][facet_dim]), order, "equispaced"
+        )
         basis = [f.subs(x, t) for f in space.get_basis_functions()]
         for facet_n in range(reference.sub_entity_count(facet_dim)):
             facet = reference.sub_entity(facet_dim, facet_n)
@@ -118,4 +118,3 @@ class LedererSchoberl(CiarletElement):
     continuity = "inner H(curl div)"
     value_type = "matrix"
     last_updated = "2024.03"
-    cache = False
