@@ -48,7 +48,7 @@ test_elements: typing.Dict[
         "Morley": [({}, [2])],
         "MWX": [({}, [1, 2])],
         "Regge": [({"variant": "point"}, range(4)), ({"variant": "integral"}, range(3))],
-        "Lederer-Schoberl": [({}, [0])],
+        "Lederer-Schoberl": [({}, [0, 1, 2])],
         "AW": [({"variant": "equispaced"}, range(3, 5))],
         "nonconforming AW": [({"variant": "equispaced"}, [2])],
         "Nedelec1": [({"variant": "equispaced"}, range(1, 4))],

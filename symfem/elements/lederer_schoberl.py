@@ -14,11 +14,12 @@ from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     InnerProductIntegralMoment,
     IntegralAgainst,
+    IntegralMoment,
     TraceIntegralMoment,
     ListOfFunctionals,
     PointInnerProduct,
 )
-from symfem.functions import FunctionInput
+from symfem.functions import FunctionInput, MatrixFunction
 from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import polynomial_set_vector
 from symfem.references import Reference, _vnormalise
@@ -78,6 +79,37 @@ class LedererSchoberl(CiarletElement):
             ),
         )
 
+        if order > 0:
+            if reference.tdim == 2:
+                functions = [MatrixFunction(i) for i in [
+                    (((x[0] + x[1] - 1) / 2, 0), (0, (1 - x[0] - x[1]) / 2)),
+                    ((x[0] / 2, 0), (x[0], -x[0] / 2)),
+                    ((x[1] / 2, -x[1]), (0, -x[1] / 2)),
+                ]]
+            else:
+                assert reference.tdim == 3
+                functions = [MatrixFunction(i) for i in [
+                    ((2*(1 - x[0] - x[1] - x[2])/3, 0, 0), (0, (x[0] + x[1] + x[2] - 1)/3, 0), (0, 0, (x[0] + x[1] + x[2] - 1)/3)),
+                    (((x[0] + x[1] + x[2] - 1)/3, 0, 0), (0, 2*(1 - x[0] - x[1] - x[2])/3, 0), (0, 0, (x[0] + x[1] + x[2] - 1)/3)),
+                    ((x[0]/3, 0, 0), (x[0], -2*x[0]/3, 0), (0, 0, x[0]/3)),
+                    ((x[0]/3, 0, 0), (0, x[0]/3, 0), (x[0], 0, -2*x[0]/3)),
+                    ((-x[1]/3, 0, 0), (0, -x[1]/3, 0), (0, -x[1], 2*x[1]/3)),
+                    ((-x[1]/3, x[1], 0), (0, 2*x[1]/3, 0), (0, x[1], -x[1]/3)),
+                    ((x[2]/3, 0, -x[2]), (0, x[2]/3, -x[2]), (0, 0, -2*x[2]/3)),
+                    ((-2*x[2]/3, 0, x[2]), (0, x[2]/3, 0), (0, 0, x[2]/3)),
+                ]]
+
+            lagrange = Lagrange(reference, order - 1)
+            for dof, f in zip(lagrange.dofs, lagrange.get_basis_functions()):
+                for g in functions:
+                    dofs.append(IntegralMoment(
+                        reference,
+                        f * g,
+                        dof,
+                        (reference.tdim, 0),
+                        "co_contravariant",
+                    ))
+
         super().__init__(
             reference,
             order,
@@ -118,3 +150,4 @@ class LedererSchoberl(CiarletElement):
     continuity = "inner H(curl div)"
     value_type = "matrix"
     last_updated = "2024.03"
+    cache = False
