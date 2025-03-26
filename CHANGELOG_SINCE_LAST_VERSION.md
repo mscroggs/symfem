@@ -1,1 +1,3 @@
 - Allow "gl" variant of Lagrange element
+- Implement component-wise integrals of VectorFunction and MatrixFunction
+- Implement grad of VectorFunction
