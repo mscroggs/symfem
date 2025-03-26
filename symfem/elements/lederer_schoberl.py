@@ -162,4 +162,3 @@ class LedererSchoberl(CiarletElement):
     continuity = "inner H(curl div)"
     value_type = "matrix"
     last_updated = "2024.03"
-    cache = False
