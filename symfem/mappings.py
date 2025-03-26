@@ -13,21 +13,23 @@ from symfem.symbols import x
 __all__ = [
     "MappingNotImplemented",
     "identity",
-    "l2",
-    "covariant",
-    "contravariant",
-    "double_covariant",
-    "double_contravariant",
-    "identity_inverse_transpose",
-    "l2_inverse_transpose",
-    "covariant_inverse_transpose",
-    "contravariant_inverse_transpose",
     "identity_inverse",
+    "identity_inverse_transpose",
+    "l2",
+    "l2_inverse_transpose",
     "l2_inverse",
+    "covariant",
     "covariant_inverse",
+    "covariant_inverse_transpose",
+    "contravariant",
     "contravariant_inverse",
+    "contravariant_inverse_transpose",
+    "double_covariant",
     "double_covariant_inverse",
+    "double_contravariant",
     "double_contravariant_inverse",
+    "co_contravariant",
+    "co_contravariant_inverse",
     "get_mapping",
 ]
 
@@ -109,8 +111,8 @@ def covariant(
 
     assert f.is_vector
 
-    j_inv = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
-    return j_inv @ f
+    j_inv_t = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
+    return j_inv_t @ f
 
 
 def contravariant(
@@ -162,8 +164,8 @@ def double_covariant(
         f = f.subs(x, inverse_map)
     assert f.is_matrix
 
-    j_inv = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
-    return j_inv @ f @ j_inv.transpose()
+    j_inv_t = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
+    return j_inv_t @ f @ j_inv_t.transpose()
 
 
 def double_contravariant(
@@ -192,6 +194,36 @@ def double_contravariant(
     jacobian = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
     jacobian /= jacobian.det()
     return jacobian @ f @ jacobian.transpose()
+
+
+def co_contravariant(
+    f_in: FunctionInput,
+    map: PointType,
+    inverse_map: PointType,
+    substitute: bool = True,
+) -> MatrixFunction:
+    """Map matrix functions.
+
+    Args:
+        f_in: The function
+        map: The map from the reference cell to the physical cell
+        inverse_map: The map to the reference cell from the physical cell
+        substitute: Should the inverse map be substituted in?
+
+    Returns:
+        The mapped function
+    """
+
+    tdim = len(inverse_map)
+    f = parse_function_input(f_in)
+    if substitute:
+        f = f.subs(x, inverse_map)
+    assert f.is_matrix
+
+    j_inv_t = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
+    jacobian = MatrixFunction([[i.diff(x[j]) for j in range(tdim)] for i in map])
+    jacobian /= jacobian.det()
+    return j_inv_t @ f @ jacobian.transpose()
 
 
 def identity_inverse_transpose(
@@ -295,9 +327,9 @@ def contravariant_inverse_transpose(
 
     assert f.is_vector
 
-    j_inv = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
-    j_inv /= j_inv.det()
-    return j_inv @ f
+    j_inv_t = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
+    j_inv_t /= j_inv_t.det()
+    return j_inv_t @ f
 
 
 def identity_inverse(
@@ -412,6 +444,26 @@ def double_contravariant_inverse(
         The mapped function
     """
     return double_contravariant(f_in, inverse_map, map, substitute)
+
+
+def co_contravariant_inverse(
+    f_in: FunctionInput,
+    map: PointType,
+    inverse_map: PointType,
+    substitute: bool = True,
+) -> MatrixFunction:
+    """Map matrix functions.
+
+    Args:
+        f_in: The function
+        map: The map from the reference cell to the physical cell
+        inverse_map: The map to the reference cell from the physical cell
+        substitute: Should the inverse map be substituted in?
+
+    Returns:
+        The mapped function
+    """
+    return co_contravariant(f_in, inverse_map, map, substitute)
 
 
 def get_mapping(

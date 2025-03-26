@@ -521,6 +521,13 @@ class FiniteElement(ABC):
                             assert dim == 2
                             f = [f[1, 1], f[2, 2]]
                             g = [g[1, 1], g[2, 2]]
+                elif continuity == "inner H(curl div)":
+                    if len(vertices[0]) == 2:
+                        f = f[1, 0]
+                        g = g[1, 0]
+                    if len(vertices[0]) == 3:
+                        f = [f[1, 0], f[2, 0]]
+                        g = [g[1, 0], g[2, 0]]
                 elif continuity == "integral inner H(div)":
                     f = f[0, 0].integrate((x[1], 0, 1))
                     g = g[0, 0].integrate((x[1], 0, 1))

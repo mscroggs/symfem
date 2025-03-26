@@ -187,6 +187,7 @@ The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities
 - Hsieh-Clough-Tocher (alternative names: Clough-Tocher, HCT, CT)
 - Kong-Mulder-Veldhuizen (alternative names: KMV)
 - Lagrange (alternative names: P)
+- Lederer-Schoberl
 - Mardal-Tai-Winther (alternative names: MTW)
 - matrix Lagrange
 - Morley
@@ -258,6 +259,7 @@ The reference tetrahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), and (0, 
 - Hermite
 - Kong-Mulder-Veldhuizen (alternative names: KMV)
 - Lagrange (alternative names: P)
+- Lederer-Schoberl
 - Mardal-Tai-Winther (alternative names: MTW)
 - matrix Lagrange
 - Morley-Wang-Xu (alternative names: MWX)
