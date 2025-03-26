@@ -1695,7 +1695,7 @@ class TraceIntegralMoment(IntegralMoment):
         desc += f"\\displaystyle\\int_{{{entity}}}"
         desc += "\\operatorname{tr}(\\boldsymbol{V})"
         if self.f != 1:
-            desc += "(" + _to_tex(self._scalar_f, True) + ")"
+            desc += "(" + _to_tex(self.f, True) + ")"
         return desc, [entity_def]
 
     name = "Trace integral moment"
