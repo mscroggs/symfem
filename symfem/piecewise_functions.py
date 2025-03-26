@@ -413,7 +413,7 @@ class PiecewiseFunction(Function):
         """
         return PiecewiseFunction({shape: f.div() for shape, f in self._pieces.items()}, self.tdim)
 
-    def grad(self, dim: int) -> PiecewiseFunction:
+    def grad(self, dim: int) -> Function:
         """Compute the grad of the function.
 
         Returns:
