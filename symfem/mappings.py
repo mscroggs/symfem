@@ -163,7 +163,7 @@ def double_covariant(
     assert f.is_matrix
 
     j_inv_t = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
-    return j_inv @ f @ j_inv.transpose()
+    return j_inv_t @ f @ j_inv_t.transpose()
 
 
 def double_contravariant(
@@ -325,9 +325,9 @@ def contravariant_inverse_transpose(
 
     assert f.is_vector
 
-    j_inv = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
-    j_inv /= j_inv.det()
-    return j_inv @ f
+    j_inv_t = MatrixFunction([[i.diff(x[j]) for i in inverse_map] for j in range(tdim)])
+    j_inv_t /= j_inv_t.det()
+    return j_inv_t @ f
 
 
 def identity_inverse(

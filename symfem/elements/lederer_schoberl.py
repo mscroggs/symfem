@@ -5,24 +5,20 @@ This element's definition appears in https://doi.org/10.34726/hss.2019.62042
 """
 
 import typing
-from itertools import product
 
-import sympy
 
 from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     InnerProductIntegralMoment,
-    IntegralAgainst,
     IntegralMoment,
     TraceIntegralMoment,
     ListOfFunctionals,
-    PointInnerProduct,
 )
 from symfem.functions import FunctionInput, MatrixFunction
 from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import polynomial_set_vector
-from symfem.references import Reference, _vnormalise
+from symfem.references import Reference
 from symfem.symbols import t, x
 
 __all__ = ["LedererSchoberl"]
@@ -61,7 +57,7 @@ class LedererSchoberl(CiarletElement):
                         InnerProductIntegralMoment(
                             reference,
                             f,
-                            _vnormalise(tangent),
+                            tuple(i / facet.volume() for i in tangent),
                             facet.normal(),
                             dof,
                             entity=(facet_dim, facet_n),
@@ -81,34 +77,50 @@ class LedererSchoberl(CiarletElement):
 
         if order > 0:
             if reference.tdim == 2:
-                functions = [MatrixFunction(i) for i in [
-                    (((x[0] + x[1] - 1) / 2, 0), (0, (1 - x[0] - x[1]) / 2)),
-                    ((x[0] / 2, 0), (x[0], -x[0] / 2)),
-                    ((x[1] / 2, -x[1]), (0, -x[1] / 2)),
-                ]]
+                functions = [
+                    MatrixFunction(i)
+                    for i in [
+                        (((x[0] + x[1] - 1) / 2, 0), (0, (1 - x[0] - x[1]) / 2)),
+                        ((x[0] / 2, 0), (x[0], -x[0] / 2)),
+                        ((x[1] / 2, -x[1]), (0, -x[1] / 2)),
+                    ]
+                ]
             else:
                 assert reference.tdim == 3
-                functions = [MatrixFunction(i) for i in [
-                    ((2*(1 - x[0] - x[1] - x[2])/3, 0, 0), (0, (x[0] + x[1] + x[2] - 1)/3, 0), (0, 0, (x[0] + x[1] + x[2] - 1)/3)),
-                    (((x[0] + x[1] + x[2] - 1)/3, 0, 0), (0, 2*(1 - x[0] - x[1] - x[2])/3, 0), (0, 0, (x[0] + x[1] + x[2] - 1)/3)),
-                    ((x[0]/3, 0, 0), (x[0], -2*x[0]/3, 0), (0, 0, x[0]/3)),
-                    ((x[0]/3, 0, 0), (0, x[0]/3, 0), (x[0], 0, -2*x[0]/3)),
-                    ((-x[1]/3, 0, 0), (0, -x[1]/3, 0), (0, -x[1], 2*x[1]/3)),
-                    ((-x[1]/3, x[1], 0), (0, 2*x[1]/3, 0), (0, x[1], -x[1]/3)),
-                    ((x[2]/3, 0, -x[2]), (0, x[2]/3, -x[2]), (0, 0, -2*x[2]/3)),
-                    ((-2*x[2]/3, 0, x[2]), (0, x[2]/3, 0), (0, 0, x[2]/3)),
-                ]]
+                functions = [
+                    MatrixFunction(i)
+                    for i in [
+                        (
+                            (2 * (1 - x[0] - x[1] - x[2]) / 3, 0, 0),
+                            (0, (x[0] + x[1] + x[2] - 1) / 3, 0),
+                            (0, 0, (x[0] + x[1] + x[2] - 1) / 3),
+                        ),
+                        (
+                            ((x[0] + x[1] + x[2] - 1) / 3, 0, 0),
+                            (0, 2 * (1 - x[0] - x[1] - x[2]) / 3, 0),
+                            (0, 0, (x[0] + x[1] + x[2] - 1) / 3),
+                        ),
+                        ((x[0] / 3, 0, 0), (x[0], -2 * x[0] / 3, 0), (0, 0, x[0] / 3)),
+                        ((x[0] / 3, 0, 0), (0, x[0] / 3, 0), (x[0], 0, -2 * x[0] / 3)),
+                        ((-x[1] / 3, 0, 0), (0, -x[1] / 3, 0), (0, -x[1], 2 * x[1] / 3)),
+                        ((-x[1] / 3, x[1], 0), (0, 2 * x[1] / 3, 0), (0, x[1], -x[1] / 3)),
+                        ((x[2] / 3, 0, -x[2]), (0, x[2] / 3, -x[2]), (0, 0, -2 * x[2] / 3)),
+                        ((-2 * x[2] / 3, 0, x[2]), (0, x[2] / 3, 0), (0, 0, x[2] / 3)),
+                    ]
+                ]
 
             lagrange = Lagrange(reference, order - 1)
             for dof, f in zip(lagrange.dofs, lagrange.get_basis_functions()):
                 for g in functions:
-                    dofs.append(IntegralMoment(
-                        reference,
-                        f * g,
-                        dof,
-                        (reference.tdim, 0),
-                        "co_contravariant",
-                    ))
+                    dofs.append(
+                        IntegralMoment(
+                            reference,
+                            f * g,
+                            dof,
+                            (reference.tdim, 0),
+                            "co_contravariant",
+                        )
+                    )
 
         super().__init__(
             reference,

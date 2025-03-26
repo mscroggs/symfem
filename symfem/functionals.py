@@ -1661,7 +1661,6 @@ class TraceIntegralMoment(IntegralMoment):
         """
         scalar_f = parse_function_input(f_in).subs(x, t)
         assert scalar_f.is_scalar
-        integral_domain = reference.sub_entity(*entity)
         super().__init__(
             reference,
             scalar_f,
@@ -1691,7 +1690,6 @@ class TraceIntegralMoment(IntegralMoment):
             Representation of the functional as TeX, and list of terms involved
         """
         entity = self.entity_tex()
-        entity_n = self.entity_number()
         entity_def = self.entity_definition()
         desc = "\\boldsymbol{V}\\mapsto"
         desc += f"\\displaystyle\\int_{{{entity}}}"

@@ -90,7 +90,7 @@ test_elements: typing.Dict[
         "CR": [({"variant": "equispaced"}, [1])],
         "Regge": [({"variant": "point"}, range(3)), ({"variant": "integral"}, range(2))],
         "HHJ": [({"variant": "equispaced"}, range(3))],
-        "Lederer-Schoberl": [({}, [0])],
+        "Lederer-Schoberl": [({}, [0, 1])],
         "Nedelec1": [({"variant": "equispaced"}, range(1, 3))],
         "Nedelec2": [({"variant": "equispaced"}, range(1, 3))],
         "RT": [({"variant": "equispaced"}, range(1, 3))],
