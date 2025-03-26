@@ -13,21 +13,23 @@ from symfem.symbols import x
 __all__ = [
     "MappingNotImplemented",
     "identity",
-    "l2",
-    "covariant",
-    "contravariant",
-    "double_covariant",
-    "double_contravariant",
-    "identity_inverse_transpose",
-    "l2_inverse_transpose",
-    "covariant_inverse_transpose",
-    "contravariant_inverse_transpose",
     "identity_inverse",
+    "identity_inverse_transpose",
+    "l2",
+    "l2_inverse_transpose",
     "l2_inverse",
+    "covariant",
     "covariant_inverse",
+    "covariant_inverse_transpose",
+    "contravariant",
     "contravariant_inverse",
+    "contravariant_inverse_transpose",
+    "double_covariant",
     "double_covariant_inverse",
+    "double_contravariant",
     "double_contravariant_inverse",
+    "co_contravariant",
+    "co_contravariant_inverse",
     "get_mapping",
 ]
 
@@ -442,6 +444,26 @@ def double_contravariant_inverse(
         The mapped function
     """
     return double_contravariant(f_in, inverse_map, map, substitute)
+
+
+def co_contravariant_inverse(
+    f_in: FunctionInput,
+    map: PointType,
+    inverse_map: PointType,
+    substitute: bool = True,
+) -> MatrixFunction:
+    """Map matrix functions.
+
+    Args:
+        f_in: The function
+        map: The map from the reference cell to the physical cell
+        inverse_map: The map to the reference cell from the physical cell
+        substitute: Should the inverse map be substituted in?
+
+    Returns:
+        The mapped function
+    """
+    return co_contravariant(f_in, inverse_map, map, substitute)
 
 
 def get_mapping(
