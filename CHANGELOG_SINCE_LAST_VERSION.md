@@ -1,4 +1,4 @@
 - Allow "gl" variant of Lagrange element
 - Implement component-wise integrals of VectorFunction and MatrixFunction
 - Implement grad of VectorFunction
-- Add Lederer-Schoberl element
+- Add Gopalakrishnan-Lederer-Schoberl element

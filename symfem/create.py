@@ -179,7 +179,7 @@ def create_element(
                       enriched vector Galerkin, locking-free enriched Galerkin, LFEG,
                       P1 macro,
                       Alfeld-Sorokina, AS,
-                      Lederer-Schoberl
+                      Gopalakrishnan-Lederer-Schoberl, GLS
         order: The order of the element.
         vertices: The vertices of the reference.
     """

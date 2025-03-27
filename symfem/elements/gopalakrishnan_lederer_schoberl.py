@@ -1,4 +1,4 @@
-"""Lederer-Schoberl elements on simplices.
+"""Gopalakrishnan-Lederer-Schoberl elements on simplices.
 
 This element's definition appears in https://doi.org/10.34726/hss.2019.62042
 (Lederer, 2019).
@@ -21,11 +21,11 @@ from symfem.polynomials import polynomial_set_vector
 from symfem.references import Reference
 from symfem.symbols import t, x
 
-__all__ = ["LedererSchoberl"]
+__all__ = ["GopalakrishnanLedererSchoberl"]
 
 
-class LedererSchoberl(CiarletElement):
-    """A Lederer-Schoberl element on a simplex."""
+class GopalakrishnanLedererSchoberl(CiarletElement):
+    """A Gopalakrishnan-Lederer-Schoberl element on a simplex."""
 
     def __init__(self, reference: Reference, order: int):
         """Create the element.
@@ -156,7 +156,7 @@ class LedererSchoberl(CiarletElement):
     def polynomial_superdegree(self) -> typing.Optional[int]:
         return self.order
 
-    names = ["Lederer-Schoberl"]
+    names = ["Gopalakrishnan-Lederer-Schoberl", "GLS"]
     references = ["triangle", "tetrahedron"]
     min_order = 0
     continuity = "inner H(curl div)"

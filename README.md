@@ -180,6 +180,7 @@ The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities
 - enriched Galerkin (alternative names: EG)
 - enriched vector Galerkin (alternative names: locking-free enriched Galerkin, LFEG)
 - Fortin-Soulie (alternative names: FS)
+- Gopalakrishnan-Lederer-Schoberl (alternative names: GLS)
 - Guzman-Neilan first kind (alternative names: Guzman-Neilan)
 - Guzman-Neilan second kind
 - Hellan-Herrmann-Johnson (alternative names: HHJ)
@@ -187,7 +188,6 @@ The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities
 - Hsieh-Clough-Tocher (alternative names: Clough-Tocher, HCT, CT)
 - Kong-Mulder-Veldhuizen (alternative names: KMV)
 - Lagrange (alternative names: P)
-- Lederer-Schoberl
 - Mardal-Tai-Winther (alternative names: MTW)
 - matrix Lagrange
 - Morley
@@ -253,13 +253,13 @@ The reference tetrahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), and (0, 
 - Crouzeix-Raviart (alternative names: CR, Crouzeix-Falk, CF)
 - enriched Galerkin (alternative names: EG)
 - enriched vector Galerkin (alternative names: locking-free enriched Galerkin, LFEG)
+- Gopalakrishnan-Lederer-Schoberl (alternative names: GLS)
 - Guzman-Neilan first kind (alternative names: Guzman-Neilan)
 - Guzman-Neilan second kind
 - Hellan-Herrmann-Johnson (alternative names: HHJ)
 - Hermite
 - Kong-Mulder-Veldhuizen (alternative names: KMV)
 - Lagrange (alternative names: P)
-- Lederer-Schoberl
 - Mardal-Tai-Winther (alternative names: MTW)
 - matrix Lagrange
 - Morley-Wang-Xu (alternative names: MWX)
