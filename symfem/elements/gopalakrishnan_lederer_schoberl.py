@@ -1,7 +1,8 @@
 """Gopalakrishnan-Lederer-Schoberl elements on simplices.
 
 This element's definition appears in https://doi.org/10.34726/hss.2019.62042
-(Lederer, 2019).
+(Lederer, 2019) and https://doi.org/10.1137/19M1248960
+(Gopalakrishnan, Lederer, Schooberl, 2020).
 """
 
 import typing
