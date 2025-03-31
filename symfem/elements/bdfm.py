@@ -33,38 +33,38 @@ def bdfm_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]
     """
     dim = reference.tdim
     pset: typing.List[FunctionInput] = []
-    pset += polynomial_set_vector(dim, dim, order - 1)
+    pset += polynomial_set_vector(dim, dim, order)
     if reference.name == "quadrilateral":
-        for i in range(1, order + 1):
-            j = order - i
+        for i in range(1, order + 2):
+            j = order + 1 - i
             pset.append((x[0] ** i * x[1] ** j, 0))
             pset.append((0, x[1] ** i * x[0] ** j))
     elif reference.name == "triangle":
-        for i in range(order - 1):
-            p = x[0] ** i * x[1] ** (order - 2 - i)
+        for i in range(order):
+            p = x[0] ** i * x[1] ** (order - 1 - i)
             pset.append((x[0] * (x[0] + x[1]) * p, 0))
             pset.append((0, x[1] * (x[0] + x[1]) * p))
-        p = x[0] ** (order - 1)
+        p = x[0] ** order
         pset.append((x[0] * p, x[1] * p))
     elif reference.name == "hexahedron":
-        for i in range(1, order + 1):
-            for j in range(order + 1 - i):
-                k = order - i - j
+        for i in range(1, order + 2):
+            for j in range(order + 2 - i):
+                k = order + 1 - i - j
                 pset.append((x[0] ** i * x[1] ** j * x[2] ** k, 0, 0))
                 pset.append((0, x[1] ** i * x[0] ** j * x[2] ** k, 0))
                 pset.append((0, 0, x[2] ** i * x[0] ** j * x[1] ** k))
     elif reference.name == "tetrahedron":
-        for i in range(order - 1):
-            for j in range(order - i - 1):
-                p = x[0] ** i * x[1] ** j * x[2] ** (order - 2 - i - j)
+        for i in range(order):
+            for j in range(order - i):
+                p = x[0] ** i * x[1] ** j * x[2] ** (order - 1 - i - j)
                 pset.append((x[0] * (x[0] + x[1] + x[2]) * p, 0, 0))
                 pset.append((0, x[1] * (x[0] + x[1] + x[2]) * p, 0))
                 pset.append((0, 0, x[2] * (x[0] + x[1] + x[2]) * p))
-        for i in range(order):
-            p = x[0] ** i * x[1] ** (order - 1 - i)
+        for i in range(order + 1):
+            p = x[0] ** i * x[1] ** (order - i)
             pset.append((x[0] * p, x[1] * p, x[2] * p))
-        for i in range(1, order):
-            p = x[0] ** i * x[1] ** (order - 1 - i)
+        for i in range(1, order + 1):
+            p = x[0] ** i * x[1] ** (order - i)
             pset.append((p * (x[0] + x[1]), 0, x[1] * p))
 
     return pset
@@ -90,14 +90,14 @@ class BDFM(CiarletElement):
         if reference.name in ["triangle", "tetrahedron"]:
             dofs = make_integral_moment_dofs(
                 reference,
-                facets=(NormalIntegralMoment, Lagrange, order - 1, {"variant": variant}),
+                facets=(NormalIntegralMoment, Lagrange, order, {"variant": variant}),
                 cells=(IntegralMoment, NedelecFirstKind, order - 1, {"variant": variant}),
             )
         else:
             dofs = make_integral_moment_dofs(
                 reference,
-                facets=(NormalIntegralMoment, DPC, order - 1, {"variant": variant}),
-                cells=(IntegralMoment, VectorDPC, order - 2, {"variant": variant}),
+                facets=(NormalIntegralMoment, DPC, order, {"variant": variant}),
+                cells=(IntegralMoment, VectorDPC, order - 1, {"variant": variant}),
             )
         self.variant = variant
 
@@ -114,25 +114,25 @@ class BDFM(CiarletElement):
     @property
     def lagrange_subdegree(self) -> int:
         if self.reference.name in ["triangle", "tetrahedron"]:
-            return self.order - 1
+            return self.order
         else:
-            return self.order // self.reference.tdim
+            return (self.order + 1) // self.reference.tdim
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        return self.order
+        return self.order + 1
 
     @property
     def polynomial_subdegree(self) -> int:
-        return self.order - 1
+        return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        return self.order
+        return self.order + 1
 
     names = ["Brezzi-Douglas-Fortin-Marini", "BDFM"]
     references = ["triangle", "quadrilateral", "hexahedron", "tetrahedron"]
-    min_order = 1
+    min_order = 0
     continuity = "H(div)"
     value_type = "vector"
     last_updated = "2024.10"

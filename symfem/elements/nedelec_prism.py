@@ -39,23 +39,23 @@ class Nedelec(CiarletElement):
         poly: typing.List[FunctionInput] = []
         poly += [
             (i[0] * j, i[1] * j, 0)
-            for i in polynomial_set_vector(2, 2, order - 1) + Hcurl_polynomials(2, 2, order)
-            for j in polynomial_set_1d(1, order, x[2:])
+            for i in polynomial_set_vector(2, 2, order) + Hcurl_polynomials(2, 2, order + 1)
+            for j in polynomial_set_1d(1, order + 1, x[2:])
         ]
         poly += [
             (0, 0, i * j)
-            for i in polynomial_set_1d(2, order, x[:2])
-            for j in polynomial_set_1d(1, order - 1, x[2:])
+            for i in polynomial_set_1d(2, order + 1, x[:2])
+            for j in polynomial_set_1d(1, order, x[2:])
         ]
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, Lagrange, order - 1, {"variant": variant}),
+            edges=(TangentIntegralMoment, Lagrange, order, {"variant": variant}),
             faces={
                 "triangle": (
                     IntegralMoment,
                     VectorLagrange,
-                    order - 2,
+                    order - 1,
                     "covariant",
                     {"variant": variant},
                 ),
@@ -72,13 +72,13 @@ class Nedelec(CiarletElement):
         triangle = create_reference("triangle")
         interval = create_reference("interval")
 
-        if order >= 2:
-            space1 = VectorLagrange(triangle, order - 2, variant)
-            space2 = Lagrange(interval, order - 2, variant)
+        if order >= 1:
+            space1 = VectorLagrange(triangle, order - 1, variant)
+            space2 = Lagrange(interval, order - 1, variant)
 
-            if order > 2:
+            if order > 1:
                 raise NotImplementedError()
-            # TODO: correct these for order > 2
+            # TODO: correct these for order > 1
             for i in range(space1.space_dim):
                 for j in range(space2.space_dim):
                     f = (
@@ -101,24 +101,24 @@ class Nedelec(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        return self.order - 1
-
-    @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
         return self.order
 
     @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
+    @property
     def polynomial_subdegree(self) -> int:
-        return self.order - 1
+        return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        return self.order * 2
+        return (self.order + 1) * 2
 
     names = ["Nedelec", "Ncurl"]
     references = ["prism"]
-    min_order = 1
-    max_order = 2
+    min_order = 0
+    max_order = 1
     continuity = "H(curl)"
     value_type = "vector"
     last_updated = "2023.06"

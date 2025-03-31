@@ -1,4 +1,4 @@
-"""Test Hsieh-Clough-Tocher elements."""
+"""Test Alfeld-Sorokina elements."""
 
 import sympy
 

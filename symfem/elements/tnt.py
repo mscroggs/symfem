@@ -74,31 +74,31 @@ class TNT(CiarletElement):
             raise NonDefaultReferenceError()
 
         poly: typing.List[FunctionInput] = []
-        poly += quolynomial_set_1d(reference.tdim, order)
+        poly += quolynomial_set_1d(reference.tdim, order - 1)
         if reference.tdim == 2:
             for i in range(2):
                 variables = [x[j] for j in range(2) if j != i]
                 for f in [1 - variables[0], variables[0]]:
-                    poly.append(f * b(order + 1, x[i]))
+                    poly.append(f * b(order, x[i]))
 
         elif reference.tdim == 3:
             for i in range(3):
                 variables = [x[j] for j in range(3) if j != i]
                 for f0 in [1 - variables[0], variables[0]]:
                     for f1 in [1 - variables[1], variables[1]]:
-                        poly.append(f0 * f1 * b(order + 1, x[i]))
+                        poly.append(f0 * f1 * b(order, x[i]))
 
         dofs: ListOfFunctionals = []
         for i, v in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, i)))
 
-        for i in range(1, order + 1):
+        for i in range(1, order):
             f = i * t[0] ** (i - 1)
             for edge_n in range(reference.sub_entity_count(1)):
                 dofs.append(IntegralAgainst(reference, f, entity=(1, edge_n), mapping="identity"))
 
-        for i in range(1, order):
-            for j in range(1, order):
+        for i in range(1, order - 1):
+            for j in range(1, order - 1):
                 f = t[0] ** i * (t[0] - 1) * t[1] ** j * (t[1] - 1)
                 delta_f = (f.diff(t[0]).diff(t[0]) + f.diff(t[1]).diff(t[1])).expand()
                 for face_n in range(reference.sub_entity_count(2)):
@@ -108,7 +108,7 @@ class TNT(CiarletElement):
 
         if reference.tdim == 3:
             dummy_dof = PointEvaluation(reference, reference.midpoint(), (3, 0))
-            for ii in product(range(1, order), repeat=3):
+            for ii in product(range(1, order - 1), repeat=3):
                 f = sympy.Integer(1)
                 for j, k in zip(ii, x):
                     f *= k**j * (k - 1)
@@ -132,23 +132,23 @@ class TNT(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        return self.order
+        return self.order - 1
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        return self.order + 1
+        return self.order
 
     @property
     def polynomial_subdegree(self) -> int:
-        return self.order + 1
+        return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        return max(self.order * self.reference.tdim, self.order + self.reference.tdim)
+        return max((self.order - 1) * self.reference.tdim, (self.order - 1) + self.reference.tdim)
 
     names = ["tiniest tensor", "TNT"]
     references = ["quadrilateral", "hexahedron"]
-    min_order = 1
+    min_order = 2
     continuity = "C0"
     value_type = "scalar"
     last_updated = "2023.06"
