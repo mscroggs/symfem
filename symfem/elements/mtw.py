@@ -83,7 +83,7 @@ class MardalTaiWinther(CiarletElement):
 
             dofs += make_integral_moment_dofs(
                 reference,
-                facets=(IntegralMoment, NedelecFirstKind, 1, "contravariant", {"variant": variant}),
+                facets=(IntegralMoment, NedelecFirstKind, 0, "contravariant", {"variant": variant}),
             )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

@@ -8,7 +8,7 @@ half = sympy.Rational(1, 2)
 
 
 def test_xxyyzz():
-    element = symfem.create_element("triangle", "RT", 1)
+    element = symfem.create_element("triangle", "RT", 0)
 
     points = [(0, 1), (1, 0), (0, 0), (half, half)]
     r1 = element.tabulate_basis(points, "xyzxyz")
@@ -23,7 +23,7 @@ def test_xxyyzz():
 
 
 def test_vector():
-    element = symfem.create_element("triangle", "RT", 1)
+    element = symfem.create_element("triangle", "RT", 0)
 
     points = [(0, 1), (1, 0), (0, 0), (half, half)]
     r1 = element.tabulate_basis(points, "xyzxyz")

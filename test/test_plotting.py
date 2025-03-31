@@ -108,7 +108,7 @@ def test_dof_diagrams_lagrange(reference, degree):
         "hexahedron",
     ],
 )
-@pytest.mark.parametrize("degree", [1, 2])
+@pytest.mark.parametrize("degree", range(2))
 def test_dof_diagrams_raviart_thomas(reference, degree):
     if reference in ["quadrilateral", "hexahedron"]:
         e = symfem.create_element(reference, "Qdiv", degree)
@@ -166,7 +166,7 @@ def test_function_plots_lagrange(reference, degree):
         "hexahedron",
     ],
 )
-@pytest.mark.parametrize("degree", [1])
+@pytest.mark.parametrize("degree", [0])
 def test_function_plots_raviart_thomas(reference, degree):
     if reference in ["quadrilateral", "hexahedron"]:
         e = symfem.create_element(reference, "Qdiv", degree)

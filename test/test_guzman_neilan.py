@@ -19,7 +19,7 @@ def test_perp_space(cell, degree):
     if degree == 1:
         nedelec = [VectorFunction([0 for _ in range(reference.tdim)])]
     else:
-        nedelec = symfem.create_element(cell, "Nedelec", degree - 1).get_basis_functions()
+        nedelec = symfem.create_element(cell, "Nedelec", degree - 2).get_basis_functions()
 
     for p in p_perp:
         for n in nedelec:

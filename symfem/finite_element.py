@@ -351,10 +351,6 @@ class FiniteElement(ABC):
             The polynomial basis
         """
 
-    @abstractproperty
-    def maximum_degree(self) -> int:
-        """Get the maximum degree of this polynomial set for the element."""
-
     def test(self):
         """Run tests for this element."""
         if self.order <= self._max_continuity_test_order:
@@ -625,9 +621,6 @@ class CiarletElement(FiniteElement):
             assert isinstance(b, Function)
         self.dofs = dofs
         self._basis_functions: typing.Union[typing.List[Function], None] = None
-        self._maximum_degree = None
-        if reference.name == "pyramid":
-            self._maximum_degree = order
 
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
         """Get the numbers of the DOFs associated with the given entity.
@@ -672,13 +665,6 @@ class CiarletElement(FiniteElement):
             The polynomial basis
         """
         return self._basis
-
-    @property
-    def maximum_degree(self) -> int:
-        """Get the maximum degree of this polynomial set for the element."""
-        if self._maximum_degree is None:
-            self._maximum_degree = max(p.maximum_degree(self.reference) for p in self._basis)
-        return self._maximum_degree
 
     def get_dual_matrix(
         self, inverse=False, caching=True
@@ -1044,11 +1030,6 @@ class DirectElement(FiniteElement):
         """
         raise NotImplementedError()
 
-    @property
-    def maximum_degree(self) -> int:
-        """Get the maximum degree of this polynomial set for the element."""
-        raise NotImplementedError()
-
     def test(self):
         """Run tests for this element."""
         super().test()
@@ -1229,11 +1210,6 @@ class EnrichedElement(FiniteElement):
         Returns:
             The polynomial basis
         """
-        raise NotImplementedError()
-
-    @property
-    def maximum_degree(self) -> int:
-        """Get the maximum degree of this polynomial set for the element."""
         raise NotImplementedError()
 
     def test(self):
