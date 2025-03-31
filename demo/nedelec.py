@@ -15,7 +15,7 @@ from symfem.polynomials import polynomial_set_vector
 from symfem.symbols import x
 from symfem.utils import allequal
 
-element = symfem.create_element("triangle", "Nedelec1", 4)
+element = symfem.create_element("triangle", "Nedelec1", 3)
 polys = element.get_polynomial_basis()
 
 # Check that the first 20 polynomials in the polynomial basis are
