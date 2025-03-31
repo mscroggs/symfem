@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 import typing
-from abc import ABC, abstractmethod, abstractproperty
+from abc import ABC, abstractmethod
 from itertools import product
 
 import sympy
