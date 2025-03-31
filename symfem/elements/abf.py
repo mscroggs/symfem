@@ -45,7 +45,7 @@ class ArnoldBoffiFalk(CiarletElement):
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
             edges=(NormalIntegralMoment, Lagrange, order, {"variant": variant}),
-            faces=(IntegralMoment, Nedelec, order, {"variant": variant}),
+            faces=(IntegralMoment, Nedelec, order - 1, {"variant": variant}),
         )
 
         for i in range(order + 1):
@@ -98,4 +98,4 @@ class ArnoldBoffiFalk(CiarletElement):
     min_order = 0
     continuity = "H(div)"
     value_type = "vector"
-    last_updated = "2023.06"
+    last_updated = "2025.03"

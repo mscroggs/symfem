@@ -38,7 +38,7 @@ def test_Hcurl_space(reference, order):
 
 @pytest.mark.parametrize("reference", ["triangle"])
 def test_MTW_space(reference):
-    e = create_element(reference, "MTW", 3)
+    e = create_element(reference, "MTW", 1)
     polynomials = e.get_polynomial_basis()
     for p in polynomials:
         assert p.div().as_sympy().is_real

@@ -29,16 +29,16 @@ class RaviartThomas(CiarletElement):
             variant: The variant of the element
         """
         poly: typing.List[FunctionInput] = []
-        poly += polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
-        poly += Hdiv_polynomials(reference.tdim, reference.tdim, order)
+        poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
+        poly += Hdiv_polynomials(reference.tdim, reference.tdim, order + 1)
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Lagrange, order - 1, {"variant": variant}),
+            facets=(NormalIntegralMoment, Lagrange, order, {"variant": variant}),
             cells=(
                 IntegralMoment,
                 VectorLagrange,
-                order - 2,
+                order - 1,
                 "contravariant",
                 {"variant": variant},
             ),
@@ -57,23 +57,23 @@ class RaviartThomas(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        return self.order - 1
+        return self.order
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        return self.order
+        return self.order + 1
 
     @property
     def polynomial_subdegree(self) -> int:
-        return self.order - 1
+        return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        return self.order
+        return self.order + 1
 
     names = ["Raviart-Thomas", "RT", "N1div"]
     references = ["triangle", "tetrahedron"]
-    min_order = 1
+    min_order = 0
     continuity = "H(div)"
     value_type = "vector"
-    last_updated = "2023.06"
+    last_updated = "2025.03"

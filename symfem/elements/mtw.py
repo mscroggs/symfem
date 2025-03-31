@@ -36,7 +36,6 @@ class MardalTaiWinther(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
-        assert order == 3
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
@@ -84,7 +83,7 @@ class MardalTaiWinther(CiarletElement):
 
             dofs += make_integral_moment_dofs(
                 reference,
-                facets=(IntegralMoment, NedelecFirstKind, 1, "contravariant", {"variant": variant}),
+                facets=(IntegralMoment, NedelecFirstKind, 0, "contravariant", {"variant": variant}),
             )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -104,7 +103,7 @@ class MardalTaiWinther(CiarletElement):
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        return self.order + self.reference.tdim - 2
+        return self.order + self.reference.tdim
 
     @property
     def polynomial_subdegree(self) -> int:
@@ -116,8 +115,8 @@ class MardalTaiWinther(CiarletElement):
 
     names = ["Mardal-Tai-Winther", "MTW"]
     references = ["triangle", "tetrahedron"]
-    min_order = 3
-    max_order = 3
+    min_order = 1
+    max_order = 1
     continuity = "H(div)"
     value_type = "vector"
-    last_updated = "2023.06"
+    last_updated = "2025.03"

@@ -30,13 +30,13 @@ class NedelecFirstKind(CiarletElement):
             variant: The variant of the element
         """
         poly: typing.List[FunctionInput] = []
-        poly += polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
-        poly += Hcurl_polynomials(reference.tdim, reference.tdim, order)
+        poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
+        poly += Hcurl_polynomials(reference.tdim, reference.tdim, order + 1)
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, Lagrange, order - 1, {"variant": variant}),
-            faces=(IntegralMoment, VectorLagrange, order - 2, "covariant", {"variant": variant}),
-            volumes=(IntegralMoment, VectorLagrange, order - 3, "covariant", {"variant": variant}),
+            edges=(TangentIntegralMoment, Lagrange, order, {"variant": variant}),
+            faces=(IntegralMoment, VectorLagrange, order - 1, "covariant", {"variant": variant}),
+            volumes=(IntegralMoment, VectorLagrange, order - 2, "covariant", {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -52,26 +52,26 @@ class NedelecFirstKind(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        return self.order - 1
+        return self.order
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
-        return self.order
+        return self.order + 1
 
     @property
     def polynomial_subdegree(self) -> int:
-        return self.order - 1
+        return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
-        return self.order
+        return self.order + 1
 
     names = ["Nedelec", "Nedelec1", "N1curl"]
     references = ["triangle", "tetrahedron"]
-    min_order = 1
+    min_order = 0
     continuity = "H(curl)"
     value_type = "vector"
-    last_updated = "2023.06"
+    last_updated = "2025.03"
 
 
 class NedelecSecondKind(CiarletElement):
@@ -91,8 +91,8 @@ class NedelecSecondKind(CiarletElement):
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, Lagrange, order, {"variant": variant}),
-            faces=(IntegralMoment, RaviartThomas, order - 1, "covariant", {"variant": variant}),
-            volumes=(IntegralMoment, RaviartThomas, order - 2, "covariant", {"variant": variant}),
+            faces=(IntegralMoment, RaviartThomas, order - 2, "covariant", {"variant": variant}),
+            volumes=(IntegralMoment, RaviartThomas, order - 3, "covariant", {"variant": variant}),
         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)

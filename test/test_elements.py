@@ -91,4 +91,38 @@ def test_bc_elements(elements_to_test, cells_to_test, n_tri, element_type):
     if cells_to_test != "ALL" and "dual polygon" not in cells_to_test:
         pytest.skip()
 
-    create_element(f"dual polygon({n_tri})", element_type, 1)
+    create_element(f"dual polygon({n_tri})", element_type, 0)
+
+
+@pytest.mark.parametrize(
+    ("cell_type", "element_type", "order", "kwargs"),
+    [
+        [reference, element, order, kwargs]
+        for reference, i in test_elements.items()
+        for element, j in i.items()
+        for kwargs, k in j
+        for order in k
+    ],
+)
+def test_degree(elements_to_test, cells_to_test, cell_type, element_type, order, kwargs, speed):
+    """Check that polynomial subdegree is the canonical degree of every element where possible."""
+    if elements_to_test != "ALL" and element_type not in elements_to_test:
+        pytest.skip()
+    if cells_to_test != "ALL" and cell_type not in cells_to_test:
+        pytest.skip()
+    if speed == "fast":
+        if order > 2:
+            pytest.skip()
+        if order == 2 and cell_type in ["tetrahedron", "hexahedron", "prism", "pyramid"]:
+            pytest.skip()
+
+    if element_type in ["bubble", "transition"]:
+        pytest.xfail("Polynomial subdegree not used for this element")
+
+    element = create_element(cell_type, element_type, order, **kwargs)
+    try:
+        poly_sub = element.polynomial_subdegree
+    except NotImplementedError:
+        pytest.xfail("Polynomial subdegree not implemented for this element")
+
+    assert element.order == poly_sub

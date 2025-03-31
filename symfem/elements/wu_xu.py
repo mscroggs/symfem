@@ -49,12 +49,16 @@ class WuXu(CiarletElement):
             reference: The reference element
             order: The polynomial order
         """
-        assert order == reference.tdim + 1
         if reference.name == "tetrahedron" and reference != reference.default_reference():
             raise NonDefaultReferenceError()
 
         poly: typing.List[FunctionInput] = []
-        poly += polynomial_set_1d(reference.tdim, order)
+        if reference.name == "interval":
+            assert order == 3
+            poly += polynomial_set_1d(reference.tdim, 2)
+        else:
+            assert order == reference.tdim + 1
+            poly += polynomial_set_1d(reference.tdim, order)
 
         invmap = reference.get_inverse_map_to_self()
         if reference.name == "interval":
@@ -104,29 +108,29 @@ class WuXu(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        if self.reference.name == "interval":
-            return 3
         return self.order
 
     @property
     def lagrange_superdegree(self) -> typing.Optional[int]:
+        if self.reference.name == "interval":
+            return 3
         return self.order + 1
 
     @property
     def polynomial_subdegree(self) -> int:
-        if self.reference.name == "interval":
-            return 3
         return self.order
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:
+        if self.reference.name == "interval":
+            return 3
         return self.order + 1
 
     names = ["Wu-Xu"]
     references = ["interval", "triangle", "tetrahedron"]
-    min_order = {"interval": 2, "triangle": 3, "tetrahedron": 4}
-    max_order = {"interval": 2, "triangle": 3, "tetrahedron": 4}
+    min_order = {"interval": 3, "triangle": 3, "tetrahedron": 4}
+    max_order = {"interval": 3, "triangle": 3, "tetrahedron": 4}
     continuity = "C0"
     # continuity = "C{order}"
     value_type = "scalar"
-    last_updated = "2023.06.1"
+    last_updated = "2025.03"
