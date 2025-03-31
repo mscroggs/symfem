@@ -697,6 +697,7 @@ class CiarletElement(FiniteElement):
                 ]
             )
             if inverse:
+                print(mat)
                 return mat.inv("LU")
             else:
                 return mat
