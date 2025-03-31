@@ -27,7 +27,6 @@ class Bell(CiarletElement):
             variant: The variant of the element
         """
         assert reference.name == "triangle"
-        assert order == 4
         dofs: ListOfFunctionals = []
         for v_n, v in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
