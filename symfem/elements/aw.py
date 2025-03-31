@@ -152,7 +152,7 @@ class ArnoldWinther(CiarletElement):
     min_order = 2
     continuity = "integral inner H(div)"
     value_type = "symmetric matrix"
-    last_updated = "2024.09"
+    last_updated = "2025.03"
 
 
 class NonConformingArnoldWinther(CiarletElement):
@@ -253,4 +253,4 @@ class NonConformingArnoldWinther(CiarletElement):
     max_order = 1
     continuity = "integral inner H(div)"
     value_type = "symmetric matrix"
-    last_updated = "2024.10"
+    last_updated = "2025.03"

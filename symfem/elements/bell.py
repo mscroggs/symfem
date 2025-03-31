@@ -76,4 +76,4 @@ class Bell(CiarletElement):
     max_order = 4
     continuity = "C1"
     value_type = "scalar"
-    last_updated = "2023.05"
+    last_updated = "2025.03"

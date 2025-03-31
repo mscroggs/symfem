@@ -239,7 +239,7 @@ class KongMulderVeldhuizen(CiarletElement):
 
     @property
     def polynomial_subdegree(self) -> int:
-        return self.lagrange_subdegree  # TODO
+        return self.lagrange_subdegree
 
     @property
     def polynomial_superdegree(self) -> typing.Optional[int]:

@@ -222,7 +222,7 @@ def test_function_plots_dual(n):
 
 @pytest.mark.parametrize("n", [4, 6])
 def test_function_plots_bc(n):
-    e = symfem.create_element(f"dual polygon({n})", "BC", 1)
+    e = symfem.create_element(f"dual polygon({n})", "BC", 0)
     for ext in ["svg", "png", "tex"]:
         e.plot_basis_function(0, os.path.join(folder, f"test_function_plots_bc-{n}.{ext}"))
     compile_tex(f"test_function_plots_bc-{n}.tex")

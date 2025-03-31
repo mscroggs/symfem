@@ -337,7 +337,7 @@ class BuffaChristiansen(DualCiarletElement):
     max_order = 0
     continuity = "H(div)"
     value_type = "vector dual"
-    last_updated = "2023.05"
+    last_updated = "2025.03"
 
 
 class RotatedBuffaChristiansen(DualCiarletElement):
@@ -405,4 +405,4 @@ class RotatedBuffaChristiansen(DualCiarletElement):
     max_order = 0
     continuity = "H(div)"
     value_type = "vector dual"
-    last_updated = "2023.05"
+    last_updated = "2025.03"

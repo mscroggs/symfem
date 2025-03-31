@@ -119,4 +119,4 @@ class MardalTaiWinther(CiarletElement):
     max_order = 1
     continuity = "H(div)"
     value_type = "vector"
-    last_updated = "2023.06"
+    last_updated = "2025.03"

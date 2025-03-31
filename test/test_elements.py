@@ -91,7 +91,7 @@ def test_bc_elements(elements_to_test, cells_to_test, n_tri, element_type):
     if cells_to_test != "ALL" and "dual polygon" not in cells_to_test:
         pytest.skip()
 
-    create_element(f"dual polygon({n_tri})", element_type, 1)
+    create_element(f"dual polygon({n_tri})", element_type, 0)
 
 
 @pytest.mark.parametrize(
