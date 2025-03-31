@@ -1,3 +1,11 @@
+# Version 2025.3.1 (31 March 2025)
+
+- Allow "gl" variant of Lagrange element
+- Implement component-wise integrals of VectorFunction and MatrixFunction
+- Implement grad of VectorFunction
+- Add Gopalakrishnan-Lederer-Schoberl element
+- Use polynomial subdegree to index elements wherever possible
+
 # Version 2025.3.0 (03 March 2025)
 
 - Corrected nonconforming Arnold-Winther polyset
