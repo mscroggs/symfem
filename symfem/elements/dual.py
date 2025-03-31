@@ -350,7 +350,6 @@ class RotatedBuffaChristiansen(DualCiarletElement):
             reference: The reference element
             order: The polynomial order
         """
-        assert order == 1
         dual_coefficients: typing.List[
             typing.List[typing.List[typing.Union[int, sympy.core.expr.Expr]]]
         ] = [
