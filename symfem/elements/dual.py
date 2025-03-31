@@ -282,7 +282,6 @@ class BuffaChristiansen(DualCiarletElement):
             reference: The reference element
             order: The polynomial order
         """
-        assert order == 1
         dual_coefficients: typing.List[
             typing.List[typing.List[typing.Union[int, sympy.core.expr.Expr]]]
         ] = [
@@ -334,8 +333,8 @@ class BuffaChristiansen(DualCiarletElement):
 
     names = ["Buffa-Christiansen", "BC"]
     references = ["dual polygon"]
-    min_order = 1
-    max_order = 1
+    min_order = 0
+    max_order = 0
     continuity = "H(div)"
     value_type = "vector dual"
     last_updated = "2023.05"
@@ -403,8 +402,8 @@ class RotatedBuffaChristiansen(DualCiarletElement):
 
     names = ["rotated Buffa-Christiansen", "RBC"]
     references = ["dual polygon"]
-    min_order = 1
-    max_order = 1
+    min_order = 0
+    max_order = 0
     continuity = "H(div)"
     value_type = "vector dual"
     last_updated = "2023.05"
