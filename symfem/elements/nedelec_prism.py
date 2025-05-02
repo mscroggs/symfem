@@ -79,12 +79,22 @@ class Nedelec(CiarletElement):
             for f in space1.get_basis_functions():
                 for g in space2.get_basis_functions():
                     h = f * g.subs(x[0], x[2])
-                    dofs.append(IntegralAgainst(
-                        reference, (h, 0, 0), entity=(3, 0), mapping="covariant",
-                    ))
-                    dofs.append(IntegralAgainst(
-                        reference, (0, h, 0), entity=(3, 0), mapping="covariant",
-                    ))
+                    dofs.append(
+                        IntegralAgainst(
+                            reference,
+                            (h, 0, 0),
+                            entity=(3, 0),
+                            mapping="covariant",
+                        )
+                    )
+                    dofs.append(
+                        IntegralAgainst(
+                            reference,
+                            (0, h, 0),
+                            entity=(3, 0),
+                            mapping="covariant",
+                        )
+                    )
 
         print(len(poly), len(dofs))
 
@@ -94,9 +104,14 @@ class Nedelec(CiarletElement):
 
             for f in space1.get_basis_functions():
                 for g in space2.get_basis_functions():
-                    dofs.append(IntegralAgainst(
-                        reference, (0, 0, f * g.subs(x[0], x[2])), entity=(3, 0), mapping="covariant",
-                    ))
+                    dofs.append(
+                        IntegralAgainst(
+                            reference,
+                            (0, 0, f * g.subs(x[0], x[2])),
+                            entity=(3, 0),
+                            mapping="covariant",
+                        )
+                    )
 
         print(len(poly), len(dofs))
 
