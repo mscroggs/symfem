@@ -23,6 +23,11 @@ def test_all_tested():
                 raise ValueError(f"{e.names[0]} on a {r} is not tested")
 
 
+def test_caching():
+    for e in symfem.create._elementlist:
+        assert e.cache
+
+
 @pytest.mark.parametrize(
     "ref, element, order", [("triangle", "Hermite", 4), ("tetrahedron", "Crouzeix-Raviart", 2)]
 )
