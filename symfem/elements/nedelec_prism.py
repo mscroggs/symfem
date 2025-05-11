@@ -148,4 +148,3 @@ class Nedelec(CiarletElement):
     continuity = "H(curl)"
     value_type = "vector"
     last_updated = "2025.05"
-    cache = False
