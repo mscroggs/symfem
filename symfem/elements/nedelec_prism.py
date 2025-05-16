@@ -96,8 +96,6 @@ class Nedelec(CiarletElement):
                         )
                     )
 
-        print(len(poly), len(dofs))
-
         if order >= 2:
             space1 = Lagrange(triangle, order - 2, variant)
             space2 = Lagrange(interval, order, variant)
@@ -112,8 +110,6 @@ class Nedelec(CiarletElement):
                             mapping="covariant",
                         )
                     )
-
-        print(len(poly), len(dofs))
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
