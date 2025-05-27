@@ -41,14 +41,14 @@ def test_bubble_in_space(cell):
             for j in range(N + 1 - i)
             for k in range(N + 1 - i - j)
         ]
-        lamb = [min(x[0], x[1], x[2], 1 - x[0] - x[1] - x[2]) for x in points]
+        lamb = [min(p[0], p[1], p[2], 1 - p[0] - p[1] - p[2]) for p in points]
     elif cell == "triangle":
         points = [
             (sympy.Rational(i, N), sympy.Rational(j, N))
             for i in range(N + 1)
             for j in range(N + 1 - i)
         ]
-        lamb = [min(x[0], x[1], 1 - x[0] - x[1]) for x in points]
+        lamb = [min(p[0], p[1], 1 - p[0] - p[1]) for p in points]
     else:
         raise ValueError(f"Unsupported cell: {cell}")
 
