@@ -145,9 +145,8 @@ def test_dual(reference, order):
 @pytest.mark.parametrize("degree", range(10))
 def test_jacobi(degree):
     p = [0, 1]
-    print(p)
     for n in range(1, degree + 1):
         # n*p_n = (2n-1)*p_{n-1} - (n-1)*P_{n-2}
-        p = [p[1], ((2*n - 1) * x[0] * p[1] - (n - 1) * p[0]) / n]
+        p = [p[1], ((2 * n - 1) * x[0] * p[1] - (n - 1) * p[0]) / n]
 
     assert allequal(jacobi_polynomial(degree, 0, 0), p[1])

@@ -11,7 +11,7 @@ __all__: typing.List[str] = []
 
 
 def _jrc(
-    a:int, b: int, n: int
+    a: int, b: int, n: int
 ) -> typing.Tuple[
     sympy.core.expr.Expr,
     sympy.core.expr.Expr,
@@ -38,7 +38,9 @@ def _jrc(
 jacobi_cache = {}
 
 
-def jacobi_polynomial(n: int, a: int, b: int, variable: typing.Optional[sympy.Symbol] = None) -> ScalarFunction:
+def jacobi_polynomial(
+    n: int, a: int, b: int, variable: typing.Optional[sympy.Symbol] = None
+) -> ScalarFunction:
     """Get a Jacobi polynomial.
 
     Args:
@@ -50,13 +52,15 @@ def jacobi_polynomial(n: int, a: int, b: int, variable: typing.Optional[sympy.Sy
     key = (n, a, b)
     if key not in jacobi_cache:
         if n == 0:
-            jacobi_cache[key] = ScalarFunction(1)
+            jacobi_cache[key] = sympy.Integer(1)
         elif n == 1:
-            jacobi_cache[key] = ScalarFunction((a + 1) + (a + b + 2) * (x[0] - 1) / 2)
+            jacobi_cache[key] = (a + 1) + (a + b + 2) * (x[0] - 1) / 2
         else:
-            i, j, k = _jrc(a, b, n)
-            jacobi_cache[key] = (j * jacobi_polynomial(n - 1, a, b) + k * jacobi_polynomial(n - 2, a, b)) / i
+            i, j, k = _jrc(a, b, n - 1)
+            jacobi_cache[key] = (i * x[0] + j) * jacobi_polynomial(
+                n - 1, a, b
+            ) - k * jacobi_polynomial(n - 2, a, b)
     if variable is None:
-        return jacobi_cache[key]
+        return ScalarFunction(jacobi_cache[key])
     else:
-        return jacobi_cache[key].subs(x[0], variable)
+        return ScalarFunction(jacobi_cache[key].subs(x[0], variable).expand())

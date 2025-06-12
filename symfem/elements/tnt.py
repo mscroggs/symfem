@@ -38,7 +38,7 @@ def p(k: int, v: sympy.core.symbol.Symbol) -> ScalarFunction:
     Returns:
         The kth Legendre polynomial
     """
-    return orthogonal_basis("interval", k, 0, [v])[0][-1]
+    return orthogonal_basis("interval", k, [v])[-1]
 
 
 def b(k: int, v: sympy.core.symbol.Symbol) -> ScalarFunction:

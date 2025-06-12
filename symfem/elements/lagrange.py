@@ -38,7 +38,7 @@ class Lagrange(CiarletElement):
         """
         dofs: ListOfFunctionals = []
         if variant == "legendre":
-            basis = orthonormal_basis(reference.name, order, 0)[0]
+            basis = orthonormal_basis(reference.name, order)
             for f in basis:
                 dofs.append(IntegralAgainst(reference, f, (reference.tdim, 0)))
         elif order == 0:
