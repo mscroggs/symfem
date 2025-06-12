@@ -10,11 +10,13 @@ from symfem.functions import VectorFunction
 from symfem.polynomials import (
     Hcurl_polynomials,
     Hdiv_polynomials,
+    jacobi_polynomial,
     l2_dual,
     orthogonal_basis,
     orthonormal_basis,
 )
 from symfem.symbols import t, x
+from symfem.utils import allequal
 
 
 @pytest.mark.parametrize("reference", ["triangle", "tetrahedron"])
@@ -85,7 +87,7 @@ def test_orthogonal_polynomials(reference, order, speed):
     if speed == "fast" and order > 2:
         pytest.skip()
 
-    polynomials = orthogonal_basis(reference, order, 0)[0]
+    polynomials = orthogonal_basis(reference, order)
     ref = create_reference(reference)
     if len(polynomials) <= 5:
         for i, p in enumerate(polynomials):
@@ -103,41 +105,12 @@ def test_orthogonal_polynomials(reference, order, speed):
     "reference",
     ["interval", "triangle", "quadrilateral", "tetrahedron", "hexahedron", "prism", "pyramid"],
 )
-@pytest.mark.parametrize("order", range(5))
-def test_orthogonal_polynomial_derivatives(reference, order):
-    polynomials = orthogonal_basis(reference, order, 2)
-    ref = create_reference(reference)
-
-    if ref.tdim == 1:
-        first_d = [(1, 0)]
-        second_d = [(2, 0, 0)]
-    elif ref.tdim == 2:
-        first_d = [(1, 0), (2, 1)]
-        second_d = [(3, 0, 0), (4, 0, 1), (5, 1, 1)]
-    elif ref.tdim == 3:
-        first_d = [(1, 0), (2, 1), (3, 2)]
-        second_d = [(4, 0, 0), (5, 0, 1), (6, 0, 2), (7, 1, 1), (8, 1, 2), (9, 2, 2)]
-    else:
-        raise NotImplementedError()
-
-    for i, j in first_d:
-        for p, q in zip(polynomials[0], polynomials[i]):
-            assert p.diff(x[j]) == q
-    for i, j, k in second_d:
-        for p, q in zip(polynomials[0], polynomials[i]):
-            assert p.diff(x[j]).diff(x[k]) == q
-
-
-@pytest.mark.parametrize(
-    "reference",
-    ["interval", "triangle", "quadrilateral", "tetrahedron", "hexahedron", "prism", "pyramid"],
-)
 @pytest.mark.parametrize("order", range(3))
 def test_orthonormal_polynomials(reference, order, speed):
     if speed == "fast" and order > 2:
         pytest.skip()
 
-    polynomials = orthonormal_basis(reference, order, 0)[0]
+    polynomials = orthonormal_basis(reference, order)
     ref = create_reference(reference)
     for p in polynomials:
         assert (p**2).integral(ref, x) == 1
@@ -167,3 +140,14 @@ def test_dual(reference, order):
     for i, p in enumerate(poly):
         for j, d in enumerate(dual):
             assert (p * d).integrate(*ref.integration_limits(x)) == (1 if i == j else 0)
+
+
+@pytest.mark.parametrize("degree", range(10))
+def test_jacobi(degree):
+    p = [0, 1]
+    print(p)
+    for n in range(1, degree + 1):
+        # n*p_n = (2n-1)*p_{n-1} - (n-1)*P_{n-2}
+        p = [p[1], ((2*n - 1) * x[0] * p[1] - (n - 1) * p[0]) / n]
+
+    assert allequal(jacobi_polynomial(degree, 0, 0), p[1])
