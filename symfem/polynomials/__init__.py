@@ -1,7 +1,7 @@
 """Polynomials."""
 
 from symfem.polynomials.dual import l2_dual
-from symfem.polynomials.jacobi import jacobi_polynomial
+from symfem.polynomials.jacobi import jacobi_polynomial, monic_jacobi_polynomial
 from symfem.polynomials.legendre import orthogonal_basis, orthonormal_basis
 from symfem.polynomials.lobatto import lobatto_basis, lobatto_dual_basis
 from symfem.polynomials.polysets import (

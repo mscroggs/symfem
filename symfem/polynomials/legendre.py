@@ -6,7 +6,7 @@ import sympy
 
 from symfem.functions import ScalarFunction
 from symfem.symbols import AxisVariablesNotSingle, x
-from symfem.polynomials.jacobi import jacobi_polynomial
+from symfem.polynomials.jacobi import jacobi_polynomial, monic_jacobi_polynomial
 
 __all__: typing.List[str] = []
 
@@ -42,20 +42,13 @@ def orthogonal_basis_triangle(
     """
     assert len(variables) == 2
 
-    def index(p: int, q: int) -> int:
-        """Get the index."""
-        return (p + q + 1) * (p + q) // 2 + q
-
-    poly = [ScalarFunction(0) for i in range((order + 1) * (order + 2) // 2)]
-
-    for p in range(order + 1):
-        for q in range(order - p + 1):
-            poly[index(p, q)] = (
-                jacobi_polynomial(p, 0, 0, 2 * variables[0] / (1 - variables[1]) - 1)
-                * (1 - variables[1]) ** p
-                * jacobi_polynomial(q, 2 * p + 1, 0, 2 * variables[1] - 1)
-            )
-    return poly
+    return [
+        jacobi_polynomial(p, 0, 0, 2 * variables[0] / (1 - variables[1]) - 1)
+        * (1 - variables[1]) ** p
+        * jacobi_polynomial(q, 2 * p + 1, 0, 2 * variables[1] - 1)
+        for p in range(order + 1)
+        for q in range(order - p + 1)
+    ]
 
 
 def orthogonal_basis_quadrilateral(
@@ -92,25 +85,16 @@ def orthogonal_basis_tetrahedron(
     """
     assert len(variables) == 3
 
-    def index(p: int, q: int, r: int) -> int:
-        """Get the index."""
-        return (p + q + r) * (p + q + r + 1) * (p + q + r + 2) // 6 + (q + r) * (q + r + 1) // 2 + r
-
-    poly = [ScalarFunction(0) for i in range((order + 1) * (order + 2) * (order + 3) // 6)]
-    for p in range(order + 1):
-        for q in range(order - p + 1):
-            for r in range(order - p - q + 1):
-                poly[index(p, q, r)] = (
-                    jacobi_polynomial(
-                        p, 0, 0, 2 * variables[0] / (1 - variables[1] - variables[2]) - 1
-                    )
-                    * (1 - variables[1] - variables[2]) ** p
-                    * jacobi_polynomial(q, 2 * p + 1, 0, 2 * variables[1] / (1 - variables[2]) - 1)
-                    * (1 - variables[2]) ** q
-                    * jacobi_polynomial(r, 2 * (p + q + 1), 0, 2 * variables[2] - 1)
-                )
-
-    return poly
+    return [
+        jacobi_polynomial(p, 0, 0, 2 * variables[0] / (1 - variables[1] - variables[2]) - 1)
+        * (1 - variables[1] - variables[2]) ** p
+        * jacobi_polynomial(q, 2 * p + 1, 0, 2 * variables[1] / (1 - variables[2]) - 1)
+        * (1 - variables[2]) ** q
+        * jacobi_polynomial(r, 2 * (p + q + 1), 0, 2 * variables[2] - 1)
+        for p in range(order + 1)
+        for q in range(order - p + 1)
+        for r in range(order - p - q + 1)
+    ]
 
 
 def orthogonal_basis_hexahedron(
@@ -158,7 +142,7 @@ def orthogonal_basis_prism(
 def orthogonal_basis_lagrange_pyramid(
     order: int, variables: AxisVariablesNotSingle = x
 ) -> typing.List[ScalarFunction]:
-    """Create a basis of orthogonal polynomials.
+    """Create a basis of orthogonal rationomials.
 
     Args:
         order: The maximum polynomial degree
@@ -169,31 +153,40 @@ def orthogonal_basis_lagrange_pyramid(
     """
     assert len(variables) == 3
 
-    def index(i: int, j: int, k: int) -> int:
-        """Get the index."""
-        out = k + j * (order + 1) + i * (order + 1) * (order + 2) // 2 - i * (i**2 + 5) // 6
-        if i > j:
-            out -= i * (j - 1)
-        else:
-            out -= j * (j - 1) // 2 + i * (i - 1) // 2
-        return out
+    return [
+        jacobi_polynomial(p, 0, 0, (2 * variables[0] + variables[2] - 1) / (1 - variables[2]))
+        * jacobi_polynomial(q, 0, 0, (2 * variables[1] + variables[2] - 1) / (1 - variables[2]))
+        * (1 - variables[2]) ** max(p, q)
+        * jacobi_polynomial(r, 2 * max(p, q) + 2, 0, 2 * variables[2] - 1)
+        for r in range(order + 1)
+        for p in range(order + 1 - r)
+        for q in range(order + 1 - r)
+    ]
 
-    poly = [ScalarFunction(0) for i in range((2 * order + 3) * (order + 2) * (order + 1) // 6)]
-    for r in range(order + 1):
-        for p in range(order + 1 - r):
-            for q in range(order + 1 - r):
-                poly[index(p, q, r)] = (
-                    jacobi_polynomial(
-                        p, 0, 0, (2 * variables[0] + variables[2] - 1) / (1 - variables[2])
-                    )
-                    * jacobi_polynomial(
-                        q, 0, 0, (2 * variables[1] + variables[2] - 1) / (1 - variables[2])
-                    )
-                    * (1 - variables[2]) ** min(p, q)
-                    * jacobi_polynomial(r, 2 * max(p, q) + 2, 0, 2 * variables[2] - 1)
-                )
 
-    return poly
+def orthogonal_basis_full_pyramid(
+    order: int, variables: AxisVariablesNotSingle = x
+) -> typing.List[ScalarFunction]:
+    """Create a basis of orthogonal rationomials.
+
+    Args:
+        order: The maximum polynomial degree
+        variables: The variables to use
+
+    Returns:
+        A set of orthogonal polynomials
+    """
+    assert len(variables) == 3
+
+    return [
+        jacobi_polynomial(p, 0, 0, (2 * variables[0] + variables[2] - 1) / (1 - variables[2]))
+        * jacobi_polynomial(q, 0, 0, (2 * variables[1] + variables[2] - 1) / (1 - variables[2]))
+        * (1 - variables[2]) ** (p + q - order)
+        * monic_jacobi_polynomial(r, 2 * (p + q - order) + 2, 0, 2 * variables[2] - 1)
+        for r in range(2 * order + 1)
+        for p in range(min(order, 2 * order - r) + 1)
+        for q in range(min(order, 2 * order - r) + 1)
+    ]
 
 
 def orthogonal_basis(
@@ -235,8 +228,8 @@ def orthogonal_basis(
     if cell == "pyramid":
         if ptype == "Lagrange":
             return orthogonal_basis_lagrange_pyramid(*args)
-        # if ptype == "full":
-        # return orthogonal_basis_full_pyramid(*args)
+        if ptype == "full":
+            return orthogonal_basis_full_pyramid(*args)
 
     raise ValueError(f"Unsupported cell type: {cell}")
 

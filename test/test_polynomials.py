@@ -1,6 +1,6 @@
 """Test polynomials."""
 
-from random import choice
+from random import shuffle
 
 import pytest
 import sympy
@@ -11,6 +11,7 @@ from symfem.polynomials import (
     Hcurl_polynomials,
     Hdiv_polynomials,
     jacobi_polynomial,
+    monic_jacobi_polynomial,
     l2_dual,
     orthogonal_basis,
     orthonormal_basis,
@@ -89,15 +90,27 @@ def test_orthogonal_polynomials(reference, order, speed):
 
     polynomials = orthogonal_basis(reference, order)
     ref = create_reference(reference)
-    if len(polynomials) <= 5:
-        for i, p in enumerate(polynomials):
-            for q in polynomials[:i]:
-                assert (p * q).integral(ref, x) == 0
-    else:
-        for _ in range(15):
-            p = choice(polynomials)
-            q = choice(polynomials)
+    shuffle(polynomials)
+    for p in polynomials[:5]:
+        for q in polynomials[-5:]:
             if p != q:
+                assert (p * q).integral(ref, x) == 0
+
+
+@pytest.mark.parametrize("order", range(3))
+def test_orthogonal_polynomials_pyramid_full(order, speed):
+    if speed == "fast" and order > 1:
+        pytest.skip()
+
+    polynomials = orthogonal_basis("pyramid", order, ptype="full")
+    ref = create_reference("pyramid")
+    shuffle(polynomials)
+    for p in polynomials[:5]:
+        for q in polynomials[-5:]:
+            if p != q:
+                if (p * q).subs(x[:2], (0, 0)).subs(x[2], 0)._f.is_infinite:
+                    # Skip singular functions
+                    continue
                 assert (p * q).integral(ref, x) == 0
 
 
@@ -150,3 +163,33 @@ def test_jacobi(degree):
         p = [p[1], ((2 * n - 1) * x[0] * p[1] - (n - 1) * p[0]) / n]
 
     assert allequal(jacobi_polynomial(degree, 0, 0), p[1])
+
+
+@pytest.mark.parametrize("degree", range(10))
+def test_monic_jacobi(degree):
+    p = [sympy.Integer(0), sympy.Integer(1)]
+    for n in range(1, degree + 1):
+        # n*p_n = (2n-1)*p_{n-1} - (n-1)*P_{n-2}
+        p = [p[1], ((2 * n - 1) * x[0] * p[1] - (n - 1) * p[0]) / n]
+
+    coeff = p[1]
+    for i in range(degree):
+        coeff = coeff.diff(x[0]) / (degree - i)
+
+    assert allequal(monic_jacobi_polynomial(degree, 0, 0), p[1] / coeff)
+
+
+@pytest.mark.parametrize("monic", [True, False])
+@pytest.mark.parametrize("a", range(5))
+@pytest.mark.parametrize("b", range(5))
+def test_jacobi_orthogonal(a, b, monic):
+    if monic:
+        poly = [monic_jacobi_polynomial(degree, a, b) for degree in range(5)]
+    else:
+        if b != 0:
+            pytest.xfail("Non-monic Jacobi polynomials only implemented for b=0")
+        poly = [jacobi_polynomial(degree, a, b) for degree in range(10)]
+
+    for i, p in enumerate(poly):
+        for q in poly[:i]:
+            assert ((1 - x[0]) ** a * (1 + x[0]) ** b * p * q).integrate((x[0], -1, 1)) == 0
