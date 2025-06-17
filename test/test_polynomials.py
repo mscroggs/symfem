@@ -108,10 +108,11 @@ def test_orthogonal_polynomials_pyramid_full(order, speed):
     for p in polynomials[:5]:
         for q in polynomials[-5:]:
             if p != q:
-                if (p * q).subs(x[:2], (0, 0)).subs(x[2], 0)._f.is_infinite:
-                    # Skip singular functions
-                    continue
                 assert (p * q).integral(ref, x) == 0
+
+    polynomials = orthonormal_basis("pyramid", order, ptype="full")
+    for p in polynomials:
+        assert (p**2).integral(ref, x) == 1
 
 
 @pytest.mark.parametrize(

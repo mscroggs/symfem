@@ -6,7 +6,7 @@ import sympy
 
 from symfem.functions import ScalarFunction
 from symfem.symbols import AxisVariablesNotSingle, x
-from symfem.polynomials.jacobi import jacobi_polynomial, monic_jacobi_polynomial
+from symfem.polynomials.jacobi import jacobi_polynomial
 
 __all__: typing.List[str] = []
 
@@ -181,8 +181,8 @@ def orthogonal_basis_full_pyramid(
     return [
         jacobi_polynomial(p, 0, 0, (2 * variables[0] + variables[2] - 1) / (1 - variables[2]))
         * jacobi_polynomial(q, 0, 0, (2 * variables[1] + variables[2] - 1) / (1 - variables[2]))
-        * (1 - variables[2]) ** (p + q - order)
-        * monic_jacobi_polynomial(r, 2 * (p + q - order) + 2, 0, 2 * variables[2] - 1)
+        * (1 - variables[2]) ** max(p + q - order, -1)
+        * jacobi_polynomial(r, 2 + 2 * max(p + q - order, -1), 0, 2 * variables[2] - 1)
         for r in range(2 * order + 1)
         for p in range(min(order, 2 * order - r) + 1)
         for q in range(min(order, 2 * order - r) + 1)
