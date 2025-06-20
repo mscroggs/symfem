@@ -1,3 +1,8 @@
+# Version 2025.6.0 (09 June 2025)
+
+- Corrected higher degree Nedelec on prisms
+- Bug fixes
+
 # Version 2025.3.1 (31 March 2025)
 
 - Allow "gl" variant of Lagrange element
