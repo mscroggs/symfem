@@ -116,7 +116,7 @@ class BernsteinFunctional(BaseFunctional):
         super().__init__(reference, entity, "identity")
         orth = [
             o / sympy.sqrt((o * o).integral(integral_domain))
-            for o in orthogonal_basis(integral_domain.name, degree, 0, t[: integral_domain.tdim])[0]
+            for o in orthogonal_basis(integral_domain.name, degree, t[: integral_domain.tdim])
         ]
         self.ref = integral_domain
         self.index = index

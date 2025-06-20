@@ -57,8 +57,8 @@ def test_dual1():
         space.tabulate_basis([[0, 0], [q, q], [h, 0]]),
         (
             (q, q, q, q),
+            (sympy.Rational(3, 8), sympy.Rational(3, 8), e, e),
             (sympy.Rational(5, 8), e, e, e),
-            (sympy.Rational(3, 8), e, e, sympy.Rational(3, 8)),
         ),
     )
 

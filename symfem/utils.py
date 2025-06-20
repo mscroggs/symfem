@@ -27,5 +27,5 @@ def allequal(a: typing.Any, b: typing.Any) -> bool:
     if isinstance(a, sympy.core.expr.Expr):
         a = ScalarFunction(a)
     if isinstance(b, sympy.core.expr.Expr):
-        a = ScalarFunction(b)
+        b = ScalarFunction(b)
     return a == b
