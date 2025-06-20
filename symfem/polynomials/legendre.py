@@ -181,11 +181,11 @@ def orthogonal_basis_full_pyramid(
     return [
         jacobi_polynomial(p, 0, 0, (2 * variables[0] + variables[2] - 1) / (1 - variables[2]))
         * jacobi_polynomial(q, 0, 0, (2 * variables[1] + variables[2] - 1) / (1 - variables[2]))
-        * (1 - variables[2]) ** max(p + q - order, -1)
-        * jacobi_polynomial(r, 2 + 2 * max(p + q - order, -1), 0, 2 * variables[2] - 1)
+        * (1 - variables[2]) ** -1
+        * jacobi_polynomial(r, 0, 0, 2 * variables[2] - 1)
         for p in range(order + 1)
         for q in range(order + 1)
-        for r in range(1 + order + min(order - max(p, q), min(p, q) + 1))
+        for r in range(order + p + q + 2)
     ]
 
 
