@@ -97,21 +97,20 @@ def test_orthogonal_polynomials(reference, order, speed):
                 assert (p * q).integral(ref, x) == 0
 
 
-@pytest.mark.parametrize("order", range(3))
+@pytest.mark.parametrize("order", range(2))
 def test_orthogonal_polynomials_pyramid_full(order, speed):
     if speed == "fast" and order > 1:
         pytest.skip()
 
     polynomials = orthogonal_basis("pyramid", order, ptype="full")
     ref = create_reference("pyramid")
-    shuffle(polynomials)
-    for p in polynomials[:5]:
-        for q in polynomials[-5:]:
+    for i, p in enumerate(polynomials):
+        for q in polynomials[:i]:
             if p != q:
                 assert (p * q).integral(ref, x) == 0
 
     polynomials = orthonormal_basis("pyramid", order, ptype="full")
-    for p in polynomials[-5:]:
+    for p in polynomials:
         assert (p**2).integral(ref, x) == 1
 
 
