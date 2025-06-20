@@ -112,7 +112,7 @@ class Lagrange(CiarletElement):
     min_order = 0
     continuity = "C0"
     value_type = "scalar"
-    last_updated = "2023.09"
+    last_updated = "2025.06"
 
 
 class VectorLagrange(CiarletElement):
@@ -189,7 +189,7 @@ class VectorLagrange(CiarletElement):
     min_order = 0
     continuity = "C0"
     value_type = "vector"
-    last_updated = "2023.09"
+    last_updated = "2025.06"
 
 
 class MatrixLagrange(CiarletElement):
@@ -259,7 +259,7 @@ class MatrixLagrange(CiarletElement):
     min_order = 0
     continuity = "L2"
     value_type = "matrix"
-    last_updated = "2023.09"
+    last_updated = "2025.06"
 
 
 class SymmetricMatrixLagrange(CiarletElement):
@@ -352,4 +352,4 @@ class SymmetricMatrixLagrange(CiarletElement):
     min_order = 0
     continuity = "L2"
     value_type = "symmetric matrix"
-    last_updated = "2023.09"
+    last_updated = "2025.06"

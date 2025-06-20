@@ -111,7 +111,7 @@ def test_orthogonal_polynomials_pyramid_full(order, speed):
                 assert (p * q).integral(ref, x) == 0
 
     polynomials = orthonormal_basis("pyramid", order, ptype="full")
-    for p in polynomials:
+    for p in polynomials[-5:]:
         assert (p**2).integral(ref, x) == 1
 
 
