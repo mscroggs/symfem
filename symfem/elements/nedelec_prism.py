@@ -73,20 +73,43 @@ class Nedelec(CiarletElement):
         interval = create_reference("interval")
 
         if order >= 1:
-            space1 = VectorLagrange(triangle, order - 1, variant)
+            space1 = Lagrange(triangle, order - 1, variant)
             space2 = Lagrange(interval, order - 1, variant)
 
-            if order > 1:
-                raise NotImplementedError()
-            # TODO: correct these for order > 1
-            for i in range(space1.space_dim):
-                for j in range(space2.space_dim):
-                    f = (
-                        space2.get_basis_function(j) * space1.get_basis_function(i)[0],
-                        space2.get_basis_function(j) * space1.get_basis_function(i)[1],
-                        0,
+            for f in space1.get_basis_functions():
+                for g in space2.get_basis_functions():
+                    h = f * g.subs(x[0], x[2])
+                    dofs.append(
+                        IntegralAgainst(
+                            reference,
+                            (h, 0, 0),
+                            entity=(3, 0),
+                            mapping="covariant",
+                        )
                     )
-                    dofs.append(IntegralAgainst(reference, f, entity=(3, 0), mapping="covariant"))
+                    dofs.append(
+                        IntegralAgainst(
+                            reference,
+                            (0, h, 0),
+                            entity=(3, 0),
+                            mapping="covariant",
+                        )
+                    )
+
+        if order >= 2:
+            space1 = Lagrange(triangle, order - 2, variant)
+            space2 = Lagrange(interval, order, variant)
+
+            for f in space1.get_basis_functions():
+                for g in space2.get_basis_functions():
+                    dofs.append(
+                        IntegralAgainst(
+                            reference,
+                            (0, 0, f * g.subs(x[0], x[2])),
+                            entity=(3, 0),
+                            mapping="covariant",
+                        )
+                    )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
@@ -118,7 +141,6 @@ class Nedelec(CiarletElement):
     names = ["Nedelec", "Ncurl"]
     references = ["prism"]
     min_order = 0
-    max_order = 1
     continuity = "H(curl)"
     value_type = "vector"
-    last_updated = "2025.03"
+    last_updated = "2025.05"

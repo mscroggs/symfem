@@ -1155,7 +1155,7 @@ class Picture:
 
         assert isinstance(png_scale, float)
         assert filename.endswith(".png")
-        svg2png(bytestring=self.as_svg(), write_to=filename, scale=png_scale)
+        svg2png(bytestring=self.as_svg().encode(), write_to=filename, scale=png_scale)
 
     def as_tikz(self, filename: typing.Optional[str] = None) -> str:
         """Convert to tikz.

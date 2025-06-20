@@ -7,14 +7,18 @@ from hashlib import sha256
 import sympy
 from appdirs import user_cache_dir
 
-if not os.path.isdir(user_cache_dir()):
+try:
     os.mkdir(user_cache_dir())
+except FileExistsError:
+    pass
 CACHE_DIR = user_cache_dir("symfem")
 CACHE_FORMAT = "1"
 if os.path.isfile(CACHE_DIR):
     os.remove(CACHE_DIR)
-if not os.path.isdir(CACHE_DIR):
+try:
     os.mkdir(CACHE_DIR)
+except FileExistsError:
+    pass
 
 assert os.path.isdir(CACHE_DIR)
 

@@ -234,7 +234,7 @@ test_elements: typing.Dict[
     },
     "prism": {
         "Lagrange": [({"variant": "equispaced"}, range(4))],
-        "Nedelec": [({"variant": "equispaced"}, range(2))],
+        "Nedelec": [({"variant": "equispaced"}, range(3))],
     },
     "pyramid": {
         "Lagrange": [({"variant": "equispaced"}, range(4))],
