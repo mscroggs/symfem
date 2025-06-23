@@ -19,7 +19,7 @@ def lobatto_basis_interval(order: int) -> typing.List[ScalarFunction]:
     Returns:
         Lobatto polynomials
     """
-    legendre = orthonormal_basis("interval", order - 1, 0)[0]
+    legendre = orthonormal_basis("interval", order - 1)
     out = [ScalarFunction(1)]
     for f in legendre:
         out.append(f.integrate((x[0], 0, x[0])))

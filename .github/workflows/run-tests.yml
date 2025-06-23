@@ -35,7 +35,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y texlive-latex-base texlive-latex-extra
-      - run: python3 -m pytest -n=auto --durations=50 test -W error
+      - run: python3 -m pytest --durations=50 test -W error -xvs
         name: Run unit tests
       - run: python3 -m pytest demo/test_demos.py -W error
         name: Run demos
