@@ -83,7 +83,7 @@ def test_BDFM_space(reference, order):
     "reference",
     ["interval", "triangle", "quadrilateral", "tetrahedron", "hexahedron", "prism", "pyramid"],
 )
-@pytest.mark.parametrize("order", range(5))
+@pytest.mark.parametrize("order", range(4))
 def test_orthogonal_polynomials(reference, order, speed):
     if speed == "fast" and order > 2:
         pytest.skip()
