@@ -67,6 +67,6 @@ class Hermite(CiarletElement):
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 3
     max_order = 3
-    continuity = "C0"
+    continuity = "C1"
     value_type = "scalar"
     last_updated = "2023.05"
