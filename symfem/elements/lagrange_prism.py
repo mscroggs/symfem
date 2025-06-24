@@ -40,7 +40,7 @@ class Lagrange(CiarletElement):
 
         dofs: ListOfFunctionals = []
         if variant == "legendre":
-            basis = orthonormal_basis(reference.name, order, 0)[0]
+            basis = orthonormal_basis(reference.name, order)
             for f in basis:
                 dofs.append(IntegralAgainst(reference, f, (reference.tdim, 0)))
         elif order == 0:
@@ -141,7 +141,7 @@ class Lagrange(CiarletElement):
     min_order = 0
     continuity = "C0"
     value_type = "scalar"
-    last_updated = "2023.07"
+    last_updated = "2025.06"
 
 
 class VectorLagrange(CiarletElement):
@@ -206,4 +206,4 @@ class VectorLagrange(CiarletElement):
     min_order = 0
     continuity = "C0"
     value_type = "vector"
-    last_updated = "2023.05"
+    last_updated = "2025.06"
