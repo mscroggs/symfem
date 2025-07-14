@@ -73,7 +73,7 @@ class Bell(CiarletElement):
     references = ["triangle"]
     min_order = 4
     max_order = 4
-    continuity = "C1"
+    continuity = "C2"
     value_type = "scalar"
     last_updated = "2025.03"
     _max_continuity_test_order = 3

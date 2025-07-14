@@ -84,6 +84,6 @@ class Argyris(CiarletElement):
     references = ["triangle"]
     min_order = 5
     max_order = 5
-    continuity = "L2"
+    continuity = "C1"
     value_type = "scalar"
     last_updated = "2023.05"
