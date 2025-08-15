@@ -454,7 +454,7 @@ class DerivativePointEvaluation(BaseFunctional):
             Representation of the functional as TeX, and list of terms involved
         """
         assert isinstance(self.point, VectorFunction)
-        if len(self.point) == 1:
+        if len(self.point) == 1 and self.derivative[0] == 1:
             desc = "v\\mapsto "
             desc += f"v'({','.join([_to_tex(i, True) for i in self.point])})"
             return desc, []
