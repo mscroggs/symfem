@@ -4,10 +4,10 @@ requires = ["flit_core >=3.8.0,<4"]
 
 [project]
 name = "symfem"
-version = "2025.6.0"
+version = "2025.9.0"
 description = "a symbolic finite element definition library"
 readme = "README.md"
-requires-python = ">=3.8.0"
+requires-python = ">=3.9.0"
 license = { file = "LICENSE" }
 authors = [
     { name = "Matthew Scroggs", email = "symfem@mscroggs.co.uk" }
