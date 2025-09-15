@@ -1,3 +1,7 @@
+# Version 2025.9.0 (15 September 2025)
+
+- Update minimum Python version
+
 # Version 2025.6.0 (09 June 2025)
 
 - Corrected higher degree Nedelec on prisms
