@@ -3,10 +3,9 @@
 |  | Badges |
 | --- | :---: |
 | Documentation | [![Documentation status](https://readthedocs.org/projects/symfem/badge/?version=latest)](https://symfem.readthedocs.io/en/latest/?badge=latest) |
-| Testing&nbsp;&&nbsp;coverage | [![Style checks](https://github.com/mscroggs/symfem/actions/workflows/style-checks.yml/badge.svg)](https://github.com/mscroggs/symfem/actions) [![Run tests](https://github.com/mscroggs/symfem/actions/workflows/run-tests.yml/badge.svg)](https://github.com/mscroggs/symfem/actions) [![Coverage Status](https://coveralls.io/repos/github/mscroggs/symfem/badge.svg?branch=main)](https://coveralls.io/github/mscroggs/symfem?branch=main)  [![DefElement: used as verification baseline](https://defelement.com/badges/symfem.svg)](https://defelement.com/verification.html) |
+| Testing&nbsp;&&nbsp;coverage | [![Style checks](https://github.com/mscroggs/symfem/actions/workflows/style-checks.yml/badge.svg)](https://github.com/mscroggs/symfem/actions) [![Run tests](https://github.com/mscroggs/symfem/actions/workflows/run-tests.yml/badge.svg)](https://github.com/mscroggs/symfem/actions) [![Coverage Status](https://coveralls.io/repos/github/mscroggs/symfem/badge.svg?branch=main)](https://coveralls.io/github/mscroggs/symfem?branch=main)  [![DefElement: used as verification baseline](https://defelement.org/badges/symfem.svg)](https://defelement.org/verification/) |
 | Packages | [![PyPI](https://img.shields.io/pypi/v/symfem?color=blue&label=PyPI&logo=pypi&logoColor=white)](https://pypi.org/project/symfem/) [![conda](https://anaconda.org/conda-forge/symfem/badges/version.svg)](https://anaconda.org/conda-forge/symfem) |
 | Paper | [![DOI](https://joss.theoj.org/papers/10.21105/joss.03556/status.svg)](https://doi.org/10.21105/joss.03556) |
-| Code&nbsp;quality | [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mscroggs_symfem&metric=alert_status)](https://sonarcloud.io/summary/overall?id=mscroggs_symfem) |
 
 Symfem is a symbolic finite element definition library, that can be used to
 symbolically evaluate the basis functions of a finite element space. Symfem can:
@@ -109,7 +108,7 @@ More detailed documentation of the latest release version of Symfem can be found
 of Symfem can be found in the [`demo` folder](demo/) or viewed on
 [Read the Docs](https://symfem.readthedocs.io/en/latest/demos/index.html).
 
-Details of the definition of each element can be found on [DefElement](https://defelement.com)
+Details of the definition of each element can be found on [DefElement](https://defelement.org)
 alongside Symfem snippets for creating the element.
 
 ## Getting help
@@ -181,7 +180,9 @@ The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities
 - enriched Galerkin (alternative names: EG)
 - enriched vector Galerkin (alternative names: locking-free enriched Galerkin, LFEG)
 - Fortin-Soulie (alternative names: FS)
-- Guzman-Neilan
+- Gopalakrishnan-Lederer-Schoberl (alternative names: GLS)
+- Guzman-Neilan first kind (alternative names: Guzman-Neilan)
+- Guzman-Neilan second kind
 - Hellan-Herrmann-Johnson (alternative names: HHJ)
 - Hermite
 - Hsieh-Clough-Tocher (alternative names: Clough-Tocher, HCT, CT)
@@ -252,7 +253,9 @@ The reference tetrahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), and (0, 
 - Crouzeix-Raviart (alternative names: CR, Crouzeix-Falk, CF)
 - enriched Galerkin (alternative names: EG)
 - enriched vector Galerkin (alternative names: locking-free enriched Galerkin, LFEG)
-- Guzman-Neilan
+- Gopalakrishnan-Lederer-Schoberl (alternative names: GLS)
+- Guzman-Neilan first kind (alternative names: Guzman-Neilan)
+- Guzman-Neilan second kind
 - Hellan-Herrmann-Johnson (alternative names: HHJ)
 - Hermite
 - Kong-Mulder-Veldhuizen (alternative names: KMV)

@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -18,7 +18,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: actions/checkout@v4
         with:
-          ref: v2024.1.1
+          ref: v2025.9.0
         name: Get latest Symfem version
       - run: rm -rf symfem VERSION
         name: Remove downloaded symfem
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: conda-incubator/setup-miniconda@v2
         with:
@@ -51,7 +51,7 @@ jobs:
           activate-environment: symfem
       - uses: actions/checkout@v4
         with:
-          ref: v2024.1.1
+          ref: v2025.9.0
         name: Get latest Symfem version
       - run: rm -rf symfem VERSION
         name: Remove downloaded symfem
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -83,7 +83,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - uses: actions/checkout@v4
         with:
-          ref: v2024.1.1
+          ref: v2025.9.0
           path: symfem-src
       - name: Move tests and delete Symfem source
         run: |
@@ -91,7 +91,7 @@ jobs:
           mv symfem-src/README.md .
           rm -r symfem-src
       - run: |
-          wget -O symfem.tar.gz https://pypi.io/packages/source/s/symfem/symfem-2024.1.1.tar.gz
+          wget -O symfem.tar.gz https://pypi.io/packages/source/s/symfem/symfem-2025.9.0.tar.gz
           tar -xvzf symfem.tar.gz
         name: Download and unpack latest version of Symfem
       - name: Install LaTeΧ
@@ -101,7 +101,7 @@ jobs:
       - run: pip install pytest
         name: Install pytest
       - run: |
-          cd symfem-2024.1.1
+          cd symfem-2025.9.0
           pip install .[optional]
         name: Install requirements
       - run: |

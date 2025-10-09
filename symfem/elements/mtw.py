@@ -7,6 +7,8 @@ and https://doi.org/10.1007/s10092-006-0124-6 (Tail, Mardal, 2006)
 
 import typing
 
+from symfem.elements.lagrange import Lagrange
+from symfem.elements.nedelec import NedelecFirstKind
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     IntegralMoment,
@@ -19,8 +21,6 @@ from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
-from symfem.elements.lagrange import Lagrange
-from symfem.elements.nedelec import NedelecFirstKind
 
 __all__ = ["MardalTaiWinther"]
 
@@ -36,7 +36,6 @@ class MardalTaiWinther(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
-        assert order == 3
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
@@ -84,7 +83,7 @@ class MardalTaiWinther(CiarletElement):
 
             dofs += make_integral_moment_dofs(
                 reference,
-                facets=(IntegralMoment, NedelecFirstKind, 1, "contravariant", {"variant": variant}),
+                facets=(IntegralMoment, NedelecFirstKind, 0, "contravariant", {"variant": variant}),
             )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -98,9 +97,26 @@ class MardalTaiWinther(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return 1
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + self.reference.tdim
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.lagrange_subdegree
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.lagrange_superdegree
+
     names = ["Mardal-Tai-Winther", "MTW"]
     references = ["triangle", "tetrahedron"]
-    min_order = 3
-    max_order = 3
+    min_order = 1
+    max_order = 1
     continuity = "H(div)"
-    last_updated = "2023.06"
+    value_type = "vector"
+    last_updated = "2025.03"

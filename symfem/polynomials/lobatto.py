@@ -3,9 +3,9 @@
 import typing
 
 from symfem.functions import ScalarFunction
-from symfem.symbols import x
 from symfem.polynomials.dual import l2_dual
 from symfem.polynomials.legendre import orthonormal_basis
+from symfem.symbols import x
 
 __all__: typing.List[str] = []
 
@@ -19,7 +19,7 @@ def lobatto_basis_interval(order: int) -> typing.List[ScalarFunction]:
     Returns:
         Lobatto polynomials
     """
-    legendre = orthonormal_basis("interval", order - 1, 0)[0]
+    legendre = orthonormal_basis("interval", order - 1)
     out = [ScalarFunction(1)]
     for f in legendre:
         out.append(f.integrate((x[0], 0, x[0])))

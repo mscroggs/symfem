@@ -10,8 +10,8 @@ import typing
 import sympy
 
 from symfem.finite_element import CiarletElement
-from symfem.functionals import BaseFunctional, ListOfFunctionals, PointEvaluation
-from symfem.functions import AnyFunction, FunctionInput
+from symfem.functionals import BaseFunctional, ListOfFunctionals, PointEvaluation, DiscreteDof
+from symfem.functions import Function, FunctionInput
 from symfem.geometry import PointType
 from symfem.polynomials import orthogonal_basis, polynomial_set_1d
 from symfem.references import Reference
@@ -116,7 +116,7 @@ class BernsteinFunctional(BaseFunctional):
         super().__init__(reference, entity, "identity")
         orth = [
             o / sympy.sqrt((o * o).integral(integral_domain))
-            for o in orthogonal_basis(integral_domain.name, degree, 0, t[: integral_domain.tdim])[0]
+            for o in orthogonal_basis(integral_domain.name, degree, t[: integral_domain.tdim])
         ]
         self.ref = integral_domain
         self.index = index
@@ -137,7 +137,7 @@ class BernsteinFunctional(BaseFunctional):
         """
         return self.ref.sub_entity(*self.entity).midpoint()
 
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply the functional to a function.
 
         Args:
@@ -174,6 +174,23 @@ class BernsteinFunctional(BaseFunctional):
                 f"are the degree {self.degree} Bernstein polynomials on \\({e}\\)",
                 self.entity_definition(),
             ]
+
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points and weights
+        """
+        raise NotImplementedError()
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return 0
 
 
 class Bernstein(CiarletElement):
@@ -234,8 +251,25 @@ class Bernstein(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["Bernstein", "Bernstein-Bezier"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "C0"
+    value_type = "scalar"
     last_updated = "2023.05"

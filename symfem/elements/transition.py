@@ -5,6 +5,7 @@ from itertools import product
 
 import sympy
 
+from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import ListOfFunctionals, PointEvaluation
 from symfem.functions import FunctionInput, ScalarFunction
@@ -12,7 +13,6 @@ from symfem.polynomials import polynomial_set_1d
 from symfem.quadrature import get_quadrature
 from symfem.references import Reference
 from symfem.symbols import x
-from symfem.elements.lagrange import Lagrange
 
 __all__ = ["Transition"]
 
@@ -129,8 +129,42 @@ class Transition(CiarletElement):
             "edge_orders": self.edge_orders,
         }
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        poly_coeff = [p.as_sympy().expand().as_poly(*x).as_dict() for p in self._basis]  # type: ignore
+        degree = 0
+        while True:
+            basis_coeff = [
+                p.as_sympy().expand().as_poly(*x).as_dict()  # type: ignore
+                for p in polynomial_set_1d(self.reference.tdim, degree)
+            ]
+            monomials = list(set([m for p in poly_coeff + basis_coeff for m in p]))
+            mat = sympy.Matrix([[p[m] if m in p else 0 for m in monomials] for p in poly_coeff])
+            mat2 = sympy.Matrix(
+                [[p[m] if m in p else 0 for m in monomials] for p in poly_coeff + basis_coeff]
+            )
+            if mat.rank() < mat2.rank():
+                return degree - 1
+            degree += 1
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return max(
+            p.subs(x[2], x[0]).subs(x[1], x[0]).as_sympy().as_poly(x[0]).degree()
+            for p in self._basis
+        )
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.lagrange_subdegree
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.lagrange_superdegree
+
     names = ["transition"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
     continuity = "C0"
+    value_type = "scalar"
     last_updated = "2023.06"

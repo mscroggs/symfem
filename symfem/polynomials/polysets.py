@@ -511,18 +511,12 @@ def pyramid_polynomial_set_1d(
         A set of polynomials
     """
     assert dim == 3
-    if order == 0:
-        return [ScalarFunction(1)]
-
-    poly = polynomial_set_1d(3, order)
-    for d in range(order):
-        for i in range(d + 1):
-            for j in range(d + 1 - i):
-                p = variables[0] ** i * variables[1] ** j * variables[2] ** (d - i - j)
-                p *= (variables[0] * variables[1] / (1 - variables[2])) ** (order - d)
-                poly.append(ScalarFunction(p))
-
-    return poly
+    return [
+        variables[0] ** i * variables[1] ** j * variables[2] ** k / (1 - variables[2]) ** min(i, j)
+        for k in range(order + 1)
+        for i in range(order + 1 - k)
+        for j in range(order + 1 - k)
+    ]
 
 
 def pyramid_polynomial_set_vector(
@@ -545,3 +539,34 @@ def pyramid_polynomial_set_vector(
         for p in set1d
         for i in range(range_dim)
     ]
+
+
+def polynomial_set(
+    cell: str, order: int, variables: AxisVariablesNotSingle = x
+) -> typing.List[ScalarFunction]:
+    """One dimensional polynomial set for a cell.
+
+    Args:
+        cell: Cell name
+        order: The maximum degree
+        variabtles: The variables to use
+
+    Returns:
+        A set of polynomials
+    """
+    if cell == "interval":
+        return polynomial_set_1d(1, order, variables)
+    if cell == "triangle":
+        return polynomial_set_1d(2, order, variables)
+    if cell == "tetrahedron":
+        return polynomial_set_1d(3, order, variables)
+    if cell == "quadrilateral":
+        return quolynomial_set_1d(2, order, variables)
+    if cell == "hexahedron":
+        return quolynomial_set_1d(3, order, variables)
+    if cell == "pyramid":
+        return pyramid_polynomial_set_1d(3, order, variables)
+    if cell == "prism":
+        return prism_polynomial_set_1d(3, order, variables)
+
+    raise ValueError(f"Unsupported cell: {cell}")

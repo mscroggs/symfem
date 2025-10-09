@@ -108,7 +108,7 @@ def test_dof_diagrams_lagrange(reference, degree):
         "hexahedron",
     ],
 )
-@pytest.mark.parametrize("degree", [1, 2])
+@pytest.mark.parametrize("degree", range(2))
 def test_dof_diagrams_raviart_thomas(reference, degree):
     if reference in ["quadrilateral", "hexahedron"]:
         e = symfem.create_element(reference, "Qdiv", degree)
@@ -166,7 +166,7 @@ def test_function_plots_lagrange(reference, degree):
         "hexahedron",
     ],
 )
-@pytest.mark.parametrize("degree", [1])
+@pytest.mark.parametrize("degree", [0])
 def test_function_plots_raviart_thomas(reference, degree):
     if reference in ["quadrilateral", "hexahedron"]:
         e = symfem.create_element(reference, "Qdiv", degree)
@@ -204,7 +204,7 @@ def test_function_plots_piecewise_scalar(reference):
     ],
 )
 def test_function_plots_piecewise_vector(reference):
-    e = symfem.create_element(reference, "Guzman-Neilan", 1)
+    e = symfem.create_element(reference, "Guzman-Neilan second kind", 1)
     for ext in ["svg", "png", "tex"]:
         e.plot_basis_function(
             0, os.path.join(folder, f"test_function_plots_piecewise_vector-{reference}.{ext}")
@@ -222,7 +222,7 @@ def test_function_plots_dual(n):
 
 @pytest.mark.parametrize("n", [4, 6])
 def test_function_plots_bc(n):
-    e = symfem.create_element(f"dual polygon({n})", "BC", 1)
+    e = symfem.create_element(f"dual polygon({n})", "BC", 0)
     for ext in ["svg", "png", "tex"]:
         e.plot_basis_function(0, os.path.join(folder, f"test_function_plots_bc-{n}.{ext}"))
     compile_tex(f"test_function_plots_bc-{n}.tex")
@@ -299,6 +299,45 @@ def test_metadata():
     img.add_line(
         (sympy.Integer(0), sympy.Integer(0)),
         (sympy.Integer(1), sympy.Integer(1)),
-        symfem.plotting.colors.ORANGE,
+        img.colors.ORANGE,
     )
     img.save(os.path.join(folder, "test_metadata.svg"))
+
+
+@pytest.mark.parametrize(
+    "reference,element,degree",
+    [
+        ("triangle", "Lagrange", 2),
+        ("tetrahedron", "Raviart-Thomas", 2),
+    ],
+)
+def test_tikz_newlines(reference, element, degree):
+    e = symfem.create_element(reference, element, degree)
+    filename = os.path.join(folder, f"test_tikz_newlines-{reference}-{element}-{degree}.tex")
+
+    e.plot_dof_diagram(filename)
+    with open(filename) as f:
+        tikz = f.read()
+    tikz = tikz.replace(";\n", "")
+    assert ";" not in tikz
+
+    e.plot_basis_function(0, filename)
+    with open(filename) as f:
+        tikz = f.read()
+    tikz = tikz.replace(";\n", "")
+    assert ";" not in tikz
+
+
+def test_custom_colors():
+    e = symfem.create_element("triangle", "Lagrange", 2)
+    filename1 = os.path.join(folder, "test_custom_colors-1.tex")
+    filename2 = os.path.join(folder, "test_custom_colors-2.tex")
+
+    e.reference.plot_entity_diagrams(filename2)
+    e.plot_dof_diagram(filename1)
+
+    for filename in [filename1, filename2]:
+        with open(filename) as f:
+            content = f.read()
+        for i in range(10):
+            assert content.count(f"customcolor{i}") != 1

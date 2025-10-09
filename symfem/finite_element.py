@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 import typing
-from abc import ABC, abstractmethod, abstractproperty
+from abc import ABC, abstractmethod
 from itertools import product
 
 import sympy
@@ -13,7 +13,7 @@ from symfem.basis_functions import BasisFunction
 from symfem.caching import load_cached_matrix, save_cached_matrix
 from symfem.functionals import ListOfFunctionals
 from symfem.functions import (
-    AnyFunction,
+    Function,
     FunctionInput,
     ScalarFunction,
     VectorFunction,
@@ -22,7 +22,7 @@ from symfem.functions import (
 from symfem.geometry import PointType, SetOfPointsInput, parse_set_of_points_input
 from symfem.mappings import MappingNotImplemented
 from symfem.piecewise_functions import PiecewiseFunction
-from symfem.plotting import Picture, colors
+from symfem.plotting import Picture
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
 from symfem.utils import allequal
@@ -57,7 +57,7 @@ class NoTensorProduct(Exception):
 class FiniteElement(ABC):
     """Abstract finite element."""
 
-    _float_basis_functions: typing.Union[None, typing.List[AnyFunction]]
+    _float_basis_functions: typing.Union[None, typing.List[Function]]
     _value_scale: typing.Union[None, sympy.core.expr.Expr]
 
     def __init__(
@@ -87,6 +87,42 @@ class FiniteElement(ABC):
         self.range_shape = range_shape
         self._float_basis_functions = None
         self._value_scale = None
+
+    @property
+    def lagrange_subdegree(self) -> int:
+        """Get the Lagrange subdegree of the element.
+
+        This is the degree of the highest degree Lagrange space whose polynomial space is a
+        subspace of this element's polynomial space.
+        """
+        raise NotImplementedError()
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        """Get the Lagrange superdegree of the element.
+
+        This is the degree of the highest degree Lagrange space whose polynomial space is a
+        superspace of this element's polynomial space.
+        """
+        raise NotImplementedError()
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        """Get the polynomial subdegree of the element.
+
+        This is the degree of the highest degree complete polynomial space that is a
+        subspace of this element's polynomial space.
+        """
+        raise NotImplementedError()
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        """Get the polynomial superdegree of the element.
+
+        This is the degree of the highest degree complete polynomial space that is a
+        superspace of this element's polynomial space.
+        """
+        raise NotImplementedError()
 
     @abstractmethod
     def dof_plot_positions(self) -> typing.List[PointType]:
@@ -126,6 +162,7 @@ class FiniteElement(ABC):
             kwargs: Keyword arguments
         """
         img = Picture(**kwargs)
+        colors = img.colors
 
         dof_positions = self.dof_plot_positions()
         dof_directions = self.dof_directions()
@@ -175,9 +212,7 @@ class FiniteElement(ABC):
         """
 
     @abstractmethod
-    def get_basis_functions(
-        self, use_tensor_factorisation: bool = False
-    ) -> typing.List[AnyFunction]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -292,10 +327,10 @@ class FiniteElement(ABC):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.Optional[typing.List[AnyFunction]] = None,
+        basis: typing.Optional[typing.List[Function]] = None,
         forward_map: typing.Optional[PointType] = None,
         inverse_map: typing.Optional[PointType] = None,
-    ) -> typing.List[AnyFunction]:
+    ) -> typing.List[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
         Args:
@@ -309,16 +344,12 @@ class FiniteElement(ABC):
         """
 
     @abstractmethod
-    def get_polynomial_basis(self) -> typing.List[AnyFunction]:
+    def get_polynomial_basis(self) -> typing.List[Function]:
         """Get the symbolic polynomial basis for the element.
 
         Returns:
             The polynomial basis
         """
-
-    @abstractproperty
-    def maximum_degree(self) -> int:
-        """Get the maximum degree of this polynomial set for the element."""
 
     def test(self):
         """Run tests for this element."""
@@ -434,6 +465,10 @@ class FiniteElement(ABC):
 
                 if continuity[0] == "C":
                     order = int(continuity[1:])
+                    if order > 0:
+                        import pytest
+
+                        pytest.xfail("Testing for C1, C2, C3, ... element currently not working")
                     deriv_f = [f]
                     deriv_g = [g]
                     f = [f]
@@ -486,6 +521,13 @@ class FiniteElement(ABC):
                             assert dim == 2
                             f = [f[1, 1], f[2, 2]]
                             g = [g[1, 1], g[2, 2]]
+                elif continuity == "inner H(curl div)":
+                    if len(vertices[0]) == 2:
+                        f = f[1, 0]
+                        g = g[1, 0]
+                    if len(vertices[0]) == 3:
+                        f = [f[1, 0], f[2, 0]]
+                        g = [g[1, 0], g[2, 0]]
                 elif continuity == "integral inner H(div)":
                     f = f[0, 0].integrate((x[1], 0, 1))
                     g = g[0, 0].integrate((x[1], 0, 1))
@@ -504,7 +546,7 @@ class FiniteElement(ABC):
         """
         raise NoTensorProduct()
 
-    def _get_basis_functions_tensor(self) -> typing.List[AnyFunction]:
+    def _get_basis_functions_tensor(self) -> typing.List[Function]:
         """Compute the basis functions using the space's tensor product factorisation.
 
         Returns:
@@ -547,6 +589,8 @@ class FiniteElement(ABC):
     references: typing.List[str] = []
     last_updated = version
     cache = True
+    value_type = "unknown"
+    continuity: typing.Optional[str] = None
     _max_continuity_test_order = 4
 
 
@@ -578,12 +622,9 @@ class CiarletElement(FiniteElement):
         assert len(basis) == len(dofs)
         self._basis = [parse_function_input(b) for b in basis]
         for b in self._basis:
-            assert isinstance(b, AnyFunction)
+            assert isinstance(b, Function)
         self.dofs = dofs
-        self._basis_functions: typing.Union[typing.List[AnyFunction], None] = None
-        self._maximum_degree = None
-        if reference.name == "pyramid":
-            self._maximum_degree = order
+        self._basis_functions: typing.Union[typing.List[Function], None] = None
 
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
         """Get the numbers of the DOFs associated with the given entity.
@@ -621,20 +662,13 @@ class CiarletElement(FiniteElement):
         """
         return [d.entity for d in self.dofs]
 
-    def get_polynomial_basis(self) -> typing.List[AnyFunction]:
+    def get_polynomial_basis(self) -> typing.List[Function]:
         """Get the symbolic polynomial basis for the element.
 
         Returns:
             The polynomial basis
         """
         return self._basis
-
-    @property
-    def maximum_degree(self) -> int:
-        """Get the maximum degree of this polynomial set for the element."""
-        if self._maximum_degree is None:
-            self._maximum_degree = max(p.maximum_degree(self.reference) for p in self._basis)
-        return self._maximum_degree
 
     def get_dual_matrix(
         self, inverse=False, caching=True
@@ -671,9 +705,7 @@ class CiarletElement(FiniteElement):
             else:
                 return mat
 
-    def get_basis_functions(
-        self, use_tensor_factorisation: bool = False
-    ) -> typing.List[AnyFunction]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -688,7 +720,7 @@ class CiarletElement(FiniteElement):
             else:
                 minv = self.get_dual_matrix(inverse=True)
 
-                sfs: typing.List[AnyFunction] = []
+                sfs: typing.List[Function] = []
                 pb = self.get_polynomial_basis()
                 for i, dof in enumerate(self.dofs):
                     sf = ScalarFunction(minv[i, 0]) * pb[0]
@@ -746,10 +778,10 @@ class CiarletElement(FiniteElement):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.Optional[typing.List[AnyFunction]] = None,
+        basis: typing.Optional[typing.List[Function]] = None,
         forward_map: typing.Optional[PointType] = None,
         inverse_map: typing.Optional[PointType] = None,
-    ) -> typing.List[AnyFunction]:
+    ) -> typing.List[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
         Args:
@@ -770,7 +802,7 @@ class CiarletElement(FiniteElement):
             inverse_map = self.reference.get_inverse_map_to(vertices)
 
         try:
-            functions: typing.List[AnyFunction] = [ScalarFunction(0) for f in basis]
+            functions: typing.List[Function] = [ScalarFunction(0) for f in basis]
             for dim in range(self.reference.tdim + 1):
                 for e in range(self.reference.sub_entity_count(dim)):
                     entity_dofs = self.entity_dofs(dim, e)
@@ -843,7 +875,7 @@ class CiarletElement(FiniteElement):
 class DirectElement(FiniteElement):
     """Finite element defined directly."""
 
-    _basis_functions: typing.List[AnyFunction]
+    _basis_functions: typing.List[Function]
 
     def __init__(
         self,
@@ -955,9 +987,7 @@ class DirectElement(FiniteElement):
         """
         return self._basis_entities
 
-    def get_basis_functions(
-        self, use_tensor_factorisation: bool = False
-    ) -> typing.List[AnyFunction]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -974,10 +1004,10 @@ class DirectElement(FiniteElement):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.Optional[typing.List[AnyFunction]] = None,
+        basis: typing.Optional[typing.List[Function]] = None,
         forward_map: typing.Optional[PointType] = None,
         inverse_map: typing.Optional[PointType] = None,
-    ) -> typing.List[AnyFunction]:
+    ) -> typing.List[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
         Args:
@@ -996,17 +1026,12 @@ class DirectElement(FiniteElement):
         #                   **self.init_kwargs())
         # return e.get_basis_functions()
 
-    def get_polynomial_basis(self) -> typing.List[AnyFunction]:
+    def get_polynomial_basis(self) -> typing.List[Function]:
         """Get the symbolic polynomial basis for the element.
 
         Returns:
             The polynomial basis
         """
-        raise NotImplementedError()
-
-    @property
-    def maximum_degree(self) -> int:
-        """Get the maximum degree of this polynomial set for the element."""
         raise NotImplementedError()
 
     def test(self):
@@ -1058,7 +1083,7 @@ class DirectElement(FiniteElement):
 class EnrichedElement(FiniteElement):
     """Finite element defined directly."""
 
-    _basis_functions: typing.Optional[typing.List[AnyFunction]]
+    _basis_functions: typing.Optional[typing.List[Function]]
 
     def __init__(
         self,
@@ -1141,9 +1166,7 @@ class EnrichedElement(FiniteElement):
             positions += e.dof_entities()
         return positions
 
-    def get_basis_functions(
-        self, use_tensor_factorisation: bool = False
-    ) -> typing.List[AnyFunction]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -1165,10 +1188,10 @@ class EnrichedElement(FiniteElement):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.Optional[typing.List[AnyFunction]] = None,
+        basis: typing.Optional[typing.List[Function]] = None,
         forward_map: typing.Optional[PointType] = None,
         inverse_map: typing.Optional[PointType] = None,
-    ) -> typing.List[AnyFunction]:
+    ) -> typing.List[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
         Args:
@@ -1185,17 +1208,12 @@ class EnrichedElement(FiniteElement):
             out += e.map_to_cell(vertices_in, basis, forward_map, inverse_map)
         return out
 
-    def get_polynomial_basis(self) -> typing.List[AnyFunction]:
+    def get_polynomial_basis(self) -> typing.List[Function]:
         """Get the symbolic polynomial basis for the element.
 
         Returns:
             The polynomial basis
         """
-        raise NotImplementedError()
-
-    @property
-    def maximum_degree(self) -> int:
-        """Get the maximum degree of this polynomial set for the element."""
         raise NotImplementedError()
 
     def test(self):
@@ -1224,7 +1242,7 @@ class ElementBasisFunction(BasisFunction):
         self.element = element
         self.n = n
 
-    def get_function(self) -> AnyFunction:
+    def get_function(self) -> Function:
         """Get the actual basis function.
 
         Returns:

@@ -6,13 +6,13 @@ This element's definition appears in https://doi.org/10.1007/BF01396415
 
 import typing
 
+from symfem.elements.lagrange import Lagrange, VectorLagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import IntegralMoment, ListOfFunctionals, NormalIntegralMoment
 from symfem.functions import FunctionInput
 from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import Hdiv_polynomials, polynomial_set_vector
 from symfem.references import Reference
-from symfem.elements.lagrange import Lagrange, VectorLagrange
 
 __all__ = ["RaviartThomas"]
 
@@ -29,16 +29,16 @@ class RaviartThomas(CiarletElement):
             variant: The variant of the element
         """
         poly: typing.List[FunctionInput] = []
-        poly += polynomial_set_vector(reference.tdim, reference.tdim, order - 1)
-        poly += Hdiv_polynomials(reference.tdim, reference.tdim, order)
+        poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
+        poly += Hdiv_polynomials(reference.tdim, reference.tdim, order + 1)
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Lagrange, order - 1, {"variant": variant}),
+            facets=(NormalIntegralMoment, Lagrange, order, {"variant": variant}),
             cells=(
                 IntegralMoment,
                 VectorLagrange,
-                order - 2,
+                order - 1,
                 "contravariant",
                 {"variant": variant},
             ),
@@ -55,8 +55,25 @@ class RaviartThomas(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
     names = ["Raviart-Thomas", "RT", "N1div"]
     references = ["triangle", "tetrahedron"]
-    min_order = 1
+    min_order = 0
     continuity = "H(div)"
-    last_updated = "2023.06"
+    value_type = "vector"
+    last_updated = "2025.03"

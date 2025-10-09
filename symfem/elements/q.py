@@ -44,7 +44,7 @@ class Q(CiarletElement):
         """
         dofs: ListOfFunctionals = []
         if variant == "legendre":
-            basis = orthonormal_basis(reference.name, order, 0)[0]
+            basis = orthonormal_basis(reference.name, order)
             for f in basis:
                 dofs.append(IntegralAgainst(reference, f, (reference.tdim, 0)))
         elif order == 0:
@@ -146,10 +146,27 @@ class Q(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order * self.reference.tdim
+
     names = ["Q", "Lagrange", "P"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "C0"
+    value_type = "scalar"
     last_updated = "2023.07.1"
 
 
@@ -197,10 +214,27 @@ class VectorQ(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order * self.reference.tdim
+
     names = ["vector Q", "vQ"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "C0"
+    value_type = "vector"
     last_updated = "2023.06"
 
 
@@ -219,12 +253,12 @@ class Nedelec(CiarletElement):
             raise NonDefaultReferenceError()
 
         poly: typing.List[FunctionInput] = []
-        poly += quolynomial_set_vector(reference.tdim, reference.tdim, order - 1)
-        poly += Hcurl_quolynomials(reference.tdim, reference.tdim, order)
+        poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
+        poly += Hcurl_quolynomials(reference.tdim, reference.tdim, order + 1)
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, Q, order - 1, {"variant": variant}),
+            edges=(TangentIntegralMoment, Q, order, {"variant": variant}),
             faces=(IntegralMoment, RaviartThomas, order - 1, "covariant", {"variant": variant}),
             volumes=(IntegralMoment, RaviartThomas, order - 1, "covariant", {"variant": variant}),
         )
@@ -240,11 +274,28 @@ class Nedelec(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return (self.order + 1) * self.reference.tdim - 1
+
     names = ["NCE", "RTCE", "Qcurl", "Nedelec", "Ncurl"]
     references = ["quadrilateral", "hexahedron"]
-    min_order = 1
+    min_order = 0
     continuity = "H(curl)"
-    last_updated = "2023.06"
+    value_type = "vector"
+    last_updated = "2025.03"
 
 
 class RaviartThomas(CiarletElement):
@@ -262,12 +313,12 @@ class RaviartThomas(CiarletElement):
             raise NonDefaultReferenceError()
 
         poly: typing.List[FunctionInput] = []
-        poly += quolynomial_set_vector(reference.tdim, reference.tdim, order - 1)
-        poly += Hdiv_quolynomials(reference.tdim, reference.tdim, order)
+        poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
+        poly += Hdiv_quolynomials(reference.tdim, reference.tdim, order + 1)
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Q, order - 1, {"variant": variant}),
+            facets=(NormalIntegralMoment, Q, order, {"variant": variant}),
             cells=(IntegralMoment, Nedelec, order - 1, "contravariant", {"variant": variant}),
         )
 
@@ -282,8 +333,25 @@ class RaviartThomas(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order * self.reference.tdim + 1
+
     names = ["NCF", "RTCF", "Qdiv"]
     references = ["quadrilateral", "hexahedron"]
-    min_order = 1
+    min_order = 0
     continuity = "H(div)"
-    last_updated = "2023.06"
+    value_type = "vector"
+    last_updated = "2025.03"

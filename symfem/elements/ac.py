@@ -6,6 +6,7 @@ This element's definition appears in https://dx.doi.org/10.1137/15M1013705
 
 import typing
 
+from symfem.elements.dpc import DPC
 from symfem.finite_element import CiarletElement
 from symfem.functionals import IntegralAgainst, ListOfFunctionals, NormalIntegralMoment
 from symfem.functions import FunctionInput
@@ -13,7 +14,6 @@ from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import Hdiv_serendipity, polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
-from symfem.elements.dpc import DPC
 
 __all__ = ["AC"]
 
@@ -75,8 +75,28 @@ class AC(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        if self.order < 2:
+            return self.order
+        else:
+            return self.order // 2
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
     names = ["Arbogast-Correa", "AC", "AC full", "Arbogast-Correa full"]
     references = ["quadrilateral"]
     min_order = 0
     continuity = "H(div)"
+    value_type = "vector"
     last_updated = "2023.06"

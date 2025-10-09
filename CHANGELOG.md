@@ -1,3 +1,34 @@
+# Version 2025.9.0 (15 September 2025)
+
+- Update minimum Python version
+
+# Version 2025.6.0 (09 June 2025)
+
+- Corrected higher degree Nedelec on prisms
+- Bug fixes
+
+# Version 2025.3.1 (31 March 2025)
+
+- Allow "gl" variant of Lagrange element
+- Implement component-wise integrals of VectorFunction and MatrixFunction
+- Implement grad of VectorFunction
+- Add Gopalakrishnan-Lederer-Schoberl element
+- Use polynomial subdegree to index elements wherever possible
+
+# Version 2025.3.0 (03 March 2025)
+
+- Corrected nonconforming Arnold-Winther polyset
+- Correct Alfeld-Sorokina range dim
+- Correct Guzman-Neilan second kind element
+- Add Guzman-Neilan first kind element
+- Correct Guzman-Neilan bubbles
+- Add discontinuous elements
+
+# Version 2024.10.0 (05 October 2024)
+
+- Corrected polyset for Arnold-Winther element
+- Added sub- and superdegree functions
+
 # Version 2024.1.1 (04 January 2024)
 
 - Added get_mapping function

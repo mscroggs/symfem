@@ -35,7 +35,7 @@ class Lagrange(CiarletElement):
 
         dofs: ListOfFunctionals = []
         if variant == "legendre":
-            basis = orthonormal_basis(reference.name, order, 0)[0]
+            basis = orthonormal_basis(reference.name, order)
             for f in basis:
                 dofs.append(IntegralAgainst(reference, f, (reference.tdim, 0)))
         elif order == 0:
@@ -49,7 +49,10 @@ class Lagrange(CiarletElement):
         elif variant == "lobatto":
             raise NotImplementedError()
         else:
-            points, _ = get_quadrature(variant, order + 1)
+            if variant == "gl":
+                points, _ = get_quadrature("legendre", order + 1)
+            else:
+                points, _ = get_quadrature(variant, order + 1)
 
             # Vertices
             for v_n, v in enumerate(reference.vertices):
@@ -112,8 +115,25 @@ class Lagrange(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return None
+
     names = ["Lagrange", "P"]
     references = ["pyramid"]
     min_order = 0
     continuity = "C0"
-    last_updated = "2023.07"
+    value_type = "scalar"
+    last_updated = "2025.06"

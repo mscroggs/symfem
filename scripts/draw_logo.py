@@ -251,7 +251,7 @@ svg += "</svg>"
 
 with open(os.path.join(folder, "logo.svg"), "w") as f:
     f.write(svg)
-svg2png(bytestring=svg, write_to=os.path.join(folder, "logo.png"))
+svg2png(bytestring=svg.encode(), write_to=os.path.join(folder, "logo.png"))
 
 
 def to_2d_new(x, y, z):
@@ -334,7 +334,7 @@ svg += "</svg>"
 
 with open(os.path.join(folder, "logo-1280-640.svg"), "w") as f:
     f.write(svg)
-svg2png(bytestring=svg, write_to=os.path.join(folder, "logo-1280-640.png"))
+svg2png(bytestring=svg.encode(), write_to=os.path.join(folder, "logo-1280-640.png"))
 
 
 def fav_move(p):
@@ -367,4 +367,4 @@ svg += "</svg>"
 
 with open(os.path.join(folder, "favicon.svg"), "w") as f:
     f.write(svg)
-svg2png(bytestring=svg, write_to=os.path.join(folder, "favicon.png"))
+svg2png(bytestring=svg.encode(), write_to=os.path.join(folder, "favicon.png"))

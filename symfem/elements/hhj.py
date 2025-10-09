@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import typing
 
+from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import IntegralMoment, ListOfFunctionals, NormalInnerProductIntegralMoment
 from symfem.functions import FunctionInput
@@ -20,7 +21,6 @@ from symfem.functions import MatrixFunction as _MatrixFunction
 from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
-from symfem.elements.lagrange import Lagrange
 
 __all__ = ["HellanHerrmannJohnson"]
 
@@ -122,8 +122,25 @@ class HellanHerrmannJohnson(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["Hellan-Herrmann-Johnson", "HHJ"]
     references = ["triangle", "tetrahedron"]
     min_order = 0
     continuity = "inner H(div)"
+    value_type = "symmetric matrix"
     last_updated = "2024.02"

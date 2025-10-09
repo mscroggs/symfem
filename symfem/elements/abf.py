@@ -6,6 +6,8 @@ Thse elements definitions appear in https://dx.doi.org/10.1137/S0036142903431924
 
 import typing
 
+from symfem.elements.lagrange import Lagrange
+from symfem.elements.q import Nedelec
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     IntegralMoment,
@@ -17,8 +19,6 @@ from symfem.functions import FunctionInput
 from symfem.moments import make_integral_moment_dofs
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
-from symfem.elements.lagrange import Lagrange
-from symfem.elements.q import Nedelec
 
 __all__ = ["ArnoldBoffiFalk"]
 
@@ -45,7 +45,7 @@ class ArnoldBoffiFalk(CiarletElement):
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
             edges=(NormalIntegralMoment, Lagrange, order, {"variant": variant}),
-            faces=(IntegralMoment, Nedelec, order, {"variant": variant}),
+            faces=(IntegralMoment, Nedelec, order - 1, {"variant": variant}),
         )
 
         for i in range(order + 1):
@@ -77,8 +77,25 @@ class ArnoldBoffiFalk(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 2
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order * 2 + 2
+
     names = ["Arnold-Boffi-Falk", "ABF"]
     references = ["quadrilateral"]
     min_order = 0
     continuity = "H(div)"
-    last_updated = "2023.06"
+    value_type = "vector"
+    last_updated = "2025.03"

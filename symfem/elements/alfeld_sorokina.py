@@ -123,11 +123,28 @@ class AlfeldSorokina(CiarletElement):
         poly: typing.List[FunctionInput] = []
         poly += [PiecewiseFunction({i: j for i, j in zip(subs, p)}, 2) for p in piece_list]
 
-        super().__init__(reference, order, poly, dofs, reference.tdim, 1)
+        super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
+
+    @property
+    def lagrange_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
 
     names = ["Alfeld-Sorokina", "AS"]
     references = ["triangle"]
     min_order = 2
     max_order = 2
     continuity = "C0"
+    value_type = "scalar macro"
     last_updated = "2023.05"

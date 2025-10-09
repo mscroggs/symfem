@@ -2,6 +2,8 @@
 
 import typing
 
+from symfem.elements.lagrange import Lagrange, VectorLagrange
+from symfem.elements.q import RaviartThomas as QRT
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     IntegralAgainst,
@@ -14,8 +16,6 @@ from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import Hcurl_polynomials, polynomial_set_1d, polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
-from symfem.elements.lagrange import Lagrange, VectorLagrange
-from symfem.elements.q import RaviartThomas as QRT
 
 __all__ = ["Nedelec"]
 
@@ -39,23 +39,23 @@ class Nedelec(CiarletElement):
         poly: typing.List[FunctionInput] = []
         poly += [
             (i[0] * j, i[1] * j, 0)
-            for i in polynomial_set_vector(2, 2, order - 1) + Hcurl_polynomials(2, 2, order)
-            for j in polynomial_set_1d(1, order, x[2:])
+            for i in polynomial_set_vector(2, 2, order) + Hcurl_polynomials(2, 2, order + 1)
+            for j in polynomial_set_1d(1, order + 1, x[2:])
         ]
         poly += [
             (0, 0, i * j)
-            for i in polynomial_set_1d(2, order, x[:2])
-            for j in polynomial_set_1d(1, order - 1, x[2:])
+            for i in polynomial_set_1d(2, order + 1, x[:2])
+            for j in polynomial_set_1d(1, order, x[2:])
         ]
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
-            edges=(TangentIntegralMoment, Lagrange, order - 1, {"variant": variant}),
+            edges=(TangentIntegralMoment, Lagrange, order, {"variant": variant}),
             faces={
                 "triangle": (
                     IntegralMoment,
                     VectorLagrange,
-                    order - 2,
+                    order - 1,
                     "covariant",
                     {"variant": variant},
                 ),
@@ -72,21 +72,44 @@ class Nedelec(CiarletElement):
         triangle = create_reference("triangle")
         interval = create_reference("interval")
 
-        if order >= 2:
-            space1 = VectorLagrange(triangle, order - 2, variant)
-            space2 = Lagrange(interval, order - 2, variant)
+        if order >= 1:
+            space1 = Lagrange(triangle, order - 1, variant)
+            space2 = Lagrange(interval, order - 1, variant)
 
-            if order > 2:
-                raise NotImplementedError()
-            # TODO: correct these for order > 2
-            for i in range(space1.space_dim):
-                for j in range(space2.space_dim):
-                    f = (
-                        space2.get_basis_function(j) * space1.get_basis_function(i)[0],
-                        space2.get_basis_function(j) * space1.get_basis_function(i)[1],
-                        0,
+            for f in space1.get_basis_functions():
+                for g in space2.get_basis_functions():
+                    h = f * g.subs(x[0], x[2])
+                    dofs.append(
+                        IntegralAgainst(
+                            reference,
+                            (h, 0, 0),
+                            entity=(3, 0),
+                            mapping="covariant",
+                        )
                     )
-                    dofs.append(IntegralAgainst(reference, f, entity=(3, 0), mapping="covariant"))
+                    dofs.append(
+                        IntegralAgainst(
+                            reference,
+                            (0, h, 0),
+                            entity=(3, 0),
+                            mapping="covariant",
+                        )
+                    )
+
+        if order >= 2:
+            space1 = Lagrange(triangle, order - 2, variant)
+            space2 = Lagrange(interval, order, variant)
+
+            for f in space1.get_basis_functions():
+                for g in space2.get_basis_functions():
+                    dofs.append(
+                        IntegralAgainst(
+                            reference,
+                            (0, 0, f * g.subs(x[0], x[2])),
+                            entity=(3, 0),
+                            mapping="covariant",
+                        )
+                    )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
@@ -99,9 +122,25 @@ class Nedelec(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return (self.order + 1) * 2
+
     names = ["Nedelec", "Ncurl"]
     references = ["prism"]
-    min_order = 1
-    max_order = 2
+    min_order = 0
     continuity = "H(curl)"
-    last_updated = "2023.06"
+    value_type = "vector"
+    last_updated = "2025.05"

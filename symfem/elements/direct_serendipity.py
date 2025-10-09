@@ -4,10 +4,12 @@ This element's definition appears in https://arxiv.org/abs/1809.02192
 (Arbogast, Tao, 2018)
 """
 
+import typing
+
+from symfem.elements.dpc import DPC
 from symfem.finite_element import DirectElement
 from symfem.references import Reference
 from symfem.symbols import x
-from symfem.elements.dpc import DPC
 
 __all__ = ["DirectSerendipity"]
 
@@ -77,8 +79,25 @@ class DirectSerendipity(DirectElement):
 
         super().__init__(reference, order, basis_functions, basis_entities, reference.tdim, 1)
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
     names = ["direct serendipity"]
     references = ["quadrilateral"]
     min_order = 1
     continuity = "C0"
+    value_type = "scalar non-polynomial"
     last_updated = "2023.05"

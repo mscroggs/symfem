@@ -102,10 +102,26 @@ class MorleyWangXu(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["Morley-Wang-Xu", "MWX"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 1
     max_order = {"interval": 1, "triangle": 2, "tetrahedron": 3}
-    # continuity = "C{order}"
-    continuity = "C0"
+    continuity = "C{order}"
+    value_type = "scalar"
     last_updated = "2023.06"

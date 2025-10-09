@@ -38,7 +38,7 @@ class Lagrange(CiarletElement):
         """
         dofs: ListOfFunctionals = []
         if variant == "legendre":
-            basis = orthonormal_basis(reference.name, order, 0)[0]
+            basis = orthonormal_basis(reference.name, order)
             for f in basis:
                 dofs.append(IntegralAgainst(reference, f, (reference.tdim, 0)))
         elif order == 0:
@@ -61,7 +61,10 @@ class Lagrange(CiarletElement):
                     for f in basis:
                         dofs.append(IntegralAgainst(reference, f, (edim, e_n)))
         else:
-            points, _ = get_quadrature(variant, order + 1)
+            if variant == "gl":
+                points, _ = get_quadrature("legendre", order + 1)
+            else:
+                points, _ = get_quadrature(variant, order + 1)
             if variant != "equispaced":
                 assert reference.name in ["interval", "quadrilateral", "hexahedron"]
 
@@ -88,11 +91,28 @@ class Lagrange(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["Lagrange", "P"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "C0"
-    last_updated = "2023.09"
+    value_type = "scalar"
+    last_updated = "2025.06"
 
 
 class VectorLagrange(CiarletElement):
@@ -148,11 +168,28 @@ class VectorLagrange(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["vector Lagrange", "vP"]
     references = ["interval", "triangle", "tetrahedron"]
     min_order = 0
     continuity = "C0"
-    last_updated = "2023.09"
+    value_type = "vector"
+    last_updated = "2025.06"
 
 
 class MatrixLagrange(CiarletElement):
@@ -201,11 +238,28 @@ class MatrixLagrange(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["matrix Lagrange"]
     references = ["triangle", "tetrahedron"]
     min_order = 0
     continuity = "L2"
-    last_updated = "2023.09"
+    value_type = "matrix"
+    last_updated = "2025.06"
 
 
 class SymmetricMatrixLagrange(CiarletElement):
@@ -277,8 +331,25 @@ class SymmetricMatrixLagrange(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["symmetric matrix Lagrange"]
     references = ["triangle", "tetrahedron"]
     min_order = 0
     continuity = "L2"
-    last_updated = "2023.09"
+    value_type = "symmetric matrix"
+    last_updated = "2025.06"

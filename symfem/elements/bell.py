@@ -27,7 +27,6 @@ class Bell(CiarletElement):
             variant: The variant of the element
         """
         assert reference.name == "triangle"
-        assert order == 5
         dofs: ListOfFunctionals = []
         for v_n, v in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
@@ -54,9 +53,27 @@ class Bell(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return 4
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return 5
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return 4
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return 5
+
     names = ["Bell"]
     references = ["triangle"]
-    min_order = 5
-    max_order = 5
-    continuity = "C1"
-    last_updated = "2023.05"
+    min_order = 4
+    max_order = 4
+    continuity = "C2"
+    value_type = "scalar"
+    last_updated = "2025.03"
+    _max_continuity_test_order = 3

@@ -87,8 +87,8 @@ class KongMulderVeldhuizen(CiarletElement):
                         WeightedPointEvaluation(reference, v, sympy.Rational(1, 6), entity=(0, v_n))
                     )
                 poly = kmv_tri_polyset(1, 1)
-
-            elif order == 3:
+                self._superdegree = 1
+            elif order == 2:
                 for v_n, v in enumerate(reference.vertices):
                     dofs.append(
                         WeightedPointEvaluation(
@@ -114,8 +114,9 @@ class KongMulderVeldhuizen(CiarletElement):
                     )
                 )
                 poly = kmv_tri_polyset(2, 3)
+                self._superdegree = 3
 
-            elif order == 4:
+            elif order == 3:
                 for v_n, v in enumerate(reference.vertices):
                     dofs.append(
                         WeightedPointEvaluation(
@@ -163,7 +164,7 @@ class KongMulderVeldhuizen(CiarletElement):
                         )
                     )
                 poly = kmv_tri_polyset(3, 4)
-
+                self._superdegree = 4
             else:
                 raise NotImplementedError
 
@@ -176,8 +177,9 @@ class KongMulderVeldhuizen(CiarletElement):
                         )
                     )
                 poly = kmv_tet_polyset(1, 1, 1)
+                self._superdegree = 1
 
-            elif order == 4:
+            elif order == 2:
                 for v_n, v in enumerate(reference.vertices):
                     dofs.append(
                         WeightedPointEvaluation(
@@ -218,6 +220,7 @@ class KongMulderVeldhuizen(CiarletElement):
                     )
                 )
                 poly = kmv_tet_polyset(2, 4, 4)
+                self._superdegree = 4
 
             else:
                 raise NotImplementedError
@@ -226,8 +229,25 @@ class KongMulderVeldhuizen(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self._superdegree
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.lagrange_subdegree
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.lagrange_superdegree
+
     names = ["Kong-Mulder-Veldhuizen", "KMV"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
     continuity = "C0"
+    value_type = "scalar"
     last_updated = "2023.05"

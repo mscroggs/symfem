@@ -1,6 +1,6 @@
 """Test polynomials."""
 
-from random import choice
+from random import shuffle
 
 import pytest
 import sympy
@@ -10,11 +10,14 @@ from symfem.functions import VectorFunction
 from symfem.polynomials import (
     Hcurl_polynomials,
     Hdiv_polynomials,
+    jacobi_polynomial,
+    monic_jacobi_polynomial,
     l2_dual,
     orthogonal_basis,
     orthonormal_basis,
 )
 from symfem.symbols import t, x
+from symfem.utils import allequal
 
 
 @pytest.mark.parametrize("reference", ["triangle", "tetrahedron"])
@@ -38,7 +41,7 @@ def test_Hcurl_space(reference, order):
 
 @pytest.mark.parametrize("reference", ["triangle"])
 def test_MTW_space(reference):
-    e = create_element(reference, "MTW", 3)
+    e = create_element(reference, "MTW", 1)
     polynomials = e.get_polynomial_basis()
     for p in polynomials:
         assert p.div().as_sympy().is_real
@@ -48,7 +51,7 @@ def test_MTW_space(reference):
             )
             p_edge = p.subs(x, [i + t[0] * j for i, j in zip(sub_ref.origin, sub_ref.axes[0])])
             poly = p_edge.dot(sub_ref.normal()).as_sympy().expand().simplify()
-            assert poly.is_real or sympy.Poly(poly).degree() <= 1
+            assert poly.is_real or sympy.Poly(poly, x).degree() <= 1
 
 
 @pytest.mark.parametrize("reference", ["triangle", "quadrilateral", "tetrahedron", "hexahedron"])
@@ -73,59 +76,42 @@ def test_BDFM_space(reference, order):
                     ],
                 )
             poly = p_edge.dot(sub_ref.normal()).as_sympy().expand().simplify()
-            assert poly.is_real or sympy.Poly(poly).degree() <= order - 1
+            assert poly.is_real or sympy.Poly(poly, x).degree() <= order - 1
 
 
 @pytest.mark.parametrize(
     "reference",
     ["interval", "triangle", "quadrilateral", "tetrahedron", "hexahedron", "prism", "pyramid"],
 )
-@pytest.mark.parametrize("order", range(5))
+@pytest.mark.parametrize("order", range(4))
 def test_orthogonal_polynomials(reference, order, speed):
     if speed == "fast" and order > 2:
         pytest.skip()
 
-    polynomials = orthogonal_basis(reference, order, 0)[0]
+    polynomials = orthogonal_basis(reference, order)
     ref = create_reference(reference)
-    if len(polynomials) <= 5:
-        for i, p in enumerate(polynomials):
-            for q in polynomials[:i]:
-                assert (p * q).integral(ref, x) == 0
-    else:
-        for _ in range(15):
-            p = choice(polynomials)
-            q = choice(polynomials)
+    shuffle(polynomials)
+    for p in polynomials[:5]:
+        for q in polynomials[-5:]:
             if p != q:
                 assert (p * q).integral(ref, x) == 0
 
 
-@pytest.mark.parametrize(
-    "reference",
-    ["interval", "triangle", "quadrilateral", "tetrahedron", "hexahedron", "prism", "pyramid"],
-)
-@pytest.mark.parametrize("order", range(5))
-def test_orthogonal_polynomial_derivatives(reference, order):
-    polynomials = orthogonal_basis(reference, order, 2)
-    ref = create_reference(reference)
+@pytest.mark.parametrize("order", range(2))
+def test_orthogonal_polynomials_pyramid_full(order, speed):
+    if speed == "fast" and order > 1:
+        pytest.skip()
 
-    if ref.tdim == 1:
-        first_d = [(1, 0)]
-        second_d = [(2, 0, 0)]
-    elif ref.tdim == 2:
-        first_d = [(1, 0), (2, 1)]
-        second_d = [(3, 0, 0), (4, 0, 1), (5, 1, 1)]
-    elif ref.tdim == 3:
-        first_d = [(1, 0), (2, 1), (3, 2)]
-        second_d = [(4, 0, 0), (5, 0, 1), (6, 0, 2), (7, 1, 1), (8, 1, 2), (9, 2, 2)]
-    else:
-        raise NotImplementedError()
+    polynomials = orthogonal_basis("pyramid", order, ptype="full")
+    ref = create_reference("pyramid")
+    for i, p in enumerate(polynomials):
+        for q in polynomials[:i]:
+            if p != q:
+                assert (p * q).integral(ref, x) == 0
 
-    for i, j in first_d:
-        for p, q in zip(polynomials[0], polynomials[i]):
-            assert p.diff(x[j]) == q
-    for i, j, k in second_d:
-        for p, q in zip(polynomials[0], polynomials[i]):
-            assert p.diff(x[j]).diff(x[k]) == q
+    polynomials = orthonormal_basis("pyramid", order, ptype="full")
+    for p in polynomials:
+        assert (p**2).integral(ref, x) == 1
 
 
 @pytest.mark.parametrize(
@@ -137,7 +123,7 @@ def test_orthonormal_polynomials(reference, order, speed):
     if speed == "fast" and order > 2:
         pytest.skip()
 
-    polynomials = orthonormal_basis(reference, order, 0)[0]
+    polynomials = orthonormal_basis(reference, order)
     ref = create_reference(reference)
     for p in polynomials:
         assert (p**2).integral(ref, x) == 1
@@ -167,3 +153,43 @@ def test_dual(reference, order):
     for i, p in enumerate(poly):
         for j, d in enumerate(dual):
             assert (p * d).integrate(*ref.integration_limits(x)) == (1 if i == j else 0)
+
+
+@pytest.mark.parametrize("degree", range(10))
+def test_jacobi(degree):
+    p = [0, 1]
+    for n in range(1, degree + 1):
+        # n*p_n = (2n-1)*p_{n-1} - (n-1)*P_{n-2}
+        p = [p[1], ((2 * n - 1) * x[0] * p[1] - (n - 1) * p[0]) / n]
+
+    assert allequal(jacobi_polynomial(degree, 0, 0), p[1])
+
+
+@pytest.mark.parametrize("degree", range(10))
+def test_monic_jacobi(degree):
+    p = [sympy.Integer(0), sympy.Integer(1)]
+    for n in range(1, degree + 1):
+        # n*p_n = (2n-1)*p_{n-1} - (n-1)*P_{n-2}
+        p = [p[1], ((2 * n - 1) * x[0] * p[1] - (n - 1) * p[0]) / n]
+
+    coeff = p[1]
+    for i in range(degree):
+        coeff = coeff.diff(x[0]) / (degree - i)
+
+    assert allequal(monic_jacobi_polynomial(degree, 0, 0), p[1] / coeff)
+
+
+@pytest.mark.parametrize("monic", [True, False])
+@pytest.mark.parametrize("a", range(5))
+@pytest.mark.parametrize("b", range(5))
+def test_jacobi_orthogonal(a, b, monic):
+    if monic:
+        poly = [monic_jacobi_polynomial(degree, a, b) for degree in range(5)]
+    else:
+        if b != 0:
+            pytest.xfail("Non-monic Jacobi polynomials only implemented for b=0")
+        poly = [jacobi_polynomial(degree, a, b) for degree in range(10)]
+
+    for i, p in enumerate(poly):
+        for q in poly[:i]:
+            assert ((1 - x[0]) ** a * (1 + x[0]) ** b * p * q).integrate((x[0], -1, 1)) == 0

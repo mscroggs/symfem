@@ -6,6 +6,7 @@ This element's definition appears in https://doi.org/10.1007/s11464-011-0094-0
 
 import typing
 
+from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     IntegralAgainst,
@@ -17,7 +18,6 @@ from symfem.functions import FunctionInput, VectorFunction
 from symfem.moments import make_integral_moment_dofs
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
-from symfem.elements.lagrange import Lagrange
 
 __all__ = ["HuangZhang"]
 
@@ -43,26 +43,26 @@ class HuangZhang(CiarletElement):
         poly: typing.List[FunctionInput] = []
         poly += [
             VectorFunction([x[0] ** i * x[1] ** j, 0])
-            for i in range(order + 1)
-            for j in range(order)
+            for i in range(order + 2)
+            for j in range(order + 1)
         ]
         poly += [
             VectorFunction([0, x[0] ** i * x[1] ** j])
-            for i in range(order)
-            for j in range(order + 1)
+            for i in range(order + 1)
+            for j in range(order + 2)
         ]
 
         dofs += make_integral_moment_dofs(
             reference,
-            facets=(NormalIntegralMoment, Lagrange, order - 1, {"variant": variant}),
+            facets=(NormalIntegralMoment, Lagrange, order, {"variant": variant}),
         )
         dofs += make_integral_moment_dofs(
             reference,
-            facets=(TangentIntegralMoment, Lagrange, order - 2, {"variant": variant}),
+            facets=(TangentIntegralMoment, Lagrange, order - 1, {"variant": variant}),
         )
 
-        for i in range(order - 1):
-            for j in range(order - 2):
+        for i in range(order):
+            for j in range(order - 1):
                 dofs.append(IntegralAgainst(reference, (x[0] ** i * x[1] ** j, 0), (2, 0)))
                 dofs.append(IntegralAgainst(reference, (0, x[0] ** j * x[1] ** i), (2, 0)))
 
@@ -76,8 +76,25 @@ class HuangZhang(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order * 2 + 1
+
     names = ["Huang-Zhang", "HZ"]
     references = ["quadrilateral"]
-    min_order = 2
+    min_order = 1
     continuity = "H(div)"
-    last_updated = "2023.06"
+    value_type = "vector"
+    last_updated = "2025.03"

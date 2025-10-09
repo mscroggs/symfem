@@ -6,6 +6,7 @@ This element's definition appears in https://doi.org/10.1007/s10208-011-9087-3
 
 import typing
 
+from symfem.elements.dpc import DPC, VectorDPC
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     IntegralMoment,
@@ -24,7 +25,6 @@ from symfem.polynomials import (
     serendipity_set_1d,
 )
 from symfem.references import NonDefaultReferenceError, Reference
-from symfem.elements.dpc import DPC, VectorDPC
 
 __all__ = ["Serendipity", "SerendipityCurl", "SerendipityDiv"]
 
@@ -66,11 +66,30 @@ class Serendipity(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        if self.order < self.reference.tdim:
+            return 1
+        return self.order // self.reference.tdim
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order + self.reference.tdim - 1
+
     names = ["serendipity", "S"]
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "C0"
-    last_updated = "2023.06"
+    value_type = "scalar"
+    last_updated = "2024.09"
 
 
 class SerendipityCurl(CiarletElement):
@@ -109,10 +128,29 @@ class SerendipityCurl(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        if self.order == 2 and self.reference.tdim == 3:
+            return 1
+        return self.order // self.reference.tdim
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order + self.reference.tdim - 1
+
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(curl)"
+    value_type = "vector"
     last_updated = "2023.07"
 
 
@@ -151,8 +189,25 @@ class SerendipityDiv(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order // self.reference.tdim
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 1
     continuity = "H(div)"
+    value_type = "vector"
     last_updated = "2023.07"

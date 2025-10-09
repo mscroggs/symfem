@@ -64,9 +64,26 @@ class Argyris(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["Argyris"]
     references = ["triangle"]
     min_order = 5
     max_order = 5
-    continuity = "L2"
+    continuity = "C1"
+    value_type = "scalar"
     last_updated = "2023.05"

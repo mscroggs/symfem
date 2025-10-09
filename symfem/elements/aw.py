@@ -9,6 +9,7 @@ import typing
 
 import sympy
 
+from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     InnerProductIntegralMoment,
@@ -20,7 +21,6 @@ from symfem.functions import FunctionInput
 from symfem.polynomials import polynomial_set_vector
 from symfem.references import Reference
 from symfem.symbols import x
-from symfem.elements.lagrange import Lagrange
 
 __all__ = ["ArnoldWinther", "NonConformingArnoldWinther"]
 
@@ -40,25 +40,24 @@ class ArnoldWinther(CiarletElement):
         self.variant = variant
         poly: typing.List[FunctionInput] = []
         poly += [
-            ((p[0], p[1]), (p[1], p[2]))
-            for p in polynomial_set_vector(reference.tdim, 3, order - 1)
+            ((p[0], p[1]), (p[1], p[2])) for p in polynomial_set_vector(reference.tdim, 3, order)
         ]
         poly += [
             (
                 (
-                    (order - k + 1) * (order - k + 2) * x[0] ** k * x[1] ** (order - k),
-                    -k * (order - k + 2) * x[0] ** (k - 1) * x[1] ** (order - k + 1),
+                    (order - k + 2) * (order - k + 3) * x[0] ** k * x[1] ** (order - k + 1),
+                    -k * (order - k + 3) * x[0] ** (k - 1) * x[1] ** (order - k + 2),
                 ),
                 (
-                    -k * (order - k + 2) * x[0] ** (k - 1) * x[1] ** (order - k + 1),
-                    -k * (k - 1) * x[0] ** (k - 2) * x[1] ** (order - k + 2),
+                    -k * (order - k + 3) * x[0] ** (k - 1) * x[1] ** (order - k + 2),
+                    k * (k - 1) * x[0] ** (k - 2) * x[1] ** (order - k + 3),
                 ),
             )
-            for k in range(order + 1)
+            for k in range(order + 2)
         ]
         poly += [
-            ((0, x[0] ** order), (x[0] ** order, -order * x[0] ** (order - 1) * x[1])),
-            ((0, 0), (0, x[0] ** order)),
+            ((0, x[0] ** (order + 1)), (x[0] ** (order + 1), -(order + 1) * x[0] ** order * x[1])),
+            ((0, 0), (0, x[0] ** (order + 1))),
         ]
 
         dofs: ListOfFunctionals = []
@@ -71,19 +70,10 @@ class ArnoldWinther(CiarletElement):
                 )
         for e_n in range(reference.sub_entity_count(1)):
             sub_ref = reference.sub_entity(1, e_n)
-            sub_e = Lagrange(sub_ref.default_reference(), order - 2, variant)
+            sub_e = Lagrange(sub_ref.default_reference(), order - 1, variant)
             for dof_n, dof in enumerate(sub_e.dofs):
                 p = sub_e.get_basis_function(dof_n).get_function()
                 for component in [sub_ref.normal(), sub_ref.tangent()]:
-                    InnerProductIntegralMoment(
-                        reference,
-                        p,
-                        component,
-                        sub_ref.normal(),
-                        dof,
-                        entity=(1, e_n),
-                        mapping="double_contravariant",
-                    )
                     dofs.append(
                         InnerProductIntegralMoment(
                             reference,
@@ -95,7 +85,7 @@ class ArnoldWinther(CiarletElement):
                             mapping="double_contravariant",
                         )
                     )
-        sub_e = Lagrange(reference, order - 3, variant)
+        sub_e = Lagrange(reference, order - 2, variant)
         for dof_n, dof in enumerate(sub_e.dofs):
             p = sub_e.get_basis_function(dof_n).get_function()
             for component22 in [((1, 0), (0, 0)), ((0, 1), (0, 0)), ((0, 0), (0, 1))]:
@@ -105,17 +95,23 @@ class ArnoldWinther(CiarletElement):
                         tuple(tuple(p * j for j in i) for i in component22),
                         dof,
                         entity=(2, 0),
+                        mapping="double_contravariant",
                     )
                 )
 
-        if order >= 4:
-            sub_e = Lagrange(reference, order - 4, variant)
+        if order >= 3:
+            sub_e = Lagrange(reference, order - 3, variant)
             for p, dof in zip(sub_e.get_basis_functions(), sub_e.dofs):
-                if sympy.Poly(p.as_sympy(), x[:2]).degree() != order - 4:
+                if sympy.Poly(p.as_sympy(), x[:2]).degree() != order - 3:
                     continue
                 f = p * x[0] ** 2 * x[1] ** 2 * (1 - x[0] - x[1]) ** 2
-                J = tuple(tuple(f.diff(x[i]).diff(x[j]) for j in range(2)) for i in range(2))
-                dofs.append(IntegralMoment(reference, J, dof, entity=(2, 0)))
+                J = [
+                    [f.diff(x[1]).diff(x[1]), -f.diff(x[0]).diff(x[1])],
+                    [-f.diff(x[1]).diff(x[0]), f.diff(x[0]).diff(x[0])],
+                ]
+                dofs.append(
+                    IntegralMoment(reference, J, dof, entity=(2, 0), mapping="double_contravariant")
+                )
 
         super().__init__(
             reference,
@@ -135,11 +131,28 @@ class ArnoldWinther(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
     names = ["Arnold-Winther", "AW", "conforming Arnold-Winther"]
     references = ["triangle"]
-    min_order = 3
+    min_order = 2
     continuity = "integral inner H(div)"
-    last_updated = "2023.05"
+    value_type = "symmetric matrix"
+    last_updated = "2025.03"
 
 
 class NonConformingArnoldWinther(CiarletElement):
@@ -157,17 +170,16 @@ class NonConformingArnoldWinther(CiarletElement):
         self.variant = variant
         poly: typing.List[FunctionInput] = []
         poly += [
-            ((p[0], p[1]), (p[1], p[2]))
-            for p in polynomial_set_vector(reference.tdim, 3, order - 1)
+            ((p[0], p[1]), (p[1], p[2])) for p in polynomial_set_vector(reference.tdim, 3, order)
         ]
 
         poly += [
             ((0, x[1] ** 2), (x[1] ** 2, -2 * x[1] ** 2)),
             ((-2 * x[0] ** 2, x[0] ** 2), (x[0] ** 2, 0)),
             ((-2 * x[0] * x[1], x[0] * x[1]), (x[0] * x[1], 0)),
-            ((x[0] * (x[0] - x[1]), 0), (0, 0)),
+            ((x[0] * (x[0] + x[1]), 0), (0, 0)),
             ((x[0] ** 2, 0), (0, x[0] * x[1])),
-            ((x[0] ** 2, 0), (0, x[1] ** 2)),
+            ((x[0] ** 2, 0), (0, -(x[1] ** 2))),
         ]
 
         dofs: ListOfFunctionals = []
@@ -219,9 +231,26 @@ class NonConformingArnoldWinther(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
     names = ["nonconforming Arnold-Winther", "nonconforming AW"]
     references = ["triangle"]
-    min_order = 2
-    max_order = 2
+    min_order = 1
+    max_order = 1
     continuity = "integral inner H(div)"
-    last_updated = "2023.06"
+    value_type = "symmetric matrix"
+    last_updated = "2025.03"

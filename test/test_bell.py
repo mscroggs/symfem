@@ -5,7 +5,7 @@ from symfem.symbols import t, x
 
 
 def test_bell_polyset():
-    b = symfem.create_element("triangle", "Bell", 5)
+    b = symfem.create_element("triangle", "Bell", 4)
     for p in b.get_polynomial_basis():
         gradp = [p.diff(x[0]), p.diff(x[1])]
         for en in range(b.reference.sub_entity_count(1)):

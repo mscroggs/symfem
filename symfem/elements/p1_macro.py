@@ -60,9 +60,26 @@ class P1Macro(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        raise NotImplementedError()
+
     names = ["P1 macro"]
     references = ["triangle"]
     min_order = 1
     max_order = 1
     continuity = "C0"
+    value_type = "scalar macro"
     last_updated = "2023.06"

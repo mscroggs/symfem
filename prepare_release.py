@@ -2,7 +2,7 @@
 
 import argparse
 
-parser = argparse.ArgumentParser(description="Build defelement.com")
+parser = argparse.ArgumentParser(description="Prepare PyPI release")
 parser.add_argument("--version", metavar="version", default="main", help="Symfem version.")
 version = parser.parse_args().version
 if version != "main":

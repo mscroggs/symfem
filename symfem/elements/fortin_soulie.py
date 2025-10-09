@@ -47,9 +47,26 @@ class FortinSoulie(CiarletElement):
         poly += polynomial_set_1d(reference.tdim, order)
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["Fortin-Soulie", "FS"]
     references = ["triangle"]
     min_order = 2
     max_order = 2
     continuity = "L2"
+    value_type = "scalar"
     last_updated = "2023.05"

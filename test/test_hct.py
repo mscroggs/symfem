@@ -55,7 +55,7 @@ def test_c1_continuity(family):
         assert allequal(grad_f1, grad_f2)
 
 
-def test_rcht_linear_normal_derivatices():
+def test_rcht_linear_normal_derivatives():
     e = symfem.create_element("triangle", "rHCT", 3)
     for f in e.get_polynomial_basis():
         # Check that normal derivatives are linear

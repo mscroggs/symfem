@@ -7,7 +7,7 @@ import sympy
 
 from symfem import mappings
 from symfem.functions import (
-    AnyFunction,
+    Function,
     FunctionInput,
     ScalarFunction,
     VectorFunction,
@@ -43,6 +43,7 @@ __all__ = [
     "DivergenceIntegralMoment",
     "TangentIntegralMoment",
     "NormalIntegralMoment",
+    "TraceIntegralMoment",
     "NormalDerivativeIntegralMoment",
     "InnerProductIntegralMoment",
     "NormalInnerProductIntegralMoment",
@@ -123,8 +124,8 @@ class BaseFunctional(ABC):
         return self.entity[1]
 
     def perform_mapping(
-        self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType
-    ) -> typing.List[AnyFunction]:
+        self, fs: typing.List[Function], map: PointType, inverse_map: PointType
+    ) -> typing.List[Function]:
         """Map functions to a cell.
 
         Args:
@@ -171,7 +172,7 @@ class BaseFunctional(ABC):
         return None
 
     def eval(
-        self, function: AnyFunction, symbolic: bool = True
+        self, function: Function, symbolic: bool = True
     ) -> typing.Union[ScalarFunction, float]:
         """Apply to the functional to a function.
 
@@ -210,7 +211,7 @@ class BaseFunctional(ABC):
         midpoint = self.reference.sub_entity(*self.entity).midpoint()
         return tuple(m + sympy.Rational(7, 10) * (p - m) for m, p in zip(midpoint, point))
 
-    def eval_symbolic(self, function: AnyFunction) -> ScalarFunction:
+    def eval_symbolic(self, function: Function) -> ScalarFunction:
         """Symbolically apply the functional to a function.
 
         Args:
@@ -227,7 +228,7 @@ class BaseFunctional(ABC):
         return e
 
     @abstractmethod
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
 
         Args:
@@ -289,7 +290,7 @@ class PointEvaluation(BaseFunctional):
         """Number of derivatives."""
         return 0
 
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
 
         Args:
@@ -372,7 +373,7 @@ class WeightedPointEvaluation(BaseFunctional):
         """Number of derivatives."""
         return 0
 
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
 
         Args:
@@ -458,7 +459,7 @@ class DerivativePointEvaluation(BaseFunctional):
         """Number of derivatives."""
         return sum(self.derivative)
 
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
 
         Args:
@@ -491,8 +492,8 @@ class DerivativePointEvaluation(BaseFunctional):
         return self.dof_point()
 
     def perform_mapping(
-        self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType
-    ) -> typing.List[AnyFunction]:
+        self, fs: typing.List[Function], map: PointType, inverse_map: PointType
+    ) -> typing.List[Function]:
         """Map functions to a cell.
 
         Args:
@@ -512,7 +513,7 @@ class DerivativePointEvaluation(BaseFunctional):
             Representation of the functional as TeX, and list of terms involved
         """
         assert isinstance(self.point, VectorFunction)
-        if len(self.point) == 1:
+        if len(self.point) == 1 and self.derivative[0] == 1:
             desc = "v\\mapsto "
             desc += f"v'({','.join([_to_tex(i, True) for i in self.point])})"
             return desc, []
@@ -575,7 +576,7 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
         """Number of derivatives."""
         return 1
 
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
 
         Args:
@@ -629,7 +630,7 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
             desc += f"v'({','.join([_to_tex(i, True) for i in self.point])})"
             return desc, []
         desc = "v\\mapsto"
-        desc += f"\\nabla{{v}}({','.join([_to_tex(i, True) for i in self.point])})"
+        desc += f"\\nabla {{v}}({','.join([_to_tex(i, True) for i in self.point])})"
         desc += "\\cdot\\left(\\begin{array}{c}"
         desc += "\\\\".join([_to_tex(i) for i in self.dir])
         desc += "\\end{array}\\right)"
@@ -686,7 +687,7 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
             Representation of the functional as TeX, and list of terms involved
         """
         desc = "v\\mapsto"
-        desc += "\\nabla{v}(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
+        desc += "\\nabla {v}(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
         entity_n = self.entity_number()
         desc += "\\cdot\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}}"
         return desc, [
@@ -738,7 +739,7 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
         """Number of derivatives."""
         return 2
 
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
 
         Args:
@@ -830,7 +831,7 @@ class PointInnerProduct(BaseFunctional):
         """Number of derivatives."""
         return 0
 
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
 
         Args:
@@ -936,7 +937,7 @@ class DotPointEvaluation(BaseFunctional):
         """Number of derivatives."""
         return 0
 
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
 
         Args:
@@ -1037,7 +1038,7 @@ class PointDivergenceEvaluation(BaseFunctional):
         """Number of derivatives."""
         return 1
 
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
 
         Args:
@@ -1089,7 +1090,7 @@ class PointDivergenceEvaluation(BaseFunctional):
             Representation of the functional as TeX, and list of terms involved
         """
         desc = "\\boldsymbol{v}\\mapsto"
-        desc += "\\nablaa\\cdot\\boldsymbol{v}"
+        desc += "\\nabla a\\cdot\\boldsymbol{v}"
         desc += "(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
         return desc, []
 
@@ -1111,7 +1112,7 @@ class PointDivergenceEvaluation(BaseFunctional):
 class IntegralAgainst(BaseFunctional):
     """An integral against a function."""
 
-    f: AnyFunction
+    f: Function
 
     def __init__(
         self,
@@ -1165,7 +1166,7 @@ class IntegralAgainst(BaseFunctional):
         """
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.integral_domain.vertices))
 
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
 
         Args:
@@ -1182,7 +1183,7 @@ class IntegralAgainst(BaseFunctional):
         integrand = self.dot(v1)
         return integrand.integral(self.integral_domain)
 
-    def dot(self, function: AnyFunction) -> ScalarFunction:
+    def dot(self, function: Function) -> ScalarFunction:
         """Dot a function with the moment function.
 
         Args:
@@ -1278,7 +1279,7 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
         """
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.integral_domain.vertices))
 
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
 
         Args:
@@ -1378,7 +1379,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         """
         return tuple(sympy.Rational(sum(i), len(i)) for i in zip(*self.integral_domain.vertices))
 
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
 
         Args:
@@ -1398,8 +1399,8 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         return integrand.integral(self.integral_domain)
 
     def perform_mapping(
-        self, fs: typing.List[AnyFunction], map: PointType, inverse_map: PointType
-    ) -> typing.List[AnyFunction]:
+        self, fs: typing.List[Function], map: PointType, inverse_map: PointType
+    ) -> typing.List[Function]:
         """Map functions to a cell.
 
         Args:
@@ -1456,7 +1457,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
 class IntegralMoment(BaseFunctional):
     """An integral moment."""
 
-    f: AnyFunction
+    f: Function
 
     def __init__(
         self,
@@ -1518,7 +1519,7 @@ class IntegralMoment(BaseFunctional):
         """Number of derivatives."""
         return 0
 
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
 
         Args:
@@ -1536,7 +1537,7 @@ class IntegralMoment(BaseFunctional):
         integrand = self.dot(v1)
         return integrand.integral(self.integral_domain)
 
-    def dot(self, function: AnyFunction) -> ScalarFunction:
+    def dot(self, function: Function) -> ScalarFunction:
         """Dot a function with the moment function.
 
         Args:
@@ -1668,7 +1669,7 @@ class DerivativeIntegralMoment(IntegralMoment):
         """Number of derivatives."""
         return 1
 
-    def dot(self, function: AnyFunction) -> ScalarFunction:
+    def dot(self, function: Function) -> ScalarFunction:
         """Dot a function with the moment function.
 
         Args:
@@ -1691,7 +1692,7 @@ class DerivativeIntegralMoment(IntegralMoment):
         assert isinstance(dw, tuple)
         return dw
 
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
 
         Args:
@@ -1740,7 +1741,7 @@ class DivergenceIntegralMoment(IntegralMoment):
         """Number of derivatives."""
         return 1
 
-    def _eval_symbolic(self, function: AnyFunction) -> AnyFunction:
+    def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
 
         Args:
@@ -1913,6 +1914,68 @@ class NormalIntegralMoment(IntegralMoment):
     name = "Normal integral moment"
 
 
+class TraceIntegralMoment(IntegralMoment):
+    """An integral moment of the trace of a matrix."""
+
+    def __init__(
+        self,
+        reference: Reference,
+        f_in: FunctionInput,
+        dof: BaseFunctional,
+        entity: typing.Tuple[int, int],
+        mapping: typing.Union[str, None] = "contravariant",
+    ):
+        """Create the functional.
+
+        Args:
+            reference: The reference cell
+            f_in: The function to multiply with
+            dof: The DOF in a moment space that the function is associated with
+            entity: The entity the functional is associated with
+            mapping: The type of mappping from the reference cell to a physical cell
+        """
+        scalar_f = parse_function_input(f_in).subs(x, t)
+        assert scalar_f.is_scalar
+        super().__init__(
+            reference,
+            scalar_f,
+            dof,
+            entity=entity,
+            mapping=mapping,
+            map_function=False,
+        )
+
+    def dot(self, function: Function) -> ScalarFunction:
+        """Take the product of a function with the trace of the matrix.
+
+        Args:
+            function: The function
+
+        Returns:
+            The inner product of the function and the matrix's trace
+        """
+        assert function.is_matrix and function.shape[0] == function.shape[1]
+        trace = sum(function[i, i] for i in range(function.shape[0]))
+        return trace * self.f * self.integral_domain.jacobian()
+
+    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
+        """Get a representation of the functional as TeX, and list of terms involved.
+
+        Returns:
+            Representation of the functional as TeX, and list of terms involved
+        """
+        entity = self.entity_tex()
+        entity_def = self.entity_definition()
+        desc = "\\boldsymbol{V}\\mapsto"
+        desc += f"\\displaystyle\\int_{{{entity}}}"
+        desc += "\\operatorname{tr}(\\boldsymbol{V})"
+        if self.f != 1:
+            desc += "(" + _to_tex(self.f, True) + ")"
+        return desc, [entity_def]
+
+    name = "Trace integral moment"
+
+
 class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
     """An integral moment in the normal direction."""
 
@@ -2015,7 +2078,7 @@ class InnerProductIntegralMoment(IntegralMoment):
         self.inner_with_left = inner_with_left
         self.inner_with_right = inner_with_right
 
-    def dot(self, function: AnyFunction) -> ScalarFunction:
+    def dot(self, function: Function) -> ScalarFunction:
         """Take the inner product of a function with the moment direction.
 
         Args:

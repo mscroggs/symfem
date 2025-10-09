@@ -5,6 +5,7 @@ from itertools import product
 
 import sympy
 
+from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     DotPointEvaluation,
@@ -15,7 +16,6 @@ from symfem.functionals import (
 from symfem.functions import FunctionInput
 from symfem.polynomials import polynomial_set_1d, polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
-from symfem.elements.lagrange import Lagrange
 
 __all__ = ["DPC", "VectorDPC"]
 
@@ -71,10 +71,27 @@ class DPC(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order // self.reference.tdim
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["dPc"]
     references = ["interval", "quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
+    value_type = "scalar"
     last_updated = "2023.07.1"
 
 
@@ -119,8 +136,25 @@ class VectorDPC(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order // self.reference.tdim
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["vector dPc"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "L2"
+    value_type = "vector"
     last_updated = "2023.07"

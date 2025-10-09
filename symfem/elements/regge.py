@@ -12,6 +12,7 @@ from itertools import product
 
 import sympy
 
+from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     InnerProductIntegralMoment,
@@ -25,7 +26,6 @@ from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import polynomial_set_vector
 from symfem.references import Reference
 from symfem.symbols import t, x
-from symfem.elements.lagrange import Lagrange
 
 __all__ = ["Regge", "ReggeTP"]
 
@@ -175,10 +175,27 @@ class Regge(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["Regge"]
     references = ["triangle", "tetrahedron"]
     min_order = 0
     continuity = "inner H(curl)"
+    value_type = "symmetric matrix"
     last_updated = "2023.06"
 
 
@@ -386,8 +403,25 @@ class ReggeTP(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order + 1
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return (self.order + 1) * self.reference.tdim - 1
+
     names = ["Regge"]
     references = ["quadrilateral", "hexahedron"]
     min_order = 0
     continuity = "inner H(curl)"
+    value_type = "symmetric matrix"
     last_updated = "2023.06"

@@ -7,14 +7,18 @@ from hashlib import sha256
 import sympy
 from appdirs import user_cache_dir
 
-if not os.path.isdir(user_cache_dir()):
+try:
     os.mkdir(user_cache_dir())
+except FileExistsError:
+    pass
 CACHE_DIR = user_cache_dir("symfem")
 CACHE_FORMAT = "1"
 if os.path.isfile(CACHE_DIR):
     os.remove(CACHE_DIR)
-if not os.path.isdir(CACHE_DIR):
+try:
     os.mkdir(CACHE_DIR)
+except FileExistsError:
+    pass
 
 assert os.path.isdir(CACHE_DIR)
 
@@ -70,7 +74,7 @@ def matrix_to_string(m: sympy.matrices.dense.MutableDenseMatrix) -> str:
     Returns:
         A representation of the matrix as a string
     """
-    return ";".join(",".join(f"{m[i,j]!r}" for j in range(m.cols)) for i in range(m.rows))
+    return ";".join(",".join(f"{m[i, j]!r}" for j in range(m.cols)) for i in range(m.rows))
 
 
 def matrix_from_string(mstr: str) -> sympy.matrices.dense.MutableDenseMatrix:

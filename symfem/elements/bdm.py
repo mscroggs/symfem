@@ -6,14 +6,14 @@ This element's definition appears in https://doi.org/10.1007/BF01389710
 
 import typing
 
+from symfem.elements.lagrange import Lagrange
+from symfem.elements.nedelec import NedelecFirstKind
 from symfem.finite_element import CiarletElement
 from symfem.functionals import IntegralMoment, ListOfFunctionals, NormalIntegralMoment
 from symfem.functions import FunctionInput
 from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
-from symfem.elements.lagrange import Lagrange
-from symfem.elements.nedelec import NedelecFirstKind
 
 __all__ = ["BDM"]
 
@@ -38,7 +38,7 @@ class BDM(CiarletElement):
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
             facets=(NormalIntegralMoment, Lagrange, order, {"variant": variant}),
-            cells=(IntegralMoment, NedelecFirstKind, order - 1, {"variant": variant}),
+            cells=(IntegralMoment, NedelecFirstKind, order - 2, {"variant": variant}),
         )
         self.variant = variant
 
@@ -52,8 +52,25 @@ class BDM(CiarletElement):
         """
         return {"variant": self.variant}
 
+    @property
+    def lagrange_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def lagrange_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
+    @property
+    def polynomial_subdegree(self) -> int:
+        return self.order
+
+    @property
+    def polynomial_superdegree(self) -> typing.Optional[int]:
+        return self.order
+
     names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]
     references = ["triangle", "tetrahedron"]
     min_order = 1
     continuity = "H(div)"
-    last_updated = "2023.06"
+    value_type = "vector"
+    last_updated = "2025.03"

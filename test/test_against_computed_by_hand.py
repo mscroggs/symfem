@@ -17,7 +17,7 @@ def test_lagrange():
 
 
 def test_nedelec():
-    space = create_element("triangle", "Nedelec", 1)
+    space = create_element("triangle", "Nedelec", 0)
     assert allequal(
         space.tabulate_basis([[0, 0], [1, 0], [0, 1]], "xxyyzz"),
         ((0, 0, 1, 0, 1, 0), (0, 0, 1, 1, 0, 1), (-1, 1, 0, 0, 1, 0)),
@@ -25,7 +25,7 @@ def test_nedelec():
 
 
 def test_rt():
-    space = create_element("triangle", "Raviart-Thomas", 1)
+    space = create_element("triangle", "Raviart-Thomas", 0)
     assert allequal(
         space.tabulate_basis([[0, 0], [1, 0], [0, 1]], "xxyyzz"),
         ((0, -1, 0, 0, 0, 1), (-1, 0, -1, 0, 0, 1), (0, -1, 0, -1, 1, 0)),
@@ -57,8 +57,8 @@ def test_dual1():
         space.tabulate_basis([[0, 0], [q, q], [h, 0]]),
         (
             (q, q, q, q),
+            (sympy.Rational(3, 8), sympy.Rational(3, 8), e, e),
             (sympy.Rational(5, 8), e, e, e),
-            (sympy.Rational(3, 8), e, e, sympy.Rational(3, 8)),
         ),
     )
 

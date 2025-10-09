@@ -7,7 +7,7 @@ from symfem.symbols import x
 
 
 def test_nedelec_2d():
-    space = create_element("triangle", "Nedelec", 1)
+    space = create_element("triangle", "Nedelec", 0)
     k = sympy.Symbol("k")
 
     tdim = 2
@@ -28,7 +28,7 @@ def test_nedelec_2d():
 
 
 def test_nedelec_3d():
-    space = create_element("tetrahedron", "Nedelec", 1)
+    space = create_element("tetrahedron", "Nedelec", 0)
     k = sympy.Symbol("k")
 
     tdim = 3
