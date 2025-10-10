@@ -16,6 +16,7 @@ from symfem.functions import (
 from symfem.geometry import PointType, SetOfPoints
 from symfem.polynomials import degree
 from symfem.piecewise_functions import PiecewiseFunction
+from symfem.quadrature import numerical as numerical_quadrature
 from symfem.references import Interval, NonDefaultReferenceError, Reference
 from symfem.symbols import t, x
 
@@ -257,7 +258,7 @@ class BaseFunctional(ABC):
                     degree quadrature rule to use
 
         Returns:
-            Points and weights
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
 
     name = "Base functional"
@@ -336,9 +337,9 @@ class PointEvaluation(BaseFunctional):
                     degree quadrature rule to use
 
         Returns:
-            Points and weights
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
-        return [float(i) for i in self.dof_point()], [[[1.0]]]
+        return [[float(i) for i in self.dof_point()]], [[[1.0]]]
 
     name = "Point evaluation"
 
@@ -422,9 +423,9 @@ class WeightedPointEvaluation(BaseFunctional):
                     degree quadrature rule to use
 
         Returns:
-            Points and weights
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
-        return [float(i) for i in self.dof_point()], [[[float(self.weight)]]]
+        return [[float(i) for i in self.dof_point()]], [[[float(self.weight)]]]
 
     name = "Weighted point evaluation"
 
@@ -539,7 +540,7 @@ class DerivativePointEvaluation(BaseFunctional):
                     degree quadrature rule to use
 
         Returns:
-            Points and weights
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
         raise NotImplementedError()
 
@@ -644,7 +645,7 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
                     degree quadrature rule to use
 
         Returns:
-            Points and weights
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
         raise NotImplementedError()
 
@@ -702,7 +703,7 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
                     degree quadrature rule to use
 
         Returns:
-            Points and weights
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
         raise NotImplementedError()
 
@@ -789,7 +790,7 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
                     degree quadrature rule to use
 
         Returns:
-            Points and weights
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
         raise NotImplementedError()
 
@@ -900,7 +901,7 @@ class PointInnerProduct(BaseFunctional):
                     degree quadrature rule to use
 
         Returns:
-            Points and weights
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
         raise NotImplementedError()
 
@@ -1004,9 +1005,18 @@ class DotPointEvaluation(BaseFunctional):
                     degree quadrature rule to use
 
         Returns:
-            Points and weights
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
-        raise NotImplementedError()
+        if self.vector.is_vector:
+            return [[float(i) for i in self.dof_point()]], [[[float(i)]] for i in self.vector]
+        elif self.vector.is_matrix:
+            return [[float(i) for i in self.dof_point()]], [
+                [[float(self.vector[i][j])]]
+                for i in range(self.vector.shape[0])
+                for j in range(self.vector.shape[1])
+            ]
+        else:
+            raise NotImplementedError()
 
     name = "Dot point evaluation"
 
@@ -1102,7 +1112,7 @@ class PointDivergenceEvaluation(BaseFunctional):
                     degree quadrature rule to use
 
         Returns:
-            Points and weights
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
         raise NotImplementedError()
 
@@ -1223,21 +1233,30 @@ class IntegralAgainst(BaseFunctional):
                     degree quadrature rule to use
 
         Returns:
-            Points and weights
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
-        try:
-            import basix
-        except ModuleNotFoundError:
-            raise ModuleNotFoundError("Basix is required to create this discrete DOF.")
-        _pts, wts = basix.make_quadrature(
-            getattr(basix.CellType, self.integral_domain.name),
-            poly_degree + degree(self.integral_domain, self.f),
+        pts, wts = numerical_quadrature(
+            self.integral_domain.name, poly_degree + degree(self.integral_domain, self.f)
         )
+        mapped_pts = [
+            [
+                float(i[0] + sum(j * k for j, k in zip(i[1:], p)))
+                for i in zip(self.integral_domain.origin, *self.integral_domain.axes)
+            ]
+            for p in pts
+        ]
 
-        pt_map = self.integral_domain.get_map_to_self()  # TODO
-        pts = [[c for c in p] for p in _pts]
+        dof_wts = []
 
-        return pts, [[[float(w * float(self.f.subs(t, p).as_sympy()))] for p, w in zip(pts, wts)]]
+        for p, w in zip(pts, wts):
+            value = self.f.subs(t[: len(p)], p)
+            if self.f.is_scalar:
+                dof_wts.append([float(value) * w])
+            else:
+                for v in value:
+                    dof_wts.append([float(v) * w])
+
+        return mapped_pts, [dof_wts]
 
     name = "Integral against"
 
@@ -1330,7 +1349,7 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
                     degree quadrature rule to use
 
         Returns:
-            Points and weights
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
         raise NotImplementedError()
 
@@ -1447,7 +1466,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
                     degree quadrature rule to use
 
         Returns:
-            Points and weights
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
         raise NotImplementedError()
 
@@ -1632,9 +1651,30 @@ class IntegralMoment(BaseFunctional):
                     degree quadrature rule to use
 
         Returns:
-            Points and weights
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
-        raise NotImplementedError()
+        pts, wts = numerical_quadrature(
+            self.integral_domain.name, poly_degree + degree(self.integral_domain, self.f)
+        )
+        mapped_pts = [
+            [
+                float(i[0] + sum(j * k for j, k in zip(i[1:], p)))
+                for i in zip(self.integral_domain.origin, *self.integral_domain.axes)
+            ]
+            for p in pts
+        ]
+
+        dof_wts = []
+
+        for p, w in zip(pts, wts):
+            value = self.f.subs(t[: len(p)], p)
+            if self.f.is_scalar:
+                dof_wts.append([float(value) * w])
+            else:
+                for v in value:
+                    dof_wts.append([float(v) * w])
+
+        return mapped_pts, [dof_wts]
 
     name = "Integral moment"
 
@@ -1781,7 +1821,7 @@ class DivergenceIntegralMoment(IntegralMoment):
                     degree quadrature rule to use
 
         Returns:
-            Points and weights
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
         raise NotImplementedError()
 
@@ -2036,7 +2076,7 @@ class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
                     degree quadrature rule to use
 
         Returns:
-            Points and weights
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
         raise NotImplementedError()
 

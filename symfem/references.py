@@ -688,7 +688,7 @@ class Reference(ABC):
             return order + 1
         if self.tdim == 2:
             return (order + 1) * (order + 2) // 2
-        if self.tdim == 2:
+        if self.tdim == 3:
             return (order + 1) * (order + 2) * (order + 3) // 6
         raise ValueError(f"Unsupported reference: {self.name}")
 

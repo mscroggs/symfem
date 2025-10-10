@@ -443,4 +443,4 @@ class SubbedBasisFunction(BasisFunction):
         Returns:
             A version the function with floats as coefficients
         """
-        raise ValueError("Cannot infer degree of a substituted basis function.")
+        return self.get_function().maximum_degree(cell)

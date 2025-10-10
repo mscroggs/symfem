@@ -5,6 +5,7 @@ import pytest
 from symfem.basix_interface import create_basix_element
 from symfem import create_element
 from symfem.finite_element import DirectElement, EnrichedElement
+from symfem.piecewise_functions import PiecewiseFunction
 
 from .utils import test_elements
 
@@ -34,11 +35,22 @@ def test_element(elements_to_test, cells_to_test, cell_type, element_type, order
     if order == 0:
         pytest.skip()
 
+    if element_type in ["transition", "GLS"]:
+        pytest.xfail("Cannot convert this element type to a Basix element")
+
     element = create_element(cell_type, element_type, order, **kwargs)
+
     if isinstance(element, (DirectElement, EnrichedElement)):
         pytest.xfail("Cannot convert this element type to a Basix element")
+    for dof in element.dofs:
+        if dof.nderivs > 0:
+            pytest.xfail("Cannot convert this element type to a Basix element")
+    for p in element.get_polynomial_basis():
+        if isinstance(p, PiecewiseFunction):
+            pytest.xfail("Cannot convert this element type to a Basix element")
+
     basix_element = create_basix_element(element)
     if element.range_shape is None:
         assert basix_element.value_shape == []
     else:
-        assert basix_element.value_shape == element.range_shape
+        assert basix_element.value_shape == list(element.range_shape)
