@@ -1670,9 +1670,14 @@ class IntegralMoment(BaseFunctional):
             value = self.f.subs(t[: len(p)], p)
             if self.f.is_scalar:
                 dof_wts.append([float(value) * w])
-            else:
+            elif self.f.is_vector:
                 for v in value:
                     dof_wts.append([float(v) * w])
+            else:
+                assert self.f.is_matrix
+                for i0 in range(self.f.shape[0]):
+                    for i1 in range(self.f.shape[1]):
+                        dof_wts.append([float(value[i0][i1]) * w])
 
         return mapped_pts, [dof_wts]
 

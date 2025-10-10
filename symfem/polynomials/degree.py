@@ -17,7 +17,7 @@ def simplex_degree(polynomial: ScalarFunction, vars: typing.Tuple[sympy.Symbol, 
     Returns:
         The degree of the polynomial on a simplex cell
     """
-    p = polynomial.as_sympy().as_poly()
+    p = polynomial.subs(x[1:], [x[0], x[0]]).as_sympy().as_poly()
     if p is None:
         return 0
     else:
@@ -34,12 +34,36 @@ def tp_degree(polynomial: ScalarFunction, vars: typing.Tuple[sympy.Symbol, ...] 
         The degree of the polynomial on a tensor product cell
     """
     return max(
-        0 if p is None else p.degree()
-        for p in [
-            polynomial.as_sympy().subs(vars[i], 1).subs(vars[j], 1).as_poly()
-            for i, j in [(0, 1), (0, 2), (1, 2)]
-        ]
+        simplex_degree(polynomial.subs([vars[i], vars[j]], [1, 1]))
+        for i, j in [(0, 1), (0, 2), (1, 2)]
     )
+
+
+def prism_degree(polynomial: ScalarFunction, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
+    """Get the degree of a polynomial on a prism.
+
+    Args:
+        polynomial: The polynomial
+
+    Returns:
+        The degree of the polynomial on a prism
+    """
+    return max(
+        simplex_degree(polynomial.subs([vars[0]], [1])),
+        simplex_degree(polynomial.subs([vars[1]], [1])),
+    )
+
+
+def pyramid_degree(polynomial: ScalarFunction, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
+    """Get the degree of a polynomial on a pyramid.
+
+    Args:
+        polynomial: The polynomial
+
+    Returns:
+        The degree of the polynomial on a pyramid
+    """
+    return tp_degree(polynomial.subs([x[0], x[1]], [x[0] * (1 - x[2]), x[1] * (1 - x[2])]))
 
 
 def degree(
@@ -72,5 +96,9 @@ def degree(
     if reference.name in ["interval", "triangle", "tetrahedron"]:
         return simplex_degree(polynomial, vars)
     if reference.name in ["quadrilateral", "hexahedron"]:
-        return simplex_degree(polynomial, vars)
+        return tp_degree(polynomial, vars)
+    if reference.name == "prism":
+        return prism_degree(polynomial, vars)
+    if reference.name == "pyramid":
+        return pyramid_degree(polynomial, vars)
     raise ValueError(f"Unsupported cell: {reference.name}")
