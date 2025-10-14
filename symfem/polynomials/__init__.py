@@ -24,4 +24,4 @@ from symfem.polynomials.polysets import (
     serendipity_set_1d,
     serendipity_set_vector,
 )
-from symfem.polynomials.degree import degree
+from symfem.polynomials.degree_computation import degree
