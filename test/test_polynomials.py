@@ -211,6 +211,7 @@ def test_jacobi_orthogonal(a, b, monic):
         (x[0] * x[1] * (x[0] + x[1]), "quadrilateral", 2),
         (x[0] * x[1] * (x[0] + x[1]), "tetrahedron", 3),
         (x[0] * x[1] * (x[0] + x[1]), "hexahedron", 2),
+        (x[0] * x[1] * (x[0] * x[1] - x[0] - x[1] + 1) ** 2, "quadrilateral", 3),
     ]
 )
 def test_degree(poly, ref, expected_degree):

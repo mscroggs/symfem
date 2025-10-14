@@ -8,6 +8,16 @@ from symfem.basis_functions import SubbedBasisFunction
 from symfem.symbols import x
 
 
+def _degree(term: sympy.core.expr.Expr) -> int:
+    """Get the degree of a sympy monomial."""
+    poly = term.as_poly()
+    if poly is None:
+        if term == 1:
+            return 0
+        raise ValueError(f"Invalid monomial: {term}")
+    return poly.degree()
+
+
 def simplex_degree(polynomial: ScalarFunction, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
     """Get the degree of a polynomial on a simplex cell.
 
@@ -17,11 +27,10 @@ def simplex_degree(polynomial: ScalarFunction, vars: typing.Tuple[sympy.Symbol, 
     Returns:
         The degree of the polynomial on a simplex cell
     """
-    p = polynomial.subs(x[1:], [x[0], x[0]]).as_sympy().as_poly()
-    if p is None:
-        return 0
-    else:
-        return p.degree()
+    return max(
+        _degree(term.subs(x[1], x[0]).subs(x[2], x[0]))
+        for term in polynomial.as_sympy().expand().as_coefficients_dict()
+    )
 
 
 def tp_degree(polynomial: ScalarFunction, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
@@ -33,10 +42,7 @@ def tp_degree(polynomial: ScalarFunction, vars: typing.Tuple[sympy.Symbol, ...] 
     Returns:
         The degree of the polynomial on a tensor product cell
     """
-    return max(
-        simplex_degree(polynomial.subs([vars[i], vars[j]], [1, 1]))
-        for i, j in [(0, 1), (0, 2), (1, 2)]
-    )
+    return max(_degree(term) for term in polynomial.as_sympy().expand().as_coefficients_dict())
 
 
 def prism_degree(polynomial: ScalarFunction, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
