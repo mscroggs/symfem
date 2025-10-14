@@ -75,8 +75,12 @@ def create_basix_element(
                 "Conversion to Basix element not implemented for macro elements"
             )
 
+    map_name = element.dofs[0].mapping
+    continuity = element.continuity
+    assert map_name is not None
+    assert continuity is not None
     map_type = map_types[element.dofs[0].mapping]
-    sobolev_space = sobolev_spaces[element.continuity.replace("{order}", f"{element.order}")]
+    sobolev_space = sobolev_spaces[continuity.replace("{order}", f"{element.order}")]
 
     poly = element.get_polynomial_basis()
     subdegree, superdegree = get_embedded_degrees(poly, element.reference)
