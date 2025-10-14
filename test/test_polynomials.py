@@ -196,7 +196,8 @@ def test_jacobi_orthogonal(a, b, monic):
             assert ((1 - x[0]) ** a * (1 + x[0]) ** b * p * q).integrate((x[0], -1, 1)) == 0
 
 
-@pytest.mark.parametrize(("poly", "ref", "expected_degree"),
+@pytest.mark.parametrize(
+    ("poly", "ref", "expected_degree"),
     [
         (x[0], "interval", 1),
         (x[0], "triangle", 1),
@@ -212,17 +213,20 @@ def test_jacobi_orthogonal(a, b, monic):
         (x[0] * x[1] * (x[0] + x[1]), "tetrahedron", 3),
         (x[0] * x[1] * (x[0] + x[1]), "hexahedron", 2),
         (x[0] * x[1] * (x[0] * x[1] - x[0] - x[1] + 1) ** 2, "quadrilateral", 3),
-    ]
+    ],
 )
 def test_degree(poly, ref, expected_degree):
     assert degree(create_reference(ref), ScalarFunction(poly)) == expected_degree
 
 
-@pytest.mark.parametrize(("ref", "dfunc"), [
-    ("tetrahedron", lambda p, q, r: p + q + r),
-    ("hexahedron", max),
-    ("prism", lambda p, q, r: max(p, q) + r),
-])
+@pytest.mark.parametrize(
+    ("ref", "dfunc"),
+    [
+        ("tetrahedron", lambda p, q, r: p + q + r),
+        ("hexahedron", max),
+        ("prism", lambda p, q, r: max(p, q) + r),
+    ],
+)
 def test_random_degrees(ref, dfunc):
     cell = create_reference(ref)
     for _ in range(20):
