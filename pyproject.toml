@@ -23,8 +23,8 @@ documentation = "https://symfem.readthedocs.io/en/latest/"
 [project.optional-dependencies]
 style = ["ruff", "mypy"]
 docs = ["sphinx", "sphinx-autoapi"]
-optional = ["CairoSVG>=2.6.0"]
-test = ["pytest", "symfem[optional]", "numpy"]
+optional = ["CairoSVG>=2.6.0", "fenics-basix", "numpy"]
+test = ["pytest", "symfem[optional]"]
 
 [tool.ruff]
 line-length = 100

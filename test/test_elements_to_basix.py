@@ -22,6 +22,8 @@ from .utils import test_elements
 )
 def test_element(elements_to_test, cells_to_test, cell_type, element_type, order, kwargs, speed):
     """Run tests for each element."""
+    if not has_basix:
+        pytest.skip()
     if elements_to_test != "ALL" and element_type not in elements_to_test:
         pytest.skip()
     if cells_to_test != "ALL" and cell_type not in cells_to_test:

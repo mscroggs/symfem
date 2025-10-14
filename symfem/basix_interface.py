@@ -6,12 +6,9 @@ from symfem.symbols import x
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.polynomials import degree
 
-try:
-    import numpy as np
-    import numpy.typing as npt
-    import basix
-except ModuleNotFoundError:
-    exit()
+import numpy as np
+import numpy.typing as npt
+import basix
 
 sobolev_spaces = {
     "L2": basix.SobolevSpace.L2,
