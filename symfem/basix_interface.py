@@ -79,7 +79,7 @@ def create_basix_element(
     continuity = element.continuity
     assert map_name is not None
     assert continuity is not None
-    map_type = map_types[element.dofs[0].mapping]
+    map_type = map_types[map_name]
     sobolev_space = sobolev_spaces[continuity.replace("{order}", f"{element.order}")]
 
     poly = element.get_polynomial_basis()
@@ -105,11 +105,14 @@ def create_basix_element(
                     for j, q in enumerate(opoly):
                         wcoeffs[i, c * len(opoly) + j] = (q * values * wts).sum()
             elif p.is_matrix:
-                for c0 in range(element.range_shape[0]):
-                    for c1 in range(element.range_shape[1]):
+                rshape = element.range_shape
+                assert rshape is not None
+                assert len(rshape) == 2
+                for c0 in range(rshape[0]):
+                    for c1 in range(rshape[1]):
                         values = np.array([float(p[c0][c1].subs(x, list(pt))) for pt in pts])
                         for j, q in enumerate(opoly):
-                            wcoeffs[i, (c0 * element.range_shape[1] + c1) * len(opoly) + j] = (
+                            wcoeffs[i, (c0 * rshape[1] + c1) * len(opoly) + j] = (
                                 q * values * wts
                             ).sum()
             else:
@@ -133,10 +136,10 @@ def create_basix_element(
         shape = dof_wts[dof.entity[0]][dof.entity[1]].shape
         new_dof_wts = np.zeros((shape[0] + 1, shape[1], shape[2], shape[3]))
         new_dof_wts[: shape[0], :, :, :] = dof_wts[dof.entity[0]][dof.entity[1]]
-        for p_i, p in enumerate(dof_p):
+        for p_i, pt in enumerate(dof_p):
             dof_wts[dof.entity[0]][dof.entity[1]] = new_dof_wts
             for i, q in enumerate(dof_pts[dof.entity[0]][dof.entity[1]]):
-                if np.allclose(p, q):
+                if np.allclose(pt, q):
                     point_n = i
                     break
             else:
