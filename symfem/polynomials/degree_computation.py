@@ -8,7 +8,7 @@ from symfem.basis_functions import SubbedBasisFunction
 from symfem.symbols import x
 
 
-def _degree(term: sympy.core.expr.Expr) -> int:
+def monomial_degree(term: sympy.core.expr.Expr) -> int:
     """Get the degree of a sympy monomial."""
     poly = term.as_poly()
     if poly is None:
@@ -18,7 +18,7 @@ def _degree(term: sympy.core.expr.Expr) -> int:
     return poly.degree()
 
 
-def simplex_degree(polynomial: ScalarFunction, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
+def simplex_degree(polynomial: sympy.core.expr.Expr, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
     """Get the degree of a polynomial on a simplex cell.
 
     Args:
@@ -28,12 +28,12 @@ def simplex_degree(polynomial: ScalarFunction, vars: typing.Tuple[sympy.Symbol, 
         The degree of the polynomial on a simplex cell
     """
     return max(
-        _degree(term.subs(x[1], x[0]).subs(x[2], x[0]))
-        for term in polynomial.as_sympy().expand().as_coefficients_dict()
+        monomial_degree(term.subs(x[1], x[0]).subs(x[2], x[0]))
+        for term in sym_poly.expand().as_coefficients_dict()
     )
 
 
-def tp_degree(polynomial: ScalarFunction, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
+def tp_degree(polynomial: sympy.core.expr.Expr, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
     """Get the degree of a polynomial on a tensor product cell.
 
     Args:
@@ -42,10 +42,10 @@ def tp_degree(polynomial: ScalarFunction, vars: typing.Tuple[sympy.Symbol, ...] 
     Returns:
         The degree of the polynomial on a tensor product cell
     """
-    return max(_degree(term) for term in polynomial.as_sympy().expand().as_coefficients_dict())
+    return max(monomial_degree(term) for term in polynomial.as_sympy().expand().as_coefficients_dict())
 
 
-def prism_degree(polynomial: ScalarFunction, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
+def prism_degree(polynomial: sympy.core.expr.Expr, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
     """Get the degree of a polynomial on a prism.
 
     Args:
@@ -60,7 +60,7 @@ def prism_degree(polynomial: ScalarFunction, vars: typing.Tuple[sympy.Symbol, ..
     )
 
 
-def pyramid_degree(polynomial: ScalarFunction, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
+def pyramid_degree(polynomial: sympy.core.expr.Expr, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
     """Get the degree of a polynomial on a pyramid.
 
     Args:
@@ -99,12 +99,15 @@ def degree(
     if not isinstance(polynomial, ScalarFunction):
         raise NotImplementedError(f"Unsupported polynomial type: {type(polynomial)}")
 
+    sym_poly = polynomial.as_sympy()
+    assert isinstance(sym_poly, sympy.core.expr.Expr)
+
     if reference.name in ["interval", "triangle", "tetrahedron"]:
-        return simplex_degree(polynomial, vars)
+        return simplex_degree(sym_poly, vars)
     if reference.name in ["quadrilateral", "hexahedron"]:
-        return tp_degree(polynomial, vars)
+        return tp_degree(sym_poly, vars)
     if reference.name == "prism":
-        return prism_degree(polynomial, vars)
+        return prism_degree(sym_poly, vars)
     if reference.name == "pyramid":
-        return pyramid_degree(polynomial, vars)
+        return pyramid_degree(sym_poly, vars)
     raise ValueError(f"Unsupported cell: {reference.name}")
