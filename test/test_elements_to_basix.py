@@ -35,7 +35,7 @@ def test_element(elements_to_test, cells_to_test, cell_type, element_type, order
     if order == 0:
         pytest.skip()
 
-    if element_type in ["transition", "GLS"]:
+    if element_type in ["transition", "GLS", "Bernardi-Raugel"]:
         pytest.xfail("Cannot convert this element type to a Basix element")
 
     element = create_element(cell_type, element_type, order, **kwargs)

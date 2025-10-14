@@ -63,7 +63,7 @@ class BDDF(CiarletElement):
         dofs: ListOfFunctionals = make_integral_moment_dofs(
             reference,
             facets=(NormalIntegralMoment, DPC, order, {"variant": variant}),
-            cells=(IntegralMoment, VectorDPC, order - 2, {"variant": variant}),
+            cells=(IntegralMoment, VectorDPC, order - 2, "contravariant", {"variant": variant}),
         )
 
         self.variant = variant

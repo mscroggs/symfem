@@ -9,6 +9,7 @@ from symfem import mappings
 from symfem.functions import (
     Function,
     FunctionInput,
+    MatrixFunction,
     ScalarFunction,
     VectorFunction,
     parse_function_input,
@@ -952,7 +953,9 @@ class PointInnerProduct(BaseFunctional):
         Returns:
             Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
-        return [[float(i) for i in self.dof_point()]], [[[float(i * j)]] for i in self.lvec for j in self.rvec]
+        return [[float(i) for i in self.dof_point()]], [
+            [[float(i * j)]] for i in self.lvec for j in self.rvec
+        ]
 
     name = "Point inner product"
 
@@ -1756,6 +1759,18 @@ class DerivativeIntegralMoment(IntegralMoment):
         value = integrand.integral(self.integral_domain)
         return value
 
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        raise NotImplementedError()
+
     name = "Derivative integral moment"
 
 
@@ -2020,6 +2035,18 @@ class TraceIntegralMoment(IntegralMoment):
             desc += "(" + _to_tex(self.f, True) + ")"
         return desc, [entity_def]
 
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        raise NotImplementedError()
+
     name = "Trace integral moment"
 
 
@@ -2169,6 +2196,22 @@ class InnerProductIntegralMoment(IntegralMoment):
         desc += "\\boldsymbol{V}"
         desc += _to_tex(self.inner_with_right)
         return desc, [entity_def]
+
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        dot_with = MatrixFunction(
+            [[self.f * i * j for j in self.inner_with_right] for i in self.inner_with_left]
+        )
+
+        return discrete_integral_moment(self.integral_domain, dot_with, poly_degree)
 
     name = "Inner product integral moment"
 

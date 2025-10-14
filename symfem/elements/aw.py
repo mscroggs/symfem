@@ -210,6 +210,7 @@ class NonConformingArnoldWinther(CiarletElement):
                         tuple(tuple(p * j for j in i) for i in component22),
                         dof,
                         entity=(2, 0),
+                        mapping="double_contravariant",
                     )
                 )
 

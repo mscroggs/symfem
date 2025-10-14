@@ -65,7 +65,10 @@ def create_basix_element(
                 "Conversion to Basix element not implemented for elements including derivatives"
             )
     for dof in element.dofs[1:]:
-        assert dof.mapping == element.dofs[0].mapping
+        if dof.mapping != element.dofs[0].mapping:
+            raise NotImplementedError(
+                "Conversion to Basix element not implemented for elements with a mixture of mapping types"
+            )
     for p in element.get_polynomial_basis():
         if isinstance(p, PiecewiseFunction):
             raise NotImplementedError(

@@ -292,9 +292,7 @@ class TNTcurl(CiarletElement):
                         f *= x[2] ** (k - 1) * x[2] ** k
                         grad_f = ScalarFunction(f).grad(3)
                         dofs.append(
-                            IntegralAgainst(
-                                reference, grad_f, entity=(3, 0), mapping="covariant"
-                            )
+                            IntegralAgainst(reference, grad_f, entity=(3, 0), mapping="covariant")
                         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -464,7 +462,10 @@ class TNTdiv(CiarletElement):
                             )
                             dofs.append(
                                 IntegralAgainst(
-                                    reference, f, entity=(reference.tdim, 0), mapping="contravariant"
+                                    reference,
+                                    f,
+                                    entity=(reference.tdim, 0),
+                                    mapping="contravariant",
                                 )
                             )
 

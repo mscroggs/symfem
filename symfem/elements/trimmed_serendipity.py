@@ -99,8 +99,8 @@ class TrimmedSerendipityHcurl(CiarletElement):
         dofs += make_integral_moment_dofs(
             reference,
             edges=(TangentIntegralMoment, DPC, order, {"variant": variant}),
-            faces=(IntegralMoment, VectorDPC, order - 2, "contravariant", {"variant": variant}),
-            volumes=(IntegralMoment, VectorDPC, order - 4, "contravariant", {"variant": variant}),
+            faces=(IntegralMoment, VectorDPC, order - 2, "covariant", {"variant": variant}),
+            volumes=(IntegralMoment, VectorDPC, order - 4, "covariant", {"variant": variant}),
         )
         if order >= 1:
             for f_n in range(reference.sub_entity_count(2)):
@@ -108,7 +108,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
                     f = ScalarFunction(x[0] ** (order - i) * x[1] ** i).grad(2)
                     f2 = VectorFunction((f[1], -f[0])).subs(x, tuple(t))
                     dofs.append(
-                        IntegralAgainst(reference, f2, entity=(2, f_n), mapping="contravariant")
+                        IntegralAgainst(reference, f2, entity=(2, f_n), mapping="covariant")
                     )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -143,7 +143,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
     min_order = 0
     continuity = "H(curl)"
     value_type = "vector"
-    last_updated = "2025.03"
+    last_updated = "2025.10"
 
 
 class TrimmedSerendipityHdiv(CiarletElement):
@@ -192,7 +192,7 @@ class TrimmedSerendipityHdiv(CiarletElement):
         dofs += make_integral_moment_dofs(
             reference,
             facets=(NormalIntegralMoment, DPC, order, {"variant": variant}),
-            cells=(IntegralMoment, VectorDPC, order - 2, "covariant", {"variant": variant}),
+            cells=(IntegralMoment, VectorDPC, order - 2, "contravariant", {"variant": variant}),
         )
         if order >= 1:
             if reference.tdim == 2:
@@ -209,7 +209,9 @@ class TrimmedSerendipityHdiv(CiarletElement):
             for f in fs:
                 f2 = f.subs(x, tuple(t))
                 dofs.append(
-                    IntegralAgainst(reference, f2, entity=(reference.tdim, 0), mapping="covariant")
+                    IntegralAgainst(
+                        reference, f2, entity=(reference.tdim, 0), mapping="contravariant"
+                    )
                 )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -244,4 +246,4 @@ class TrimmedSerendipityHdiv(CiarletElement):
     min_order = 0
     continuity = "H(div)"
     value_type = "vector"
-    last_updated = "2025.03"
+    last_updated = "2025.10"

@@ -58,13 +58,27 @@ class HuangZhang(CiarletElement):
         )
         dofs += make_integral_moment_dofs(
             reference,
-            facets=(TangentIntegralMoment, Lagrange, order - 1, {"variant": variant}),
+            facets=(
+                TangentIntegralMoment,
+                Lagrange,
+                order - 1,
+                "contravariant",
+                {"variant": variant},
+            ),
         )
 
         for i in range(order):
             for j in range(order - 1):
-                dofs.append(IntegralAgainst(reference, (x[0] ** i * x[1] ** j, 0), (2, 0)))
-                dofs.append(IntegralAgainst(reference, (0, x[0] ** j * x[1] ** i), (2, 0)))
+                dofs.append(
+                    IntegralAgainst(
+                        reference, (x[0] ** i * x[1] ** j, 0), (2, 0), mapping="contravariant"
+                    )
+                )
+                dofs.append(
+                    IntegralAgainst(
+                        reference, (0, x[0] ** j * x[1] ** i), (2, 0), mapping="contravariant"
+                    )
+                )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
@@ -97,4 +111,4 @@ class HuangZhang(CiarletElement):
     min_order = 1
     continuity = "H(div)"
     value_type = "vector"
-    last_updated = "2025.03"
+    last_updated = "2025.10"
