@@ -952,7 +952,7 @@ class PointInnerProduct(BaseFunctional):
         Returns:
             Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
-        raise NotImplementedError()
+        return [[float(i) for i in self.dof_point()]], [[[float(i * j)]] for i in self.lvec for j in self.rvec]
 
     name = "Point inner product"
 
