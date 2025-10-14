@@ -148,4 +148,3 @@ class BDFM(CiarletElement):
     continuity = "H(div)"
     value_type = "vector"
     last_updated = "2025.10"
-    cache = False
