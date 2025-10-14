@@ -87,6 +87,55 @@ def _nth(n: int) -> str:
     return f"{n}th"
 
 
+def discrete_integral_moment(domain: Reference, f: Function, poly_degree: int):
+    """Get points and weights that define an integral moment against f.
+
+    Args:
+        domain: The integral domain
+        f: The function to integrate against
+        poly_degree: The polynomial degree of the element. This may be used to decide which
+            degree quadrature rule to use
+
+    Returns:
+        Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+    """
+    pts, wts = numerical_quadrature(domain.name, poly_degree + degree(domain, f))
+    mapped_pts = [
+        [
+            float(i[0] + sum(j * k for j, k in zip(i[1:], p)))
+            for i in zip(domain.origin, *domain.axes)
+        ]
+        for p in pts
+    ]
+
+    dof_wts = []
+
+    if f.is_scalar:
+        sub_w = []
+        for p, w in zip(pts, wts):
+            value = f.subs(t[: len(p)], p)
+            sub_w.append([float(value) * w])
+        dof_wts.append(sub_w)
+    elif f.is_vector:
+        for i in range(f.shape[0]):
+            sub_w = []
+            for p, w in zip(pts, wts):
+                value = f.subs(t[: len(p)], p)
+                sub_w.append([float(value[i]) * w])
+            dof_wts.append(sub_w)
+    else:
+        assert f.is_matrix
+        for i0 in range(f.shape[0]):
+            for i1 in range(f.shape[1]):
+                sub_w = []
+                for p, w in zip(pts, wts):
+                    value = f.subs(t[: len(p)], p)
+                    sub_w.append([float(value[i0][i1]) * w])
+                dof_wts.append(sub_w)
+
+    return mapped_pts, dof_wts
+
+
 class BaseFunctional(ABC):
     """A functional."""
 
@@ -1235,28 +1284,7 @@ class IntegralAgainst(BaseFunctional):
         Returns:
             Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
-        pts, wts = numerical_quadrature(
-            self.integral_domain.name, poly_degree + degree(self.integral_domain, self.f)
-        )
-        mapped_pts = [
-            [
-                float(i[0] + sum(j * k for j, k in zip(i[1:], p)))
-                for i in zip(self.integral_domain.origin, *self.integral_domain.axes)
-            ]
-            for p in pts
-        ]
-
-        dof_wts = []
-
-        for p, w in zip(pts, wts):
-            value = self.f.subs(t[: len(p)], p)
-            if self.f.is_scalar:
-                dof_wts.append([float(value) * w])
-            else:
-                for v in value:
-                    dof_wts.append([float(v) * w])
-
-        return mapped_pts, [dof_wts]
+        return discrete_integral_moment(self.integral_domain, self.f, poly_degree)
 
     name = "Integral against"
 
@@ -1653,33 +1681,7 @@ class IntegralMoment(BaseFunctional):
         Returns:
             Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
         """
-        pts, wts = numerical_quadrature(
-            self.integral_domain.name, poly_degree + degree(self.integral_domain, self.f)
-        )
-        mapped_pts = [
-            [
-                float(i[0] + sum(j * k for j, k in zip(i[1:], p)))
-                for i in zip(self.integral_domain.origin, *self.integral_domain.axes)
-            ]
-            for p in pts
-        ]
-
-        dof_wts = []
-
-        for p, w in zip(pts, wts):
-            value = self.f.subs(t[: len(p)], p)
-            if self.f.is_scalar:
-                dof_wts.append([float(value) * w])
-            elif self.f.is_vector:
-                for v in value:
-                    dof_wts.append([float(v) * w])
-            else:
-                assert self.f.is_matrix
-                for i0 in range(self.f.shape[0]):
-                    for i1 in range(self.f.shape[1]):
-                        dof_wts.append([float(value[i0][i1]) * w])
-
-        return mapped_pts, [dof_wts]
+        return discrete_integral_moment(self.integral_domain, self.f, poly_degree)
 
     name = "Integral moment"
 
