@@ -1,6 +1,7 @@
 """Interface to Basix."""
 
 import typing
+from enum import Enum
 from symfem.finite_element import CiarletElement
 from symfem.symbols import x
 from symfem.piecewise_functions import PiecewiseFunction
@@ -44,17 +45,17 @@ def get_embedded_degrees(poly, reference) -> typing.Tuple[int, int]:
     return (-1, superdegree)
 
 
-def create_basix_element(
+def _create_custom_element_args(
     element: CiarletElement, dtype: npt.DTypeLike = np.float64
-) -> basix.finite_element.FiniteElement:
-    """Create a Basix element from a Symfem element.
+) -> tuple[list[typing.Any], dict[str, typing.Any]]:
+    """Generate the arguments to create a Basix custom element.
 
     Args:
         element: The Symfem element
         dtype: The dtype of the Basix element
 
     Returns:
-        A Basix element
+        A list of args and a dict of kwargs
     """
     for dof in element.dofs:
         if dof.nderivs > 0:
@@ -153,7 +154,7 @@ def create_basix_element(
                 dof_wts[dof.entity[0]][dof.entity[1]] = new_dof_wts
             dof_wts[dof.entity[0]][dof.entity[1]][-1, :, point_n, :] = dof_w[:, p_i, :]
 
-    return basix.create_custom_element(
+    return [
         cell,
         () if element.range_shape is None else element.range_shape,
         wcoeffs,
@@ -166,5 +167,99 @@ def create_basix_element(
         subdegree,
         superdegree,
         ptype,
-        dtype=dtype,
-    )
+    ], {"dtype": dtype}
+
+
+def create_basix_element(
+    element: CiarletElement, dtype: npt.DTypeLike = np.float64
+) -> basix.finite_element.FiniteElement:
+    """Create a Basix element from a Symfem element.
+
+    Args:
+        element: The Symfem element
+        dtype: The dtype of the Basix element
+
+    Returns:
+        A Basix element
+    """
+    args, kwargs = _create_custom_element_args(element, dtype)
+    return basix.create_custom_element(*args, **kwargs)
+
+
+def _to_python_string(item: typing.Any, in_array: bool = False) -> str:
+    if isinstance(item, np.ndarray):
+        if item.size == 0:
+            return f"np.empty({_to_python_string(item.shape)}, dtype=np.{item.dtype})"
+        if in_array:
+            return "[" + ", ".join(_to_python_string(i, True) for i in item) + "]"
+        else:
+            return (
+                "np.array(["
+                + ", ".join(_to_python_string(i, True) for i in item)
+                + f"], dtype=np.{item.dtype})"
+            )
+    if isinstance(item, tuple):
+        if len(item) == 1:
+            return f"({_to_python_string(item[0])}, )"
+        return "(" + ", ".join(_to_python_string(i) for i in item) + ")"
+    if isinstance(item, list):
+        return "[" + ", ".join(_to_python_string(i) for i in item) + "]"
+    if isinstance(item, set):
+        return "{" + ", ".join(_to_python_string(i) for i in item) + "}"
+    if isinstance(item, dict):
+        return (
+            "{"
+            + ", ".join(f"{_to_python_string(i)}: {_to_python_string(j)}" for i, j in item.items())
+            + "}"
+        )
+    if isinstance(item, basix.CellType):
+        return f"basix.CellType.{item.name}"
+    if isinstance(item, basix.ElementFamily):
+        return f"basix.ElementFamily.{item.name}"
+    if isinstance(item, basix.MapType):
+        return f"basix.MapType.{item.name}"
+    if isinstance(item, basix.SobolevSpace):
+        return f"basix.SobolevSpace.{item.name}"
+    if isinstance(item, basix.PolysetType):
+        return f"basix.PolysetType.{item.name}"
+    if isinstance(item, Enum):
+        raise NotImplementedError(f"Invalid item type: {type(item)}")
+    if isinstance(item, (float, bool, int)):
+        return f"{item}"
+    if isinstance(item, type):
+        if item.__module__ == "numpy":
+            return f"np.{item.__name__}"
+        return f"{item.__module__}.{item.__name__}"
+
+    print(f"{item}")
+
+    raise NotImplementedError(f"Invalid item type: {type(item)}")
+
+
+def generate_basix_element_code(
+    element: CiarletElement, language: str = "python", dtype: npt.DTypeLike = np.float64
+) -> basix.finite_element.FiniteElement:
+    """Generate code to create a Basix custom element.
+
+    Args:
+        element: The Symfem element
+        dtype: The dtype of the Basix element
+
+    Returns:
+        A Basix element
+    """
+    args, kwargs = _create_custom_element_args(element, dtype)
+    if language == "python":
+        code = "import basix\n"
+        code += "import numpy as np\n"
+        code += "\n"
+        code += f"# Create degree {element.lagrange_superdegree} {element.name} element\n"
+        code += (
+            "basix.create_custom_element(\n    "
+            + ",\n    ".join(_to_python_string(i) for i in args)
+            + "".join(f", {j}={_to_python_string(k)}" for j, k in kwargs.items())
+            + "\n)"
+        )
+        return code
+    else:
+        raise NotImplementedError(f"Unsupported language: {language}")

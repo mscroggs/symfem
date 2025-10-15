@@ -2,7 +2,7 @@
 
 import pytest
 
-from symfem.basix_interface import create_basix_element
+from symfem.basix_interface import create_basix_element, generate_basix_element_code
 from symfem import create_element
 from symfem.finite_element import DirectElement, EnrichedElement
 from symfem.piecewise_functions import PiecewiseFunction
@@ -54,3 +54,6 @@ def test_element(elements_to_test, cells_to_test, cell_type, element_type, order
         assert basix_element.value_shape == []
     else:
         assert basix_element.value_shape == list(element.range_shape)
+
+    code_string = generate_basix_element_code(element)
+    exec(code_string)
