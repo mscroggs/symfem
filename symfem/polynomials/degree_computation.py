@@ -44,9 +44,7 @@ def tp_degree(polynomial: sympy.core.expr.Expr, vars: typing.Tuple[sympy.Symbol,
     Returns:
         The degree of the polynomial on a tensor product cell
     """
-    return max(
-        monomial_degree(term) for term in polynomial.expand().as_coefficients_dict()
-    )
+    return max(monomial_degree(term) for term in polynomial.expand().as_coefficients_dict())
 
 
 def prism_degree(
