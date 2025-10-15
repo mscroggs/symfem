@@ -234,6 +234,31 @@ def _to_python_string(item: typing.Any, in_array: bool = False) -> str:
     raise NotImplementedError(f"Invalid item type: {type(item)}")
 
 
+def _to_cpp_string(item: typing.Any, in_array: bool = False) -> tuple[list[str], str]:
+    if isinstance(item, (tuple, list)):
+        return [], "{" + ", ".join(_to_cpp_string(i)[1] for i in item) + "}"
+    if isinstance(item, (set, dict, np.ndarray)):
+        raise NotImplementedError(f"Invalid item type: {type(item)}")
+    if isinstance(item, basix.CellType):
+        return [], f"basix::cell::type::{item.name}"
+    if isinstance(item, basix.ElementFamily):
+        return [], f"basix::element::family::{item.name}"
+    if isinstance(item, basix.MapType):
+        return [], f"basix::maps::type::{item.name}"
+    if isinstance(item, basix.SobolevSpace):
+        return [], f"basix::sobolev::space::{item.name}"
+    if isinstance(item, basix.PolysetType):
+        return [], f"basix::polyset::type::{item.name}"
+    if isinstance(item, Enum):
+        raise NotImplementedError(f"Invalid item type: {type(item)}")
+    if isinstance(item, bool):
+        return [], "true" if item else "false"
+    if isinstance(item, (float, bool, int)):
+        return [], f"{item}"
+
+    raise NotImplementedError(f"Invalid item type: {type(item)}")
+
+
 def generate_basix_element_code(
     element: CiarletElement, language: str = "python", dtype: npt.DTypeLike = np.float64
 ) -> basix.finite_element.FiniteElement:
@@ -256,8 +281,59 @@ def generate_basix_element_code(
             "e = basix.create_custom_element(\n    "
             + ",\n    ".join(_to_python_string(i) for i in args)
             + "".join(f", {j}={_to_python_string(k)}" for j, k in kwargs.items())
-            + "\n)"
+            + "\n)\n"
         )
         return code
-    else:
-        raise NotImplementedError(f"Unsupported language: {language}")
+
+    if language == "c++":
+        t = {np.float64: "double", np.float32: "float"}[dtype]
+        definitions = []
+
+        function = "auto e = basix::create_custom_element(\n"
+
+        for n, a in enumerate(args):
+            if n == 2:
+                f = "wcoeffs"
+                data = f"std::vector<{t}> data = {{"
+                data += ", ".join(_to_cpp_string(c)[1] for b in a for c in b)
+                data += "};"
+                d = [data, f"impl::mdarray_t<{t}, 2> wcoeffs(data, {a.shape[0]}, {a.shape[1]});"]
+            elif n == 3:
+                d = ["std::array<std::vector<basix::impl::mdarray_t<{t}, 2>>, 4> x;"]
+                f = "x"
+                for i, x_i in enumerate(a):
+                    for x_ij in x_i:
+                        d.append(
+                            f"x[{i}].emplace_back(std::array{{{x_ij.shape[0]}, {x_ij.shape[1]}}}, {{"
+                            + ", ".join(_to_cpp_string(c)[1] for b in x_ij for c in b)
+                            + "});"
+                        )
+            elif n == 4:
+                d = ["std::array<std::vector<basix::impl::mdarray_t<{t}, 4>>, 4> M;"]
+                f = "M"
+                for i, m_i in enumerate(a):
+                    for m_ij in m_i:
+                        d.append(
+                            f"M[{i}].emplace_back(std::array{{{m_ij.shape[0]}, {m_ij.shape[1]}, {m_ij.shape[2]}, {m_ij.shape[3]}}}, {{"
+                            + ", ".join(
+                                _to_cpp_string(e)[1] for b in m_ij for c in b for d in c for e in d
+                            )
+                            + "});"
+                        )
+            else:
+                d, f = _to_cpp_string(a)
+            definitions += d
+            function += f"  {f},\n"
+        function += ");\n"
+
+        code = "#include <basix>\n"
+        code += "#include <vector>\n"
+        code += "\n"
+        code += "\n".join(definitions) + "\n"
+        code += "\n"
+        code += f"// Create degree {element.lagrange_superdegree} {element.name} element\n"
+        code += function
+
+        return code
+
+    raise NotImplementedError(f"Unsupported language: {language}")
