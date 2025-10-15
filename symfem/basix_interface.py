@@ -186,30 +186,30 @@ def create_basix_element(
     return basix.create_custom_element(*args, **kwargs)
 
 
-def _to_code_string(item: typing.Any, in_array: bool = False) -> str:
+def _to_python_string(item: typing.Any, in_array: bool = False) -> str:
     if isinstance(item, np.ndarray):
         if item.size == 0:
-            return f"np.empty({_to_code_string(item.shape)}, dtype=np.{item.dtype})"
+            return f"np.empty({_to_python_string(item.shape)}, dtype=np.{item.dtype})"
         if in_array:
-            return "[" + ", ".join(_to_code_string(i, True) for i in item) + "]"
+            return "[" + ", ".join(_to_python_string(i, True) for i in item) + "]"
         else:
             return (
                 "np.array(["
-                + ", ".join(_to_code_string(i, True) for i in item)
+                + ", ".join(_to_python_string(i, True) for i in item)
                 + f"], dtype=np.{item.dtype})"
             )
     if isinstance(item, tuple):
         if len(item) == 1:
-            return f"({_to_code_string(item[0])}, )"
-        return "(" + ", ".join(_to_code_string(i) for i in item) + ")"
+            return f"({_to_python_string(item[0])}, )"
+        return "(" + ", ".join(_to_python_string(i) for i in item) + ")"
     if isinstance(item, list):
-        return "[" + ", ".join(_to_code_string(i) for i in item) + "]"
+        return "[" + ", ".join(_to_python_string(i) for i in item) + "]"
     if isinstance(item, set):
-        return "{" + ", ".join(_to_code_string(i) for i in item) + "}"
+        return "{" + ", ".join(_to_python_string(i) for i in item) + "}"
     if isinstance(item, dict):
         return (
             "{"
-            + ", ".join(f"{_to_code_string(i)}: {_to_code_string(j)}" for i, j in item.items())
+            + ", ".join(f"{_to_python_string(i)}: {_to_python_string(j)}" for i, j in item.items())
             + "}"
         )
     if isinstance(item, basix.CellType):
@@ -237,7 +237,7 @@ def _to_code_string(item: typing.Any, in_array: bool = False) -> str:
 
 
 def generate_basix_element_code(
-    element: CiarletElement, dtype: npt.DTypeLike = np.float64
+    element: CiarletElement, language: str = "python", dtype: npt.DTypeLike = np.float64
 ) -> basix.finite_element.FiniteElement:
     """Generate code to create a Basix custom element.
 
@@ -249,14 +249,17 @@ def generate_basix_element_code(
         A Basix element
     """
     args, kwargs = _create_custom_element_args(element, dtype)
-    code = "import basix\n"
-    code += "import numpy as np\n"
-    code += "\n"
-    code += f"# Create degree {element.lagrange_superdegree} {element.name} element\n"
-    code += (
-        "basix.create_custom_element(\n    "
-        + ",\n    ".join(_to_code_string(i) for i in args)
-        + "".join(f", {j}={_to_code_string(k)}" for j, k in kwargs.items())
-        + "\n)"
-    )
-    return code
+    if language == "python":
+        code = "import basix\n"
+        code += "import numpy as np\n"
+        code += "\n"
+        code += f"# Create degree {element.lagrange_superdegree} {element.name} element\n"
+        code += (
+            "basix.create_custom_element(\n    "
+            + ",\n    ".join(_to_python_string(i) for i in args)
+            + "".join(f", {j}={_to_python_string(k)}" for j, k in kwargs.items())
+            + "\n)"
+        )
+        return code
+    else:
+        raise NotImplementedError(f"Unsupported language: {language}")
