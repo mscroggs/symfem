@@ -253,7 +253,7 @@ def generate_basix_element_code(
         code += "\n"
         code += f"# Create degree {element.lagrange_superdegree} {element.name} element\n"
         code += (
-            "basix.create_custom_element(\n    "
+            "e = basix.create_custom_element(\n    "
             + ",\n    ".join(_to_python_string(i) for i in args)
             + "".join(f", {j}={_to_python_string(k)}" for j, k in kwargs.items())
             + "\n)"
