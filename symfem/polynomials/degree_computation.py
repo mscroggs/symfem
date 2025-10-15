@@ -8,14 +8,9 @@ from symfem.basis_functions import SubbedBasisFunction
 from symfem.symbols import x
 
 
-def monomial_degree(term: sympy.core.expr.Expr) -> int:
+def monomial_degree(term: sympy.core.expr.Expr, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
     """Get the degree of a sympy monomial."""
-    poly = term.as_poly()
-    if poly is None:
-        if term == 1:
-            return 0
-        raise ValueError(f"Invalid monomial: {term}")
-    return poly.degree()
+    return max(term.as_poly(v).degree() for v in vars)
 
 
 def simplex_degree(
@@ -30,7 +25,7 @@ def simplex_degree(
         The degree of the polynomial on a simplex cell
     """
     return max(
-        monomial_degree(term.subs(x[1], x[0]).subs(x[2], x[0]))
+        monomial_degree(term.subs(vars[1], vars[0]).subs(vars[2], vars[0]), vars)
         for term in polynomial.expand().as_coefficients_dict()
     )
 
@@ -44,7 +39,7 @@ def tp_degree(polynomial: sympy.core.expr.Expr, vars: typing.Tuple[sympy.Symbol,
     Returns:
         The degree of the polynomial on a tensor product cell
     """
-    return max(monomial_degree(term) for term in polynomial.expand().as_coefficients_dict())
+    return max(monomial_degree(term, vars) for term in polynomial.expand().as_coefficients_dict())
 
 
 def prism_degree(
@@ -58,10 +53,8 @@ def prism_degree(
     Returns:
         The degree of the polynomial on a prism
     """
-    return max(
-        simplex_degree(polynomial.subs(vars[1], vars[0])),
-        simplex_degree(polynomial.subs(vars[2], vars[0])),
-    )
+    print(polynomial)
+    return tp_degree(polynomial.subs(vars[0], vars[1]))
 
 
 def pyramid_degree(
@@ -75,13 +68,15 @@ def pyramid_degree(
     Returns:
         The degree of the polynomial on a pyramid
     """
-    return tp_degree(polynomial.subs([x[0], x[1]], [x[0] * (1 - x[2]), x[1] * (1 - x[2])]))
+    return tp_degree(
+        polynomial.subs([vars[0], vars[1]], [vars[0] * (1 - vars[2]), vars[1] * (1 - vars[2])])
+    )
 
 
 def degree(
     reference: Reference, polynomial: Function, vars: typing.Tuple[sympy.Symbol, ...] = x
 ) -> int:
-    """Get the degree of a polynomial on a reference cell.
+    """Get the Lagrange degree of a polynomial on a reference cell.
 
     Args:
         reference: The reference cell
