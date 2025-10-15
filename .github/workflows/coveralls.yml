@@ -20,10 +20,8 @@ jobs:
         with:
           path: /home/runner/.cache/symfem
           key: symfem-matrix-cache
-      - run: |
-            sudo apt-get install -y libeigen3-dev libopenblas-dev liblapack-dev ninja-build
-            pip install pybind11
-        name: Install Basix requirements
+      - run: sudo apt-get install -y libopenblas-dev
+        name: Install OpenBLAS
       - run: pip install coverage coveralls pytest-cov
         name: Install Coveralls
       - uses: actions/checkout@v4

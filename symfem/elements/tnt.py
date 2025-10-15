@@ -240,12 +240,12 @@ class TNTcurl(CiarletElement):
                 )
         if reference.tdim == 2:
             for f in face_moments:
-                dofs.append(IntegralAgainst(reference, f, entity=(2, 0), mapping="contravariant"))
+                dofs.append(IntegralAgainst(reference, f, entity=(2, 0), mapping="covariant"))
         elif reference.tdim == 3:
             for face_n in range(6):
                 for f in face_moments:
                     dofs.append(
-                        IntegralAgainst(reference, f, entity=(2, face_n), mapping="contravariant")
+                        IntegralAgainst(reference, f, entity=(2, face_n), mapping="covariant")
                     )
 
         # Interior Moments
@@ -292,9 +292,7 @@ class TNTcurl(CiarletElement):
                         f *= x[2] ** (k - 1) * x[2] ** k
                         grad_f = ScalarFunction(f).grad(3)
                         dofs.append(
-                            IntegralAgainst(
-                                reference, grad_f, entity=(3, 0), mapping="contravariant"
-                            )
+                            IntegralAgainst(reference, grad_f, entity=(3, 0), mapping="covariant")
                         )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -329,7 +327,7 @@ class TNTcurl(CiarletElement):
     min_order = 1
     continuity = "H(curl)"
     value_type = "vector"
-    last_updated = "2023.06"
+    last_updated = "2025.10"
 
 
 class TNTdiv(CiarletElement):
@@ -392,7 +390,7 @@ class TNTdiv(CiarletElement):
                 grad_f = ScalarFunction(f).grad(reference.tdim)
                 dofs.append(
                     IntegralAgainst(
-                        reference, grad_f, entity=(reference.tdim, 0), mapping="covariant"
+                        reference, grad_f, entity=(reference.tdim, 0), mapping="contravariant"
                     )
                 )
 
@@ -405,7 +403,7 @@ class TNTdiv(CiarletElement):
                     )
                     dofs.append(
                         IntegralAgainst(
-                            reference, f, entity=(reference.tdim, 0), mapping="covariant"
+                            reference, f, entity=(reference.tdim, 0), mapping="contravariant"
                         )
                     )
         if reference.tdim == 3:
@@ -427,7 +425,7 @@ class TNTdiv(CiarletElement):
                         )
                         dofs.append(
                             IntegralAgainst(
-                                reference, f, entity=(reference.tdim, 0), mapping="covariant"
+                                reference, f, entity=(reference.tdim, 0), mapping="contravariant"
                             )
                         )
                         f = (
@@ -445,7 +443,7 @@ class TNTdiv(CiarletElement):
                         )
                         dofs.append(
                             IntegralAgainst(
-                                reference, f, entity=(reference.tdim, 0), mapping="covariant"
+                                reference, f, entity=(reference.tdim, 0), mapping="contravariant"
                             )
                         )
                         if k in [0, 2]:
@@ -464,7 +462,10 @@ class TNTdiv(CiarletElement):
                             )
                             dofs.append(
                                 IntegralAgainst(
-                                    reference, f, entity=(reference.tdim, 0), mapping="covariant"
+                                    reference,
+                                    f,
+                                    entity=(reference.tdim, 0),
+                                    mapping="contravariant",
                                 )
                             )
 
@@ -500,4 +501,4 @@ class TNTdiv(CiarletElement):
     min_order = 1
     continuity = "H(div)"
     value_type = "vector"
-    last_updated = "2023.06"
+    last_updated = "2025.10"

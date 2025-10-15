@@ -1,12 +1,12 @@
 """Test polynomials."""
 
-from random import shuffle
+from random import shuffle, randrange
 
 import pytest
 import sympy
 
 from symfem import create_element, create_reference
-from symfem.functions import VectorFunction
+from symfem.functions import VectorFunction, ScalarFunction
 from symfem.polynomials import (
     Hcurl_polynomials,
     Hdiv_polynomials,
@@ -15,6 +15,7 @@ from symfem.polynomials import (
     l2_dual,
     orthogonal_basis,
     orthonormal_basis,
+    degree,
 )
 from symfem.symbols import t, x
 from symfem.utils import allequal
@@ -193,3 +194,60 @@ def test_jacobi_orthogonal(a, b, monic):
     for i, p in enumerate(poly):
         for q in poly[:i]:
             assert ((1 - x[0]) ** a * (1 + x[0]) ** b * p * q).integrate((x[0], -1, 1)) == 0
+
+
+@pytest.mark.parametrize(
+    ("poly", "ref", "expected_degree"),
+    [
+        (x[0], "interval", 1),
+        (x[0], "triangle", 1),
+        (x[0], "quadrilateral", 1),
+        (x[0], "tetrahedron", 1),
+        (x[0], "hexahedron", 1),
+        (x[0] * x[1], "triangle", 2),
+        (x[0] * x[1], "quadrilateral", 1),
+        (x[0] * x[1], "tetrahedron", 2),
+        (x[0] * x[1], "hexahedron", 1),
+        (x[0] * x[1] * (x[0] + x[1]), "triangle", 3),
+        (x[0] * x[1] * (x[0] + x[1]), "quadrilateral", 2),
+        (x[0] * x[1] * (x[0] + x[1]), "tetrahedron", 3),
+        (x[0] * x[1] * (x[0] + x[1]), "hexahedron", 2),
+        (x[0] * x[1] * (x[0] * x[1] - x[0] - x[1] + 1) ** 2, "quadrilateral", 3),
+        (x[0] ** 11 * x[1] ** 14 * x[2], "tetrahedron", 26),
+        (x[0] ** 11 * x[1] ** 14 * x[2], "hexahedron", 14),
+        (x[0] ** 11 * x[1] ** 14 * x[2], "prism", 25),
+    ],
+)
+def test_degree(poly, ref, expected_degree):
+    assert degree(create_reference(ref), ScalarFunction(poly)) == expected_degree
+
+
+@pytest.mark.parametrize(
+    ("ref", "dfunc"),
+    [
+        ("tetrahedron", lambda p, q, r: p + q + r),
+        ("hexahedron", max),
+        ("prism", lambda p, q, r: max(p + q, r)),
+    ],
+)
+def test_random_degrees(ref, dfunc):
+    cell = create_reference(ref)
+    for _ in range(20):
+        p = randrange(20)
+        q = randrange(20)
+        r = randrange(20)
+        poly = ScalarFunction(x[0] ** p * x[1] ** q * x[2] ** r)
+
+        assert degree(cell, poly) == dfunc(p, q, r)
+        assert degree(cell, poly.subs(x, t), t) == dfunc(p, q, r)
+
+
+def test_random_degrees_pyramid():
+    pyr = create_reference("pyramid")
+    for _ in range(20):
+        p = randrange(20)
+        q = randrange(20)
+        r = randrange(20)
+        poly = ScalarFunction((x[0] / (1 - x[2])) ** p * (x[1] / (1 - x[2])) ** q * x[2] ** r)
+
+        assert degree(pyr, poly) == max(p, q, r)

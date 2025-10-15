@@ -84,7 +84,10 @@ class FiniteElement(ABC):
         self.space_dim = space_dim
         self.domain_dim = domain_dim
         self.range_dim = range_dim
-        self.range_shape = range_shape
+        if range_shape is None and range_dim > 1:
+            self.range_shape: typing.Optional[typing.Tuple[int, ...]] = (range_dim,)
+        else:
+            self.range_shape = range_shape
         self._float_basis_functions = None
         self._value_scale = None
 

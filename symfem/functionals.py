@@ -1,7 +1,7 @@
 """Functionals used to define the dual sets."""
 
 import typing
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, abstractproperty
 
 import sympy
 
@@ -9,16 +9,22 @@ from symfem import mappings
 from symfem.functions import (
     Function,
     FunctionInput,
+    MatrixFunction,
     ScalarFunction,
     VectorFunction,
     parse_function_input,
 )
 from symfem.geometry import PointType, SetOfPoints
+from symfem.polynomials import degree
 from symfem.piecewise_functions import PiecewiseFunction
+from symfem.quadrature import numerical as numerical_quadrature
 from symfem.references import Interval, NonDefaultReferenceError, Reference
 from symfem.symbols import t, x
 
 ScalarValueOrFloat = typing.Union[sympy.core.expr.Expr, float]
+DiscreteDof = typing.Tuple[
+    typing.List[typing.List[float]], typing.List[typing.List[typing.List[float]]]
+]
 
 __all__ = [
     "BaseFunctional",
@@ -82,6 +88,57 @@ def _nth(n: int) -> str:
     return f"{n}th"
 
 
+def discrete_integral_moment(
+    domain: Reference, f: Function, poly_degree: int, vars: typing.Tuple[sympy.Symbol, ...] = t
+):
+    """Get points and weights that define an integral moment against f.
+
+    Args:
+        domain: The integral domain
+        f: The function to integrate against
+        poly_degree: The polynomial degree of the element. This may be used to decide which
+            degree quadrature rule to use
+
+    Returns:
+        Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+    """
+    pts, wts = numerical_quadrature(domain.name, poly_degree + degree(domain, f, vars))
+    mapped_pts = [
+        [
+            float(i[0] + sum(j * k for j, k in zip(i[1:], p)))
+            for i in zip(domain.origin, *domain.axes)
+        ]
+        for p in pts
+    ]
+
+    dof_wts = []
+
+    if f.is_scalar:
+        sub_w = []
+        for p, w in zip(pts, wts):
+            value = f.subs(t[: len(p)], p)
+            sub_w.append([float(value) * w])
+        dof_wts.append(sub_w)
+    elif f.is_vector:
+        for i in range(f.shape[0]):
+            sub_w = []
+            for p, w in zip(pts, wts):
+                value = f.subs(t[: len(p)], p)
+                sub_w.append([float(value[i]) * w])
+            dof_wts.append(sub_w)
+    else:
+        assert f.is_matrix
+        for i0 in range(f.shape[0]):
+            for i1 in range(f.shape[1]):
+                sub_w = []
+                for p, w in zip(pts, wts):
+                    value = f.subs(t[: len(p)], p)
+                    sub_w.append([float(value[i0][i1]) * w])
+                dof_wts.append(sub_w)
+
+    return mapped_pts, dof_wts
+
+
 class BaseFunctional(ABC):
     """A functional."""
 
@@ -98,6 +155,10 @@ class BaseFunctional(ABC):
         self.reference = reference
         self.entity = entity
         self.mapping = mapping
+
+    @abstractproperty
+    def nderivs(self) -> int:
+        """Number of derivatives."""
 
     def entity_dim(self) -> int:
         """Get the dimension of the entity this DOF is associated with.
@@ -240,6 +301,18 @@ class BaseFunctional(ABC):
         """
         pass
 
+    @abstractmethod
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+
     name = "Base functional"
 
 
@@ -264,6 +337,11 @@ class PointEvaluation(BaseFunctional):
         super().__init__(reference, entity, mapping)
         self.point = parse_function_input(point_in)
         assert self.point.is_vector
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return 0
 
     def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
@@ -303,6 +381,18 @@ class PointEvaluation(BaseFunctional):
         assert isinstance(self.point, VectorFunction)
         return f"v\\mapsto v({','.join([_to_tex(i, True) for i in self.point])})", []
 
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        return [[float(i) for i in self.dof_point()]], [[[1.0]]]
+
     name = "Point evaluation"
 
 
@@ -330,6 +420,11 @@ class WeightedPointEvaluation(BaseFunctional):
         self.point = parse_function_input(point_in)
         assert self.point.is_vector
         self.weight = weight
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return 0
 
     def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
@@ -372,6 +467,18 @@ class WeightedPointEvaluation(BaseFunctional):
             f"v({','.join([_to_tex(i, True) for i in self.point])})"
         ), []
 
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        return [[float(i) for i in self.dof_point()]], [[[float(self.weight)]]]
+
     name = "Weighted point evaluation"
 
 
@@ -399,6 +506,11 @@ class DerivativePointEvaluation(BaseFunctional):
         self.point = parse_function_input(point_in)
         assert self.point.is_vector
         self.derivative = derivative
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return sum(self.derivative)
 
     def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
@@ -472,6 +584,18 @@ class DerivativePointEvaluation(BaseFunctional):
         desc += f"v({','.join([_to_tex(i, True) for i in self.point])})"
         return desc, []
 
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        raise NotImplementedError()
+
     name = "Point derivative evaluation"
 
 
@@ -499,6 +623,11 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
         self.point = parse_function_input(point_in)
         assert self.point.is_vector
         self.dir = parse_function_input(direction_in)
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return 1
 
     def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
@@ -560,6 +689,18 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
         desc += "\\end{array}\\right)"
         return desc, []
 
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        raise NotImplementedError()
+
     name = "Point evaluation of directional derivative"
 
 
@@ -587,6 +728,11 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
         super().__init__(reference, point_in, edge.normal(), entity=entity, mapping=mapping)
         self.reference = edge
 
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return 1
+
     def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
         """Get a representation of the functional as TeX, and list of terms involved.
 
@@ -600,6 +746,18 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
         return desc, [
             "\\(\\hat{\\boldsymbol{n}}" + f"_{{{entity_n}}}\\) is the normal to facet {entity_n}"
         ]
+
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        raise NotImplementedError()
 
     name = "Point evaluation of normal derivative"
 
@@ -628,6 +786,11 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
         self.point = parse_function_input(point_in)
         assert self.point.is_vector
         self.component = component
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return 2
 
     def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
@@ -671,6 +834,18 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
         desc += "}(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
         return desc, []
 
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        raise NotImplementedError()
+
     name = "Point evaluation of Hessian component"
 
 
@@ -703,6 +878,11 @@ class PointInnerProduct(BaseFunctional):
         self.rvec = parse_function_input(rvec)
         assert self.lvec.is_vector
         assert self.rvec.is_vector
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return 0
 
     def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
@@ -765,6 +945,20 @@ class PointInnerProduct(BaseFunctional):
         desc += "\\end{array}\\right)"
         return desc, []
 
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        return [[float(i) for i in self.dof_point()]], [
+            [[float(i * j)]] for i in self.lvec for j in self.rvec
+        ]
+
     name = "Point inner product"
 
 
@@ -792,6 +986,11 @@ class DotPointEvaluation(BaseFunctional):
         self.point = parse_function_input(point_in)
         assert self.point.is_vector
         self.vector = parse_function_input(vector_in)
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return 0
 
     def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
@@ -852,6 +1051,27 @@ class DotPointEvaluation(BaseFunctional):
             desc += f"\\cdot{_to_tex(self.vector)}"
         return desc, []
 
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        if self.vector.is_vector:
+            return [[float(i) for i in self.dof_point()]], [[[float(i)]] for i in self.vector]
+        elif self.vector.is_matrix:
+            return [[float(i) for i in self.dof_point()]], [
+                [[float(self.vector[i][j])]]
+                for i in range(self.vector.shape[0])
+                for j in range(self.vector.shape[1])
+            ]
+        else:
+            raise NotImplementedError()
+
     name = "Dot point evaluation"
 
 
@@ -876,6 +1096,11 @@ class PointDivergenceEvaluation(BaseFunctional):
         super().__init__(reference, entity, mapping)
         self.point = parse_function_input(point_in)
         assert self.point.is_vector
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return 1
 
     def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
@@ -933,6 +1158,18 @@ class PointDivergenceEvaluation(BaseFunctional):
         desc += "(" + ",".join([_to_tex(i, True) for i in self.dof_point()]) + ")"
         return desc, []
 
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        raise NotImplementedError()
+
     name = "Point evaluation of divergence"
 
 
@@ -979,6 +1216,11 @@ class IntegralAgainst(BaseFunctional):
             )
         else:
             self.f = f
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return 0
 
     def dof_point(self) -> PointType:
         """Get the location of the DOF in the cell.
@@ -1037,6 +1279,18 @@ class IntegralAgainst(BaseFunctional):
             desc += "v"
         return desc, [entity_def]
 
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        return discrete_integral_moment(self.integral_domain, self.f, poly_degree)
+
     name = "Integral against"
 
 
@@ -1063,6 +1317,11 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
 
         f = parse_function_input(f_in)
         self.f = f.subs(x, t)
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return 1
 
     def dof_point(self) -> PointType:
         """Get the location of the DOF in the cell.
@@ -1115,6 +1374,18 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
         desc += "\\nabla\\cdot\\mathbf{v}"
         return desc, [entity_def]
 
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        raise NotImplementedError()
+
     name = "Integral of divergence against"
 
 
@@ -1135,7 +1406,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         Args:
             reference: The reference cell
             integral_domain: The domain of the integral
-            directions: The diections of the derivatives
+            directions: The directions of the derivatives
             orders: The orders of the derivatives
             entity: The entity the functional is associated with
             scale: The scale factor
@@ -1146,6 +1417,11 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         self.directions = directions
         self.orders = orders
         self.scale = scale
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return len(self.directions)
 
     def dof_point(self) -> PointType:
         """Get the location of the DOF in the cell.
@@ -1215,6 +1491,18 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         desc += "v"
         return desc, [entity_def]
 
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        raise NotImplementedError()
+
     name = "Integral of a directional derivative"
 
 
@@ -1277,6 +1565,11 @@ class IntegralMoment(BaseFunctional):
                 substitute=False,
             )
             self.f *= id_def.volume() / self.integral_domain.volume()
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return 0
 
     def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
@@ -1383,6 +1676,18 @@ class IntegralMoment(BaseFunctional):
             desc += "v"
         return desc, [entity_def]
 
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        return discrete_integral_moment(self.integral_domain, self.f, poly_degree)
+
     name = "Integral moment"
 
 
@@ -1410,6 +1715,11 @@ class DerivativeIntegralMoment(IntegralMoment):
         """
         super().__init__(reference, f, dof, entity=entity, mapping=mapping)
         self.dot_with = parse_function_input(dot_with_in)
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return 1
 
     def dot(self, function: Function) -> ScalarFunction:
         """Dot a function with the moment function.
@@ -1451,6 +1761,18 @@ class DerivativeIntegralMoment(IntegralMoment):
         value = integrand.integral(self.integral_domain)
         return value
 
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        raise NotImplementedError()
+
     name = "Derivative integral moment"
 
 
@@ -1477,6 +1799,11 @@ class DivergenceIntegralMoment(IntegralMoment):
         f = parse_function_input(f_in)
         assert f.is_scalar
         super().__init__(reference, f, dof, entity=entity, mapping=mapping)
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return 1
 
     def _eval_symbolic(self, function: Function) -> Function:
         """Apply to the functional to a function.
@@ -1509,6 +1836,18 @@ class DivergenceIntegralMoment(IntegralMoment):
             desc += "(" + _to_tex(self.f, True) + ")"
         desc += "\\nabla\\cdot\\boldsymbol{v}"
         return desc, [entity_def]
+
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        raise NotImplementedError()
 
     name = "Integral moment of divergence"
 
@@ -1698,6 +2037,18 @@ class TraceIntegralMoment(IntegralMoment):
             desc += "(" + _to_tex(self.f, True) + ")"
         return desc, [entity_def]
 
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        raise NotImplementedError()
+
     name = "Trace integral moment"
 
 
@@ -1747,6 +2098,23 @@ class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
             entity_def,
             f"\\(\\hat{{\\boldsymbol{{n}}}}_{{{entity_n}}}\\) is the normal to facet {entity_n}",
         ]
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return 1
+
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        raise NotImplementedError()
 
     name = "Normal derivative integral moment"
 
@@ -1830,6 +2198,22 @@ class InnerProductIntegralMoment(IntegralMoment):
         desc += "\\boldsymbol{V}"
         desc += _to_tex(self.inner_with_right)
         return desc, [entity_def]
+
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
+        """
+        dot_with = MatrixFunction(
+            [[self.f * i * j for j in self.inner_with_right] for i in self.inner_with_left]
+        )
+
+        return discrete_integral_moment(self.integral_domain, dot_with, poly_degree)
 
     name = "Inner product integral moment"
 

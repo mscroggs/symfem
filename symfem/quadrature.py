@@ -4,6 +4,13 @@ import typing
 
 import sympy
 
+try:
+    import basix
+
+    has_basix = True
+except ModuleNotFoundError:
+    has_basix = False
+
 __all__ = ["Scalar", "equispaced", "lobatto", "radau", "legendre", "get_quadrature"]
 
 Scalar = typing.Union[sympy.core.expr.Expr, int]
@@ -179,3 +186,24 @@ def get_quadrature(rule: str, n: int) -> typing.Tuple[typing.List[Scalar], typin
     if rule == "legendre":
         return legendre(n)
     raise ValueError(f"Unknown quadrature rule: {rule}")
+
+
+def numerical(
+    cell: str, degree: int
+) -> typing.Tuple[typing.List[typing.List[float]], typing.List[float]]:
+    """Get numerical quadrature rule.
+
+    Args:
+        cell: The cell type
+        degree: The degree for which this rule is exact
+
+    Returns:
+        Quadrature points and weights
+    """
+    if has_basix:
+        pts, wts = basix.make_quadrature(
+            getattr(basix.CellType, cell),
+            degree,
+        )
+        return [list(i) for i in pts], list(wts)
+    raise NotImplementedError()

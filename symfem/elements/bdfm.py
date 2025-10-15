@@ -90,14 +90,26 @@ class BDFM(CiarletElement):
         if reference.name in ["triangle", "tetrahedron"]:
             dofs = make_integral_moment_dofs(
                 reference,
-                facets=(NormalIntegralMoment, Lagrange, order, {"variant": variant}),
-                cells=(IntegralMoment, NedelecFirstKind, order - 1, {"variant": variant}),
+                facets=(
+                    NormalIntegralMoment,
+                    Lagrange,
+                    order,
+                    "contravariant",
+                    {"variant": variant},
+                ),
+                cells=(
+                    IntegralMoment,
+                    NedelecFirstKind,
+                    order - 1,
+                    "contravariant",
+                    {"variant": variant},
+                ),
             )
         else:
             dofs = make_integral_moment_dofs(
                 reference,
-                facets=(NormalIntegralMoment, DPC, order, {"variant": variant}),
-                cells=(IntegralMoment, VectorDPC, order - 1, {"variant": variant}),
+                facets=(NormalIntegralMoment, DPC, order, "contravariant", {"variant": variant}),
+                cells=(IntegralMoment, VectorDPC, order - 1, "contravariant", {"variant": variant}),
             )
         self.variant = variant
 
@@ -135,4 +147,4 @@ class BDFM(CiarletElement):
     min_order = 0
     continuity = "H(div)"
     value_type = "vector"
-    last_updated = "2025.03"
+    last_updated = "2025.10"

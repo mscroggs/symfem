@@ -115,7 +115,7 @@ class Bubble(CiarletElement):
     }
     continuity = "C0"
     value_type = "scalar"
-    last_updated = "2024.09"
+    last_updated = "2025.10"
 
 
 class BubbleEnrichedLagrange(CiarletElement):

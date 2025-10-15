@@ -10,10 +10,11 @@ import typing
 import sympy
 
 from symfem.finite_element import CiarletElement
-from symfem.functionals import BaseFunctional, ListOfFunctionals, PointEvaluation
-from symfem.functions import Function, FunctionInput
+from symfem.functionals import BaseFunctional, ListOfFunctionals, PointEvaluation, DiscreteDof
+from symfem.functions import Function, FunctionInput, ScalarFunction
 from symfem.geometry import PointType
 from symfem.polynomials import orthogonal_basis, polynomial_set_1d
+from symfem.quadrature import numerical as numerical_quadrature
 from symfem.references import Reference
 from symfem.symbols import AxisVariablesNotSingle, t, x
 
@@ -174,6 +175,38 @@ class BernsteinFunctional(BaseFunctional):
                 f"are the degree {self.degree} Bernstein polynomials on \\({e}\\)",
                 self.entity_definition(),
             ]
+
+    def discrete(self, poly_degree: int) -> DiscreteDof:
+        """Get points and weights that define this DOF discretely.
+
+        Args:
+            poly_degree: The polynomial degree of the element. This may be used to decide which
+                    degree quadrature rule to use
+
+        Returns:
+            Points and weights
+        """
+        pts, wts = numerical_quadrature(self.ref.name, self.degree * 2)
+        mapped_pts = [
+            [
+                float(i[0] + sum(j * k for j, k in zip(i[1:], p)))
+                for i in zip(self.ref.origin, *self.ref.axes)
+            ]
+            for p in pts
+        ]
+
+        dof_wts = []
+
+        for p, w in zip(pts, wts):
+            value = ScalarFunction(self.moment).subs(t[: len(p)], p)
+            dof_wts.append([float(value) * w])
+
+        return mapped_pts, [dof_wts]
+
+    @property
+    def nderivs(self) -> int:
+        """Number of derivatives."""
+        return 0
 
 
 class Bernstein(CiarletElement):
