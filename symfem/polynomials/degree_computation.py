@@ -75,7 +75,7 @@ def pyramid_degree(
     Returns:
         The degree of the polynomial on a pyramid
     """
-    return tp_degree(polynomial.subs([x[0], x[1]], [x[0] * (1 - x[2]), x[1] * (1 - x[2])]))
+    return tp_degree(polynomial.subs(x[0], x[0] * (1 - x[2])).subs(x[1], x[1] * (1 - x[2])))
 
 
 def degree(
