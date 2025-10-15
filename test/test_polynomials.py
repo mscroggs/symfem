@@ -239,6 +239,7 @@ def test_random_degrees(ref, dfunc):
         poly = ScalarFunction(x[0] ** p * x[1] ** q * x[2] ** r)
 
         assert degree(cell, poly) == dfunc(p, q, r)
+        assert degree(cell, poly.subs(x, t), t) == dfunc(p, q, r)
 
 
 def test_random_degrees_pyramid():

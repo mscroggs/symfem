@@ -10,7 +10,7 @@ from symfem.symbols import x
 
 def monomial_degree(term: sympy.core.expr.Expr, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
     """Get the degree of a sympy monomial."""
-    return max(term.as_poly(v).degree() for v in vars)
+    return term.as_poly(vars).degree()
 
 
 def simplex_degree(
@@ -24,10 +24,7 @@ def simplex_degree(
     Returns:
         The degree of the polynomial on a simplex cell
     """
-    return max(
-        monomial_degree(term.subs(vars[1], vars[0]).subs(vars[2], vars[0]), vars)
-        for term in polynomial.expand().as_coefficients_dict()
-    )
+    return max(monomial_degree(term, vars) for term in polynomial.expand().as_coefficients_dict())
 
 
 def tp_degree(polynomial: sympy.core.expr.Expr, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
@@ -53,8 +50,7 @@ def prism_degree(
     Returns:
         The degree of the polynomial on a prism
     """
-    print(polynomial)
-    return tp_degree(polynomial.subs(vars[0], vars[1]))
+    return tp_degree(polynomial.subs(vars[0], vars[1]), vars)
 
 
 def pyramid_degree(
@@ -69,7 +65,7 @@ def pyramid_degree(
         The degree of the polynomial on a pyramid
     """
     return tp_degree(
-        polynomial.subs([vars[0], vars[1]], [vars[0] * (1 - vars[2]), vars[1] * (1 - vars[2])])
+        polynomial.subs(vars[0], vars[0] * (1 - vars[2])).subs(vars[1], vars[1] * (1 - vars[2])), vars
     )
 
 

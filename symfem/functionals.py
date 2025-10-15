@@ -88,7 +88,7 @@ def _nth(n: int) -> str:
     return f"{n}th"
 
 
-def discrete_integral_moment(domain: Reference, f: Function, poly_degree: int):
+def discrete_integral_moment(domain: Reference, f: Function, poly_degree: int, vars: typing.Tuple[sympy.Symbol, ...] = t):
     """Get points and weights that define an integral moment against f.
 
     Args:
@@ -100,7 +100,7 @@ def discrete_integral_moment(domain: Reference, f: Function, poly_degree: int):
     Returns:
         Points (a list of lists whose indices are [point_index][dimension]) and weights (a list of list of lists whose indices are [dimension][point_index][derivative])
     """
-    pts, wts = numerical_quadrature(domain.name, poly_degree + degree(domain, f))
+    pts, wts = numerical_quadrature(domain.name, poly_degree + degree(domain, f, vars))
     mapped_pts = [
         [
             float(i[0] + sum(j * k for j, k in zip(i[1:], p)))
