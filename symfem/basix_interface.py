@@ -144,7 +144,7 @@ def create_basix_element(
 
                 new_dof_pts = np.zeros((point_n + 1, ref.gdim))
                 new_dof_pts[:point_n, :] = dof_pts[dof.entity[0]][dof.entity[1]]
-                new_dof_pts[point_n, :] = p
+                new_dof_pts[point_n, :] = pt
                 dof_pts[dof.entity[0]][dof.entity[1]] = new_dof_pts
 
                 shape = dof_wts[dof.entity[0]][dof.entity[1]].shape
