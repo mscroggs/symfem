@@ -88,7 +88,9 @@ def _nth(n: int) -> str:
     return f"{n}th"
 
 
-def discrete_integral_moment(domain: Reference, f: Function, poly_degree: int, vars: typing.Tuple[sympy.Symbol, ...] = t):
+def discrete_integral_moment(
+    domain: Reference, f: Function, poly_degree: int, vars: typing.Tuple[sympy.Symbol, ...] = t
+):
     """Get points and weights that define an integral moment against f.
 
     Args:

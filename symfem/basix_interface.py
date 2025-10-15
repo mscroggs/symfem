@@ -231,8 +231,6 @@ def _to_python_string(item: typing.Any, in_array: bool = False) -> str:
             return f"np.{item.__name__}"
         return f"{item.__module__}.{item.__name__}"
 
-    print(f"{item}")
-
     raise NotImplementedError(f"Invalid item type: {type(item)}")
 
 
