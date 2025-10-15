@@ -59,8 +59,8 @@ def prism_degree(
         The degree of the polynomial on a prism
     """
     return max(
-        simplex_degree(polynomial.subs([vars[1]], [vars[0]])),
-        simplex_degree(polynomial.subs([vars[2]], [vars[0]])),
+        simplex_degree(polynomial.subs(vars[1], vars[0])),
+        simplex_degree(polynomial.subs(vars[2], vars[0])),
     )
 
 
