@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -50,14 +50,14 @@ jobs:
           path: /home/runner/.cache/symfem
           key: symfem-matrix-cache-${{ github.run_id }}
           restore-keys: symfem-matrix-cache
-        if: ${{ matrix.python-version == '3.13' && github.ref == 'refs/heads/main' }}
+        if: ${{ matrix.python-version == '3.14' && github.ref == 'refs/heads/main' }}
 
   run-tests-against-basix:
     name: Run tests against Basix
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - name: Set up Python
         uses: actions/setup-python@v4
