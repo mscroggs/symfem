@@ -379,7 +379,7 @@ def generate_basix_element_code(
             definitions += d
             function_args.append(f)
 
-        code = "#include <basix>\n"
+        code = "#include <basix/finite-element.h>\n"
         code += "#include <vector>\n"
         code += "\n"
         code += "\n".join(definitions) + "\n"
