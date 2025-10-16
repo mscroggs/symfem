@@ -88,6 +88,7 @@ def _create_custom_element_args(
 
     pts, wts = basix.make_quadrature(cell, superdegree * 2)
     opoly = basix.polynomials.tabulate_polynomial_set(cell, ptype, superdegree, 0, pts)[0]
+    assert isinstance(opoly, typing.Sized)
 
     wcoeffs = np.empty((len(poly), opoly.shape[0] * element.range_dim))
     if element.range_dim == 1:
@@ -266,7 +267,7 @@ def generate_basix_element_code(
     variable_name: str = "e",
     *,
     ufl: typing.Optional[bool] = None,
-) -> basix.finite_element.FiniteElement:
+) -> str:
     """Generate code to create a Basix custom element.
 
     Args:
@@ -292,7 +293,7 @@ def generate_basix_element_code(
         else:
             code += f"{variable_name} = basix.create_custom_element(\n    "
         code += (
-            +",\n    ".join(_to_python_string(i) for i in args)
+            ",\n    ".join(_to_python_string(i) for i in args)
             + "".join(f", {j}={_to_python_string(k)}" for j, k in kwargs.items())
             + "\n)\n"
         )
@@ -301,10 +302,16 @@ def generate_basix_element_code(
     if language == "c++":
         if ufl is not None:
             raise ValueError("ufl option cannot be used when generating C++")
+
         if isinstance(dtype, str):
             t = dtype
+        elif dtype == np.float64:
+            t = "double"
+        elif dtype == np.float32:
+            t = "float"
         else:
-            t = {np.float64: "double", np.float32: "float"}[dtype]
+            raise ValueError(f"Invalid dtype: {dtype}")
+
         definitions = []
 
         function_args = []
