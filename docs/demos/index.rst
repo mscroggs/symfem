@@ -9,3 +9,4 @@ Symfem demos
    nedelec
    stiffness_matrix
    custom_element
+   basix_interface
