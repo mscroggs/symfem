@@ -224,4 +224,3 @@ def test_demos_all_in_docs():
     for d in demos:
         assert d in index
         assert f"{d}.rst" in demos_in_docs
-    print(demos)
