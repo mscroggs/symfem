@@ -10,6 +10,7 @@ from symfem.polynomials import degree
 import numpy as np
 import numpy.typing as npt
 import basix
+import basix.ufl
 
 sobolev_spaces = {
     "L2": basix.SobolevSpace.L2,
@@ -171,19 +172,23 @@ def _create_custom_element_args(
 
 
 def create_basix_element(
-    element: CiarletElement, dtype: npt.DTypeLike = np.float64
-) -> basix.finite_element.FiniteElement:
+    element: CiarletElement, dtype: npt.DTypeLike = np.float64, ufl: bool = False
+) -> typing.Union[basix.finite_element.FiniteElement, basix.ufl._ElementBase]:
     """Create a Basix element from a Symfem element.
 
     Args:
         element: The Symfem element
         dtype: The dtype of the Basix element
+        ufl: If generating Python, a basix.ufl element will be created if this is set to True
 
     Returns:
         A Basix element
     """
     args, kwargs = _create_custom_element_args(element, dtype)
-    return basix.create_custom_element(*args, **kwargs)
+    if ufl:
+        return basix.ufl.custom_element(*args, **kwargs)
+    else:
+        return basix.create_custom_element(*args, **kwargs)
 
 
 def _to_python_string(item: typing.Any, in_array: bool = False) -> str:
