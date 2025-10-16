@@ -88,7 +88,6 @@ def _create_custom_element_args(
 
     pts, wts = basix.make_quadrature(cell, superdegree * 2)
     opoly = basix.polynomials.tabulate_polynomial_set(cell, ptype, superdegree, 0, pts)[0]
-    assert isinstance(opoly, typing.Sized)
 
     wcoeffs = np.empty((len(poly), opoly.shape[0] * element.range_dim))
     if element.range_dim == 1:
