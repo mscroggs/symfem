@@ -260,7 +260,10 @@ def _to_cpp_string(item: typing.Any, in_array: bool = False) -> tuple[list[str],
 
 
 def generate_basix_element_code(
-    element: CiarletElement, language: str = "python", dtype: npt.DTypeLike = np.float64
+    element: CiarletElement,
+    language: str = "python",
+    dtype: npt.DTypeLike = np.float64,
+    variable_name: str = "e",
 ) -> basix.finite_element.FiniteElement:
     """Generate code to create a Basix custom element.
 
@@ -278,7 +281,7 @@ def generate_basix_element_code(
         code += "\n"
         code += f"# Create degree {element.lagrange_superdegree} {element.name} element\n"
         code += (
-            "e = basix.create_custom_element(\n    "
+            f"{variable_name} = basix.create_custom_element(\n    "
             + ",\n    ".join(_to_python_string(i) for i in args)
             + "".join(f", {j}={_to_python_string(k)}" for j, k in kwargs.items())
             + "\n)\n"
@@ -289,7 +292,7 @@ def generate_basix_element_code(
         t = {np.float64: "double", np.float32: "float"}[dtype]
         definitions = []
 
-        function = "auto e = basix::create_custom_element(\n"
+        function_args = []
 
         for n, a in enumerate(args):
             if n == 2:
@@ -297,34 +300,58 @@ def generate_basix_element_code(
                 data = f"std::vector<{t}> data = {{"
                 data += ", ".join(_to_cpp_string(c)[1] for b in a for c in b)
                 data += "};"
-                d = [data, f"impl::mdarray_t<{t}, 2> wcoeffs(data, {a.shape[0]}, {a.shape[1]});"]
+                d = [
+                    data,
+                    f"basix::impl::mdspan_t<const {t}, 2> wcoeffs(data.data(), {a.shape[0]}, {a.shape[1]});",
+                ]
             elif n == 3:
-                d = ["std::array<std::vector<basix::impl::mdarray_t<{t}, 2>>, 4> x;"]
-                f = "x"
+                d = [f"std::array<std::vector<basix::impl::mdarray_t<{t}, 2>>, 4> x;"]
                 for i, x_i in enumerate(a):
                     for x_ij in x_i:
-                        d.append(
-                            f"x[{i}].emplace_back(std::array{{{x_ij.shape[0]}, {x_ij.shape[1]}}}, {{"
-                            + ", ".join(_to_cpp_string(c)[1] for b in x_ij for c in b)
-                            + "});"
-                        )
+                        if x_ij.size == 0:
+                            d.append(f"x[{i}].emplace_back({x_ij.shape[0]}, {x_ij.shape[1]});")
+                        else:
+                            d.append("{")
+                            d.append(
+                                f"  auto &_x = x[{i}].emplace_back({x_ij.shape[0]}, {x_ij.shape[1]});"
+                            )
+                            for k, x_ijk in enumerate(x_ij):
+                                for m, x_ijkm in enumerate(x_ijk):
+                                    d.append(f"  _x({k}, {m}) = {_to_cpp_string(x_ijkm)[1]};")
+                            d.append("}")
+                d.append(
+                    f"std::array<std::vector<basix::impl::mdspan_t<const {t}, 2>>, 4> xview = basix::impl::to_mdspan(x);"
+                )
+                f = "xview"
             elif n == 4:
-                d = ["std::array<std::vector<basix::impl::mdarray_t<{t}, 4>>, 4> M;"]
-                f = "M"
+                d = [f"std::array<std::vector<basix::impl::mdarray_t<{t}, 4>>, 4> M;"]
                 for i, m_i in enumerate(a):
                     for m_ij in m_i:
-                        d.append(
-                            f"M[{i}].emplace_back(std::array{{{m_ij.shape[0]}, {m_ij.shape[1]}, {m_ij.shape[2]}, {m_ij.shape[3]}}}, {{"
-                            + ", ".join(
-                                _to_cpp_string(e)[1] for b in m_ij for c in b for d in c for e in d
+                        if m_ij.size == 0:
+                            d.append(
+                                f"M[{i}].emplace_back({m_ij.shape[0]}, {m_ij.shape[1]}, {m_ij.shape[2]}, {m_ij.shape[3]});"
                             )
-                            + "});"
-                        )
+                        else:
+                            d.append("{")
+                            d.append(
+                                f"  auto &_M = M[{i}].emplace_back({m_ij.shape[0]}, {m_ij.shape[1]}, {m_ij.shape[2]}, {m_ij.shape[3]});"
+                            )
+                            for k, m_ijk in enumerate(m_ij):
+                                for m, m_ijkm in enumerate(m_ijk):
+                                    for n, m_ijkmn in enumerate(m_ijkm):
+                                        for o, m_ijkmno in enumerate(m_ijkmn):
+                                            d.append(
+                                                f"  _M({k}, {m}, {n}, {o}) = {_to_cpp_string(m_ijkmno)[1]};"
+                                            )
+                            d.append("}")
+                d.append(
+                    f"std::array<std::vector<basix::impl::mdspan_t<const {t}, 4>>, 4> Mview = basix::impl::to_mdspan(M);"
+                )
+                f = "Mview"
             else:
                 d, f = _to_cpp_string(a)
             definitions += d
-            function += f"  {f},\n"
-        function += ");\n"
+            function_args.append(f)
 
         code = "#include <basix>\n"
         code += "#include <vector>\n"
@@ -332,7 +359,9 @@ def generate_basix_element_code(
         code += "\n".join(definitions) + "\n"
         code += "\n"
         code += f"// Create degree {element.lagrange_superdegree} {element.name} element\n"
-        code += function
+        code += f"auto {variable_name} = basix::create_custom_element(\n"
+        code += ",\n".join(f"  {a}" for a in function_args) + "\n"
+        code += ");\n"
 
         return code
 
