@@ -262,7 +262,7 @@ def _to_cpp_string(item: typing.Any, in_array: bool = False) -> tuple[list[str],
 def generate_basix_element_code(
     element: CiarletElement,
     language: str = "python",
-    dtype: npt.DTypeLike = np.float64,
+    dtype: typing.Union[npt.DTypeLike, str] = np.float64,
     variable_name: str = "e",
     *,
     ufl: typing.Optional[bool] = None,
@@ -301,7 +301,10 @@ def generate_basix_element_code(
     if language == "c++":
         if ufl is not None:
             raise ValueError("ufl option cannot be used when generating C++")
-        t = {np.float64: "double", np.float32: "float"}[dtype]
+        if isinstance(dtype, str):
+            t = dtype
+        else:
+            t = {np.float64: "double", np.float32: "float"}[dtype]
         definitions = []
 
         function_args = []
