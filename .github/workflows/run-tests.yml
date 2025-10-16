@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -31,6 +31,8 @@ jobs:
           path: /home/runner/.cache/symfem
           key: symfem-matrix-cache
       - uses: actions/checkout@v4
+      - run: pip install git+https://github.com/FEniCS/basix.git git+https://github.com/FEniCS/ufl.git
+        name: Install Basix
       - run: pip install .[test] pytest-xdist
         name: Install Symfem
       - name: Install LaTeΧ
@@ -71,7 +73,7 @@ jobs:
           key: symfem-matrix-cache
       - run: sudo apt-get install -y libopenblas-dev
         name: Install OpenBLAS
-      - run: pip install git+https://github.com/FEniCS/basix.git
+      - run: pip install git+https://github.com/FEniCS/basix.git git+https://github.com/FEniCS/ufl.git
         name: Install Basix
       - uses: actions/checkout@v4
       - run: pip install .[test] pytest-xdist

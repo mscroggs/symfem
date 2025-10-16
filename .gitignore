@@ -14,3 +14,4 @@ joss/build.sh
 joss/paper.pdf
 
 _temp/
+demo/_*

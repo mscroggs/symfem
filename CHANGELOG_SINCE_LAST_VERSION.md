@@ -1,1 +1,3 @@
 - Allow most Symfem elements to be converted to Basix custom elements
+- Add demo of creating Basix custom elements
+- Increase minimum Python version to 3.10

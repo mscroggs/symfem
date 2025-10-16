@@ -2,7 +2,7 @@
 
 import typing
 from enum import Enum
-from symfem.finite_element import CiarletElement
+from symfem.finite_element import FiniteElement, CiarletElement
 from symfem.symbols import x
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.polynomials import degree
@@ -10,6 +10,7 @@ from symfem.polynomials import degree
 import numpy as np
 import numpy.typing as npt
 import basix
+import basix.ufl
 
 sobolev_spaces = {
     "L2": basix.SobolevSpace.L2,
@@ -46,7 +47,7 @@ def get_embedded_degrees(poly, reference) -> typing.Tuple[int, int]:
 
 
 def _create_custom_element_args(
-    element: CiarletElement, dtype: npt.DTypeLike = np.float64
+    element: FiniteElement, dtype: npt.DTypeLike = np.float64
 ) -> tuple[list[typing.Any], dict[str, typing.Any]]:
     """Generate the arguments to create a Basix custom element.
 
@@ -57,6 +58,8 @@ def _create_custom_element_args(
     Returns:
         A list of args and a dict of kwargs
     """
+    if not isinstance(element, CiarletElement):
+        raise NotImplementedError("Can only convert Ciarlet elements to Basix custom elements")
     for dof in element.dofs:
         if dof.nderivs > 0:
             raise NotImplementedError(
@@ -171,19 +174,23 @@ def _create_custom_element_args(
 
 
 def create_basix_element(
-    element: CiarletElement, dtype: npt.DTypeLike = np.float64
-) -> basix.finite_element.FiniteElement:
+    element: FiniteElement, dtype: npt.DTypeLike = np.float64, ufl: bool = False
+) -> typing.Union[basix.finite_element.FiniteElement, basix.ufl._ElementBase]:
     """Create a Basix element from a Symfem element.
 
     Args:
         element: The Symfem element
         dtype: The dtype of the Basix element
+        ufl: If generating Python, a basix.ufl element will be created if this is set to True
 
     Returns:
         A Basix element
     """
     args, kwargs = _create_custom_element_args(element, dtype)
-    return basix.create_custom_element(*args, **kwargs)
+    if ufl:
+        return basix.ufl.custom_element(*args, **kwargs)
+    else:
+        return basix.create_custom_element(*args, **kwargs)
 
 
 def _to_python_string(item: typing.Any, in_array: bool = False) -> str:
@@ -260,7 +267,7 @@ def _to_cpp_string(item: typing.Any, in_array: bool = False) -> tuple[list[str],
 
 
 def generate_basix_element_code(
-    element: CiarletElement,
+    element: FiniteElement,
     language: str = "python",
     dtype: typing.Union[npt.DTypeLike, str] = np.float64,
     variable_name: str = "e",
@@ -374,7 +381,7 @@ def generate_basix_element_code(
             definitions += d
             function_args.append(f)
 
-        code = "#include <basix>\n"
+        code = "#include <basix/finite-element.h>\n"
         code += "#include <vector>\n"
         code += "\n"
         code += "\n".join(definitions) + "\n"
