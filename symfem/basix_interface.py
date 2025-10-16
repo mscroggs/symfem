@@ -264,12 +264,17 @@ def generate_basix_element_code(
     language: str = "python",
     dtype: npt.DTypeLike = np.float64,
     variable_name: str = "e",
+    *,
+    ufl: typing.Optional[bool] = None,
 ) -> basix.finite_element.FiniteElement:
     """Generate code to create a Basix custom element.
 
     Args:
         element: The Symfem element
+        language: Programming language to generate ("python" or "c++")
         dtype: The dtype of the Basix element
+        variable_name: The variable name to use for the element in the code
+        ufl: If generating Python, a basix.ufl element will be created if this is set to True
 
     Returns:
         A Basix element
@@ -277,18 +282,25 @@ def generate_basix_element_code(
     args, kwargs = _create_custom_element_args(element, dtype)
     if language == "python":
         code = "import basix\n"
+        if ufl:
+            code += "import basix.ufl\n"
         code += "import numpy as np\n"
         code += "\n"
         code += f"# Create degree {element.lagrange_superdegree} {element.name} element\n"
+        if ufl:
+            code += f"{variable_name} = basix.ufl.custom_element(\n    "
+        else:
+            code += f"{variable_name} = basix.create_custom_element(\n    "
         code += (
-            f"{variable_name} = basix.create_custom_element(\n    "
-            + ",\n    ".join(_to_python_string(i) for i in args)
+            +",\n    ".join(_to_python_string(i) for i in args)
             + "".join(f", {j}={_to_python_string(k)}" for j, k in kwargs.items())
             + "\n)\n"
         )
         return code
 
     if language == "c++":
+        if ufl is not None:
+            raise ValueError("ufl option cannot be used when generating C++")
         t = {np.float64: "double", np.float32: "float"}[dtype]
         definitions = []
 
