@@ -25,10 +25,10 @@ jobs:
       - run: pip install coverage coveralls pytest-cov
         name: Install Coveralls
       - uses: actions/checkout@v4
-      - run: pip install .[test] pytest-xdist
-        name: Install Symfem
       - run: pip install git+https://github.com/FEniCS/basix.git
         name: Install Basix
+      - run: pip install .[test] pytest-xdist
+        name: Install Symfem
       - run: python3 -m pytest -n=auto --cov=symfem test/ > .coveralls_output
         name: Run unit tests
         continue-on-error: true
