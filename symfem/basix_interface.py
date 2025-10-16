@@ -234,14 +234,47 @@ def _to_python_string(item: typing.Any, in_array: bool = False) -> str:
     raise NotImplementedError(f"Invalid item type: {type(item)}")
 
 
+def _to_cpp_string(item: typing.Any, in_array: bool = False) -> tuple[list[str], str]:
+    if isinstance(item, (tuple, list)):
+        return [], "{" + ", ".join(_to_cpp_string(i)[1] for i in item) + "}"
+    if isinstance(item, (set, dict, np.ndarray)):
+        raise NotImplementedError(f"Invalid item type: {type(item)}")
+    if isinstance(item, basix.CellType):
+        return [], f"basix::cell::type::{item.name}"
+    if isinstance(item, basix.ElementFamily):
+        return [], f"basix::element::family::{item.name}"
+    if isinstance(item, basix.MapType):
+        return [], f"basix::maps::type::{item.name}"
+    if isinstance(item, basix.SobolevSpace):
+        return [], f"basix::sobolev::space::{item.name}"
+    if isinstance(item, basix.PolysetType):
+        return [], f"basix::polyset::type::{item.name}"
+    if isinstance(item, Enum):
+        raise NotImplementedError(f"Invalid item type: {type(item)}")
+    if isinstance(item, bool):
+        return [], "true" if item else "false"
+    if isinstance(item, (float, bool, int)):
+        return [], f"{item}"
+
+    raise NotImplementedError(f"Invalid item type: {type(item)}")
+
+
 def generate_basix_element_code(
-    element: CiarletElement, language: str = "python", dtype: npt.DTypeLike = np.float64
-) -> basix.finite_element.FiniteElement:
+    element: CiarletElement,
+    language: str = "python",
+    dtype: typing.Union[npt.DTypeLike, str] = np.float64,
+    variable_name: str = "e",
+    *,
+    ufl: typing.Optional[bool] = None,
+) -> str:
     """Generate code to create a Basix custom element.
 
     Args:
         element: The Symfem element
+        language: Programming language to generate ("python" or "c++")
         dtype: The dtype of the Basix element
+        variable_name: The variable name to use for the element in the code
+        ufl: If generating Python, a basix.ufl element will be created if this is set to True
 
     Returns:
         A Basix element
@@ -249,15 +282,108 @@ def generate_basix_element_code(
     args, kwargs = _create_custom_element_args(element, dtype)
     if language == "python":
         code = "import basix\n"
+        if ufl:
+            code += "import basix.ufl\n"
         code += "import numpy as np\n"
         code += "\n"
         code += f"# Create degree {element.lagrange_superdegree} {element.name} element\n"
+        if ufl:
+            code += f"{variable_name} = basix.ufl.custom_element(\n    "
+        else:
+            code += f"{variable_name} = basix.create_custom_element(\n    "
         code += (
-            "basix.create_custom_element(\n    "
-            + ",\n    ".join(_to_python_string(i) for i in args)
+            ",\n    ".join(_to_python_string(i) for i in args)
             + "".join(f", {j}={_to_python_string(k)}" for j, k in kwargs.items())
-            + "\n)"
+            + "\n)\n"
         )
         return code
-    else:
-        raise NotImplementedError(f"Unsupported language: {language}")
+
+    if language == "c++":
+        if ufl is not None:
+            raise ValueError("ufl option cannot be used when generating C++")
+
+        if isinstance(dtype, str):
+            t = dtype
+        elif dtype == np.float64:
+            t = "double"
+        elif dtype == np.float32:
+            t = "float"
+        else:
+            raise ValueError(f"Invalid dtype: {dtype}")
+
+        definitions = []
+
+        function_args = []
+
+        for n, a in enumerate(args):
+            if n == 2:
+                f = "wcoeffs"
+                data = f"std::vector<{t}> data = {{"
+                data += ", ".join(_to_cpp_string(c)[1] for b in a for c in b)
+                data += "};"
+                d = [
+                    data,
+                    f"basix::impl::mdspan_t<const {t}, 2> wcoeffs(data.data(), {a.shape[0]}, {a.shape[1]});",
+                ]
+            elif n == 3:
+                d = [f"std::array<std::vector<basix::impl::mdarray_t<{t}, 2>>, 4> x;"]
+                for i, x_i in enumerate(a):
+                    for x_ij in x_i:
+                        if x_ij.size == 0:
+                            d.append(f"x[{i}].emplace_back({x_ij.shape[0]}, {x_ij.shape[1]});")
+                        else:
+                            d.append("{")
+                            d.append(
+                                f"  auto &_x = x[{i}].emplace_back({x_ij.shape[0]}, {x_ij.shape[1]});"
+                            )
+                            for k, x_ijk in enumerate(x_ij):
+                                for m, x_ijkm in enumerate(x_ijk):
+                                    d.append(f"  _x({k}, {m}) = {_to_cpp_string(x_ijkm)[1]};")
+                            d.append("}")
+                d.append(
+                    f"std::array<std::vector<basix::impl::mdspan_t<const {t}, 2>>, 4> xview = basix::impl::to_mdspan(x);"
+                )
+                f = "xview"
+            elif n == 4:
+                d = [f"std::array<std::vector<basix::impl::mdarray_t<{t}, 4>>, 4> M;"]
+                for i, m_i in enumerate(a):
+                    for m_ij in m_i:
+                        if m_ij.size == 0:
+                            d.append(
+                                f"M[{i}].emplace_back({m_ij.shape[0]}, {m_ij.shape[1]}, {m_ij.shape[2]}, {m_ij.shape[3]});"
+                            )
+                        else:
+                            d.append("{")
+                            d.append(
+                                f"  auto &_M = M[{i}].emplace_back({m_ij.shape[0]}, {m_ij.shape[1]}, {m_ij.shape[2]}, {m_ij.shape[3]});"
+                            )
+                            for k, m_ijk in enumerate(m_ij):
+                                for m, m_ijkm in enumerate(m_ijk):
+                                    for n, m_ijkmn in enumerate(m_ijkm):
+                                        for o, m_ijkmno in enumerate(m_ijkmn):
+                                            d.append(
+                                                f"  _M({k}, {m}, {n}, {o}) = {_to_cpp_string(m_ijkmno)[1]};"
+                                            )
+                            d.append("}")
+                d.append(
+                    f"std::array<std::vector<basix::impl::mdspan_t<const {t}, 4>>, 4> Mview = basix::impl::to_mdspan(M);"
+                )
+                f = "Mview"
+            else:
+                d, f = _to_cpp_string(a)
+            definitions += d
+            function_args.append(f)
+
+        code = "#include <basix>\n"
+        code += "#include <vector>\n"
+        code += "\n"
+        code += "\n".join(definitions) + "\n"
+        code += "\n"
+        code += f"// Create degree {element.lagrange_superdegree} {element.name} element\n"
+        code += f"auto {variable_name} = basix::create_custom_element(\n"
+        code += ",\n".join(f"  {a}" for a in function_args) + "\n"
+        code += ");\n"
+
+        return code
+
+    raise NotImplementedError(f"Unsupported language: {language}")
