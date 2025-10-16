@@ -20,7 +20,7 @@ jobs:
         run: sudo apt-get install -y libopenblas-dev
       - uses: actions/checkout@v4
         with:
-          ref: v2025.9.0
+          ref: v2025.10.0
         name: Get latest Symfem version
       - run: rm -rf symfem VERSION
         name: Remove downloaded symfem
@@ -55,7 +55,7 @@ jobs:
         run: sudo apt-get install -y libopenblas-dev
       - uses: actions/checkout@v4
         with:
-          ref: v2025.9.0
+          ref: v2025.10.0
         name: Get latest Symfem version
       - run: rm -rf symfem VERSION
         name: Remove downloaded symfem
@@ -89,7 +89,7 @@ jobs:
         run: sudo apt-get install -y libopenblas-dev
       - uses: actions/checkout@v4
         with:
-          ref: v2025.9.0
+          ref: v2025.10.0
           path: symfem-src
       - name: Move tests and delete Symfem source
         run: |
@@ -97,7 +97,7 @@ jobs:
           mv symfem-src/README.md .
           rm -r symfem-src
       - run: |
-          wget -O symfem.tar.gz https://pypi.io/packages/source/s/symfem/symfem-2025.9.0.tar.gz
+          wget -O symfem.tar.gz https://pypi.io/packages/source/s/symfem/symfem-2025.10.0.tar.gz
           tar -xvzf symfem.tar.gz
         name: Download and unpack latest version of Symfem
       - name: Install LaTeΧ
@@ -107,7 +107,7 @@ jobs:
       - run: pip install pytest
         name: Install pytest
       - run: |
-          cd symfem-2025.9.0
+          cd symfem-2025.10.0
           pip install .[optional]
         name: Install requirements
       - run: |
