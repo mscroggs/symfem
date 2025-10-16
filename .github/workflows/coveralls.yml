@@ -25,7 +25,7 @@ jobs:
       - run: pip install coverage coveralls pytest-cov
         name: Install Coveralls
       - uses: actions/checkout@v4
-      - run: pip install git+https://github.com/FEniCS/basix.git
+      - run: pip install git+https://github.com/FEniCS/basix.git[optional]
         name: Install Basix
       - run: pip install .[test] pytest-xdist
         name: Install Symfem

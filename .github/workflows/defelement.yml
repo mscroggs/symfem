@@ -21,7 +21,7 @@ jobs:
           path: /home/runner/.cache/symfem
           key: symfem-matrix-cache
       - uses: actions/checkout@v4
-      - run: pip install git+https://github.com/FEniCS/basix.git
+      - run: pip install git+https://github.com/FEniCS/basix.git[optional]
         name: Install Basix
       - run: pip install .[optional]
         name: Install Symfem
