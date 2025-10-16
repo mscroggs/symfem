@@ -203,3 +203,25 @@ def test_version_numbers():
                 assert line.split("version: ")[1].strip() == version
             elif line.startswith("date-released: "):
                 assert line.split("date-released: ")[1].strip() == date
+
+
+def test_demos_all_in_docs():
+    root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+    if not os.path.isfile(os.path.join(root, "VERSION")):
+        # Skip test if running in tarball source
+        pytest.skip()
+    demos = [
+        file[:-3]
+        for file in os.listdir(os.path.join(root, "demo"))
+        if file.endswith(".py") and not file.startswith("_") and file != "test_demos.py"
+    ]
+
+    docs_dir = os.path.join(os.path.join(root, "docs"), "demos")
+    demos_in_docs = [file for file in os.listdir(docs_dir)]
+
+    with open(os.path.join(docs_dir, "index.rst")) as f:
+        index = f.read()
+    for d in demos:
+        assert d in index
+        assert f"{d}.rst" in demos_in_docs
+    print(demos)
