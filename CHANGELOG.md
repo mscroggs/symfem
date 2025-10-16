@@ -1,3 +1,9 @@
+# Version 2025.10.0 (16 October 2025)
+
+- Allow most Symfem elements to be converted to Basix custom elements
+- Add demo of creating Basix custom elements
+- Increase minimum Python version to 3.10
+
 # Version 2025.9.0 (15 September 2025)
 
 - Update minimum Python version
