@@ -2,7 +2,6 @@
 
 import pytest
 
-from symfem.basix_interface import create_basix_element, generate_basix_element_code
 from symfem import create_element
 from symfem.finite_element import DirectElement, EnrichedElement
 from symfem.piecewise_functions import PiecewiseFunction
@@ -20,8 +19,18 @@ from .utils import test_elements
         for order in k
     ],
 )
-def test_element(elements_to_test, cells_to_test, cell_type, element_type, order, kwargs, speed):
+def test_element(
+    elements_to_test, cells_to_test, cell_type, element_type, order, kwargs, speed, has_basix
+):
     """Run tests for each element."""
+    if has_basix:
+        from symfem.basix_interface import create_basix_element, generate_basix_element_code
+    else:
+        try:
+            from symfem.basix_interface import create_basix_element, generate_basix_element_code
+        except ImportError:
+            pytest.skip("Basix, Numpy and UFL must be imported to run this test")
+
     if elements_to_test != "ALL" and element_type not in elements_to_test:
         pytest.skip()
     if cells_to_test != "ALL" and cell_type not in cells_to_test:
