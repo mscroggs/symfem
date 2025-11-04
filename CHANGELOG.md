@@ -1,3 +1,7 @@
+# Version 2025.11.0 (04 November 2025)
+
+- Update test to skip if Basix not installed
+
 # Version 2025.10.0 (16 October 2025)
 
 - Allow most Symfem elements to be converted to Basix custom elements
