@@ -1,0 +1,1 @@
+- Skip demo if Basix not installed
