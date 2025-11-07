@@ -1,3 +1,7 @@
+# Version 2025.11.1 (07 November 2025)
+
+- Skip demo if Basix not installed
+
 # Version 2025.11.0 (04 November 2025)
 
 - Update test to skip if Basix not installed
