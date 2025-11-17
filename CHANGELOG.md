@@ -1,3 +1,7 @@
+# Version 2025.11.2 (17 November 2025)
+
+- add `include_inputs` and `include_comment` args to custom Basix element function
+
 # Version 2025.11.1 (07 November 2025)
 
 - Skip demo if Basix not installed
