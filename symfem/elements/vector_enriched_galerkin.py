@@ -4,8 +4,6 @@ This element's definition appears in https://doi.org/10.1016/j.camwa.2022.06.018
 (Yi, Hu, Lee, Adler, 2022)
 """
 
-import typing
-
 from symfem.elements.lagrange import VectorLagrange
 from symfem.elements.q import VectorQ
 from symfem.finite_element import CiarletElement, EnrichedElement
@@ -29,9 +27,9 @@ class Enrichment(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
         f = VectorFunction(tuple(x[i] - j for i, j in enumerate(reference.midpoint())))
-        poly: typing.List[FunctionInput] = [f]
+        poly: list[FunctionInput] = [f]
         size = f.dot(f).integral(reference, x)
-        dofs: typing.List[BaseFunctional] = [
+        dofs: list[BaseFunctional] = [
             IntegralAgainst(
                 reference, tuple(i / size for i in f), (reference.tdim, 0), "contravariant"
             )
@@ -55,7 +53,7 @@ class Enrichment(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return 1
 
-    names: typing.List[str] = []
+    names: list[str] = []
     references = ["triangle", "quadrilateral", "tetrahedron", "hexahedron"]
     min_order = 1
     max_order = 1

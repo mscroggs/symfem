@@ -44,7 +44,7 @@ class MardalTaiWinther(CiarletElement):
             facets=(NormalIntegralMoment, Lagrange, 1, "contravariant", {"variant": variant}),
         )
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         if reference.name == "triangle":
             poly += [
                 (1, 0),
@@ -89,7 +89,7 @@ class MardalTaiWinther(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:

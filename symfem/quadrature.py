@@ -1,7 +1,5 @@
 """Quadrature definitions."""
 
-import typing
-
 import sympy
 
 try:
@@ -16,7 +14,7 @@ __all__ = ["Scalar", "equispaced", "lobatto", "radau", "legendre", "get_quadratu
 Scalar = sympy.core.expr.Expr | int
 
 
-def equispaced(n: int) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
+def equispaced(n: int) -> tuple[list[Scalar], list[Scalar]]:
     """Get equispaced points and weights.
 
     Args:
@@ -34,7 +32,7 @@ def equispaced(n: int) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]
     )
 
 
-def lobatto(n: int) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
+def lobatto(n: int) -> tuple[list[Scalar], list[Scalar]]:
     """Get Gauss-Lobatto-Legendre points and weights.
 
     Args:
@@ -120,7 +118,7 @@ def lobatto(n: int) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
     raise NotImplementedError()
 
 
-def radau(n: int) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
+def radau(n: int) -> tuple[list[Scalar], list[Scalar]]:
     """Get Radau points and weights.
 
     Args:
@@ -139,7 +137,7 @@ def radau(n: int) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
     raise NotImplementedError()
 
 
-def legendre(n: int) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
+def legendre(n: int) -> tuple[list[Scalar], list[Scalar]]:
     """Get Gauss-Legendre points and weights.
 
     Args:
@@ -163,7 +161,7 @@ def legendre(n: int) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
     raise NotImplementedError()
 
 
-def get_quadrature(rule: str, n: int) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:
+def get_quadrature(rule: str, n: int) -> tuple[list[Scalar], list[Scalar]]:
     """Get quadrature points and weights.
 
     Args:
@@ -188,9 +186,7 @@ def get_quadrature(rule: str, n: int) -> typing.Tuple[typing.List[Scalar], typin
     raise ValueError(f"Unknown quadrature rule: {rule}")
 
 
-def numerical(
-    cell: str, degree: int
-) -> typing.Tuple[typing.List[typing.List[float]], typing.List[float]]:
+def numerical(cell: str, degree: int) -> tuple[list[list[float]], list[float]]:
     """Get numerical quadrature rule.
 
     Args:

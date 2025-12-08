@@ -37,7 +37,7 @@ class Bell(CiarletElement):
             dofs.append(DerivativePointEvaluation(reference, v, (0, 2), entity=(0, v_n)))
         self.variant = variant
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, 4)
         poly.append(x[0] ** 5 - x[1] ** 5)
         poly.append(x[0] ** 3 * x[1] ** 2 - x[0] ** 2 * x[1] ** 3)
@@ -45,7 +45,7 @@ class Bell(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:

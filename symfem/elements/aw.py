@@ -38,7 +38,7 @@ class ArnoldWinther(CiarletElement):
         """
         assert reference.name == "triangle"
         self.variant = variant
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += [
             ((p[0], p[1]), (p[1], p[2])) for p in polynomial_set_vector(reference.tdim, 3, order)
         ]
@@ -123,7 +123,7 @@ class ArnoldWinther(CiarletElement):
             (reference.tdim, reference.tdim),
         )
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -168,7 +168,7 @@ class NonConformingArnoldWinther(CiarletElement):
         """
         assert reference.name == "triangle"
         self.variant = variant
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += [
             ((p[0], p[1]), (p[1], p[2])) for p in polynomial_set_vector(reference.tdim, 3, order)
         ]
@@ -224,7 +224,7 @@ class NonConformingArnoldWinther(CiarletElement):
             (reference.tdim, reference.tdim),
         )
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:

@@ -4,8 +4,6 @@ This element's definition appears in https://doi.org/10.1051/m2an/197307R300331
 (Crouzeix, Raviart, 1973)
 """
 
-import typing
-
 import sympy
 
 from symfem.finite_element import CiarletElement
@@ -32,7 +30,7 @@ class ConformingCrouzeixRaviart(CiarletElement):
             raise NonDefaultReferenceError()
         assert reference.name == "triangle"
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
 
         poly += [x[0] ** i * x[1] ** (order - i) * (x[0] + x[1]) for i in range(1, order)]

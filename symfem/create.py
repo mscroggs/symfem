@@ -12,8 +12,8 @@ from symfem.geometry import parse_set_of_points_input as _parse_set_of_points_in
 
 _folder = _os.path.dirname(_os.path.realpath(__file__))
 
-_elementmap: _typing.Dict[str, _typing.Dict[str, _typing.Type]] = {}
-_elementlist: _typing.List[_typing.Type] = []
+_elementmap: dict[str, dict[str, _typing.Type]] = {}
+_elementlist: list[_typing.Type] = []
 
 __all__ = ["add_element", "create_reference", "create_element"]
 

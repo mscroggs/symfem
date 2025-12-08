@@ -6,14 +6,14 @@ import pytest
 
 from symfem import create_element
 
-elements: typing.Dict[
+elements: dict[
     str,
-    typing.List[
-        typing.Tuple[
+    list[
+        tuple[
             str,
             str,
-            typing.List[typing.Tuple[int, int]],
-            typing.List[typing.Tuple[str, typing.Any]],
+            list[tuple[int, int]],
+            list[tuple[str, typing.Any]],
         ]
     ],
 ] = {

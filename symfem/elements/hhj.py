@@ -40,9 +40,9 @@ class HellanHerrmannJohnson(CiarletElement):
             raise NonDefaultReferenceError()
         assert reference.name == "triangle" or reference.name == "tetrahedron"
 
-        poly: typing.List[FunctionInput] = []
-        directions: typing.List[typing.Tuple[typing.Tuple[int, ...], ...]] = []
-        directions_extra: typing.List[typing.Tuple[typing.Tuple[int, ...], ...]] = []
+        poly: list[FunctionInput] = []
+        directions: list[tuple[tuple[int, ...], ...]] = []
+        directions_extra: list[tuple[tuple[int, ...], ...]] = []
 
         if reference.tdim == 2:
             poly = [
@@ -114,7 +114,7 @@ class HellanHerrmannJohnson(CiarletElement):
             (reference.tdim, reference.tdim),
         )
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:

@@ -4,8 +4,6 @@ This element's definition appears in https://doi.org/10.2307/2006147
 (Ciarlet, 1978)
 """
 
-import typing
-
 import sympy
 
 from symfem.finite_element import CiarletElement
@@ -121,7 +119,7 @@ class HsiehCloughTocher(CiarletElement):
             )
         )
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += [PiecewiseFunction({i: j for i, j in zip(subs, p)}, 2) for p in piece_list]
         poly = reference.map_polyset_from_default(poly)
 

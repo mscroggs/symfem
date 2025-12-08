@@ -78,7 +78,7 @@ class Bubble(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -132,7 +132,7 @@ class BubbleEnrichedLagrange(CiarletElement):
         lagrange = Lagrange(reference, order, variant)
         bubble = Bubble(reference, order + 2, variant)
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         for e in [lagrange, bubble]:
             for p in e._basis:
                 poly.append(p)
@@ -141,7 +141,7 @@ class BubbleEnrichedLagrange(CiarletElement):
 
         super().__init__(reference, order, poly, lagrange.dofs + bubble.dofs, reference.tdim, 1)
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -187,7 +187,7 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
         lagrange = Lagrange(reference, order, variant)
         bubble = Bubble(reference, order + 2, variant)
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         for e in [lagrange, bubble]:
             for p in e._basis:
                 poly.append((p, 0))
@@ -203,7 +203,7 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 2)
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:

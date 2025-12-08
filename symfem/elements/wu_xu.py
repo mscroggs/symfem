@@ -4,8 +4,6 @@ This element's definition appears in https://doi.org/10.1090/mcom/3361
 (Wu, Xu, 2019)
 """
 
-import typing
-
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     DerivativePointEvaluation,
@@ -20,7 +18,7 @@ from symfem.references import NonDefaultReferenceError, Reference
 __all__ = ["derivatives", "WuXu"]
 
 
-def derivatives(dim: int, order: int) -> typing.List[typing.Tuple[int, ...]]:
+def derivatives(dim: int, order: int) -> list[tuple[int, ...]]:
     """Return all the orders of a multidimensional derivative.
 
     Args:
@@ -52,7 +50,7 @@ class WuXu(CiarletElement):
         if reference.name == "tetrahedron" and reference != reference.default_reference():
             raise NonDefaultReferenceError()
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         if reference.name == "interval":
             assert order == 3
             poly += polynomial_set_1d(reference.tdim, 2)

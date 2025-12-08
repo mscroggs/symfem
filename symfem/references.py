@@ -34,10 +34,10 @@ __all__ = [
     "DualPolygon",
 ]
 
-LatticeWithLines = typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]
-IntLimits = typing.List[
-    typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr]
-    | typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr]
+LatticeWithLines = tuple[SetOfPoints, list[tuple[int, int]]]
+IntLimits = list[
+    tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr]
+    | tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr]
 ]
 
 
@@ -196,10 +196,10 @@ class Reference(ABC):
         axes: SetOfPointsInput,
         reference_vertices: SetOfPointsInput,
         vertices: SetOfPointsInput,
-        edges: typing.Tuple[typing.Tuple[int, int], ...],
-        faces: typing.Tuple[typing.Tuple[int, ...], ...],
-        volumes: typing.Tuple[typing.Tuple[int, ...], ...],
-        sub_entity_types: typing.List[typing.List[str] | str | None],
+        edges: tuple[tuple[int, int], ...],
+        faces: tuple[tuple[int, ...], ...],
+        volumes: tuple[tuple[int, ...], ...],
+        sub_entity_types: list[list[str] | str | None],
         simplex: bool = False,
         tp: bool = False,
     ):
@@ -348,7 +348,7 @@ class Reference(ABC):
         pts, pairs = self.make_lattice_with_lines(n)
         return tuple(tuple(sympy.Float(float(i)) for i in p) for p in pts), pairs
 
-    def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
+    def z_ordered_entities(self) -> list[list[tuple[int, int]]]:
         """Get the subentities of the cell in back-to-front plotting order.
 
         Returns:
@@ -356,7 +356,7 @@ class Reference(ABC):
         """
         return [[(i, j) for i in range(self.tdim, -1, -1) for j in range(self.sub_entity_count(i))]]
 
-    def z_ordered_entities_extra_dim(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
+    def z_ordered_entities_extra_dim(self) -> list[list[tuple[int, int]]]:
         """Get the subentities in back-to-front plotting order when using an extra dimension.
 
         Returns:
@@ -364,7 +364,7 @@ class Reference(ABC):
         """
         return self.z_ordered_entities()
 
-    def get_point(self, reference_coords: PointType) -> typing.Tuple[sympy.core.expr.Expr, ...]:
+    def get_point(self, reference_coords: PointType) -> tuple[sympy.core.expr.Expr, ...]:
         """Get a point in the reference from reference coordinates.
 
         Args:
@@ -526,7 +526,7 @@ class Reference(ABC):
 
     def sub_entities(
         self, dim: int | None = None, codim: int | None = None
-    ) -> typing.Tuple[typing.Tuple[int, ...], ...]:
+    ) -> tuple[tuple[int, ...], ...]:
         """Get the sub-entities of a given dimension.
 
         Args:
@@ -659,8 +659,8 @@ class Reference(ABC):
         """
 
     def map_polyset_from_default(
-        self, poly: typing.List[symfem.functions.FunctionInput]
-    ) -> typing.List[symfem.functions.FunctionInput]:
+        self, poly: list[symfem.functions.FunctionInput]
+    ) -> list[symfem.functions.FunctionInput]:
         """Map the polynomials from the default reference element to this reference."""
         from symfem.functions import parse_function_input
 
@@ -690,8 +690,8 @@ class Reference(ABC):
 
     def plot_entity_diagrams(
         self,
-        filename: str | typing.List[str],
-        plot_options: typing.Dict[str, typing.Any] = {},
+        filename: str | list[str],
+        plot_options: dict[str, typing.Any] = {},
         **kwargs: typing.Any,
     ):
         """Plot diagrams showing the entity numbering of the reference."""
@@ -701,7 +701,7 @@ class Reference(ABC):
         colors = img.colors
 
         if self.tdim == 1:
-            offset_unit: typing.Tuple[sympy.core.expr.Expr | int, ...] = (sympy.Rational(4, 3),)
+            offset_unit: tuple[sympy.core.expr.Expr | int, ...] = (sympy.Rational(4, 3),)
             img.add_arrow((-sympy.Rational(1, 2), 0), (-sympy.Rational(1, 3), 0))
             img.add_math((-sympy.Rational(8, 25), 0), "x", anchor="west")
         elif self.tdim == 2:
@@ -1126,7 +1126,7 @@ class Triangle(Reference):
                 s += i
         return pts, pairs
 
-    def z_ordered_entities_extra_dim(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
+    def z_ordered_entities_extra_dim(self) -> list[list[tuple[int, int]]]:
         """Get the subentities in back-to-front plotting order when using an extra dimension.
 
         Returns:
@@ -1268,7 +1268,7 @@ class Tetrahedron(Reference):
         """
         return (self.vertices[0], self.vertices[1], self.vertices[3])
 
-    def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
+    def z_ordered_entities(self) -> list[list[tuple[int, int]]]:
         """Get the subentities of the cell in back-to-front plotting order.
 
         Returns:
@@ -1510,7 +1510,7 @@ class Quadrilateral(Reference):
                         pairs += [(node, node + n - 1)]
         return pts, pairs
 
-    def z_ordered_entities_extra_dim(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
+    def z_ordered_entities_extra_dim(self) -> list[list[tuple[int, int]]]:
         """Get the subentities in back-to-front plotting order when using an extra dimension.
 
         Returns:
@@ -1718,7 +1718,7 @@ class Hexahedron(Reference):
             self.vertices[4],
         )
 
-    def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
+    def z_ordered_entities(self) -> list[list[tuple[int, int]]]:
         """Get the subentities of the cell in back-to-front plotting order.
 
         Returns:
@@ -1944,7 +1944,7 @@ class Prism(Reference):
             self.vertices[3],
         )
 
-    def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
+    def z_ordered_entities(self) -> list[list[tuple[int, int]]]:
         """Get the subentities of the cell in back-to-front plotting order.
 
         Returns:
@@ -2158,7 +2158,7 @@ class Pyramid(Reference):
         """
         return (self.vertices[0], self.vertices[1], self.vertices[3], self.vertices[4])
 
-    def z_ordered_entities(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
+    def z_ordered_entities(self) -> list[list[tuple[int, int]]]:
         """Get the subentities of the cell in back-to-front plotting order.
 
         Returns:
@@ -2475,7 +2475,7 @@ class DualPolygon(Reference):
         """
         raise NotImplementedError()
 
-    def z_ordered_entities_extra_dim(self) -> typing.List[typing.List[typing.Tuple[int, int]]]:
+    def z_ordered_entities_extra_dim(self) -> list[list[tuple[int, int]]]:
         """Get the subentities in back-to-front plotting order when using an extra dimension.
 
         Returns:

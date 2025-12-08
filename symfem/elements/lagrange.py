@@ -78,12 +78,12 @@ class Lagrange(CiarletElement):
                             point = entity.get_point([points[j] for j in i[::-1]])
                             dofs.append(PointEvaluation(reference, point, entity=(edim, e_n)))
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -128,7 +128,7 @@ class VectorLagrange(CiarletElement):
         """
         scalar_space = Lagrange(reference, order, variant)
         dofs: ListOfFunctionals = []
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         if reference.tdim == 1:
             for p in scalar_space.dofs:
                 if isinstance(p, PointEvaluation):
@@ -160,7 +160,7 @@ class VectorLagrange(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -206,7 +206,7 @@ class MatrixLagrange(CiarletElement):
         scalar_space = Lagrange(reference, order, variant)
         dofs: ListOfFunctionals = []
         if reference.tdim == 1:
-            directions: typing.List[typing.Tuple[int, ...]] = [(1,)]
+            directions: list[tuple[int, ...]] = [(1,)]
         else:
             directions = [
                 tuple(1 if i == j else 0 for j in range(reference.tdim**2))
@@ -216,7 +216,7 @@ class MatrixLagrange(CiarletElement):
             for d in directions:
                 dofs.append(DotPointEvaluation(reference, p.dof_point(), d, entity=p.entity))
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim**2, order)
 
         super().__init__(
@@ -230,7 +230,7 @@ class MatrixLagrange(CiarletElement):
         )
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -273,7 +273,7 @@ class SymmetricMatrixLagrange(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         dofs: ListOfFunctionals = []
         scalar_space = Lagrange(reference, order, variant)
         if reference.tdim == 1:
@@ -289,7 +289,7 @@ class SymmetricMatrixLagrange(CiarletElement):
                 reference.tdim**2,
             )
         else:
-            directions: typing.List[typing.Tuple[typing.Tuple[int, ...], ...]] = []
+            directions: list[tuple[tuple[int, ...], ...]] = []
             if reference.tdim == 2:
                 poly += [((a[0], a[1]), (a[1], a[2])) for a in polynomial_set_vector(2, 3, order)]
                 directions = [((1, 0), (0, 0)), ((0, 1), (0, 0)), ((0, 0), (0, 1))]
@@ -323,7 +323,7 @@ class SymmetricMatrixLagrange(CiarletElement):
             )
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:

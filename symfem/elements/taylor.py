@@ -1,6 +1,5 @@
 """Taylor element on an interval, triangle or tetrahedron."""
 
-import typing
 from itertools import product
 
 from symfem.elements.lagrange import Lagrange
@@ -36,7 +35,7 @@ class Taylor(CiarletElement):
                     )
                 )
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)

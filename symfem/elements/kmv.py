@@ -4,8 +4,6 @@ This element's definition is given in https://doi.org/10.1023/A:1004420829610
 (Chin-Joe-Kong, Mulder, Van Veldhuizen, 1999)
 """
 
-import typing
-
 import sympy
 
 from symfem.finite_element import CiarletElement
@@ -18,7 +16,7 @@ from symfem.symbols import x
 __all__ = ["kmv_tri_polyset", "kmv_tet_polyset", "KongMulderVeldhuizen"]
 
 
-def kmv_tri_polyset(m: int, mf: int) -> typing.List[FunctionInput]:
+def kmv_tri_polyset(m: int, mf: int) -> list[FunctionInput]:
     """Create the polynomial set for a KMV space on a triangle.
 
     Args:
@@ -28,7 +26,7 @@ def kmv_tri_polyset(m: int, mf: int) -> typing.List[FunctionInput]:
     Returns:
         The polynomial set
     """
-    poly: typing.List[FunctionInput] = []
+    poly: list[FunctionInput] = []
     poly += polynomial_set_1d(2, m)
 
     b = x[0] * x[1] * (1 - x[0] - x[1])
@@ -37,7 +35,7 @@ def kmv_tri_polyset(m: int, mf: int) -> typing.List[FunctionInput]:
     return poly
 
 
-def kmv_tet_polyset(m: int, mf: int, mi: int) -> typing.List[FunctionInput]:
+def kmv_tet_polyset(m: int, mf: int, mi: int) -> list[FunctionInput]:
     """Create the polynomial set for a KMV space on a tetrahedron.
 
     Args:
@@ -48,7 +46,7 @@ def kmv_tet_polyset(m: int, mf: int, mi: int) -> typing.List[FunctionInput]:
     Returns:
         The polynomial set
     """
-    poly: typing.List[FunctionInput] = []
+    poly: list[FunctionInput] = []
     poly += polynomial_set_1d(3, m)
 
     # TODO: check this

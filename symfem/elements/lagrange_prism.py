@@ -106,13 +106,13 @@ class Lagrange(CiarletElement):
                         )
                     )
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += prism_polynomial_set_1d(reference.tdim, order)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -157,7 +157,7 @@ class VectorLagrange(CiarletElement):
         """
         scalar_space = Lagrange(reference, order, variant)
         dofs: ListOfFunctionals = []
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         if reference.tdim == 1:
             for p in scalar_space.dofs:
                 dofs.append(PointEvaluation(reference, p.dof_point(), entity=p.entity))
@@ -177,7 +177,7 @@ class VectorLagrange(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -201,7 +201,7 @@ class VectorLagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * 2
 
-    names: typing.List[str] = []
+    names: list[str] = []
     references = ["prism"]
     min_order = 0
     continuity = "C0"

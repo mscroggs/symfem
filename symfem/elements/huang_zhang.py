@@ -40,7 +40,7 @@ class HuangZhang(CiarletElement):
         self.variant = variant
 
         dofs: ListOfFunctionals = []
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += [
             VectorFunction([x[0] ** i * x[1] ** j, 0])
             for i in range(order + 2)
@@ -82,7 +82,7 @@ class HuangZhang(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:

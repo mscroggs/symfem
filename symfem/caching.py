@@ -1,7 +1,6 @@
 """Functions to cache matrices."""
 
 import os
-import typing
 from hashlib import sha256
 
 import sympy
@@ -26,7 +25,7 @@ __all__ = ["load_cached_matrix", "save_cached_matrix", "matrix_to_string", "matr
 
 
 def load_cached_matrix(
-    matrix_type: str, cache_id: str, size: typing.Tuple[int, int]
+    matrix_type: str, cache_id: str, size: tuple[int, int]
 ) -> sympy.matrices.dense.MutableDenseMatrix | None:
     """Load a cached matrix.
 

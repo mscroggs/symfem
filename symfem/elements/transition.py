@@ -24,8 +24,8 @@ class Transition(CiarletElement):
         self,
         reference: Reference,
         order: int,
-        edge_orders: typing.List[int] | None = None,
-        face_orders: typing.List[int] | None = None,
+        edge_orders: list[int] | None = None,
+        face_orders: list[int] | None = None,
         variant: str = "equispaced",
     ):
         """Create the element.
@@ -52,7 +52,7 @@ class Transition(CiarletElement):
         for v_n, v in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, 1)
 
         for edim in range(1, 4):
@@ -117,7 +117,7 @@ class Transition(CiarletElement):
         self.face_orders = face_orders
         self.edge_orders = edge_orders
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:

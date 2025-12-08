@@ -39,10 +39,10 @@ __all__ = [
 ]
 
 TabulatedBasis = (
-    typing.List[sympy.core.expr.Expr | int]
-    | typing.List[typing.Tuple[sympy.core.expr.Expr | int, ...]]
-    | typing.List[typing.Tuple[typing.Tuple[sympy.core.expr.Expr | int, ...], ...]]
-    | typing.List[sympy.matrices.dense.MutableDenseMatrix]
+    list[sympy.core.expr.Expr | int]
+    | list[tuple[sympy.core.expr.Expr | int, ...]]
+    | list[tuple[tuple[sympy.core.expr.Expr | int, ...], ...]]
+    | list[sympy.matrices.dense.MutableDenseMatrix]
 )
 
 
@@ -57,7 +57,7 @@ class NoTensorProduct(Exception):
 class FiniteElement(ABC):
     """Abstract finite element."""
 
-    _float_basis_functions: typing.List[Function] | None
+    _float_basis_functions: list[Function] | None
     _value_scale: sympy.core.expr.Expr | None
 
     def __init__(
@@ -67,7 +67,7 @@ class FiniteElement(ABC):
         space_dim: int,
         domain_dim: int,
         range_dim: int,
-        range_shape: typing.Tuple[int, ...] | None = None,
+        range_shape: tuple[int, ...] | None = None,
     ):
         """Create a finite element.
 
@@ -85,7 +85,7 @@ class FiniteElement(ABC):
         self.domain_dim = domain_dim
         self.range_dim = range_dim
         if range_shape is None and range_dim > 1:
-            self.range_shape: typing.Tuple[int, ...] | None = (range_dim,)
+            self.range_shape: tuple[int, ...] | None = (range_dim,)
         else:
             self.range_shape = range_shape
         self._float_basis_functions = None
@@ -128,7 +128,7 @@ class FiniteElement(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def dof_plot_positions(self) -> typing.List[PointType]:
+    def dof_plot_positions(self) -> list[PointType]:
         """Get the points to plot each DOF at on a DOF diagram.
 
         Returns:
@@ -136,7 +136,7 @@ class FiniteElement(ABC):
         """
 
     @abstractmethod
-    def dof_directions(self) -> typing.List[PointType | None]:
+    def dof_directions(self) -> list[PointType | None]:
         """Get the direction associated with each DOF.
 
         Returns:
@@ -144,7 +144,7 @@ class FiniteElement(ABC):
         """
 
     @abstractmethod
-    def dof_entities(self) -> typing.List[typing.Tuple[int, int]]:
+    def dof_entities(self) -> list[tuple[int, int]]:
         """Get the entities that each DOF is associated with.
 
         Returns:
@@ -153,8 +153,8 @@ class FiniteElement(ABC):
 
     def plot_dof_diagram(
         self,
-        filename: str | typing.List[str],
-        plot_options: typing.Dict[str, typing.Any] = {},
+        filename: str | list[str],
+        plot_options: dict[str, typing.Any] = {},
         **kwargs: typing.Any,
     ):
         """Plot a diagram showing the DOFs of the element.
@@ -203,7 +203,7 @@ class FiniteElement(ABC):
         img.save(filename, plot_options=plot_options)
 
     @abstractmethod
-    def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
+    def entity_dofs(self, entity_dim: int, entity_number: int) -> list[int]:
         """Get the numbers of the DOFs associated with the given entity.
 
         Args:
@@ -215,7 +215,7 @@ class FiniteElement(ABC):
         """
 
     @abstractmethod
-    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> list[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -296,7 +296,7 @@ class FiniteElement(ABC):
     def plot_basis_function(
         self,
         n: int,
-        filename: str | typing.List[str],
+        filename: str | list[str],
         cell: Reference | None = None,
         **kwargs: typing.Any,
     ):
@@ -330,10 +330,10 @@ class FiniteElement(ABC):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.List[Function] | None = None,
+        basis: list[Function] | None = None,
         forward_map: PointType | None = None,
         inverse_map: PointType | None = None,
-    ) -> typing.List[Function]:
+    ) -> list[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
         Args:
@@ -347,7 +347,7 @@ class FiniteElement(ABC):
         """
 
     @abstractmethod
-    def get_polynomial_basis(self) -> typing.List[Function]:
+    def get_polynomial_basis(self) -> list[Function]:
         """Get the symbolic polynomial basis for the element.
 
         Returns:
@@ -541,7 +541,7 @@ class FiniteElement(ABC):
 
     def get_tensor_factorisation(
         self,
-    ) -> typing.List[typing.Tuple[str, typing.List[FiniteElement], typing.List[int]]]:
+    ) -> list[tuple[str, list[FiniteElement], list[int]]]:
         """Get the representation of the element as a tensor product.
 
         Returns:
@@ -549,7 +549,7 @@ class FiniteElement(ABC):
         """
         raise NoTensorProduct()
 
-    def _get_basis_functions_tensor(self) -> typing.List[Function]:
+    def _get_basis_functions_tensor(self) -> list[Function]:
         """Compute the basis functions using the space's tensor product factorisation.
 
         Returns:
@@ -571,7 +571,7 @@ class FiniteElement(ABC):
                 raise ValueError(f"Unknown tensor product type: {t_type}")
         return [basis[i] for i in range(len(basis))]
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the keyword arguments used to create this element.
 
         Returns:
@@ -588,8 +588,8 @@ class FiniteElement(ABC):
         """
         return self.names[0]
 
-    names: typing.List[str] = []
-    references: typing.List[str] = []
+    names: list[str] = []
+    references: list[str] = []
     last_updated = version
     cache = True
     value_type = "unknown"
@@ -604,11 +604,11 @@ class CiarletElement(FiniteElement):
         self,
         reference: Reference,
         order: int,
-        basis: typing.List[FunctionInput],
+        basis: list[FunctionInput],
         dofs: ListOfFunctionals,
         domain_dim: int,
         range_dim: int,
-        range_shape: typing.Tuple[int, ...] | None = None,
+        range_shape: tuple[int, ...] | None = None,
     ):
         """Create a Ciarlet element.
 
@@ -627,9 +627,9 @@ class CiarletElement(FiniteElement):
         for b in self._basis:
             assert isinstance(b, Function)
         self.dofs = dofs
-        self._basis_functions: typing.List[Function] | None = None
+        self._basis_functions: list[Function] | None = None
 
-    def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
+    def entity_dofs(self, entity_dim: int, entity_number: int) -> list[int]:
         """Get the numbers of the DOFs associated with the given entity.
 
         Args:
@@ -641,7 +641,7 @@ class CiarletElement(FiniteElement):
         """
         return [i for i, j in enumerate(self.dofs) if j.entity == (entity_dim, entity_number)]
 
-    def dof_plot_positions(self) -> typing.List[PointType]:
+    def dof_plot_positions(self) -> list[PointType]:
         """Get the points to plot each DOF at on a DOF diagram.
 
         Returns:
@@ -649,7 +649,7 @@ class CiarletElement(FiniteElement):
         """
         return [d.adjusted_dof_point() for d in self.dofs]
 
-    def dof_directions(self) -> typing.List[PointType | None]:
+    def dof_directions(self) -> list[PointType | None]:
         """Get the direction associated with each DOF.
 
         Returns:
@@ -657,7 +657,7 @@ class CiarletElement(FiniteElement):
         """
         return [d.dof_direction() for d in self.dofs]
 
-    def dof_entities(self) -> typing.List[typing.Tuple[int, int]]:
+    def dof_entities(self) -> list[tuple[int, int]]:
         """Get the entities that each DOF is associated with.
 
         Returns:
@@ -665,7 +665,7 @@ class CiarletElement(FiniteElement):
         """
         return [d.entity for d in self.dofs]
 
-    def get_polynomial_basis(self) -> typing.List[Function]:
+    def get_polynomial_basis(self) -> list[Function]:
         """Get the symbolic polynomial basis for the element.
 
         Returns:
@@ -708,7 +708,7 @@ class CiarletElement(FiniteElement):
             else:
                 return mat
 
-    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> list[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -723,7 +723,7 @@ class CiarletElement(FiniteElement):
             else:
                 minv = self.get_dual_matrix(inverse=True)
 
-                sfs: typing.List[Function] = []
+                sfs: list[Function] = []
                 pb = self.get_polynomial_basis()
                 for i, dof in enumerate(self.dofs):
                     sf = ScalarFunction(minv[i, 0]) * pb[0]
@@ -740,7 +740,7 @@ class CiarletElement(FiniteElement):
     def plot_basis_function(
         self,
         n: int,
-        filename: str | typing.List[str],
+        filename: str | list[str],
         cell: Reference | None = None,
         **kwargs: typing.Any,
     ):
@@ -781,10 +781,10 @@ class CiarletElement(FiniteElement):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.List[Function] | None = None,
+        basis: list[Function] | None = None,
         forward_map: PointType | None = None,
         inverse_map: PointType | None = None,
-    ) -> typing.List[Function]:
+    ) -> list[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
         Args:
@@ -805,13 +805,11 @@ class CiarletElement(FiniteElement):
             inverse_map = self.reference.get_inverse_map_to(vertices)
 
         try:
-            functions: typing.List[Function] = [ScalarFunction(0) for f in basis]
+            functions: list[Function] = [ScalarFunction(0) for f in basis]
             for dim in range(self.reference.tdim + 1):
                 for e in range(self.reference.sub_entity_count(dim)):
                     entity_dofs = self.entity_dofs(dim, e)
-                    dofs_by_type: typing.Dict[
-                        typing.Tuple[typing.Type, str | None], typing.List[int]
-                    ] = {}
+                    dofs_by_type: dict[tuple[typing.Type, str | None], list[int]] = {}
                     for d in entity_dofs:
                         dof = self.dofs[d]
                         t = (type(dof), dof.mapping)
@@ -878,17 +876,17 @@ class CiarletElement(FiniteElement):
 class DirectElement(FiniteElement):
     """Finite element defined directly."""
 
-    _basis_functions: typing.List[Function]
+    _basis_functions: list[Function]
 
     def __init__(
         self,
         reference: Reference,
         order: int,
-        basis_functions: typing.List[FunctionInput],
-        basis_entities: typing.List[typing.Tuple[int, int]],
+        basis_functions: list[FunctionInput],
+        basis_entities: list[tuple[int, int]],
         domain_dim: int,
         range_dim: int,
-        range_shape: typing.Tuple[int, ...] | None = None,
+        range_shape: tuple[int, ...] | None = None,
     ):
         """Create a direct element.
 
@@ -905,7 +903,7 @@ class DirectElement(FiniteElement):
         self._basis_entities = basis_entities
         self._basis_functions = [parse_function_input(f) for f in basis_functions]
 
-    def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
+    def entity_dofs(self, entity_dim: int, entity_number: int) -> list[int]:
         """Get the numbers of the DOFs associated with the given entity.
 
         Args:
@@ -917,7 +915,7 @@ class DirectElement(FiniteElement):
         """
         return [i for i, j in enumerate(self._basis_entities) if j == (entity_dim, entity_number)]
 
-    def dof_plot_positions(self) -> typing.List[PointType]:
+    def dof_plot_positions(self) -> list[PointType]:
         """Get the points to plot each DOF at on a DOF diagram.
 
         Returns:
@@ -974,7 +972,7 @@ class DirectElement(FiniteElement):
 
         return positions
 
-    def dof_directions(self) -> typing.List[PointType | None]:
+    def dof_directions(self) -> list[PointType | None]:
         """Get the direction associated with each DOF.
 
         Returns:
@@ -982,7 +980,7 @@ class DirectElement(FiniteElement):
         """
         return [None for d in self._basis_entities]
 
-    def dof_entities(self) -> typing.List[typing.Tuple[int, int]]:
+    def dof_entities(self) -> list[tuple[int, int]]:
         """Get the entities that each DOF is associated with.
 
         Returns:
@@ -990,7 +988,7 @@ class DirectElement(FiniteElement):
         """
         return self._basis_entities
 
-    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> list[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -1007,10 +1005,10 @@ class DirectElement(FiniteElement):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.List[Function] | None = None,
+        basis: list[Function] | None = None,
         forward_map: PointType | None = None,
         inverse_map: PointType | None = None,
-    ) -> typing.List[Function]:
+    ) -> list[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
         Args:
@@ -1029,7 +1027,7 @@ class DirectElement(FiniteElement):
         #                   **self.init_kwargs())
         # return e.get_basis_functions()
 
-    def get_polynomial_basis(self) -> typing.List[Function]:
+    def get_polynomial_basis(self) -> list[Function]:
         """Get the symbolic polynomial basis for the element.
 
         Returns:
@@ -1086,11 +1084,11 @@ class DirectElement(FiniteElement):
 class EnrichedElement(FiniteElement):
     """Finite element defined directly."""
 
-    _basis_functions: typing.List[Function] | None
+    _basis_functions: list[Function] | None
 
     def __init__(
         self,
-        subelements: typing.List[FiniteElement],
+        subelements: list[FiniteElement],
     ):
         """Create an enriched element.
 
@@ -1119,7 +1117,7 @@ class EnrichedElement(FiniteElement):
             range_shape,
         )
 
-    def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
+    def entity_dofs(self, entity_dim: int, entity_number: int) -> list[int]:
         """Get the numbers of the DOFs associated with the given entity.
 
         Args:
@@ -1136,7 +1134,7 @@ class EnrichedElement(FiniteElement):
             start += e.space_dim
         return dofs
 
-    def dof_plot_positions(self) -> typing.List[PointType]:
+    def dof_plot_positions(self) -> list[PointType]:
         """Get the points to plot each DOF at on a DOF diagram.
 
         Returns:
@@ -1147,7 +1145,7 @@ class EnrichedElement(FiniteElement):
             positions += e.dof_plot_positions()
         return positions
 
-    def dof_directions(self) -> typing.List[PointType | None]:
+    def dof_directions(self) -> list[PointType | None]:
         """Get the direction associated with each DOF.
 
         Returns:
@@ -1158,7 +1156,7 @@ class EnrichedElement(FiniteElement):
             positions += e.dof_directions()
         return positions
 
-    def dof_entities(self) -> typing.List[typing.Tuple[int, int]]:
+    def dof_entities(self) -> list[tuple[int, int]]:
         """Get the entities that each DOF is associated with.
 
         Returns:
@@ -1169,7 +1167,7 @@ class EnrichedElement(FiniteElement):
             positions += e.dof_entities()
         return positions
 
-    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> list[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -1191,10 +1189,10 @@ class EnrichedElement(FiniteElement):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.List[Function] | None = None,
+        basis: list[Function] | None = None,
         forward_map: PointType | None = None,
         inverse_map: PointType | None = None,
-    ) -> typing.List[Function]:
+    ) -> list[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
         Args:
@@ -1211,7 +1209,7 @@ class EnrichedElement(FiniteElement):
             out += e.map_to_cell(vertices_in, basis, forward_map, inverse_map)
         return out
 
-    def get_polynomial_basis(self) -> typing.List[Function]:
+    def get_polynomial_basis(self) -> list[Function]:
         """Get the symbolic polynomial basis for the element.
 
         Returns:

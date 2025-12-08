@@ -73,7 +73,7 @@ class TNT(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += quolynomial_set_1d(reference.tdim, order - 1)
         if reference.tdim == 2:
             for i in range(2):
@@ -122,7 +122,7 @@ class TNT(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -168,7 +168,7 @@ class TNTcurl(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
         if reference.tdim == 2:
             for ii in product([0, 1], repeat=2):
@@ -298,7 +298,7 @@ class TNTcurl(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -344,7 +344,7 @@ class TNTdiv(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
         if reference.tdim == 2:
             for ii in product([0, 1], repeat=2):
@@ -472,7 +472,7 @@ class TNTdiv(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:

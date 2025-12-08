@@ -33,7 +33,7 @@ map_types = {
 }
 
 
-def get_embedded_degrees(poly, reference) -> typing.Tuple[int, int]:
+def get_embedded_degrees(poly, reference) -> tuple[int, int]:
     """Get embedded degrees of a set of polynomials.
 
     Args:

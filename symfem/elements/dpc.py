@@ -56,14 +56,14 @@ class DPC(CiarletElement):
 
             dofs = [PointEvaluation(reference, d, entity=(reference.tdim, 0)) for d in points]
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
         poly = reference.map_polyset_from_default(poly)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -112,7 +112,7 @@ class VectorDPC(CiarletElement):
         scalar_space = DPC(reference, order, variant)
         dofs: ListOfFunctionals = []
         if reference.tdim == 1:
-            directions: typing.List[typing.Tuple[int, ...]] = [(1,)]
+            directions: list[tuple[int, ...]] = [(1,)]
         else:
             directions = [
                 tuple(1 if i == j else 0 for j in range(reference.tdim))
@@ -122,13 +122,13 @@ class VectorDPC(CiarletElement):
             for d in directions:
                 dofs.append(DotPointEvaluation(reference, p.dof_point(), d, entity=p.entity))
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:

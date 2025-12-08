@@ -4,8 +4,6 @@ This element's definition appears in https://doi.org/10.1017/S0001925900004546
 (Morley, 1968)
 """
 
-import typing
-
 from symfem.finite_element import CiarletElement
 from symfem.functionals import ListOfFunctionals, PointEvaluation, PointNormalDerivativeEvaluation
 from symfem.functions import FunctionInput
@@ -39,7 +37,7 @@ class Morley(CiarletElement):
                 PointNormalDerivativeEvaluation(reference, midpoint, sub_ref, entity=(1, e_n))
             )
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)

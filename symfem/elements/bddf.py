@@ -18,7 +18,7 @@ from symfem.symbols import x
 __all__ = ["bddf_polyset", "BDDF"]
 
 
-def bddf_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]:
+def bddf_polyset(reference: Reference, order: int) -> list[FunctionInput]:
     """Create the polynomial basis for a BDDF element.
 
     Args:
@@ -31,7 +31,7 @@ def bddf_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]
     assert reference.name == "hexahedron"
 
     dim = reference.tdim
-    pset: typing.List[FunctionInput] = []
+    pset: list[FunctionInput] = []
     pset += polynomial_set_vector(dim, dim, order)
     pset.append(VectorFunction((0, 0, x[0] ** (order + 1) * x[1])).curl())
     pset.append(VectorFunction((0, x[0] * x[2] ** (order + 1), 0)).curl())
@@ -70,7 +70,7 @@ class BDDF(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:

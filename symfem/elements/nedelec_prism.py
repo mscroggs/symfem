@@ -36,7 +36,7 @@ class Nedelec(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += [
             (i[0] * j, i[1] * j, 0)
             for i in polynomial_set_vector(2, 2, order) + Hcurl_polynomials(2, 2, order + 1)
@@ -114,7 +114,7 @@ class Nedelec(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:

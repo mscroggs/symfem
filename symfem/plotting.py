@@ -31,7 +31,7 @@ __all__ = [
 ]
 
 PointOrFunction = PointTypeInput | Function
-SetOfPointsOrFunctions = typing.List[PointOrFunction] | typing.Tuple[PointOrFunction, ...]
+SetOfPointsOrFunctions = list[PointOrFunction] | tuple[PointOrFunction, ...]
 
 
 def tex_font_size(n: int):
@@ -130,13 +130,13 @@ class Colors:
 class PictureElement(ABC):
     """An element in a picture."""
 
-    def __init__(self, colors: Colors, midpoint: typing.Tuple[float, ...] = ()):
+    def __init__(self, colors: Colors, midpoint: tuple[float, ...] = ()):
         """Create an element."""
         self.midpoint = midpoint
         self.colors = colors
 
     @abstractmethod
-    def as_svg(self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]) -> str:
+    def as_svg(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
         """Return SVG format.
 
         Args:
@@ -148,7 +148,7 @@ class PictureElement(ABC):
         pass
 
     @abstractmethod
-    def as_tikz(self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]) -> str:
+    def as_tikz(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
         """Return Tikz format.
 
         Args:
@@ -221,7 +221,7 @@ class Line(PictureElement):
         self.color = color
         self.width = width
 
-    def as_svg(self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]) -> str:
+    def as_svg(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
         """Return SVG format.
 
         Args:
@@ -237,7 +237,7 @@ class Line(PictureElement):
             f"stroke='{self.color}' stroke-width='{self.width}' stroke-linecap='round' />\n"
         )
 
-    def as_tikz(self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]) -> str:
+    def as_tikz(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
         """Return Tikz format.
 
         Args:
@@ -295,7 +295,7 @@ class Bezier(PictureElement):
         self.color = color
         self.width = width
 
-    def as_svg(self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]) -> str:
+    def as_svg(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
         """Return SVG format.
 
         Args:
@@ -314,7 +314,7 @@ class Bezier(PictureElement):
             " fill='none' />\n"
         )
 
-    def as_tikz(self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]) -> str:
+    def as_tikz(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
         """Return Tikz format.
 
         Args:
@@ -362,7 +362,7 @@ class Arrow(PictureElement):
         self.color = color
         self.width = width
 
-    def as_svg(self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]) -> str:
+    def as_svg(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
         """Return SVG format.
 
         Args:
@@ -399,7 +399,7 @@ class Arrow(PictureElement):
             )
         return out
 
-    def as_tikz(self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]) -> str:
+    def as_tikz(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
         """Return Tikz format.
 
         Args:
@@ -475,7 +475,7 @@ class NCircle(PictureElement):
             self.font_size = font_size
         self.width = width
 
-    def as_svg(self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]) -> str:
+    def as_svg(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
         """Return SVG format.
 
         Args:
@@ -494,7 +494,7 @@ class NCircle(PictureElement):
             f"{self.number}</text>\n"
         )
 
-    def as_tikz(self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]) -> str:
+    def as_tikz(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
         """Return Tikz format.
 
         Args:
@@ -539,7 +539,7 @@ class Fill(PictureElement):
         self.color = color
         self.opacity = opacity
 
-    def as_svg(self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]) -> str:
+    def as_svg(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
         """Return SVG format.
 
         Args:
@@ -552,7 +552,7 @@ class Fill(PictureElement):
         ptstring = " ".join(f"{p[0]},{p[1]}" for p in pts)
         return f"<polygon points='{ptstring}' fill='{self.color}' opacity='{self.opacity}' />"
 
-    def as_tikz(self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]) -> str:
+    def as_tikz(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
         """Return Tikz format.
 
         Args:
@@ -611,7 +611,7 @@ class Math(PictureElement):
         ]
         self.anchor = anchor
 
-    def as_svg(self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]) -> str:
+    def as_svg(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
         """Return SVG format.
 
         Args:
@@ -646,7 +646,7 @@ class Math(PictureElement):
             f"{self.math}</text>\n"
         )
 
-    def as_tikz(self, map_pt: typing.Callable[[PointType], typing.Tuple[float, float]]) -> str:
+    def as_tikz(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
         """Return Tikz format.
 
         Args:
@@ -708,7 +708,7 @@ class Picture:
             (sympy.Rational(1, 2), sympy.Rational(1, 5)),
             (sympy.Integer(0), sympy.Integer(1)),
         )
-        self.elements: typing.List[PictureElement] = []
+        self.elements: list[PictureElement] = []
         self.padding = padding
         self.scale = scale
         self.height = height
@@ -1021,11 +1021,11 @@ class Picture:
 
     def compute_scale(
         self, unit: str = "px", reverse_y: bool = True
-    ) -> typing.Tuple[
+    ) -> tuple[
         sympy.core.expr.Expr,
         sympy.core.expr.Expr,
         sympy.core.expr.Expr,
-        typing.Callable[[PointType], typing.Tuple[float, float]],
+        typing.Callable[[PointType], tuple[float, float]],
     ]:
         """Compute the scale and size of the picture.
 
@@ -1067,7 +1067,7 @@ class Picture:
 
         if reverse_y:
 
-            def map_pt(pt: PointType) -> typing.Tuple[float, float]:
+            def map_pt(pt: PointType) -> tuple[float, float]:
                 """Map a point."""
                 return (
                     float(self.padding + (pt[0] - minx) * scale),
@@ -1075,7 +1075,7 @@ class Picture:
                 )
         else:
 
-            def map_pt(pt: PointType) -> typing.Tuple[float, float]:
+            def map_pt(pt: PointType) -> tuple[float, float]:
                 """Map a point."""
                 return (
                     float(self.padding + (pt[0] - minx) * scale),
@@ -1184,8 +1184,8 @@ class Picture:
 
     def save(
         self,
-        filename: str | typing.List[str],
-        plot_options: typing.Dict[str, typing.Any] = {},
+        filename: str | list[str],
+        plot_options: dict[str, typing.Any] = {},
     ):
         """Save the picture as a file.
 

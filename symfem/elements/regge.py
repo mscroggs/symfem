@@ -43,7 +43,7 @@ class Regge(CiarletElement):
         """
         from symfem import create_reference
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         if reference.tdim == 2:
             poly = [
                 ((p[0], p[1]), (p[1], p[2]))
@@ -167,7 +167,7 @@ class Regge(CiarletElement):
         )
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -212,7 +212,7 @@ class ReggeTP(CiarletElement):
         """
         from symfem import create_reference
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         if reference.tdim == 2:
             for i in range(order + 1):
                 for j in range(order + 2):
@@ -395,7 +395,7 @@ class ReggeTP(CiarletElement):
         )
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:

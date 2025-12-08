@@ -4,8 +4,6 @@ This element's definition appears in https://doi.org/10.1137/17M1153467
 (Guzman and Neilan, 2018)
 """
 
-import typing
-
 import sympy
 
 from symfem.elements.bdm import BDM
@@ -23,7 +21,7 @@ from symfem.symbols import t, x
 __all__ = ["GuzmanNeilanFirstKind", "GuzmanNeilanSecondKind", "make_piecewise_lagrange"]
 
 
-def poly(reference: Reference, k: int) -> typing.List[Function]:
+def poly(reference: Reference, k: int) -> list[Function]:
     """Generate the P^perp polynomial set."""
     if k < 2:
         if reference.name == "triangle":
@@ -72,7 +70,7 @@ def get_sub_cells(reference):
         ]
 
 
-def bubbles(reference: Reference) -> typing.List[VectorFunction]:
+def bubbles(reference: Reference) -> list[VectorFunction]:
     """Generate divergence-free bubbles."""
     br_bubbles = []
     p1 = Lagrange(reference, 1, variant="equispaced")
@@ -126,7 +124,7 @@ def bubbles(reference: Reference) -> typing.List[VectorFunction]:
             assert term in terms
         aim = [fun[term] if term in fun else 0 for term in terms] * (reference.tdim + 1)
 
-        mat: typing.List[typing.List[ScalarFunction]] = [[] for t in terms for p in lamb.pieces]
+        mat: list[list[ScalarFunction]] = [[] for t in terms for p in lamb.pieces]
         for b in sub_basis:
             assert isinstance(b, PiecewiseFunction)
             i = 0
@@ -312,12 +310,12 @@ class GuzmanNeilanSecondKind(CiarletElement):
 
 
 def make_piecewise_lagrange(
-    sub_cells: typing.List[SetOfPoints],
+    sub_cells: list[SetOfPoints],
     cell_name,
     order: int,
     zero_on_boundary: bool = False,
     zero_at_centre: bool = False,
-) -> typing.List[PiecewiseFunction]:
+) -> list[PiecewiseFunction]:
     """Make the basis functions of a piecewise Lagrange space.
 
     Args:
@@ -333,17 +331,17 @@ def make_piecewise_lagrange(
     from symfem import create_reference
 
     lagrange_space = VectorLagrange(create_reference(cell_name), order)
-    lagrange_bases: typing.List[typing.List[VectorFunction]] = []
+    lagrange_bases: list[list[VectorFunction]] = []
     for c in sub_cells:
-        row: typing.List[VectorFunction] = []
+        row: list[VectorFunction] = []
         c_basis = lagrange_space.map_to_cell(c)
         for cb in c_basis:
             assert isinstance(cb, VectorFunction)
             row.append(cb)
         lagrange_bases.append(row)
 
-    basis_dofs: typing.List[typing.Tuple[int, ...]] = []
-    zero: typing.Tuple[int, ...] = (0,)
+    basis_dofs: list[tuple[int, ...]] = []
+    zero: tuple[int, ...] = (0,)
     if cell_name == "triangle":
         cell_tdim = 2
         for dim, tri_entities in enumerate(
@@ -418,9 +416,9 @@ def make_piecewise_lagrange(
                     basis_dofs.append(dofs)
         zero = (0, 0, 0)
 
-    basis: typing.List[PiecewiseFunction] = []
+    basis: list[PiecewiseFunction] = []
     for i in basis_dofs:
-        pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {i: zero for i in sub_cells}
+        pieces: dict[SetOfPointsInput, FunctionInput] = {i: zero for i in sub_cells}
         for c, s, j in zip(sub_cells, lagrange_bases, i):
             if j != -1:
                 pieces[c] = s[j]

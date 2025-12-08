@@ -1,6 +1,5 @@
 """Jacobi polynomials."""
 
-import typing
 from functools import cache
 
 from math import prod, factorial
@@ -9,12 +8,12 @@ import sympy
 from symfem.functions import ScalarFunction
 from symfem.symbols import x
 
-__all__: typing.List[str] = []
+__all__: list[str] = []
 
 
 def _jrc(
     a: int, b: int, n: int
-) -> typing.Tuple[
+) -> tuple[
     sympy.core.expr.Expr,
     sympy.core.expr.Expr,
     sympy.core.expr.Expr,
@@ -40,7 +39,7 @@ def _jrc(
 
 def _jrc_monic(
     a: int, b: int, n: int
-) -> typing.Tuple[
+) -> tuple[
     sympy.core.expr.Expr,
     sympy.core.expr.Expr,
 ]:

@@ -4,7 +4,6 @@ import json
 import os
 import re
 import sys
-import typing
 from io import StringIO
 
 import pytest
@@ -14,10 +13,10 @@ import symfem
 code = False
 output = False
 check_for_output = False
-lines: typing.List[str] = []
+lines: list[str] = []
 doc_data = []
-outputlines: typing.List[str] = []
-codelines: typing.List[str] = []
+outputlines: list[str] = []
+codelines: list[str] = []
 
 if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../docs/index.rst")):
     with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../docs/index.rst")) as f:

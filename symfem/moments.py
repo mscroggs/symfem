@@ -7,14 +7,14 @@ from symfem.references import Reference
 
 __all__ = ["MomentType", "SingleMomentTypeInput", "MomentTypeInput", "make_integral_moment_dofs"]
 
-MomentType = typing.Tuple[typing.Type, typing.Type, int, str | None, typing.Dict[str, typing.Any]]
+MomentType = tuple[typing.Type, typing.Type, int, str | None, dict[str, typing.Any]]
 SingleMomentTypeInput = (
     MomentType
-    | typing.Tuple[typing.Type, typing.Type, int, str]
-    | typing.Tuple[typing.Type, typing.Type, int, typing.Dict[str, typing.Any]]
-    | typing.Tuple[typing.Type, typing.Type, int]
+    | tuple[typing.Type, typing.Type, int, str]
+    | tuple[typing.Type, typing.Type, int, dict[str, typing.Any]]
+    | tuple[typing.Type, typing.Type, int]
 )
-MomentTypeInput = SingleMomentTypeInput | typing.Dict[str, SingleMomentTypeInput]
+MomentTypeInput = SingleMomentTypeInput | dict[str, SingleMomentTypeInput]
 
 
 def _extract_moment_data(moment_data: MomentTypeInput, sub_type: str) -> MomentType:
@@ -57,7 +57,7 @@ def make_integral_moment_dofs(
     facets: MomentTypeInput | None = None,
     ridges: MomentTypeInput | None = None,
     peaks: MomentTypeInput | None = None,
-) -> typing.List[BaseFunctional]:
+) -> list[BaseFunctional]:
     """Generate DOFs due to integral moments on sub entities.
 
     Args:

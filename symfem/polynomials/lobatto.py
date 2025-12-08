@@ -1,16 +1,14 @@
 """Lobatto polynomials."""
 
-import typing
-
 from symfem.functions import ScalarFunction
 from symfem.polynomials.dual import l2_dual
 from symfem.polynomials.legendre import orthonormal_basis
 from symfem.symbols import x
 
-__all__: typing.List[str] = []
+__all__: list[str] = []
 
 
-def lobatto_basis_interval(order: int) -> typing.List[ScalarFunction]:
+def lobatto_basis_interval(order: int) -> list[ScalarFunction]:
     """Get Lobatto polynomials on an interval.
 
     Args:
@@ -26,7 +24,7 @@ def lobatto_basis_interval(order: int) -> typing.List[ScalarFunction]:
     return out
 
 
-def lobatto_dual_basis_interval(order: int) -> typing.List[ScalarFunction]:
+def lobatto_dual_basis_interval(order: int) -> list[ScalarFunction]:
     """Get L2 dual of Lobatto polynomials on an interval.
 
     Args:
@@ -38,9 +36,7 @@ def lobatto_dual_basis_interval(order: int) -> typing.List[ScalarFunction]:
     return l2_dual("interval", lobatto_basis_interval(order))
 
 
-def lobatto_basis(
-    cell: str, order: int, include_endpoints: bool = True
-) -> typing.List[ScalarFunction]:
+def lobatto_basis(cell: str, order: int, include_endpoints: bool = True) -> list[ScalarFunction]:
     """Get Lobatto polynomials.
 
     Args:
@@ -72,7 +68,7 @@ def lobatto_basis(
 
 def lobatto_dual_basis(
     cell: str, order: int, include_endpoints: bool = True
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """Get L2 dual of Lobatto polynomials.
 
     Args:
