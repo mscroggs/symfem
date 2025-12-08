@@ -22,9 +22,7 @@ class DualCiarletElement(FiniteElement):
 
     def __init__(
         self,
-        dual_coefficients: typing.List[
-            typing.List[typing.List[int |sympy.core.expr.Expr]]
-        ],
+        dual_coefficients: typing.List[typing.List[typing.List[int | sympy.core.expr.Expr]]],
         fine_space: str,
         reference: DualPolygon,
         order: int,
@@ -215,9 +213,7 @@ class Dual(DualCiarletElement):
             reference: The reference element
             order: The polynomial order
         """
-        dual_coefficients: typing.List[
-            typing.List[typing.List[int | sympy.core.expr.Expr]]
-        ] = []
+        dual_coefficients: typing.List[typing.List[typing.List[int | sympy.core.expr.Expr]]] = []
         if order == 0:
             dual_coefficients = [[[1] for i in range(2 * reference.number_of_triangles)]]
             fine_space = "Lagrange"
@@ -282,9 +278,7 @@ class BuffaChristiansen(DualCiarletElement):
             reference: The reference element
             order: The polynomial order
         """
-        dual_coefficients: typing.List[
-            typing.List[typing.List[int | sympy.core.expr.Expr]]
-        ] = [
+        dual_coefficients: typing.List[typing.List[typing.List[int | sympy.core.expr.Expr]]] = [
             [[0, 0, 0] for i in range(2 * reference.number_of_triangles)]
             for j in range(reference.number_of_triangles)
         ]
@@ -350,9 +344,7 @@ class RotatedBuffaChristiansen(DualCiarletElement):
             reference: The reference element
             order: The polynomial order
         """
-        dual_coefficients: typing.List[
-            typing.List[typing.List[int | sympy.core.expr.Expr]]
-        ] = [
+        dual_coefficients: typing.List[typing.List[typing.List[int | sympy.core.expr.Expr]]] = [
             [[0, 0, 0] for i in range(2 * reference.number_of_triangles)]
             for j in range(reference.number_of_triangles)
         ]

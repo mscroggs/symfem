@@ -21,7 +21,7 @@ from symfem.quadrature import numerical as numerical_quadrature
 from symfem.references import Interval, NonDefaultReferenceError, Reference
 from symfem.symbols import t, x
 
-ScalarValueOrFloat = sympy.core.expr.Expr |float
+ScalarValueOrFloat = sympy.core.expr.Expr | float
 DiscreteDof = typing.Tuple[
     typing.List[typing.List[float]], typing.List[typing.List[typing.List[float]]]
 ]
@@ -142,9 +142,7 @@ def discrete_integral_moment(
 class BaseFunctional(ABC):
     """A functional."""
 
-    def __init__(
-        self, reference: Reference, entity: typing.Tuple[int, int], mapping: str | None
-    ):
+    def __init__(self, reference: Reference, entity: typing.Tuple[int, int], mapping: str | None):
         """Create the functional.
 
         Args:
@@ -224,9 +222,7 @@ class BaseFunctional(ABC):
         """
         return None
 
-    def eval(
-        self, function: Function, symbolic: bool = True
-    ) -> ScalarFunction | float:
+    def eval(self, function: Function, symbolic: bool = True) -> ScalarFunction | float:
         """Apply to the functional to a function.
 
         Args:

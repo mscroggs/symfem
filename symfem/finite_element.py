@@ -38,7 +38,12 @@ __all__ = [
     "ElementBasisFunction",
 ]
 
-TabulatedBasis = typing.List[sympy.core.expr.Expr | int] | typing.List[typing.Tuple[sympy.core.expr.Expr | int, ...]] | typing.List[typing.Tuple[typing.Tuple[sympy.core.expr.Expr | int, ...], ...]] | typing.List[sympy.matrices.dense.MutableDenseMatrix]
+TabulatedBasis = (
+    typing.List[sympy.core.expr.Expr | int]
+    | typing.List[typing.Tuple[sympy.core.expr.Expr | int, ...]]
+    | typing.List[typing.Tuple[typing.Tuple[sympy.core.expr.Expr | int, ...], ...]]
+    | typing.List[sympy.matrices.dense.MutableDenseMatrix]
+)
 
 
 class NoTensorProduct(Exception):

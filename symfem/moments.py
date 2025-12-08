@@ -7,10 +7,13 @@ from symfem.references import Reference
 
 __all__ = ["MomentType", "SingleMomentTypeInput", "MomentTypeInput", "make_integral_moment_dofs"]
 
-MomentType = typing.Tuple[
-    typing.Type, typing.Type, int, str | None, typing.Dict[str, typing.Any]
-]
-SingleMomentTypeInput = MomentType | typing.Tuple[typing.Type, typing.Type, int, str] | typing.Tuple[typing.Type, typing.Type, int, typing.Dict[str, typing.Any]] | typing.Tuple[typing.Type, typing.Type, int]
+MomentType = typing.Tuple[typing.Type, typing.Type, int, str | None, typing.Dict[str, typing.Any]]
+SingleMomentTypeInput = (
+    MomentType
+    | typing.Tuple[typing.Type, typing.Type, int, str]
+    | typing.Tuple[typing.Type, typing.Type, int, typing.Dict[str, typing.Any]]
+    | typing.Tuple[typing.Type, typing.Type, int]
+)
 MomentTypeInput = SingleMomentTypeInput | typing.Dict[str, SingleMomentTypeInput]
 
 

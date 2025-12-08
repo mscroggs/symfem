@@ -35,7 +35,10 @@ __all__ = [
 ]
 
 LatticeWithLines = typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]
-IntLimits = typing.List[typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr] | typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr]]
+IntLimits = typing.List[
+    typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr]
+    | typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr]
+]
 
 
 class NonDefaultReferenceError(NotImplementedError):
@@ -700,9 +703,7 @@ class Reference(ABC):
         colors = img.colors
 
         if self.tdim == 1:
-            offset_unit: typing.Tuple[sympy.core.expr.Expr | int, ...] = (
-                sympy.Rational(4, 3),
-            )
+            offset_unit: typing.Tuple[sympy.core.expr.Expr | int, ...] = (sympy.Rational(4, 3),)
             img.add_arrow((-sympy.Rational(1, 2), 0), (-sympy.Rational(1, 3), 0))
             img.add_math((-sympy.Rational(8, 25), 0), "x", anchor="west")
         elif self.tdim == 2:

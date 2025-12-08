@@ -19,7 +19,11 @@ __all__ = [
 
 PointType = typing.Tuple[sympy.core.expr.Expr, ...]
 SetOfPoints = typing.Tuple[PointType, ...]
-PointTypeInput = typing.Tuple[sympy.core.expr.Expr | int, ...] | typing.List[sympy.core.expr.Expr | int] | sympy.matrices.dense.MutableDenseMatrix
+PointTypeInput = (
+    typing.Tuple[sympy.core.expr.Expr | int, ...]
+    | typing.List[sympy.core.expr.Expr | int]
+    | sympy.matrices.dense.MutableDenseMatrix
+)
 SetOfPointsInput = typing.Tuple[PointTypeInput, ...] | typing.List[PointTypeInput]
 
 
