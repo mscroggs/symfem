@@ -13,7 +13,7 @@ except ModuleNotFoundError:
 
 __all__ = ["Scalar", "equispaced", "lobatto", "radau", "legendre", "get_quadrature"]
 
-Scalar = typing.Union[sympy.core.expr.Expr, int]
+Scalar = sympy.core.expr.Expr | int
 
 
 def equispaced(n: int) -> typing.Tuple[typing.List[Scalar], typing.List[Scalar]]:

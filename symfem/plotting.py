@@ -30,10 +30,8 @@ __all__ = [
     "Picture",
 ]
 
-PointOrFunction = typing.Union[PointTypeInput, Function]
-SetOfPointsOrFunctions = typing.Union[
-    typing.List[PointOrFunction], typing.Tuple[PointOrFunction, ...]
-]
+PointOrFunction = PointTypeInput | Function
+SetOfPointsOrFunctions = typing.List[PointOrFunction] | typing.Tuple[PointOrFunction, ...]
 
 
 def tex_font_size(n: int):
@@ -440,7 +438,7 @@ class NCircle(PictureElement):
         text_color: str,
         fill_color: str,
         radius: float,
-        font_size: typing.Union[int, None],
+        font_size: int | None,
         width: float,
         font: str,
     ):
@@ -685,7 +683,7 @@ class Picture:
         width: typing.Optional[int] = None,
         height: typing.Optional[int] = None,
         axes_3d: typing.Optional[SetOfPointsInput] = None,
-        dof_arrow_size: typing.Union[int, sympy.core.expr.Expr] = 1,
+        dof_arrow_size: int | sympy.core.expr.Expr = 1,
         title: typing.Optional[str] = None,
         desc: typing.Optional[str] = None,
         svg_metadata: typing.Optional[str] = None,
@@ -1186,7 +1184,7 @@ class Picture:
 
     def save(
         self,
-        filename: typing.Union[str, typing.List[str]],
+        filename: str | typing.List[str],
         plot_options: typing.Dict[str, typing.Any] = {},
     ):
         """Save the picture as a file.

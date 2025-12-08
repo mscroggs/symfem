@@ -23,7 +23,7 @@ class DualCiarletElement(FiniteElement):
     def __init__(
         self,
         dual_coefficients: typing.List[
-            typing.List[typing.List[typing.Union[int, sympy.core.expr.Expr]]]
+            typing.List[typing.List[int |sympy.core.expr.Expr]]
         ],
         fine_space: str,
         reference: DualPolygon,
@@ -56,7 +56,7 @@ class DualCiarletElement(FiniteElement):
         super().__init__(
             reference, order, len(dual_coefficients), domain_dim, range_dim, range_shape=range_shape
         )
-        self._basis_functions: typing.Union[typing.List[Function], None] = None
+        self._basis_functions: typing.List[Function] | None = None
         self._dof_entities = dof_entities
         self._dof_directions = dof_directions
 
@@ -166,7 +166,7 @@ class DualCiarletElement(FiniteElement):
 
         return positions
 
-    def dof_directions(self) -> typing.List[typing.Union[PointType, None]]:
+    def dof_directions(self) -> typing.List[PointType | None]:
         """Get the direction associated with each DOF.
 
         Returns:
@@ -216,7 +216,7 @@ class Dual(DualCiarletElement):
             order: The polynomial order
         """
         dual_coefficients: typing.List[
-            typing.List[typing.List[typing.Union[int, sympy.core.expr.Expr]]]
+            typing.List[typing.List[int | sympy.core.expr.Expr]]
         ] = []
         if order == 0:
             dual_coefficients = [[[1] for i in range(2 * reference.number_of_triangles)]]
@@ -283,7 +283,7 @@ class BuffaChristiansen(DualCiarletElement):
             order: The polynomial order
         """
         dual_coefficients: typing.List[
-            typing.List[typing.List[typing.Union[int, sympy.core.expr.Expr]]]
+            typing.List[typing.List[int | sympy.core.expr.Expr]]
         ] = [
             [[0, 0, 0] for i in range(2 * reference.number_of_triangles)]
             for j in range(reference.number_of_triangles)
@@ -351,7 +351,7 @@ class RotatedBuffaChristiansen(DualCiarletElement):
             order: The polynomial order
         """
         dual_coefficients: typing.List[
-            typing.List[typing.List[typing.Union[int, sympy.core.expr.Expr]]]
+            typing.List[typing.List[int | sympy.core.expr.Expr]]
         ] = [
             [[0, 0, 0] for i in range(2 * reference.number_of_triangles)]
             for j in range(reference.number_of_triangles)

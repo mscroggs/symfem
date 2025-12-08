@@ -35,12 +35,7 @@ __all__ = [
 ]
 
 LatticeWithLines = typing.Tuple[SetOfPoints, typing.List[typing.Tuple[int, int]]]
-IntLimits = typing.List[
-    typing.Union[
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr],
-        typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr],
-    ]
-]
+IntLimits = typing.List[typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr, sympy.core.expr.Expr] | typing.Tuple[sympy.core.symbol.Symbol, sympy.core.expr.Expr]]
 
 
 class NonDefaultReferenceError(NotImplementedError):
@@ -201,7 +196,7 @@ class Reference(ABC):
         edges: typing.Tuple[typing.Tuple[int, int], ...],
         faces: typing.Tuple[typing.Tuple[int, ...], ...],
         volumes: typing.Tuple[typing.Tuple[int, ...], ...],
-        sub_entity_types: typing.List[typing.Union[typing.List[str], str, None]],
+        sub_entity_types: typing.List[typing.List[str] | str | None],
         simplex: bool = False,
         tp: bool = False,
     ):
@@ -234,8 +229,8 @@ class Reference(ABC):
         self.sub_entity_types = sub_entity_types
         self.simplex = simplex
         self.tp = tp
-        self._inverse_map_to_self: typing.Union[PointType, None] = None
-        self._map_to_self: typing.Union[PointType, None] = None
+        self._inverse_map_to_self: PointType | None = None
+        self._map_to_self: PointType | None = None
 
     @property
     def clockwise_vertices(self) -> SetOfPoints:
@@ -694,7 +689,7 @@ class Reference(ABC):
 
     def plot_entity_diagrams(
         self,
-        filename: typing.Union[str, typing.List[str]],
+        filename: str | typing.List[str],
         plot_options: typing.Dict[str, typing.Any] = {},
         **kwargs: typing.Any,
     ):
@@ -705,7 +700,7 @@ class Reference(ABC):
         colors = img.colors
 
         if self.tdim == 1:
-            offset_unit: typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...] = (
+            offset_unit: typing.Tuple[sympy.core.expr.Expr | int, ...] = (
                 sympy.Rational(4, 3),
             )
             img.add_arrow((-sympy.Rational(1, 2), 0), (-sympy.Rational(1, 3), 0))

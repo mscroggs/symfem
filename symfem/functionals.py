@@ -21,7 +21,7 @@ from symfem.quadrature import numerical as numerical_quadrature
 from symfem.references import Interval, NonDefaultReferenceError, Reference
 from symfem.symbols import t, x
 
-ScalarValueOrFloat = typing.Union[sympy.core.expr.Expr, float]
+ScalarValueOrFloat = sympy.core.expr.Expr |float
 DiscreteDof = typing.Tuple[
     typing.List[typing.List[float]], typing.List[typing.List[typing.List[float]]]
 ]
@@ -143,7 +143,7 @@ class BaseFunctional(ABC):
     """A functional."""
 
     def __init__(
-        self, reference: Reference, entity: typing.Tuple[int, int], mapping: typing.Union[str, None]
+        self, reference: Reference, entity: typing.Tuple[int, int], mapping: str | None
     ):
         """Create the functional.
 
@@ -216,7 +216,7 @@ class BaseFunctional(ABC):
             desc += ["vertex", "edge", "face", "volume"][self.entity[0]]
             return desc
 
-    def dof_direction(self) -> typing.Union[PointType, None]:
+    def dof_direction(self) -> PointType | None:
         """Get the direction of the DOF.
 
         Returns:
@@ -226,7 +226,7 @@ class BaseFunctional(ABC):
 
     def eval(
         self, function: Function, symbolic: bool = True
-    ) -> typing.Union[ScalarFunction, float]:
+    ) -> ScalarFunction | float:
         """Apply to the functional to a function.
 
         Args:
@@ -324,7 +324,7 @@ class PointEvaluation(BaseFunctional):
         reference: Reference,
         point_in: FunctionInput,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "identity",
+        mapping: str | None = "identity",
     ):
         """Create the functional.
 
@@ -405,7 +405,7 @@ class WeightedPointEvaluation(BaseFunctional):
         point_in: FunctionInput,
         weight: sympy.core.expr.Expr,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "identity",
+        mapping: str | None = "identity",
     ):
         """Create the functional.
 
@@ -608,7 +608,7 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
         point_in: FunctionInput,
         direction_in: FunctionInput,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "identity",
+        mapping: str | None = "identity",
     ):
         """Create the functional.
 
@@ -652,7 +652,7 @@ class PointDirectionalDerivativeEvaluation(BaseFunctional):
         assert isinstance(pt, tuple)
         return pt
 
-    def dof_direction(self) -> typing.Union[PointType, None]:
+    def dof_direction(self) -> PointType | None:
         """Get the direction of the DOF.
 
         Returns:
@@ -713,7 +713,7 @@ class PointNormalDerivativeEvaluation(PointDirectionalDerivativeEvaluation):
         point_in: FunctionInput,
         edge: Reference,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "identity",
+        mapping: str | None = "identity",
     ):
         """Create the functional.
 
@@ -771,7 +771,7 @@ class PointComponentSecondDerivativeEvaluation(BaseFunctional):
         point_in: FunctionInput,
         component: typing.Tuple[int, int],
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "identity",
+        mapping: str | None = "identity",
     ):
         """Create the functional.
 
@@ -859,7 +859,7 @@ class PointInnerProduct(BaseFunctional):
         lvec: FunctionInput,
         rvec: FunctionInput,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "identity",
+        mapping: str | None = "identity",
     ):
         """Create the functional.
 
@@ -907,7 +907,7 @@ class PointInnerProduct(BaseFunctional):
         assert isinstance(pt, tuple)
         return pt
 
-    def dof_direction(self) -> typing.Union[PointType, None]:
+    def dof_direction(self) -> PointType | None:
         """Get the direction of the DOF.
 
         Returns:
@@ -971,7 +971,7 @@ class DotPointEvaluation(BaseFunctional):
         point_in: FunctionInput,
         vector_in: FunctionInput,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "identity",
+        mapping: str | None = "identity",
     ):
         """Create the functional.
 
@@ -1015,7 +1015,7 @@ class DotPointEvaluation(BaseFunctional):
         assert isinstance(pt, tuple)
         return pt
 
-    def dof_direction(self) -> typing.Union[PointType, None]:
+    def dof_direction(self) -> PointType | None:
         """Get the direction of the DOF.
 
         Returns:
@@ -1083,7 +1083,7 @@ class PointDivergenceEvaluation(BaseFunctional):
         reference: Reference,
         point_in: FunctionInput,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "identity",
+        mapping: str | None = "identity",
     ):
         """Create the functional.
 
@@ -1131,7 +1131,7 @@ class PointDivergenceEvaluation(BaseFunctional):
         assert isinstance(pt, tuple)
         return pt
 
-    def dof_direction(self) -> typing.Union[PointType, None]:
+    def dof_direction(self) -> PointType | None:
         """Get the direction of the DOF.
 
         Returns:
@@ -1183,7 +1183,7 @@ class IntegralAgainst(BaseFunctional):
         reference: Reference,
         f_in: FunctionInput,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "identity",
+        mapping: str | None = "identity",
     ):
         """Create the functional.
 
@@ -1302,7 +1302,7 @@ class IntegralOfDivergenceAgainst(BaseFunctional):
         reference: Reference,
         f_in: FunctionInput,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "identity",
+        mapping: str | None = "identity",
     ):
         """Create the functional.
 
@@ -1399,7 +1399,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         orders: typing.Tuple[int, ...],
         entity: typing.Tuple[int, int],
         scale: int = 1,
-        mapping: typing.Union[str, None] = "identity",
+        mapping: str | None = "identity",
     ):
         """Create the functional.
 
@@ -1517,7 +1517,7 @@ class IntegralMoment(BaseFunctional):
         f_in: FunctionInput,
         dof: BaseFunctional,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "identity",
+        mapping: str | None = "identity",
         map_function: bool = True,
     ):
         """Create the functional.
@@ -1612,7 +1612,7 @@ class IntegralMoment(BaseFunctional):
             for i, o in enumerate(self.integral_domain.origin)
         )
 
-    def dof_direction(self) -> typing.Union[PointType, None]:
+    def dof_direction(self) -> PointType | None:
         """Get the direction of the DOF.
 
         Returns:
@@ -1701,7 +1701,7 @@ class DerivativeIntegralMoment(IntegralMoment):
         dot_with_in: FunctionInput,
         dof: BaseFunctional,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "identity",
+        mapping: str | None = "identity",
     ):
         """Create the functional.
 
@@ -1734,7 +1734,7 @@ class DerivativeIntegralMoment(IntegralMoment):
         assert self.f.is_scalar
         return function.dot(self.dot_with) * self.f
 
-    def dof_direction(self) -> typing.Union[PointType, None]:
+    def dof_direction(self) -> PointType | None:
         """Get the direction of the DOF.
 
         Returns:
@@ -1785,7 +1785,7 @@ class DivergenceIntegralMoment(IntegralMoment):
         f_in: FunctionInput,
         dof: BaseFunctional,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "identity",
+        mapping: str | None = "identity",
     ):
         """Create the functional.
 
@@ -1861,7 +1861,7 @@ class TangentIntegralMoment(IntegralMoment):
         f_in: FunctionInput,
         dof: BaseFunctional,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "covariant",
+        mapping: str | None = "covariant",
     ):
         """Create the functional.
 
@@ -1884,7 +1884,7 @@ class TangentIntegralMoment(IntegralMoment):
             map_function=False,
         )
 
-    def dof_direction(self) -> typing.Union[PointType, None]:
+    def dof_direction(self) -> PointType | None:
         """Get the direction of the DOF.
 
         Returns:
@@ -1924,7 +1924,7 @@ class NormalIntegralMoment(IntegralMoment):
         f_in: FunctionInput,
         dof: BaseFunctional,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "contravariant",
+        mapping: str | None = "contravariant",
     ):
         """Create the functional.
 
@@ -1947,7 +1947,7 @@ class NormalIntegralMoment(IntegralMoment):
             map_function=False,
         )
 
-    def dof_direction(self) -> typing.Union[PointType, None]:
+    def dof_direction(self) -> PointType | None:
         """Get the direction of the DOF.
 
         Returns:
@@ -1987,7 +1987,7 @@ class TraceIntegralMoment(IntegralMoment):
         f_in: FunctionInput,
         dof: BaseFunctional,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "contravariant",
+        mapping: str | None = "contravariant",
     ):
         """Create the functional.
 
@@ -2061,7 +2061,7 @@ class NormalDerivativeIntegralMoment(DerivativeIntegralMoment):
         f_in: FunctionInput,
         dof: BaseFunctional,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "identity",
+        mapping: str | None = "identity",
     ):
         """Create the functional.
 
@@ -2130,7 +2130,7 @@ class InnerProductIntegralMoment(IntegralMoment):
         inner_with_right_in: FunctionInput,
         dof: BaseFunctional,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "identity",
+        mapping: str | None = "identity",
     ):
         """Create the functional.
 
@@ -2170,7 +2170,7 @@ class InnerProductIntegralMoment(IntegralMoment):
             * self.integral_domain.jacobian()
         )
 
-    def dof_direction(self) -> typing.Union[PointType, None]:
+    def dof_direction(self) -> PointType | None:
         """Get the direction of the DOF.
 
         Returns:
@@ -2227,7 +2227,7 @@ class NormalInnerProductIntegralMoment(InnerProductIntegralMoment):
         f_in: FunctionInput,
         dof: BaseFunctional,
         entity: typing.Tuple[int, int],
-        mapping: typing.Union[str, None] = "double_contravariant",
+        mapping: str | None = "double_contravariant",
     ):
         """Create the functional.
 

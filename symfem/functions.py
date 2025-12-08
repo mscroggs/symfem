@@ -24,18 +24,9 @@ __all__ = [
     "parse_function_list_input",
 ]
 
-SingleSympyFormat = typing.Union[
-    sympy.core.expr.Expr,
-    typing.Tuple[sympy.core.expr.Expr, ...],
-    sympy.matrices.dense.MutableDenseMatrix,
-]
-SympyFormat = typing.Union[
-    SingleSympyFormat,
-    typing.Dict[typing.Tuple[typing.Tuple[sympy.core.expr.Expr, ...], ...], SingleSympyFormat],
-]
-_ValuesToSubstitute = typing.Union[
-    typing.Tuple[typing.Any, ...], typing.List[typing.Any], typing.Any
-]
+SingleSympyFormat = sympy.core.expr.Expr | typing.Tuple[sympy.core.expr.Expr, ...] | sympy.matrices.dense.MutableDenseMatrix
+SympyFormat = SingleSympyFormat | typing.Dict[typing.Tuple[typing.Tuple[sympy.core.expr.Expr, ...], ...], SingleSympyFormat
+_ValuesToSubstitute = typing.Tuple[typing.Any, ...] | typing.List[typing.Any] | typing.Any
 
 
 def _to_sympy_format(item: typing.Any) -> SympyFormat:
@@ -189,7 +180,7 @@ class Function(ABC):
         """
 
     @abstractmethod
-    def subs(self, vars: AxisVariables, values: typing.Union[Function, _ValuesToSubstitute]):
+    def subs(self, vars: AxisVariables, values: Function | _ValuesToSubstitute):
         """Substitute values into the function.
 
         Args:
@@ -346,8 +337,8 @@ class Function(ABC):
         self,
         *limits: typing.Tuple[
             sympy.core.symbol.Symbol,
-            typing.Union[int, sympy.core.expr.Expr],
-            typing.Union[int, sympy.core.expr.Expr],
+            int | sympy.core.expr.Expr,
+            int | sympy.core.expr.Expr,
         ],
     ):
         """Integrate the function.
@@ -388,7 +379,7 @@ class Function(ABC):
     def plot(
         self,
         reference: symfem.references.Reference,
-        filename: typing.Union[str, typing.List[str]],
+        filename: str | typing.List[str],
         dof_point: typing.Optional[PointType] = None,
         dof_direction: typing.Optional[PointType] = None,
         dof_entity: typing.Optional[typing.Tuple[int, int]] = None,
@@ -522,7 +513,7 @@ class Function(ABC):
         return not self.__eq__(other)
 
 
-ValuesToSubstitute = typing.Union[Function, _ValuesToSubstitute]
+ValuesToSubstitute = Function | _ValuesToSubstitute
 
 
 class ScalarFunction(Function):
@@ -530,7 +521,7 @@ class ScalarFunction(Function):
 
     _f: sympy.core.expr.Expr
 
-    def __init__(self, f: typing.Union[int, sympy.core.expr.Expr]):
+    def __init__(self, f: int | sympy.core.expr.Expr):
         """Create a scalar-valued function.
 
         Args:
@@ -818,8 +809,8 @@ class ScalarFunction(Function):
         self,
         *limits: typing.Tuple[
             sympy.core.symbol.Symbol,
-            typing.Union[int, sympy.core.expr.Expr],
-            typing.Union[int, sympy.core.expr.Expr],
+            int | sympy.core.expr.Expr,
+            int | sympy.core.expr.Expr,
         ],
     ):
         """Integrate the function.
@@ -939,10 +930,7 @@ class VectorFunction(Function):
 
     def __init__(
         self,
-        vec: typing.Union[
-            typing.Tuple[typing.Union[Function, int, sympy.core.expr.Expr], ...],
-            typing.List[typing.Union[Function, int, sympy.core.expr.Expr]],
-        ],
+        vec: typing.Tuple[Function | int | sympy.core.expr.Expr, ...] | typing.List[Function | int | sympy.core.expr.Expr]
     ):
         """Create a vector-valued function.
 
@@ -985,7 +973,7 @@ class VectorFunction(Function):
         """
         return (len(self),)
 
-    def __getitem__(self, key) -> typing.Union[ScalarFunction, VectorFunction]:
+    def __getitem__(self, key) -> ScalarFunction | VectorFunction:
         """Get a component or slice of the function."""
         fs = self._vec[key]
         if isinstance(fs, ScalarFunction):
@@ -1181,7 +1169,7 @@ class VectorFunction(Function):
 
         raise NotImplementedError()
 
-    def cross(self, other_in: FunctionInput) -> typing.Union[VectorFunction, ScalarFunction]:
+    def cross(self, other_in: FunctionInput) -> VectorFunction | ScalarFunction:
         """Compute the cross product with another function.
 
         Args:
@@ -1345,13 +1333,7 @@ class MatrixFunction(Function):
 
     def __init__(
         self,
-        mat: typing.Union[
-            typing.Tuple[typing.Tuple[typing.Union[Function, int, sympy.core.expr.Expr], ...], ...],
-            typing.Tuple[typing.List[typing.Union[Function, int, sympy.core.expr.Expr]], ...],
-            typing.List[typing.Tuple[typing.Union[Function, int, sympy.core.expr.Expr], ...]],
-            typing.List[typing.List[typing.Union[Function, int, sympy.core.expr.Expr]]],
-            sympy.matrices.dense.MutableDenseMatrix,
-        ],
+        mat: typing.Tuple[typing.Tuple[Function | int | sympy.core.expr.Expr, ...], ...] | typing.Tuple[typing.List[Function | int | sympy.core.expr.Expr], ...] | typing.List[typing.Tuple[Function | int | sympy.core.expr.Expr, ...]] | typing.List[typing.List[Function | int | sympy.core.expr.Expr]] | sympy.matrices.dense.MutableDenseMatrix
     ):
         """Create a matrix-valued function.
 
@@ -1393,7 +1375,7 @@ class MatrixFunction(Function):
         """
         return self._shape
 
-    def __getitem__(self, key) -> typing.Union[ScalarFunction, VectorFunction]:
+    def __getitem__(self, key) -> ScalarFunction | VectorFunction:
         """Get a component or slice of the function."""
         if isinstance(key, tuple):
             assert len(key) == 2
@@ -1812,18 +1794,7 @@ class MatrixFunction(Function):
         return max(f.maximum_degree(cell) for row in self._mat for f in row)
 
 
-FunctionInput = typing.Union[
-    Function,
-    sympy.core.expr.Expr,
-    int,
-    typing.Tuple[typing.Union[sympy.core.expr.Expr, int, Function], ...],
-    typing.List[typing.Union[sympy.core.expr.Expr, int, Function]],
-    typing.Tuple[typing.Tuple[typing.Union[sympy.core.expr.Expr, int, Function], ...], ...],
-    typing.Tuple[typing.List[typing.Union[sympy.core.expr.Expr, int, Function]], ...],
-    typing.List[typing.Tuple[typing.Union[sympy.core.expr.Expr, int, Function], ...]],
-    typing.List[typing.List[typing.Union[sympy.core.expr.Expr, int, Function]]],
-    sympy.matrices.dense.MutableDenseMatrix,
-]
+FunctionInput = Function | sympy.core.expr.Expr | int | typing.Tuple[sympy.core.expr.Expr | int | Function, ...] | typing.List[sympy.core.expr.Expr | int | Function] | typing.Tuple[typing.Tuple[sympy.core.expr.Expr | int | Function, ...], ...] | typing.Tuple[typing.List[sympy.core.expr.Expr | int | Function], ...] | typing.List[typing.Tuple[sympy.core.expr.Expr | int | Function, ...]] | typing.List[typing.List[sympy.core.expr.Expr | int | Function]] | sympy.matrices.dense.MutableDenseMatrix
 
 
 def parse_function_input(f: FunctionInput) -> Function:
@@ -1856,7 +1827,7 @@ def parse_function_input(f: FunctionInput) -> Function:
 
 
 def parse_function_list_input(
-    functions: typing.Union[typing.List[FunctionInput], typing.Tuple[FunctionInput, ...]],
+    functions: typing.List[FunctionInput] | typing.Tuple[FunctionInput, ...],
 ) -> typing.List[Function]:
     """Parse a list of functions.
 

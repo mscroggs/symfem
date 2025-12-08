@@ -199,7 +199,7 @@ for x in range(-4, 26):
             else:
                 edge1 = (p2[0] - p1[0], p2[1] - p1[1], z2 - z1)
                 edge2 = (p3[0] - p1[0], p3[1] - p1[1], z3 - z1)
-                normal: typing.Tuple[typing.Union[int, float], ...] = (
+                normal: typing.Tuple[int | float, ...] = (
                     edge1[1] * edge2[2] - edge1[2] * edge2[1],
                     edge1[2] * edge2[0] - edge1[0] * edge2[2],
                     edge1[0] * edge2[1] - edge1[1] * edge2[0],

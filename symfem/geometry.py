@@ -19,12 +19,8 @@ __all__ = [
 
 PointType = typing.Tuple[sympy.core.expr.Expr, ...]
 SetOfPoints = typing.Tuple[PointType, ...]
-PointTypeInput = typing.Union[
-    typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...],
-    typing.List[typing.Union[sympy.core.expr.Expr, int]],
-    sympy.matrices.dense.MutableDenseMatrix,
-]
-SetOfPointsInput = typing.Union[typing.Tuple[PointTypeInput, ...], typing.List[PointTypeInput]]
+PointTypeInput = typing.Tuple[sympy.core.expr.Expr | int, ...] | typing.List[sympy.core.expr.Expr | int] | sympy.matrices.dense.MutableDenseMatrix
+SetOfPointsInput = typing.Tuple[PointTypeInput, ...] | typing.List[PointTypeInput]
 
 
 def _is_close(a: sympy.core.expr.Expr, b: int) -> bool:

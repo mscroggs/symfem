@@ -27,7 +27,7 @@ __all__ = ["load_cached_matrix", "save_cached_matrix", "matrix_to_string", "matr
 
 def load_cached_matrix(
     matrix_type: str, cache_id: str, size: typing.Tuple[int, int]
-) -> typing.Union[sympy.matrices.dense.MutableDenseMatrix, None]:
+) -> sympy.matrices.dense.MutableDenseMatrix | None:
     """Load a cached matrix.
 
     Args:

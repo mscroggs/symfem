@@ -8,15 +8,10 @@ from symfem.references import Reference
 __all__ = ["MomentType", "SingleMomentTypeInput", "MomentTypeInput", "make_integral_moment_dofs"]
 
 MomentType = typing.Tuple[
-    typing.Type, typing.Type, int, typing.Union[str, None], typing.Dict[str, typing.Any]
+    typing.Type, typing.Type, int, str | None, typing.Dict[str, typing.Any]
 ]
-SingleMomentTypeInput = typing.Union[
-    MomentType,
-    typing.Tuple[typing.Type, typing.Type, int, str],
-    typing.Tuple[typing.Type, typing.Type, int, typing.Dict[str, typing.Any]],
-    typing.Tuple[typing.Type, typing.Type, int],
-]
-MomentTypeInput = typing.Union[SingleMomentTypeInput, typing.Dict[str, SingleMomentTypeInput]]
+SingleMomentTypeInput = MomentType | typing.Tuple[typing.Type, typing.Type, int, str] | typing.Tuple[typing.Type, typing.Type, int, typing.Dict[str, typing.Any]] | typing.Tuple[typing.Type, typing.Type, int]
+MomentTypeInput = SingleMomentTypeInput | typing.Dict[str, SingleMomentTypeInput]
 
 
 def _extract_moment_data(moment_data: MomentTypeInput, sub_type: str) -> MomentType:
@@ -32,7 +27,7 @@ def _extract_moment_data(moment_data: MomentTypeInput, sub_type: str) -> MomentT
     if isinstance(moment_data, dict):
         return _extract_moment_data(moment_data[sub_type], sub_type)
 
-    mapping: typing.Union[str, None] = None
+    mapping: str | None = None
     if isinstance(moment_data[-1], dict):
         kwargs = moment_data[-1]
         if isinstance(moment_data[-2], str):

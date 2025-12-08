@@ -38,12 +38,7 @@ __all__ = [
     "ElementBasisFunction",
 ]
 
-TabulatedBasis = typing.Union[
-    typing.List[typing.Union[sympy.core.expr.Expr, int]],
-    typing.List[typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...]],
-    typing.List[typing.Tuple[typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...], ...]],
-    typing.List[sympy.matrices.dense.MutableDenseMatrix],
-]
+TabulatedBasis = typing.List[sympy.core.expr.Expr | int] | typing.List[typing.Tuple[sympy.core.expr.Expr | int, ...]] | typing.List[typing.Tuple[typing.Tuple[sympy.core.expr.Expr | int, ...], ...]] | typing.List[sympy.matrices.dense.MutableDenseMatrix]
 
 
 class NoTensorProduct(Exception):
@@ -57,8 +52,8 @@ class NoTensorProduct(Exception):
 class FiniteElement(ABC):
     """Abstract finite element."""
 
-    _float_basis_functions: typing.Union[None, typing.List[Function]]
-    _value_scale: typing.Union[None, sympy.core.expr.Expr]
+    _float_basis_functions: typing.List[Function] | None
+    _value_scale: sympy.core.expr.Expr | None
 
     def __init__(
         self,
@@ -136,7 +131,7 @@ class FiniteElement(ABC):
         """
 
     @abstractmethod
-    def dof_directions(self) -> typing.List[typing.Union[PointType, None]]:
+    def dof_directions(self) -> typing.List[PointType | None]:
         """Get the direction associated with each DOF.
 
         Returns:
@@ -153,7 +148,7 @@ class FiniteElement(ABC):
 
     def plot_dof_diagram(
         self,
-        filename: typing.Union[str, typing.List[str]],
+        filename: str | typing.List[str],
         plot_options: typing.Dict[str, typing.Any] = {},
         **kwargs: typing.Any,
     ):
@@ -296,7 +291,7 @@ class FiniteElement(ABC):
     def plot_basis_function(
         self,
         n: int,
-        filename: typing.Union[str, typing.List[str]],
+        filename: str | typing.List[str],
         cell: typing.Optional[Reference] = None,
         **kwargs: typing.Any,
     ):
@@ -627,7 +622,7 @@ class CiarletElement(FiniteElement):
         for b in self._basis:
             assert isinstance(b, Function)
         self.dofs = dofs
-        self._basis_functions: typing.Union[typing.List[Function], None] = None
+        self._basis_functions: typing.List[Function] | None = None
 
     def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
         """Get the numbers of the DOFs associated with the given entity.
@@ -649,7 +644,7 @@ class CiarletElement(FiniteElement):
         """
         return [d.adjusted_dof_point() for d in self.dofs]
 
-    def dof_directions(self) -> typing.List[typing.Union[PointType, None]]:
+    def dof_directions(self) -> typing.List[PointType | None]:
         """Get the direction associated with each DOF.
 
         Returns:
@@ -740,7 +735,7 @@ class CiarletElement(FiniteElement):
     def plot_basis_function(
         self,
         n: int,
-        filename: typing.Union[str, typing.List[str]],
+        filename: str | typing.List[str],
         cell: typing.Optional[Reference] = None,
         **kwargs: typing.Any,
     ):
@@ -810,7 +805,7 @@ class CiarletElement(FiniteElement):
                 for e in range(self.reference.sub_entity_count(dim)):
                     entity_dofs = self.entity_dofs(dim, e)
                     dofs_by_type: typing.Dict[
-                        typing.Tuple[typing.Type, typing.Union[str, None]], typing.List[int]
+                        typing.Tuple[typing.Type, str | None], typing.List[int]
                     ] = {}
                     for d in entity_dofs:
                         dof = self.dofs[d]
@@ -974,7 +969,7 @@ class DirectElement(FiniteElement):
 
         return positions
 
-    def dof_directions(self) -> typing.List[typing.Union[PointType, None]]:
+    def dof_directions(self) -> typing.List[PointType | None]:
         """Get the direction associated with each DOF.
 
         Returns:
@@ -1147,7 +1142,7 @@ class EnrichedElement(FiniteElement):
             positions += e.dof_plot_positions()
         return positions
 
-    def dof_directions(self) -> typing.List[typing.Union[PointType, None]]:
+    def dof_directions(self) -> typing.List[PointType | None]:
         """Get the direction associated with each DOF.
 
         Returns:
