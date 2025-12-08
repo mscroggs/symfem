@@ -58,7 +58,7 @@ class Bell(CiarletElement):
         return 4
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return 5
 
     @property
@@ -66,7 +66,7 @@ class Bell(CiarletElement):
         return 4
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return 5
 
     names = ["Bell"]

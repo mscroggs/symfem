@@ -49,7 +49,7 @@ class NonDefaultReferenceError(NotImplementedError):
         super().__init__("Cannot create this element on a non-default reference")
 
 
-def _which_side(vs: SetOfPoints, p: PointType, q: PointType) -> typing.Optional[int]:
+def _which_side(vs: SetOfPoints, p: PointType, q: PointType) -> int | None:
     """Check which side of a line or plane a set of points are.
 
     Args:
@@ -254,7 +254,7 @@ class Reference(ABC):
         """Check if two references are equal."""
         return hash((self.reference_vertices, self.vertices))
 
-    def intersection(self, other: Reference) -> typing.Optional[Reference]:
+    def intersection(self, other: Reference) -> Reference | None:
         """Get the intersection of two references.
 
         Returns:
@@ -525,7 +525,7 @@ class Reference(ABC):
         raise RuntimeError
 
     def sub_entities(
-        self, dim: typing.Optional[int] = None, codim: typing.Optional[int] = None
+        self, dim: int | None = None, codim: int | None = None
     ) -> typing.Tuple[typing.Tuple[int, ...], ...]:
         """Get the sub-entities of a given dimension.
 
@@ -549,9 +549,7 @@ class Reference(ABC):
             return self.volumes
         raise ValueError(f"Unsupported dimension: {dim}")
 
-    def sub_entity_count(
-        self, dim: typing.Optional[int] = None, codim: typing.Optional[int] = None
-    ) -> int:
+    def sub_entity_count(self, dim: int | None = None, codim: int | None = None) -> int:
         """Get the number of sub-entities of a given dimension.
 
         Args:
@@ -2326,9 +2324,7 @@ class DualPolygon(Reference):
 
     reference_origin: PointType
 
-    def __init__(
-        self, number_of_triangles: int, vertices: typing.Optional[SetOfPointsInput] = None
-    ):
+    def __init__(self, number_of_triangles: int, vertices: SetOfPointsInput | None = None):
         """Create a dual polygon.
 
         Args:

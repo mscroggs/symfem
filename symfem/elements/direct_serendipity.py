@@ -4,8 +4,6 @@ This element's definition appears in https://arxiv.org/abs/1809.02192
 (Arbogast, Tao, 2018)
 """
 
-import typing
-
 from symfem.elements.dpc import DPC
 from symfem.finite_element import DirectElement
 from symfem.references import Reference
@@ -84,7 +82,7 @@ class DirectSerendipity(DirectElement):
         raise NotImplementedError()
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     @property
@@ -92,7 +90,7 @@ class DirectSerendipity(DirectElement):
         raise NotImplementedError()
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     names = ["direct serendipity"]

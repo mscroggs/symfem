@@ -91,7 +91,7 @@ class Bubble(CiarletElement):
         return -1
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -99,7 +99,7 @@ class Bubble(CiarletElement):
         return -1
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         if self.reference.name in ["quadrilateral", "hexahedron"]:
             return self.order * self.reference.tdim
         return self.order
@@ -154,7 +154,7 @@ class BubbleEnrichedLagrange(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 2
 
     @property
@@ -162,7 +162,7 @@ class BubbleEnrichedLagrange(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + 2
 
     names = ["bubble enriched Lagrange"]
@@ -216,7 +216,7 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 2
 
     @property
@@ -224,7 +224,7 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + 2
 
     names = ["bubble enriched vector Lagrange"]

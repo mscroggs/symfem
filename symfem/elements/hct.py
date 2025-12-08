@@ -132,7 +132,7 @@ class HsiehCloughTocher(CiarletElement):
         raise NotImplementedError()
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     @property
@@ -140,7 +140,7 @@ class HsiehCloughTocher(CiarletElement):
         raise NotImplementedError()
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     names = ["Hsieh-Clough-Tocher", "Clough-Tocher", "HCT", "CT"]

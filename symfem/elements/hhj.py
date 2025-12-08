@@ -127,7 +127,7 @@ class HellanHerrmannJohnson(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -135,7 +135,7 @@ class HellanHerrmannJohnson(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order
 
     names = ["Hellan-Herrmann-Johnson", "HHJ"]

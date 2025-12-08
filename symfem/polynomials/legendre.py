@@ -191,7 +191,7 @@ def orthogonal_basis_full_pyramid(
 def orthogonal_basis(
     cell: str,
     order: int,
-    variables: typing.Optional[AxisVariablesNotSingle] = None,
+    variables: AxisVariablesNotSingle | None = None,
     ptype: str = "Lagrange",
 ) -> typing.List[ScalarFunction]:
     """Create a basis of orthogonal polynomials.
@@ -236,7 +236,7 @@ def orthogonal_basis(
 def orthonormal_basis(
     cell: str,
     order: int,
-    variables: typing.Optional[AxisVariablesNotSingle] = None,
+    variables: AxisVariablesNotSingle | None = None,
     ptype: str = "Lagrange",
 ) -> typing.List[ScalarFunction]:
     """Create a basis of orthonormal polynomials.

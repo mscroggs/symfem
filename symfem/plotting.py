@@ -679,15 +679,15 @@ class Picture:
     def __init__(
         self,
         padding: sympy.core.expr.Expr = sympy.Integer(25),
-        scale: typing.Optional[int] = None,
-        width: typing.Optional[int] = None,
-        height: typing.Optional[int] = None,
-        axes_3d: typing.Optional[SetOfPointsInput] = None,
+        scale: int | None = None,
+        width: int | None = None,
+        height: int | None = None,
+        axes_3d: SetOfPointsInput | None = None,
         dof_arrow_size: int | sympy.core.expr.Expr = 1,
-        title: typing.Optional[str] = None,
-        desc: typing.Optional[str] = None,
-        svg_metadata: typing.Optional[str] = None,
-        tex_comment: typing.Optional[str] = None,
+        title: str | None = None,
+        desc: str | None = None,
+        svg_metadata: str | None = None,
+        tex_comment: str | None = None,
     ):
         """Create a picture.
 
@@ -809,7 +809,7 @@ class Picture:
         self,
         start: PointOrFunction,
         end: PointOrFunction,
-        color: typing.Optional[str] = None,
+        color: str | None = None,
         width: float = 4.0,
     ):
         """Add a line to the picture.
@@ -836,7 +836,7 @@ class Picture:
         mid1: PointOrFunction,
         mid2: PointOrFunction,
         end: PointOrFunction,
-        color: typing.Optional[str] = None,
+        color: str | None = None,
         width: float = 4.0,
     ):
         """Add a Bezier curve to the picture.
@@ -865,7 +865,7 @@ class Picture:
         self,
         start: PointOrFunction,
         end: PointOrFunction,
-        color: typing.Optional[str] = None,
+        color: str | None = None,
         width: float = 4.0,
     ):
         """Add an arrow to the picture.
@@ -905,7 +905,7 @@ class Picture:
         point: PointOrFunction,
         direction: PointOrFunction,
         number: int,
-        color: typing.Optional[str] = None,
+        color: str | None = None,
         shifted: bool = False,
         bold: bool = True,
     ):
@@ -933,11 +933,11 @@ class Picture:
         self,
         centre: PointOrFunction,
         number: int,
-        color: typing.Optional[str] = None,
-        text_color: typing.Optional[str] = None,
-        fill_color: typing.Optional[str] = None,
+        color: str | None = None,
+        text_color: str | None = None,
+        fill_color: str | None = None,
         radius: float = 20.0,
-        font_size: typing.Optional[int] = None,
+        font_size: int | None = None,
         width: float = 4.0,
         font: str = "'Varela Round',sans-serif",
     ):
@@ -973,7 +973,7 @@ class Picture:
         self,
         point: PointTypeInput,
         math: str,
-        color: typing.Optional[str] = None,
+        color: str | None = None,
         font_size: int = 35,
         anchor="center",
     ):
@@ -1000,7 +1000,7 @@ class Picture:
     def add_fill(
         self,
         vertices: SetOfPointsOrFunctions,
-        color: typing.Optional[str] = None,
+        color: str | None = None,
         opacity: float = 1.0,
     ):
         """Add a filled polygon to the picture.
@@ -1084,7 +1084,7 @@ class Picture:
 
         return scale, height, width, map_pt
 
-    def as_svg(self, filename: typing.Optional[str] = None) -> str:
+    def as_svg(self, filename: str | None = None) -> str:
         """Convert to an SVG.
 
         Args:
@@ -1123,9 +1123,9 @@ class Picture:
     def as_png(
         self,
         filename: str,
-        png_scale: typing.Optional[float] = None,
-        png_width: typing.Optional[int] = None,
-        png_height: typing.Optional[int] = None,
+        png_scale: float | None = None,
+        png_width: int | None = None,
+        png_height: int | None = None,
     ):
         """Convert to a PNG.
 
@@ -1155,7 +1155,7 @@ class Picture:
         assert filename.endswith(".png")
         svg2png(bytestring=self.as_svg().encode(), write_to=filename, scale=png_scale)
 
-    def as_tikz(self, filename: typing.Optional[str] = None) -> str:
+    def as_tikz(self, filename: str | None = None) -> str:
         """Convert to tikz.
 
         Args:

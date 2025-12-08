@@ -49,14 +49,14 @@ def _extract_moment_data(moment_data: MomentTypeInput, sub_type: str) -> MomentT
 
 def make_integral_moment_dofs(
     reference: Reference,
-    vertices: typing.Optional[MomentTypeInput] = None,
-    edges: typing.Optional[MomentTypeInput] = None,
-    faces: typing.Optional[MomentTypeInput] = None,
-    volumes: typing.Optional[MomentTypeInput] = None,
-    cells: typing.Optional[MomentTypeInput] = None,
-    facets: typing.Optional[MomentTypeInput] = None,
-    ridges: typing.Optional[MomentTypeInput] = None,
-    peaks: typing.Optional[MomentTypeInput] = None,
+    vertices: MomentTypeInput | None = None,
+    edges: MomentTypeInput | None = None,
+    faces: MomentTypeInput | None = None,
+    volumes: MomentTypeInput | None = None,
+    cells: MomentTypeInput | None = None,
+    facets: MomentTypeInput | None = None,
+    ridges: MomentTypeInput | None = None,
+    peaks: MomentTypeInput | None = None,
 ) -> typing.List[BaseFunctional]:
     """Generate DOFs due to integral moments on sub entities.
 

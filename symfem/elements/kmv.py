@@ -234,7 +234,7 @@ class KongMulderVeldhuizen(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self._superdegree
 
     @property
@@ -242,7 +242,7 @@ class KongMulderVeldhuizen(CiarletElement):
         return self.lagrange_subdegree
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.lagrange_superdegree
 
     names = ["Kong-Mulder-Veldhuizen", "KMV"]

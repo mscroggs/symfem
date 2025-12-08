@@ -63,7 +63,7 @@ class ConformingCrouzeixRaviart(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         if self.order == 1:
             return 1
         return self.order + 1
@@ -73,7 +73,7 @@ class ConformingCrouzeixRaviart(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         if self.order == 1:
             return 1
         return self.order + 1

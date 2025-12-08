@@ -55,7 +55,7 @@ class RannacherTurek(CiarletElement):
         return 0
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return 2
 
     @property
@@ -63,7 +63,7 @@ class RannacherTurek(CiarletElement):
         return 1
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return 2
 
     names = ["Rannacher-Turek"]

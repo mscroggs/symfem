@@ -272,7 +272,7 @@ def generate_basix_element_code(
     dtype: npt.DTypeLike | str = np.float64,
     variable_name: str = "e",
     *,
-    ufl: typing.Optional[bool] = None,
+    ufl: bool | None = None,
     include_imports: bool = True,
     include_comment: bool = True,
 ) -> str:

@@ -63,7 +63,7 @@ for _file in _os.listdir(_os.path.join(_folder, "elements")):
 
 
 def create_reference(
-    cell_type: str, vertices: _typing.Optional[_SetOfPointsInput] = None
+    cell_type: str, vertices: _SetOfPointsInput | None = None
 ) -> _references.Reference:
     """Make a reference cell.
 
@@ -104,7 +104,7 @@ def create_element(
     cell_type: str,
     element_type: str,
     order: int,
-    vertices: _typing.Optional[_SetOfPointsInput] = None,
+    vertices: _SetOfPointsInput | None = None,
     **kwargs: _typing.Any,
 ) -> _FiniteElement:
     """Make a finite element.

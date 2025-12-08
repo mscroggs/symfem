@@ -115,7 +115,7 @@ class BernardiRaugel(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + self.reference.tdim - 1
 
     @property
@@ -123,7 +123,7 @@ class BernardiRaugel(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + self.reference.tdim - 1
 
     names = ["Bernardi-Raugel"]

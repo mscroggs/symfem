@@ -111,7 +111,7 @@ class WuXu(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         if self.reference.name == "interval":
             return 3
         return self.order + 1
@@ -121,7 +121,7 @@ class WuXu(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         if self.reference.name == "interval":
             return 3
         return self.order + 1

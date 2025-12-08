@@ -264,7 +264,7 @@ def Hcurl_quolynomials(
 
 
 def serendipity_indices(
-    total: int, linear: int, dim: int, done: typing.Optional[typing.List[int]] = None
+    total: int, linear: int, dim: int, done: typing.List[int] | None = None
 ) -> typing.List[typing.List[int]]:
     """Get the set indices for a serendipity polynomial set.
 

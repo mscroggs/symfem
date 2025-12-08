@@ -487,7 +487,7 @@ class DerivativePointEvaluation(BaseFunctional):
         point_in: FunctionInput,
         derivative: typing.Tuple[int, ...],
         entity: typing.Tuple[int, int],
-        mapping: typing.Optional[str] = None,
+        mapping: str | None = None,
     ):
         """Create the functional.
 

@@ -151,7 +151,7 @@ class Q(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -159,7 +159,7 @@ class Q(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim
 
     names = ["Q", "Lagrange", "P"]
@@ -219,7 +219,7 @@ class VectorQ(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -227,7 +227,7 @@ class VectorQ(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim
 
     names = ["vector Q", "vQ"]
@@ -279,7 +279,7 @@ class Nedelec(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -287,7 +287,7 @@ class Nedelec(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return (self.order + 1) * self.reference.tdim - 1
 
     names = ["NCE", "RTCE", "Qcurl", "Nedelec", "Ncurl"]
@@ -338,7 +338,7 @@ class RaviartThomas(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -346,7 +346,7 @@ class RaviartThomas(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim + 1
 
     names = ["NCF", "RTCF", "Qdiv"]

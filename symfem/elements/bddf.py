@@ -83,7 +83,7 @@ class BDDF(CiarletElement):
         return self.order // 3
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -91,7 +91,7 @@ class BDDF(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
     names = ["Brezzi-Douglas-Duran-Fortin", "BDDF"]

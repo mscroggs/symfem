@@ -73,7 +73,7 @@ class Serendipity(CiarletElement):
         return self.order // self.reference.tdim
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -81,7 +81,7 @@ class Serendipity(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + self.reference.tdim - 1
 
     names = ["serendipity", "S"]
@@ -135,7 +135,7 @@ class SerendipityCurl(CiarletElement):
         return self.order // self.reference.tdim
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -143,7 +143,7 @@ class SerendipityCurl(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + self.reference.tdim - 1
 
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
@@ -194,7 +194,7 @@ class SerendipityDiv(CiarletElement):
         return self.order // self.reference.tdim
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -202,7 +202,7 @@ class SerendipityDiv(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]

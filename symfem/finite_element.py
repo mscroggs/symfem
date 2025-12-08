@@ -67,7 +67,7 @@ class FiniteElement(ABC):
         space_dim: int,
         domain_dim: int,
         range_dim: int,
-        range_shape: typing.Optional[typing.Tuple[int, ...]] = None,
+        range_shape: typing.Tuple[int, ...] | None = None,
     ):
         """Create a finite element.
 
@@ -85,7 +85,7 @@ class FiniteElement(ABC):
         self.domain_dim = domain_dim
         self.range_dim = range_dim
         if range_shape is None and range_dim > 1:
-            self.range_shape: typing.Optional[typing.Tuple[int, ...]] = (range_dim,)
+            self.range_shape: typing.Tuple[int, ...] | None = (range_dim,)
         else:
             self.range_shape = range_shape
         self._float_basis_functions = None
@@ -101,7 +101,7 @@ class FiniteElement(ABC):
         raise NotImplementedError()
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         """Get the Lagrange superdegree of the element.
 
         This is the degree of the highest degree Lagrange space whose polynomial space is a
@@ -119,7 +119,7 @@ class FiniteElement(ABC):
         raise NotImplementedError()
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         """Get the polynomial superdegree of the element.
 
         This is the degree of the highest degree complete polynomial space that is a
@@ -297,7 +297,7 @@ class FiniteElement(ABC):
         self,
         n: int,
         filename: str | typing.List[str],
-        cell: typing.Optional[Reference] = None,
+        cell: Reference | None = None,
         **kwargs: typing.Any,
     ):
         """Plot a diagram showing a basis function.
@@ -330,9 +330,9 @@ class FiniteElement(ABC):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.Optional[typing.List[Function]] = None,
-        forward_map: typing.Optional[PointType] = None,
-        inverse_map: typing.Optional[PointType] = None,
+        basis: typing.List[Function] | None = None,
+        forward_map: PointType | None = None,
+        inverse_map: PointType | None = None,
     ) -> typing.List[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
@@ -593,7 +593,7 @@ class FiniteElement(ABC):
     last_updated = version
     cache = True
     value_type = "unknown"
-    continuity: typing.Optional[str] = None
+    continuity: str | None = None
     _max_continuity_test_order = 4
 
 
@@ -608,7 +608,7 @@ class CiarletElement(FiniteElement):
         dofs: ListOfFunctionals,
         domain_dim: int,
         range_dim: int,
-        range_shape: typing.Optional[typing.Tuple[int, ...]] = None,
+        range_shape: typing.Tuple[int, ...] | None = None,
     ):
         """Create a Ciarlet element.
 
@@ -741,7 +741,7 @@ class CiarletElement(FiniteElement):
         self,
         n: int,
         filename: str | typing.List[str],
-        cell: typing.Optional[Reference] = None,
+        cell: Reference | None = None,
         **kwargs: typing.Any,
     ):
         """Plot a diagram showing a basis function.
@@ -781,9 +781,9 @@ class CiarletElement(FiniteElement):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.Optional[typing.List[Function]] = None,
-        forward_map: typing.Optional[PointType] = None,
-        inverse_map: typing.Optional[PointType] = None,
+        basis: typing.List[Function] | None = None,
+        forward_map: PointType | None = None,
+        inverse_map: PointType | None = None,
     ) -> typing.List[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
@@ -888,7 +888,7 @@ class DirectElement(FiniteElement):
         basis_entities: typing.List[typing.Tuple[int, int]],
         domain_dim: int,
         range_dim: int,
-        range_shape: typing.Optional[typing.Tuple[int, ...]] = None,
+        range_shape: typing.Tuple[int, ...] | None = None,
     ):
         """Create a direct element.
 
@@ -1007,9 +1007,9 @@ class DirectElement(FiniteElement):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.Optional[typing.List[Function]] = None,
-        forward_map: typing.Optional[PointType] = None,
-        inverse_map: typing.Optional[PointType] = None,
+        basis: typing.List[Function] | None = None,
+        forward_map: PointType | None = None,
+        inverse_map: PointType | None = None,
     ) -> typing.List[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
@@ -1086,7 +1086,7 @@ class DirectElement(FiniteElement):
 class EnrichedElement(FiniteElement):
     """Finite element defined directly."""
 
-    _basis_functions: typing.Optional[typing.List[Function]]
+    _basis_functions: typing.List[Function] | None
 
     def __init__(
         self,
@@ -1191,9 +1191,9 @@ class EnrichedElement(FiniteElement):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.Optional[typing.List[Function]] = None,
-        forward_map: typing.Optional[PointType] = None,
-        inverse_map: typing.Optional[PointType] = None,
+        basis: typing.List[Function] | None = None,
+        forward_map: PointType | None = None,
+        inverse_map: PointType | None = None,
     ) -> typing.List[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 

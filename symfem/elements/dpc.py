@@ -76,7 +76,7 @@ class DPC(CiarletElement):
         return self.order // self.reference.tdim
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -84,7 +84,7 @@ class DPC(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order
 
     names = ["dPc"]
@@ -141,7 +141,7 @@ class VectorDPC(CiarletElement):
         return self.order // self.reference.tdim
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -149,7 +149,7 @@ class VectorDPC(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order
 
     names = ["vector dPc"]

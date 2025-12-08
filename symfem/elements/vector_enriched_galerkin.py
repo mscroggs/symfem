@@ -44,7 +44,7 @@ class Enrichment(CiarletElement):
         return -1
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return 1
 
     @property
@@ -52,7 +52,7 @@ class Enrichment(CiarletElement):
         return -1
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return 1
 
     names: typing.List[str] = []
@@ -84,7 +84,7 @@ class VectorEnrichedGalerkin(EnrichedElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -92,7 +92,7 @@ class VectorEnrichedGalerkin(EnrichedElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         if self.reference.name in ["quadrilateral", "hexahedron"]:
             return self.order * self.reference.tdim
         return self.order

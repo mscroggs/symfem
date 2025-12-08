@@ -29,8 +29,8 @@ class DualCiarletElement(FiniteElement):
         dof_entities: typing.List[typing.Tuple[int, int]],
         domain_dim: int,
         range_dim: int,
-        range_shape: typing.Optional[typing.Tuple[int, ...]] = None,
-        dof_directions: typing.Optional[SetOfPoints] = None,
+        range_shape: typing.Tuple[int, ...] | None = None,
+        dof_directions: SetOfPoints | None = None,
     ):
         """Create a dual element.
 
@@ -185,9 +185,9 @@ class DualCiarletElement(FiniteElement):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.Optional[typing.List[Function]] = None,
-        forward_map: typing.Optional[PointType] = None,
-        inverse_map: typing.Optional[PointType] = None,
+        basis: typing.List[Function] | None = None,
+        forward_map: PointType | None = None,
+        inverse_map: PointType | None = None,
     ) -> typing.List[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
@@ -248,7 +248,7 @@ class Dual(DualCiarletElement):
         raise NotImplementedError()
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     @property
@@ -256,7 +256,7 @@ class Dual(DualCiarletElement):
         raise NotImplementedError()
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     names = ["dual polynomial", "dual P", "dual"]
@@ -314,7 +314,7 @@ class BuffaChristiansen(DualCiarletElement):
         raise NotImplementedError()
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     @property
@@ -322,7 +322,7 @@ class BuffaChristiansen(DualCiarletElement):
         raise NotImplementedError()
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     names = ["Buffa-Christiansen", "BC"]
@@ -380,7 +380,7 @@ class RotatedBuffaChristiansen(DualCiarletElement):
         raise NotImplementedError()
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     @property
@@ -388,7 +388,7 @@ class RotatedBuffaChristiansen(DualCiarletElement):
         raise NotImplementedError()
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     names = ["rotated Buffa-Christiansen", "RBC"]

@@ -82,7 +82,7 @@ class ArnoldBoffiFalk(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 2
 
     @property
@@ -90,7 +90,7 @@ class ArnoldBoffiFalk(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order * 2 + 2
 
     names = ["Arnold-Boffi-Falk", "ABF"]

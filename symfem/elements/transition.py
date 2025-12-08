@@ -24,8 +24,8 @@ class Transition(CiarletElement):
         self,
         reference: Reference,
         order: int,
-        edge_orders: typing.Optional[typing.List[int]] = None,
-        face_orders: typing.Optional[typing.List[int]] = None,
+        edge_orders: typing.List[int] | None = None,
+        face_orders: typing.List[int] | None = None,
         variant: str = "equispaced",
     ):
         """Create the element.
@@ -148,7 +148,7 @@ class Transition(CiarletElement):
             degree += 1
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return max(
             p.subs(x[2], x[0]).subs(x[1], x[0]).as_sympy().as_poly(x[0]).degree()
             for p in self._basis
@@ -159,7 +159,7 @@ class Transition(CiarletElement):
         return self.lagrange_subdegree
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.lagrange_superdegree
 
     names = ["transition"]

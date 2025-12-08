@@ -135,7 +135,7 @@ class TNT(CiarletElement):
         return self.order - 1
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -143,7 +143,7 @@ class TNT(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return max((self.order - 1) * self.reference.tdim, (self.order - 1) + self.reference.tdim)
 
     names = ["tiniest tensor", "TNT"]
@@ -311,7 +311,7 @@ class TNTcurl(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -319,7 +319,7 @@ class TNTcurl(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim + 1
 
     names = ["tiniest tensor Hcurl", "TNTcurl"]
@@ -485,7 +485,7 @@ class TNTdiv(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -493,7 +493,7 @@ class TNTdiv(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim + 1
 
     names = ["tiniest tensor Hdiv", "TNTdiv"]

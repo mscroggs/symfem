@@ -136,7 +136,7 @@ class ArnoldWinther(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -144,7 +144,7 @@ class ArnoldWinther(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
     names = ["Arnold-Winther", "AW", "conforming Arnold-Winther"]
@@ -237,7 +237,7 @@ class NonConformingArnoldWinther(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -245,7 +245,7 @@ class NonConformingArnoldWinther(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
     names = ["nonconforming Arnold-Winther", "nonconforming AW"]
