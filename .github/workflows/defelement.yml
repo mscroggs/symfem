@@ -31,7 +31,7 @@ jobs:
         with:
           path: ./defelement
           repository: DefElement/DefElement
-          ref: main
+          ref: mscroggs/reorder-entities
       - name: Install requirements
         run: |
           cd defelement
