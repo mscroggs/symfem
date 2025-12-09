@@ -53,13 +53,15 @@ for _file in _os.listdir(_os.path.join(_folder, "elements")):
 
         for _class_name in dir(_module):
             _element = getattr(_module, _class_name)
-            if (
-                isinstance(_element, type)
-                and issubclass(_element, _FiniteElement)
-                and _element != _FiniteElement
-                and len(_element.names) > 0
-            ):
-                add_element(_element)
+            try:
+                if (
+                    issubclass(_element, _FiniteElement)
+                    and _element != _FiniteElement
+                    and len(_element.names) > 0
+                ):
+                    add_element(_element)
+            except TypeError:
+                pass
 
 
 def create_reference(
