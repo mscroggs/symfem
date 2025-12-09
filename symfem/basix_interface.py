@@ -135,12 +135,12 @@ def _create_custom_element_args(
         entity = dof.entity
         if ref.name == "triangle":
             if entity[0] == 1:
-                entity[1] = [2, 1, 0][entity[1]]
+                entity = (1, [2, 1, 0][entity[1]])
         elif ref.name == "tetrahedron":
             if entity[0] == 1:
-                entity[1] = [5, 4, 3, 2, 1, 0][entity[1]]
+                entity = (1, [5, 4, 3, 2, 1, 0][entity[1]])
             elif entity[0] == 2:
-                entity[1] = [3, 2, 1, 0][entity[1]]
+                entity = (2, [3, 2, 1, 0][entity[1]])
 
         dof_p, _dof_w = dof.discrete(superdegree)
         dof_w = np.array(_dof_w)
