@@ -33,7 +33,7 @@ map_types = {
 }
 
 
-def get_embedded_degrees(poly, reference) -> typing.Tuple[int, int]:
+def get_embedded_degrees(poly, reference) -> tuple[int, int]:
     """Get embedded degrees of a set of polynomials.
 
     Args:
@@ -175,7 +175,7 @@ def _create_custom_element_args(
 
 def create_basix_element(
     element: FiniteElement, dtype: npt.DTypeLike = np.float64, ufl: bool = False
-) -> typing.Union[basix.finite_element.FiniteElement, basix.ufl._ElementBase]:
+) -> basix.finite_element.FiniteElement | basix.ufl._ElementBase:
     """Create a Basix element from a Symfem element.
 
     Args:
@@ -269,10 +269,10 @@ def _to_cpp_string(item: typing.Any, in_array: bool = False) -> tuple[list[str],
 def generate_basix_element_code(
     element: FiniteElement,
     language: str = "python",
-    dtype: typing.Union[npt.DTypeLike, str] = np.float64,
+    dtype: npt.DTypeLike | str = np.float64,
     variable_name: str = "e",
     *,
-    ufl: typing.Optional[bool] = None,
+    ufl: bool | None = None,
     include_imports: bool = True,
     include_comment: bool = True,
 ) -> str:

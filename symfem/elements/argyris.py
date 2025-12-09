@@ -4,8 +4,6 @@ This element's definition appears in https://doi.org/10.1017/S000192400008489X
 (Arygris, Fried, Scharpf, 1968)
 """
 
-import typing
-
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     ListOfFunctionals,
@@ -59,7 +57,7 @@ class Argyris(CiarletElement):
                     reference, sub_ref.midpoint(), sub_ref, entity=(1, e_n)
                 )
             )
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
@@ -69,7 +67,7 @@ class Argyris(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -77,7 +75,7 @@ class Argyris(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order
 
     names = ["Argyris"]

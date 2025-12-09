@@ -36,9 +36,9 @@ __all__ = ["PiecewiseFunction"]
 class PiecewiseFunction(Function):
     """A piecewise function."""
 
-    _pieces: typing.Dict[SetOfPoints, Function]
+    _pieces: dict[SetOfPoints, Function]
 
-    def __init__(self, pieces: typing.Dict[SetOfPointsInput, FunctionInput], tdim: int):
+    def __init__(self, pieces: dict[SetOfPointsInput, FunctionInput], tdim: int):
         """Create a piecewise function.
 
         Args:
@@ -178,7 +178,7 @@ class PiecewiseFunction(Function):
         return True
 
     @property
-    def pieces(self) -> typing.Dict[SetOfPoints, Function]:
+    def pieces(self) -> dict[SetOfPoints, Function]:
         """Get the pieces of the function.
 
         Returns:
@@ -189,7 +189,7 @@ class PiecewiseFunction(Function):
     def __add__(self, other: typing.Any) -> PiecewiseFunction:
         """Add."""
         if isinstance(other, PiecewiseFunction):
-            new_pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+            new_pieces: dict[SetOfPointsInput, FunctionInput] = {}
             for (shape0, f0), (shape1, f1) in zip(self._pieces.items(), other._pieces.items()):
                 assert shape0 == shape1
                 new_pieces[shape0] = f0 + f1
@@ -199,7 +199,7 @@ class PiecewiseFunction(Function):
     def __radd__(self, other: typing.Any) -> PiecewiseFunction:
         """Add."""
         if isinstance(other, PiecewiseFunction):
-            new_pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+            new_pieces: dict[SetOfPointsInput, FunctionInput] = {}
             for (shape0, f0), (shape1, f1) in zip(self._pieces.items(), other._pieces.items()):
                 assert shape0 == shape1
                 new_pieces[shape0] = f1 + f0
@@ -209,7 +209,7 @@ class PiecewiseFunction(Function):
     def __sub__(self, other: typing.Any) -> PiecewiseFunction:
         """Subtract."""
         if isinstance(other, PiecewiseFunction):
-            new_pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+            new_pieces: dict[SetOfPointsInput, FunctionInput] = {}
             for (shape0, f0), (shape1, f1) in zip(self._pieces.items(), other._pieces.items()):
                 assert shape0 == shape1
                 new_pieces[shape0] = f0 - f1
@@ -219,7 +219,7 @@ class PiecewiseFunction(Function):
     def __rsub__(self, other: typing.Any) -> PiecewiseFunction:
         """Subtract."""
         if isinstance(other, PiecewiseFunction):
-            new_pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+            new_pieces: dict[SetOfPointsInput, FunctionInput] = {}
             for (shape0, f0), (shape1, f1) in zip(self._pieces.items(), other._pieces.items()):
                 assert shape0 == shape1
                 new_pieces[shape0] = f1 - f0
@@ -229,7 +229,7 @@ class PiecewiseFunction(Function):
     def __truediv__(self, other: typing.Any) -> PiecewiseFunction:
         """Divide."""
         if isinstance(other, PiecewiseFunction):
-            new_pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+            new_pieces: dict[SetOfPointsInput, FunctionInput] = {}
             for (shape0, f0), (shape1, f1) in zip(self._pieces.items(), other._pieces.items()):
                 assert shape0 == shape1
                 new_pieces[shape0] = f0 / f1
@@ -239,7 +239,7 @@ class PiecewiseFunction(Function):
     def __rtruediv__(self, other: typing.Any) -> PiecewiseFunction:
         """Divide."""
         if isinstance(other, PiecewiseFunction):
-            new_pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+            new_pieces: dict[SetOfPointsInput, FunctionInput] = {}
             for (shape0, f0), (shape1, f1) in zip(self._pieces.items(), other._pieces.items()):
                 assert shape0 == shape1
                 new_pieces[shape0] = f1 / f0
@@ -249,7 +249,7 @@ class PiecewiseFunction(Function):
     def __mul__(self, other: typing.Any) -> PiecewiseFunction:
         """Multiply."""
         if isinstance(other, PiecewiseFunction):
-            new_pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+            new_pieces: dict[SetOfPointsInput, FunctionInput] = {}
             for (shape0, f0), (shape1, f1) in zip(self._pieces.items(), other._pieces.items()):
                 assert shape0 == shape1
                 new_pieces[shape0] = f0 * f1
@@ -259,7 +259,7 @@ class PiecewiseFunction(Function):
     def __rmul__(self, other: typing.Any) -> PiecewiseFunction:
         """Multiply."""
         if isinstance(other, PiecewiseFunction):
-            new_pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+            new_pieces: dict[SetOfPointsInput, FunctionInput] = {}
             for (shape0, f0), (shape1, f1) in zip(self._pieces.items(), other._pieces.items()):
                 assert shape0 == shape1
                 new_pieces[shape0] = f1 * f0
@@ -269,7 +269,7 @@ class PiecewiseFunction(Function):
     def __matmul__(self, other: typing.Any) -> PiecewiseFunction:
         """Multiply."""
         if isinstance(other, PiecewiseFunction):
-            new_pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+            new_pieces: dict[SetOfPointsInput, FunctionInput] = {}
             for (shape0, f0), (shape1, f1) in zip(self._pieces.items(), other._pieces.items()):
                 assert shape0 == shape1
                 new_pieces[shape0] = f0 @ f1
@@ -279,7 +279,7 @@ class PiecewiseFunction(Function):
     def __rmatmul__(self, other: typing.Any) -> PiecewiseFunction:
         """Multiply."""
         if isinstance(other, PiecewiseFunction):
-            new_pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+            new_pieces: dict[SetOfPointsInput, FunctionInput] = {}
             for (shape0, f0), (shape1, f1) in zip(self._pieces.items(), other._pieces.items()):
                 assert shape0 == shape1
                 new_pieces[shape0] = f1 @ f0
@@ -289,7 +289,7 @@ class PiecewiseFunction(Function):
     def __pow__(self, other: typing.Any) -> PiecewiseFunction:
         """Raise to a power."""
         if isinstance(other, PiecewiseFunction):
-            new_pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+            new_pieces: dict[SetOfPointsInput, FunctionInput] = {}
             for (shape0, f0), (shape1, f1) in zip(self._pieces.items(), other._pieces.items()):
                 assert shape0 == shape1
                 new_pieces[shape0] = f0**f1
@@ -353,7 +353,7 @@ class PiecewiseFunction(Function):
             self.tdim,
         )
 
-    def jacobian_component(self, component: typing.Tuple[int, int]) -> PiecewiseFunction:
+    def jacobian_component(self, component: tuple[int, int]) -> PiecewiseFunction:
         """Compute a component of the jacobian.
 
         Args:
@@ -494,7 +494,7 @@ class PiecewiseFunction(Function):
         Returns:
             The mapped pieces
         """
-        new_pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+        new_pieces: dict[SetOfPointsInput, FunctionInput] = {}
         for shape, f in self._pieces.items():
             nshape = []
             for v in shape:
@@ -508,7 +508,7 @@ class PiecewiseFunction(Function):
         }
 
     @property
-    def shape(self) -> typing.Tuple[int, ...]:
+    def shape(self) -> tuple[int, ...]:
         """Get the value shape of the function.
 
         Returns:

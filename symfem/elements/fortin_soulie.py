@@ -4,8 +4,6 @@ This element's definition appears in https://doi.org/10.1002/nme.1620190405
 (Fortin, Soulie, 1973)
 """
 
-import typing
-
 import sympy
 
 from symfem.finite_element import CiarletElement
@@ -43,7 +41,7 @@ class FortinSoulie(CiarletElement):
             PointEvaluation(reference, (third, third), entity=(2, 0)),
         ]
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
@@ -52,7 +50,7 @@ class FortinSoulie(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -60,7 +58,7 @@ class FortinSoulie(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order
 
     names = ["Fortin-Soulie", "FS"]

@@ -40,7 +40,7 @@ class Serendipity(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
         poly += serendipity_set_1d(reference.tdim, order)
         poly = reference.map_polyset_from_default(poly)
@@ -58,7 +58,7 @@ class Serendipity(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -73,7 +73,7 @@ class Serendipity(CiarletElement):
         return self.order // self.reference.tdim
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -81,7 +81,7 @@ class Serendipity(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + self.reference.tdim - 1
 
     names = ["serendipity", "S"]
@@ -106,7 +106,7 @@ class SerendipityCurl(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
         poly += Hcurl_serendipity(reference.tdim, reference.tdim, order)
 
@@ -120,7 +120,7 @@ class SerendipityCurl(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -135,7 +135,7 @@ class SerendipityCurl(CiarletElement):
         return self.order // self.reference.tdim
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -143,7 +143,7 @@ class SerendipityCurl(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + self.reference.tdim - 1
 
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
@@ -168,7 +168,7 @@ class SerendipityDiv(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
         poly += Hdiv_serendipity(reference.tdim, reference.tdim, order)
 
@@ -181,7 +181,7 @@ class SerendipityDiv(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -194,7 +194,7 @@ class SerendipityDiv(CiarletElement):
         return self.order // self.reference.tdim
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -202,7 +202,7 @@ class SerendipityDiv(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]

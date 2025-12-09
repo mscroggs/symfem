@@ -26,16 +26,13 @@ __all__ = [
 
 SingleSympyFormat = typing.Union[
     sympy.core.expr.Expr,
-    typing.Tuple[sympy.core.expr.Expr, ...],
+    tuple[sympy.core.expr.Expr, ...],
     sympy.matrices.dense.MutableDenseMatrix,
 ]
 SympyFormat = typing.Union[
-    SingleSympyFormat,
-    typing.Dict[typing.Tuple[typing.Tuple[sympy.core.expr.Expr, ...], ...], SingleSympyFormat],
+    SingleSympyFormat, dict[tuple[tuple[sympy.core.expr.Expr, ...], ...], SingleSympyFormat]
 ]
-_ValuesToSubstitute = typing.Union[
-    typing.Tuple[typing.Any, ...], typing.List[typing.Any], typing.Any
-]
+_ValuesToSubstitute = typing.Union[tuple[typing.Any, ...], list[typing.Any], typing.Any]
 
 
 def _to_sympy_format(item: typing.Any) -> SympyFormat:
@@ -189,7 +186,7 @@ class Function(ABC):
         """
 
     @abstractmethod
-    def subs(self, vars: AxisVariables, values: typing.Union[Function, _ValuesToSubstitute]):
+    def subs(self, vars: AxisVariables, values: Function | _ValuesToSubstitute):
         """Substitute values into the function.
 
         Args:
@@ -223,7 +220,7 @@ class Function(ABC):
         """
 
     @abstractmethod
-    def jacobian_component(self, component: typing.Tuple[int, int]):
+    def jacobian_component(self, component: tuple[int, int]):
         """Compute a component of the jacobian.
 
         Args:
@@ -344,10 +341,10 @@ class Function(ABC):
 
     def integrate(
         self,
-        *limits: typing.Tuple[
+        *limits: tuple[
             sympy.core.symbol.Symbol,
-            typing.Union[int, sympy.core.expr.Expr],
-            typing.Union[int, sympy.core.expr.Expr],
+            int | sympy.core.expr.Expr,
+            int | sympy.core.expr.Expr,
         ],
     ):
         """Integrate the function.
@@ -377,7 +374,7 @@ class Function(ABC):
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute 'transpose'")
 
     @property
-    def shape(self) -> typing.Tuple[int, ...]:
+    def shape(self) -> tuple[int, ...]:
         """Get the value shape of the function.
 
         Returns:
@@ -388,13 +385,13 @@ class Function(ABC):
     def plot(
         self,
         reference: symfem.references.Reference,
-        filename: typing.Union[str, typing.List[str]],
-        dof_point: typing.Optional[PointType] = None,
-        dof_direction: typing.Optional[PointType] = None,
-        dof_entity: typing.Optional[typing.Tuple[int, int]] = None,
-        dof_n: typing.Optional[int] = None,
+        filename: str | list[str],
+        dof_point: PointType | None = None,
+        dof_direction: PointType | None = None,
+        dof_entity: tuple[int, int] | None = None,
+        dof_n: int | None = None,
         value_scale: sympy.core.expr.Expr = sympy.Integer(1),
-        plot_options: typing.Dict[str, typing.Any] = {},
+        plot_options: dict[str, typing.Any] = {},
         **kwargs: typing.Any,
     ):
         """Plot the function.
@@ -412,7 +409,7 @@ class Function(ABC):
         """
         from symfem.plotting import Picture
 
-        extra: typing.Tuple[int, ...] = tuple()
+        extra: tuple[int, ...] = tuple()
         if self.is_scalar:
             extra = (0,)
 
@@ -522,7 +519,7 @@ class Function(ABC):
         return not self.__eq__(other)
 
 
-ValuesToSubstitute = typing.Union[Function, _ValuesToSubstitute]
+ValuesToSubstitute = Function | _ValuesToSubstitute
 
 
 class ScalarFunction(Function):
@@ -530,7 +527,7 @@ class ScalarFunction(Function):
 
     _f: sympy.core.expr.Expr
 
-    def __init__(self, f: typing.Union[int, sympy.core.expr.Expr]):
+    def __init__(self, f: int | sympy.core.expr.Expr):
         """Create a scalar-valued function.
 
         Args:
@@ -542,9 +539,9 @@ class ScalarFunction(Function):
         else:
             self._f = f
         assert isinstance(self._f, sympy.core.expr.Expr)
-        self._plot_beziers: typing.Dict[
-            typing.Tuple[symfem.references.Reference, int],
-            typing.List[typing.Tuple[PointType, PointType, PointType, PointType]],
+        self._plot_beziers: dict[
+            tuple[symfem.references.Reference, int],
+            list[tuple[PointType, PointType, PointType, PointType]],
         ] = {}
 
     def __add__(self, other: typing.Any) -> ScalarFunction:
@@ -696,7 +693,7 @@ class ScalarFunction(Function):
             out += j * self.diff(i)
         return out
 
-    def jacobian_component(self, component: typing.Tuple[int, int]) -> ScalarFunction:
+    def jacobian_component(self, component: tuple[int, int]) -> ScalarFunction:
         """Compute a component of the jacobian.
 
         Args:
@@ -816,10 +813,10 @@ class ScalarFunction(Function):
 
     def integrate(
         self,
-        *limits: typing.Tuple[
+        *limits: tuple[
             sympy.core.symbol.Symbol,
-            typing.Union[int, sympy.core.expr.Expr],
-            typing.Union[int, sympy.core.expr.Expr],
+            int | sympy.core.expr.Expr,
+            int | sympy.core.expr.Expr,
         ],
     ):
         """Integrate the function.
@@ -939,10 +936,8 @@ class VectorFunction(Function):
 
     def __init__(
         self,
-        vec: typing.Union[
-            typing.Tuple[typing.Union[Function, int, sympy.core.expr.Expr], ...],
-            typing.List[typing.Union[Function, int, sympy.core.expr.Expr]],
-        ],
+        vec: tuple[Function | int | sympy.core.expr.Expr, ...]
+        | list[Function | int | sympy.core.expr.Expr],
     ):
         """Create a vector-valued function.
 
@@ -965,11 +960,9 @@ class VectorFunction(Function):
         for i in self._vec:
             assert i.is_scalar
 
-        self._plot_arrows: typing.Dict[
-            typing.Tuple[symfem.references.Reference, int],
-            typing.List[
-                typing.Tuple[typing.Tuple[sympy.core.expr.Expr, ...], VectorFunction, float]
-            ],
+        self._plot_arrows: dict[
+            tuple[symfem.references.Reference, int],
+            list[tuple[tuple[sympy.core.expr.Expr, ...], VectorFunction, float]],
         ] = {}
 
     def __len__(self):
@@ -977,7 +970,7 @@ class VectorFunction(Function):
         return len(self._vec)
 
     @property
-    def shape(self) -> typing.Tuple[int, ...]:
+    def shape(self) -> tuple[int, ...]:
         """Get the value shape of the function.
 
         Returns:
@@ -985,7 +978,7 @@ class VectorFunction(Function):
         """
         return (len(self),)
 
-    def __getitem__(self, key) -> typing.Union[ScalarFunction, VectorFunction]:
+    def __getitem__(self, key) -> ScalarFunction | VectorFunction:
         """Get a component or slice of the function."""
         fs = self._vec[key]
         if isinstance(fs, ScalarFunction):
@@ -1137,7 +1130,7 @@ class VectorFunction(Function):
         """
         raise NotImplementedError()
 
-    def jacobian_component(self, component: typing.Tuple[int, int]):
+    def jacobian_component(self, component: tuple[int, int]):
         """Compute a component of the jacobian.
 
         Args:
@@ -1181,7 +1174,7 @@ class VectorFunction(Function):
 
         raise NotImplementedError()
 
-    def cross(self, other_in: FunctionInput) -> typing.Union[VectorFunction, ScalarFunction]:
+    def cross(self, other_in: FunctionInput) -> VectorFunction | ScalarFunction:
         """Compute the cross product with another function.
 
         Args:
@@ -1341,17 +1334,15 @@ class VectorFunction(Function):
 class MatrixFunction(Function):
     """A matrix-valued function."""
 
-    _mat: typing.Tuple[typing.Tuple[ScalarFunction, ...], ...]
+    _mat: tuple[tuple[ScalarFunction, ...], ...]
 
     def __init__(
         self,
-        mat: typing.Union[
-            typing.Tuple[typing.Tuple[typing.Union[Function, int, sympy.core.expr.Expr], ...], ...],
-            typing.Tuple[typing.List[typing.Union[Function, int, sympy.core.expr.Expr]], ...],
-            typing.List[typing.Tuple[typing.Union[Function, int, sympy.core.expr.Expr], ...]],
-            typing.List[typing.List[typing.Union[Function, int, sympy.core.expr.Expr]]],
-            sympy.matrices.dense.MutableDenseMatrix,
-        ],
+        mat: tuple[tuple[Function | int | sympy.core.expr.Expr, ...], ...]
+        | tuple[list[Function | int | sympy.core.expr.Expr], ...]
+        | list[tuple[Function | int | sympy.core.expr.Expr, ...]]
+        | list[list[Function | int | sympy.core.expr.Expr]]
+        | sympy.matrices.dense.MutableDenseMatrix,
     ):
         """Create a matrix-valued function.
 
@@ -1385,7 +1376,7 @@ class MatrixFunction(Function):
                 assert j.is_scalar
 
     @property
-    def shape(self) -> typing.Tuple[int, ...]:
+    def shape(self) -> tuple[int, ...]:
         """Get the value shape of the function.
 
         Returns:
@@ -1393,7 +1384,7 @@ class MatrixFunction(Function):
         """
         return self._shape
 
-    def __getitem__(self, key) -> typing.Union[ScalarFunction, VectorFunction]:
+    def __getitem__(self, key) -> ScalarFunction | VectorFunction:
         """Get a component or slice of the function."""
         if isinstance(key, tuple):
             assert len(key) == 2
@@ -1657,7 +1648,7 @@ class MatrixFunction(Function):
         """
         raise NotImplementedError()
 
-    def jacobian_component(self, component: typing.Tuple[int, int]):
+    def jacobian_component(self, component: tuple[int, int]):
         """Compute a component of the jacobian.
 
         Args:
@@ -1816,12 +1807,12 @@ FunctionInput = typing.Union[
     Function,
     sympy.core.expr.Expr,
     int,
-    typing.Tuple[typing.Union[sympy.core.expr.Expr, int, Function], ...],
-    typing.List[typing.Union[sympy.core.expr.Expr, int, Function]],
-    typing.Tuple[typing.Tuple[typing.Union[sympy.core.expr.Expr, int, Function], ...], ...],
-    typing.Tuple[typing.List[typing.Union[sympy.core.expr.Expr, int, Function]], ...],
-    typing.List[typing.Tuple[typing.Union[sympy.core.expr.Expr, int, Function], ...]],
-    typing.List[typing.List[typing.Union[sympy.core.expr.Expr, int, Function]]],
+    tuple[sympy.core.expr.Expr | int | Function, ...],
+    list[sympy.core.expr.Expr | int | Function],
+    tuple[tuple[sympy.core.expr.Expr | int | Function, ...], ...],
+    tuple[list[sympy.core.expr.Expr | int | Function], ...],
+    list[tuple[sympy.core.expr.Expr | int | Function, ...]],
+    list[list[sympy.core.expr.Expr | int | Function]],
     sympy.matrices.dense.MutableDenseMatrix,
 ]
 
@@ -1856,8 +1847,8 @@ def parse_function_input(f: FunctionInput) -> Function:
 
 
 def parse_function_list_input(
-    functions: typing.Union[typing.List[FunctionInput], typing.Tuple[FunctionInput, ...]],
-) -> typing.List[Function]:
+    functions: list[FunctionInput] | tuple[FunctionInput, ...],
+) -> list[Function]:
     """Parse a list of functions.
 
     Args:

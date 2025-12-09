@@ -39,7 +39,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
         if reference.tdim == 2:
             poly += [
@@ -114,7 +114,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -127,7 +127,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
         return (self.order + self.reference.tdim) // (self.reference.tdim + 1)
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -135,7 +135,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + self.reference.tdim - 1
 
     names = ["trimmed serendipity Hcurl", "TScurl"]
@@ -160,7 +160,7 @@ class TrimmedSerendipityHdiv(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
         if reference.tdim == 2:
             poly += [
@@ -217,7 +217,7 @@ class TrimmedSerendipityHdiv(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -230,7 +230,7 @@ class TrimmedSerendipityHdiv(CiarletElement):
         return (self.order + 2) // (self.reference.tdim + 1)
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -238,7 +238,7 @@ class TrimmedSerendipityHdiv(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
     names = ["trimmed serendipity Hdiv", "TSdiv"]

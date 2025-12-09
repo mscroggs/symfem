@@ -78,7 +78,7 @@ class Bubble(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -91,7 +91,7 @@ class Bubble(CiarletElement):
         return -1
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -99,7 +99,7 @@ class Bubble(CiarletElement):
         return -1
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         if self.reference.name in ["quadrilateral", "hexahedron"]:
             return self.order * self.reference.tdim
         return self.order
@@ -131,7 +131,7 @@ class BubbleEnrichedLagrange(CiarletElement):
         lagrange = Lagrange(reference, order, variant)
         bubble = Bubble(reference, order + 2, variant)
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         for e in [lagrange, bubble]:
             for p in e._basis:
                 poly.append(p)
@@ -140,7 +140,7 @@ class BubbleEnrichedLagrange(CiarletElement):
 
         super().__init__(reference, order, poly, lagrange.dofs + bubble.dofs, reference.tdim, 1)
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -153,7 +153,7 @@ class BubbleEnrichedLagrange(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 2
 
     @property
@@ -161,7 +161,7 @@ class BubbleEnrichedLagrange(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + 2
 
     names = ["bubble enriched Lagrange"]
@@ -186,7 +186,7 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
         lagrange = Lagrange(reference, order, variant)
         bubble = Bubble(reference, order + 2, variant)
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         for e in [lagrange, bubble]:
             for p in e._basis:
                 poly.append((p, 0))
@@ -202,7 +202,7 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 2)
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -215,7 +215,7 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 2
 
     @property
@@ -223,7 +223,7 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + 2
 
     names = ["bubble enriched vector Lagrange"]

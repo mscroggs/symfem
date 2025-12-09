@@ -1,8 +1,7 @@
 """Geometry."""
 
-import typing
-
 import sympy
+import typing
 
 __all__ = [
     "PointType",
@@ -17,14 +16,14 @@ __all__ = [
     "point_in_tetrahedron",
 ]
 
-PointType = typing.Tuple[sympy.core.expr.Expr, ...]
-SetOfPoints = typing.Tuple[PointType, ...]
+PointType = tuple[sympy.core.expr.Expr, ...]
+SetOfPoints = tuple[PointType, ...]
 PointTypeInput = typing.Union[
-    typing.Tuple[typing.Union[sympy.core.expr.Expr, int], ...],
-    typing.List[typing.Union[sympy.core.expr.Expr, int]],
+    tuple[sympy.core.expr.Expr | int, ...],
+    list[sympy.core.expr.Expr | int],
     sympy.matrices.dense.MutableDenseMatrix,
 ]
-SetOfPointsInput = typing.Union[typing.Tuple[PointTypeInput, ...], typing.List[PointTypeInput]]
+SetOfPointsInput = tuple[PointTypeInput, ...] | list[PointTypeInput]
 
 
 def _is_close(a: sympy.core.expr.Expr, b: int) -> bool:

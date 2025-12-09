@@ -4,8 +4,6 @@ This element's definition appears in https://doi.org/10.1007/BF01399555
 (Bercovier, Pironneau, 1979)
 """
 
-import typing
-
 import sympy
 
 from symfem.finite_element import CiarletElement
@@ -33,7 +31,7 @@ class P1IsoP2Interval(CiarletElement):
         one = reference.get_point((sympy.Integer(1),))
 
         x = reference.get_inverse_map_to_self()[0]
-        poly: typing.List[FunctionInput] = [
+        poly: list[FunctionInput] = [
             PiecewiseFunction({(zero, half): 1 - 2 * x, (half, one): 0}, 1),
             PiecewiseFunction({(zero, half): 2 * x, (half, one): 2 - 2 * x}, 1),
             PiecewiseFunction({(zero, half): 0, (half, one): 2 * x - 1}, 1),
@@ -52,7 +50,7 @@ class P1IsoP2Interval(CiarletElement):
         raise NotImplementedError()
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     @property
@@ -60,7 +58,7 @@ class P1IsoP2Interval(CiarletElement):
         raise NotImplementedError()
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
@@ -85,13 +83,13 @@ class P1IsoP2Tri(CiarletElement):
         half = sympy.Rational(1, 2)
         zero = sympy.Integer(0)
         one = sympy.Integer(1)
-        tris: typing.List[SetOfPoints] = [
+        tris: list[SetOfPoints] = [
             ((zero, zero), (half, zero), (zero, half)),
             ((one, zero), (half, half), (half, zero)),
             ((zero, one), (zero, half), (half, half)),
             ((zero, half), (half, half), (half, zero)),
         ]
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         invmap = reference.get_inverse_map_to_self()
         x = invmap[0]
         y = invmap[1]
@@ -128,7 +126,7 @@ class P1IsoP2Tri(CiarletElement):
         raise NotImplementedError()
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     @property
@@ -136,7 +134,7 @@ class P1IsoP2Tri(CiarletElement):
         raise NotImplementedError()
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
@@ -161,13 +159,13 @@ class P1IsoP2Quad(CiarletElement):
         half = sympy.Rational(1, 2)
         zero = sympy.Integer(0)
         one = sympy.Integer(1)
-        quads: typing.List[SetOfPoints] = [
+        quads: list[SetOfPoints] = [
             ((zero, zero), (half, zero), (zero, half), (half, half)),
             ((half, zero), (one, zero), (half, half), (one, half)),
             ((zero, half), (half, half), (zero, one), (half, one)),
             ((half, half), (one, half), (half, one), (one, one)),
         ]
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         invmap = reference.get_inverse_map_to_self()
         x = invmap[0]
         y = invmap[1]
@@ -207,7 +205,7 @@ class P1IsoP2Quad(CiarletElement):
         raise NotImplementedError()
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     @property
@@ -215,7 +213,7 @@ class P1IsoP2Quad(CiarletElement):
         raise NotImplementedError()
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]

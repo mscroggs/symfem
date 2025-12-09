@@ -4,8 +4,6 @@ This element's definition appears in http://contrails.iit.edu/reports/8569
 (Bogner, Fox, Schmit, 1966)
 """
 
-import typing
-
 from symfem.finite_element import CiarletElement
 from symfem.functionals import DerivativePointEvaluation, ListOfFunctionals, PointEvaluation
 from symfem.functions import FunctionInput
@@ -46,7 +44,7 @@ class BognerFoxSchmit(CiarletElement):
                     )
                 )
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += quolynomial_set_1d(reference.tdim, order)
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
@@ -55,7 +53,7 @@ class BognerFoxSchmit(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -63,7 +61,7 @@ class BognerFoxSchmit(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order * 2
 
     names = ["Bogner-Fox-Schmit", "BFS"]

@@ -21,7 +21,7 @@ from symfem.symbols import x
 __all__ = ["bdfm_polyset", "BDFM"]
 
 
-def bdfm_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]:
+def bdfm_polyset(reference: Reference, order: int) -> list[FunctionInput]:
     """Create the polynomial basis for a BDFM element.
 
     Args:
@@ -32,7 +32,7 @@ def bdfm_polyset(reference: Reference, order: int) -> typing.List[FunctionInput]
         The polynomial basis
     """
     dim = reference.tdim
-    pset: typing.List[FunctionInput] = []
+    pset: list[FunctionInput] = []
     pset += polynomial_set_vector(dim, dim, order)
     if reference.name == "quadrilateral":
         for i in range(1, order + 2):
@@ -115,7 +115,7 @@ class BDFM(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -131,7 +131,7 @@ class BDFM(CiarletElement):
             return (self.order + 1) // self.reference.tdim
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -139,7 +139,7 @@ class BDFM(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
     names = ["Brezzi-Douglas-Fortin-Marini", "BDFM"]

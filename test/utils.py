@@ -2,9 +2,7 @@
 
 import typing
 
-test_elements: typing.Dict[
-    str, typing.Dict[str, typing.List[typing.Tuple[typing.Dict[str, typing.Any], typing.Iterable]]]
-] = {
+test_elements: dict[str, dict[str, list[tuple[dict[str, typing.Any], typing.Iterable]]]] = {
     "interval": {
         "P": [
             ({"variant": "equispaced"}, range(6)),

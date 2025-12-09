@@ -32,7 +32,7 @@ class BDM(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
@@ -50,7 +50,7 @@ class BDM(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -63,7 +63,7 @@ class BDM(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -71,7 +71,7 @@ class BDM(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order
 
     names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]

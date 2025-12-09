@@ -39,7 +39,7 @@ class GopalakrishnanLedererSchoberl(CiarletElement):
         from symfem import create_reference
 
         tdim = reference.tdim
-        poly: typing.List[FunctionInput] = [
+        poly: list[FunctionInput] = [
             tuple(tuple(p[i * tdim : (i + 1) * tdim]) for i in range(tdim))
             for p in polynomial_set_vector(tdim, tdim**2, order)
         ]
@@ -133,7 +133,7 @@ class GopalakrishnanLedererSchoberl(CiarletElement):
             (reference.tdim, reference.tdim),
         )
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -146,7 +146,7 @@ class GopalakrishnanLedererSchoberl(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -154,7 +154,7 @@ class GopalakrishnanLedererSchoberl(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order
 
     names = ["Gopalakrishnan-Lederer-Schoberl", "GLS"]

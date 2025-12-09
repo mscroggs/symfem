@@ -1,6 +1,5 @@
 """Functions to compute the degree of polynomials."""
 
-import typing
 import sympy
 from symfem.references import Reference
 from symfem.functions import ScalarFunction, Function
@@ -8,14 +7,12 @@ from symfem.basis_functions import SubbedBasisFunction
 from symfem.symbols import x
 
 
-def monomial_degree(term: sympy.core.expr.Expr, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
+def monomial_degree(term: sympy.core.expr.Expr, vars: tuple[sympy.Symbol, ...] = x) -> int:
     """Get the degree of a sympy monomial."""
     return term.subs(vars[1], vars[0]).subs(vars[2], vars[0]).as_poly(vars[0]).degree()
 
 
-def simplex_degree(
-    polynomial: sympy.core.expr.Expr, vars: typing.Tuple[sympy.Symbol, ...] = x
-) -> int:
+def simplex_degree(polynomial: sympy.core.expr.Expr, vars: tuple[sympy.Symbol, ...] = x) -> int:
     """Get the degree of a polynomial on a simplex cell.
 
     Args:
@@ -27,7 +24,7 @@ def simplex_degree(
     return max(monomial_degree(term, vars) for term in polynomial.expand().as_coefficients_dict())
 
 
-def tp_degree(polynomial: sympy.core.expr.Expr, vars: typing.Tuple[sympy.Symbol, ...] = x) -> int:
+def tp_degree(polynomial: sympy.core.expr.Expr, vars: tuple[sympy.Symbol, ...] = x) -> int:
     """Get the degree of a polynomial on a tensor product cell.
 
     Args:
@@ -45,9 +42,7 @@ def tp_degree(polynomial: sympy.core.expr.Expr, vars: typing.Tuple[sympy.Symbol,
     )
 
 
-def prism_degree(
-    polynomial: sympy.core.expr.Expr, vars: typing.Tuple[sympy.Symbol, ...] = x
-) -> int:
+def prism_degree(polynomial: sympy.core.expr.Expr, vars: tuple[sympy.Symbol, ...] = x) -> int:
     """Get the degree of a polynomial on a prism.
 
     Args:
@@ -59,9 +54,7 @@ def prism_degree(
     return tp_degree(polynomial.subs(vars[0], vars[1]), vars)
 
 
-def pyramid_degree(
-    polynomial: sympy.core.expr.Expr, vars: typing.Tuple[sympy.Symbol, ...] = x
-) -> int:
+def pyramid_degree(polynomial: sympy.core.expr.Expr, vars: tuple[sympy.Symbol, ...] = x) -> int:
     """Get the degree of a polynomial on a pyramid.
 
     Args:
@@ -76,9 +69,7 @@ def pyramid_degree(
     )
 
 
-def degree(
-    reference: Reference, polynomial: Function, vars: typing.Tuple[sympy.Symbol, ...] = x
-) -> int:
+def degree(reference: Reference, polynomial: Function, vars: tuple[sympy.Symbol, ...] = x) -> int:
     """Get the Lagrange degree of a polynomial on a reference cell.
 
     Args:

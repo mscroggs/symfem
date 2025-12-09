@@ -4,8 +4,6 @@ This element's definition appears in https://doi.org/10.1007/s00211-018-0970-6
 (Christiansen, Hu, 2018)
 """
 
-import typing
-
 import sympy
 
 from symfem.finite_element import CiarletElement
@@ -32,14 +30,14 @@ class P1Macro(CiarletElement):
         third = sympy.Rational(1, 3)
         zero = sympy.Integer(0)
         one = sympy.Integer(1)
-        tris: typing.List[SetOfPoints] = [
+        tris: list[SetOfPoints] = [
             ((zero, zero), (one, zero), (third, third)),
             ((one, zero), (zero, one), (third, third)),
             ((zero, one), (zero, zero), (third, third)),
         ]
         tris = [tuple(reference.get_point(p) for p in t) for t in tris]
         invmap = reference.get_inverse_map_to_self()
-        poly: typing.List[FunctionInput] = [
+        poly: list[FunctionInput] = [
             PiecewiseFunction({q: 1 for q in tris}, 2),
             PiecewiseFunction({q: x[0] for q in tris}, 2),
             PiecewiseFunction({q: x[1] for q in tris}, 2),
@@ -65,7 +63,7 @@ class P1Macro(CiarletElement):
         raise NotImplementedError()
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     @property
@@ -73,7 +71,7 @@ class P1Macro(CiarletElement):
         raise NotImplementedError()
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     names = ["P1 macro"]

@@ -4,8 +4,6 @@ These elements' definitions appear in https://doi.org/10.1016/j.crma.2004.12.022
 (Buffa, Christiansen, 2005)
 """
 
-import typing
-
 import sympy
 
 from symfem.finite_element import FiniteElement
@@ -22,17 +20,15 @@ class DualCiarletElement(FiniteElement):
 
     def __init__(
         self,
-        dual_coefficients: typing.List[
-            typing.List[typing.List[typing.Union[int, sympy.core.expr.Expr]]]
-        ],
+        dual_coefficients: list[list[list[int | sympy.core.expr.Expr]]],
         fine_space: str,
         reference: DualPolygon,
         order: int,
-        dof_entities: typing.List[typing.Tuple[int, int]],
+        dof_entities: list[tuple[int, int]],
         domain_dim: int,
         range_dim: int,
-        range_shape: typing.Optional[typing.Tuple[int, ...]] = None,
-        dof_directions: typing.Optional[SetOfPoints] = None,
+        range_shape: tuple[int, ...] | None = None,
+        dof_directions: SetOfPoints | None = None,
     ):
         """Create a dual element.
 
@@ -56,11 +52,11 @@ class DualCiarletElement(FiniteElement):
         super().__init__(
             reference, order, len(dual_coefficients), domain_dim, range_dim, range_shape=range_shape
         )
-        self._basis_functions: typing.Union[typing.List[Function], None] = None
+        self._basis_functions: list[Function] | None = None
         self._dof_entities = dof_entities
         self._dof_directions = dof_directions
 
-    def get_polynomial_basis(self, reshape: bool = True) -> typing.List[Function]:
+    def get_polynomial_basis(self, reshape: bool = True) -> list[Function]:
         """Get the symbolic polynomial basis for the element.
 
         Returns:
@@ -76,7 +72,7 @@ class DualCiarletElement(FiniteElement):
         """
         raise ValueError("Dual matrix not supported for barycentric dual elements.")
 
-    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> typing.List[Function]:
+    def get_basis_functions(self, use_tensor_factorisation: bool = False) -> list[Function]:
         """Get the basis functions of the element.
 
         Args:
@@ -90,11 +86,11 @@ class DualCiarletElement(FiniteElement):
         if self._basis_functions is None:
             from symfem import create_element
 
-            bfs: typing.List[Function] = []
+            bfs: list[Function] = []
             sub_e = create_element("triangle", self.fine_space, self.order)
             for coeff_list in self.dual_coefficients:
                 v0 = self.reference.origin
-                pieces: typing.Dict[SetOfPointsInput, FunctionInput] = {}
+                pieces: dict[SetOfPointsInput, FunctionInput] = {}
                 for coeffs, v1, v2 in zip(
                     coeff_list,
                     self.reference.vertices,
@@ -123,7 +119,7 @@ class DualCiarletElement(FiniteElement):
         assert self._basis_functions is not None
         return self._basis_functions
 
-    def entity_dofs(self, entity_dim: int, entity_number: int) -> typing.List[int]:
+    def entity_dofs(self, entity_dim: int, entity_number: int) -> list[int]:
         """Get the numbers of the DOFs associated with the given entity.
 
         Args:
@@ -139,7 +135,7 @@ class DualCiarletElement(FiniteElement):
                 out.append(i)
         return out
 
-    def dof_plot_positions(self) -> typing.List[PointType]:
+    def dof_plot_positions(self) -> list[PointType]:
         """Get the points to plot each DOF at on a DOF diagram.
 
         Returns:
@@ -166,7 +162,7 @@ class DualCiarletElement(FiniteElement):
 
         return positions
 
-    def dof_directions(self) -> typing.List[typing.Union[PointType, None]]:
+    def dof_directions(self) -> list[PointType | None]:
         """Get the direction associated with each DOF.
 
         Returns:
@@ -176,7 +172,7 @@ class DualCiarletElement(FiniteElement):
             return [None for d in self._dof_entities]
         return list(self._dof_directions)
 
-    def dof_entities(self) -> typing.List[typing.Tuple[int, int]]:
+    def dof_entities(self) -> list[tuple[int, int]]:
         """Get the entities that each DOF is associated with.
 
         Returns:
@@ -187,10 +183,10 @@ class DualCiarletElement(FiniteElement):
     def map_to_cell(
         self,
         vertices_in: SetOfPointsInput,
-        basis: typing.Optional[typing.List[Function]] = None,
-        forward_map: typing.Optional[PointType] = None,
-        inverse_map: typing.Optional[PointType] = None,
-    ) -> typing.List[Function]:
+        basis: list[Function] | None = None,
+        forward_map: PointType | None = None,
+        inverse_map: PointType | None = None,
+    ) -> list[Function]:
         """Map the basis onto a cell using the appropriate mapping for the element.
 
         Args:
@@ -215,9 +211,7 @@ class Dual(DualCiarletElement):
             reference: The reference element
             order: The polynomial order
         """
-        dual_coefficients: typing.List[
-            typing.List[typing.List[typing.Union[int, sympy.core.expr.Expr]]]
-        ] = []
+        dual_coefficients: list[list[list[int | sympy.core.expr.Expr]]] = []
         if order == 0:
             dual_coefficients = [[[1] for i in range(2 * reference.number_of_triangles)]]
             fine_space = "Lagrange"
@@ -252,7 +246,7 @@ class Dual(DualCiarletElement):
         raise NotImplementedError()
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     @property
@@ -260,7 +254,7 @@ class Dual(DualCiarletElement):
         raise NotImplementedError()
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     names = ["dual polynomial", "dual P", "dual"]
@@ -282,9 +276,7 @@ class BuffaChristiansen(DualCiarletElement):
             reference: The reference element
             order: The polynomial order
         """
-        dual_coefficients: typing.List[
-            typing.List[typing.List[typing.Union[int, sympy.core.expr.Expr]]]
-        ] = [
+        dual_coefficients: list[list[list[int | sympy.core.expr.Expr]]] = [
             [[0, 0, 0] for i in range(2 * reference.number_of_triangles)]
             for j in range(reference.number_of_triangles)
         ]
@@ -298,7 +290,7 @@ class BuffaChristiansen(DualCiarletElement):
                 dual_coefficients[j][(2 * j + i + 1) % N][1] = sympy.Rational(i + 1 - N // 2, N)
 
         dof_entities = [(0, i) for i in range(0, len(reference.vertices), 2)]
-        dof_directions: typing.List[PointType] = []
+        dof_directions: list[PointType] = []
         for i in range(0, len(reference.vertices), 2):
             dof_directions.append(
                 tuple(b - a for a, b in zip(reference.origin, reference.vertices[i]))
@@ -320,7 +312,7 @@ class BuffaChristiansen(DualCiarletElement):
         raise NotImplementedError()
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     @property
@@ -328,7 +320,7 @@ class BuffaChristiansen(DualCiarletElement):
         raise NotImplementedError()
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     names = ["Buffa-Christiansen", "BC"]
@@ -350,9 +342,7 @@ class RotatedBuffaChristiansen(DualCiarletElement):
             reference: The reference element
             order: The polynomial order
         """
-        dual_coefficients: typing.List[
-            typing.List[typing.List[typing.Union[int, sympy.core.expr.Expr]]]
-        ] = [
+        dual_coefficients: list[list[list[int | sympy.core.expr.Expr]]] = [
             [[0, 0, 0] for i in range(2 * reference.number_of_triangles)]
             for j in range(reference.number_of_triangles)
         ]
@@ -366,7 +356,7 @@ class RotatedBuffaChristiansen(DualCiarletElement):
                 dual_coefficients[j][(2 * j + i + 1) % N][1] = sympy.Rational(N // 2 - 1 - i, N)
 
         dof_entities = [(0, i) for i in range(0, len(reference.vertices), 2)]
-        dof_directions: typing.List[PointType] = []
+        dof_directions: list[PointType] = []
         for i in range(0, len(reference.vertices), 2):
             dof_directions.append(
                 tuple(b - a for a, b in zip(reference.origin, reference.vertices[i]))
@@ -388,7 +378,7 @@ class RotatedBuffaChristiansen(DualCiarletElement):
         raise NotImplementedError()
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     @property
@@ -396,7 +386,7 @@ class RotatedBuffaChristiansen(DualCiarletElement):
         raise NotImplementedError()
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     names = ["rotated Buffa-Christiansen", "RBC"]
