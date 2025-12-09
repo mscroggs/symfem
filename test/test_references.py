@@ -69,4 +69,3 @@ def test_reference_ordering(ReferenceClass):
         for i, e in enumerate(ref.sub_entities(dim=d)):
             for e2 in ref.sub_entities(dim=d)[:i]:
                 assert e2 < e
-
