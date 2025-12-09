@@ -40,3 +40,7 @@ jobs:
         run: |
           cd defelement
           python3 build.py ../_test_html --test auto
+      - name: Run verification
+        run: |
+          cd defelement
+          python3 verify.py --impl basix --assert-passing

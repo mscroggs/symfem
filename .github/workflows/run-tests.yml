@@ -53,30 +53,3 @@ jobs:
           key: symfem-matrix-cache-${{ github.run_id }}
           restore-keys: symfem-matrix-cache
         if: ${{ matrix.python-version == '3.14' && github.ref == 'refs/heads/main' }}
-
-  run-tests-against-basix:
-    name: Run tests against Basix
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
-    steps:
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Load matrix cache
-        id: cache-restore
-        uses: actions/cache/restore@v3
-        with:
-          path: /home/runner/.cache/symfem
-          key: symfem-matrix-cache
-      - run: sudo apt-get install -y libopenblas-dev
-        name: Install OpenBLAS
-      - run: pip install git+https://github.com/FEniCS/basix.git git+https://github.com/FEniCS/ufl.git
-        name: Install Basix
-      - uses: actions/checkout@v4
-      - run: pip install .[test] pytest-xdist
-        name: Install Symfem
-      - run: python3 -m pytest -n=auto --durations=50 test/test_against_basix.py --has-basix 1 -W error
-        name: Run unit tests
