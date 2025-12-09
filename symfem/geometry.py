@@ -1,6 +1,7 @@
 """Geometry."""
 
 import sympy
+import typing
 
 __all__ = [
     "PointType",
@@ -17,11 +18,10 @@ __all__ = [
 
 PointType = tuple[sympy.core.expr.Expr, ...]
 SetOfPoints = tuple[PointType, ...]
-PointTypeInput = (
-    tuple[sympy.core.expr.Expr | int, ...]
-    | list[sympy.core.expr.Expr | int]
-    | sympy.matrices.dense.MutableDenseMatrix
-)
+PointTypeInput = typing.Union[tuple[sympy.core.expr.Expr | int, ...],
+    list[sympy.core.expr.Expr | int],
+    sympy.matrices.dense.MutableDenseMatrix
+]
 SetOfPointsInput = tuple[PointTypeInput, ...] | list[PointTypeInput]
 
 

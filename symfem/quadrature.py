@@ -1,6 +1,7 @@
 """Quadrature definitions."""
 
 import sympy
+import typing
 
 try:
     import basix
@@ -11,7 +12,7 @@ except ModuleNotFoundError:
 
 __all__ = ["Scalar", "equispaced", "lobatto", "radau", "legendre", "get_quadrature"]
 
-Scalar = sympy.core.expr.Expr | int
+Scalar = typing.Union[sympy.core.expr.Expr, int]
 
 
 def equispaced(n: int) -> tuple[list[Scalar], list[Scalar]]:

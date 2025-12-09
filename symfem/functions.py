@@ -24,15 +24,15 @@ __all__ = [
     "parse_function_list_input",
 ]
 
-SingleSympyFormat = (
-    sympy.core.expr.Expr
-    | tuple[sympy.core.expr.Expr, ...]
-    | sympy.matrices.dense.MutableDenseMatrix
-)
-SympyFormat = (
-    SingleSympyFormat | dict[tuple[tuple[sympy.core.expr.Expr, ...], ...], SingleSympyFormat]
-)
-_ValuesToSubstitute = tuple[typing.Any, ...] | list[typing.Any] | typing.Any
+SingleSympyFormat = typing.Union[
+    sympy.core.expr.Expr,
+    tuple[sympy.core.expr.Expr, ...],
+    sympy.matrices.dense.MutableDenseMatrix,
+]
+SympyFormat = typing.Union[
+    SingleSympyFormat, dict[tuple[tuple[sympy.core.expr.Expr, ...], ...], SingleSympyFormat]
+]
+_ValuesToSubstitute = typing.Union[tuple[typing.Any, ...], list[typing.Any], typing.Any]
 
 
 def _to_sympy_format(item: typing.Any) -> SympyFormat:
@@ -1803,18 +1803,18 @@ class MatrixFunction(Function):
         return max(f.maximum_degree(cell) for row in self._mat for f in row)
 
 
-FunctionInput = (
-    Function
-    | sympy.core.expr.Expr
-    | int
-    | tuple[sympy.core.expr.Expr | int | Function, ...]
-    | list[sympy.core.expr.Expr | int | Function]
-    | tuple[tuple[sympy.core.expr.Expr | int | Function, ...], ...]
-    | tuple[list[sympy.core.expr.Expr | int | Function], ...]
-    | list[tuple[sympy.core.expr.Expr | int | Function, ...]]
-    | list[list[sympy.core.expr.Expr | int | Function]]
-    | sympy.matrices.dense.MutableDenseMatrix
-)
+FunctionInput = typing.Union[
+    Function,
+    sympy.core.expr.Expr,
+    int,
+    tuple[sympy.core.expr.Expr | int | Function, ...],
+    list[sympy.core.expr.Expr | int | Function],
+    tuple[tuple[sympy.core.expr.Expr | int | Function, ...], ...],
+    tuple[list[sympy.core.expr.Expr | int | Function], ...],
+    list[tuple[sympy.core.expr.Expr | int | Function, ...]],
+    list[list[sympy.core.expr.Expr | int | Function]],
+    sympy.matrices.dense.MutableDenseMatrix,
+]
 
 
 def parse_function_input(f: FunctionInput) -> Function:
