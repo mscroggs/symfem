@@ -1,0 +1,2 @@
+- Update typing for Python 3.10
+- Use consistent entity numbering by lowest vertex indices
