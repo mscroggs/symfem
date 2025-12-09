@@ -132,4 +132,4 @@ class BernardiRaugel(CiarletElement):
     max_order = {"triangle": 1, "tetrahedron": 2}
     continuity = "L2"
     value_type = "vector"
-    last_updated = "2024.10.1"
+    last_updated = "2025.12"

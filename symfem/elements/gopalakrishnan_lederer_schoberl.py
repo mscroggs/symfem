@@ -162,4 +162,4 @@ class GopalakrishnanLedererSchoberl(CiarletElement):
     min_order = 0
     continuity = "inner H(curl div)"
     value_type = "matrix"
-    last_updated = "2024.03"
+    last_updated = "2025.12"

@@ -61,7 +61,7 @@ class Enrichment(CiarletElement):
     max_order = 1
     continuity = "C0"
     value_type = "vector"
-    last_updated = "2023.05"
+    last_updated = "2025.12"
 
 
 class VectorEnrichedGalerkin(EnrichedElement):
@@ -102,4 +102,4 @@ class VectorEnrichedGalerkin(EnrichedElement):
     min_order = 1
     continuity = "C0"
     value_type = "vector"
-    last_updated = "2023.05"
+    last_updated = "2025.12"

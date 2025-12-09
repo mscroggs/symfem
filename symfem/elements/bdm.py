@@ -79,4 +79,4 @@ class BDM(CiarletElement):
     min_order = 1
     continuity = "H(div)"
     value_type = "vector"
-    last_updated = "2025.10"
+    last_updated = "2025.12"

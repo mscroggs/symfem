@@ -150,4 +150,4 @@ class HsiehCloughTocher(CiarletElement):
     # continuity = "C1"
     continuity = "C0"
     value_type = "scalar macro"
-    last_updated = "2023.06"
+    last_updated = "2025.12"

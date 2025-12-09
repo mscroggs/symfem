@@ -133,4 +133,4 @@ class WuXu(CiarletElement):
     continuity = "C0"
     # continuity = "C{order}"
     value_type = "scalar"
-    last_updated = "2025.03"
+    last_updated = "2025.12"

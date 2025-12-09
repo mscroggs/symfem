@@ -124,4 +124,4 @@ class MorleyWangXu(CiarletElement):
     max_order = {"interval": 1, "triangle": 2, "tetrahedron": 3}
     continuity = "C{order}"
     value_type = "scalar"
-    last_updated = "2023.06"
+    last_updated = "2025.12"

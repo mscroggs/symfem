@@ -143,4 +143,4 @@ class HellanHerrmannJohnson(CiarletElement):
     min_order = 0
     continuity = "inner H(div)"
     value_type = "symmetric matrix"
-    last_updated = "2024.02"
+    last_updated = "2025.12"
