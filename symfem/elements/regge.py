@@ -64,7 +64,7 @@ class Regge(CiarletElement):
                     entity = reference.sub_entity(edim, e_n)
                     for i in product(range(1, order + 2), repeat=edim):
                         if sum(i) < order + 2:
-                            for edge in entity.edges[::-1]:
+                            for edge in entity.edges:
                                 tangent = tuple(
                                     b - a
                                     for a, b in zip(
@@ -78,7 +78,7 @@ class Regge(CiarletElement):
                                             o
                                             + sum(
                                                 sympy.Rational(a[j] * b, order + 2)
-                                                for a, b in zip(entity.axes, i[::-1])
+                                                for a, b in zip(entity.axes, i)
                                             )
                                             for j, o in enumerate(entity.origin)
                                         ),
@@ -197,6 +197,7 @@ class Regge(CiarletElement):
     continuity = "inner H(curl)"
     value_type = "symmetric matrix"
     last_updated = "2025.12"
+    cache = False
 
 
 class ReggeTP(CiarletElement):

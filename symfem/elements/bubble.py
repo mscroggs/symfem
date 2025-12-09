@@ -117,7 +117,6 @@ class Bubble(CiarletElement):
     value_type = "scalar"
     last_updated = "2025.12"
 
-
 class BubbleEnrichedLagrange(CiarletElement):
     """Bubble enriched Lagrange element."""
 
