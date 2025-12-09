@@ -29,7 +29,7 @@ class NedelecFirstKind(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
         poly += Hcurl_polynomials(reference.tdim, reference.tdim, order + 1)
         dofs: ListOfFunctionals = make_integral_moment_dofs(
@@ -42,7 +42,7 @@ class NedelecFirstKind(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -55,7 +55,7 @@ class NedelecFirstKind(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -63,7 +63,7 @@ class NedelecFirstKind(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
     names = ["Nedelec", "Nedelec1", "N1curl"]
@@ -85,7 +85,7 @@ class NedelecSecondKind(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
 
         dofs: ListOfFunctionals = make_integral_moment_dofs(
@@ -98,7 +98,7 @@ class NedelecSecondKind(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -111,7 +111,7 @@ class NedelecSecondKind(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -119,7 +119,7 @@ class NedelecSecondKind(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order
 
     names = ["Nedelec2", "N2curl"]

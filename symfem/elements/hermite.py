@@ -4,8 +4,6 @@ This element's definition appears in https://doi.org/10.1016/0045-7825(72)90006-
 (Ciarlet, Raviart, 1972)
 """
 
-import typing
-
 from symfem.finite_element import CiarletElement
 from symfem.functionals import DerivativePointEvaluation, ListOfFunctionals, PointEvaluation
 from symfem.functions import FunctionInput
@@ -42,7 +40,7 @@ class Hermite(CiarletElement):
             sub_entity = reference.sub_entity(2, e_n)
             dofs.append(PointEvaluation(reference, sub_entity.midpoint(), entity=(2, e_n)))
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
@@ -52,7 +50,7 @@ class Hermite(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -60,7 +58,7 @@ class Hermite(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order
 
     names = ["Hermite"]

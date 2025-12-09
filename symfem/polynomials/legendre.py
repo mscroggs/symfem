@@ -8,12 +8,12 @@ from symfem.functions import ScalarFunction
 from symfem.symbols import AxisVariablesNotSingle, x
 from symfem.polynomials.jacobi import jacobi_polynomial
 
-__all__: typing.List[str] = []
+__all__: list[str] = []
 
 
 def orthogonal_basis_interval(
     order: int, variables: AxisVariablesNotSingle = [x[0]]
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """Create a basis of orthogonal polynomials.
 
     Args:
@@ -30,7 +30,7 @@ def orthogonal_basis_interval(
 
 def orthogonal_basis_triangle(
     order: int, variables: AxisVariablesNotSingle = [x[0], x[1]]
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """Create a basis of orthogonal polynomials.
 
     Args:
@@ -53,7 +53,7 @@ def orthogonal_basis_triangle(
 
 def orthogonal_basis_quadrilateral(
     order: int, variables: AxisVariablesNotSingle = [x[0], x[1]]
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """Create a basis of orthogonal polynomials.
 
     Args:
@@ -73,7 +73,7 @@ def orthogonal_basis_quadrilateral(
 
 def orthogonal_basis_tetrahedron(
     order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """Create a basis of orthogonal polynomials.
 
     Args:
@@ -99,7 +99,7 @@ def orthogonal_basis_tetrahedron(
 
 def orthogonal_basis_hexahedron(
     order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """Create a basis of orthogonal polynomials.
 
     Args:
@@ -120,7 +120,7 @@ def orthogonal_basis_hexahedron(
 
 def orthogonal_basis_prism(
     order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """Create a basis of orthogonal polynomials.
 
     Args:
@@ -141,7 +141,7 @@ def orthogonal_basis_prism(
 
 def orthogonal_basis_lagrange_pyramid(
     order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """Create a basis of orthogonal rationomials.
 
     Args:
@@ -166,7 +166,7 @@ def orthogonal_basis_lagrange_pyramid(
 
 def orthogonal_basis_full_pyramid(
     order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """Create a basis of orthogonal rationomials.
 
     Args:
@@ -191,9 +191,9 @@ def orthogonal_basis_full_pyramid(
 def orthogonal_basis(
     cell: str,
     order: int,
-    variables: typing.Optional[AxisVariablesNotSingle] = None,
+    variables: AxisVariablesNotSingle | None = None,
     ptype: str = "Lagrange",
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """Create a basis of orthogonal polynomials.
 
     Args:
@@ -205,7 +205,7 @@ def orthogonal_basis(
     Returns:
         A set of orthogonal polynomials
     """
-    args: typing.List[typing.Any] = [order]
+    args: list[typing.Any] = [order]
     if variables is not None:
         args.append(variables)
 
@@ -236,9 +236,9 @@ def orthogonal_basis(
 def orthonormal_basis(
     cell: str,
     order: int,
-    variables: typing.Optional[AxisVariablesNotSingle] = None,
+    variables: AxisVariablesNotSingle | None = None,
     ptype: str = "Lagrange",
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """Create a basis of orthonormal polynomials.
 
     Args:

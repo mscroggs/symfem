@@ -4,8 +4,6 @@ This element's definition appears in https://doi.org/10.1090/S0025-5718-2012-026
 (Wang, Xu, 2013)
 """
 
-import typing
-
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     IntegralAgainst,
@@ -34,7 +32,7 @@ class MorleyWangXu(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
 
         dofs: ListOfFunctionals = []
@@ -107,7 +105,7 @@ class MorleyWangXu(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -115,7 +113,7 @@ class MorleyWangXu(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order
 
     names = ["Morley-Wang-Xu", "MWX"]

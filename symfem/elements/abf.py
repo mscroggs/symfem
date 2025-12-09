@@ -38,7 +38,7 @@ class ArnoldBoffiFalk(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += [(x[0] ** i * x[1] ** j, 0) for i in range(order + 3) for j in range(order + 1)]
         poly += [(0, x[0] ** i * x[1] ** j) for i in range(order + 1) for j in range(order + 3)]
 
@@ -69,7 +69,7 @@ class ArnoldBoffiFalk(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -82,7 +82,7 @@ class ArnoldBoffiFalk(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 2
 
     @property
@@ -90,7 +90,7 @@ class ArnoldBoffiFalk(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order * 2 + 2
 
     names = ["Arnold-Boffi-Falk", "ABF"]

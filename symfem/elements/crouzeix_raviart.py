@@ -66,13 +66,13 @@ class CrouzeixRaviart(CiarletElement):
                     )
                 )
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
 
         self.variant = variant
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -85,7 +85,7 @@ class CrouzeixRaviart(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -93,7 +93,7 @@ class CrouzeixRaviart(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order
 
     names = ["Crouzeix-Raviart", "CR", "Crouzeix-Falk", "CF"]

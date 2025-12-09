@@ -1,15 +1,13 @@
 """Dual polynomials."""
 
-import typing
-
 import sympy
 
 from symfem.functions import ScalarFunction
 
-__all__: typing.List[str] = []
+__all__: list[str] = []
 
 
-def l2_dual(cell: str, poly: typing.List[ScalarFunction]) -> typing.List[ScalarFunction]:
+def l2_dual(cell: str, poly: list[ScalarFunction]) -> list[ScalarFunction]:
     """Compute the L2 dual of a set of polynomials.
 
     Args:

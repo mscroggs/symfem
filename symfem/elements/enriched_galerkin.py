@@ -4,8 +4,6 @@ This element's definition appears in https://doi.org/10.1137/080722953
 (Sun, Liu, 2009).
 """
 
-import typing
-
 from symfem.elements.lagrange import Lagrange
 from symfem.elements.q import Q
 from symfem.finite_element import EnrichedElement
@@ -34,7 +32,7 @@ class EnrichedGalerkin(EnrichedElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -42,7 +40,7 @@ class EnrichedGalerkin(EnrichedElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         if self.reference.name in ["quadrilateral", "hexahedron"]:
             return self.order * self.reference.tdim
         return self.order

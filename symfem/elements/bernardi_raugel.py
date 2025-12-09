@@ -4,8 +4,6 @@ This element's definition appears in https://doi.org/10.2307/2007793
 (Bernardi and Raugel, 1985)
 """
 
-import typing
-
 import sympy
 
 from symfem.elements.lagrange import Lagrange
@@ -41,7 +39,7 @@ class BernardiRaugel(CiarletElement):
 
         tdim = reference.tdim
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
 
         p = Lagrange(reference, 1, variant="equispaced")
@@ -115,7 +113,7 @@ class BernardiRaugel(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + self.reference.tdim - 1
 
     @property
@@ -123,7 +121,7 @@ class BernardiRaugel(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order + self.reference.tdim - 1
 
     names = ["Bernardi-Raugel"]

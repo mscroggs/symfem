@@ -215,7 +215,7 @@ class BasisFunction(Function):
         """
         return self.get_function().directional_derivative(direction)
 
-    def jacobian_component(self, component: typing.Tuple[int, int]) -> Function:
+    def jacobian_component(self, component: tuple[int, int]) -> Function:
         """Compute a component of the jacobian.
 
         Args:
@@ -406,7 +406,7 @@ class SubbedBasisFunction(BasisFunction):
         return self.f.get_function().subs(self._vars, self._values)
 
     @property
-    def shape(self) -> typing.Tuple[int, ...]:
+    def shape(self) -> tuple[int, ...]:
         """Get the value shape of the function.
 
         Returns:

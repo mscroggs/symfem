@@ -34,7 +34,7 @@ class RannacherTurek(CiarletElement):
             pt = reference.sub_entity(reference.tdim - 1, e_n).midpoint()
             dofs.append(PointEvaluation(reference, pt, entity=(reference.tdim - 1, e_n)))
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         if reference.name == "quadrilateral":
             poly += [1, x[0], x[1], x[0] ** 2 - x[1] ** 2]
         else:
@@ -42,7 +42,7 @@ class RannacherTurek(CiarletElement):
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -55,7 +55,7 @@ class RannacherTurek(CiarletElement):
         return 0
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return 2
 
     @property
@@ -63,7 +63,7 @@ class RannacherTurek(CiarletElement):
         return 1
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return 2
 
     names = ["Rannacher-Turek"]

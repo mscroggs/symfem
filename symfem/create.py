@@ -12,8 +12,8 @@ from symfem.geometry import parse_set_of_points_input as _parse_set_of_points_in
 
 _folder = _os.path.dirname(_os.path.realpath(__file__))
 
-_elementmap: _typing.Dict[str, _typing.Dict[str, _typing.Type]] = {}
-_elementlist: _typing.List[_typing.Type] = []
+_elementmap: dict[str, dict[str, _typing.Type]] = {}
+_elementlist: list[_typing.Type] = []
 
 __all__ = ["add_element", "create_reference", "create_element"]
 
@@ -53,17 +53,19 @@ for _file in _os.listdir(_os.path.join(_folder, "elements")):
 
         for _class_name in dir(_module):
             _element = getattr(_module, _class_name)
-            if (
-                isinstance(_element, type)
-                and issubclass(_element, _FiniteElement)
-                and _element != _FiniteElement
-                and len(_element.names) > 0
-            ):
-                add_element(_element)
+            try:
+                if (
+                    issubclass(_element, _FiniteElement)
+                    and _element != _FiniteElement
+                    and len(_element.names) > 0
+                ):
+                    add_element(_element)
+            except TypeError:
+                pass
 
 
 def create_reference(
-    cell_type: str, vertices: _typing.Optional[_SetOfPointsInput] = None
+    cell_type: str, vertices: _SetOfPointsInput | None = None
 ) -> _references.Reference:
     """Make a reference cell.
 
@@ -104,7 +106,7 @@ def create_element(
     cell_type: str,
     element_type: str,
     order: int,
-    vertices: _typing.Optional[_SetOfPointsInput] = None,
+    vertices: _SetOfPointsInput | None = None,
     **kwargs: _typing.Any,
 ) -> _FiniteElement:
     """Make a finite element.

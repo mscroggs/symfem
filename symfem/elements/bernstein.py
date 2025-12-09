@@ -5,8 +5,6 @@ https://doi.org/10.1007/s00211-010-0327-2 (Kirby, 2011) and
 https://doi.org/10.1137/11082539X (Ainsworth, Andriamaro, Davydov, 2011)
 """
 
-import typing
-
 import sympy
 
 from symfem.finite_element import CiarletElement
@@ -39,7 +37,7 @@ def single_choose(n: int, k: int) -> sympy.core.expr.Expr:
     return out
 
 
-def choose(n: int, powers: typing.List[int]) -> sympy.core.expr.Expr:
+def choose(n: int, powers: list[int]) -> sympy.core.expr.Expr:
     """Calculate choose function of a set of powers.
 
     Args:
@@ -58,7 +56,7 @@ def choose(n: int, powers: typing.List[int]) -> sympy.core.expr.Expr:
 
 def bernstein_polynomials(
     n: int, d: int, vars: AxisVariablesNotSingle = x
-) -> typing.List[sympy.core.expr.Expr]:
+) -> list[sympy.core.expr.Expr]:
     """Return a list of Bernstein polynomials.
 
     Args:
@@ -103,7 +101,7 @@ class BernsteinFunctional(BaseFunctional):
         integral_domain: Reference,
         index: int,
         degree: int,
-        entity: typing.Tuple[int, int],
+        entity: tuple[int, int],
     ):
         """Create the functional.
 
@@ -155,7 +153,7 @@ class BernsteinFunctional(BaseFunctional):
         integrand = function.subs(x, point) * self.moment
         return integrand.integral(self.ref)
 
-    def get_tex(self) -> typing.Tuple[str, typing.List[str]]:
+    def get_tex(self) -> tuple[str, list[str]]:
         """Get a representation of the functional as TeX, and list of terms involved.
 
         Returns:
@@ -219,7 +217,7 @@ class Bernstein(CiarletElement):
             reference: The reference element
             order: The polynomial order
         """
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += polynomial_set_1d(reference.tdim, order)
 
         dofs: ListOfFunctionals = []
@@ -272,7 +270,7 @@ class Bernstein(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -280,7 +278,7 @@ class Bernstein(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order
 
     names = ["Bernstein", "Bernstein-Bezier"]

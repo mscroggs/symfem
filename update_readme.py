@@ -1,7 +1,5 @@
 """Script to update the list of available elements in README.md."""
 
-import typing
-
 import symfem
 
 cells = [
@@ -14,7 +12,7 @@ cells = [
     "pyramid",
     "dual polygon",
 ]
-elementlist: typing.Dict[str, typing.List[str]] = {i: [] for i in cells}
+elementlist: dict[str, list[str]] = {i: [] for i in cells}
 
 for e in symfem.create._elementlist:
     name = e.names[0]

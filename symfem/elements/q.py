@@ -86,7 +86,7 @@ class Q(CiarletElement):
                             )
                         )
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += quolynomial_set_1d(reference.tdim, order)
         poly = reference.map_polyset_from_default(poly)
 
@@ -95,7 +95,7 @@ class Q(CiarletElement):
 
     def get_tensor_factorisation(
         self,
-    ) -> typing.List[typing.Tuple[str, typing.List[FiniteElement], typing.List[int]]]:
+    ) -> list[tuple[str, list[FiniteElement], list[int]]]:
         """Get the representation of the element as a tensor product.
 
         Returns:
@@ -138,7 +138,7 @@ class Q(CiarletElement):
 
         return [("scalar", [interval_q for i in range(self.reference.tdim)], perm)]
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -151,7 +151,7 @@ class Q(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -159,7 +159,7 @@ class Q(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim
 
     names = ["Q", "Lagrange", "P"]
@@ -186,7 +186,7 @@ class VectorQ(CiarletElement):
 
         scalar_space = Q(reference, order, variant)
         dofs: ListOfFunctionals = []
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         if reference.tdim == 1:
             for p in scalar_space.dofs:
                 dofs.append(PointEvaluation(reference, p.dof_point(), entity=p.entity))
@@ -206,7 +206,7 @@ class VectorQ(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -219,7 +219,7 @@ class VectorQ(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order
 
     @property
@@ -227,7 +227,7 @@ class VectorQ(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim
 
     names = ["vector Q", "vQ"]
@@ -252,7 +252,7 @@ class Nedelec(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
         poly += Hcurl_quolynomials(reference.tdim, reference.tdim, order + 1)
 
@@ -266,7 +266,7 @@ class Nedelec(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -279,7 +279,7 @@ class Nedelec(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -287,7 +287,7 @@ class Nedelec(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return (self.order + 1) * self.reference.tdim - 1
 
     names = ["NCE", "RTCE", "Qcurl", "Nedelec", "Ncurl"]
@@ -312,7 +312,7 @@ class RaviartThomas(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
         poly += Hdiv_quolynomials(reference.tdim, reference.tdim, order + 1)
 
@@ -325,7 +325,7 @@ class RaviartThomas(CiarletElement):
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
-    def init_kwargs(self) -> typing.Dict[str, typing.Any]:
+    def init_kwargs(self) -> dict[str, typing.Any]:
         """Return the kwargs used to create this element.
 
         Returns:
@@ -338,7 +338,7 @@ class RaviartThomas(CiarletElement):
         return self.order
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         return self.order + 1
 
     @property
@@ -346,7 +346,7 @@ class RaviartThomas(CiarletElement):
         return self.order
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim + 1
 
     names = ["NCF", "RTCF", "Qdiv"]

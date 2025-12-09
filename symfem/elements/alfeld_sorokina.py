@@ -4,8 +4,6 @@ This element's definition appears in https://doi.org/10.1007/s10543-015-0557-x
 (Alfeld, Sorokina, 2015)
 """
 
-import typing
-
 import sympy
 
 from symfem.finite_element import CiarletElement
@@ -120,7 +118,7 @@ class AlfeldSorokina(CiarletElement):
             )
         )
 
-        poly: typing.List[FunctionInput] = []
+        poly: list[FunctionInput] = []
         poly += [PiecewiseFunction({i: j for i, j in zip(subs, p)}, 2) for p in piece_list]
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
@@ -130,7 +128,7 @@ class AlfeldSorokina(CiarletElement):
         raise NotImplementedError()
 
     @property
-    def lagrange_superdegree(self) -> typing.Optional[int]:
+    def lagrange_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     @property
@@ -138,7 +136,7 @@ class AlfeldSorokina(CiarletElement):
         raise NotImplementedError()
 
     @property
-    def polynomial_superdegree(self) -> typing.Optional[int]:
+    def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
     names = ["Alfeld-Sorokina", "AS"]

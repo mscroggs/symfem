@@ -1,17 +1,16 @@
 """Polynomial sets."""
 
-import typing
 from itertools import product
 
 from symfem.functions import ScalarFunction, VectorFunction
 from symfem.symbols import AxisVariablesNotSingle, x
 
-__all__: typing.List[str] = []
+__all__: list[str] = []
 
 
 def polynomial_set_1d(
     dim: int, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """One dimensional polynomial set.
 
     Args:
@@ -42,7 +41,7 @@ def polynomial_set_1d(
 
 def polynomial_set_vector(
     domain_dim: int, range_dim: int, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[VectorFunction]:
+) -> list[VectorFunction]:
     """Polynomial set.
 
     Args:
@@ -64,7 +63,7 @@ def polynomial_set_vector(
 
 def Hdiv_polynomials(
     domain_dim: int, range_dim: int, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[VectorFunction]:
+) -> list[VectorFunction]:
     """Hdiv conforming polynomial set.
 
     Args:
@@ -88,7 +87,7 @@ def Hdiv_polynomials(
             for j in range(order)
         ]
     if domain_dim == 3:
-        basis: typing.List[VectorFunction] = []
+        basis: list[VectorFunction] = []
         for j in range(order):
             for k in range(order - j):
                 p = variables[0] ** (order - 1 - j - k) * variables[1] ** j * variables[2] ** k
@@ -100,7 +99,7 @@ def Hdiv_polynomials(
 
 def Hcurl_polynomials(
     domain_dim: int, range_dim: int, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[VectorFunction]:
+) -> list[VectorFunction]:
     """Hcurl conforming polynomial set.
 
     Args:
@@ -124,7 +123,7 @@ def Hcurl_polynomials(
             for j in range(order)
         ]
     if domain_dim == 3:
-        poly: typing.List[VectorFunction] = []
+        poly: list[VectorFunction] = []
         poly += [
             VectorFunction(
                 (
@@ -167,7 +166,7 @@ def Hcurl_polynomials(
 
 def quolynomial_set_1d(
     dim: int, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """One dimensional quolynomial set.
 
     Args:
@@ -189,7 +188,7 @@ def quolynomial_set_1d(
 
 def quolynomial_set_vector(
     domain_dim: int, range_dim: int, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[VectorFunction]:
+) -> list[VectorFunction]:
     """Quolynomial set.
 
     Args:
@@ -211,7 +210,7 @@ def quolynomial_set_vector(
 
 def Hdiv_quolynomials(
     domain_dim: int, range_dim: int, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[VectorFunction]:
+) -> list[VectorFunction]:
     """Hdiv conforming quolynomial set.
 
     Args:
@@ -224,7 +223,7 @@ def Hdiv_quolynomials(
         A set of polynomials
     """
     assert domain_dim == range_dim
-    basis: typing.List[VectorFunction] = []
+    basis: list[VectorFunction] = []
     for d in range(domain_dim):
         for j in product(range(order), repeat=domain_dim - 1):
             poly = 1
@@ -236,7 +235,7 @@ def Hdiv_quolynomials(
 
 def Hcurl_quolynomials(
     domain_dim: int, range_dim: int, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[VectorFunction]:
+) -> list[VectorFunction]:
     """Hcurl conforming quolynomial set.
 
     Args:
@@ -249,7 +248,7 @@ def Hcurl_quolynomials(
         A set of polynomials
     """
     assert domain_dim == range_dim
-    basis: typing.List[VectorFunction] = []
+    basis: list[VectorFunction] = []
     for d in range(domain_dim):
         for j in product(
             *[range(order) if i == d else range(order + 1) for i in range(domain_dim)]
@@ -264,8 +263,8 @@ def Hcurl_quolynomials(
 
 
 def serendipity_indices(
-    total: int, linear: int, dim: int, done: typing.Optional[typing.List[int]] = None
-) -> typing.List[typing.List[int]]:
+    total: int, linear: int, dim: int, done: list[int] | None = None
+) -> list[list[int]]:
     """Get the set indices for a serendipity polynomial set.
 
     Args:
@@ -292,7 +291,7 @@ def serendipity_indices(
 
 def serendipity_set_1d(
     dim: int, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """One dimensional serendipity set.
 
     Args:
@@ -303,7 +302,7 @@ def serendipity_set_1d(
     Returns:
         A set of polynomials
     """
-    basis: typing.List[ScalarFunction] = []
+    basis: list[ScalarFunction] = []
     for s in range(order + 1, order + dim + 1):
         for i in serendipity_indices(s, s - order, dim):
             p = 1
@@ -315,7 +314,7 @@ def serendipity_set_1d(
 
 def serendipity_set_vector(
     domain_dim: int, range_dim: int, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[VectorFunction]:
+) -> list[VectorFunction]:
     """Serendipity set.
 
     Args:
@@ -337,7 +336,7 @@ def serendipity_set_vector(
 
 def Hdiv_serendipity(
     domain_dim: int, range_dim: int, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[VectorFunction]:
+) -> list[VectorFunction]:
     """Hdiv conforming serendipity set.
 
     Args:
@@ -394,7 +393,7 @@ def Hdiv_serendipity(
 
 def Hcurl_serendipity(
     domain_dim: int, range_dim: int, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[VectorFunction]:
+) -> list[VectorFunction]:
     """Hcurl conforming serendipity set.
 
     Args:
@@ -417,7 +416,7 @@ def Hcurl_serendipity(
             ),
         ]
     if domain_dim == 3:
-        out: typing.List[VectorFunction] = []
+        out: list[VectorFunction] = []
         if order == 1:
             out += [
                 VectorFunction((0, variables[0] * variables[2], -variables[0] * variables[1])),
@@ -455,7 +454,7 @@ def Hcurl_serendipity(
 
 def prism_polynomial_set_1d(
     dim: int, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """One dimensional polynomial set.
 
     Args:
@@ -477,7 +476,7 @@ def prism_polynomial_set_1d(
 
 def prism_polynomial_set_vector(
     domain_dim: int, range_dim: int, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[VectorFunction]:
+) -> list[VectorFunction]:
     """Polynomial set for a prism.
 
     Args:
@@ -499,7 +498,7 @@ def prism_polynomial_set_vector(
 
 def pyramid_polynomial_set_1d(
     dim: int, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """One dimensional polynomial set.
 
     Args:
@@ -521,7 +520,7 @@ def pyramid_polynomial_set_1d(
 
 def pyramid_polynomial_set_vector(
     domain_dim: int, range_dim: int, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[VectorFunction]:
+) -> list[VectorFunction]:
     """Polynomial set for a pyramid.
 
     Args:
@@ -543,7 +542,7 @@ def pyramid_polynomial_set_vector(
 
 def polynomial_set(
     cell: str, order: int, variables: AxisVariablesNotSingle = x
-) -> typing.List[ScalarFunction]:
+) -> list[ScalarFunction]:
     """One dimensional polynomial set for a cell.
 
     Args:
