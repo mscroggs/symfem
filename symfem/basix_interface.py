@@ -132,30 +132,40 @@ def _create_custom_element_args(
     ]
 
     for dof in element.dofs:
+        entity = dof.entity
+        if ref.name == "triangle":
+            if entity[0] == 1:
+                entity[1] = [2, 1, 0][entity[1]]
+        elif ref.name == "tetrahedron":
+            if entity[0] == 1:
+                entity[1] = [5, 4, 3, 2, 1, 0][entity[1]]
+            elif entity[0] == 2:
+                entity[1] = [3, 2, 1, 0][entity[1]]
+
         dof_p, _dof_w = dof.discrete(superdegree)
         dof_w = np.array(_dof_w)
-        shape = dof_wts[dof.entity[0]][dof.entity[1]].shape
+        shape = dof_wts[entity[0]][entity[1]].shape
         new_dof_wts = np.zeros((shape[0] + 1, shape[1], shape[2], shape[3]))
-        new_dof_wts[: shape[0], :, :, :] = dof_wts[dof.entity[0]][dof.entity[1]]
+        new_dof_wts[: shape[0], :, :, :] = dof_wts[entity[0]][entity[1]]
         for p_i, pt in enumerate(dof_p):
-            dof_wts[dof.entity[0]][dof.entity[1]] = new_dof_wts
-            for i, q in enumerate(dof_pts[dof.entity[0]][dof.entity[1]]):
+            dof_wts[entity[0]][entity[1]] = new_dof_wts
+            for i, q in enumerate(dof_pts[entity[0]][entity[1]]):
                 if np.allclose(pt, q):
                     point_n = i
                     break
             else:
-                point_n = dof_pts[dof.entity[0]][dof.entity[1]].shape[0]
+                point_n = dof_pts[entity[0]][entity[1]].shape[0]
 
                 new_dof_pts = np.zeros((point_n + 1, ref.gdim))
-                new_dof_pts[:point_n, :] = dof_pts[dof.entity[0]][dof.entity[1]]
+                new_dof_pts[:point_n, :] = dof_pts[entity[0]][entity[1]]
                 new_dof_pts[point_n, :] = pt
-                dof_pts[dof.entity[0]][dof.entity[1]] = new_dof_pts
+                dof_pts[entity[0]][entity[1]] = new_dof_pts
 
-                shape = dof_wts[dof.entity[0]][dof.entity[1]].shape
+                shape = dof_wts[entity[0]][entity[1]].shape
                 new_dof_wts = np.zeros((shape[0], shape[1], shape[2] + 1, shape[3]))
-                new_dof_wts[:, :, : shape[2], :] = dof_wts[dof.entity[0]][dof.entity[1]]
-                dof_wts[dof.entity[0]][dof.entity[1]] = new_dof_wts
-            dof_wts[dof.entity[0]][dof.entity[1]][-1, :, point_n, :] = dof_w[:, p_i, :]
+                new_dof_wts[:, :, : shape[2], :] = dof_wts[entity[0]][entity[1]]
+                dof_wts[entity[0]][entity[1]] = new_dof_wts
+            dof_wts[entity[0]][entity[1]][-1, :, point_n, :] = dof_w[:, p_i, :]
 
     return [
         cell,
