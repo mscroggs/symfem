@@ -197,7 +197,6 @@ class Regge(CiarletElement):
     continuity = "inner H(curl)"
     value_type = "symmetric matrix"
     last_updated = "2025.12"
-    cache = False
 
 
 class ReggeTP(CiarletElement):
