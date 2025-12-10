@@ -69,3 +69,21 @@ def test_reference_ordering(ReferenceClass):
         for i, e in enumerate(ref.sub_entities(dim=d)):
             for e2 in ref.sub_entities(dim=d)[:i]:
                 assert e2 < e
+
+
+@pytest.mark.parametrize(
+    "ReferenceClass",
+    [
+        references.Interval,
+        references.Triangle,
+        references.Tetrahedron,
+        references.Quadrilateral,
+        references.Prism,
+        references.Pyramid,
+    ],
+)
+def test_vertex_ordering(ReferenceClass):
+    ref = ReferenceClass()
+    for i, e in enumerate(ref.vertices):
+        for e2 in ref.vertices[:i]:
+            assert e2[::-1] < e[::-1]
