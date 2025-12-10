@@ -69,9 +69,9 @@ test_elements: dict[str, dict[str, list[tuple[dict[str, typing.Any], typing.Iter
         "Wu-Xu": [({}, [3])],
         "transition": [
             ({"edge_orders": [1, 1, 1], "variant": "equispaced"}, range(1, 6)),
-            ({"edge_orders": [2, 2, 1], "variant": "equispaced"}, range(1, 6)),
-            ({"edge_orders": [3, 3, 1], "variant": "equispaced"}, range(1, 6)),
-            ({"edge_orders": [3, 3, 2], "variant": "equispaced"}, range(1, 6)),
+            ({"edge_orders": [1, 2, 2], "variant": "equispaced"}, range(1, 6)),
+            ({"edge_orders": [1, 3, 3], "variant": "equispaced"}, range(1, 6)),
+            ({"edge_orders": [2, 3, 3], "variant": "equispaced"}, range(1, 6)),
         ],
         "P1-iso-P2": [({}, [1])],
         "EG": [({}, range(1, 4))],
@@ -116,7 +116,7 @@ test_elements: dict[str, dict[str, list[tuple[dict[str, typing.Any], typing.Iter
             (
                 {
                     "edge_orders": [1, 1, 1, 1, 1, 1],
-                    "face_orders": [3, 3, 1, 1],
+                    "face_orders": [1, 1, 3, 3],
                     "variant": "equispaced",
                 },
                 range(1, 5),
@@ -124,7 +124,7 @@ test_elements: dict[str, dict[str, list[tuple[dict[str, typing.Any], typing.Iter
             (
                 {
                     "edge_orders": [1, 1, 1, 1, 1, 1],
-                    "face_orders": [3, 3, 4, 2],
+                    "face_orders": [2, 4, 3, 3],
                     "variant": "equispaced",
                 },
                 range(1, 5),
@@ -132,7 +132,7 @@ test_elements: dict[str, dict[str, list[tuple[dict[str, typing.Any], typing.Iter
             (
                 {
                     "edge_orders": [1, 1, 1, 1, 1, 1],
-                    "face_orders": [4, 4, 1, 1],
+                    "face_orders": [1, 1, 4, 4],
                     "variant": "equispaced",
                 },
                 range(1, 5),
@@ -147,7 +147,7 @@ test_elements: dict[str, dict[str, list[tuple[dict[str, typing.Any], typing.Iter
             ),
             (
                 {
-                    "edge_orders": [3, 2, 1, 2, 1, 1],
+                    "edge_orders": [1, 1, 2, 1, 2, 3],
                     "face_orders": [1, 1, 1, 1],
                     "variant": "equispaced",
                 },
@@ -155,7 +155,7 @@ test_elements: dict[str, dict[str, list[tuple[dict[str, typing.Any], typing.Iter
             ),
             (
                 {
-                    "edge_orders": [1, 1, 3, 1, 3, 1],
+                    "edge_orders": [1, 3, 1, 3, 1, 1],
                     "face_orders": [1, 1, 1, 1],
                     "variant": "equispaced",
                 },
@@ -163,8 +163,8 @@ test_elements: dict[str, dict[str, list[tuple[dict[str, typing.Any], typing.Iter
             ),
             (
                 {
-                    "edge_orders": [1, 1, 2, 1, 2, 5],
-                    "face_orders": [3, 3, 2, 5],
+                    "edge_orders": [5, 2, 1, 2, 1, 1],
+                    "face_orders": [5, 2, 3, 3],
                     "variant": "equispaced",
                 },
                 range(1, 5),

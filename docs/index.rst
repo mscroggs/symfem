@@ -139,7 +139,7 @@ can be obtained:
 ::
 
     ((0, 0), (1, 0), (0, 1))
-    ((1, 2), (0, 2), (0, 1))
+    ((0, 1), (0, 2), (1, 2))
 
 The origin and axes of the element can be obtained:
 
@@ -197,7 +197,7 @@ representing a subentity:
 ::
 
     ['point', 'interval', 'triangle', None]
-    ((1, 0), (0, 1))
+    ((0, 0), (1, 0))
 
 Documentation index
 ===================

@@ -71,7 +71,7 @@ class NedelecFirstKind(CiarletElement):
     min_order = 0
     continuity = "H(curl)"
     value_type = "vector"
-    last_updated = "2025.03"
+    last_updated = "2025.12"
 
 
 class NedelecSecondKind(CiarletElement):
@@ -127,4 +127,4 @@ class NedelecSecondKind(CiarletElement):
     min_order = 1
     continuity = "H(curl)"
     value_type = "vector"
-    last_updated = "2023.06"
+    last_updated = "2025.12"

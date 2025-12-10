@@ -12,7 +12,7 @@ def test_nedelec_2d():
 
     tdim = 2
 
-    for i, edge in enumerate([((1, 0), (0, 1)), ((0, 0), (0, 1)), ((0, 0), (1, 0))]):
+    for i, edge in enumerate([((0, 0), (1, 0)), ((0, 0), (0, 1)), ((1, 0), (0, 1))]):
         for j, f in enumerate(space.get_basis_functions()):
             norm = sympy.sqrt(sum((edge[0][i] - edge[1][i]) ** 2 for i in range(tdim)))
             tangent = tuple((edge[1][i] - edge[0][i]) / norm for i in range(tdim))
@@ -35,12 +35,12 @@ def test_nedelec_3d():
 
     for i, edge in enumerate(
         [
-            ((0, 1, 0), (0, 0, 1)),
-            ((1, 0, 0), (0, 0, 1)),
-            ((1, 0, 0), (0, 1, 0)),
-            ((0, 0, 0), (0, 0, 1)),
-            ((0, 0, 0), (0, 1, 0)),
             ((0, 0, 0), (1, 0, 0)),
+            ((0, 0, 0), (0, 1, 0)),
+            ((0, 0, 0), (0, 0, 1)),
+            ((1, 0, 0), (0, 1, 0)),
+            ((1, 0, 0), (0, 0, 1)),
+            ((0, 1, 0), (0, 0, 1)),
         ]
     ):
         for j, f in enumerate(space.get_basis_functions()):

@@ -8,7 +8,7 @@ from symfem.utils import allequal
 def test_cache():
     e = symfem.create_element("triangle", "Lagrange", 2)
 
-    m1 = e.get_dual_matrix(caching=False, inverse=True)
+    m1 = e.get_dual_matrix(inverse=True)
 
     def a(*args, **kwargs):
         raise RuntimeError()

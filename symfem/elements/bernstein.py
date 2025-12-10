@@ -286,4 +286,4 @@ class Bernstein(CiarletElement):
     min_order = 0
     continuity = "C0"
     value_type = "scalar"
-    last_updated = "2023.05"
+    last_updated = "2023.12"

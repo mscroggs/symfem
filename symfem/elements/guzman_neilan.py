@@ -204,7 +204,7 @@ class GuzmanNeilanFirstKind(CiarletElement):
     max_order = {"triangle": 1, "tetrahedron": 2}
     continuity = "L2"
     value_type = "vector macro"
-    last_updated = "2024.10.5"
+    last_updated = "2025.12"
 
 
 class GuzmanNeilanSecondKind(CiarletElement):
@@ -306,7 +306,7 @@ class GuzmanNeilanSecondKind(CiarletElement):
     max_order = {"triangle": 1, "tetrahedron": 2}
     continuity = "L2"
     value_type = "vector macro"
-    last_updated = "2024.10.3"
+    last_updated = "2025.12"
 
 
 def make_piecewise_lagrange(
@@ -347,7 +347,7 @@ def make_piecewise_lagrange(
         for dim, tri_entities in enumerate(
             [
                 [(0, 0, -1), (1, -1, 0), (-1, 1, 1), (2, 2, 2)],
-                [(0, -1, 1), (1, 1, -1), (-1, 0, 0), (2, -1, -1), (-1, 2, -1), (-1, -1, 2)],
+                [(2, -1, 1), (1, 1, -1), (-1, 2, 2), (0, -1, -1), (-1, 0, -1), (-1, -1, 0)],
                 [(0, -1, -1), (-1, 0, -1), (-1, -1, 0)],
             ]
         ):
@@ -359,7 +359,7 @@ def make_piecewise_lagrange(
                     if zero_at_centre and (2 in tri_e):
                         continue
                 elif dim == 1:
-                    if zero_on_boundary and (2 in tri_e):
+                    if zero_on_boundary and (0 in tri_e):
                         continue
                 doflist = [nones if i == -1 else lagrange_space.entity_dofs(dim, i) for i in tri_e]
                 for dofs in zip(*doflist):
@@ -372,28 +372,28 @@ def make_piecewise_lagrange(
             [
                 [(0, 0, 0, -1), (1, 1, -1, 0), (2, -1, 1, 1), (-1, 2, 2, 2), (3, 3, 3, 3)],
                 [
-                    (2, -1, -1, 5),
-                    (5, 5, -1, -1),
-                    (4, -1, 5, -1),
-                    (-1, 2, -1, 4),
-                    (-1, 4, 4, -1),
-                    (-1, -1, 2, 2),
-                    (3, 3, 3, -1),
-                    (-1, 0, 0, 0),
-                    (0, -1, 1, 1),
-                    (1, 1, -1, 3),
+                    (3, -1, -1, 0),
+                    (0, 0, -1, -1),
+                    (1, -1, 0, -1),
+                    (-1, 3, -1, 1),
+                    (-1, 1, 1, -1),
+                    (-1, -1, 3, 3),
+                    (2, 2, 2, -1),
+                    (-1, 5, 5, 5),
+                    (5, -1, 4, 4),
+                    (4, 4, -1, 2),
                 ],
                 [
-                    (0, -1, -1, 2),
-                    (1, -1, 2, -1),
-                    (2, 2, -1, -1),
-                    (3, -1, -1, -1),
-                    (-1, 0, -1, 1),
-                    (-1, 1, 1, -1),
-                    (-1, 3, -1, -1),
-                    (-1, -1, 0, 0),
-                    (-1, -1, 3, -1),
-                    (-1, -1, -1, 3),
+                    (3, -1, -1, 1),
+                    (2, -1, 1, -1),
+                    (1, 1, -1, -1),
+                    (0, -1, -1, -1),
+                    (-1, 3, -1, 1),
+                    (-1, 2, 2, -1),
+                    (-1, 0, -1, -1),
+                    (-1, -1, 3, 3),
+                    (-1, -1, 0, -1),
+                    (-1, -1, -1, 0),
                 ],
                 [(0, -1, -1, -1), (-1, 0, -1, -1), (-1, -1, 0, -1), (-1, -1, -1, 0)],
             ]
@@ -406,10 +406,10 @@ def make_piecewise_lagrange(
                     if zero_at_centre and (3 in tet_e):
                         continue
                 elif dim == 1:
-                    if zero_on_boundary and (2 in tet_e or 4 in tet_e or 5 in tet_e):
+                    if zero_on_boundary and (3 in tet_e or 1 in tet_e or 0 in tet_e):
                         continue
                 elif dim == 2:
-                    if zero_on_boundary and (3 in tet_e):
+                    if zero_on_boundary and (0 in tet_e):
                         continue
                 doflist = [nones if i == -1 else lagrange_space.entity_dofs(dim, i) for i in tet_e]
                 for dofs in zip(*doflist):

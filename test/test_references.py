@@ -50,3 +50,40 @@ def test_jacobian(ReferenceClass, points):
 @pytest.mark.parametrize("n_tri", range(3, 10))
 def test_dual_reference(n_tri):
     references.DualPolygon(n_tri)
+
+
+@pytest.mark.parametrize(
+    "ReferenceClass",
+    [
+        references.Interval,
+        references.Triangle,
+        references.Tetrahedron,
+        references.Quadrilateral,
+        references.Prism,
+        references.Pyramid,
+    ],
+)
+def test_reference_ordering(ReferenceClass):
+    ref = ReferenceClass()
+    for d in range(ref.tdim + 1):
+        for i, e in enumerate(ref.sub_entities(dim=d)):
+            for e2 in ref.sub_entities(dim=d)[:i]:
+                assert e2 < e
+
+
+@pytest.mark.parametrize(
+    "ReferenceClass",
+    [
+        references.Interval,
+        references.Triangle,
+        references.Tetrahedron,
+        references.Quadrilateral,
+        references.Prism,
+        references.Pyramid,
+    ],
+)
+def test_vertex_ordering(ReferenceClass):
+    ref = ReferenceClass()
+    for i, e in enumerate(ref.vertices):
+        for e2 in ref.vertices[:i]:
+            assert e2[::-1] < e[::-1]

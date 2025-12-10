@@ -86,7 +86,7 @@ class Transition(CiarletElement):
                     elif edim == reference.tdim - 1:
                         bubble = sympy.Integer(1)
                         for i, f in enumerate(bubble_space.get_basis_functions()):
-                            if i != e_n:
+                            if i != len(reference.vertices) - 1 - e_n:
                                 bubble *= f
                     else:
                         assert edim == 1 and reference.tdim == 3
@@ -109,6 +109,9 @@ class Transition(CiarletElement):
                     for f in space.get_basis_functions():
                         assert isinstance(f, ScalarFunction)
                         poly.append(f.subs(x, variables) * bubble)
+
+        print(edge_orders)
+        print(face_orders)
 
         poly = reference.map_polyset_from_default(poly)
 
@@ -167,4 +170,4 @@ class Transition(CiarletElement):
     min_order = 1
     continuity = "C0"
     value_type = "scalar"
-    last_updated = "2023.06"
+    last_updated = "2025.12"

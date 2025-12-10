@@ -143,7 +143,7 @@ class P1IsoP2Tri(CiarletElement):
     max_order = 1
     continuity = "C0"
     value_type = "scalar macro"
-    last_updated = "2023.06"
+    last_updated = "2025.12"
 
 
 class P1IsoP2Quad(CiarletElement):
@@ -222,4 +222,4 @@ class P1IsoP2Quad(CiarletElement):
     max_order = 1
     continuity = "C0"
     value_type = "scalar macro"
-    last_updated = "2023.06"
+    last_updated = "2025.12"

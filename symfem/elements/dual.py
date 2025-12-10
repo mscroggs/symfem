@@ -263,7 +263,7 @@ class Dual(DualCiarletElement):
     max_order = 1
     continuity = "C0"
     value_type = "scalar dual"
-    last_updated = "2023.05"
+    last_updated = "2025.12"
 
 
 class BuffaChristiansen(DualCiarletElement):
@@ -329,7 +329,7 @@ class BuffaChristiansen(DualCiarletElement):
     max_order = 0
     continuity = "H(div)"
     value_type = "vector dual"
-    last_updated = "2025.03"
+    last_updated = "2025.12"
 
 
 class RotatedBuffaChristiansen(DualCiarletElement):
@@ -395,4 +395,4 @@ class RotatedBuffaChristiansen(DualCiarletElement):
     max_order = 0
     continuity = "H(div)"
     value_type = "vector dual"
-    last_updated = "2025.03"
+    last_updated = "2025.12"

@@ -145,4 +145,4 @@ class AlfeldSorokina(CiarletElement):
     max_order = 2
     continuity = "C0"
     value_type = "scalar macro"
-    last_updated = "2023.05"
+    last_updated = "2025.12"

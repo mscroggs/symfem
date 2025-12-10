@@ -61,4 +61,4 @@ class Taylor(CiarletElement):
     min_order = 0
     continuity = "L2"
     value_type = "scalar"
-    last_updated = "2023.06"
+    last_updated = "2025.12"
