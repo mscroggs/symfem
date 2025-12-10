@@ -1,3 +1,9 @@
+# Version 2025.12.0 (10 December 2025)
+
+- Update typing for Python 3.10
+- Use consistent entity numbering by lowest vertex indices
+- Change the edge and face ordering for the triangle and tetrahedron reference cells to enable consistend numbering
+
 # Version 2025.11.2 (17 November 2025)
 
 - add `include_inputs` and `include_comment` args to custom Basix element function
