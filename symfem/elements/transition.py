@@ -110,9 +110,6 @@ class Transition(CiarletElement):
                         assert isinstance(f, ScalarFunction)
                         poly.append(f.subs(x, variables) * bubble)
 
-        print(edge_orders)
-        print(face_orders)
-
         poly = reference.map_polyset_from_default(poly)
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
