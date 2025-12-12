@@ -35,7 +35,7 @@ jobs:
       - name: Install requirements
         run: |
           cd defelement
-          pip install -r requirements.txt
+          pip install .
       - name: Test DefElement build
         run: |
           cd defelement
