@@ -20,7 +20,7 @@ from symfem.functionals import (
 )
 from symfem.functions import FunctionInput, ScalarFunction, VectorFunction
 from symfem.moments import make_integral_moment_dofs
-from symfem.polynomials import orthogonal_basis, quolynomial_set_1d, quolynomial_set_vector, polynomial_set_1d, prism_polynomial_set_1d, pyramid_polynomial_set_1d
+from symfem.polynomials import orthogonal_basis, quolynomial_set_1d, quolynomial_set_vector, polynomial_set_1d, polynomial_set_vector, prism_polynomial_set_1d, pyramid_polynomial_set_1d
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import t, x
 
