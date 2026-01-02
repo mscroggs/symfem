@@ -1,7 +1,7 @@
 """TiNiest Tensor product (TNT) elements.
 
 These elements' definitions appear in https://doi.org/10.1090/S0025-5718-2013-02729-9
-(Cockburn, Qiu, 2013) and https://doi.org/10.1137/16M1073352 (Cockburn, Fu, 2017)
+(Cockburn, Qiu, 2013)
 """
 
 import typing
@@ -64,7 +64,6 @@ class TNT(CiarletElement):
 
     def __init__(self, reference: Reference, order: int, variant: str = "equispaced"):
         """Create the element.
-                f = sympy.Integer(1)
 
         Args:
             reference: The reference element
@@ -562,43 +561,7 @@ class TNTdiv(CiarletElement):
         return self.order + 1
 
     @property
-    def polynomial_subdegree(self) -> int:"""TiNiest Tensor product (TNT) elements.
-
-These elements' definitions appear in https://doi.org/10.1090/S0025-5718-2013-02729-9
-(Cockburn, Qiu, 2013)
-"""
-
-import typing
-from itertools import product
-
-import sympy
-
-from symfem.elements.q import Q
-from symfem.finite_element import CiarletElement
-from symfem.functionals import (
-    DerivativeIntegralMoment,
-    IntegralAgainst,
-    ListOfFunctionals,
-    NormalIntegralMoment,
-    PointEvaluation,
-    TangentIntegralMoment,
-)
-from symfem.functions import FunctionInput, ScalarFunction, VectorFunction
-from symfem.moments import make_integral_moment_dofs
-from symfem.polynomials import orthogonal_basis, quolynomial_set_1d, quolynomial_set_vector
-from symfem.references import NonDefaultReferenceError, Reference
-from symfem.symbols import t, x
-
-__all__ = ["p", "b", "TNT", "TNTcurl", "TNTdiv"]
-
-
-def p(k: int, v: sympy.core.symbol.Symbol) -> ScalarFunction:
-    """Return the kth Legendre polynomial.
-
-    Args:
-        k: k
-        v: The variable to use
-
+    def polynomial_subdegree(self) -> int:
         return self.order
 
     @property
