@@ -12,7 +12,6 @@ import sympy
 from symfem.elements.q import Q
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
-    DerivativeIntegralMoment,
     IntegralAgainst,
     ListOfFunctionals,
     NormalIntegralMoment,
@@ -74,9 +73,20 @@ class TNT(CiarletElement):
             raise NonDefaultReferenceError()
 
         poly: list[FunctionInput] = []
-        if reference.name == "interval" or reference.name == "triangle" or reference.name == "tetrahedron":
+        if reference.name in ["interval","triangle","tetrahedron","pyramid"]:
             poly += polynomial_set_1d(reference.tdim, order)
-        elif reference.name == "quadrilateral" or reference.name == "hexahedron":
+            if reference.name == "pyramid":
+                pol=pyramid_polynomial_set_1d(3, order)
+                for ii in range(order-1):
+                    poly.append(pol[(order+1)*(order+2)*(2*order+3)//6-(order-ii+1)*(order-ii+2)*(2*(order-ii)+3)//6+(order-ii)*(order-ii)])
+                poly.append(pol[2*order+1])
+                if order>1:
+                    for ii in range(order-2):
+                        poly.append(pol[(order+1)*(order+2)*(2*order+3)//6-(order-ii+1)*(order-ii+2)*(2*(order-ii)+3)//6+2*(order-ii)])
+                        for jj in range(ii+1):
+                            poly.append(pol[3*order+1+ii*order+jj])
+                    poly.append(pol[order*(order+1)+1])
+        elif reference.name in ["quadrilateral","hexahedron"]:
             poly += quolynomial_set_1d(reference.tdim, order - 1)
             if reference.tdim == 2:
                 for i in range(2):
@@ -104,18 +114,6 @@ class TNT(CiarletElement):
                 poly.append(x[0]**i*x[1]**(order-i))
                 if order>1:
                     poly.append(x[0]**i*x[1]**(order-i)*x[2])
-        elif reference.name == "pyramid":
-            poly+=polynomial_set_1d(3,order)
-            pol=pyramid_polynomial_set_1d(3, order)
-            for ii in range(order-1):
-                poly.append(pol[(order+1)*(order+2)*(2*order+3)//6-(order-ii+1)*(order-ii+2)*(2*(order-ii)+3)//6+(order-ii)*(order-ii)])
-            poly.append(pol[2*order+1])
-            if order>1:
-                for ii in range(order-2):
-                    poly.append(pol[(order+1)*(order+2)*(2*order+3)//6-(order-ii+1)*(order-ii+2)*(2*(order-ii)+3)//6+2*(order-ii)])
-                    for jj in range(ii+1):
-                        poly.append(pol[3*order+1+ii*order+jj])
-                poly.append(pol[order*(order+1)+1])
 
         dofs: ListOfFunctionals = []
         for i, v in enumerate(reference.vertices):
@@ -125,13 +123,13 @@ class TNT(CiarletElement):
         for edge_n,ii in product(range(reference.sub_entity_count(1)),range(1,order)): # skip 0th order as it falls in the kernel of the gradient
                 dofs.append(IntegralAgainst(reference, pol[ii].grad(1)[0], entity=(1, edge_n), mapping="identity")) 
 
-        if reference.name == "triangle" or reference.name == "tetrahedron":
+        if reference.name in ["triangle","tetrahedron"]:
             pol=polynomial_set_1d(2, order-3)
             for face_n,ii in product(range(reference.sub_entity_count(2)),range(len(pol))):
                 dofs.append(
                     IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*x[1]*(1-x[0]-x[1])*pol[ii]).grad(2)), entity=(2, face_n), mapping="identity")
                 )
-        elif reference.name == "quadrilateral" or reference.name =="hexahedron":
+        elif reference.name in ["quadrilateral","hexahedron"]:
             pol=quolynomial_set_1d(2, order-3)
             for face_n,ii in product(range(reference.sub_entity_count(2)),range(len(pol))):
                 dofs.append(
@@ -198,7 +196,7 @@ class TNT(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        if reference.name == "interval" or reference.name == "triangle" or reference.name == "tetrahedron":
+        if reference.name in ["interval","triangle","tetrahedron"]:
             return self.order
         else:
             return self.order - 1
@@ -213,7 +211,7 @@ class TNT(CiarletElement):
 
     @property
     def polynomial_superdegree(self) -> int | None:
-        if reference.name == "interval" or reference.name == "triangle" or reference.name == "tetrahedron":
+        if reference.name in ["interval","triangle","tetrahedron"]:
             return self.order
         else:
             return max((self.order - 1) * self.reference.tdim, (self.order - 1) + self.reference.tdim)
@@ -241,49 +239,56 @@ class TNTcurl(CiarletElement):
             raise NonDefaultReferenceError()
 
         poly: list[FunctionInput] = []
-        poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
-        if reference.tdim == 2:
-            for ii in product([0, 1], repeat=2):
-                if sum(ii) != 0:
-                    poly.append(
-                        tuple(
-                            sympy.S(j).expand()
-                            for j in [
-                                p(order, ii[0] * x[0]) * b(order + 1, ii[1] * x[1]),
-                                -b(order + 1, ii[0] * x[0]) * p(order, ii[1] * x[1]),
-                            ]
+        if reference.name in ["interval","triangle","tetrahedron"]:
+            poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
+        elif reference.name in ["quadrilateral","hexahedron"]:
+            poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
+            if reference.tdim == 2:
+                for ii in product([0, 1], repeat=2):
+                    if sum(ii) != 0:
+                        poly.append(
+                            tuple(
+                                sympy.S(j).expand()
+                                for j in [
+                                    p(order, ii[0] * x[0]) * b(order + 1, ii[1] * x[1]),
+                                    -b(order + 1, ii[0] * x[0]) * p(order, ii[1] * x[1]),
+                                ]
+                            )
                         )
-                    )
-        else:
-            face_poly = []
-            for ii in product([0, 1], repeat=2):
-                if sum(ii) != 0:
-                    face_poly.append(
-                        tuple(
-                            sympy.S(j).expand()
-                            for j in [
-                                b(order + 1, ii[0] * t[0]) * p(order, ii[1] * t[1]),
-                                p(order, ii[0] * t[0]) * b(order + 1, ii[1] * t[1]),
-                            ]
+            else:
+                face_poly = []
+                for ii in product([0, 1], repeat=2):
+                    if sum(ii) != 0:
+                        face_poly.append(
+                            tuple(
+                                sympy.S(j).expand()
+                                for j in [
+                                    b(order + 1, ii[0] * t[0]) * p(order, ii[1] * t[1]),
+                                    p(order, ii[0] * t[0]) * b(order + 1, ii[1] * t[1]),
+                                ]
+                            )
                         )
-                    )
-            for lamb_n in [
-                (x[0], 0, 0),
-                (1 - x[0], 0, 0),
-                (0, x[1], 0),
-                (0, 1 - x[1], 0),
-                (0, 0, x[2]),
-                (0, 0, 1 - x[2]),
-            ]:
-                variables = tuple(i for i, j in enumerate(lamb_n) if j == 0)
-                for pf in face_poly:
-                    psub = VectorFunction(pf).subs(t[:2], [x[j] for j in variables])
-                    pc = VectorFunction(lamb_n).cross(
-                        VectorFunction(
-                            [psub[variables.index(i)] if i in variables else 0 for i in range(3)]
+                for lamb_n in [
+                    (x[0], 0, 0),
+                    (1 - x[0], 0, 0),
+                    (0, x[1], 0),
+                    (0, 1 - x[1], 0),
+                    (0, 0, x[2]),
+                    (0, 0, 1 - x[2]),
+                ]:
+                    variables = tuple(i for i, j in enumerate(lamb_n) if j == 0)
+                    for pf in face_poly:
+                        psub = VectorFunction(pf).subs(t[:2], [x[j] for j in variables])
+                        pc = VectorFunction(lamb_n).cross(
+                            VectorFunction(
+                                [psub[variables.index(i)] if i in variables else 0 for i in range(3)]
+                            )
                         )
-                    )
-                    poly.append(pc)
+                        poly.append(pc)
+        elif reference.name == "prism":
+            None
+        elif reference.name == "pyramid":
+            None
 
         dofs: ListOfFunctionals = []
         dofs += make_integral_moment_dofs(
