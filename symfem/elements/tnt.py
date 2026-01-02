@@ -196,7 +196,7 @@ class TNT(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        if reference.name in ["interval","triangle","tetrahedron"]:
+        if self.reference.name in ["interval","triangle","tetrahedron"]:
             return self.order
         else:
             return self.order - 1
@@ -211,7 +211,7 @@ class TNT(CiarletElement):
 
     @property
     def polynomial_superdegree(self) -> int | None:
-        if reference.name in ["interval","triangle","tetrahedron"]:
+        if self.reference.name in ["interval","triangle","tetrahedron"]:
             return self.order
         else:
             return max((self.order - 1) * self.reference.tdim, (self.order - 1) + self.reference.tdim)
