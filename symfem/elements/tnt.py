@@ -543,43 +543,7 @@ class TNTdiv(CiarletElement):
                             x[2] ** k
                             * x[1] ** (j - 1)
                             * (1 - x[1])
-                            * x[0] ** (i - 2)"""TiNiest Tensor product (TNT) elements.
-
-These elements' definitions appear in https://doi.org/10.1090/S0025-5718-2013-02729-9
-(Cockburn, Qiu, 2013)
-"""
-
-import typing
-from itertools import product
-
-import sympy
-
-from symfem.elements.q import Q
-from symfem.finite_element import CiarletElement
-from symfem.functionals import (
-    IntegralAgainst,
-    ListOfFunctionals,
-    NormalIntegralMoment,
-    PointEvaluation,
-    TangentIntegralMoment,
-)
-from symfem.functions import FunctionInput, ScalarFunction, VectorFunction
-from symfem.moments import make_integral_moment_dofs
-from symfem.polynomials import orthogonal_basis, quolynomial_set_1d, quolynomial_set_vector, polynomial_set_1d, polynomial_set_vector, prism_polynomial_set_1d, pyramid_polynomial_set_1d
-from symfem.references import NonDefaultReferenceError, Reference
-from symfem.symbols import t, x
-
-__all__ = ["p", "b", "TNT", "TNTcurl", "TNTdiv"]
-
-
-def p(k: int, v: sympy.core.symbol.Symbol) -> ScalarFunction:
-    """Return the kth Legendre polynomial.
-
-    Args:
-        k: k
-        v: The variable to use
-
-
+                            * x[0] ** (i - 2)
                             * (i * x[0] - i + 1),
                             0,
                         )
