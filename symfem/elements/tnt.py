@@ -2,6 +2,9 @@
 
 These elements' definitions appear in https://doi.org/10.1090/S0025-5718-2013-02729-9
 (Cockburn, Qiu, 2013)
+
+Prism and Pyramid modified after https://doi.org/10.1137/16M1073352
+(Cockburn, Fu, 2017)
 """
 
 import typing
@@ -20,7 +23,7 @@ from symfem.functionals import (
 )
 from symfem.functions import FunctionInput, ScalarFunction, VectorFunction
 from symfem.moments import make_integral_moment_dofs
-from symfem.polynomials import orthogonal_basis, quolynomial_set_1d, quolynomial_set_vector, polynomial_set_1d, polynomial_set_vector, prism_polynomial_set_1d, pyramid_polynomial_set_1d
+from symfem.polynomials import orthogonal_basis, quolynomial_set_1d, quolynomial_set_vector, polynomial_set_1d, polynomial_set_vector, prism_polynomial_set_1d, prism_polynomial_set_vector, pyramid_polynomial_set_1d, Hcurl_polynomials
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import t, x
 
@@ -73,7 +76,7 @@ class TNT(CiarletElement):
             raise NonDefaultReferenceError()
 
         poly: list[FunctionInput] = []
-        if reference.name in ["interval","triangle","tetrahedron","pyramid"]:
+        if reference.name in ["interval", "triangle", "tetrahedron", "pyramid"]:
             poly += polynomial_set_1d(reference.tdim, order)
             if reference.name == "pyramid":
                 pol=pyramid_polynomial_set_1d(3, order)
@@ -86,7 +89,7 @@ class TNT(CiarletElement):
                         for jj in range(ii+1):
                             poly.append(pol[3*order+1+ii*order+jj])
                     poly.append(pol[order*(order+1)+1])
-        elif reference.name in ["quadrilateral","hexahedron"]:
+        elif reference.name in ["quadrilateral", "hexahedron"]:
             poly += quolynomial_set_1d(reference.tdim, order - 1)
             if reference.tdim == 2:
                 for i in range(2):
@@ -107,68 +110,57 @@ class TNT(CiarletElement):
                             poly.append(f0 * variables[1] * b(order, x[i]))
         elif reference.name == "prism":
             poly += prism_polynomial_set_1d(3, order - 1)
-            pol=polynomial_set_1d(2, 1)  # P_1(x[0],x[1])*x[2]**order
-            for ii in range(len(pol)):
-                poly.append(x[2]**order*pol[ii])
+            for pl in polynomial_set_1d(2, 1)[:2*order-1]: # P_1(x[0],x[1])*x[2]**order
+                poly.append(x[2]**order*pl)
             for i in range(order+1):  # P~_order(x[0],x[1])*{1,x[2]}
                 poly.append(x[0]**i*x[1]**(order-i))
-                if order>1:
-                    poly.append(x[0]**i*x[1]**(order-i)*x[2])
+                poly.append(x[0]**i*x[1]**(order-i)*x[2])
 
         dofs: ListOfFunctionals = []
         for i, v in enumerate(reference.vertices):
             dofs.append(PointEvaluation(reference, v, entity=(0, i)))
 
-        pol=polynomial_set_1d(1, order-1)
-        for edge_n,ii in product(range(reference.sub_entity_count(1)),range(1,order)): # skip 0th order as it falls in the kernel of the gradient
-                dofs.append(IntegralAgainst(reference, pol[ii].grad(1)[0], entity=(1, edge_n), mapping="identity")) 
+        for edge_n,pl in product(range(reference.sub_entity_count(1)),polynomial_set_1d(1, order-1)[1:]): # skip 0th order as it falls in the kernel of the gradient
+                dofs.append(IntegralAgainst(reference, pl.grad(1)[0], entity=(1, edge_n), mapping="identity")) 
 
-        if reference.name in ["triangle","tetrahedron"]:
-            pol=polynomial_set_1d(2, order-3)
-            for face_n,ii in product(range(reference.sub_entity_count(2)),range(len(pol))):
+        if reference.name in ["triangle", "tetrahedron"]:
+            for face_n,pl in product(range(reference.sub_entity_count(2)),polynomial_set_1d(2, order-3)):
                 dofs.append(
-                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*x[1]*(1-x[0]-x[1])*pol[ii]).grad(2)), entity=(2, face_n), mapping="identity")
+                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*x[1]*(1-x[0]-x[1])*pl).grad(2)), entity=(2, face_n), mapping="identity")
                 )
-        elif reference.name in ["quadrilateral","hexahedron"]:
-            pol=quolynomial_set_1d(2, order-3)
-            for face_n,ii in product(range(reference.sub_entity_count(2)),range(len(pol))):
+        elif reference.name in ["quadrilateral", "hexahedron"]:
+            for face_n,pl in product(range(reference.sub_entity_count(2)),quolynomial_set_1d(2, order-3)):
                 dofs.append(
-                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*(1-x[0])*x[1]*(1-x[1])*pol[ii]).grad(2)), entity=(2, face_n), mapping="identity")
+                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*(1-x[0])*x[1]*(1-x[1])*pl).grad(2)), entity=(2, face_n), mapping="identity")
                 ) 
         elif reference.name == "prism":
-            pol=polynomial_set_1d(2, order-3)
-            for face_n,ii in product([0,4],range(len(pol))):
+            for face_n,pl in product([0,4],polynomial_set_1d(2, order-3)):
                 dofs.append(
-                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*x[1]*(1-x[0]-x[1])*pol[ii]).grad(2)), entity=(2, face_n), mapping="identity") # does this also work on slanted surfaces of tetrahedron and pyramid?
+                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*x[1]*(1-x[0]-x[1])*pl).grad(2)), entity=(2, face_n), mapping="identity") # does this also work on slanted surfaces of tetrahedron and pyramid?
                 )
-            pol=quolynomial_set_1d(2, order-3)
-            for face_n,ii in product(range(1,4),range(len(pol))):
+            for face_n,pl in product(range(1,4),quolynomial_set_1d(2, order-3)):
                 dofs.append(
-                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*(1-x[0])*x[1]*(1-x[1])*pol[ii]).grad(2)), entity=(2, face_n), mapping="identity")
+                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*(1-x[0])*x[1]*(1-x[1])*pl).grad(2)), entity=(2, face_n), mapping="identity")
                 ) 
         elif reference.name == "pyramid":
-            pol=quolynomial_set_1d(2, order-3)
-            for ii in range(len(pol)):
+            for pl in quolynomial_set_1d(2, order-3):
                 dofs.append(
-                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*(1-x[0])*x[1]*(1-x[1])*pol[ii]).grad(2)), entity=(2, 0), mapping="identity")
+                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*(1-x[0])*x[1]*(1-x[1])*pl).grad(2)), entity=(2, 0), mapping="identity")
                 ) 
-            pol=polynomial_set_1d(2, order-3)
-            for face_n,ii in product(range(1,5),range(len(pol))):
+            for face_n,pl in product(range(1,5),polynomial_set_1d(2, order-3)):
                 dofs.append(
-                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*x[1]*(1-x[0]-x[1])*pol[ii]).grad(2)), entity=(2, face_n), mapping="identity") # does this also work on slanted surfaces of tetrahedron and pyramid?
+                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*x[1]*(1-x[0]-x[1])*pl).grad(2)), entity=(2, face_n), mapping="identity") # does this also work on slanted surfaces of tetrahedron and pyramid?
                 )
                     
         if reference.name == "tetrahedron":
-            pol=polynomial_set_1d(3, order-4)
-            for ii in range(len(pol)):
+            for ii in polynomial_set_1d(3, order-4):
                 dofs.append(
-                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*x[1]*x[2]*(1-x[0]-x[1]-x[2])*pol[ii]).grad(3)),entity=(3, 0), mapping="identity")
+                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*x[1]*x[2]*(1-x[0]-x[1]-x[2])*pl).grad(3)),entity=(3, 0), mapping="identity")
                 )
         elif reference.name == "hexahedron":
-            pol=quolynomial_set_1d(3, order-3)
-            for ii in range(len(pol)):
+            for pl in quolynomial_set_1d(3, order-3):
                 dofs.append(
-                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*(1-x[0])*x[1]*(1-x[1])*x[2]*(1-x[2])*pol[ii]).grad(3)),entity=(3, 0), mapping="identity")
+                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*(1-x[0])*x[1]*(1-x[1])*x[2]*(1-x[2])*pl).grad(3)),entity=(3, 0), mapping="identity")
                 )
         elif reference.name == "prism":
             pol=prism_polynomial_set_1d(3, order-3)
@@ -177,10 +169,9 @@ class TNT(CiarletElement):
                     IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*x[1]*(1-x[0]-x[1])*x[2]*(1-x[2])*pol[i+j*(order-1)*(order-2)//2]).grad(3)),entity=(3, 0), mapping="identity")
                 )
         elif reference.name == "pyramid":
-            pol=polynomial_set_1d(3, order-5)
-            for ii in range(len(pol)):
+            for pl in polynomial_set_1d(3, order-5):
                 dofs.append(
-                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*x[1]*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])*pol[ii]).grad(3)),entity=(3, 0), mapping="identity")
+                    IntegralAgainst(reference, VectorFunction.div(ScalarFunction(x[0]*x[1]*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])*pl).grad(3)),entity=(3, 0), mapping="identity")
                 )
 
         super().__init__(reference, order, poly, dofs, reference.tdim, 1)
@@ -196,7 +187,7 @@ class TNT(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        if self.reference.name in ["interval","triangle","tetrahedron"]:
+        if self.reference.name in ["interval", "triangle", "tetrahedron"]:
             return self.order
         else:
             return self.order - 1
@@ -211,7 +202,7 @@ class TNT(CiarletElement):
 
     @property
     def polynomial_superdegree(self) -> int | None:
-        if self.reference.name in ["interval","triangle","tetrahedron"]:
+        if self.reference.name in ["interval", "triangle", "tetrahedron"]:
             return self.order
         else:
             return max((self.order - 1) * self.reference.tdim, (self.order - 1) + self.reference.tdim)
@@ -239,19 +230,20 @@ class TNTcurl(CiarletElement):
             raise NonDefaultReferenceError()
 
         poly: list[FunctionInput] = []
-        if reference.name in ["interval","triangle","tetrahedron"]:
-            poly += polynomial_set_vector(reference.tdim, reference.tdim, order)
-        elif reference.name in ["quadrilateral","hexahedron"]:
-            poly += quolynomial_set_vector(reference.tdim, reference.tdim, order)
+        if reference.name in ["interval", "triangle", "tetrahedron"]:
+            poly += polynomial_set_vector(reference.tdim, reference.tdim, order-1)
+            poly += Hcurl_polynomials(reference.tdim,reference.tdim,order)
+        elif reference.name in ["quadrilateral", "hexahedron"]:
+            poly += quolynomial_set_vector(reference.tdim, reference.tdim, order-1)
             if reference.tdim == 2:
                 for ii in product([0, 1], repeat=2):
-                    if sum(ii) != 0:
+                    if sum(ii) != 0 and (order!=1 or sum(ii)!=2):
                         poly.append(
                             tuple(
                                 sympy.S(j).expand()
                                 for j in [
-                                    p(order, ii[0] * x[0]) * b(order + 1, ii[1] * x[1]),
-                                    -b(order + 1, ii[0] * x[0]) * p(order, ii[1] * x[1]),
+                                    p(order - 1, ii[0] * x[0]) * b(order, ii[1] * x[1]),
+                                    -b(order, ii[0] * x[0]) * p(order - 1, ii[1] * x[1]),
                                 ]
                             )
                         )
@@ -263,8 +255,8 @@ class TNTcurl(CiarletElement):
                             tuple(
                                 sympy.S(j).expand()
                                 for j in [
-                                    b(order + 1, ii[0] * t[0]) * p(order, ii[1] * t[1]),
-                                    p(order, ii[0] * t[0]) * b(order + 1, ii[1] * t[1]),
+                                    b(order, ii[0] * t[0]) * p(order - 1, ii[1] * t[1]),
+                                    p(order - 1, ii[0] * t[0]) * b(order , ii[1] * t[1]),
                                 ]
                             )
                         )
@@ -286,50 +278,96 @@ class TNTcurl(CiarletElement):
                         )
                         poly.append(pc)
         elif reference.name == "prism":
-            None
+            poly += prism_polynomial_set_vector(reference.tdim, reference.tdim, order-1)
+            for i in range(order):
+                poly.append(VectorFunction([x[1],-x[0],0])*x[0]**i*x[1]**(order-i-1))
+                poly.append(VectorFunction([x[1],-x[0],0])*x[0]**i*x[1]**(order-i-1)*x[2])
+            for i in range(order+1):  
+                poly.append(VectorFunction([0,0,x[0]**i*x[1]**(order-i)]).curl().cross(VectorFunction([x[0],x[1],x[2]]))*x[2]**(order-1))
+                poly.append(ScalarFunction(x[0]**i*x[1]**(order-i)*x[2]).grad(3)) # P~_order(x[0],x[1])*x[2]
+            if order > 1:
+                # P_1(x[0],x[1])*x[2]**order
+                for pl in polynomial_set_1d(2, 1)[1:]:
+                    poly.append(ScalarFunction(x[2]**order*pl).grad(3))
+                poly.append(VectorFunction([x[1],-x[0],0])*x[2]**order)
+            print(reference.name,order,poly)
+            
+                    
         elif reference.name == "pyramid":
             None
 
+            poly += prism_polynomial_set_1d(3, order - 1)
+                    
         dofs: ListOfFunctionals = []
-        dofs += make_integral_moment_dofs(
-            reference,
-            edges=(TangentIntegralMoment, Q, order, {"variant": variant}),
-        )
+        dofs += make_integral_moment_dofs(reference, edges=(TangentIntegralMoment, Q, order - 1, {"variant": variant}))
 
         # Face moments
-        face_moments = []
-        for ii in product(range(order + 1), repeat=2):
-            if sum(ii) > 0:
-                f = x[0] ** ii[0] * x[1] ** ii[1]
-                grad_f = ScalarFunction(f).grad(2)
-                grad_f2 = VectorFunction((grad_f[1], -grad_f[0])).subs(x[:2], tuple(t[:2]))
-                face_moments.append(grad_f2)
-
-        for i in range(2, order + 1):
-            for j in range(2, order + 1):
-                face_moments.append(
-                    VectorFunction(
-                        (
-                            t[1] ** (j - 1) * (1 - t[1]) * t[0] ** (i - 2) * (i * t[0] - i + 1),
-                            -(t[0] ** (i - 1)) * (1 - t[0]) * t[1] ** (j - 2) * (j - 1 - j * t[1]),
-                        )
-                    )
-                )
-        if reference.tdim == 2:
-            for f in face_moments:
-                dofs.append(IntegralAgainst(reference, f, entity=(2, 0), mapping="covariant"))
-        elif reference.tdim == 3:
-            for face_n in range(6):
-                for f in face_moments:
-                    dofs.append(
-                        IntegralAgainst(reference, f, entity=(2, face_n), mapping="covariant")
-                    )
-
+        if reference.name in ["triangle", "tetrahedron", "prism", "pyramid"]:
+            face_moments_s = []
+            pol=polynomial_set_1d(2, order - 1)
+            for pl in pol[1:]:
+                face_moments_s.append(pl.curl())
+            pol=polynomial_set_1d(2, order - 3)
+            for pl in pol:
+                face_moments_s.append(ScalarFunction(x[0]*x[1]*(1-x[0]-x[1])*pl).grad(2))
+        if reference.name in ["quadrilateral", "hexahedron", "prism", "pyramid"]:
+            face_moments_q = []
+            pol=quolynomial_set_1d(2, order - 1)
+            for pl in pol[1:]:
+                face_moments_q.append(pl.curl())
+            pol=quolynomial_set_1d(2, order - 3)
+            for pl in pol:
+                face_moments_q.append(ScalarFunction(x[0]*(1-x[0])*x[1]*(1-x[1])*pl).grad(2))
+        if reference.name == "triangle":
+            for f in face_moments_s:
+                dofs.append(IntegralAgainst(reference, f, entity=(2,0), mapping="covariant"))
+        elif reference.name == "quadrilateral":
+            for f in face_moments_q:
+                dofs.append(IntegralAgainst(reference, f, entity=(2,0), mapping="covariant"))
+        elif reference.name == "tetrahedron":
+            for f in product(face_moments_s, range(4)):
+                dofs.append(IntegralAgainst(reference, f[0], entity=(2, f[1]), mapping="covariant"))
+        elif reference.name == "hexahedron":
+            for f in product(face_moments_q, range(6)):
+                dofs.append(IntegralAgainst(reference, f[0], entity=(2, f[1]), mapping="covariant"))
+        elif reference.name == "prism":
+            for f in product(face_moments_s, [0,4]):
+                dofs.append(IntegralAgainst(reference, f[0], entity=(2, f[1]), mapping="covariant"))
+            for f in product(face_moments_q, range(1,4)):
+                dofs.append(IntegralAgainst(reference, f[0], entity=(2, f[1]), mapping="covariant"))
+        elif reference.name == "pyramid":
+            for f in face_moments_q:
+                dofs.append(IntegralAgainst(reference, entity=(2, f), mapping="covariant"))
+            for f in product(face_moments_s, range(1,5)):
+                dofs.append(IntegralAgainst(reference, f[0], entity=(2, f[1]), mapping="covariant"))
+            
         # Interior Moments
-        if reference.tdim == 3:
-            for i in range(1, order):
-                for j in range(1, order):
-                    for k in range(order + 1):
+        if reference.name == "tetrahedron":
+            pol=polynomial_set_1d(3, order - 3)
+            for f in pol:
+                dofs.append(IntegralAgainst(reference,(VectorFunction([x[1]*x[2]*(1-x[0]-x[1]-x[2]),0,0])*f).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*x[1]*(1-x[0]-x[1]-x[2])])*f).curl().curl(),entity=(3,0),mapping="covariant"))
+            for f in pol[-(order-2)*(order-1)//2:]:
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,x[0]*x[2]*(1-x[0]-x[1]-x[2]),0])*f).curl().curl(),entity=(3,0),mapping="covariant"))
+            pol=polynomial_set_1d(3, order - 4)
+            for f in pol:
+                dofs.append(IntegralAgainst(reference,ScalarFunction(x[0]*x[1]*x[2]*(1-x[0]-x[1]-x[2])*f).grad(3),entity=(3,0),mapping="covariant"))
+        elif reference.name == "hexahedron":
+            pol=quolynomial_set_1d(3, order - 3)
+            for f in pol:
+                dofs.append(IntegralAgainst(reference,(VectorFunction([x[0]* x[1]*(1-x[1])*x[2]*(1-x[2]),0,0])*f).curl().curl(),entity=(3,0),mapping="covariant"))             
+                dofs.append(IntegralAgainst(reference,(VectorFunction([x[0]*(1-x[0])* x[1]*(1-x[1])*x[2]*(1-x[2]),0,0])*f).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([(1-x[0])* x[1]*(1-x[1])*x[2]*(1-x[2]),0,0])*f).curl().curl(),entity=(3,0),mapping="covariant"))                
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,x[0]*(1-x[0])* x[1] *x[2]*(1-x[2]),0])*f).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,x[0]*(1-x[0])* x[1]*(1-x[1])* x[2]*(1-x[2]),0])*f).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,x[0]*(1-x[0])* (1-x[1])*x[2]*(1-x[2]),0])*f).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*(1-x[0])*x[1]*(1-x[1])*x[2]])*f).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*(1-x[0])*x[1]*(1-x[1])*x[2]*(1-x[2])])*f).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,ScalarFunction(x[0]*(1-x[0])*x[1]*(1-x[1])*x[2]*(1-x[2])*f).grad(3),entity=(3,0),mapping="covariant"))                
+        elif reference.name == "hexahedronn":
+            for i in range(1, order - 1):
+                for j in range(1, order - 1):
+                    for k in range(order):
                         f = (x[0] ** k * x[1] ** i * (1 - x[1]) * x[2] ** j * (1 - x[2]), 0, 0)
                         dofs.append(
                             IntegralAgainst(
@@ -361,9 +399,9 @@ class TNTcurl(CiarletElement):
                                 )
                             )
 
-            for i in range(2, order + 1):
-                for j in range(2, order + 1):
-                    for k in range(2, order + 1):
+            for i in range(2, order):
+                for j in range(2, order):
+                    for k in range(2, order):
                         f = x[0] ** (i - 1) * x[0] ** i
                         f *= x[1] ** (j - 1) * x[1] ** j
                         f *= x[2] ** (k - 1) * x[2] ** k
@@ -371,6 +409,15 @@ class TNTcurl(CiarletElement):
                         dofs.append(
                             IntegralAgainst(reference, grad_f, entity=(3, 0), mapping="covariant")
                         )
+        elif reference.name == "prism":
+            pol=prism_polynomial_set_1d(3, order - 3)
+            for f in pol:
+                dofs.append(IntegralAgainst(reference,(VectorFunction([x[1]*(1-x[0]-x[1])*x[2]*(1-x[2]),0,0])*f).curl().curl(),entity=(3,0),mapping="covariant"))             
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,x[0]*(1-x[0]-x[1])*x[2]*(1-x[2]),0])*f).curl().curl(),entity=(3,0),mapping="covariant"))             
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*x[1]*(1-x[0]-x[1])*x[2]])*f).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*x[1]*(1-x[0]-x[1])*x[2]*(1-x[2])])*f).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*x[1]*(1-x[0]-x[1])*(1-x[2])])*f).curl().curl(),entity=(3,0),mapping="covariant"))
+#                dofs.append(IntegralAgainst(reference,ScalarFunction(x[0]*x[1]*(1-x[0]-x[1])*x[2]*(1-x[2])*f).grad(3),entity=(3,0),mapping="covariant"))   
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
@@ -385,22 +432,22 @@ class TNTcurl(CiarletElement):
 
     @property
     def lagrange_subdegree(self) -> int:
-        return self.order
+        return self.order - 1
 
     @property
     def lagrange_superdegree(self) -> int | None:
-        return self.order + 1
-
-    @property
-    def polynomial_subdegree(self) -> int:
         return self.order
 
     @property
+    def polynomial_subdegree(self) -> int:
+        return self.order - 1
+
+    @property
     def polynomial_superdegree(self) -> int | None:
-        return self.order * self.reference.tdim + 1
+        return (self.order - 1) * self.reference.tdim + 1
 
     names = ["tiniest tensor Hcurl", "TNTcurl"]
-    references = ["quadrilateral", "hexahedron"]
+    references = ["interval", "triangle", "quadrilateral", "tetrahedron", "hexahedron", "prism", "pyramid"]
     min_order = 1
     continuity = "H(curl)"
     value_type = "vector"
@@ -496,7 +543,43 @@ class TNTdiv(CiarletElement):
                             x[2] ** k
                             * x[1] ** (j - 1)
                             * (1 - x[1])
-                            * x[0] ** (i - 2)
+                            * x[0] ** (i - 2)"""TiNiest Tensor product (TNT) elements.
+
+These elements' definitions appear in https://doi.org/10.1090/S0025-5718-2013-02729-9
+(Cockburn, Qiu, 2013)
+"""
+
+import typing
+from itertools import product
+
+import sympy
+
+from symfem.elements.q import Q
+from symfem.finite_element import CiarletElement
+from symfem.functionals import (
+    IntegralAgainst,
+    ListOfFunctionals,
+    NormalIntegralMoment,
+    PointEvaluation,
+    TangentIntegralMoment,
+)
+from symfem.functions import FunctionInput, ScalarFunction, VectorFunction
+from symfem.moments import make_integral_moment_dofs
+from symfem.polynomials import orthogonal_basis, quolynomial_set_1d, quolynomial_set_vector, polynomial_set_1d, polynomial_set_vector, prism_polynomial_set_1d, pyramid_polynomial_set_1d
+from symfem.references import NonDefaultReferenceError, Reference
+from symfem.symbols import t, x
+
+__all__ = ["p", "b", "TNT", "TNTcurl", "TNTdiv"]
+
+
+def p(k: int, v: sympy.core.symbol.Symbol) -> ScalarFunction:
+    """Return the kth Legendre polynomial.
+
+    Args:
+        k: k
+        v: The variable to use
+
+
                             * (i * x[0] - i + 1),
                             0,
                         )
@@ -525,8 +608,7 @@ class TNTdiv(CiarletElement):
                         )
                         if k in [0, 2]:
                             f = (
-                                0,
-                                x[0] ** k
+                                0, x[0] ** k
                                 * x[1] ** (i - 1)
                                 * (1 - x[1])
                                 * x[2] ** (j - 2)
