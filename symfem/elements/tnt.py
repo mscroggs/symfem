@@ -356,26 +356,26 @@ class TNTcurl(CiarletElement):
         # Interior Moments
         if reference.name == "tetrahedron":
             pol=polynomial_set_1d(3, order - 3)
-            for f in pol:
-                dofs.append(IntegralAgainst(reference,(VectorFunction([x[1]*x[2]*(1-x[0]-x[1]-x[2]),0,0])*f).curl().curl(),entity=(3,0),mapping="covariant"))
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*x[1]*(1-x[0]-x[1]-x[2])])*f).curl().curl(),entity=(3,0),mapping="covariant"))
-            for f in pol[-(order-2)*(order-1)//2:]:
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,x[0]*x[2]*(1-x[0]-x[1]-x[2]),0])*f).curl().curl(),entity=(3,0),mapping="covariant"))
+            for pl in pol:
+                dofs.append(IntegralAgainst(reference,(VectorFunction([x[1]*x[2]*(1-x[0]-x[1]-x[2]),0,0])*pl).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*x[1]*(1-x[0]-x[1]-x[2])])*pl).curl().curl(),entity=(3,0),mapping="covariant"))
+            for pl in pol[-(order-2)*(order-1)//2:]:
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,x[0]*x[2]*(1-x[0]-x[1]-x[2]),0])*pl).curl().curl(),entity=(3,0),mapping="covariant"))
             pol=polynomial_set_1d(3, order - 4)
-            for f in pol:
-                dofs.append(IntegralAgainst(reference,ScalarFunction(x[0]*x[1]*x[2]*(1-x[0]-x[1]-x[2])*f).grad(3),entity=(3,0),mapping="covariant"))
+            for pl in pol:
+                dofs.append(IntegralAgainst(reference,ScalarFunction(x[0]*x[1]*x[2]*(1-x[0]-x[1]-x[2])*pl).grad(3),entity=(3,0),mapping="covariant"))
         elif reference.name == "hexahedron":
             pol=quolynomial_set_1d(3, order - 3)
-            for f in pol:
-                dofs.append(IntegralAgainst(reference,(VectorFunction([x[0]* x[1]*(1-x[1])*x[2]*(1-x[2]),0,0])*f).curl().curl(),entity=(3,0),mapping="covariant"))             
-                dofs.append(IntegralAgainst(reference,(VectorFunction([x[0]*(1-x[0])* x[1]*(1-x[1])*x[2]*(1-x[2]),0,0])*f).curl().curl(),entity=(3,0),mapping="covariant"))
-                dofs.append(IntegralAgainst(reference,(VectorFunction([(1-x[0])* x[1]*(1-x[1])*x[2]*(1-x[2]),0,0])*f).curl().curl(),entity=(3,0),mapping="covariant"))                
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,x[0]*(1-x[0])* x[1] *x[2]*(1-x[2]),0])*f).curl().curl(),entity=(3,0),mapping="covariant"))
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,x[0]*(1-x[0])* x[1]*(1-x[1])* x[2]*(1-x[2]),0])*f).curl().curl(),entity=(3,0),mapping="covariant"))
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,x[0]*(1-x[0])* (1-x[1])*x[2]*(1-x[2]),0])*f).curl().curl(),entity=(3,0),mapping="covariant"))
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*(1-x[0])*x[1]*(1-x[1])*x[2]])*f).curl().curl(),entity=(3,0),mapping="covariant"))
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*(1-x[0])*x[1]*(1-x[1])*x[2]*(1-x[2])])*f).curl().curl(),entity=(3,0),mapping="covariant"))
-                dofs.append(IntegralAgainst(reference,ScalarFunction(x[0]*(1-x[0])*x[1]*(1-x[1])*x[2]*(1-x[2])*f).grad(3),entity=(3,0),mapping="covariant"))                
+            for pl in pol:
+                dofs.append(IntegralAgainst(reference,(VectorFunction([x[0]* x[1]*(1-x[1])*x[2]*(1-x[2]),0,0])*pl).curl().curl(),entity=(3,0),mapping="covariant"))             
+                dofs.append(IntegralAgainst(reference,(VectorFunction([x[0]*(1-x[0])* x[1]*(1-x[1])*x[2]*(1-x[2]),0,0])*pl).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([(1-x[0])* x[1]*(1-x[1])*x[2]*(1-x[2]),0,0])*pl).curl().curl(),entity=(3,0),mapping="covariant"))                
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,x[0]*(1-x[0])* x[1] *x[2]*(1-x[2]),0])*pl).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,x[0]*(1-x[0])* x[1]*(1-x[1])* x[2]*(1-x[2]),0])*pl).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,x[0]*(1-x[0])* (1-x[1])*x[2]*(1-x[2]),0])*pl).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*(1-x[0])*x[1]*(1-x[1])*x[2]])*pl).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*(1-x[0])*x[1]*(1-x[1])*x[2]*(1-x[2])])*pl).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,ScalarFunction(x[0]*(1-x[0])*x[1]*(1-x[1])*x[2]*(1-x[2])*pl).grad(3),entity=(3,0),mapping="covariant"))                
         elif reference.name == "hexahedronn":
             for i in range(1, order - 1):
                 for j in range(1, order - 1):
@@ -423,13 +423,25 @@ class TNTcurl(CiarletElement):
                         )
         elif reference.name == "prism":
             pol=prism_polynomial_set_1d(3, order - 3)
-            for f in pol:
-                dofs.append(IntegralAgainst(reference,(VectorFunction([x[1]*(1-x[0]-x[1])*x[2]*(1-x[2]),0,0])*f).curl().curl(),entity=(3,0),mapping="covariant"))             
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,x[0]*(1-x[0]-x[1])*x[2]*(1-x[2]),0])*f).curl().curl(),entity=(3,0),mapping="covariant"))             
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*x[1]*(1-x[0]-x[1])*x[2]])*f).curl().curl(),entity=(3,0),mapping="covariant"))
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*x[1]*(1-x[0]-x[1])*x[2]*(1-x[2])])*f).curl().curl(),entity=(3,0),mapping="covariant"))
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*x[1]*(1-x[0]-x[1])*(1-x[2])])*f).curl().curl(),entity=(3,0),mapping="covariant"))
+            for pl in pol:
+                dofs.append(IntegralAgainst(reference,(VectorFunction([x[1]*(1-x[0]-x[1])*x[2]*(1-x[2]),0,0])*pl).curl().curl(),entity=(3,0),mapping="covariant"))             
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,x[0]*(1-x[0]-x[1])*x[2]*(1-x[2]),0])*pl).curl().curl(),entity=(3,0),mapping="covariant"))             
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*x[1]*(1-x[0]-x[1])*x[2]])*pl).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*x[1]*(1-x[0]-x[1])*x[2]*(1-x[2])])*pl).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*x[1]*(1-x[0]-x[1])*(1-x[2])])*pl).curl().curl(),entity=(3,0),mapping="covariant"))
 #                dofs.append(IntegralAgainst(reference,ScalarFunction(x[0]*x[1]*(1-x[0]-x[1])*x[2]*(1-x[2])*f).grad(3),entity=(3,0),mapping="covariant"))   
+
+        elif reference.name == "pyramid":
+            pol=prism_polynomial_set_1d(3, order - 4)
+            for pl in pol:
+                dofs.append(IntegralAgainst(reference,(VectorFunction([x[1]*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2]),0,0])*pl).curl().curl(),entity=(3,0),mapping="covariant"))             
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,x[0]*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2]),0])*pl).curl().curl(),entity=(3,0),mapping="covariant"))             
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[1]*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])])*pl).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([x[0]*x[1]*x[2]*(1-x[1]-x[2]),x[0]*x[1]*x[2]*(1-x[1]-x[2]),0]).pl).curl().curl(),entity=(3,0),mapping="covariant"))
+            pol=prism_polynomial_set_1d(3, order - 5)
+            for pl in pol:
+               dofs.append(IntegralAgainst(reference,ScalarFunction(x[0]*x[1]*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])*pl).grad(3),entity=(3,0),mapping="covariant"))   
+
 
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
