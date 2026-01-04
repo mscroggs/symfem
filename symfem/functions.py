@@ -768,7 +768,12 @@ class ScalarFunction(Function):
         Returns:
             The curl
         """
-        raise ValueError("Cannot compute the curl of a scalar-valued function.")
+        return VectorFunction(
+            [
+                self.diff(x[1]), - self.diff(x[0])
+            ]
+        )
+
 
     def norm(self) -> ScalarFunction:
         """Compute the norm of the function.
