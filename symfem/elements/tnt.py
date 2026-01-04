@@ -230,9 +230,28 @@ class TNTcurl(CiarletElement):
             raise NonDefaultReferenceError()
 
         poly: list[FunctionInput] = []
-        if reference.name in ["interval", "triangle", "tetrahedron"]:
+        if reference.name in ["interval", "triangle", "tetrahedron", "pyramid"]:
             poly += polynomial_set_vector(reference.tdim, reference.tdim, order-1)
             poly += Hcurl_polynomials(reference.tdim,reference.tdim,order)
+            if reference.name == "pyramid":
+                pol=pyramid_polynomial_set_1d(3, order)
+                print(pol)
+                for ii in range(order-1):
+                    poly.append(ScalarFunction(pol[(order+1)*(order+2)*(2*order+3)//6-(order-ii+1)*(order-ii+2)*(2*(order-ii)+3)//6+(order-ii)*(order-ii)]).grad(3))
+                poly.append(ScalarFunction(pol[2*order+1]).grad(3))
+                if order>1:
+                    for ii in range(order-2):
+                        poly.append(ScalarFunction(pol[(order+1)*(order+2)*(2*order+3)//6-(order-ii+1)*(order-ii+2)*(2*(order-ii)+3)//6+2*(order-ii)]).grad(3))
+                        for jj in range(ii+1):
+                            poly.append(ScalarFunction(pol[3*order+1+ii*order+jj]).grad(3))
+                    poly.append(ScalarFunction(pol[order*(order+1)+1]).grad(3))
+                pol=polynomial_set_vector(3,3,0)
+                for pl in pol[max(4-2*order,0):]:
+                    poly.append(x[0]*x[1]/(1-x[2])*pl) # modified from Cockburn & Fu
+                pol=pyramid_polynomial_set_1d(3,order-1)
+                for ii in range(order-1):
+                    for jj in range(ii+1):
+                        poly.append(VectorFunction([x[1],-x[0],0])*pol[ii+1+(jj+1)*(order+1)]) 
         elif reference.name in ["quadrilateral", "hexahedron"]:
             poly += quolynomial_set_vector(reference.tdim, reference.tdim, order-1)
             if reference.tdim == 2:
@@ -283,20 +302,13 @@ class TNTcurl(CiarletElement):
                 poly.append(VectorFunction([x[1],-x[0],0])*x[0]**i*x[1]**(order-i-1))
                 poly.append(VectorFunction([x[1],-x[0],0])*x[0]**i*x[1]**(order-i-1)*x[2])
             for i in range(order+1):  
-                poly.append(VectorFunction([0,0,x[0]**i*x[1]**(order-i)]).curl().cross(VectorFunction([x[0],x[1],x[2]]))*x[2]**(order-1))
+                poly.append(VectorFunction([0,0,x[0]**i*x[1]**(order-i)]).curl().cross(VectorFunction([x[0],x[1],x[2]]))*x[2]**(order-1))  # modified from Cockburn & Fu
                 poly.append(ScalarFunction(x[0]**i*x[1]**(order-i)*x[2]).grad(3)) # P~_order(x[0],x[1])*x[2]
             if order > 1:
-                # P_1(x[0],x[1])*x[2]**order
-                for pl in polynomial_set_1d(2, 1)[1:]:
-                    poly.append(ScalarFunction(x[2]**order*pl).grad(3))
+                for pl in polynomial_set_1d(2, 1)[1:]:  
+                    poly.append(ScalarFunction(x[2]**order*pl).grad(3))  # P_1(x[0],x[1])*x[2]**order
                 poly.append(VectorFunction([x[1],-x[0],0])*x[2]**order)
             print(reference.name,order,poly)
-            
-                    
-        elif reference.name == "pyramid":
-            None
-
-            poly += prism_polynomial_set_1d(3, order - 1)
                     
         dofs: ListOfFunctionals = []
         dofs += make_integral_moment_dofs(reference, edges=(TangentIntegralMoment, Q, order - 1, {"variant": variant}))
@@ -337,7 +349,7 @@ class TNTcurl(CiarletElement):
                 dofs.append(IntegralAgainst(reference, f[0], entity=(2, f[1]), mapping="covariant"))
         elif reference.name == "pyramid":
             for f in face_moments_q:
-                dofs.append(IntegralAgainst(reference, entity=(2, f), mapping="covariant"))
+                dofs.append(IntegralAgainst(reference, f[0], entity=(2, 0), mapping="covariant"))
             for f in product(face_moments_s, range(1,5)):
                 dofs.append(IntegralAgainst(reference, f[0], entity=(2, f[1]), mapping="covariant"))
             
