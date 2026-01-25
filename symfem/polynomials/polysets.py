@@ -75,6 +75,8 @@ def Hdiv_polynomials(
         A set of polynomials
     """
     assert domain_dim == range_dim
+    if domain_dim == 1:
+        return []
     if domain_dim == 2:
         return [
             VectorFunction(
