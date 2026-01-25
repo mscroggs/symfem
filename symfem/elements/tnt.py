@@ -228,7 +228,7 @@ class TNTcurl(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
-#        order+=1
+        order+=1
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
@@ -259,7 +259,7 @@ class TNTcurl(CiarletElement):
             poly += quolynomial_set_vector(reference.tdim, reference.tdim, order-1)
             if reference.tdim == 2:
                 for ii in product([0, 1], repeat=2):
-                    if sum(ii) != 0 and (order!=1 or sum(ii)!=2):
+                    if sum(ii) > 0 and (order > 1 or sum(ii) < 2):
                         poly.append(
                             tuple(
                                 sympy.S(j).expand()
@@ -272,7 +272,7 @@ class TNTcurl(CiarletElement):
             else:
                 face_poly = []
                 for ii in product([0, 1], repeat=2):
-                    if sum(ii) != 0:
+                    if sum(ii) > 0:
                         face_poly.append(
                             tuple(
                                 sympy.S(j).expand()
@@ -299,6 +299,16 @@ class TNTcurl(CiarletElement):
                             )
                         )
                         poly.append(pc)
+                if order==1: # sniff out dependents
+                    poly.pop(20)
+                    poly.pop(19)
+                    poly.pop(17)
+                    poly.pop(13)
+                    poly.pop(12)
+                    poly.pop(11)
+                    poly.pop(8)
+                    poly.pop(7)
+                    poly.pop(4)
         elif reference.name == "prism":
             poly += prism_polynomial_set_vector(reference.tdim, reference.tdim, order-1)
             for i in range(order):
@@ -405,9 +415,7 @@ class TNTcurl(CiarletElement):
             pol=polynomial_set_1d(3, order - 5)
             for pl in pol:
                dofs.append(IntegralAgainst(reference,ScalarFunction(((1-x[2])*symmetricpyramid+x[0])*((1-x[2])*symmetricpyramid+x[1])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])*pl).grad(3),entity=(3,0),mapping="covariant"))   
-
-        print(reference.name, order, order-1, poly)
-#        order-=1
+        order-=1
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
@@ -454,7 +462,7 @@ class TNTdiv(CiarletElement):
             order: The polynomial order
             variant: The variant of the element
         """
-#        order+=1
+        order+=1
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
 
@@ -476,7 +484,7 @@ class TNTdiv(CiarletElement):
             poly += quolynomial_set_vector(reference.tdim, reference.tdim, order-1)
             if reference.tdim == 2:
                 for ii in product([0, 1], repeat=2):
-                    if sum(ii) != 0:
+                    if sum(ii) > 0 and (order > 1 or sum(ii) < 2):
                         poly.append(
                             tuple(
                                 sympy.S(j).expand()
@@ -488,20 +496,14 @@ class TNTdiv(CiarletElement):
                         )
             else:
                 for ii in product([0, 1], repeat=3):
-                    if sum(ii) != 0:
+                    if sum(ii) > 0  and (order > 1 or sum(ii) < 2):
                         poly.append(
                             (
-                                b(order, ii[0] * x[0])
-                                * p(order - 1, ii[1] * x[1])
-                                * p(order - 1, ii[2] * x[2]),
-                                p(order - 1, ii[0] * x[0])
-                                * b(order, ii[1] * x[1])
-                                * p(order - 1, ii[2] * x[2]),
-                                p(order - 1, ii[0] * x[0])
-                                * p(order - 1, ii[1] * x[1])
-                                * b(order, ii[2] * x[2]),
+                                b(order, ii[0] * x[0]) * p(order - 1, ii[1] * x[1]) * p(order - 1, ii[2] * x[2]),
+                                p(order - 1, ii[0] * x[0])  * b(order, ii[1] * x[1])  * p(order - 1, ii[2] * x[2]),
+                                p(order - 1, ii[0] * x[0]) * p(order - 1, ii[1] * x[1]) * b(order, ii[2] * x[2]),
                             )
-                        )
+                        )              
         elif reference.name == "prism":
             poly += prism_polynomial_set_vector(reference.tdim, reference.tdim, order-1)
             for i in range(order):
@@ -580,8 +582,7 @@ class TNTdiv(CiarletElement):
                 dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,x[0]*x[1]*(1-x[0]-x[1])*(1-x[2])])*pol[i*(order  - 2)]).curl(),entity=(3,0),mapping="contravariant"))
             for pl in prism_polynomial_set_1d(3, order - 1)[1:]:
                 dofs.append(IntegralAgainst(reference,pl.grad(3),entity=(3,0),mapping="contravariant"))                           
-#        print(reference.name, order, poly)
-#        order-=1
+        order-=1
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
 
