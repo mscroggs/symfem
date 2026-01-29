@@ -88,11 +88,11 @@ class DPC(CiarletElement):
         return self.order
 
     names = ["dPc"]
-    references = ["interval", "quadrilateral", "hexahedron"]
+    references = ["interval", "triangle", "quadrilateral", "tetrahedron", "hexahedron", "prism", "pyramid"] # don't know what the use is for prism. Pyramid according to Cockburn & Fu
     min_order = 0
     continuity = "L2"
     value_type = "scalar"
-    last_updated = "2023.07.1"
+    last_updated = "2026.1"
 
 
 class VectorDPC(CiarletElement):

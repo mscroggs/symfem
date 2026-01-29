@@ -2189,7 +2189,18 @@ class Pyramid(Reference):
         Returns:
             A lattice of points offset from the edge of the cell
         """
-        raise NotImplementedError()
+        assert self.vertices == self.reference_vertices
+        pts = []
+        for k in range(n + 1):
+            z = sympy.Rational(2 * k + 1, 2 * (n + 1))
+            m = n - k
+            for i in range(m + 1):
+                x = sympy.Rational(2 * i + 1, 2 * (n + 1))
+                for j in range(m + 1):
+                    y = sympy.Rational(2 * j + 1, 2 * (n + 1))
+                    if x + z <= 1 and y + z <= 1:
+                        pts.append((x, y, z))
+        return tuple(pts)
 
     def make_lattice_with_lines(self, n: int) -> LatticeWithLines:
         """Make a lattice of points, and a list of lines connecting them.
