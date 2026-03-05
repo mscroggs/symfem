@@ -683,7 +683,7 @@ class ScalarFunction(Function):
         """Compute a directional derivative.
 
         Args:
-            direction: The diection
+            direction: The direction
 
         Returns:
             The directional derivatve
@@ -754,7 +754,7 @@ class ScalarFunction(Function):
         """
         raise ValueError("Cannot compute the div of a scalar-valued function.")
 
-    def grad(self, dim: int) -> Function:
+    def grad(self, dim: int) -> VectorFunction:
         """Compute the grad of the function.
 
         Returns:
@@ -783,7 +783,7 @@ class ScalarFunction(Function):
         domain: symfem.references.Reference,
         vars: AxisVariablesNotSingle = x,
         dummy_vars: AxisVariablesNotSingle = t,
-    ) -> Function:
+    ) -> ScalarFunction:
         """Compute the integral of the function.
 
         Args:
@@ -818,7 +818,7 @@ class ScalarFunction(Function):
             int | sympy.core.expr.Expr,
             int | sympy.core.expr.Expr,
         ],
-    ):
+    ) -> ScalarFunction:
         """Integrate the function.
 
         Args:
@@ -886,7 +886,7 @@ class ScalarFunction(Function):
         for s, m1, m2, e in self._plot_beziers[(reference, n)]:
             img.add_bezier(s, m1, m2, e, colors.ORANGE)
 
-    def with_floats(self) -> Function:
+    def with_floats(self) -> ScalarFunction:
         """Return a version the function with floats as coefficients.
 
         Returns:
@@ -1208,7 +1208,7 @@ class VectorFunction(Function):
             out += i.diff(j)
         return out
 
-    def grad(self, dim: int) -> Function:
+    def grad(self, dim: int) -> MatrixFunction:
         """Compute the grad of the function.
 
         Returns:
@@ -1247,7 +1247,7 @@ class VectorFunction(Function):
         domain: symfem.references.Reference,
         vars: AxisVariablesNotSingle = x,
         dummy_vars: AxisVariablesNotSingle = t,
-    ) -> Function:
+    ) -> VectorFunction:
         """Compute the integral of the function.
 
         Args:
@@ -1741,7 +1741,7 @@ class MatrixFunction(Function):
         domain: symfem.references.Reference,
         vars: AxisVariablesNotSingle = x,
         dummy_vars: AxisVariablesNotSingle = t,
-    ) -> Function:
+    ) -> MatrixFunction:
         """Compute the integral of the function.
 
         Args:
@@ -1780,7 +1780,7 @@ class MatrixFunction(Function):
         assert isinstance(mat, sympy.matrices.dense.MutableDenseMatrix)
         return MatrixFunction(mat.transpose())
 
-    def with_floats(self) -> Function:
+    def with_floats(self) -> MatrixFunction:
         """Return a version the function with floats as coefficients.
 
         Returns:
