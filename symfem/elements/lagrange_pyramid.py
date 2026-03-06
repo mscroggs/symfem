@@ -50,9 +50,9 @@ class Lagrange(CiarletElement):
             raise NotImplementedError()
         else:
             if variant == "gl":
-                points, _ = get_quadrature("legendre", order + 1)
+                points = [i[0] for i in get_quadrature("legendre", order + 1).points]
             else:
-                points, _ = get_quadrature(variant, order + 1)
+                points = [i[0] for i in get_quadrature(variant, order + 1).points]
 
             # Vertices
             for v_n, v in enumerate(reference.vertices):

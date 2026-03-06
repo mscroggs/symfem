@@ -1,0 +1,2 @@
+- Add QuadratureRule class
+- Add AbstractQuadratureRule for quadrature with points represented by variables

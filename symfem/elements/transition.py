@@ -71,7 +71,7 @@ class Transition(CiarletElement):
                     raise RuntimeError("Could not find order for this entity.")
 
                 # DOFs
-                points, _ = get_quadrature(variant, entity_order + 1)
+                points = [i[0] for i in get_quadrature(variant, entity_order + 1).points]
                 for ii in product(range(1, entity_order), repeat=edim):
                     if sum(ii) < entity_order:
                         pt = entity.get_point([points[j] for j in ii])
