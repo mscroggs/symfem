@@ -53,3 +53,11 @@ def test_abstract():
     qr1 = quadrature.AbstractQuadratureRule(3, 2)
     assert qr0.weights[0] == sympy.Symbol(f"{qr0.weights[0]}")
     assert qr0.weights[0] != qr1.weights[0]
+
+
+def test_abstract_integrate():
+    x = sympy.Symbol("x")
+    y = sympy.Symbol("y")
+
+    qr = quadrature.AbstractQuadratureRule(3, 2)
+    qr.integrate(x * y**2, (x, y))

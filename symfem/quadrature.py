@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import sympy
 import typing
 from symfem.symbols import AxisVariablesNotSingle, x
-from symfem.functions import Function
+from symfem.functions import Function, FunctionInput, parse_function_input
 
 try:
     import basix
@@ -41,13 +41,14 @@ class BaseQuadratureRule(ABC):
     def weights(self) -> list[Scalar]:
         """Quadrature weights."""
 
-    def integrate(self, f: Function, vars: AxisVariablesNotSingle = x) -> Function:
+    def integrate(self, f_in: FunctionInput, vars: AxisVariablesNotSingle = x) -> Function:
         """Use the quadrature rule to estimate the integral of a function.
 
         Args:
-            f: The function to integrate
+            f_in: The function to integrate
             vars: The variables to integrate with repect to
         """
+        f = parse_function_input(f_in)
         return sum(w * f.subs(vars, p) for p, w in zip(self.points, self.weights))
 
 
