@@ -33,7 +33,7 @@ class CrouzeixRaviart(CiarletElement):
         if order > 1:
             assert reference.name == "triangle"
 
-        points, _ = get_quadrature(variant, order + reference.tdim)
+        points = [i[0] for i in get_quadrature(variant, order + reference.tdim).points]
 
         dofs: ListOfFunctionals = []
 
@@ -52,7 +52,7 @@ class CrouzeixRaviart(CiarletElement):
                         )
                     )
 
-        points, _ = get_quadrature(variant, order + reference.tdim - 1)
+        points = [i[0] for i in get_quadrature(variant, order + reference.tdim - 1).points]
         for i in product(range(1, order), repeat=reference.tdim):
             if sum(i) < order:
                 dofs.append(

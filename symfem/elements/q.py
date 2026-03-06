@@ -67,7 +67,7 @@ class Q(CiarletElement):
                     for f in basis:
                         dofs.append(IntegralAgainst(reference, f, (edim, e_n)))
         else:
-            points, _ = get_quadrature(variant, order + 1)
+            points = [i[0] for i in get_quadrature(variant, order + 1).points]
 
             for v_n, v in enumerate(reference.vertices):
                 dofs.append(PointEvaluation(reference, v, entity=(0, v_n)))
