@@ -956,7 +956,7 @@ class VectorFunction(Function):
                 vec_l.append(i)
             else:
                 vec_l.append(ScalarFunction(i))
-        self._vec = tuple(vec_l)
+        self._vec = vec_l#tuple(vec_l)
         for i in self._vec:
             assert i.is_scalar
 
@@ -1368,7 +1368,7 @@ class MatrixFunction(Function):
                     row.append(ScalarFunction(j))
             mat_l.append(tuple(row))
 
-        self._mat = tuple(mat_l)
+        self._mat = mat_l#tuple(mat_l)
         self._shape = (len(self._mat), 0 if len(self._mat) == 0 else len(self._mat[0]))
         for i in self._mat:
             assert len(i) == self._shape[1]
