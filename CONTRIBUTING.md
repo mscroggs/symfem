@@ -18,3 +18,7 @@ to see where (if anywhere) there are errors in your code.
 ### Code of conduct
 We expect all our contributors to follow [the Contributor Covenant](CODE_OF_CONDUCT.md). Any unacceptable
 behaviour can be reported to Matthew (symfem@mscroggs.co.uk).
+
+### AI-assisted development
+If any LLM or other AI tool is used, this must be declared in the text of the pull request. Any AI-generated code must be thoroughly
+checked by the person opening the pull request before the PR is opened.
