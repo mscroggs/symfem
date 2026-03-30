@@ -31,6 +31,17 @@ You may also use `-e` to install in editable mode:
 ```bash
 pip3 install -e .
 ```
+For testing install 
+
+```bash
+pip3 install -e .[test]
+```
+
+and for style checking 
+
+```bash
+pip3 install -e .[style]
+```
 
 ## Installing from PyPI using pip
 The latest release of Symfem can be installed by running:
