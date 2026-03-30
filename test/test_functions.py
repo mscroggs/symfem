@@ -46,15 +46,14 @@ def test_scalar_function_subs():
 
 
 def test_vector_function_itemassignment():
-    a = VectorFunction([1,2,3])
+    a = VectorFunction([1, 2, 3])
     a[0] = 0
     # test single index assignment
     assert a[0] == 0
     # test single slice assigment
-    assert a[::2] == [0,3]
-    # test 
-    
-                    
+    assert a[::2] == [0, 3]
+    # test
+
 
 def test_vector_function_add_sub():
     a = [(0, 1), VectorFunction((0, 1))]
@@ -118,9 +117,7 @@ def test_matrix_function_add_sub():
 
 
 def test_matrix_function_itemassignment():
-    a = MatrixFunction([[1, 0, 0], 
-                        [0, 1, 2], 
-                        [3, 1, 3]])
+    a = MatrixFunction([[1, 0, 0], [0, 1, 2], [3, 1, 3]])
 
     # single item assignment
     a[0, 0] = 0

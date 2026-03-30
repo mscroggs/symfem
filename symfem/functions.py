@@ -104,6 +104,7 @@ def _check_equal(first: SympyFormat, second: SympyFormat) -> bool:
 
     return False
 
+
 class Function(ABC):
     """A function."""
 
@@ -929,15 +930,18 @@ class ScalarFunction(Function):
         else:
             raise ValueError(f"Unrecognised cell: {cell.name}")
 
+
 def enforce_ScalarFunction(value: Function | int | float | sympy.core.expr.Expr) -> ScalarFunction:
     """Enforce that value/entry becomes a ScalarFunction."""
     from symfem.basis_functions import BasisFunction
+
     if isinstance(value, Function):
         if isinstance(value, BasisFunction):
             value = value.get_function()
         assert isinstance(value, ScalarFunction)
         return value
     return ScalarFunction(value)
+
 
 class VectorFunction(Function):
     """A vector-valued function."""
@@ -987,7 +991,7 @@ class VectorFunction(Function):
         if isinstance(fs, ScalarFunction):
             return fs
         return VectorFunction(fs)
-    
+
     def __setitem__(self, key, value) -> None:
         """Set a component or slice of the function."""
         if isinstance(key, slice):
@@ -998,7 +1002,7 @@ class VectorFunction(Function):
             self._vec[key] = enforce_ScalarFunction(value)
 
         self._plot_arrows.clear()
-        
+
     def __add__(self, other: typing.Any) -> VectorFunction:
         """Add."""
         if isinstance(other, VectorFunction):
@@ -1396,7 +1400,7 @@ class MatrixFunction(Function):
             assert len(key) == 2
             return self._mat[key[0]][key[1]]
         return self.row(key)
-    
+
     def __setitem__(self, key, value) -> None:
         """Set a component, row, or slice of the matrix."""
         # case two indices are provided
@@ -1415,7 +1419,7 @@ class MatrixFunction(Function):
                     for col, colval in zip(cols, val):
                         self._mat[row][col] = enforce_ScalarFunction(colval)
             # row assigment via slice and column via integer
-            elif isinstance(i, slice) and isinstance(j,int):
+            elif isinstance(i, slice) and isinstance(j, int):
                 assert isinstance(value, (list, tuple))
                 rows = range(*i.indices(self.shape[0]))
                 assert len(value) == len(rows)
@@ -1429,12 +1433,14 @@ class MatrixFunction(Function):
                 for jj, v in zip(cols, value):
                     self._mat[i][jj] = enforce_ScalarFunction(v)
             # assigment via two integers
-            elif isinstance(i, int) and isinstance(j ,int):
+            elif isinstance(i, int) and isinstance(j, int):
                 self._mat[i][j] = enforce_ScalarFunction(value)
             #
             else:
-                raise TypeError("key must contain either slices or int. "+\
-                                f"Current types: {type(i)}, {type(j)}")
+                raise TypeError(
+                    "key must contain either slices or int. "
+                    + f"Current types: {type(i)}, {type(j)}"
+                )
         # single slice provided
         elif isinstance(key, slice):
             if isinstance(value, (list, tuple)):
@@ -1444,7 +1450,7 @@ class MatrixFunction(Function):
                     assert isinstance(v, (list, tuple))
                     assert len(v) == self.shape[1]
                     self._mat[ii] = [enforce_ScalarFunction(x) for x in v]
-            elif isinstance(value, (int,float,sympy.core.expr.Expr,ScalarFunction)):
+            elif isinstance(value, (int, float, sympy.core.expr.Expr, ScalarFunction)):
                 v = enforce_ScalarFunction(value)
                 for row in range(self.shape[0])[key]:
                     self._mat[row] = [v for i in range(self.shape[1])]
@@ -1453,15 +1459,14 @@ class MatrixFunction(Function):
             if isinstance(value, (list, tuple)):
                 assert len(value) == self.shape[1]
                 self._mat[key] = [enforce_ScalarFunction(v) for v in value]
-            elif isinstance(value, (int,float,sympy.core.expr.Expr,ScalarFunction)):
+            elif isinstance(value, (int, float, sympy.core.expr.Expr, ScalarFunction)):
                 v = enforce_ScalarFunction(value)
                 self._mat[key] = [v for i in range(self.shape[1])]
             else:
                 raise TypeError
         #
         else:
-            raise TypeError("key must be int, slice or tuple. "+\
-                            f"Current type: {type(key)}")
+            raise TypeError("key must be int, slice or tuple. " + f"Current type: {type(key)}")
 
     def row(self, n: int) -> VectorFunction:
         """Get a row of the matrix.
@@ -1878,7 +1883,7 @@ class MatrixFunction(Function):
 FunctionInput = typing.Union[
     Function,
     sympy.core.expr.Expr,
-    int, 
+    int,
     float,
     tuple[sympy.core.expr.Expr | int | float | Function, ...],
     list[sympy.core.expr.Expr | int | float | Function],
