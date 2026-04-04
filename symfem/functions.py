@@ -527,7 +527,7 @@ class ScalarFunction(Function):
 
     _f: sympy.core.expr.Expr
 
-    def __init__(self, f: int | sympy.core.expr.Expr):
+    def __init__(self, f: int | float | sympy.core.expr.Expr):
         """Create a scalar-valued function.
 
         Args:
@@ -536,6 +536,8 @@ class ScalarFunction(Function):
         super().__init__(scalar=True)
         if isinstance(f, int):
             self._f = sympy.Integer(f)
+        elif isinstance(f, float):
+            self._f = sympy.Float(f)
         else:
             self._f = f
         assert isinstance(self._f, sympy.core.expr.Expr)
@@ -929,10 +931,22 @@ class ScalarFunction(Function):
             raise ValueError(f"Unrecognised cell: {cell.name}")
 
 
+def enforce_ScalarFunction(value: Function | int | float | sympy.core.expr.Expr) -> ScalarFunction:
+    """Enforce that value/entry becomes a ScalarFunction."""
+    from symfem.basis_functions import BasisFunction
+
+    if isinstance(value, Function):
+        if isinstance(value, BasisFunction):
+            value = value.get_function()
+        assert isinstance(value, ScalarFunction)
+        return value
+    return ScalarFunction(value)
+
+
 class VectorFunction(Function):
     """A vector-valued function."""
 
-    _vec: tuple[ScalarFunction, ...]
+    _vec: list[ScalarFunction]
 
     def __init__(
         self,
@@ -944,19 +958,12 @@ class VectorFunction(Function):
         Args:
             vec: The sympy representation of the function.
         """
-        from symfem.basis_functions import BasisFunction
 
         super().__init__(vector=True)
         vec_l = []
         for i in vec:
-            if isinstance(i, Function):
-                if isinstance(i, BasisFunction):
-                    i = i.get_function()
-                assert isinstance(i, ScalarFunction)
-                vec_l.append(i)
-            else:
-                vec_l.append(ScalarFunction(i))
-        self._vec = tuple(vec_l)
+            vec_l.append(enforce_ScalarFunction(i))
+        self._vec = vec_l
         for i in self._vec:
             assert i.is_scalar
 
@@ -984,6 +991,17 @@ class VectorFunction(Function):
         if isinstance(fs, ScalarFunction):
             return fs
         return VectorFunction(fs)
+
+    def __setitem__(self, key, value) -> None:
+        """Set a component or slice of the function."""
+        if isinstance(key, slice):
+            # type check
+            assert isinstance(value, (list, tuple))
+            self._vec[key] = [enforce_ScalarFunction(v) for v in value]
+        else:
+            self._vec[key] = enforce_ScalarFunction(value)
+
+        self._plot_arrows.clear()
 
     def __add__(self, other: typing.Any) -> VectorFunction:
         """Add."""
@@ -1334,7 +1352,7 @@ class VectorFunction(Function):
 class MatrixFunction(Function):
     """A matrix-valued function."""
 
-    _mat: tuple[tuple[ScalarFunction, ...], ...]
+    _mat: list[list[ScalarFunction]]
 
     def __init__(
         self,
@@ -1349,7 +1367,6 @@ class MatrixFunction(Function):
         Args:
             mat: The sympy representation of the function.
         """
-        from symfem.basis_functions import BasisFunction
 
         super().__init__(matrix=True)
         if isinstance(mat, sympy.matrices.dense.MutableDenseMatrix):
@@ -1359,16 +1376,9 @@ class MatrixFunction(Function):
         for i in mat:
             row = []
             for j in i:
-                if isinstance(j, Function):
-                    if isinstance(j, BasisFunction):
-                        j = j.get_function()
-                    assert isinstance(j, ScalarFunction)
-                    row.append(j)
-                else:
-                    row.append(ScalarFunction(j))
-            mat_l.append(tuple(row))
-
-        self._mat = tuple(mat_l)
+                row.append(enforce_ScalarFunction(j))
+            mat_l.append(list(row))
+        self._mat = mat_l
         self._shape = (len(self._mat), 0 if len(self._mat) == 0 else len(self._mat[0]))
         for i in self._mat:
             assert len(i) == self._shape[1]
@@ -1390,6 +1400,73 @@ class MatrixFunction(Function):
             assert len(key) == 2
             return self._mat[key[0]][key[1]]
         return self.row(key)
+
+    def __setitem__(self, key, value) -> None:
+        """Set a component, row, or slice of the matrix."""
+        # case two indices are provided
+        if isinstance(key, tuple):
+            assert len(key) == 2
+            i, j = key
+            # grid assigment via two slices
+            if isinstance(i, slice) and isinstance(j, slice):
+                assert isinstance(value, (list, tuple))
+                rows = range(self.shape[0])[i]
+                assert len(value) == len(rows)
+                for row, val in zip(rows, value):
+                    assert isinstance(val, (list, tuple))
+                    cols = range(*j.indices(self.shape[1]))
+                    assert len(val) == len(cols)
+                    for col, colval in zip(cols, val):
+                        self._mat[row][col] = enforce_ScalarFunction(colval)
+            # row assigment via slice and column via integer
+            elif isinstance(i, slice) and isinstance(j, int):
+                assert isinstance(value, (list, tuple))
+                rows = range(*i.indices(self.shape[0]))
+                assert len(value) == len(rows)
+                for row, val in zip(rows, value):
+                    self._mat[row][j] = enforce_ScalarFunction(val)
+            # row assigment via integer and column via slice
+            elif isinstance(i, int) and isinstance(j, slice):
+                assert isinstance(value, (list, tuple))
+                cols = range(*j.indices(self.shape[1]))
+                assert len(value) == len(cols)
+                for jj, v in zip(cols, value):
+                    self._mat[i][jj] = enforce_ScalarFunction(v)
+            # assigment via two integers
+            elif isinstance(i, int) and isinstance(j, int):
+                self._mat[i][j] = enforce_ScalarFunction(value)
+            #
+            else:
+                raise TypeError(
+                    "key must contain either slices or int. "
+                    + f"Current types: {type(i)}, {type(j)}"
+                )
+        # single slice provided
+        elif isinstance(key, slice):
+            if isinstance(value, (list, tuple)):
+                rows = range(*key.indices(self.shape[0]))
+                assert len(value) == len(rows)
+                for ii, v in zip(rows, value):
+                    assert isinstance(v, (list, tuple))
+                    assert len(v) == self.shape[1]
+                    self._mat[ii] = [enforce_ScalarFunction(x) for x in v]
+            elif isinstance(value, (int, float, sympy.core.expr.Expr, ScalarFunction)):
+                v = enforce_ScalarFunction(value)
+                for row in range(self.shape[0])[key]:
+                    self._mat[row] = [v for i in range(self.shape[1])]
+        # single integer provided
+        elif isinstance(key, int):
+            if isinstance(value, (list, tuple)):
+                assert len(value) == self.shape[1]
+                self._mat[key] = [enforce_ScalarFunction(v) for v in value]
+            elif isinstance(value, (int, float, sympy.core.expr.Expr, ScalarFunction)):
+                v = enforce_ScalarFunction(value)
+                self._mat[key] = [v for i in range(self.shape[1])]
+            else:
+                raise TypeError
+        #
+        else:
+            raise TypeError("key must be int, slice or tuple. " + f"Current type: {type(key)}")
 
     def row(self, n: int) -> VectorFunction:
         """Get a row of the matrix.
@@ -1807,12 +1884,13 @@ FunctionInput = typing.Union[
     Function,
     sympy.core.expr.Expr,
     int,
-    tuple[sympy.core.expr.Expr | int | Function, ...],
-    list[sympy.core.expr.Expr | int | Function],
-    tuple[tuple[sympy.core.expr.Expr | int | Function, ...], ...],
-    tuple[list[sympy.core.expr.Expr | int | Function], ...],
-    list[tuple[sympy.core.expr.Expr | int | Function, ...]],
-    list[list[sympy.core.expr.Expr | int | Function]],
+    float,
+    tuple[sympy.core.expr.Expr | int | float | Function, ...],
+    list[sympy.core.expr.Expr | int | float | Function],
+    tuple[tuple[sympy.core.expr.Expr | int | float | Function, ...], ...],
+    tuple[list[sympy.core.expr.Expr | int | float | Function], ...],
+    list[tuple[sympy.core.expr.Expr | int | float | Function, ...]],
+    list[list[sympy.core.expr.Expr | int | float | Function]],
     sympy.matrices.dense.MutableDenseMatrix,
 ]
 
@@ -1828,7 +1906,7 @@ def parse_function_input(f: FunctionInput) -> Function:
     """
     if isinstance(f, Function):
         return f
-    if isinstance(f, (sympy.core.expr.Expr, int)):
+    if isinstance(f, (sympy.core.expr.Expr, int, float)):
         return ScalarFunction(f)
     if isinstance(f, (list, tuple)):
         if isinstance(f[0], (list, tuple)):
