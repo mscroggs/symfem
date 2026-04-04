@@ -45,6 +45,16 @@ def test_scalar_function_subs():
     assert f.subs(x, [1, 2]) == 5
 
 
+def test_vector_function_itemassignment():
+    a = VectorFunction([1, 2, 3])
+    a[0] = 0
+    # test single index assignment
+    assert a[0] == 0
+    # test single slice assigment
+    assert a[::2] == [0, 3]
+    # test
+
+
 def test_vector_function_add_sub():
     a = [(0, 1), VectorFunction((0, 1))]
     b = [(1, 1), VectorFunction((1, 1))]
@@ -104,6 +114,56 @@ def test_matrix_function_add_sub():
                 # if isinstance(i, MatrixFunction) or isinstance(k, MatrixFunction):
                 if isinstance(k, MatrixFunction):
                     assert k - i == j
+
+
+def test_matrix_function_itemassignment():
+    a = MatrixFunction([[1, 0, 0], [0, 1, 2], [3, 1, 3]])
+
+    # single item assignment
+    a[0, 0] = 0
+    assert a[0, 0] == 0
+
+    # single row assignment by scalar
+    a[0] = 1
+    assert a[0] == [1, 1, 1]
+
+    # single row assignment by list
+    a[1] = [4, 5, 6]
+    assert a[1] == [4, 5, 6]
+
+    # row-slice assignment by scalar
+    a[::2] = 2
+    assert a[0] == [2, 2, 2]
+    assert a[2] == [2, 2, 2]
+
+    # row-slice assignment by list of rows
+    a[::2] = [[7, 8, 9], [10, 11, 12]]
+    assert a[0] == [7, 8, 9]
+    assert a[2] == [10, 11, 12]
+
+    # column-slice assignment in one row
+    a[0, ::2] = [1, 3]
+    assert a[0] == [1, 8, 3]
+
+    # row-slice assignment in one column
+    a[::2, 1] = [20, 30]
+    assert a[0] == [1, 20, 3]
+    assert a[2] == [10, 30, 12]
+
+    # block assignment with two slices
+    a[0:2, 1:3] = [[100, 101], [200, 201]]
+    assert a[0] == [1, 100, 101]
+    assert a[1] == [4, 200, 201]
+
+    # full row replacement through tuple indexing
+    a[1, :] = [9, 8, 7]
+    assert a[1] == [9, 8, 7]
+
+    # full column replacement through tuple indexing
+    a[:, 0] = [5, 6, 7]
+    assert a[0] == [5, 100, 101]
+    assert a[1] == [6, 8, 7]
+    assert a[2] == [7, 30, 12]
 
 
 def test_matrix_function_mul_div():
