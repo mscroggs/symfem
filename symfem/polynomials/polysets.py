@@ -25,19 +25,18 @@ def polynomial_set_1d(
         return [ScalarFunction(variables[0] ** i) for i in range(order + 1)]
     if dim == 2:
         return [
-            ScalarFunction(variables[0] ** i * variables[1] ** j)
+            ScalarFunction(variables[0] ** i * variables[1] ** (j - i))
             for j in range(order + 1)
-            for i in range(order + 1 - j)
+            for i in range(j + 1)
         ]
     if dim == 3:
         return [
-            ScalarFunction(variables[0] ** i * variables[1] ** j * variables[2] ** k)
+            ScalarFunction(variables[0] ** i * variables[1] ** (j - i) * variables[2] ** (k - j))
             for k in range(order + 1)
-            for j in range(order + 1 - k)
-            for i in range(order + 1 - k - j)
+            for j in range(k + 1)
+            for i in range(j + 1)
         ]
     raise ValueError(f"Unsupported dimension: {dim}")
-
 
 def polynomial_set_vector(
     domain_dim: int, range_dim: int, order: int, variables: AxisVariablesNotSingle = x
@@ -76,6 +75,8 @@ def Hdiv_polynomials(
         A set of polynomials
     """
     assert domain_dim == range_dim
+    if domain_dim == 1:
+        return []
     if domain_dim == 2:
         return [
             VectorFunction(
@@ -112,6 +113,8 @@ def Hcurl_polynomials(
         A set of polynomials
     """
     assert domain_dim == range_dim
+    if domain_dim == 1:
+        return []
     if domain_dim == 2:
         return [
             VectorFunction(
@@ -467,12 +470,11 @@ def prism_polynomial_set_1d(
     """
     assert dim == 3
     return [
-        ScalarFunction(variables[0] ** i * variables[1] ** j * variables[2] ** k)
-        for k in range(order + 1)
+        ScalarFunction(variables[0] ** i * variables[1] ** (j - i) * variables[2] ** k)
         for j in range(order + 1)
-        for i in range(order + 1 - j)
+        for i in range(j + 1)
+        for k in range(order + 1)
     ]
-
 
 def prism_polynomial_set_vector(
     domain_dim: int, range_dim: int, order: int, variables: AxisVariablesNotSingle = x
