@@ -260,11 +260,20 @@ class TNTcurl(CiarletElement):
                     for jj in range(order-kk):
                         poly.append(VectorFunction([1-x[2],0,x[0]])*pol[-(kk+max(ii,jj)+2)*(kk+max(ii,jj)+3)*(2*(kk+max(ii,jj))+5)//6+ii*(kk+max(ii,jj)+2)+jj])
                         poly.append(VectorFunction([0,1-x[2],x[1]])*pol[-(kk+max(ii,jj)+2)*(kk+max(ii,jj)+3)*(2*(kk+max(ii,jj))+5)//6+ii*(kk+max(ii,jj)+2)+jj])                    
-            for kk in range(min(order,2)):
-                poly.append(VectorFunction([1,0,x[0]/(1-x[2])])*pol[kk+1])
-                poly.append(VectorFunction([0,1,x[1]/(1-x[2])])*pol[(kk+1)*(order+1)])
-            if order>1:
-                poly.append(VectorFunction([-pol[(order+1)+2],pol[2*(order+1)+1],0]))
+#            for kk in range(min(order,2)):
+#                poly.append(VectorFunction([1,0,x[0]/(1-x[2])])*pol[order-1-kk+1])
+#                poly.append(VectorFunction([0,1,x[1]/(1-x[2])])*pol[(order-1-kk+1)*(order+1)]*1000000)
+#            for kk in range(1):
+#                poly.append(VectorFunction([1,0,x[0]/(1-x[2])])*pol[order-1-kk+1])
+#                poly.append(VectorFunction([0,1,x[1]/(1-x[2])])*pol[(order-1-kk+1)*(order+1)])
+
+            for kk in range(0,order,max(order-1,1)):
+                poly.append(VectorFunction([1,0,x[0]/(1-x[2])])*pol[order-1-kk+1])
+                poly.append(VectorFunction([0,1,x[1]/(1-x[2])])*pol[(order-1-kk+1)*(order+1)])
+            for kk in range(max(order-2,0),order-1):
+                poly.append(VectorFunction([-pol[(kk+1)*(order+1)+kk+2],pol[(kk+2)*(order+1)+kk+1],0]))
+
+#                poly.append(VectorFunction([-pol[(order+1)+2],pol[2*(order+1)+1],0]))
 
         elif reference.name in ["quadrilateral", "hexahedron"]:
             poly += quolynomial_set_vector(reference.tdim, reference.tdim, order-1)
@@ -426,15 +435,15 @@ class TNTcurl(CiarletElement):
             for zz in range(order-2):
               for yy in range(order-zz-3):
                 for xx in range(order-zz-2):
-                    dofs.append(IntegralAgainst(reference,(VectorFunction([((1-x[2])*symmetricpyramid+x[1])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2]),0,-symmetricpyramid*(1+x[1]-x[2])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])])*(1-x[2])**(2-min(xx+1,yy)+min(xx,yy))*pol[-(order-zz-2)*(order-zz-1)*(2*order-2*zz-3)//6+xx*(order-zz-2)+yy]).curl().curl(),entity=(3,0),mapping="covariant"))
-                    dofs.append(IntegralAgainst(reference,(VectorFunction([((1-x[2])*symmetricpyramid+x[0])*((1-x[2])*symmetricpyramid+x[1])*x[2]*(1-x[1]-x[2]),0,((1-x[2])*symmetricpyramid+x[0])*((1-x[2])*symmetricpyramid+x[1])*x[2]*(1-x[1]-x[2])])*(1-x[2])**(2-min(xx+1,yy)+min(xx,yy))*pol[-(order-zz-2)*(order-zz-1)*(2*order-2*zz-3)//6+xx*(order-zz-2)+yy]).curl().curl(),entity=(3,0),mapping="covariant")) 
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,((1-x[2])*symmetricpyramid+x[0])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2]),-symmetricpyramid*(1+x[0]-x[2])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])])*(1-x[2])**2*pol[-(order-zz-2)*(order-zz-1)*(2*order-2*zz-3)//6+yy*(order-zz-2)+order-2]).curl().curl(),entity=(3,0),mapping="covariant"))
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,((1-x[2])*symmetricpyramid+x[0])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2]),-symmetricpyramid*(1+x[0]-x[2])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])])*(1-x[2])**(2-min(1,yy))*pol[-(order-zz-2)*(order-zz-1)*(2*order-2*zz-3)//6+yy*(order-zz-2)]).curl().curl(),entity=(3,0),mapping="covariant"))
+                    dofs.append(IntegralAgainst(reference,(VectorFunction([((1-x[2])*symmetricpyramid+x[1])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2]),0,-symmetricpyramid*(1+x[1]-x[2])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])])*(1-x[2])**-(-1-min(xx,yy+1)+min(xx,yy))*pol[-(order-zz-2)*(order-zz-1)*(2*order-2*zz-3)//6+xx*(order-zz-2)+yy]).curl().curl(),entity=(3,0),mapping="covariant"))
+                    dofs.append(IntegralAgainst(reference,(VectorFunction([((1-x[2])*symmetricpyramid+x[0])*((1-x[2])*symmetricpyramid+x[1])*x[2]*(1-x[1]-x[2]),0,((1-x[2])*symmetricpyramid+x[0])*((1-x[2])*symmetricpyramid+x[1])*x[2]*(1-x[1]-x[2])])*(1-x[2])**(-1-min(xx,yy+1)+min(xx,yy))*pol[-(order-zz-2)*(order-zz-1)*(2*order-2*zz-3)//6+xx*(order-zz-2)+yy]).curl().curl(),entity=(3,0),mapping="covariant"))
+                for xx in range(0,order-zz-2,order-zz-3):
+                    dofs.append(IntegralAgainst(reference,(VectorFunction([0,((1-x[2])*symmetricpyramid+x[0])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2]),-symmetricpyramid*(1+x[0]-x[2])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])])*(1-x[2])**-(-1-min(xx,yy+1)+min(xx,yy))*pol[-(order-zz-2)*(order-zz-1)*(2*order-2*zz-3)//6+yy*(order-zz-2)+xx]).curl().curl(),entity=(3,0),mapping="covariant"))
             for pl in pol[:(order-2)*(order-2)]:
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,((1-x[2])*symmetricpyramid+x[0])*((1-x[2])*symmetricpyramid+x[1])*(1-x[0]-x[2])*(1-x[1]-x[2])])*(1-x[2])**2*pl).curl().curl(),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,((1-x[2])*symmetricpyramid+x[0])*((1-x[2])*symmetricpyramid+x[1])*(1-x[0]-x[2])*(1-x[1]-x[2])])*(1-x[2])**-2*pl).curl().curl(),entity=(3,0),mapping="covariant"))
             pol=pyramid_polynomial_set_1d(3, order -4)
             for pl in pol:
-               dofs.append(IntegralAgainst(reference,ScalarFunction(((1-x[2])*symmetricpyramid+x[0])*((1-x[2])*symmetricpyramid+x[1])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])*(1+x[2])*(1+x[2])*pl).grad(3),entity=(3,0),mapping="covariant"))
+                dofs.append(IntegralAgainst(reference,ScalarFunction(((1-x[2])*symmetricpyramid+x[0])*((1-x[2])*symmetricpyramid+x[1])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])*(1+x[2])*(1+x[2])*pl).grad(3),entity=(3,0),mapping="covariant"))
         order-=1
         super().__init__(reference, order, poly, dofs, reference.tdim, reference.tdim)
         self.variant = variant
@@ -498,11 +507,11 @@ class TNTdiv(CiarletElement):
                         poly.append((VectorFunction([1-x[2],0,x[0]])*pol[-(kk+max(ii,jj)+2)*(kk+max(ii,jj)+3)*(2*(kk+max(ii,jj))+5)//6+ii*(kk+max(ii,jj)+2)+jj]).curl())
                         poly.append((VectorFunction([0,1-x[2],x[1]])*pol[-(kk+max(ii,jj)+2)*(kk+max(ii,jj)+3)*(2*(kk+max(ii,jj))+5)//6+ii*(kk+max(ii,jj)+2)+jj]).curl())
                         poly.append((VectorFunction([x[0],x[1],x[2]-1])*pol[-(kk+max(ii,jj)+2)*(kk+max(ii,jj)+3)*(2*(kk+max(ii,jj))+5)//6+ii*(kk+max(ii,jj)+2)+jj]))
-            for kk in range(min(order,2)):
-                poly.append((VectorFunction([1,0,x[0]/(1-x[2])])*pol[kk+1]).curl())
-                poly.append((VectorFunction([0,1,x[1]/(1-x[2])])*pol[(kk+1)*(order+1)]).curl())
-            if order>1:
-                poly.append(VectorFunction([-pol[(order+1)+2],pol[2*(order+1)+1],0]).curl())
+            for kk in range(0,order,max(order-1,1)):
+                poly.append((VectorFunction([1,0,x[0]/(1-x[2])])*pol[order-1-kk+1]).curl())
+                poly.append((VectorFunction([0,1,x[1]/(1-x[2])])*pol[(order-1-kk+1)*(order+1)]).curl())
+            for kk in range(max(order-2,0),order-1):
+                poly.append(VectorFunction([-pol[(kk+1)*(order+1)+kk+2],pol[(kk+2)*(order+1)+kk+1],0]).curl())
         elif reference.name in ["quadrilateral", "hexahedron"]:
             poly += quolynomial_set_vector(reference.tdim, reference.tdim, order-1)
             if reference.tdim == 2:
@@ -572,12 +581,12 @@ class TNTdiv(CiarletElement):
             for zz in range(order-2):
               for yy in range(order-zz-3):
                 for xx in range(order-zz-2):
-                    dofs.append(IntegralAgainst(reference,(VectorFunction([((1-x[2])*symmetricpyramid+x[1])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2]),0,-symmetricpyramid*(1+x[1]-x[2])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])])*(1-x[2])**(2-min(xx+1,yy)+min(xx,yy))*pol[-(order-zz-2)*(order-zz-1)*(2*order-2*zz-3)//6+xx*(order-zz-2)+yy]).curl(),entity=(3,0),mapping="contravariant"))
-                    dofs.append(IntegralAgainst(reference,(VectorFunction([((1-x[2])*symmetricpyramid+x[0])*((1-x[2])*symmetricpyramid+x[1])*x[2]*(1-x[1]-x[2]),0,((1-x[2])*symmetricpyramid+x[0])*((1-x[2])*symmetricpyramid+x[1])*x[2]*(1-x[1]-x[2])])*(1-x[2])**(2-min(xx+1,yy)+min(xx,yy))*pol[-(order-zz-2)*(order-zz-1)*(2*order-2*zz-3)//6+xx*(order-zz-2)+yy]).curl(),entity=(3,0),mapping="contravariant")) 
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,((1-x[2])*symmetricpyramid+x[0])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2]),-symmetricpyramid*(1+x[0]-x[2])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])])*(1-x[2])**2*pol[-(order-zz-2)*(order-zz-1)*(2*order-2*zz-3)//6+yy*(order-zz-2)+order-2]).curl(),entity=(3,0),mapping="contravariant"))
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,((1-x[2])*symmetricpyramid+x[0])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2]),-symmetricpyramid*(1+x[0]-x[2])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])])*(1-x[2])**(2-min(1,yy))*pol[-(order-zz-2)*(order-zz-1)*(2*order-2*zz-3)//6+yy*(order-zz-2)]).curl().curl(),entity=(3,0),mapping="contravariant"))
+                    dofs.append(IntegralAgainst(reference,(VectorFunction([((1-x[2])*symmetricpyramid+x[1])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2]),0,-symmetricpyramid*(1+x[1]-x[2])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])])*(1-x[2])**-(-1-min(xx,yy+1)+min(xx,yy))*pol[-(order-zz-2)*(order-zz-1)*(2*order-2*zz-3)//6+xx*(order-zz-2)+yy]).curl(),entity=(3,0),mapping="contravariant"))
+                    dofs.append(IntegralAgainst(reference,(VectorFunction([((1-x[2])*symmetricpyramid+x[0])*((1-x[2])*symmetricpyramid+x[1])*x[2]*(1-x[1]-x[2]),0,((1-x[2])*symmetricpyramid+x[0])*((1-x[2])*symmetricpyramid+x[1])*x[2]*(1-x[1]-x[2])])*(1-x[2])**(-1-min(xx,yy+1)+min(xx,yy))*pol[-(order-zz-2)*(order-zz-1)*(2*order-2*zz-3)//6+xx*(order-zz-2)+yy]).curl(),entity=(3,0),mapping="contravariant"))
+                for xx in range(0,order-zz-2,order-zz-3):
+                    dofs.append(IntegralAgainst(reference,(VectorFunction([0,((1-x[2])*symmetricpyramid+x[0])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2]),-symmetricpyramid*(1+x[0]-x[2])*x[2]*(1-x[0]-x[2])*(1-x[1]-x[2])])*(1-x[2])**-(-1-min(xx,yy+1)+min(xx,yy))*pol[-(order-zz-2)*(order-zz-1)*(2*order-2*zz-3)//6+yy*(order-zz-2)+xx]).curl(),entity=(3,0),mapping="contravariant"))
             for pl in pol[:(order-2)*(order-2)]:
-                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,((1-x[2])*symmetricpyramid+x[0])*((1-x[2])*symmetricpyramid+x[1])*(1-x[0]-x[2])*(1-x[1]-x[2])])*(1-x[2])**2*pl).curl(),entity=(3,0),mapping="contravariant"))
+                dofs.append(IntegralAgainst(reference,(VectorFunction([0,0,((1-x[2])*symmetricpyramid+x[0])*((1-x[2])*symmetricpyramid+x[1])*(1-x[0]-x[2])*(1-x[1]-x[2])])*(1-x[2])**-2*pl).curl(),entity=(3,0),mapping="contravariant"))
         elif reference.name in ["quadrilateral", "hexahedron"]:
             for pl in quolynomial_set_1d(reference.tdim, order - 1)[1:]:
                 dofs.append(IntegralAgainst(reference, pl.grad(reference.tdim), entity=(reference.tdim, 0), mapping="contravariant"))
