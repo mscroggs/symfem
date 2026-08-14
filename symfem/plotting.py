@@ -78,7 +78,10 @@ class Colors:
 
     def __init__(self):
         """Initialise."""
-        self._tikz = {}
+        self._tikz = {
+            self.BLACK: "black",
+            self.WHITE: "white",
+        }
 
     def entity(self, n: int) -> str:
         """Get the color used for an entity of a given dimension.
@@ -145,19 +148,20 @@ class PictureElement(ABC):
         Returns:
             An SVG string
         """
-        pass
 
     @abstractmethod
-    def as_tikz(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], tuple[float, float]], skip: tuple[str] = ()
+    ) -> str:
         """Return Tikz format.
 
         Args:
             map_pt: A function that adjust the origin and scales the picture
+            skip: List of tikz options to skip
 
         Returns:
             A Tikz string
         """
-        pass
 
     @property
     @abstractmethod
@@ -167,7 +171,6 @@ class PictureElement(ABC):
         Returns:
             A set of points
         """
-        pass
 
     def minx(self) -> sympy.core.expr.Expr:
         """Get the minimum x-coordinate.
@@ -237,21 +240,30 @@ class Line(PictureElement):
             f"stroke='{self.color}' stroke-width='{self.width}' stroke-linecap='round' />\n"
         )
 
-    def as_tikz(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], tuple[float, float]], skip: tuple[str] = ()
+    ) -> str:
         """Return Tikz format.
 
         Args:
             map_pt: A function that adjust the origin and scales the picture
+            skip: List of tikz options to skip
 
         Returns:
             A Tikz string
         """
         s = map_pt(self.start)
         e = map_pt(self.end)
-        return (
-            f"\\draw[{self.colors.get_tikz_name(self.color)},line width={self.width * 0.2}pt,"
-            f"line cap=round] ({s[0]},{s[1]}) -- ({e[0]},{e[1]});\n"
-        )
+        options = [
+            value
+            for o, value in [
+                ("color", self.colors.get_tikz_name(self.color)),
+                ("line width", f"line width={self.width * 0.2}pt"),
+                ("line cap", "line cap=round"),
+            ]
+            if o not in skip
+        ]
+        return f"\\draw[{','.join(options)}] ({s[0]},{s[1]}) -- ({e[0]},{e[1]});\n"
 
     @property
     def points(self) -> SetOfPoints:
@@ -314,11 +326,14 @@ class Bezier(PictureElement):
             " fill='none' />\n"
         )
 
-    def as_tikz(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], tuple[float, float]], skip: tuple[str] = ()
+    ) -> str:
         """Return Tikz format.
 
         Args:
             map_pt: A function that adjust the origin and scales the picture
+            skip: List of tikz options to skip
 
         Returns:
             A Tikz string
@@ -327,9 +342,17 @@ class Bezier(PictureElement):
         m1 = map_pt(self.mid1)
         m2 = map_pt(self.mid2)
         e = map_pt(self.end)
+        options = [
+            value
+            for o, value in [
+                ("color", self.colors.get_tikz_name(self.color)),
+                ("line width", f"line width={self.width * 0.2}pt"),
+                ("line cap", "line cap=round"),
+            ]
+            if o not in skip
+        ]
         return (
-            f"\\draw[{self.colors.get_tikz_name(self.color)},line width={self.width * 0.2}pt,"
-            f"line cap=round] ({s[0]},{s[1]}) .. controls ({m1[0]},{m1[1]}) "
+            f"\\draw[{','.join(options)}] ({s[0]},{s[1]}) .. controls ({m1[0]},{m1[1]}) "
             f"and ({m2[0]},{m2[1]}) .. ({e[0]},{e[1]});\n"
         )
 
@@ -399,22 +422,31 @@ class Arrow(PictureElement):
             )
         return out
 
-    def as_tikz(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], tuple[float, float]], skip: tuple[str] = ()
+    ) -> str:
         """Return Tikz format.
 
         Args:
             map_pt: A function that adjust the origin and scales the picture
+            skip: List of tikz options to skip
 
         Returns:
             A Tikz string
         """
         s = map_pt(self.start)
         e = map_pt(self.end)
-        return (
-            f"\\draw[-stealth,{self.colors.get_tikz_name(self.color)},"
-            f"line width={self.width * 0.2}pt,line cap=round] "
-            f"({s[0]},{s[1]}) -- ({e[0]},{e[1]});\n"
-        )
+        options = [
+            value
+            for o, value in [
+                ("-stealth", "-stealth"),
+                ("color", self.colors.get_tikz_name(self.color)),
+                ("line width", f"line width={self.width * 0.2}pt"),
+                ("line cap", "line cap=round"),
+            ]
+            if o not in skip
+        ]
+        return f"\\draw[{','.join(options)}] ({s[0]},{s[1]}) -- ({e[0]},{e[1]});\n"
 
     @property
     def points(self) -> SetOfPoints:
@@ -494,22 +526,32 @@ class NCircle(PictureElement):
             f"{self.number}</text>\n"
         )
 
-    def as_tikz(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], tuple[float, float]], skip: tuple[str] = ()
+    ) -> str:
         """Return Tikz format.
 
         Args:
             map_pt: A function that adjust the origin and scales the picture
+            skip: List of tikz options to skip
 
         Returns:
             A Tikz string
         """
         c = map_pt(self.centre)
+        options = [
+            value
+            for o, value in [
+                ("color", self.colors.get_tikz_name(self.color)),
+                ("line width", f"line width={self.width * 0.2}pt"),
+                ("fill", f"fill={self.colors.get_tikz_name(self.fill_color)}"),
+            ]
+            if o not in skip
+        ]
         return (
-            f"\\draw[{self.colors.get_tikz_name(self.color)},line width={self.width * 0.2}pt,"
-            f"fill={self.colors.get_tikz_name(self.fill_color)}] "
-            f"({c[0]},{c[1]}) circle ({self.radius * 0.2}pt);\n"
-            f"\\node[{self.colors.get_tikz_name(self.text_color)},anchor=center] "
-            f"at ({c[0]},{c[1]}) {{{tex_font_size(self.font_size)} {self.number}}};\n"
+            f"\\draw[{','.join(options)}] "
+            f"({c[0]},{c[1]}) circle ({self.radius * 0.2}pt) "
+            f" node[anchor=center] {{{tex_font_size(self.font_size)} {self.number}}};\n"
         )
 
     @property
@@ -552,18 +594,29 @@ class Fill(PictureElement):
         ptstring = " ".join(f"{p[0]},{p[1]}" for p in pts)
         return f"<polygon points='{ptstring}' fill='{self.color}' opacity='{self.opacity}' />"
 
-    def as_tikz(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], tuple[float, float]], skip: tuple[str] = ()
+    ) -> str:
         """Return Tikz format.
 
         Args:
             map_pt: A function that adjust the origin and scales the picture
+            skip: List of tikz options to skip
 
         Returns:
             A Tikz string
         """
         vs = [map_pt(v) for v in self.vertices]
+        options = [
+            value
+            for o, value in [
+                ("color", self.colors.get_tikz_name(self.color)),
+                ("opacity", f"opacity={self.opacity}"),
+            ]
+            if o not in skip
+        ]
         return (
-            f"\\fill[{self.colors.get_tikz_name(self.color)},opacity={self.opacity}]"
+            f"\\fill[{','.join(options)}]"
             " " + " -- ".join([f"({v[0]},{v[1]})" for v in vs]) + " -- cycle;\n"
         )
 
@@ -646,18 +699,29 @@ class Math(PictureElement):
             f"{self.math}</text>\n"
         )
 
-    def as_tikz(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
+    def as_tikz(
+        self, map_pt: typing.Callable[[PointType], tuple[float, float]], skip: tuple[str] = ()
+    ) -> str:
         """Return Tikz format.
 
         Args:
             map_pt: A function that adjust the origin and scales the picture
+            skip: List of tikz options to skip
 
         Returns:
             A Tikz string
         """
         p = map_pt(self.point)
+        options = [
+            value
+            for o, value in [
+                ("color", self.colors.get_tikz_name(self.color)),
+                ("anchor", f"anchor={self.anchor}"),
+            ]
+            if o not in skip
+        ]
         return (
-            f"\\;node[{self.colors.get_tikz_name(self.color)},anchor={self.anchor}] "
+            f"\\node[{','.join(options)}] "
             f"at ({p[0]},{p[1]}) {{{tex_font_size(self.font_size)}${self.math}$}};\n"
         )
 
@@ -1169,8 +1233,26 @@ class Picture:
         tikz += "\\begin{tikzpicture}[x=1cm,y=1cm]\n"
 
         inner_tikz = ""
+        arrows = []
         for e in self.elements:
-            inner_tikz += e.as_tikz(map_pt)
+            if len(arrows) > 0 and (not isinstance(e, Arrow) or e.color != arrows[0].color):
+                if len(arrows) == 1:
+                    inner_tikz += arrows[0].as_tikz(map_pt)
+                else:
+                    inner_tikz += (
+                        f"\\begin{{scope}}[{self.colors.get_tikz_name(arrows[0].color)},"
+                        "line cap=round,-stealth]\n"
+                    )
+                    for a in arrows:
+                        inner_tikz += "  " + a.as_tikz(
+                            map_pt, skip=("color", "line cap", "-stealth")
+                        )
+                    inner_tikz += f"\\end{{scope}}\n"
+                arrows = []
+            if isinstance(e, Arrow):
+                arrows.append(e)
+            else:
+                inner_tikz += e.as_tikz(map_pt)
 
         tikz += self.colors.get_tikz_definitions() + inner_tikz
 
