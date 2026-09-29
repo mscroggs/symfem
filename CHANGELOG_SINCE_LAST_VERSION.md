@@ -1,2 +1,3 @@
 - Add QuadratureRule class
 - Add AbstractQuadratureRule for quadrature with points represented by variables
+- Associate the DOFs of the Fortin-Soulie element with the correct edges

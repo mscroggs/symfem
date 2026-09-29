@@ -33,11 +33,11 @@ class FortinSoulie(CiarletElement):
         third = sympy.Rational(1, 3)
         two_thirds = sympy.Rational(2, 3)
         dofs: ListOfFunctionals = [
-            PointEvaluation(reference, (two_thirds, third), entity=(1, 0)),
-            PointEvaluation(reference, (third, two_thirds), entity=(1, 0)),
+            PointEvaluation(reference, (sympy.Rational(1, 2), 0), entity=(1, 0)),
             PointEvaluation(reference, (0, third), entity=(1, 1)),
             PointEvaluation(reference, (0, two_thirds), entity=(1, 1)),
-            PointEvaluation(reference, (sympy.Rational(1, 2), 0), entity=(1, 2)),
+            PointEvaluation(reference, (two_thirds, third), entity=(1, 2)),
+            PointEvaluation(reference, (third, two_thirds), entity=(1, 2)),
             PointEvaluation(reference, (third, third), entity=(2, 0)),
         ]
 
@@ -67,4 +67,4 @@ class FortinSoulie(CiarletElement):
     max_order = 2
     continuity = "L2"
     value_type = "scalar"
-    last_updated = "2025.12"
+    last_updated = "2026.09"
