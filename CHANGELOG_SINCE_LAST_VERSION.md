@@ -1,3 +1,4 @@
 - Add QuadratureRule class
 - Add AbstractQuadratureRule for quadrature with points represented by variables
 - Associate the DOFs of the Fortin-Soulie element with the correct edges
+- Use the Gauss-Legendre points of the edges in the Fortin-Soulie element, as in the original paper
