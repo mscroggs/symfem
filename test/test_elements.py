@@ -1,9 +1,11 @@
 """Test every element."""
 
 import pytest
+import sympy
 
 import symfem
 from symfem import create_element
+from symfem.finite_element import CiarletElement
 from symfem.functions import VectorFunction
 from symfem.symbols import x
 from symfem.utils import allequal
@@ -131,3 +133,57 @@ def test_degree(elements_to_test, cells_to_test, cell_type, element_type, order,
         pytest.xfail("Polynomial subdegree not implemented for this element")
 
     assert element.order == poly_sub
+
+
+def _on_sub_entity(reference, dim, n, point):
+    """Check if a point lies on a sub-entity of a reference."""
+    sub = reference.sub_entity(dim, n)
+    if dim == 0:
+        return all(sympy.simplify(p - v) == 0 for p, v in zip(point, sub.vertices[0]))
+    # Solve point = origin + sum_i s_i axes_i for s (the axes are linearly independent)
+    s = sympy.symbols(f"s:{dim}")
+    eqs = [
+        p - o - sum(si * a[j] for si, a in zip(s, sub.axes))
+        for j, (p, o) in enumerate(zip(point, sub.origin))
+    ]
+    sol = sympy.solve(eqs, s, dict=True)
+    if len(sol) != 1 or len(sol[0]) != dim:
+        return False
+    values = [float(sol[0][si]) for si in s]
+    tol = 1e-12
+    if sub.name == "triangle":
+        return all(v >= -tol for v in values) and sum(values) <= 1 + tol
+    return all(-tol <= v <= 1 + tol for v in values)
+
+
+@pytest.mark.parametrize(
+    ("cell_type", "element_type", "order", "kwargs"),
+    [
+        [reference, element, order, kwargs]
+        for reference, i in test_elements.items()
+        for element, j in i.items()
+        for kwargs, k in j
+        for order in k
+    ],
+)
+def test_dof_entities(
+    elements_to_test, cells_to_test, cell_type, element_type, order, kwargs, speed
+):
+    """Check that the DOF point of each DOF lies on the sub-entity the DOF is associated with."""
+    if elements_to_test != "ALL" and element_type not in elements_to_test:
+        pytest.skip()
+    if cells_to_test != "ALL" and cell_type not in cells_to_test:
+        pytest.skip()
+    if speed == "fast":
+        if order > 2:
+            pytest.skip()
+        if order == 2 and cell_type in ["tetrahedron", "hexahedron", "prism", "pyramid"]:
+            pytest.skip()
+
+    element = create_element(cell_type, element_type, order, **kwargs)
+    if not isinstance(element, CiarletElement):
+        pytest.skip("Only Ciarlet elements have DOFs associated with sub-entities")
+    for dof in element.dofs:
+        dim, n = dof.entity
+        if dim < element.reference.tdim:
+            assert _on_sub_entity(element.reference, dim, n, dof.dof_point())
