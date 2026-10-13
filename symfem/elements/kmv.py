@@ -244,7 +244,10 @@ class KongMulderVeldhuizen(CiarletElement):
         return self.lagrange_superdegree
 
     names = ["Kong-Mulder-Veldhuizen", "KMV"]
-    references = ("triangle", "tetrahedron",)
+    references = (
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 1
     continuity = "C0"
     value_type = "scalar"

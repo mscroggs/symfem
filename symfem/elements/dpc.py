@@ -88,7 +88,11 @@ class DPC(CiarletElement):
         return self.order
 
     names = ["dPc"]
-    references = ("interval", "quadrilateral", "hexahedron",)
+    references = (
+        "interval",
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 0
     continuity = "L2"
     value_type = "scalar"
@@ -153,7 +157,10 @@ class VectorDPC(CiarletElement):
         return self.order
 
     names = ["vector dPc"]
-    references = ("quadrilateral", "hexahedron",)
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 0
     continuity = "L2"
     value_type = "vector"

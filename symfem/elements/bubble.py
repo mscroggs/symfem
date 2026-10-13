@@ -105,7 +105,13 @@ class Bubble(CiarletElement):
         return self.order
 
     names = ["bubble"]
-    references = ("interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron",)
+    references = (
+        "interval",
+        "triangle",
+        "tetrahedron",
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = {
         "interval": 2,
         "triangle": 3,

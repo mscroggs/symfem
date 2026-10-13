@@ -67,7 +67,10 @@ class RannacherTurek(CiarletElement):
         return 2
 
     names = ["Rannacher-Turek"]
-    references = ("quadrilateral", "hexahedron",)
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 1
     max_order = 1
     continuity = "L2"

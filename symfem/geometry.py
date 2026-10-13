@@ -1,6 +1,5 @@
 """Geometry."""
 
-
 import sympy
 
 __all__ = [

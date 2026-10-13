@@ -192,7 +192,10 @@ class Regge(CiarletElement):
         return self.order
 
     names = ["Regge"]
-    references = ("triangle", "tetrahedron",)
+    references = (
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 0
     continuity = "inner H(curl)"
     value_type = "symmetric matrix"
@@ -420,7 +423,10 @@ class ReggeTP(CiarletElement):
         return (self.order + 1) * self.reference.tdim - 1
 
     names = ["Regge"]
-    references = ("quadrilateral", "hexahedron",)
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 0
     continuity = "inner H(curl)"
     value_type = "symmetric matrix"

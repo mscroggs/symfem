@@ -147,7 +147,10 @@ class TNT(CiarletElement):
         return max((self.order - 1) * self.reference.tdim, (self.order - 1) + self.reference.tdim)
 
     names = ["tiniest tensor", "TNT"]
-    references = ("quadrilateral", "hexahedron",)
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 2
     continuity = "C0"
     value_type = "scalar"
@@ -323,7 +326,10 @@ class TNTcurl(CiarletElement):
         return self.order * self.reference.tdim + 1
 
     names = ["tiniest tensor Hcurl", "TNTcurl"]
-    references = ("quadrilateral", "hexahedron",)
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 1
     continuity = "H(curl)"
     value_type = "vector"
@@ -497,7 +503,10 @@ class TNTdiv(CiarletElement):
         return self.order * self.reference.tdim + 1
 
     names = ["tiniest tensor Hdiv", "TNTdiv"]
-    references = ("quadrilateral", "hexahedron",)
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 1
     continuity = "H(div)"
     value_type = "vector"

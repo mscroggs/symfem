@@ -163,7 +163,10 @@ class Q(CiarletElement):
         return self.order * self.reference.tdim
 
     names = ["Q", "Lagrange", "P"]
-    references = ("quadrilateral", "hexahedron",)
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 0
     continuity = "C0"
     value_type = "scalar"
@@ -231,7 +234,10 @@ class VectorQ(CiarletElement):
         return self.order * self.reference.tdim
 
     names = ["vector Q", "vQ"]
-    references = ("quadrilateral", "hexahedron",)
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 0
     continuity = "C0"
     value_type = "vector"
@@ -291,7 +297,10 @@ class Nedelec(CiarletElement):
         return (self.order + 1) * self.reference.tdim - 1
 
     names = ["NCE", "RTCE", "Qcurl", "Nedelec", "Ncurl"]
-    references = ("quadrilateral", "hexahedron",)
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 0
     continuity = "H(curl)"
     value_type = "vector"
@@ -350,7 +359,10 @@ class RaviartThomas(CiarletElement):
         return self.order * self.reference.tdim + 1
 
     names = ["NCF", "RTCF", "Qdiv"]
-    references = ("quadrilateral", "hexahedron",)
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 0
     continuity = "H(div)"
     value_type = "vector"

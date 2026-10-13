@@ -72,7 +72,10 @@ class RaviartThomas(CiarletElement):
         return self.order + 1
 
     names = ["Raviart-Thomas", "RT", "N1div"]
-    references = ("triangle", "tetrahedron",)
+    references = (
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 0
     continuity = "H(div)"
     value_type = "vector"

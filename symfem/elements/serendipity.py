@@ -85,7 +85,11 @@ class Serendipity(CiarletElement):
         return self.order + self.reference.tdim - 1
 
     names = ["serendipity", "S"]
-    references = ("interval", "quadrilateral", "hexahedron",)
+    references = (
+        "interval",
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 1
     continuity = "C0"
     value_type = "scalar"
@@ -147,7 +151,10 @@ class SerendipityCurl(CiarletElement):
         return self.order + self.reference.tdim - 1
 
     names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
-    references = ("quadrilateral", "hexahedron",)
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 1
     continuity = "H(curl)"
     value_type = "vector"
@@ -206,7 +213,10 @@ class SerendipityDiv(CiarletElement):
         return self.order + 1
 
     names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]
-    references = ("quadrilateral", "hexahedron",)
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 1
     continuity = "H(div)"
     value_type = "vector"

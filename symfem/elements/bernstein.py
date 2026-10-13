@@ -286,7 +286,11 @@ class Bernstein(CiarletElement):
         return self.order
 
     names = ["Bernstein", "Bernstein-Bezier"]
-    references = ("interval", "triangle", "tetrahedron",)
+    references = (
+        "interval",
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 0
     continuity = "C0"
     value_type = "scalar"

@@ -62,7 +62,11 @@ class Hermite(CiarletElement):
         return self.order
 
     names = ["Hermite"]
-    references = ("interval", "triangle", "tetrahedron",)
+    references = (
+        "interval",
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 3
     max_order = 3
     continuity = "C1"
