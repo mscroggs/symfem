@@ -142,7 +142,7 @@ class HsiehCloughTocher(CiarletElement):
         raise NotImplementedError()
 
     names = ["Hsieh-Clough-Tocher", "Clough-Tocher", "HCT", "CT"]
-    references = ["triangle"]
+    references = ("triangle",)
     min_order = 3
     max_order = 3
     # continuity = "C1"

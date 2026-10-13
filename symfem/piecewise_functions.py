@@ -32,6 +32,8 @@ from symfem.symbols import AxisVariables, AxisVariablesNotSingle, t, x
 
 __all__ = ["PiecewiseFunction"]
 
+one = sympy.Integer(1)
+
 
 class PiecewiseFunction(Function):
     """A piecewise function."""
@@ -520,7 +522,7 @@ class PiecewiseFunction(Function):
         self,
         reference: Reference,
         img: typing.Any,
-        value_scale: sympy.core.expr.Expr = sympy.Integer(1),
+        value_scale: sympy.core.expr.Expr = one,
         n: int = 6,
     ):
         """Plot the function's values.

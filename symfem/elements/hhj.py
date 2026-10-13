@@ -139,7 +139,7 @@ class HellanHerrmannJohnson(CiarletElement):
         return self.order
 
     names = ["Hellan-Herrmann-Johnson", "HHJ"]
-    references = ["triangle", "tetrahedron"]
+    references = ("triangle", "tetrahedron",)
     min_order = 0
     continuity = "inner H(div)"
     value_type = "symmetric matrix"

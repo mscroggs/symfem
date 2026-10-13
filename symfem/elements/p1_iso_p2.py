@@ -62,7 +62,7 @@ class P1IsoP2Interval(CiarletElement):
         raise NotImplementedError()
 
     names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
-    references = ["interval"]
+    references = ("interval",)
     min_order = 1
     max_order = 1
     continuity = "C0"
@@ -138,7 +138,7 @@ class P1IsoP2Tri(CiarletElement):
         raise NotImplementedError()
 
     names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
-    references = ["triangle"]
+    references = ("triangle",)
     min_order = 1
     max_order = 1
     continuity = "C0"
@@ -217,7 +217,7 @@ class P1IsoP2Quad(CiarletElement):
         raise NotImplementedError()
 
     names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
-    references = ["quadrilateral"]
+    references = ("quadrilateral",)
     min_order = 1
     max_order = 1
     continuity = "C0"

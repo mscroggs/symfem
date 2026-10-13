@@ -143,7 +143,7 @@ class BDFM(CiarletElement):
         return self.order + 1
 
     names = ["Brezzi-Douglas-Fortin-Marini", "BDFM"]
-    references = ["triangle", "quadrilateral", "hexahedron", "tetrahedron"]
+    references = ("triangle", "quadrilateral", "hexahedron", "tetrahedron",)
     min_order = 0
     continuity = "H(div)"
     value_type = "vector"

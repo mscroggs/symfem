@@ -87,9 +87,10 @@ def test_vector_function_neg():
     a_neg = [(0, -1), VectorFunction((0, -1))]
     for i in a:
         for j in a_neg:
-            if isinstance(i, VectorFunction) or isinstance(j, VectorFunction):
-                if not isinstance(i, tuple):
-                    assert -i == j
+            if (isinstance(i, VectorFunction) or isinstance(j, VectorFunction)) and not isinstance(
+                i, tuple
+            ):
+                assert -i == j
 
 
 def test_vector_function_subs():
@@ -108,10 +109,8 @@ def test_matrix_function_add_sub():
     for i in a:
         for j in b:
             for k in c:
-                # if isinstance(i, MatrixFunction) or isinstance(j, MatrixFunction):
                 if isinstance(i, MatrixFunction):
                     assert i + j == k
-                # if isinstance(i, MatrixFunction) or isinstance(k, MatrixFunction):
                 if isinstance(k, MatrixFunction):
                     assert k - i == j
 
@@ -194,9 +193,10 @@ def test_matrix_function_neg():
     ]
     for i in a:
         for j in a_neg:
-            if isinstance(i, MatrixFunction) or isinstance(j, MatrixFunction):
-                if not isinstance(i, list):
-                    assert -i == j
+            if (isinstance(i, MatrixFunction) or isinstance(j, MatrixFunction)) and not isinstance(
+                i, list
+            ):
+                assert -i == j
 
 
 def test_matrix_function_subs():

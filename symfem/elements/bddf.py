@@ -94,8 +94,8 @@ class BDDF(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
-    names = ["Brezzi-Douglas-Duran-Fortin", "BDDF"]
-    references = ["hexahedron"]
+    names = ("Brezzi-Douglas-Duran-Fortin", "BDDF")
+    references = ("hexahedron",)
     min_order = 1
     continuity = "H(div)"
     value_type = "vector"

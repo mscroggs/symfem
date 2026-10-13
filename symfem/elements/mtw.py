@@ -114,7 +114,7 @@ class MardalTaiWinther(CiarletElement):
         return self.lagrange_superdegree
 
     names = ["Mardal-Tai-Winther", "MTW"]
-    references = ["triangle", "tetrahedron"]
+    references = ("triangle", "tetrahedron",)
     min_order = 1
     max_order = 1
     continuity = "H(div)"

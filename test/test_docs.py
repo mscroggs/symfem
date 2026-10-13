@@ -150,7 +150,7 @@ def test_snippets(script, output):
 
     old_stdout = sys.stdout
     redirected_output = sys.stdout = StringIO()
-    exec(script)
+    exec(script)  # noqa: S102
     sys.stdout = old_stdout
 
     actual_output = redirected_output.getvalue().strip()

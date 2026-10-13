@@ -132,7 +132,7 @@ class Lagrange(CiarletElement):
         return None
 
     names = ["Lagrange", "P"]
-    references = ["pyramid"]
+    references = ("pyramid",)
     min_order = 0
     continuity = "C0"
     value_type = "scalar"

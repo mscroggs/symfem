@@ -77,7 +77,7 @@ class ConformingCrouzeixRaviart(CiarletElement):
         return self.order + 1
 
     names = ["conforming Crouzeix-Raviart", "conforming CR"]
-    references = ["triangle"]
+    references = ("triangle",)
     min_order = 1
     continuity = "L2"
     value_type = "scalar"

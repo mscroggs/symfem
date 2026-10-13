@@ -258,7 +258,7 @@ class Dual(DualCiarletElement):
         raise NotImplementedError()
 
     names = ["dual polynomial", "dual P", "dual"]
-    references = ["dual polygon"]
+    references = ("dual polygon",)
     min_order = 0
     max_order = 1
     continuity = "C0"
@@ -324,7 +324,7 @@ class BuffaChristiansen(DualCiarletElement):
         raise NotImplementedError()
 
     names = ["Buffa-Christiansen", "BC"]
-    references = ["dual polygon"]
+    references = ("dual polygon",)
     min_order = 0
     max_order = 0
     continuity = "H(div)"
@@ -390,7 +390,7 @@ class RotatedBuffaChristiansen(DualCiarletElement):
         raise NotImplementedError()
 
     names = ["rotated Buffa-Christiansen", "RBC"]
-    references = ["dual polygon"]
+    references = ("dual polygon",)
     min_order = 0
     max_order = 0
     continuity = "H(div)"

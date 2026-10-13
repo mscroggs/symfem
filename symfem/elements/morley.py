@@ -59,7 +59,7 @@ class Morley(CiarletElement):
         return self.order
 
     names = ["Morley"]
-    references = ["triangle"]
+    references = ("triangle",)
     min_order = 2
     max_order = 2
     continuity = "C1"

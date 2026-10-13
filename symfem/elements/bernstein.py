@@ -162,15 +162,19 @@ class BernsteinFunctional(BaseFunctional):
         if self.reference.tdim == self.ref.tdim:
             return f"v\\mapsto c_{{{self.index}}}", [
                 "\\(v=\\sum_ic_iB_i\\)",
-                (f"\\(B_1\\) to \\(B_n\\) "
-                f"are the degree {self.degree} Bernstein polynomials on the cell"),
+                (
+                    f"\\(B_1\\) to \\(B_n\\) "
+                    f"are the degree {self.degree} Bernstein polynomials on the cell"
+                ),
             ]
         else:
             e = self.entity_tex()
             return f"v\\mapsto c^{{{e}}}_{{{self.index}}}", [
                 f"\\(v=\\sum_ic^{{{e}}}_iB^{{{e}}}_i\\)",
-                (f"\\(B^{{{e}}}_1\\) to \\(B^{{{e}}}_n\\) "
-                f"are the degree {self.degree} Bernstein polynomials on \\({e}\\)"),
+                (
+                    f"\\(B^{{{e}}}_1\\) to \\(B^{{{e}}}_n\\) "
+                    f"are the degree {self.degree} Bernstein polynomials on \\({e}\\)"
+                ),
                 self.entity_definition(),
             ]
 
@@ -282,7 +286,7 @@ class Bernstein(CiarletElement):
         return self.order
 
     names = ["Bernstein", "Bernstein-Bezier"]
-    references = ["interval", "triangle", "tetrahedron"]
+    references = ("interval", "triangle", "tetrahedron",)
     min_order = 0
     continuity = "C0"
     value_type = "scalar"

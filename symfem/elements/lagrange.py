@@ -108,7 +108,7 @@ class Lagrange(CiarletElement):
         return self.order
 
     names = ["Lagrange", "P"]
-    references = ["interval", "triangle", "tetrahedron"]
+    references = ("interval", "triangle", "tetrahedron",)
     min_order = 0
     continuity = "C0"
     value_type = "scalar"
@@ -185,7 +185,7 @@ class VectorLagrange(CiarletElement):
         return self.order
 
     names = ["vector Lagrange", "vP"]
-    references = ["interval", "triangle", "tetrahedron"]
+    references = ("interval", "triangle", "tetrahedron",)
     min_order = 0
     continuity = "C0"
     value_type = "vector"
@@ -255,7 +255,7 @@ class MatrixLagrange(CiarletElement):
         return self.order
 
     names = ["matrix Lagrange"]
-    references = ["triangle", "tetrahedron"]
+    references = ("triangle", "tetrahedron",)
     min_order = 0
     continuity = "L2"
     value_type = "matrix"
@@ -348,7 +348,7 @@ class SymmetricMatrixLagrange(CiarletElement):
         return self.order
 
     names = ["symmetric matrix Lagrange"]
-    references = ["triangle", "tetrahedron"]
+    references = ("triangle", "tetrahedron",)
     min_order = 0
     continuity = "L2"
     value_type = "symmetric matrix"

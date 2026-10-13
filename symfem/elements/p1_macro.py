@@ -75,7 +75,7 @@ class P1Macro(CiarletElement):
         raise NotImplementedError()
 
     names = ["P1 macro"]
-    references = ["triangle"]
+    references = ("triangle",)
     min_order = 1
     max_order = 1
     continuity = "C0"

@@ -1,6 +1,5 @@
 """Quadrature definitions."""
 
-import typing
 from abc import ABC, abstractmethod
 
 import sympy
@@ -26,7 +25,7 @@ __all__ = [
     "radau",
 ]
 
-Scalar = typing.Union[sympy.core.expr.Expr, int]
+Scalar = sympy.core.expr.Expr | int
 _qrcount = 0
 
 

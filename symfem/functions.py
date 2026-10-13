@@ -24,15 +24,17 @@ __all__ = [
     "parse_function_list_input",
 ]
 
-SingleSympyFormat = typing.Union[
-    sympy.core.expr.Expr,
-    tuple[sympy.core.expr.Expr, ...],
-    sympy.matrices.dense.MutableDenseMatrix,
-]
-SympyFormat = typing.Union[
-    SingleSympyFormat, dict[tuple[tuple[sympy.core.expr.Expr, ...], ...], SingleSympyFormat]
-]
-_ValuesToSubstitute = typing.Union[tuple[typing.Any, ...], list[typing.Any], typing.Any]
+SingleSympyFormat = (
+    sympy.core.expr.Expr
+    | tuple[sympy.core.expr.Expr, ...]
+    | sympy.matrices.dense.MutableDenseMatrix
+)
+SympyFormat = (
+    SingleSympyFormat | dict[tuple[tuple[sympy.core.expr.Expr, ...], ...] | SingleSympyFormat]
+)
+_ValuesToSubstitute = tuple[typing.Any, ...] | list[typing.Any] | typing.Any
+
+one = sympy.Integer(1)
 
 
 def _to_sympy_format(item: typing.Any) -> SympyFormat:
@@ -390,7 +392,7 @@ class Function(ABC):
         dof_direction: PointType | None = None,
         dof_entity: tuple[int, int] | None = None,
         dof_n: int | None = None,
-        value_scale: sympy.core.expr.Expr = sympy.Integer(1),
+        value_scale: sympy.core.expr.Expr = one,
         plot_options: dict[str, typing.Any] | None = None,
         **kwargs: typing.Any,
     ):
@@ -459,7 +461,7 @@ class Function(ABC):
         self,
         reference: symfem.references.Reference,
         img: typing.Any,
-        value_scale: sympy.core.expr.Expr = sympy.Integer(1),
+        value_scale: sympy.core.expr.Expr = one,
         n: int = 6,
     ):
         """Plot the function's values.
@@ -837,7 +839,7 @@ class ScalarFunction(Function):
         self,
         reference: symfem.references.Reference,
         img: typing.Any,
-        value_scale: sympy.core.expr.Expr = sympy.Integer(1),
+        value_scale: sympy.core.expr.Expr = one,
         n: int = 6,
     ):
         """Plot the function's values.
@@ -1297,7 +1299,7 @@ class VectorFunction(Function):
         self,
         reference: symfem.references.Reference,
         img: typing.Any,
-        value_scale: sympy.core.expr.Expr = sympy.Integer(1),
+        value_scale: sympy.core.expr.Expr = one,
         n: int = 6,
     ):
         """Plot the function's values.
@@ -1880,19 +1882,19 @@ class MatrixFunction(Function):
         return max(f.maximum_degree(cell) for row in self._mat for f in row)
 
 
-FunctionInput = typing.Union[
-    Function,
-    sympy.core.expr.Expr,
-    int,
-    float,
-    tuple[sympy.core.expr.Expr | int | float | Function, ...],
-    list[sympy.core.expr.Expr | int | float | Function],
-    tuple[tuple[sympy.core.expr.Expr | int | float | Function, ...], ...],
-    tuple[list[sympy.core.expr.Expr | int | float | Function], ...],
-    list[tuple[sympy.core.expr.Expr | int | float | Function, ...]],
-    list[list[sympy.core.expr.Expr | int | float | Function]],
-    sympy.matrices.dense.MutableDenseMatrix,
-]
+FunctionInput = (
+    Function
+    | sympy.core.expr.Expr
+    | int
+    | float
+    | tuple[sympy.core.expr.Expr | int | float | Function, ...]
+    | list[sympy.core.expr.Expr | int | float | Function]
+    | tuple[tuple[sympy.core.expr.Expr | int | float | Function, ...], ...]
+    | tuple[list[sympy.core.expr.Expr | int | float | Function], ...]
+    | list[tuple[sympy.core.expr.Expr | int | float | Function, ...]]
+    | list[list[sympy.core.expr.Expr | int | float | Function]]
+    | sympy.matrices.dense.MutableDenseMatrix
+)
 
 
 def parse_function_input(f: FunctionInput) -> Function:

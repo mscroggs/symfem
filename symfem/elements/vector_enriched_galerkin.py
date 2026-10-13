@@ -54,7 +54,7 @@ class Enrichment(CiarletElement):
         return 1
 
     names: list[str] = []
-    references = ["triangle", "quadrilateral", "tetrahedron", "hexahedron"]
+    references = ("triangle", "quadrilateral", "tetrahedron", "hexahedron",)
     min_order = 1
     max_order = 1
     continuity = "C0"
@@ -96,7 +96,7 @@ class VectorEnrichedGalerkin(EnrichedElement):
         return self.order
 
     names = ["enriched vector Galerkin", "locking-free enriched Galerkin", "LFEG"]
-    references = ["triangle", "quadrilateral", "tetrahedron", "hexahedron"]
+    references = ("triangle", "quadrilateral", "tetrahedron", "hexahedron",)
     min_order = 1
     continuity = "C0"
     value_type = "vector"

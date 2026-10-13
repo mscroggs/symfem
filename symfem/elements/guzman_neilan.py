@@ -199,7 +199,7 @@ class GuzmanNeilanFirstKind(CiarletElement):
         raise NotImplementedError()
 
     names = ["Guzman-Neilan first kind", "Guzman-Neilan"]
-    references = ["triangle", "tetrahedron"]
+    references = ("triangle", "tetrahedron",)
     min_order = 1
     max_order = {"triangle": 1, "tetrahedron": 2}
     continuity = "L2"
@@ -301,7 +301,7 @@ class GuzmanNeilanSecondKind(CiarletElement):
         raise NotImplementedError()
 
     names = ["Guzman-Neilan second kind"]
-    references = ["triangle", "tetrahedron"]
+    references = ("triangle", "tetrahedron",)
     min_order = 1
     max_order = {"triangle": 1, "tetrahedron": 2}
     continuity = "L2"

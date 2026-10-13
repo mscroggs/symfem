@@ -75,7 +75,7 @@ class BDM(CiarletElement):
         return self.order
 
     names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]
-    references = ["triangle", "tetrahedron"]
+    references = ("triangle", "tetrahedron",)
     min_order = 1
     continuity = "H(div)"
     value_type = "vector"

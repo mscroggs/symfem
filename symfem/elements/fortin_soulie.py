@@ -62,7 +62,7 @@ class FortinSoulie(CiarletElement):
         return self.order
 
     names = ["Fortin-Soulie", "FS"]
-    references = ["triangle"]
+    references = ("triangle",)
     min_order = 2
     max_order = 2
     continuity = "L2"

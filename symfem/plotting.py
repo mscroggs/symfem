@@ -675,7 +675,7 @@ class Picture:
 
     def __init__(
         self,
-        padding: sympy.core.expr.Expr = sympy.Integer(25),
+        padding: sympy.core.expr.Expr | None = None,
         scale: int | None = None,
         width: int | None = None,
         height: int | None = None,
@@ -700,6 +700,8 @@ class Picture:
             svg_metadata: Metadata to put at the start of the SVG file
             tex_comment: Comment to put at the start of the TeX file
         """
+        if padding is None:
+            padding = sympy.Integer(25)
         self._default_axes: SetOfPoints = (
             (sympy.Integer(1), -sympy.Rational(2, 25)),
             (sympy.Rational(1, 2), sympy.Rational(1, 5)),

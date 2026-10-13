@@ -163,7 +163,7 @@ class Transition(CiarletElement):
         return self.lagrange_superdegree
 
     names = ["transition"]
-    references = ["triangle", "tetrahedron"]
+    references = ("triangle", "tetrahedron",)
     min_order = 1
     continuity = "C0"
     value_type = "scalar"

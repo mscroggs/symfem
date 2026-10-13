@@ -157,7 +157,7 @@ class GopalakrishnanLedererSchoberl(CiarletElement):
         return self.order
 
     names = ["Gopalakrishnan-Lederer-Schoberl", "GLS"]
-    references = ["triangle", "tetrahedron"]
+    references = ("triangle", "tetrahedron",)
     min_order = 0
     continuity = "inner H(curl div)"
     value_type = "matrix"

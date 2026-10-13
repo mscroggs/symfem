@@ -70,7 +70,7 @@ class Bell(CiarletElement):
         return 5
 
     names = ["Bell"]
-    references = ["triangle"]
+    references = ("triangle",)
     min_order = 4
     max_order = 4
     continuity = "C2"

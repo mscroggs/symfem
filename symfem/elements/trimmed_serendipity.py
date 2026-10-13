@@ -139,7 +139,7 @@ class TrimmedSerendipityHcurl(CiarletElement):
         return self.order + self.reference.tdim - 1
 
     names = ["trimmed serendipity Hcurl", "TScurl"]
-    references = ["quadrilateral", "hexahedron"]
+    references = ("quadrilateral", "hexahedron",)
     min_order = 0
     continuity = "H(curl)"
     value_type = "vector"
@@ -242,7 +242,7 @@ class TrimmedSerendipityHdiv(CiarletElement):
         return self.order + 1
 
     names = ["trimmed serendipity Hdiv", "TSdiv"]
-    references = ["quadrilateral", "hexahedron"]
+    references = ("quadrilateral", "hexahedron",)
     min_order = 0
     continuity = "H(div)"
     value_type = "vector"

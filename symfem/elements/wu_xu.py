@@ -125,7 +125,7 @@ class WuXu(CiarletElement):
         return self.order + 1
 
     names = ["Wu-Xu"]
-    references = ["interval", "triangle", "tetrahedron"]
+    references = ("interval", "triangle", "tetrahedron",)
     min_order = {"interval": 3, "triangle": 3, "tetrahedron": 4}
     max_order = {"interval": 3, "triangle": 3, "tetrahedron": 4}
     continuity = "C0"

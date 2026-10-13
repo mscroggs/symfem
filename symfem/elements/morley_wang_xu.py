@@ -117,7 +117,7 @@ class MorleyWangXu(CiarletElement):
         return self.order
 
     names = ["Morley-Wang-Xu", "MWX"]
-    references = ["interval", "triangle", "tetrahedron"]
+    references = ("interval", "triangle", "tetrahedron",)
     min_order = 1
     max_order = {"interval": 1, "triangle": 2, "tetrahedron": 3}
     continuity = "C{order}"

@@ -94,7 +94,7 @@ class DirectSerendipity(DirectElement):
         raise NotImplementedError()
 
     names = ["direct serendipity"]
-    references = ["quadrilateral"]
+    references = ("quadrilateral",)
     min_order = 1
     continuity = "C0"
     value_type = "scalar non-polynomial"

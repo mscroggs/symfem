@@ -65,7 +65,7 @@ class BognerFoxSchmit(CiarletElement):
         return self.order * 2
 
     names = ["Bogner-Fox-Schmit", "BFS"]
-    references = ["quadrilateral"]
+    references = ("quadrilateral",)
     min_order = 3
     max_order = 3
     continuity = "C0"

@@ -97,7 +97,7 @@ class CrouzeixRaviart(CiarletElement):
         return self.order
 
     names = ["Crouzeix-Raviart", "CR", "Crouzeix-Falk", "CF"]
-    references = ["triangle", "tetrahedron"]
+    references = ("triangle", "tetrahedron",)
     min_order = 1
     max_order = {"tetrahedron": 1}
     continuity = "L2"

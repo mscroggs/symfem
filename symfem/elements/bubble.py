@@ -105,7 +105,7 @@ class Bubble(CiarletElement):
         return self.order
 
     names = ["bubble"]
-    references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
+    references = ("interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron",)
     min_order = {
         "interval": 2,
         "triangle": 3,
@@ -166,7 +166,7 @@ class BubbleEnrichedLagrange(CiarletElement):
         return self.order + 2
 
     names = ["bubble enriched Lagrange"]
-    references = ["triangle"]
+    references = ("triangle",)
     min_order = 1
     continuity = "C0"
     value_type = "scalar"
@@ -228,7 +228,7 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
         return self.order + 2
 
     names = ["bubble enriched vector Lagrange"]
-    references = ["triangle"]
+    references = ("triangle",)
     min_order = 1
     continuity = "C0"
     value_type = "vector"

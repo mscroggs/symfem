@@ -137,7 +137,7 @@ class Lagrange(CiarletElement):
         return self.order * 2
 
     names = ["Lagrange", "P"]
-    references = ["prism"]
+    references = ("prism",)
     min_order = 0
     continuity = "C0"
     value_type = "scalar"
@@ -202,7 +202,7 @@ class VectorLagrange(CiarletElement):
         return self.order * 2
 
     names: list[str] = []
-    references = ["prism"]
+    references = ("prism",)
     min_order = 0
     continuity = "C0"
     value_type = "vector"

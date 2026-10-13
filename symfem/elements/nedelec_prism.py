@@ -139,7 +139,7 @@ class Nedelec(CiarletElement):
         return (self.order + 1) * 2
 
     names = ["Nedelec", "Ncurl"]
-    references = ["prism"]
+    references = ("prism",)
     min_order = 0
     continuity = "H(curl)"
     value_type = "vector"

@@ -125,7 +125,7 @@ class BernardiRaugel(CiarletElement):
         return self.order + self.reference.tdim - 1
 
     names = ["Bernardi-Raugel"]
-    references = ["triangle", "tetrahedron"]
+    references = ("triangle", "tetrahedron",)
     min_order = 1
     max_order = {"triangle": 1, "tetrahedron": 2}
     continuity = "L2"
