@@ -29,13 +29,13 @@ from symfem.utils import allequal
 from symfem.version import version
 
 __all__ = [
-    "TabulatedBasis",
-    "NoTensorProduct",
-    "FiniteElement",
     "CiarletElement",
     "DirectElement",
-    "EnrichedElement",
     "ElementBasisFunction",
+    "EnrichedElement",
+    "FiniteElement",
+    "NoTensorProduct",
+    "TabulatedBasis",
 ]
 
 TabulatedBasis = (
@@ -809,7 +809,7 @@ class CiarletElement(FiniteElement):
             for dim in range(self.reference.tdim + 1):
                 for e in range(self.reference.sub_entity_count(dim)):
                     entity_dofs = self.entity_dofs(dim, e)
-                    dofs_by_type: dict[tuple[typing.Type, str | None], list[int]] = {}
+                    dofs_by_type: dict[tuple[type, str | None], list[int]] = {}
                     for d in entity_dofs:
                         dof = self.dofs[d]
                         t = (type(dof), dof.mapping)

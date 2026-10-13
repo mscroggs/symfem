@@ -1,5 +1,6 @@
 """Polynomials."""
 
+from symfem.polynomials.degree_computation import degree
 from symfem.polynomials.dual import l2_dual
 from symfem.polynomials.jacobi import jacobi_polynomial, monic_jacobi_polynomial
 from symfem.polynomials.legendre import orthogonal_basis, orthonormal_basis
@@ -24,4 +25,3 @@ from symfem.polynomials.polysets import (
     serendipity_set_1d,
     serendipity_set_vector,
 )
-from symfem.polynomials.degree_computation import degree

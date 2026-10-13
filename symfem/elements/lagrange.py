@@ -22,7 +22,7 @@ from symfem.polynomials import (
 from symfem.quadrature import get_quadrature
 from symfem.references import Reference
 
-__all__ = ["Lagrange", "VectorLagrange", "MatrixLagrange", "SymmetricMatrixLagrange"]
+__all__ = ["Lagrange", "MatrixLagrange", "SymmetricMatrixLagrange", "VectorLagrange"]
 
 
 class Lagrange(CiarletElement):

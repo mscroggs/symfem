@@ -46,7 +46,6 @@ class BasisFunction(Function):
         Returns:
             The basis function
         """
-        pass
 
     def __add__(self, other: typing.Any) -> Function:
         """Add.

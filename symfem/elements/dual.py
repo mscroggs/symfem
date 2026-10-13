@@ -12,7 +12,7 @@ from symfem.geometry import PointType, SetOfPoints, SetOfPointsInput
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.references import DualPolygon, NonDefaultReferenceError
 
-__all__ = ["DualCiarletElement", "Dual", "BuffaChristiansen", "RotatedBuffaChristiansen"]
+__all__ = ["BuffaChristiansen", "Dual", "DualCiarletElement", "RotatedBuffaChristiansen"]
 
 
 class DualCiarletElement(FiniteElement):

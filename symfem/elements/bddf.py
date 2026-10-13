@@ -15,7 +15,7 @@ from symfem.polynomials import polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
 
-__all__ = ["bddf_polyset", "BDDF"]
+__all__ = ["BDDF", "bddf_polyset"]
 
 
 def bddf_polyset(reference: Reference, order: int) -> list[FunctionInput]:

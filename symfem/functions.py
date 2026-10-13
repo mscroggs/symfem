@@ -12,14 +12,14 @@ from symfem.geometry import PointType
 from symfem.symbols import AxisVariables, AxisVariablesNotSingle, t, x
 
 __all__ = [
+    "Function",
+    "FunctionInput",
+    "MatrixFunction",
+    "ScalarFunction",
     "SingleSympyFormat",
     "SympyFormat",
     "ValuesToSubstitute",
-    "Function",
-    "ScalarFunction",
     "VectorFunction",
-    "MatrixFunction",
-    "FunctionInput",
     "parse_function_input",
     "parse_function_list_input",
 ]
@@ -510,11 +510,11 @@ class Function(ABC):
         """Representation."""
         return self.as_sympy().__repr__()
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Check if two functions are equal."""
         return _check_equal(_to_sympy_format(self), _to_sympy_format(other))
 
-    def __ne__(self, other: typing.Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         """Check if two functions are not equal."""
         return not self.__eq__(other)
 
@@ -527,7 +527,7 @@ class ScalarFunction(Function):
 
     _f: sympy.core.expr.Expr
 
-    def __init__(self, f: int | float | sympy.core.expr.Expr):
+    def __init__(self, f: float | sympy.core.expr.Expr):
         """Create a scalar-valued function.
 
         Args:
@@ -931,7 +931,7 @@ class ScalarFunction(Function):
             raise ValueError(f"Unrecognised cell: {cell.name}")
 
 
-def enforce_ScalarFunction(value: Function | int | float | sympy.core.expr.Expr) -> ScalarFunction:
+def enforce_ScalarFunction(value: Function | float | sympy.core.expr.Expr) -> ScalarFunction:
     """Enforce that value/entry becomes a ScalarFunction."""
     from symfem.basis_functions import BasisFunction
 
@@ -1435,7 +1435,6 @@ class MatrixFunction(Function):
             # assigment via two integers
             elif isinstance(i, int) and isinstance(j, int):
                 self._mat[i][j] = enforce_ScalarFunction(value)
-            #
             else:
                 raise TypeError(
                     "key must contain either slices or int. "
@@ -1464,7 +1463,6 @@ class MatrixFunction(Function):
                 self._mat[key] = [v for i in range(self.shape[1])]
             else:
                 raise TypeError
-        #
         else:
             raise TypeError("key must be int, slice or tuple. " + f"Current type: {type(key)}")
 

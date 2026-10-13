@@ -13,7 +13,7 @@ from symfem.geometry import SetOfPoints
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.references import Reference
 
-__all__ = ["P1IsoP2Interval", "P1IsoP2Tri", "P1IsoP2Quad"]
+__all__ = ["P1IsoP2Interval", "P1IsoP2Quad", "P1IsoP2Tri"]
 
 
 class P1IsoP2Interval(CiarletElement):

@@ -16,18 +16,18 @@ from symfem.geometry import (
 )
 
 __all__ = [
+    "Arrow",
+    "Bezier",
+    "Colors",
+    "Fill",
+    "Line",
+    "Math",
+    "NCircle",
+    "Picture",
+    "PictureElement",
     "PointOrFunction",
     "SetOfPointsOrFunctions",
     "tex_font_size",
-    "Colors",
-    "PictureElement",
-    "Line",
-    "Bezier",
-    "Arrow",
-    "NCircle",
-    "Fill",
-    "Math",
-    "Picture",
 ]
 
 PointOrFunction = PointTypeInput | Function
@@ -145,7 +145,6 @@ class PictureElement(ABC):
         Returns:
             An SVG string
         """
-        pass
 
     @abstractmethod
     def as_tikz(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
@@ -157,7 +156,6 @@ class PictureElement(ABC):
         Returns:
             A Tikz string
         """
-        pass
 
     @property
     @abstractmethod
@@ -167,7 +165,6 @@ class PictureElement(ABC):
         Returns:
             A set of points
         """
-        pass
 
     def minx(self) -> sympy.core.expr.Expr:
         """Get the minimum x-coordinate.

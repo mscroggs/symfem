@@ -1,8 +1,8 @@
 """Jacobi polynomials."""
 
 from functools import cache
+from math import factorial, prod
 
-from math import prod, factorial
 import sympy
 
 from symfem.functions import ScalarFunction

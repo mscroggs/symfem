@@ -5,20 +5,20 @@ import os as _os
 import typing as _typing
 
 import symfem.references as _references
-from symfem.finite_element import FiniteElement as _FiniteElement
 from symfem.finite_element import CiarletElement as _CiarletElement
+from symfem.finite_element import FiniteElement as _FiniteElement
 from symfem.geometry import SetOfPointsInput as _SetOfPointsInput
 from symfem.geometry import parse_set_of_points_input as _parse_set_of_points_input
 
 _folder = _os.path.dirname(_os.path.realpath(__file__))
 
-_elementmap: dict[str, dict[str, _typing.Type]] = {}
-_elementlist: list[_typing.Type] = []
+_elementmap: dict[str, dict[str, type]] = {}
+_elementlist: list[type] = []
 
-__all__ = ["add_element", "create_reference", "create_element"]
+__all__ = ["add_element", "create_element", "create_reference"]
 
 
-def add_element(element_class: _typing.Type):
+def add_element(element_class: type):
     """Add an element to Symfem.
 
     Args:
@@ -213,7 +213,7 @@ def create_element(
     raise ValueError(f"Unsupported element type: {element_type}")
 
 
-def _order_is_allowed(element_class: _typing.Type, ref: str, order: int) -> bool:
+def _order_is_allowed(element_class: type, ref: str, order: int) -> bool:
     """Check that an order is valid for an element.
 
     Args:

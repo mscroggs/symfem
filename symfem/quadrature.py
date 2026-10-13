@@ -1,10 +1,12 @@
 """Quadrature definitions."""
 
-from abc import ABC, abstractmethod
-import sympy
 import typing
-from symfem.symbols import AxisVariablesNotSingle, x
+from abc import ABC, abstractmethod
+
+import sympy
+
 from symfem.functions import Function, FunctionInput, parse_function_input
+from symfem.symbols import AxisVariablesNotSingle, x
 
 try:
     import basix
@@ -14,14 +16,14 @@ except ModuleNotFoundError:
     has_basix = False
 
 __all__ = [
+    "AbstractQuadratureRule",
+    "QuadratureRule",
     "Scalar",
     "equispaced",
+    "get_quadrature",
+    "legendre",
     "lobatto",
     "radau",
-    "legendre",
-    "get_quadrature",
-    "QuadratureRule",
-    "AbstractQuadratureRule",
 ]
 
 Scalar = typing.Union[sympy.core.expr.Expr, int]

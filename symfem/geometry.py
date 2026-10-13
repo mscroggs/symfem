@@ -1,19 +1,20 @@
 """Geometry."""
 
-import sympy
 import typing
+
+import sympy
 
 __all__ = [
     "PointType",
-    "SetOfPoints",
     "PointTypeInput",
+    "SetOfPoints",
     "SetOfPointsInput",
-    "parse_set_of_points_input",
     "parse_point_input",
+    "parse_set_of_points_input",
     "point_in_interval",
-    "point_in_triangle",
     "point_in_quadrilateral",
     "point_in_tetrahedron",
+    "point_in_triangle",
 ]
 
 PointType = tuple[sympy.core.expr.Expr, ...]

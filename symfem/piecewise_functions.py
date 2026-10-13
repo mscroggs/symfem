@@ -164,7 +164,7 @@ class PiecewiseFunction(Function):
             {shape: f.__getitem__(key) for shape, f in self._pieces.items()}, self.tdim
         )
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Check if two functions are equal."""
         if not isinstance(other, PiecewiseFunction):
             return False

@@ -5,14 +5,14 @@ import typing
 from symfem.functionals import BaseFunctional
 from symfem.references import Reference
 
-__all__ = ["MomentType", "SingleMomentTypeInput", "MomentTypeInput", "make_integral_moment_dofs"]
+__all__ = ["MomentType", "MomentTypeInput", "SingleMomentTypeInput", "make_integral_moment_dofs"]
 
-MomentType = tuple[typing.Type, typing.Type, int, str | None, dict[str, typing.Any]]
+MomentType = tuple[type, type, int, str | None, dict[str, typing.Any]]
 SingleMomentTypeInput = (
     MomentType
-    | tuple[typing.Type, typing.Type, int, str]
-    | tuple[typing.Type, typing.Type, int, dict[str, typing.Any]]
-    | tuple[typing.Type, typing.Type, int]
+    | tuple[type, type, int, str]
+    | tuple[type, type, int, dict[str, typing.Any]]
+    | tuple[type, type, int]
 )
 MomentTypeInput = SingleMomentTypeInput | dict[str, SingleMomentTypeInput]
 

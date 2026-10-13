@@ -2,10 +2,10 @@
 
 import sympy
 
+from symfem import create_reference
 from symfem.functions import MatrixFunction, ScalarFunction, VectorFunction
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.symbols import x
-from symfem import create_reference
 
 
 def test_scalar_function_add_sub():

@@ -19,19 +19,19 @@ from symfem.geometry import (
 from symfem.symbols import AxisVariablesNotSingle, t, x
 
 __all__ = [
-    "LatticeWithLines",
-    "IntLimits",
-    "NonDefaultReferenceError",
-    "Reference",
-    "Point",
-    "Interval",
-    "Triangle",
-    "Tetrahedron",
-    "Quadrilateral",
+    "DualPolygon",
     "Hexahedron",
+    "IntLimits",
+    "Interval",
+    "LatticeWithLines",
+    "NonDefaultReferenceError",
+    "Point",
     "Prism",
     "Pyramid",
-    "DualPolygon",
+    "Quadrilateral",
+    "Reference",
+    "Tetrahedron",
+    "Triangle",
 ]
 
 LatticeWithLines = tuple[SetOfPoints, list[tuple[int, int]]]

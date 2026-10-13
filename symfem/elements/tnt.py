@@ -25,7 +25,7 @@ from symfem.polynomials import orthogonal_basis, quolynomial_set_1d, quolynomial
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import t, x
 
-__all__ = ["p", "b", "TNT", "TNTcurl", "TNTdiv"]
+__all__ = ["TNT", "TNTcurl", "TNTdiv", "b", "p"]
 
 
 def p(k: int, v: sympy.core.symbol.Symbol) -> ScalarFunction:

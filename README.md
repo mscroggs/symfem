@@ -86,7 +86,6 @@ qcurl = symfem.create_element("quadrilateral", "Qcurl", 2)
 The basis functions of an element can be obtained by calling `get_basis_functions()`:
 
 ```python
-
 lagrange = symfem.create_element("triangle", "Lagrange", 1)
 print(lagrange.get_basis_functions())
 ```
@@ -103,10 +102,9 @@ The function `map_to_cell` can be used to map the basis functions of a finite el
 to a non-default cell:
 
 ```python
-
 lagrange = symfem.create_element("triangle", "Lagrange", 1)
 print(lagrange.get_basis_functions())
-print(lagrange.map_to_cell([(0,0), (2, 0), (2, 1)]))
+print(lagrange.map_to_cell([(0, 0), (2, 0), (2, 1)]))
 ```
 ```
 [-x - y + 1, x, y]

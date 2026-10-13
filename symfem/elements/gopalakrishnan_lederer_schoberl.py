@@ -7,14 +7,13 @@ This element's definition appears in https://doi.org/10.34726/hss.2019.62042
 
 import typing
 
-
 from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import (
     InnerProductIntegralMoment,
     IntegralMoment,
-    TraceIntegralMoment,
     ListOfFunctionals,
+    TraceIntegralMoment,
 )
 from symfem.functions import FunctionInput, MatrixFunction
 from symfem.moments import make_integral_moment_dofs

@@ -15,7 +15,7 @@ from symfem.functions import FunctionInput
 from symfem.polynomials import polynomial_set_1d
 from symfem.references import NonDefaultReferenceError, Reference
 
-__all__ = ["derivatives", "WuXu"]
+__all__ = ["WuXu", "derivatives"]
 
 
 def derivatives(dim: int, order: int) -> list[tuple[int, ...]]:

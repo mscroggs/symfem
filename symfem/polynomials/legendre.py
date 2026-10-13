@@ -5,8 +5,8 @@ import typing
 import sympy
 
 from symfem.functions import ScalarFunction
-from symfem.symbols import AxisVariablesNotSingle, x
 from symfem.polynomials.jacobi import jacobi_polynomial
+from symfem.symbols import AxisVariablesNotSingle, x
 
 __all__: list[str] = []
 

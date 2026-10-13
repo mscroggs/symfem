@@ -14,8 +14,8 @@ from symfem.functions import (
     parse_function_input,
 )
 from symfem.geometry import PointType, SetOfPoints
-from symfem.polynomials import degree
 from symfem.piecewise_functions import PiecewiseFunction
+from symfem.polynomials import degree
 from symfem.quadrature import numerical as numerical_quadrature
 from symfem.references import Interval, NonDefaultReferenceError, Reference
 from symfem.symbols import t, x
@@ -25,27 +25,27 @@ DiscreteDof = tuple[list[list[float]], list[list[list[float]]]]
 
 __all__ = [
     "BaseFunctional",
-    "PointEvaluation",
-    "WeightedPointEvaluation",
-    "DerivativePointEvaluation",
-    "PointDirectionalDerivativeEvaluation",
-    "PointNormalDerivativeEvaluation",
-    "PointComponentSecondDerivativeEvaluation",
-    "PointInnerProduct",
-    "DotPointEvaluation",
-    "PointDivergenceEvaluation",
-    "IntegralAgainst",
-    "IntegralOfDivergenceAgainst",
-    "IntegralOfDirectionalMultiderivative",
-    "IntegralMoment",
     "DerivativeIntegralMoment",
+    "DerivativePointEvaluation",
     "DivergenceIntegralMoment",
-    "TangentIntegralMoment",
-    "NormalIntegralMoment",
-    "TraceIntegralMoment",
-    "NormalDerivativeIntegralMoment",
+    "DotPointEvaluation",
     "InnerProductIntegralMoment",
+    "IntegralAgainst",
+    "IntegralMoment",
+    "IntegralOfDirectionalMultiderivative",
+    "IntegralOfDivergenceAgainst",
+    "NormalDerivativeIntegralMoment",
     "NormalInnerProductIntegralMoment",
+    "NormalIntegralMoment",
+    "PointComponentSecondDerivativeEvaluation",
+    "PointDirectionalDerivativeEvaluation",
+    "PointDivergenceEvaluation",
+    "PointEvaluation",
+    "PointInnerProduct",
+    "PointNormalDerivativeEvaluation",
+    "TangentIntegralMoment",
+    "TraceIntegralMoment",
+    "WeightedPointEvaluation",
 ]
 
 
@@ -242,7 +242,6 @@ class BaseFunctional(ABC):
         Returns:
             The point
         """
-        pass
 
     def adjusted_dof_point(self) -> PointType:
         """Get the adjusted position of the DOF in the cell for plotting.
@@ -283,7 +282,6 @@ class BaseFunctional(ABC):
         Returns:
             The value of the functional for the function
         """
-        pass
 
     @abstractmethod
     def get_tex(self) -> tuple[str, list[str]]:
@@ -292,7 +290,6 @@ class BaseFunctional(ABC):
         Returns:
             Representation of the functional as TeX, and list of terms involved
         """
-        pass
 
     @abstractmethod
     def discrete(self, poly_degree: int) -> DiscreteDof:
