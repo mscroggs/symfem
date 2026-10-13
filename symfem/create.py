@@ -223,16 +223,14 @@ def _order_is_allowed(element_class: type, ref: str, order: int) -> bool:
     """
     if hasattr(element_class, "min_order"):
         if isinstance(element_class.min_order, dict):
-            if ref in element_class.min_order:
-                if order < element_class.min_order[ref]:
-                    return False
+            if ref in element_class.min_order and order < element_class.min_order[ref]:
+                return False
         elif order < element_class.min_order:
             return False
     if hasattr(element_class, "max_order"):
         if isinstance(element_class.max_order, dict):
-            if ref in element_class.max_order:
-                if order > element_class.max_order[ref]:
-                    return False
+            if ref in element_class.max_order and order > element_class.max_order[ref]:
+                return False
         elif order > element_class.max_order:
             return False
     return True

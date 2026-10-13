@@ -1090,7 +1090,7 @@ class Picture:
         Returns:
             The image as an SVG string
         """
-        scale, height, width, map_pt = self.compute_scale("px")
+        _scale, height, width, map_pt = self.compute_scale("px")
 
         assert filename is None or filename.endswith(".svg")
         img = (
@@ -1161,7 +1161,7 @@ class Picture:
         Returns:
             The image as a Tikz string
         """
-        scale, height, width, map_pt = self.compute_scale("cm", False)
+        _scale, _height, _width, map_pt = self.compute_scale("cm", False)
         tikz = self.tex_comment
         tikz += "\\begin{tikzpicture}[x=1cm,y=1cm]\n"
 
@@ -1182,7 +1182,7 @@ class Picture:
     def save(
         self,
         filename: str | list[str],
-        plot_options: dict[str, typing.Any] = {},
+        plot_options: dict[str, typing.Any] | None = None,
     ):
         """Save the picture as a file.
 
@@ -1190,6 +1190,8 @@ class Picture:
             filename: The file name
             plot_options: The plotting options
         """
+        if plot_options is None:
+            plot_options = {}
         if isinstance(filename, list):
             for fn in filename:
                 self.save(fn, plot_options)

@@ -105,7 +105,7 @@ class P1IsoP2Tri(CiarletElement):
             poly.append(
                 PiecewiseFunction(
                     {
-                        tuple(reference.get_point(pt) for pt in q): pieces[i] if i in pieces else 0
+                        tuple(reference.get_point(pt) for pt in q): pieces.get(i, 0)
                         for i, q in enumerate(tris)
                     },
                     2,
@@ -183,7 +183,7 @@ class P1IsoP2Quad(CiarletElement):
             poly.append(
                 PiecewiseFunction(
                     {
-                        tuple(reference.get_point(pt) for pt in q): pieces[i] if i in pieces else 0
+                        tuple(reference.get_point(pt) for pt in q): pieces.get(i, 0)
                         for i, q in enumerate(quads)
                     },
                     2,

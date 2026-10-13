@@ -101,11 +101,11 @@ def run_subdegree_test(element, subdegree, pfunc, pargs):
         poly = pfunc(*[subdegree if p == "SUBDEGREE" else p for p in pargs])
         poly_coeff = [polydict(p, element) for p in make_into_value_type(poly, element)]
 
-        monomials = list(set([m for p in poly_coeff + basis_coeff for m in p]))
+        monomials = list({m for p in poly_coeff + basis_coeff for m in p})
 
-        mat = sympy.Matrix([[p[m] if m in p else 0 for m in monomials] for p in basis_coeff])
+        mat = sympy.Matrix([[p.get(m, 0) for m in monomials] for p in basis_coeff])
         mat2 = sympy.Matrix(
-            [[p[m] if m in p else 0 for m in monomials] for p in poly_coeff + basis_coeff]
+            [[p.get(m, 0) for m in monomials] for p in poly_coeff + basis_coeff]
         )
 
         assert mat.rank() == mat2.rank()
@@ -113,11 +113,11 @@ def run_subdegree_test(element, subdegree, pfunc, pargs):
     poly = pfunc(*[subdegree + 1 if p == "SUBDEGREE" else p for p in pargs])
     poly_coeff = [polydict(p, element) for p in make_into_value_type(poly, element)]
 
-    monomials = list(set([m for p in poly_coeff + basis_coeff for m in p]))
+    monomials = list({m for p in poly_coeff + basis_coeff for m in p})
 
-    mat = sympy.Matrix([[p[m] if m in p else 0 for m in monomials] for p in basis_coeff])
+    mat = sympy.Matrix([[p.get(m, 0) for m in monomials] for p in basis_coeff])
     mat2 = sympy.Matrix(
-        [[p[m] if m in p else 0 for m in monomials] for p in poly_coeff + basis_coeff]
+        [[p.get(m, 0) for m in monomials] for p in poly_coeff + basis_coeff]
     )
 
     assert mat.rank() != mat2.rank()
@@ -140,11 +140,11 @@ def run_superdegree_test(element, superdegree, pfunc, pargs):
         poly = pfunc(*[superdegree if p == "SUPERDEGREE" else p for p in pargs])
         poly_coeff = [polydict(p, element) for p in make_into_value_type(poly, element)]
 
-        monomials = list(set([m for p in poly_coeff + basis_coeff for m in p]))
+        monomials = list({m for p in poly_coeff + basis_coeff for m in p})
 
-        mat = sympy.Matrix([[p[m] if m in p else 0 for m in monomials] for p in poly_coeff])
+        mat = sympy.Matrix([[p.get(m, 0) for m in monomials] for p in poly_coeff])
         mat2 = sympy.Matrix(
-            [[p[m] if m in p else 0 for m in monomials] for p in poly_coeff + basis_coeff]
+            [[p.get(m, 0) for m in monomials] for p in poly_coeff + basis_coeff]
         )
 
         assert mat.rank() == mat2.rank()
@@ -160,11 +160,11 @@ def run_superdegree_test(element, superdegree, pfunc, pargs):
         for p in make_into_value_type(poly, element)
     ]
 
-    monomials = list(set([m for p in poly_coeff + basis_coeff for m in p]))
+    monomials = list({m for p in poly_coeff + basis_coeff for m in p})
 
-    mat = sympy.Matrix([[p[m] if m in p else 0 for m in monomials] for p in poly_coeff])
+    mat = sympy.Matrix([[p.get(m, 0) for m in monomials] for p in poly_coeff])
     mat2 = sympy.Matrix(
-        [[p[m] if m in p else 0 for m in monomials] for p in poly_coeff + basis_coeff]
+        [[p.get(m, 0) for m in monomials] for p in poly_coeff + basis_coeff]
     )
 
     assert mat.rank() != mat2.rank()

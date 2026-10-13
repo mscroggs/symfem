@@ -138,10 +138,10 @@ class Transition(CiarletElement):
                 p.as_sympy().expand().as_poly(*x).as_dict()  # type: ignore
                 for p in polynomial_set_1d(self.reference.tdim, degree)
             ]
-            monomials = list(set([m for p in poly_coeff + basis_coeff for m in p]))
-            mat = sympy.Matrix([[p[m] if m in p else 0 for m in monomials] for p in poly_coeff])
+            monomials = list({m for p in poly_coeff + basis_coeff for m in p})
+            mat = sympy.Matrix([[p.get(m, 0) for m in monomials] for p in poly_coeff])
             mat2 = sympy.Matrix(
-                [[p[m] if m in p else 0 for m in monomials] for p in poly_coeff + basis_coeff]
+                [[p.get(m, 0) for m in monomials] for p in poly_coeff + basis_coeff]
             )
             if mat.rank() < mat2.rank():
                 return degree - 1

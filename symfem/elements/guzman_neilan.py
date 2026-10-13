@@ -122,7 +122,7 @@ def bubbles(reference: Reference) -> list[VectorFunction]:
 
         for term in fun:
             assert term in terms
-        aim = [fun[term] if term in fun else 0 for term in terms] * (reference.tdim + 1)
+        aim = [fun.get(term, 0) for term in terms] * (reference.tdim + 1)
 
         mat: list[list[ScalarFunction]] = [[] for t in terms for p in lamb.pieces]
         for b in sub_basis:
@@ -137,7 +137,7 @@ def bubbles(reference: Reference) -> list[VectorFunction]:
                     assert term == 0 or term in terms
                 for term in terms:
                     if i < len(mat):
-                        mat[i].append(d[term] if term in d else 0)  # type: ignore
+                        mat[i].append(d.get(term, 0))  # type: ignore
                     i += 1
 
         s_mat = sympy.Matrix(mat)

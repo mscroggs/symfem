@@ -154,7 +154,7 @@ class FiniteElement(ABC):
     def plot_dof_diagram(
         self,
         filename: str | list[str],
-        plot_options: dict[str, typing.Any] = {},
+        plot_options: dict[str, typing.Any] | None = None,
         **kwargs: typing.Any,
     ):
         """Plot a diagram showing the DOFs of the element.
@@ -164,6 +164,8 @@ class FiniteElement(ABC):
             plot_options: Options for the plot
             kwargs: Keyword arguments
         """
+        if plot_options is None:
+            plot_options = {}
         img = Picture(**kwargs)
         colors = img.colors
 

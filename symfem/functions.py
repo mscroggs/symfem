@@ -391,7 +391,7 @@ class Function(ABC):
         dof_entity: tuple[int, int] | None = None,
         dof_n: int | None = None,
         value_scale: sympy.core.expr.Expr = sympy.Integer(1),
-        plot_options: dict[str, typing.Any] = {},
+        plot_options: dict[str, typing.Any] | None = None,
         **kwargs: typing.Any,
     ):
         """Plot the function.
@@ -409,7 +409,9 @@ class Function(ABC):
         """
         from symfem.plotting import Picture
 
-        extra: tuple[int, ...] = tuple()
+        if plot_options is None:
+            plot_options = {}
+        extra: tuple[int, ...] = ()
         if self.is_scalar:
             extra = (0,)
 

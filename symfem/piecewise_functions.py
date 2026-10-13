@@ -51,7 +51,7 @@ class PiecewiseFunction(Function):
         self.tdim = tdim
 
         assert len(self._pieces) > 0
-        self.first_piece = list(self._pieces.values())[0]
+        self.first_piece = next(iter(self._pieces.values()))
         if self.first_piece.is_scalar:
             for f in self._pieces.values():
                 assert f.is_scalar
