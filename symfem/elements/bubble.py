@@ -104,7 +104,7 @@ class Bubble(CiarletElement):
             return self.order * self.reference.tdim
         return self.order
 
-    names = ["bubble"]
+    names = ("bubble",)
     references = (
         "interval",
         "triangle",
@@ -171,7 +171,7 @@ class BubbleEnrichedLagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + 2
 
-    names = ["bubble enriched Lagrange"]
+    names = ("bubble enriched Lagrange",)
     references = ("triangle",)
     min_order = 1
     continuity = "C0"
@@ -233,7 +233,7 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + 2
 
-    names = ["bubble enriched vector Lagrange"]
+    names = ("bubble enriched vector Lagrange",)
     references = ("triangle",)
     min_order = 1
     continuity = "C0"

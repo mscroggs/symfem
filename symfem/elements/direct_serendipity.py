@@ -93,7 +93,7 @@ class DirectSerendipity(DirectElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["direct serendipity"]
+    names = ("direct serendipity",)
     references = ("quadrilateral",)
     min_order = 1
     continuity = "C0"

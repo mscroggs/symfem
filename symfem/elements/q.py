@@ -162,7 +162,11 @@ class Q(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim
 
-    names = ["Q", "Lagrange", "P"]
+    names = (
+        "Q",
+        "Lagrange",
+        "P",
+    )
     references = (
         "quadrilateral",
         "hexahedron",
@@ -233,7 +237,10 @@ class VectorQ(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim
 
-    names = ["vector Q", "vQ"]
+    names = (
+        "vector Q",
+        "vQ",
+    )
     references = (
         "quadrilateral",
         "hexahedron",
@@ -296,7 +303,13 @@ class Nedelec(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return (self.order + 1) * self.reference.tdim - 1
 
-    names = ["NCE", "RTCE", "Qcurl", "Nedelec", "Ncurl"]
+    names = (
+        "NCE",
+        "RTCE",
+        "Qcurl",
+        "Nedelec",
+        "Ncurl",
+    )
     references = (
         "quadrilateral",
         "hexahedron",
@@ -358,7 +371,11 @@ class RaviartThomas(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim + 1
 
-    names = ["NCF", "RTCF", "Qdiv"]
+    names = (
+        "NCF",
+        "RTCF",
+        "Qdiv",
+    )
     references = (
         "quadrilateral",
         "hexahedron",

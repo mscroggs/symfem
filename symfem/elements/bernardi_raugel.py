@@ -124,7 +124,7 @@ class BernardiRaugel(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + self.reference.tdim - 1
 
-    names = ["Bernardi-Raugel"]
+    names = ("Bernardi-Raugel",)
     references = (
         "triangle",
         "tetrahedron",

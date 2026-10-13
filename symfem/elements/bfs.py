@@ -64,7 +64,10 @@ class BognerFoxSchmit(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * 2
 
-    names = ["Bogner-Fox-Schmit", "BFS"]
+    names = (
+        "Bogner-Fox-Schmit",
+        "BFS",
+    )
     references = ("quadrilateral",)
     min_order = 3
     max_order = 3

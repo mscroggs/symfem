@@ -142,7 +142,10 @@ class BDFM(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
-    names = ["Brezzi-Douglas-Fortin-Marini", "BDFM"]
+    names = (
+        "Brezzi-Douglas-Fortin-Marini",
+        "BDFM",
+    )
     references = (
         "triangle",
         "quadrilateral",

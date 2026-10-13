@@ -96,7 +96,12 @@ class CrouzeixRaviart(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Crouzeix-Raviart", "CR", "Crouzeix-Falk", "CF"]
+    names = (
+        "Crouzeix-Raviart",
+        "CR",
+        "Crouzeix-Falk",
+        "CF",
+    )
     references = (
         "triangle",
         "tetrahedron",

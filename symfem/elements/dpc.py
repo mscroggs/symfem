@@ -87,7 +87,7 @@ class DPC(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["dPc"]
+    names = ("dPc",)
     references = (
         "interval",
         "quadrilateral",
@@ -156,7 +156,7 @@ class VectorDPC(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["vector dPc"]
+    names = ("vector dPc",)
     references = (
         "quadrilateral",
         "hexahedron",

@@ -71,7 +71,11 @@ class RaviartThomas(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
-    names = ["Raviart-Thomas", "RT", "N1div"]
+    names = (
+        "Raviart-Thomas",
+        "RT",
+        "N1div",
+    )
     references = (
         "triangle",
         "tetrahedron",

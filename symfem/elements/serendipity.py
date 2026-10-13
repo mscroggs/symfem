@@ -84,7 +84,10 @@ class Serendipity(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + self.reference.tdim - 1
 
-    names = ["serendipity", "S"]
+    names = (
+        "serendipity",
+        "S",
+    )
     references = (
         "interval",
         "quadrilateral",
@@ -150,7 +153,12 @@ class SerendipityCurl(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + self.reference.tdim - 1
 
-    names = ["serendipity Hcurl", "Scurl", "BDMCE", "AAE"]
+    names = (
+        "serendipity Hcurl",
+        "Scurl",
+        "BDMCE",
+        "AAE",
+    )
     references = (
         "quadrilateral",
         "hexahedron",
@@ -212,7 +220,12 @@ class SerendipityDiv(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
-    names = ["serendipity Hdiv", "Sdiv", "BDMCF", "AAF"]
+    names = (
+        "serendipity Hdiv",
+        "Sdiv",
+        "BDMCF",
+        "AAF",
+    )
     references = (
         "quadrilateral",
         "hexahedron",

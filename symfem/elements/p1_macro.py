@@ -74,7 +74,7 @@ class P1Macro(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["P1 macro"]
+    names = ("P1 macro",)
     references = ("triangle",)
     min_order = 1
     max_order = 1

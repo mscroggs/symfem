@@ -124,7 +124,7 @@ class WuXu(CiarletElement):
             return 3
         return self.order + 1
 
-    names = ["Wu-Xu"]
+    names = ("Wu-Xu",)
     references = (
         "interval",
         "triangle",

@@ -198,7 +198,10 @@ class GuzmanNeilanFirstKind(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["Guzman-Neilan first kind", "Guzman-Neilan"]
+    names = (
+        "Guzman-Neilan first kind",
+        "Guzman-Neilan",
+    )
     references = (
         "triangle",
         "tetrahedron",
@@ -303,7 +306,7 @@ class GuzmanNeilanSecondKind(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["Guzman-Neilan second kind"]
+    names = ("Guzman-Neilan second kind",)
     references = (
         "triangle",
         "tetrahedron",

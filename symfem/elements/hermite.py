@@ -61,7 +61,7 @@ class Hermite(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Hermite"]
+    names = ("Hermite",)
     references = (
         "interval",
         "triangle",

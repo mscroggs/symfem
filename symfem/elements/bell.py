@@ -69,7 +69,7 @@ class Bell(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return 5
 
-    names = ["Bell"]
+    names = ("Bell",)
     references = ("triangle",)
     min_order = 4
     max_order = 4

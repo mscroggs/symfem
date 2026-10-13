@@ -162,7 +162,7 @@ class Transition(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.lagrange_superdegree
 
-    names = ["transition"]
+    names = ("transition",)
     references = (
         "triangle",
         "tetrahedron",

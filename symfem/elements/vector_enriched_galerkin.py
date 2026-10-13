@@ -100,7 +100,11 @@ class VectorEnrichedGalerkin(EnrichedElement):
             return self.order * self.reference.tdim
         return self.order
 
-    names = ["enriched vector Galerkin", "locking-free enriched Galerkin", "LFEG"]
+    names = (
+        "enriched vector Galerkin",
+        "locking-free enriched Galerkin",
+        "LFEG",
+    )
     references = (
         "triangle",
         "quadrilateral",

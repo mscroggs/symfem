@@ -257,7 +257,11 @@ class Dual(DualCiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["dual polynomial", "dual P", "dual"]
+    names = (
+        "dual polynomial",
+        "dual P",
+        "dual",
+    )
     references = ("dual polygon",)
     min_order = 0
     max_order = 1
@@ -323,7 +327,10 @@ class BuffaChristiansen(DualCiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["Buffa-Christiansen", "BC"]
+    names = (
+        "Buffa-Christiansen",
+        "BC",
+    )
     references = ("dual polygon",)
     min_order = 0
     max_order = 0
@@ -389,7 +396,10 @@ class RotatedBuffaChristiansen(DualCiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["rotated Buffa-Christiansen", "RBC"]
+    names = (
+        "rotated Buffa-Christiansen",
+        "RBC",
+    )
     references = ("dual polygon",)
     min_order = 0
     max_order = 0

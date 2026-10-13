@@ -156,7 +156,10 @@ class GopalakrishnanLedererSchoberl(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Gopalakrishnan-Lederer-Schoberl", "GLS"]
+    names = (
+        "Gopalakrishnan-Lederer-Schoberl",
+        "GLS",
+    )
     references = (
         "triangle",
         "tetrahedron",

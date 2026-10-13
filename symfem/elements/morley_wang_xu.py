@@ -116,7 +116,10 @@ class MorleyWangXu(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Morley-Wang-Xu", "MWX"]
+    names = (
+        "Morley-Wang-Xu",
+        "MWX",
+    )
     references = (
         "interval",
         "triangle",

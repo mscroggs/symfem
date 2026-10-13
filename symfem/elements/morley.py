@@ -58,7 +58,7 @@ class Morley(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Morley"]
+    names = ("Morley",)
     references = ("triangle",)
     min_order = 2
     max_order = 2

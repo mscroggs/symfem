@@ -191,7 +191,7 @@ class Regge(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Regge"]
+    names = ("Regge",)
     references = (
         "triangle",
         "tetrahedron",
@@ -422,7 +422,7 @@ class ReggeTP(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return (self.order + 1) * self.reference.tdim - 1
 
-    names = ["Regge"]
+    names = ("Regge",)
     references = (
         "quadrilateral",
         "hexahedron",

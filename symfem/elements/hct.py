@@ -141,7 +141,12 @@ class HsiehCloughTocher(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["Hsieh-Clough-Tocher", "Clough-Tocher", "HCT", "CT"]
+    names = (
+        "Hsieh-Clough-Tocher",
+        "Clough-Tocher",
+        "HCT",
+        "CT",
+    )
     references = ("triangle",)
     min_order = 3
     max_order = 3

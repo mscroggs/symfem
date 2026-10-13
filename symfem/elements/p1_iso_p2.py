@@ -61,7 +61,11 @@ class P1IsoP2Interval(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
+    names = (
+        "P1-iso-P2",
+        "P2-iso-P1",
+        "iso-P2 P1",
+    )
     references = ("interval",)
     min_order = 1
     max_order = 1
@@ -137,7 +141,11 @@ class P1IsoP2Tri(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
+    names = (
+        "P1-iso-P2",
+        "P2-iso-P1",
+        "iso-P2 P1",
+    )
     references = ("triangle",)
     min_order = 1
     max_order = 1
@@ -216,7 +224,11 @@ class P1IsoP2Quad(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
+    names = (
+        "P1-iso-P2",
+        "P2-iso-P1",
+        "iso-P2 P1",
+    )
     references = ("quadrilateral",)
     min_order = 1
     max_order = 1

@@ -107,7 +107,10 @@ class Lagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Lagrange", "P"]
+    names = (
+        "Lagrange",
+        "P",
+    )
     references = (
         "interval",
         "triangle",
@@ -188,7 +191,10 @@ class VectorLagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["vector Lagrange", "vP"]
+    names = (
+        "vector Lagrange",
+        "vP",
+    )
     references = (
         "interval",
         "triangle",
@@ -262,7 +268,7 @@ class MatrixLagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["matrix Lagrange"]
+    names = ("matrix Lagrange",)
     references = (
         "triangle",
         "tetrahedron",
@@ -358,7 +364,7 @@ class SymmetricMatrixLagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["symmetric matrix Lagrange"]
+    names = ("symmetric matrix Lagrange",)
     references = (
         "triangle",
         "tetrahedron",

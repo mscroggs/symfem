@@ -138,7 +138,10 @@ class TrimmedSerendipityHcurl(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + self.reference.tdim - 1
 
-    names = ["trimmed serendipity Hcurl", "TScurl"]
+    names = (
+        "trimmed serendipity Hcurl",
+        "TScurl",
+    )
     references = (
         "quadrilateral",
         "hexahedron",
@@ -244,7 +247,10 @@ class TrimmedSerendipityHdiv(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
-    names = ["trimmed serendipity Hdiv", "TSdiv"]
+    names = (
+        "trimmed serendipity Hdiv",
+        "TSdiv",
+    )
     references = (
         "quadrilateral",
         "hexahedron",

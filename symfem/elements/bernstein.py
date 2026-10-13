@@ -285,7 +285,10 @@ class Bernstein(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Bernstein", "Bernstein-Bezier"]
+    names = (
+        "Bernstein",
+        "Bernstein-Bezier",
+    )
     references = (
         "interval",
         "triangle",

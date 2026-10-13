@@ -138,7 +138,10 @@ class Nedelec(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return (self.order + 1) * 2
 
-    names = ["Nedelec", "Ncurl"]
+    names = (
+        "Nedelec",
+        "Ncurl",
+    )
     references = ("prism",)
     min_order = 0
     continuity = "H(curl)"

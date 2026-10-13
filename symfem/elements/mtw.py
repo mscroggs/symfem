@@ -113,7 +113,10 @@ class MardalTaiWinther(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.lagrange_superdegree
 
-    names = ["Mardal-Tai-Winther", "MTW"]
+    names = (
+        "Mardal-Tai-Winther",
+        "MTW",
+    )
     references = (
         "triangle",
         "tetrahedron",

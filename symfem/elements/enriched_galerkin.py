@@ -45,7 +45,10 @@ class EnrichedGalerkin(EnrichedElement):
             return self.order * self.reference.tdim
         return self.order
 
-    names = ["enriched Galerkin", "EG"]
+    names = (
+        "enriched Galerkin",
+        "EG",
+    )
     references = (
         "interval",
         "triangle",

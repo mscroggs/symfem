@@ -146,7 +146,10 @@ class TNT(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return max((self.order - 1) * self.reference.tdim, (self.order - 1) + self.reference.tdim)
 
-    names = ["tiniest tensor", "TNT"]
+    names = (
+        "tiniest tensor",
+        "TNT",
+    )
     references = (
         "quadrilateral",
         "hexahedron",
@@ -325,7 +328,10 @@ class TNTcurl(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim + 1
 
-    names = ["tiniest tensor Hcurl", "TNTcurl"]
+    names = (
+        "tiniest tensor Hcurl",
+        "TNTcurl",
+    )
     references = (
         "quadrilateral",
         "hexahedron",
@@ -502,7 +508,10 @@ class TNTdiv(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim + 1
 
-    names = ["tiniest tensor Hdiv", "TNTdiv"]
+    names = (
+        "tiniest tensor Hdiv",
+        "TNTdiv",
+    )
     references = (
         "quadrilateral",
         "hexahedron",

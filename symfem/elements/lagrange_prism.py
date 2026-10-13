@@ -136,7 +136,10 @@ class Lagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * 2
 
-    names = ["Lagrange", "P"]
+    names = (
+        "Lagrange",
+        "P",
+    )
     references = ("prism",)
     min_order = 0
     continuity = "C0"

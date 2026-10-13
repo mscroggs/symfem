@@ -243,7 +243,10 @@ class KongMulderVeldhuizen(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.lagrange_superdegree
 
-    names = ["Kong-Mulder-Veldhuizen", "KMV"]
+    names = (
+        "Kong-Mulder-Veldhuizen",
+        "KMV",
+    )
     references = (
         "triangle",
         "tetrahedron",
