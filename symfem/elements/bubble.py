@@ -12,7 +12,7 @@ import sympy
 from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
-from symfem.functions import FunctionInput
+from symfem.functions import Function, FunctionInput
 from symfem.references import Reference
 from symfem.utils import ConstDict
 
@@ -144,7 +144,8 @@ class BubbleEnrichedLagrange(CiarletElement):
         poly: list[FunctionInput] = []
         for e in [lagrange, bubble]:
             for p in e._basis:
-                poly.append(p.copy())
+                assert isinstance(p, Function)
+                poly.append(p)
 
         self.variant = variant
 

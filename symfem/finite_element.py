@@ -590,8 +590,8 @@ class FiniteElement(ABC):
         """
         return self.names[0]
 
-    names: tuple[str] = ()
-    references: tuple[str] = ()
+    names: tuple[str, ...] = ()
+    references: tuple[str, ...] = ()
     last_updated = version
     cache = True
     value_type = "unknown"

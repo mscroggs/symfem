@@ -373,7 +373,7 @@ def make_piecewise_lagrange(
                         continue
                 doflist = [nones if i == -1 else lagrange_space.entity_dofs(dim, i) for i in tri_e]
                 for dofs in zip(*doflist):
-                    basis_dofs.append(dofs.copy())
+                    basis_dofs.append(tuple(dofs))
         zero = (0, 0)
 
     elif cell_name == "tetrahedron":
@@ -423,7 +423,7 @@ def make_piecewise_lagrange(
                         continue
                 doflist = [nones if i == -1 else lagrange_space.entity_dofs(dim, i) for i in tet_e]
                 for dofs in zip(*doflist):
-                    basis_dofs.append(dofs.copy())
+                    basis_dofs.append(tuple(dofs))
         zero = (0, 0, 0)
 
     basis: list[PiecewiseFunction] = []
