@@ -53,7 +53,7 @@ class Enrichment(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return 1
 
-    names: list[str] = []
+    names: list[str] = ()
     references = (
         "triangle",
         "quadrilateral",

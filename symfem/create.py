@@ -24,8 +24,6 @@ def add_element(element_class: type):
     Args:
         element_class: The class defining the element.
     """
-    global _elementlist
-    global _elementmap
     if not isinstance(element_class, type):
         raise TypeError("Element must be defined by a class.")
     if not issubclass(element_class, _FiniteElement):

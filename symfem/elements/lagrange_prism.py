@@ -204,7 +204,7 @@ class VectorLagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * 2
 
-    names: list[str] = []
+    names: list[str] = ()
     references = ("prism",)
     min_order = 0
     continuity = "C0"

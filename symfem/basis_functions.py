@@ -21,6 +21,8 @@ from symfem.symbols import AxisVariables, AxisVariablesNotSingle, t, x
 
 __all__ = ["BasisFunction", "SubbedBasisFunction"]
 
+one = sympy.Integer(1)
+
 
 class BasisFunction(Function):
     """A basis function of a finite element.
@@ -417,7 +419,7 @@ class SubbedBasisFunction(BasisFunction):
         self,
         reference: Reference,
         img: typing.Any,
-        value_scale: sympy.core.expr.Expr = sympy.Integer(1),
+        value_scale: sympy.core.expr.Expr = one,
         n: int = 6,
     ):
         """Plot the function's values.

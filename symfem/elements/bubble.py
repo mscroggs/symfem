@@ -141,7 +141,7 @@ class BubbleEnrichedLagrange(CiarletElement):
         poly: list[FunctionInput] = []
         for e in [lagrange, bubble]:
             for p in e._basis:
-                poly.append(p)
+                poly.append(p.copy())
 
         self.variant = variant
 
