@@ -1,5 +1,6 @@
 """Draw the symfem logo."""
 
+import itertools
 import os
 import sys
 from math import sqrt
@@ -238,7 +239,7 @@ for p in polys:
 
 for letter in letters:
     for line_group in letter:
-        for i, j in zip(line_group[:-1], line_group[1:]):
+        for i, j in itertools.pairwise(line_group):
             x1, y1 = to_2d(*i, 1.3)
             x2, y2 = to_2d(*j, 1.3)
             svg += (
@@ -321,7 +322,7 @@ for p in polys:
 
 for letter in letters:
     for line_group in letter:
-        for i, j in zip(line_group[:-1], line_group[1:]):
+        for i, j in itertools.pairwise(line_group):
             x1, y1 = to_2d_new(*i, 1.3)
             x2, y2 = to_2d_new(*j, 1.3)
             svg += (
@@ -354,7 +355,7 @@ for p in polys:
         svg += f"' stroke='{p[3]}' stroke-width='1' fill='{p[2]}' />\n"
 
 for line_group in letters[0]:
-    for i, j in zip(line_group[:-1], line_group[1:]):
+    for i, j in itertools.pairwise(line_group):
         x1, y1 = fav_move(to_2d_new(*i, 1.3))
         x2, y2 = fav_move(to_2d_new(*j, 1.3))
         svg += (

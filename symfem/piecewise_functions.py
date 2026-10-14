@@ -32,6 +32,8 @@ from symfem.symbols import AxisVariables, AxisVariablesNotSingle, t, x
 
 __all__ = ["PiecewiseFunction"]
 
+one = sympy.Integer(1)
+
 
 class PiecewiseFunction(Function):
     """A piecewise function."""
@@ -51,7 +53,7 @@ class PiecewiseFunction(Function):
         self.tdim = tdim
 
         assert len(self._pieces) > 0
-        self.first_piece = list(self._pieces.values())[0]
+        self.first_piece = next(iter(self._pieces.values()))
         if self.first_piece.is_scalar:
             for f in self._pieces.values():
                 assert f.is_scalar
@@ -164,7 +166,7 @@ class PiecewiseFunction(Function):
             {shape: f.__getitem__(key) for shape, f in self._pieces.items()}, self.tdim
         )
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Check if two functions are equal."""
         if not isinstance(other, PiecewiseFunction):
             return False
@@ -520,7 +522,7 @@ class PiecewiseFunction(Function):
         self,
         reference: Reference,
         img: typing.Any,
-        value_scale: sympy.core.expr.Expr = sympy.Integer(1),
+        value_scale: sympy.core.expr.Expr = one,
         n: int = 6,
     ):
         """Plot the function's values.

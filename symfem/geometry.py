@@ -1,28 +1,27 @@
 """Geometry."""
 
 import sympy
-import typing
 
 __all__ = [
     "PointType",
-    "SetOfPoints",
     "PointTypeInput",
+    "SetOfPoints",
     "SetOfPointsInput",
-    "parse_set_of_points_input",
     "parse_point_input",
+    "parse_set_of_points_input",
     "point_in_interval",
-    "point_in_triangle",
     "point_in_quadrilateral",
     "point_in_tetrahedron",
+    "point_in_triangle",
 ]
 
 PointType = tuple[sympy.core.expr.Expr, ...]
 SetOfPoints = tuple[PointType, ...]
-PointTypeInput = typing.Union[
-    tuple[sympy.core.expr.Expr | int, ...],
-    list[sympy.core.expr.Expr | int],
-    sympy.matrices.dense.MutableDenseMatrix,
-]
+PointTypeInput = (
+    tuple[sympy.core.expr.Expr | int, ...]
+    | list[sympy.core.expr.Expr | int]
+    | sympy.matrices.dense.MutableDenseMatrix
+)
 SetOfPointsInput = tuple[PointTypeInput, ...] | list[PointTypeInput]
 
 

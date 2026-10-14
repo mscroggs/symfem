@@ -19,6 +19,7 @@ from symfem.moments import make_integral_moment_dofs
 from symfem.polynomials import polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
+from symfem.utils import ConstDict
 
 __all__ = ["BernardiRaugel"]
 
@@ -124,10 +125,13 @@ class BernardiRaugel(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + self.reference.tdim - 1
 
-    names = ["Bernardi-Raugel"]
-    references = ["triangle", "tetrahedron"]
+    names = ("Bernardi-Raugel",)
+    references = (
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 1
-    max_order = {"triangle": 1, "tetrahedron": 2}
+    max_order = ConstDict({"triangle": 1, "tetrahedron": 2})
     continuity = "L2"
     value_type = "vector"
     last_updated = "2025.12"

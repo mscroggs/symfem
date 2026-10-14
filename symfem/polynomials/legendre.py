@@ -5,14 +5,14 @@ import typing
 import sympy
 
 from symfem.functions import ScalarFunction
-from symfem.symbols import AxisVariablesNotSingle, x
 from symfem.polynomials.jacobi import jacobi_polynomial
+from symfem.symbols import AxisVariablesNotSingle, x
 
 __all__: list[str] = []
 
 
 def orthogonal_basis_interval(
-    order: int, variables: AxisVariablesNotSingle = [x[0]]
+    order: int, variables: AxisVariablesNotSingle = None
 ) -> list[ScalarFunction]:
     """Create a basis of orthogonal polynomials.
 
@@ -23,13 +23,15 @@ def orthogonal_basis_interval(
     Returns:
         A set of orthogonal polynomials
     """
+    if variables is None:
+        variables = [x[0]]
     assert len(variables) == 1
 
     return [jacobi_polynomial(i, 0, 0, 2 * variables[0] - 1) for i in range(order + 1)]
 
 
 def orthogonal_basis_triangle(
-    order: int, variables: AxisVariablesNotSingle = [x[0], x[1]]
+    order: int, variables: AxisVariablesNotSingle = None
 ) -> list[ScalarFunction]:
     """Create a basis of orthogonal polynomials.
 
@@ -40,6 +42,8 @@ def orthogonal_basis_triangle(
     Returns:
         A set of orthogonal polynomials
     """
+    if variables is None:
+        variables = [x[0], x[1]]
     assert len(variables) == 2
 
     return [
@@ -52,7 +56,7 @@ def orthogonal_basis_triangle(
 
 
 def orthogonal_basis_quadrilateral(
-    order: int, variables: AxisVariablesNotSingle = [x[0], x[1]]
+    order: int, variables: AxisVariablesNotSingle = None
 ) -> list[ScalarFunction]:
     """Create a basis of orthogonal polynomials.
 
@@ -63,6 +67,8 @@ def orthogonal_basis_quadrilateral(
     Returns:
         A set of orthogonal polynomials
     """
+    if variables is None:
+        variables = [x[0], x[1]]
     assert len(variables) == 2
     return [
         a * b

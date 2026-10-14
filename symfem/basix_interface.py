@@ -2,15 +2,16 @@
 
 import typing
 from enum import Enum
-from symfem.finite_element import FiniteElement, CiarletElement
-from symfem.symbols import x
-from symfem.piecewise_functions import PiecewiseFunction
-from symfem.polynomials import degree
 
-import numpy as np
-import numpy.typing as npt
 import basix
 import basix.ufl
+import numpy as np
+import numpy.typing as npt
+
+from symfem.finite_element import CiarletElement, FiniteElement
+from symfem.piecewise_functions import PiecewiseFunction
+from symfem.polynomials import degree
+from symfem.symbols import x
 
 sobolev_spaces = {
     "L2": basix.SobolevSpace.L2,

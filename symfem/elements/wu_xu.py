@@ -14,8 +14,9 @@ from symfem.functionals import (
 from symfem.functions import FunctionInput
 from symfem.polynomials import polynomial_set_1d
 from symfem.references import NonDefaultReferenceError, Reference
+from symfem.utils import ConstDict
 
-__all__ = ["derivatives", "WuXu"]
+__all__ = ["WuXu", "derivatives"]
 
 
 def derivatives(dim: int, order: int) -> list[tuple[int, ...]]:
@@ -124,10 +125,14 @@ class WuXu(CiarletElement):
             return 3
         return self.order + 1
 
-    names = ["Wu-Xu"]
-    references = ["interval", "triangle", "tetrahedron"]
-    min_order = {"interval": 3, "triangle": 3, "tetrahedron": 4}
-    max_order = {"interval": 3, "triangle": 3, "tetrahedron": 4}
+    names = ("Wu-Xu",)
+    references = (
+        "interval",
+        "triangle",
+        "tetrahedron",
+    )
+    min_order = ConstDict({"interval": 3, "triangle": 3, "tetrahedron": 4})
+    max_order = ConstDict({"interval": 3, "triangle": 3, "tetrahedron": 4})
     continuity = "C0"
     # continuity = "C{order}"
     value_type = "scalar"

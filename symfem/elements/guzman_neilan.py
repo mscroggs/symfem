@@ -17,6 +17,7 @@ from symfem.moments import make_integral_moment_dofs
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import t, x
+from symfem.utils import ConstDict
 
 __all__ = ["GuzmanNeilanFirstKind", "GuzmanNeilanSecondKind", "make_piecewise_lagrange"]
 
@@ -122,7 +123,7 @@ def bubbles(reference: Reference) -> list[VectorFunction]:
 
         for term in fun:
             assert term in terms
-        aim = [fun[term] if term in fun else 0 for term in terms] * (reference.tdim + 1)
+        aim = [fun.get(term, 0) for term in terms] * (reference.tdim + 1)
 
         mat: list[list[ScalarFunction]] = [[] for t in terms for p in lamb.pieces]
         for b in sub_basis:
@@ -137,7 +138,7 @@ def bubbles(reference: Reference) -> list[VectorFunction]:
                     assert term == 0 or term in terms
                 for term in terms:
                     if i < len(mat):
-                        mat[i].append(d[term] if term in d else 0)  # type: ignore
+                        mat[i].append(d.get(term, 0))  # type: ignore
                     i += 1
 
         s_mat = sympy.Matrix(mat)
@@ -198,10 +199,16 @@ class GuzmanNeilanFirstKind(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["Guzman-Neilan first kind", "Guzman-Neilan"]
-    references = ["triangle", "tetrahedron"]
+    names = (
+        "Guzman-Neilan first kind",
+        "Guzman-Neilan",
+    )
+    references = (
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 1
-    max_order = {"triangle": 1, "tetrahedron": 2}
+    max_order = ConstDict({"triangle": 1, "tetrahedron": 2})
     continuity = "L2"
     value_type = "vector macro"
     last_updated = "2025.12"
@@ -300,10 +307,13 @@ class GuzmanNeilanSecondKind(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["Guzman-Neilan second kind"]
-    references = ["triangle", "tetrahedron"]
+    names = ("Guzman-Neilan second kind",)
+    references = (
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 1
-    max_order = {"triangle": 1, "tetrahedron": 2}
+    max_order = ConstDict({"triangle": 1, "tetrahedron": 2})
     continuity = "L2"
     value_type = "vector macro"
     last_updated = "2025.12"
@@ -363,7 +373,7 @@ def make_piecewise_lagrange(
                         continue
                 doflist = [nones if i == -1 else lagrange_space.entity_dofs(dim, i) for i in tri_e]
                 for dofs in zip(*doflist):
-                    basis_dofs.append(dofs)
+                    basis_dofs.append(tuple(dofs))
         zero = (0, 0)
 
     elif cell_name == "tetrahedron":
@@ -413,7 +423,7 @@ def make_piecewise_lagrange(
                         continue
                 doflist = [nones if i == -1 else lagrange_space.entity_dofs(dim, i) for i in tet_e]
                 for dofs in zip(*doflist):
-                    basis_dofs.append(dofs)
+                    basis_dofs.append(tuple(dofs))
         zero = (0, 0, 0)
 
     basis: list[PiecewiseFunction] = []

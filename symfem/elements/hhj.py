@@ -138,8 +138,14 @@ class HellanHerrmannJohnson(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Hellan-Herrmann-Johnson", "HHJ"]
-    references = ["triangle", "tetrahedron"]
+    names = (
+        "Hellan-Herrmann-Johnson",
+        "HHJ",
+    )
+    references = (
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 0
     continuity = "inner H(div)"
     value_type = "symmetric matrix"

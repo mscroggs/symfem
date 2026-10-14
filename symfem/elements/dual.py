@@ -12,7 +12,7 @@ from symfem.geometry import PointType, SetOfPoints, SetOfPointsInput
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.references import DualPolygon, NonDefaultReferenceError
 
-__all__ = ["DualCiarletElement", "Dual", "BuffaChristiansen", "RotatedBuffaChristiansen"]
+__all__ = ["BuffaChristiansen", "Dual", "DualCiarletElement", "RotatedBuffaChristiansen"]
 
 
 class DualCiarletElement(FiniteElement):
@@ -257,8 +257,12 @@ class Dual(DualCiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["dual polynomial", "dual P", "dual"]
-    references = ["dual polygon"]
+    names = (
+        "dual polynomial",
+        "dual P",
+        "dual",
+    )
+    references = ("dual polygon",)
     min_order = 0
     max_order = 1
     continuity = "C0"
@@ -323,8 +327,11 @@ class BuffaChristiansen(DualCiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["Buffa-Christiansen", "BC"]
-    references = ["dual polygon"]
+    names = (
+        "Buffa-Christiansen",
+        "BC",
+    )
+    references = ("dual polygon",)
     min_order = 0
     max_order = 0
     continuity = "H(div)"
@@ -389,8 +396,11 @@ class RotatedBuffaChristiansen(DualCiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["rotated Buffa-Christiansen", "RBC"]
-    references = ["dual polygon"]
+    names = (
+        "rotated Buffa-Christiansen",
+        "RBC",
+    )
+    references = ("dual polygon",)
     min_order = 0
     max_order = 0
     continuity = "H(div)"

@@ -14,6 +14,7 @@ from symfem.functionals import (
 from symfem.functions import FunctionInput
 from symfem.polynomials import polynomial_set_1d
 from symfem.references import NonDefaultReferenceError, Reference
+from symfem.utils import ConstDict
 
 __all__ = ["MorleyWangXu"]
 
@@ -116,10 +117,17 @@ class MorleyWangXu(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Morley-Wang-Xu", "MWX"]
-    references = ["interval", "triangle", "tetrahedron"]
+    names = (
+        "Morley-Wang-Xu",
+        "MWX",
+    )
+    references = (
+        "interval",
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 1
-    max_order = {"interval": 1, "triangle": 2, "tetrahedron": 3}
+    max_order = ConstDict({"interval": 1, "triangle": 2, "tetrahedron": 3})
     continuity = "C{order}"
     value_type = "scalar"
     last_updated = "2025.12"

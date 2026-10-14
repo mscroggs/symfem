@@ -8,7 +8,7 @@ https://doi.org/10.1137/11082539X (Ainsworth, Andriamaro, Davydov, 2011)
 import sympy
 
 from symfem.finite_element import CiarletElement
-from symfem.functionals import BaseFunctional, ListOfFunctionals, PointEvaluation, DiscreteDof
+from symfem.functionals import BaseFunctional, DiscreteDof, ListOfFunctionals, PointEvaluation
 from symfem.functions import Function, FunctionInput, ScalarFunction
 from symfem.geometry import PointType
 from symfem.polynomials import orthogonal_basis, polynomial_set_1d
@@ -16,7 +16,7 @@ from symfem.quadrature import numerical as numerical_quadrature
 from symfem.references import Reference
 from symfem.symbols import AxisVariablesNotSingle, t, x
 
-__all__ = ["single_choose", "choose", "bernstein_polynomials", "BernsteinFunctional", "Bernstein"]
+__all__ = ["Bernstein", "BernsteinFunctional", "bernstein_polynomials", "choose", "single_choose"]
 
 
 def single_choose(n: int, k: int) -> sympy.core.expr.Expr:
@@ -162,15 +162,19 @@ class BernsteinFunctional(BaseFunctional):
         if self.reference.tdim == self.ref.tdim:
             return f"v\\mapsto c_{{{self.index}}}", [
                 "\\(v=\\sum_ic_iB_i\\)",
-                f"\\(B_1\\) to \\(B_n\\) "
-                f"are the degree {self.degree} Bernstein polynomials on the cell",
+                (
+                    f"\\(B_1\\) to \\(B_n\\) "
+                    f"are the degree {self.degree} Bernstein polynomials on the cell"
+                ),
             ]
         else:
             e = self.entity_tex()
             return f"v\\mapsto c^{{{e}}}_{{{self.index}}}", [
                 f"\\(v=\\sum_ic^{{{e}}}_iB^{{{e}}}_i\\)",
-                f"\\(B^{{{e}}}_1\\) to \\(B^{{{e}}}_n\\) "
-                f"are the degree {self.degree} Bernstein polynomials on \\({e}\\)",
+                (
+                    f"\\(B^{{{e}}}_1\\) to \\(B^{{{e}}}_n\\) "
+                    f"are the degree {self.degree} Bernstein polynomials on \\({e}\\)"
+                ),
                 self.entity_definition(),
             ]
 
@@ -281,8 +285,15 @@ class Bernstein(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Bernstein", "Bernstein-Bezier"]
-    references = ["interval", "triangle", "tetrahedron"]
+    names = (
+        "Bernstein",
+        "Bernstein-Bezier",
+    )
+    references = (
+        "interval",
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 0
     continuity = "C0"
     value_type = "scalar"

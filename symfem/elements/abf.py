@@ -93,8 +93,8 @@ class ArnoldBoffiFalk(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * 2 + 2
 
-    names = ["Arnold-Boffi-Falk", "ABF"]
-    references = ["quadrilateral"]
+    names = ("Arnold-Boffi-Falk", "ABF")
+    references = ("quadrilateral",)
     min_order = 0
     continuity = "H(div)"
     value_type = "vector"

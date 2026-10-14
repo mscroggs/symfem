@@ -94,8 +94,8 @@ class AC(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
-    names = ["Arbogast-Correa", "AC", "AC full", "Arbogast-Correa full"]
-    references = ["quadrilateral"]
+    names = ("Arbogast-Correa", "AC", "AC full", "Arbogast-Correa full")
+    references = ("quadrilateral",)
     min_order = 0
     continuity = "H(div)"
     value_type = "vector"

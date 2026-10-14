@@ -66,8 +66,11 @@ class RannacherTurek(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return 2
 
-    names = ["Rannacher-Turek"]
-    references = ["quadrilateral", "hexahedron"]
+    names = ("Rannacher-Turek",)
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 1
     max_order = 1
     continuity = "L2"

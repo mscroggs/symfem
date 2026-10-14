@@ -19,19 +19,19 @@ from symfem.geometry import (
 from symfem.symbols import AxisVariablesNotSingle, t, x
 
 __all__ = [
-    "LatticeWithLines",
-    "IntLimits",
-    "NonDefaultReferenceError",
-    "Reference",
-    "Point",
-    "Interval",
-    "Triangle",
-    "Tetrahedron",
-    "Quadrilateral",
+    "DualPolygon",
     "Hexahedron",
+    "IntLimits",
+    "Interval",
+    "LatticeWithLines",
+    "NonDefaultReferenceError",
+    "Point",
     "Prism",
     "Pyramid",
-    "DualPolygon",
+    "Quadrilateral",
+    "Reference",
+    "Tetrahedron",
+    "Triangle",
 ]
 
 LatticeWithLines = tuple[SetOfPoints, list[tuple[int, int]]]
@@ -514,14 +514,12 @@ class Reference(ABC):
         Returns:
             The normal
         """
-        if self.tdim == 1:
-            if self.gdim == 2:
-                return _vnormalise((-self.axes[0][1], self.axes[0][0]))
-        if self.tdim == 2:
-            if self.gdim == 3:
-                crossed = _vcross(self.axes[0], self.axes[1])
-                assert isinstance(crossed, tuple)
-                return _vnormalise(crossed)
+        if self.tdim == 1 and self.gdim == 2:
+            return _vnormalise((-self.axes[0][1], self.axes[0][0]))
+        if self.tdim == 2 and self.gdim == 3:
+            crossed = _vcross(self.axes[0], self.axes[1])
+            assert isinstance(crossed, tuple)
+            return _vnormalise(crossed)
         raise RuntimeError
 
     def sub_entities(
@@ -691,12 +689,14 @@ class Reference(ABC):
     def plot_entity_diagrams(
         self,
         filename: str | list[str],
-        plot_options: dict[str, typing.Any] = {},
+        plot_options: dict[str, typing.Any] | None = None,
         **kwargs: typing.Any,
     ):
         """Plot diagrams showing the entity numbering of the reference."""
         from symfem.plotting import Picture
 
+        if plot_options is None:
+            plot_options = {}
         img = Picture(**kwargs)
         colors = img.colors
 

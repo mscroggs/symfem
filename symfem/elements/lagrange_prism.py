@@ -136,8 +136,11 @@ class Lagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * 2
 
-    names = ["Lagrange", "P"]
-    references = ["prism"]
+    names = (
+        "Lagrange",
+        "P",
+    )
+    references = ("prism",)
     min_order = 0
     continuity = "C0"
     value_type = "scalar"
@@ -201,8 +204,8 @@ class VectorLagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * 2
 
-    names: list[str] = []
-    references = ["prism"]
+    names = ()
+    references = ("prism",)
     min_order = 0
     continuity = "C0"
     value_type = "vector"

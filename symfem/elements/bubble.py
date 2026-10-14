@@ -12,8 +12,9 @@ import sympy
 from symfem.elements.lagrange import Lagrange
 from symfem.finite_element import CiarletElement
 from symfem.functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
-from symfem.functions import FunctionInput
+from symfem.functions import Function, FunctionInput
 from symfem.references import Reference
+from symfem.utils import ConstDict
 
 __all__ = ["Bubble", "BubbleEnrichedLagrange", "BubbleEnrichedVectorLagrange"]
 
@@ -104,15 +105,23 @@ class Bubble(CiarletElement):
             return self.order * self.reference.tdim
         return self.order
 
-    names = ["bubble"]
-    references = ["interval", "triangle", "tetrahedron", "quadrilateral", "hexahedron"]
-    min_order = {
-        "interval": 2,
-        "triangle": 3,
-        "tetrahedron": 4,
-        "quadrilateral": 2,
-        "hexahedron": 2,
-    }
+    names = ("bubble",)
+    references = (
+        "interval",
+        "triangle",
+        "tetrahedron",
+        "quadrilateral",
+        "hexahedron",
+    )
+    min_order = ConstDict(
+        {
+            "interval": 2,
+            "triangle": 3,
+            "tetrahedron": 4,
+            "quadrilateral": 2,
+            "hexahedron": 2,
+        }
+    )
     continuity = "C0"
     value_type = "scalar"
     last_updated = "2025.12"
@@ -135,6 +144,7 @@ class BubbleEnrichedLagrange(CiarletElement):
         poly: list[FunctionInput] = []
         for e in [lagrange, bubble]:
             for p in e._basis:
+                assert isinstance(p, Function)
                 poly.append(p)
 
         self.variant = variant
@@ -165,8 +175,8 @@ class BubbleEnrichedLagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + 2
 
-    names = ["bubble enriched Lagrange"]
-    references = ["triangle"]
+    names = ("bubble enriched Lagrange",)
+    references = ("triangle",)
     min_order = 1
     continuity = "C0"
     value_type = "scalar"
@@ -227,8 +237,8 @@ class BubbleEnrichedVectorLagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + 2
 
-    names = ["bubble enriched vector Lagrange"]
-    references = ["triangle"]
+    names = ("bubble enriched vector Lagrange",)
+    references = ("triangle",)
     min_order = 1
     continuity = "C0"
     value_type = "vector"

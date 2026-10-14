@@ -45,8 +45,17 @@ class EnrichedGalerkin(EnrichedElement):
             return self.order * self.reference.tdim
         return self.order
 
-    names = ["enriched Galerkin", "EG"]
-    references = ["interval", "triangle", "quadrilateral", "tetrahedron", "hexahedron"]
+    names = (
+        "enriched Galerkin",
+        "EG",
+    )
+    references = (
+        "interval",
+        "triangle",
+        "quadrilateral",
+        "tetrahedron",
+        "hexahedron",
+    )
     min_order = 1
     continuity = "C0"
     value_type = "scalar"

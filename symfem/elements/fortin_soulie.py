@@ -61,8 +61,11 @@ class FortinSoulie(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Fortin-Soulie", "FS"]
-    references = ["triangle"]
+    names = (
+        "Fortin-Soulie",
+        "FS",
+    )
+    references = ("triangle",)
     min_order = 2
     max_order = 2
     continuity = "L2"

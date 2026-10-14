@@ -15,7 +15,7 @@ from symfem.polynomials import polynomial_set_vector
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
 
-__all__ = ["bddf_polyset", "BDDF"]
+__all__ = ["BDDF", "bddf_polyset"]
 
 
 def bddf_polyset(reference: Reference, order: int) -> list[FunctionInput]:
@@ -94,8 +94,8 @@ class BDDF(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
-    names = ["Brezzi-Douglas-Duran-Fortin", "BDDF"]
-    references = ["hexahedron"]
+    names = ("Brezzi-Douglas-Duran-Fortin", "BDDF")
+    references = ("hexahedron",)
     min_order = 1
     continuity = "H(div)"
     value_type = "vector"
