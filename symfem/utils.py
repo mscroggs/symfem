@@ -29,3 +29,15 @@ def allequal(a: typing.Any, b: typing.Any) -> bool:
     if isinstance(b, sympy.core.expr.Expr):
         b = ScalarFunction(b)
     return a == b
+
+
+class ConstDict:
+    """An immutable dictionary mapping strings to integers or None."""
+
+    def __init__(self, d: dict[str, int | None]):
+        """Initialise."""
+        self._d = d
+
+    def __getitem__(self, key: str) -> int | None:
+        """Get an item."""
+        return self._d[key]

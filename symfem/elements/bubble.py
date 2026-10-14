@@ -14,6 +14,7 @@ from symfem.finite_element import CiarletElement
 from symfem.functionals import DotPointEvaluation, ListOfFunctionals, PointEvaluation
 from symfem.functions import FunctionInput
 from symfem.references import Reference
+from symfem.utils import ConstDict
 
 __all__ = ["Bubble", "BubbleEnrichedLagrange", "BubbleEnrichedVectorLagrange"]
 
@@ -112,13 +113,15 @@ class Bubble(CiarletElement):
         "quadrilateral",
         "hexahedron",
     )
-    min_order = {
-        "interval": 2,
-        "triangle": 3,
-        "tetrahedron": 4,
-        "quadrilateral": 2,
-        "hexahedron": 2,
-    }
+    min_order = ConstDict(
+        {
+            "interval": 2,
+            "triangle": 3,
+            "tetrahedron": 4,
+            "quadrilateral": 2,
+            "hexahedron": 2,
+        }
+    )
     continuity = "C0"
     value_type = "scalar"
     last_updated = "2025.12"

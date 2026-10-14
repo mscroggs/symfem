@@ -9,6 +9,7 @@ from symfem.finite_element import CiarletElement as _CiarletElement
 from symfem.finite_element import FiniteElement as _FiniteElement
 from symfem.geometry import SetOfPointsInput as _SetOfPointsInput
 from symfem.geometry import parse_set_of_points_input as _parse_set_of_points_input
+from symfem.utils import ConstDict
 
 _folder = _os.path.dirname(_os.path.realpath(__file__))
 
@@ -220,13 +221,13 @@ def _order_is_allowed(element_class: type, ref: str, order: int) -> bool:
         order: The polynomial order
     """
     if hasattr(element_class, "min_order"):
-        if isinstance(element_class.min_order, dict):
+        if isinstance(element_class.min_order, dict | ConstDict):
             if ref in element_class.min_order and order < element_class.min_order[ref]:
                 return False
         elif order < element_class.min_order:
             return False
     if hasattr(element_class, "max_order"):
-        if isinstance(element_class.max_order, dict):
+        if isinstance(element_class.max_order, dict | ConstDict):
             if ref in element_class.max_order and order > element_class.max_order[ref]:
                 return False
         elif order > element_class.max_order:

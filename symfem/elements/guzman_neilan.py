@@ -17,6 +17,7 @@ from symfem.moments import make_integral_moment_dofs
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import t, x
+from symfem.utils import ConstDict
 
 __all__ = ["GuzmanNeilanFirstKind", "GuzmanNeilanSecondKind", "make_piecewise_lagrange"]
 
@@ -207,7 +208,7 @@ class GuzmanNeilanFirstKind(CiarletElement):
         "tetrahedron",
     )
     min_order = 1
-    max_order = {"triangle": 1, "tetrahedron": 2}
+    max_order = ConstDict({"triangle": 1, "tetrahedron": 2})
     continuity = "L2"
     value_type = "vector macro"
     last_updated = "2025.12"
@@ -312,7 +313,7 @@ class GuzmanNeilanSecondKind(CiarletElement):
         "tetrahedron",
     )
     min_order = 1
-    max_order = {"triangle": 1, "tetrahedron": 2}
+    max_order = ConstDict({"triangle": 1, "tetrahedron": 2})
     continuity = "L2"
     value_type = "vector macro"
     last_updated = "2025.12"
