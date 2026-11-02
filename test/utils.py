@@ -32,6 +32,10 @@ test_elements: dict[str, dict[str, list[tuple[dict[str, typing.Any], typing.Iter
         "P1-iso-P2": [({}, [1])],
     },
     "triangle": {
+        "robust Wu-Xu": [({}, [3])],
+        "Hu-Zhang": [({"variant": "point"}, [3]), ({"variant": "integral"}, [3])],
+        "Bramble-Zlamal C2": [({}, [9])],
+        "Alfeld C2": [({}, [5])],
         "P": [({"variant": "equispaced"}, range(5))],
         "vP": [({"variant": "equispaced"}, range(5))],
         "matrix Lagrange": [({"variant": "equispaced"}, range(3))],
@@ -80,6 +84,7 @@ test_elements: dict[str, dict[str, list[tuple[dict[str, typing.Any], typing.Iter
         "P1 macro": [({}, [1])],
     },
     "tetrahedron": {
+        "Hu-Zhang-Zhang": [({}, [0, 1])],
         "Walkington": [({}, [4])],
         "P": [({"variant": "equispaced"}, range(3))],
         "vP": [({"variant": "equispaced"}, range(3))],

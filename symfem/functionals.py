@@ -1393,6 +1393,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         entity: tuple[int, int],
         scale: int = 1,
         mapping: str | None = "identity",
+        weight: FunctionInput = 1,
     ):
         """Create the functional.
 
@@ -1402,6 +1403,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
             directions: The directions of the derivatives
             orders: The orders of the derivatives
             entity: The entity the functional is associated with
+            weight: Polynomial weight in reference subentity coordinates
             scale: The scale factor
             mapping: The type of mappping from the reference cell to a physical cell
         """
@@ -1410,6 +1412,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         self.directions = directions
         self.orders = orders
         self.scale = scale
+        self.weight = parse_function_input(weight)
 
     @property
     def nderivs(self) -> int:
@@ -1440,7 +1443,7 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
         for i, a in enumerate(zip(*self.integral_domain.axes)):
             for j, k in zip(a, t):
                 point[i] += j * k
-        integrand = ScalarFunction(self.scale) * function.subs(x, point)
+        integrand = ScalarFunction(self.scale) * self.weight.subs(x, t) * function.subs(x, point)
         return integrand.integral(self.integral_domain)
 
     def perform_mapping(
@@ -1482,6 +1485,8 @@ class IntegralOfDirectionalMultiderivative(BaseFunctional):
                     desc += f"^{{{order}}}"
                 desc += "}"
         desc += "v"
+        if self.weight != 1:
+            desc += "\\," + self.weight.as_tex()
         return desc, [entity_def]
 
     def discrete(self, poly_degree: int) -> DiscreteDof:
