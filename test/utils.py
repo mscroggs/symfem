@@ -80,6 +80,7 @@ test_elements: dict[str, dict[str, list[tuple[dict[str, typing.Any], typing.Iter
         "P1 macro": [({}, [1])],
     },
     "tetrahedron": {
+        "Walkington": [({}, [4])],
         "P": [({"variant": "equispaced"}, range(3))],
         "vP": [({"variant": "equispaced"}, range(3))],
         "matrix Lagrange": [({"variant": "equispaced"}, range(2))],

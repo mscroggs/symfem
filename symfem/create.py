@@ -154,6 +154,7 @@ def create_element(
                       Bell,
                       Kong-Mulder-Veldhuizen, KMV,
                       Bernstein, Bernstein-Bezier,
+                      Walkington,
                       Hsieh-Clough-Tocher, Clough-Tocher, HCT, CT,
                       reduced Hsieh-Clough-Tocher, rHCT,
                       Taylor, discontinuous Taylor,

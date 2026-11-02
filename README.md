@@ -282,6 +282,7 @@ The reference tetrahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), and (0, 
 - Taylor (alternative names: discontinuous Taylor)
 - transition
 - vector Lagrange (alternative names: vP)
+- Walkington
 - Wu-Xu
 
 ## Hexahedron
