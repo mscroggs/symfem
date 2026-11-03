@@ -33,19 +33,19 @@ class HuZhang(CiarletElement):
         ]
         directions = [(1, 0), (0, 1)]
         components = [(a, b) for a in range(2) for b in range(a, 2)]
+        mapping = "double_contravariant"
         dofs: ListOfFunctionals = []
         for i, v in enumerate(reference.vertices):
             for a, b in components:
-                dofs.append(
-                    PointInnerProduct(
-                        reference,
-                        v,
-                        directions[a],
-                        directions[b],
-                        (0, i),
-                        mapping="double_contravariant",
-                    )
+                dof = PointInnerProduct(
+                    reference,
+                    v,
+                    directions[a],
+                    directions[b],
+                    (0, i),
+                    mapping=mapping,
                 )
+                dofs.append(dof)
         for i in range(3):
             edge = reference.sub_entity(1, i)
             if variant == "point":
@@ -54,46 +54,43 @@ class HuZhang(CiarletElement):
                         a + sympy.Rational(j, order) * b for a, b in zip(edge.origin, edge.axes[0])
                     )
                     for direction in (edge.normal(), edge.tangent()):
-                        dofs.append(
-                            PointInnerProduct(
-                                reference,
-                                v,
-                                edge.normal(),
-                                direction,
-                                (1, i),
-                                mapping="double_contravariant",
-                            )
+                        dof = PointInnerProduct(
+                            reference,
+                            v,
+                            edge.normal(),
+                            direction,
+                            (1, i),
+                            mapping=mapping,
                         )
+                        dofs.append(dof)
             else:
                 moment = Lagrange(edge.default_reference(), order - 2)
                 for p, d in zip(moment.get_basis_functions(), moment.dofs):
                     for direction in (edge.normal(), edge.tangent()):
-                        dofs.append(
-                            InnerProductIntegralMoment(
-                                reference,
-                                p,
-                                edge.normal(),
-                                direction,
-                                d,
-                                (1, i),
-                                mapping="double_contravariant",
-                            )
+                        dof = InnerProductIntegralMoment(
+                            reference,
+                            p,
+                            edge.normal(),
+                            direction,
+                            d,
+                            (1, i),
+                            mapping=mapping,
                         )
+                        dofs.append(dof)
         if variant == "point":
             for a in range(1, order):
                 for b in range(1, order + 1 - a):
                     v = (sympy.Rational(a, order + 1), sympy.Rational(b, order + 1))
                     for i, j in components:
-                        dofs.append(
-                            PointInnerProduct(
-                                reference,
-                                v,
-                                directions[i],
-                                directions[j],
-                                (2, 0),
-                                mapping="double_contravariant",
-                            )
+                        dof = PointInnerProduct(
+                            reference,
+                            v,
+                            directions[i],
+                            directions[j],
+                            (2, 0),
+                            mapping=mapping,
                         )
+                        dofs.append(dof)
         else:
             moment = Lagrange(reference, order - 2)
             for p, d in zip(moment.get_basis_functions(), moment.dofs):
@@ -101,9 +98,8 @@ class HuZhang(CiarletElement):
                     matrix = tuple(
                         tuple(p if (a, b) == (i, j) else 0 for b in range(2)) for a in range(2)
                     )
-                    dofs.append(
-                        IntegralMoment(reference, matrix, d, (2, 0), mapping="double_contravariant")
-                    )
+                    dof = IntegralMoment(reference, matrix, d, (2, 0), mapping=mapping)
+                    dofs.append(dof)
         super().__init__(reference, order, poly, dofs, 2, 4, (2, 2))
 
     def init_kwargs(self) -> dict[str, str]:

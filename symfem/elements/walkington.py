@@ -71,18 +71,20 @@ def _homogeneous_quintic_splines(vertices):
         ]
         add_constraints(expressions, [(i, 1)])
 
-    kernel = DomainMatrix.from_Matrix(sympy.Matrix(rows)).to_field().nullspace().to_Matrix()
+    constraint_matrix = DomainMatrix.from_Matrix(sympy.Matrix(rows))
+    kernel = constraint_matrix.to_field().nullspace().to_Matrix()
     assert kernel.rows == 10
     shifted = [
         p.subs({x[k]: x[k] - mid[k] for k in range(3)}, simultaneous=True) for p in monomials
     ]
     pieces = [tuple(v for j, v in enumerate(vertices) if i != j) + (mid,) for i in range(4)]
-    return [
-        PiecewiseFunction(
-            {pieces[i]: sum(row[21 * i + j] * shifted[j] for j in range(21)) for i in range(4)}, 3
-        )
-        for row in kernel.tolist()
-    ]
+    basis = []
+    for row in kernel.tolist():
+        piece_values = {
+            pieces[i]: sum(row[21 * i + j] * shifted[j] for j in range(21)) for i in range(4)
+        }
+        basis.append(PiecewiseFunction(piece_values, 3))
+    return basis
 
 
 class Walkington(CiarletElement):
@@ -100,18 +102,16 @@ class Walkington(CiarletElement):
             for degree in (1, 2):
                 for a in range(degree + 1):
                     for b in range(degree - a + 1):
-                        dofs.append(
-                            DerivativePointEvaluation(
-                                reference, v, (a, b, degree - a - b), entity=(0, i)
-                            )
+                        dof = DerivativePointEvaluation(
+                            reference, v, (a, b, degree - a - b), entity=(0, i)
                         )
+                        dofs.append(dof)
         for i in range(reference.sub_entity_count(2)):
             face = reference.sub_entity(2, i)
-            dofs.append(
-                PointDirectionalDerivativeEvaluation(
-                    reference, face.midpoint(), face.normal(), entity=(2, i)
-                )
+            dof = PointDirectionalDerivativeEvaluation(
+                reference, face.midpoint(), face.normal(), entity=(2, i)
             )
+            dofs.append(dof)
         dofs.append(PointEvaluation(reference, reference.midpoint(), entity=(3, 0)))
         poly = list(polynomial_set_1d(3, 4)) + _homogeneous_quintic_splines(reference.vertices)
         super().__init__(reference, order, poly, dofs, 3, 1)

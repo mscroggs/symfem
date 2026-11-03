@@ -64,23 +64,37 @@ def _gn_space(reference, order):
     correction = []
     for j in range(3):
         for p in bdm_facet(reference, j):
-            correction.append(
-                [sympy.Matrix([sympy.expand(h ** (3 - j) * c) for c in p.as_sympy()]) for h in hats]
-            )
-    matrix = sympy.Matrix.hstack(
-        *[
-            sympy.Matrix([c for v in field for c in _coefficients(_div(v), m)])
-            for field in correction
-        ]
-    )
+            correction_values = []
+            for h in hats:
+                values = []
+                for c in p.as_sympy():
+                    values.append(sympy.expand(h ** (3 - j) * c))
+                correction_values.append(sympy.Matrix(values))
+            correction.append(correction_values)
+    correction_columns = []
+    for field in correction:
+        coefficients = []
+        for value in field:
+            coefficients.extend(_coefficients(_div(value), m))
+        correction_columns.append(sympy.Matrix(coefficients))
+    matrix = sympy.Matrix.hstack(*correction_columns)
     pivots = matrix.T.rref()[1]
     assert len(pivots) == 39
     inverse = matrix[list(pivots), :].inv()
     pressure = [p.as_sympy() for p in polynomial_set_1d(3, order - 1)]
-    mass = sympy.Matrix([[_average(a * b, reference.vertices) for b in pressure] for a in pressure])
-    fields = [
-        [sympy.Matrix(p.as_sympy()) for _ in pieces] for p in polynomial_set_vector(3, 3, order)
-    ]
+    mass_rows = []
+    for a in pressure:
+        row = []
+        for b in pressure:
+            row.append(_average(a * b, reference.vertices))
+        mass_rows.append(row)
+    mass = sympy.Matrix(mass_rows)
+    fields = []
+    for p in polynomial_set_vector(3, 3, order):
+        field = []
+        for _ in pieces:
+            field.append(sympy.Matrix(p.as_sympy()))
+        fields.append(field)
     seeds = []
     for i in range(4):
         face = reference.sub_entity(2, i)
@@ -93,47 +107,47 @@ def _gn_space(reference, order):
         seeds.extend([[sympy.eye(3)[:, i] * h for h in hats] for i in range(3)])
     for seed in seeds:
         divergences = [_div(v) for v in seed]
-        moments = sympy.Matrix(
-            [
-                sum(_average(div * q, cell) for div, cell in zip(divergences, pieces)) / 4
-                for q in pressure
-            ]
-        )
+        moments = []
+        for q in pressure:
+            moment = sum(_average(div * q, cell) for div, cell in zip(divergences, pieces)) / 4
+            moments.append(moment)
+        moments = sympy.Matrix(moments)
         projection = sum(a * b for a, b in zip(mass.inv() * moments, pressure))
-        rhs = sympy.Matrix([c for div in divergences for c in _coefficients(div - projection, m)])
+        rhs = []
+        for divergence in divergences:
+            rhs.extend(_coefficients(divergence - projection, m))
+        rhs = sympy.Matrix(rhs)
         coefficients = inverse * rhs[list(pivots), :]
         assert matrix * coefficients == rhs
-        fields.append(
-            [
-                sympy.Matrix(
-                    [
-                        sympy.expand(
-                            seed[i][c]
-                            - sum(a * field[i][c] for a, field in zip(coefficients, correction))
-                        )
-                        for c in range(3)
-                    ]
+        field = []
+        for i in range(4):
+            values = []
+            for c in range(3):
+                value = seed[i][c] - sum(
+                    a * correction_field[i][c]
+                    for a, correction_field in zip(coefficients, correction)
                 )
-                for i in range(4)
-            ]
-        )
-    divmatrix = sympy.Matrix.hstack(
-        *[sympy.Matrix(_coefficients(_div(field[0]), pressure)) for field in fields]
-    )
+                values.append(sympy.expand(value))
+            field.append(sympy.Matrix(values))
+        fields.append(field)
+    divergence_columns = []
+    for field in fields:
+        coefficients = _coefficients(_div(field[0]), pressure)
+        divergence_columns.append(sympy.Matrix(coefficients))
+    divmatrix = sympy.Matrix.hstack(*divergence_columns)
     kernel = divmatrix.nullspace()
     assert len(kernel) == (15 if order == 1 else 33)
-    return pieces, [
-        [
-            sympy.Matrix(
-                [
-                    sympy.expand(sum(a * field[i][c] for a, field in zip(v, fields)))
-                    for c in range(3)
-                ]
-            )
-            for i in range(4)
-        ]
-        for v in kernel
-    ]
+    kernel_fields = []
+    for coefficients in kernel:
+        field = []
+        for i in range(4):
+            values = []
+            for c in range(3):
+                value = sum(a * basis_field[i][c] for a, basis_field in zip(coefficients, fields))
+                values.append(sympy.expand(value))
+            field.append(sympy.Matrix(values))
+        kernel_fields.append(field)
+    return pieces, kernel_fields
 
 
 @lru_cache(None)
@@ -153,17 +167,20 @@ def _correction_data(reference):
             entity = reference.sub_entity(d, i)
             radial = sympy.Matrix(x) - sympy.Matrix(entity.midpoint())
             # Local polynomial coordinates from the inverse affine map.
-            axes = sympy.Matrix.hstack(*[sympy.Matrix(a) for a in entity.axes])
-            local = (axes.T * axes).inv() * axes.T * (sympy.Matrix(x) - sympy.Matrix(entity.origin))
+            axis_vectors = [sympy.Matrix(a) for a in entity.axes]
+            axes = sympy.Matrix.hstack(*axis_vectors)
+            origin = sympy.Matrix(entity.origin)
+            local = (axes.T * axes).inv() * axes.T * (sympy.Matrix(x) - origin)
             for p in q:
                 weight = p.subs(dict(zip(x, local)), simultaneous=True)
                 moments.append((entity.vertices, radial, weight))
-    matrix = sympy.Matrix(
-        [
-            [_average(g.dot(radial) * q, vertices) for g in gradients]
-            for vertices, radial, q in moments
-        ]
-    )
+    matrix_rows = []
+    for vertices, radial, q in moments:
+        row = []
+        for gradient in gradients:
+            row.append(_average(gradient.dot(radial) * q, vertices))
+        matrix_rows.append(row)
+    matrix = sympy.Matrix(matrix_rows)
     assert matrix.rows == matrix.cols == 52
     return gradients, moments, matrix.inv()
 
@@ -180,21 +197,20 @@ def hzz_space(reference, order):
         lift = []
         for v in field:
             value = v.subs(dict(zip(x, center + u * radial)), simultaneous=True).cross(radial) * u
-            lift.append(
-                sympy.Matrix(
-                    [
-                        sum(c / (alpha[0] + 1) for alpha, c in sympy.Poly(p.expand(), u).terms())
-                        for p in value
-                    ]
-                )
-            )
+            lift_values = []
+            for p in value:
+                terms = sympy.Poly(p.expand(), u).terms()
+                lift_values.append(sum(c / (alpha[0] + 1) for alpha, c in terms))
+            lift_value = sympy.Matrix(lift_values)
+            lift.append(lift_value)
         lifts.append(lift)
     nedelec = NedelecFirstKind(reference, 0)
     nb = [sympy.Matrix(p.as_sympy()) for p in nedelec.get_basis_functions()]
     gradients, moments, inverse = _correction_data(reference)
     corrected = []
     for lift in lifts:
-        piecewise = PiecewiseFunction({p: tuple(v) for p, v in zip(pieces, lift)}, 3)
+        piece_values = {p: tuple(v) for p, v in zip(pieces, lift)}
+        piecewise = PiecewiseFunction(piece_values, 3)
         gamma = sum(
             (nb[i] * d.eval(piecewise).as_sympy() for i, d in enumerate(nedelec.dofs)),
             sympy.zeros(3, 1),
@@ -202,23 +218,26 @@ def hzz_space(reference, order):
         rhs = []
         for vertices, r, q in moments:
             if len(vertices) == 4:
-                rhs.append(
-                    sum(_average((v - gamma).dot(r) * q, p) for p, v in zip(pieces, lift)) / 4
-                )
+                pairs = zip(pieces, lift)
+                rhs_value = sum(_average((v - gamma).dot(r) * q, p) for p, v in pairs) / 4
             else:
                 index = next(i for i, cell in enumerate(pieces) if all(v in cell for v in vertices))
-                rhs.append(_average((lift[index] - gamma).dot(r) * q, vertices))
-        coefficients = inverse * sympy.Matrix(rhs)
+                rhs_value = _average((lift[index] - gamma).dot(r) * q, vertices)
+            rhs.append(rhs_value)
+        rhs = sympy.Matrix(rhs)
+        coefficients = inverse * rhs
         correction = sum((a * g for a, g in zip(coefficients, gradients)), sympy.zeros(3, 1))
-        corrected.append(
-            PiecewiseFunction(
-                {p: tuple(sympy.expand(c) for c in v - correction) for p, v in zip(pieces, lift)}, 3
-            )
-        )
+        corrected_values = {}
+        for p, v in zip(pieces, lift):
+            corrected_values[p] = tuple(sympy.expand(c) for c in v - correction)
+        corrected_piece = PiecewiseFunction(corrected_values, 3)
+        corrected.append(corrected_piece)
     gradients = [_grad(p.as_sympy()) for p in polynomial_set_1d(3, order)[1:]]
-    return [
-        PiecewiseFunction({cell: tuple(g) for cell in pieces}, 3) for g in gradients
-    ] + corrected
+    gradient_basis = []
+    for gradient in gradients:
+        gradient_values = {cell: tuple(gradient) for cell in pieces}
+        gradient_basis.append(PiecewiseFunction(gradient_values, 3))
+    return gradient_basis + corrected
 
 
 class CurlPointEvaluation(DotPointEvaluation):
@@ -255,29 +274,25 @@ class HuZhangZhang(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
         k = order + 1
+        mapping = "covariant"
         dofs: ListOfFunctionals = []
         for i, v in enumerate(reference.vertices):
             for direction in sympy.eye(3).columnspace():
-                dofs.append(
-                    CurlPointEvaluation(reference, v, tuple(direction), (0, i), mapping="covariant")
-                )
+                dof = CurlPointEvaluation(reference, v, tuple(direction), (0, i), mapping=mapping)
+                dofs.append(dof)
         for i in range(6):
             edge = reference.sub_entity(1, i)
             moment = Lagrange(edge.default_reference(), k - 1)
             for p, d in zip(moment.get_basis_functions(), moment.dofs):
-                dofs.append(TangentIntegralMoment(reference, p, d, (1, i), mapping="covariant"))
+                dofs.append(TangentIntegralMoment(reference, p, d, (1, i), mapping=mapping))
             if k == 2:
                 for direction in sympy.eye(3).columnspace():
-                    dofs.append(
-                        CurlPointEvaluation(
-                            reference,
-                            edge.midpoint(),
-                            tuple(direction),
-                            (1, i),
-                            mapping="covariant",
-                        )
+                    dof = CurlPointEvaluation(
+                        reference, edge.midpoint(), tuple(direction), (1, i), mapping=mapping
                     )
-        super().__init__(reference, order, hzz_space(reference, k), dofs, 3, 3)
+                    dofs.append(dof)
+        basis = hzz_space(reference, k)
+        super().__init__(reference, order, basis, dofs, 3, 3)
 
     def get_dual_matrix(self, inverse=False, caching=True):
         """Return the dual matrix or its exact inverse."""

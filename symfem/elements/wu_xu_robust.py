@@ -35,15 +35,14 @@ class WuXuRobust(CiarletElement):
         for i in range(3):
             edge = reference.sub_entity(1, i)
             for degree in (1, 2):
-                dofs.append(
-                    IntegralOfDirectionalMultiderivative(
-                        reference,
-                        (edge.normal(),) * degree,
-                        (1,) * degree,
-                        (1, i),
-                        scale=1 / edge.jacobian(),
-                    )
+                dof = IntegralOfDirectionalMultiderivative(
+                    reference,
+                    (edge.normal(),) * degree,
+                    (1,) * degree,
+                    (1, i),
+                    scale=1 / edge.jacobian(),
                 )
+                dofs.append(dof)
         super().__init__(reference, order, poly, dofs, 2, 1)
 
     @property

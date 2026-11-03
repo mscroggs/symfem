@@ -73,24 +73,18 @@ def alfeld_c2_space(vertices: tuple, order: int) -> list[FunctionInput]:
         indices = [i for i, piece in enumerate(pieces) if point in piece]
         for j in indices[1:]:
             constrain(indices[0], j, point, degree, False)
-    kernel = (
-        DomainMatrix.from_Matrix(sympy.Matrix(rows))
-        .to_field()
-        .nullspace(divide_last=True)
-        .to_Matrix()
-    )
+    constraint_matrix = DomainMatrix.from_Matrix(sympy.Matrix(rows))
+    kernel = constraint_matrix.to_field().nullspace(divide_last=True).to_Matrix()
     expected = 18 + 9 * (order - 4) + (order - 5) * (order - 4) // 2
     assert kernel.rows == expected
-    return [
-        PiecewiseFunction(
-            {
-                piece: sum(row[i * n + j] * p for j, p in enumerate(poly))
-                for i, piece in enumerate(pieces)
-            },
-            2,
-        )
-        for row in kernel.tolist()
-    ]
+    basis = []
+    for row in kernel.tolist():
+        piece_values = {
+            piece: sum(row[i * n + j] * p for j, p in enumerate(poly))
+            for i, piece in enumerate(pieces)
+        }
+        basis.append(PiecewiseFunction(piece_values, 2))
+    return basis
 
 
 class AlfeldC2(CiarletElement):
@@ -101,14 +95,9 @@ class AlfeldC2(CiarletElement):
         assert reference.name == "triangle" and order >= 5
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
-        super().__init__(
-            reference,
-            order,
-            alfeld_c2_space(reference.vertices, order),
-            c2_dofs(reference, order, 2),
-            2,
-            1,
-        )
+        basis = alfeld_c2_space(reference.vertices, order)
+        dofs = c2_dofs(reference, order, 2)
+        super().__init__(reference, order, basis, dofs, 2, 1)
 
     def get_dual_matrix(self, inverse=False, caching=True):
         """Return the dual matrix or its exact inverse."""

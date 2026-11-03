@@ -30,16 +30,15 @@ def c2_dofs(reference: Reference, order: int, vertex_order: int) -> ListOfFuncti
         for degree in range(3):
             # Endpoint jets determine 2*(vertex_order-degree+1) conditions.
             for j in range(order - 2 * vertex_order + degree - 1):
-                dofs.append(
-                    IntegralOfDirectionalMultiderivative(
-                        reference,
-                        (edge.normal(),) * degree,
-                        (1,) * degree,
-                        (1, i),
-                        scale=1 / edge.jacobian(),
-                        weight=x[0] ** j,
-                    )
+                dof = IntegralOfDirectionalMultiderivative(
+                    reference,
+                    (edge.normal(),) * degree,
+                    (1,) * degree,
+                    (1, i),
+                    scale=1 / edge.jacobian(),
+                    weight=x[0] ** j,
                 )
+                dofs.append(dof)
     q = order - 3 * (vertex_order // 2 + 1)
     if q >= 0:
         for p in polynomial_set_1d(2, q):
@@ -56,7 +55,8 @@ class BrambleZlamalC2(CiarletElement):
         if reference.vertices != reference.reference_vertices:
             raise NonDefaultReferenceError()
         poly: list[FunctionInput] = list(polynomial_set_1d(2, order))
-        super().__init__(reference, order, poly, c2_dofs(reference, order, 4), 2, 1)
+        dofs = c2_dofs(reference, order, 4)
+        super().__init__(reference, order, poly, dofs, 2, 1)
 
     def get_dual_matrix(self, inverse=False, caching=True):
         """Return the dual matrix or its exact inverse."""
