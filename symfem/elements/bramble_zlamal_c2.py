@@ -47,18 +47,7 @@ def c2_dofs(reference: Reference, order: int, vertex_order: int) -> ListOfFuncti
     return dofs
 
 
-class _C2Element(CiarletElement):
-    """C2 basis construction using exact polynomial-domain matrix inversion."""
-
-    def get_dual_matrix(self, inverse=False, caching=True):
-        """Return the dual matrix or its exact inverse."""
-        matrix = super().get_dual_matrix(False, caching)
-        if inverse:
-            return matrix.to_DM(extension=True).inv().to_Matrix()
-        return matrix
-
-
-class BrambleZlamalC2(_C2Element):
+class BrambleZlamalC2(CiarletElement):
     """The complete-polynomial Bramble-Zlamal C2 triangle."""
 
     def __init__(self, reference: Reference, order: int):
@@ -68,6 +57,13 @@ class BrambleZlamalC2(_C2Element):
             raise NonDefaultReferenceError()
         poly: list[FunctionInput] = list(polynomial_set_1d(2, order))
         super().__init__(reference, order, poly, c2_dofs(reference, order, 4), 2, 1)
+
+    def get_dual_matrix(self, inverse=False, caching=True):
+        """Return the dual matrix or its exact inverse."""
+        matrix = super().get_dual_matrix(False, caching)
+        if inverse:
+            return matrix.to_DM(extension=True).inv().to_Matrix()
+        return matrix
 
     @property
     def polynomial_subdegree(self) -> int:

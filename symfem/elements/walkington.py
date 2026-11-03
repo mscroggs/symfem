@@ -26,11 +26,11 @@ __all__ = ["Walkington"]
 
 
 @lru_cache(None)
-def _enrichment(vertices):
+def _homogeneous_quintic_splines(vertices):
     """Construct the ten homogeneous quintic splines by exact linear algebra.
 
-    C4 at the centroid makes the Taylor polynomial through degree four common
-    to every piece. Only the 21 homogeneous quintics on each piece remain.
+    The splines are C1 across internal faces, C4 at the centroid, and have
+    cubic exterior normal derivatives.
     """
     mid = tuple(sum(v[i] for v in vertices) / sympy.Integer(4) for i in range(3))
     s, t = sympy.symbols("s t")
@@ -116,7 +116,7 @@ class Walkington(CiarletElement):
                 )
             )
         dofs.append(PointEvaluation(reference, reference.midpoint(), entity=(3, 0)))
-        poly = list(polynomial_set_1d(3, 4)) + _enrichment(reference.vertices)
+        poly = list(polynomial_set_1d(3, 4)) + _homogeneous_quintic_splines(reference.vertices)
         super().__init__(reference, order, poly, dofs, 3, 1)
 
     @property

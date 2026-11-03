@@ -6,8 +6,9 @@ from itertools import combinations
 import sympy
 from sympy.polys.matrices import DomainMatrix
 
-from symfem.elements.c2 import _C2Element, c2_dofs
+from symfem.elements.bramble_zlamal_c2 import c2_dofs
 from symfem.elements.wu_xu import derivatives
+from symfem.finite_element import CiarletElement
 from symfem.functions import FunctionInput
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.polynomials import polynomial_set_1d
@@ -96,7 +97,7 @@ def alfeld_c2_space(vertices: tuple, order: int) -> list[FunctionInput]:
     ]
 
 
-class AlfeldC2(_C2Element):
+class AlfeldC2(CiarletElement):
     """The C2 triangle on a double centroid split."""
 
     def __init__(self, reference: Reference, order: int):
@@ -112,6 +113,13 @@ class AlfeldC2(_C2Element):
             2,
             1,
         )
+
+    def get_dual_matrix(self, inverse=False, caching=True):
+        """Return the dual matrix or its exact inverse."""
+        matrix = super().get_dual_matrix(False, caching)
+        if inverse:
+            return matrix.to_DM(extension=True).inv().to_Matrix()
+        return matrix
 
     @property
     def polynomial_subdegree(self) -> int:
