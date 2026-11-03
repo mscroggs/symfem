@@ -56,23 +56,20 @@ def _homogeneous_quintic_splines(vertices):
         shared = [v for k, v in enumerate(vertices) if k not in (i, j)]
         point = {x[k]: s * (shared[0][k] - mid[k]) + t * (shared[1][k] - mid[k]) for k in range(3)}
         for derivative in range(4):
-            add_constraints(
-                [p[derivative].subs(point, simultaneous=True) for p in derivatives],
-                [(i, 1), (j, -1)],
-            )
+            expressions = [p[derivative].subs(point, simultaneous=True) for p in derivatives]
+            blocks = [(i, 1), (j, -1)]
+            add_constraints(expressions, blocks)
 
     for i in range(4):
         face = [sympy.Matrix(v) for j, v in enumerate(vertices) if j != i]
         a, b = face[1] - face[0], face[2] - face[0]
         normal = a.cross(b)
         point = {x[k]: s * a[k] + t * b[k] for k in range(3)}
-        add_constraints(
-            [
-                sum(normal[k] * p[k + 1] for k in range(3)).subs(point, simultaneous=True)
-                for p in derivatives
-            ],
-            [(i, 1)],
-        )
+        expressions = [
+            sum(normal[k] * p[k + 1] for k in range(3)).subs(point, simultaneous=True)
+            for p in derivatives
+        ]
+        add_constraints(expressions, [(i, 1)])
 
     kernel = DomainMatrix.from_Matrix(sympy.Matrix(rows)).to_field().nullspace().to_Matrix()
     assert kernel.rows == 10

@@ -66,13 +66,9 @@ def alfeld_c2_space(vertices: tuple, order: int) -> list[FunctionInput]:
         shared = tuple(v for v in pieces[i] if v in pieces[j])
         if len(shared) == 2:
             point = tuple(a + s * (b - a) for a, b in zip(*shared))
-            constrain(
-                i,
-                j,
-                point,
-                order - 2 if major in shared and any(v in vertices for v in shared) else 2,
-                True,
-            )
+            outer_edge = major in shared and any(v in vertices for v in shared)
+            degree = order - 2 if outer_edge else 2
+            constrain(i, j, point, degree, True)
     for point, degree in [(major, order - 2)] + [(p, order - 1) for p in minors]:
         indices = [i for i, piece in enumerate(pieces) if point in piece]
         for j in indices[1:]:
