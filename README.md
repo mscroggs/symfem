@@ -175,12 +175,14 @@ The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities
 ![The numbering of a reference triangle](img/triangle_numbering.png)
 
 ### List of supported elements
+- Alfeld C2
 - Alfeld-Sorokina (alternative names: AS)
 - Argyris
 - Arnold-Winther (alternative names: AW, conforming Arnold-Winther)
 - Bell
 - Bernardi-Raugel
 - Bernstein (alternative names: Bernstein-Bezier)
+- Bramble-Zlamal C2
 - Brezzi-Douglas-Fortin-Marini (alternative names: BDFM)
 - Brezzi-Douglas-Marini (alternative names: BDM, N2div)
 - bubble
@@ -197,6 +199,7 @@ The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities
 - Hellan-Herrmann-Johnson (alternative names: HHJ)
 - Hermite
 - Hsieh-Clough-Tocher (alternative names: Clough-Tocher, HCT, CT)
+- Hu-Zhang
 - Kong-Mulder-Veldhuizen (alternative names: KMV)
 - Lagrange (alternative names: P)
 - Mardal-Tai-Winther (alternative names: MTW)
@@ -211,6 +214,7 @@ The reference triangle has vertices (0, 0), (1, 0), and (0, 1). Its sub-entities
 - Raviart-Thomas (alternative names: RT, N1div)
 - reduced Hsieh-Clough-Tocher (alternative names: rHCT)
 - Regge
+- robust Wu-Xu (alternative names: Wu-Xu robust)
 - symmetric matrix Lagrange
 - Taylor (alternative names: discontinuous Taylor)
 - transition
@@ -269,6 +273,7 @@ The reference tetrahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), and (0, 
 - Guzman-Neilan second kind
 - Hellan-Herrmann-Johnson (alternative names: HHJ)
 - Hermite
+- Hu-Zhang-Zhang
 - Kong-Mulder-Veldhuizen (alternative names: KMV)
 - Lagrange (alternative names: P)
 - Mardal-Tai-Winther (alternative names: MTW)
@@ -282,6 +287,7 @@ The reference tetrahedron has vertices (0, 0, 0), (1, 0, 0), (0, 1, 0), and (0, 
 - Taylor (alternative names: discontinuous Taylor)
 - transition
 - vector Lagrange (alternative names: vP)
+- Walkington
 - Wu-Xu
 
 ## Hexahedron

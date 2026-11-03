@@ -284,3 +284,18 @@ def test_matrix_integral():
     assert i[0, 1] == sympy.Rational(1, 6)
     assert i[1, 0] == sympy.Rational(1, 60)
     assert i[1, 1] == sympy.Rational(1, 2)
+
+
+def test_shared_alfeld_edge_integral():
+    from symfem.elements.guzman_neilan import get_sub_cells
+    from symfem.elements.nedelec import NedelecFirstKind
+    from symfem.functions import VectorFunction
+    from symfem import create_reference
+
+    reference = create_reference("tetrahedron")
+    value = VectorFunction((1, 2, 3))
+    piecewise = PiecewiseFunction({cell: value for cell in get_sub_cells(reference)}, 3)
+    element = NedelecFirstKind(reference, 0)
+    expected = [1, 2, 3, 1, 2, 1]
+    assert [d.eval_symbolic(value).as_sympy() for d in element.dofs] == expected
+    assert [d.eval_symbolic(piecewise).as_sympy() for d in element.dofs] == expected

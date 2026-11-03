@@ -456,11 +456,16 @@ class PiecewiseFunction(Function):
             The integral
         """
         result = ScalarFunction(0)
+        integrated = set()
         for shape, f in self._pieces.items():
             ref = _piece_reference(self.tdim, shape)
             sub_domain = ref.intersection(domain)
             if sub_domain is not None:
-                result += f.integral(sub_domain, vars, dummy_vars)
+                # Shared interfaces use the first incident piece, as in get_piece.
+                key = frozenset(sub_domain.vertices)
+                if key not in integrated:
+                    result += f.integral(sub_domain, vars, dummy_vars)
+                    integrated.add(key)
         return result
 
     def det(self) -> PiecewiseFunction:
