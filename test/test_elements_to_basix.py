@@ -57,6 +57,14 @@ def test_element(
     for p in element.get_polynomial_basis():
         if isinstance(p, PiecewiseFunction):
             pytest.xfail("Cannot convert this element type to a Basix element")
+    for dim in range(element.reference.tdim + 1):
+        counts = {
+            len(element.entity_dofs(dim, i)) for i in range(element.reference.sub_entity_count(dim))
+        }
+        if len(counts) > 1:
+            with pytest.raises(NotImplementedError):
+                create_basix_element(element)
+            pytest.xfail("Cannot convert this element type to a Basix element")
 
     basix_element = create_basix_element(element)
     if element.range_shape is None:
