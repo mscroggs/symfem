@@ -3,6 +3,7 @@
 import typing
 from enum import Enum
 from symfem.finite_element import FiniteElement, CiarletElement
+from symfem.functionals import BaseFunctional
 from symfem.symbols import x
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.polynomials import degree
@@ -44,6 +45,25 @@ def get_embedded_degrees(poly, reference) -> tuple[int, int]:
     """
     superdegree = max(degree(reference, p) for p in poly)
     return (-1, superdegree)
+
+
+def _basix_dof_scale(dof: BaseFunctional) -> float:
+    """Get the factor that converts a Symfem DOF to the convention used by Basix.
+
+    Basix scales normals and tangents by the size of the sub-entity, while Symfem uses
+    unit vectors.
+
+    Args:
+        dof: The DOF
+
+    Returns:
+        The factor to multiply the DOF by
+    """
+    power = getattr(dof, "sub_entity_scale_power", 0)
+    if power == 0:
+        return 1.0
+    sub_entity = dof.reference.sub_entity(*dof.entity)
+    return float(sub_entity.volume() / sub_entity.default_reference().volume()) ** power
 
 
 def _create_custom_element_args(
@@ -143,7 +163,7 @@ def _create_custom_element_args(
                 entity = (2, [3, 2, 1, 0][entity[1]])
 
         dof_p, _dof_w = dof.discrete(superdegree)
-        dof_w = np.array(_dof_w)
+        dof_w = np.array(_dof_w) * _basix_dof_scale(dof)
         shape = dof_wts[entity[0]][entity[1]].shape
         new_dof_wts = np.zeros((shape[0] + 1, shape[1], shape[2], shape[3]))
         new_dof_wts[: shape[0], :, :, :] = dof_wts[entity[0]][entity[1]]
