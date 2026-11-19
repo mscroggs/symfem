@@ -1533,18 +1533,25 @@ class IntegralMoment(BaseFunctional):
         f = parse_function_input(f_in)
         self.f = f.subs(x, t)
 
+        # The power of the size of the sub-entity by which this functional differs from
+        # the push-forward (without the Jacobian determinant) of the functional on the
+        # reference sub-entity. This is used when converting to other libraries.
+        self.sub_entity_scale_power = 0
+
         # Map from reference entity to entity
         if id_def.default_reference() != id_def:
             if self.f.is_vector and len(self.f) != reference.gdim:
                 self.f = mappings.contravariant(
                     self.f, id_def.get_map_to_self(), id_def.get_inverse_map_to_self()
                 )
+                self.sub_entity_scale_power = 1
             elif self.f.is_matrix:
                 assert self.f.shape[0] == id_def.tdim
                 assert self.f.shape[1] == id_def.tdim
                 self.f = mappings.double_contravariant(
                     self.f, id_def.get_map_to_self(), id_def.get_inverse_map_to_self()
                 )
+                self.sub_entity_scale_power = 2
 
         # Map from default reference to reference
         if map_function and reference != reference.default_reference():
@@ -1876,6 +1883,9 @@ class TangentIntegralMoment(IntegralMoment):
             mapping=mapping,
             map_function=False,
         )
+        # The unit tangent differs from the push-forward of the tangent of the reference
+        # sub-entity by the size of the sub-entity
+        self.sub_entity_scale_power = 1
 
     def dof_direction(self) -> PointType | None:
         """Get the direction of the DOF.
@@ -1939,6 +1949,9 @@ class NormalIntegralMoment(IntegralMoment):
             mapping=mapping,
             map_function=False,
         )
+        # The unit normal differs from the push-forward of the normal of the reference
+        # sub-entity by the size of the sub-entity
+        self.sub_entity_scale_power = 1
 
     def dof_direction(self) -> PointType | None:
         """Get the direction of the DOF.
@@ -2243,6 +2256,9 @@ class NormalInnerProductIntegralMoment(InnerProductIntegralMoment):
             entity=entity,
             mapping=mapping,
         )
+        # The unit normal appears twice, and each differs from the push-forward of the
+        # normal of the reference sub-entity by the size of the sub-entity
+        self.sub_entity_scale_power = 2
 
     def get_tex(self) -> tuple[str, list[str]]:
         """Get a representation of the functional as TeX, and list of terms involved.

@@ -99,17 +99,19 @@ class Regge(CiarletElement):
                     for a, b in zip(edge_e.vertices[0], edge_e.vertices[1])
                 )
                 for f, dof in zip(basis, space.dofs):
-                    dofs.append(
-                        InnerProductIntegralMoment(
-                            reference,
-                            f,
-                            tangent,
-                            tangent,
-                            dof,
-                            entity=(1, e_n),
-                            mapping="double_covariant",
-                        )
+                    edge_dof = InnerProductIntegralMoment(
+                        reference,
+                        f,
+                        tangent,
+                        tangent,
+                        dof,
+                        entity=(1, e_n),
+                        mapping="double_covariant",
                     )
+                    # The unit tangent appears twice, and each differs from the push-forward
+                    # of the tangent of the reference edge by the length of the edge
+                    edge_dof.sub_entity_scale_power = 2
+                    dofs.append(edge_dof)
 
             if reference.tdim == 2:
                 if order > 0:
@@ -131,15 +133,17 @@ class Regge(CiarletElement):
                     for f_n, vs in enumerate(reference.sub_entities(2)):
                         face = reference.sub_entity(2, f_n)
                         for f, dof in zip(basis, rspace.dofs):
-                            dofs.append(
-                                IntegralMoment(
-                                    reference,
-                                    f * face.jacobian(),
-                                    dof,
-                                    entity=(2, f_n),
-                                    mapping="double_covariant",
-                                )
+                            face_dof = IntegralMoment(
+                                reference,
+                                f * face.jacobian(),
+                                dof,
+                                entity=(2, f_n),
+                                mapping="double_covariant",
                             )
+                            # The factor face.jacobian() cancels one of the two powers of
+                            # the size of the face introduced by mapping f to the face
+                            face_dof.sub_entity_scale_power = 1
+                            dofs.append(face_dof)
 
                 if order > 1:
                     dofs += make_integral_moment_dofs(
@@ -270,17 +274,19 @@ class ReggeTP(CiarletElement):
                     (b - a) / edge.jacobian() for a, b in zip(edge.vertices[0], edge.vertices[1])
                 )
                 for f, dof in zip(basis, space.dofs):
-                    dofs.append(
-                        InnerProductIntegralMoment(
-                            reference,
-                            f,
-                            tangent,
-                            tangent,
-                            dof,
-                            entity=(1, e_n),
-                            mapping="double_covariant",
-                        )
+                    edge_dof = InnerProductIntegralMoment(
+                        reference,
+                        f,
+                        tangent,
+                        tangent,
+                        dof,
+                        entity=(1, e_n),
+                        mapping="double_covariant",
                     )
+                    # The unit tangent appears twice, and each differs from the push-forward
+                    # of the tangent of the reference edge by the length of the edge
+                    edge_dof.sub_entity_scale_power = 2
+                    dofs.append(edge_dof)
 
             # DOFs on faces
             for f_n, vs in enumerate(reference.sub_entities(2)):
