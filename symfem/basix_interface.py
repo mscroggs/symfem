@@ -75,6 +75,15 @@ def _create_custom_element_args(
             raise NotImplementedError(
                 "Conversion to Basix element not implemented for macro elements"
             )
+    for dim in range(element.reference.tdim + 1):
+        counts = {
+            len(element.entity_dofs(dim, i)) for i in range(element.reference.sub_entity_count(dim))
+        }
+        if len(counts) > 1:
+            raise NotImplementedError(
+                "Conversion to Basix element not implemented for elements with different "
+                "numbers of DOFs on sub-entities of the same dimension"
+            )
 
     map_name = element.dofs[0].mapping
     continuity = element.continuity
