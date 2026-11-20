@@ -205,7 +205,7 @@ def create_element(
             for d in e.dofs:
                 d.entity = (reference.tdim, 0)
             e.continuity = "L2"
-            e.names = ["discontinuous " + i for i in e.names]
+            e.names = tuple("discontinuous " + i for i in e.names)
 
             return e
 
@@ -221,13 +221,13 @@ def _order_is_allowed(element_class: type, ref: str, order: int) -> bool:
         order: The polynomial order
     """
     if hasattr(element_class, "min_order"):
-        if isinstance(element_class.min_order, dict | ConstDict):
+        if isinstance(element_class.min_order, ConstDict[str, int]):
             if ref in element_class.min_order and order < element_class.min_order[ref]:
                 return False
         elif order < element_class.min_order:
             return False
     if hasattr(element_class, "max_order"):
-        if isinstance(element_class.max_order, dict | ConstDict):
+        if isinstance(element_class.max_order, ConstDict[str, int]):
             if ref in element_class.max_order and order > element_class.max_order[ref]:
                 return False
         elif order > element_class.max_order:

@@ -12,7 +12,7 @@ __all__: list[str] = []
 
 
 def orthogonal_basis_interval(
-    order: int, variables: AxisVariablesNotSingle = None
+    order: int, variables: AxisVariablesNotSingle | None = None
 ) -> list[ScalarFunction]:
     """Create a basis of orthogonal polynomials.
 
@@ -31,7 +31,7 @@ def orthogonal_basis_interval(
 
 
 def orthogonal_basis_triangle(
-    order: int, variables: AxisVariablesNotSingle = None
+    order: int, variables: AxisVariablesNotSingle | None = None
 ) -> list[ScalarFunction]:
     """Create a basis of orthogonal polynomials.
 
@@ -56,7 +56,7 @@ def orthogonal_basis_triangle(
 
 
 def orthogonal_basis_quadrilateral(
-    order: int, variables: AxisVariablesNotSingle = None
+    order: int, variables: AxisVariablesNotSingle | None = None
 ) -> list[ScalarFunction]:
     """Create a basis of orthogonal polynomials.
 

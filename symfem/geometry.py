@@ -1,6 +1,7 @@
 """Geometry."""
 
 import sympy
+from typing import Sequence, Union
 
 __all__ = [
     "PointType",
@@ -17,12 +18,8 @@ __all__ = [
 
 PointType = tuple[sympy.core.expr.Expr, ...]
 SetOfPoints = tuple[PointType, ...]
-PointTypeInput = (
-    tuple[sympy.core.expr.Expr | int, ...]
-    | list[sympy.core.expr.Expr | int]
-    | sympy.matrices.dense.MutableDenseMatrix
-)
-SetOfPointsInput = tuple[PointTypeInput, ...] | list[PointTypeInput]
+PointTypeInput = Union[Sequence[sympy.core.expr.Expr | int], sympy.matrices.dense.MutableDenseMatrix]
+SetOfPointsInput = Sequence[PointTypeInput]
 
 
 def _is_close(a: sympy.core.expr.Expr, b: int) -> bool:

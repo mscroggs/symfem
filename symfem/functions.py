@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 import sympy
 
 import symfem.references
-from symfem.geometry import PointType
+from symfem.geometry import PointType, SetOfPoints
 from symfem.symbols import AxisVariables, AxisVariablesNotSingle, t, x
 
 __all__ = [
@@ -24,14 +24,14 @@ __all__ = [
     "parse_function_list_input",
 ]
 
-SingleSympyFormat = (
-    sympy.core.expr.Expr
-    | tuple[sympy.core.expr.Expr, ...]
-    | sympy.matrices.dense.MutableDenseMatrix
-)
-SympyFormat = (
-    SingleSympyFormat | dict[tuple[tuple[sympy.core.expr.Expr, ...], ...] | SingleSympyFormat]
-)
+SingleSympyFormat = typing.Union[
+    sympy.core.expr.Expr,
+    tuple[sympy.core.expr.Expr, ...],
+    sympy.matrices.dense.MutableDenseMatrix,
+]
+SympyFormat = typing.Union[
+    SingleSympyFormat,  dict[SetOfPoints, SingleSympyFormat]
+]
 _ValuesToSubstitute = tuple[typing.Any, ...] | list[typing.Any] | typing.Any
 
 one = sympy.Integer(1)
@@ -1882,19 +1882,15 @@ class MatrixFunction(Function):
         return max(f.maximum_degree(cell) for row in self._mat for f in row)
 
 
-FunctionInput = (
-    Function
-    | sympy.core.expr.Expr
-    | int
-    | float
-    | tuple[sympy.core.expr.Expr | int | float | Function, ...]
-    | list[sympy.core.expr.Expr | int | float | Function]
-    | tuple[tuple[sympy.core.expr.Expr | int | float | Function, ...], ...]
-    | tuple[list[sympy.core.expr.Expr | int | float | Function], ...]
-    | list[tuple[sympy.core.expr.Expr | int | float | Function, ...]]
-    | list[list[sympy.core.expr.Expr | int | float | Function]]
-    | sympy.matrices.dense.MutableDenseMatrix
-)
+FunctionInput = typing.Union[
+    Function,
+    sympy.core.expr.Expr,
+    int,
+    float,
+    typing.Sequence[sympy.core.expr.Expr | int | float | Function],
+    typing.Sequence[typing.Sequence[sympy.core.expr.Expr | int | float | Function]],
+    sympy.matrices.dense.MutableDenseMatrix,
+]
 
 
 def parse_function_input(f: FunctionInput) -> Function:

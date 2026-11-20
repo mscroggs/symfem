@@ -1,6 +1,7 @@
 """Quadrature definitions."""
 
 from abc import ABC, abstractmethod
+import typing
 
 import sympy
 
@@ -25,7 +26,7 @@ __all__ = [
     "radau",
 ]
 
-Scalar = sympy.core.expr.Expr | int
+Scalar = typing.Union[sympy.core.expr.Expr, int]
 _qrcount = 0
 
 
@@ -309,5 +310,5 @@ def numerical(cell: str, degree: int) -> tuple[list[list[float]], list[float]]:
             getattr(basix.CellType, cell),
             degree,
         )
-        return [list(i) for i in pts], list(wts)
+        return [list(i) for i in pts], list(wts)  # type: ignore
     raise NotImplementedError()
