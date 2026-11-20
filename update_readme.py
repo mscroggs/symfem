@@ -15,6 +15,7 @@ cells = [
 elementlist: dict[str, list[str]] = {i: [] for i in cells}
 
 for e in symfem.create._elementlist:
+    assert hasattr(e, "names")
     name = e.names[0]
     if len(e.names) > 1:
         name += " (alternative names: " + ", ".join(e.names[1:]) + ")"
