@@ -221,14 +221,18 @@ def _order_is_allowed(element_class: type, ref: str, order: int) -> bool:
         order: The polynomial order
     """
     if hasattr(element_class, "min_order"):
-        if isinstance(element_class.min_order, ConstDict[str, int]):
-            if ref in element_class.min_order and order < element_class.min_order[ref]:
+        if isinstance(element_class.min_order, ConstDict):
+            if ref in element_class.min_order and (
+                (v := element_class.min_order[ref]) is None or order < v
+            ):
                 return False
         elif order < element_class.min_order:
             return False
     if hasattr(element_class, "max_order"):
-        if isinstance(element_class.max_order, ConstDict[str, int]):
-            if ref in element_class.max_order and order > element_class.max_order[ref]:
+        if isinstance(element_class.max_order, ConstDict):
+            if ref in element_class.max_order and (
+                (v := element_class.max_order[ref]) is None or order > v
+            ):
                 return False
         elif order > element_class.max_order:
             return False

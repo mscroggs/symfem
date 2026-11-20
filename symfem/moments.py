@@ -101,7 +101,7 @@ def make_integral_moment_dofs(
             m_kwargs = {}
             if mapping is not None:
                 m_kwargs["mapping"] = mapping
-            if order < SubElement.min_order:
+            if hasattr(SubElement, "min_order") and order < SubElement.min_order:
                 continue
             sub_element = SubElement(sub_ref.default_reference(), order, **kwargs)
             for dn, d in enumerate(sub_element.dofs):

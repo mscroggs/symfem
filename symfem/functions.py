@@ -24,14 +24,12 @@ __all__ = [
     "parse_function_list_input",
 ]
 
-SingleSympyFormat = typing.Union[
+SingleSympyFormat = typing.Union[  # noqa: UP007
     sympy.core.expr.Expr,
     tuple[sympy.core.expr.Expr, ...],
     sympy.matrices.dense.MutableDenseMatrix,
 ]
-SympyFormat = typing.Union[
-    SingleSympyFormat,  dict[SetOfPoints, SingleSympyFormat]
-]
+SympyFormat = typing.Union[SingleSympyFormat, dict[SetOfPoints, SingleSympyFormat]]  # noqa: UP007
 _ValuesToSubstitute = tuple[typing.Any, ...] | list[typing.Any] | typing.Any
 
 one = sympy.Integer(1)
@@ -1882,7 +1880,7 @@ class MatrixFunction(Function):
         return max(f.maximum_degree(cell) for row in self._mat for f in row)
 
 
-FunctionInput = typing.Union[
+FunctionInput = typing.Union[  # noqa: UP007
     Function,
     sympy.core.expr.Expr,
     int,

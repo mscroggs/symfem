@@ -1,7 +1,9 @@
 """Geometry."""
 
+from collections.abc import Sequence
+from typing import Union
+
 import sympy
-from typing import Sequence, Union
 
 __all__ = [
     "PointType",
@@ -18,7 +20,9 @@ __all__ = [
 
 PointType = tuple[sympy.core.expr.Expr, ...]
 SetOfPoints = tuple[PointType, ...]
-PointTypeInput = Union[Sequence[sympy.core.expr.Expr | int], sympy.matrices.dense.MutableDenseMatrix]
+PointTypeInput = Union[  # noqa: UP007
+    Sequence[sympy.core.expr.Expr | int], sympy.matrices.dense.MutableDenseMatrix
+]
 SetOfPointsInput = Sequence[PointTypeInput]
 
 

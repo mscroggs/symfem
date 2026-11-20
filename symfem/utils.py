@@ -41,3 +41,7 @@ class ConstDict:
     def __getitem__(self, key: str) -> int | None:
         """Get an item."""
         return self._d[key]
+
+    def __contains__(self, key: str) -> bool:
+        """Check if a key is in this const dict."""
+        return key in self._d
