@@ -22,7 +22,7 @@ from symfem.polynomials import (
 from symfem.quadrature import get_quadrature
 from symfem.references import Reference
 
-__all__ = ["Lagrange", "VectorLagrange", "MatrixLagrange", "SymmetricMatrixLagrange"]
+__all__ = ["Lagrange", "MatrixLagrange", "SymmetricMatrixLagrange", "VectorLagrange"]
 
 
 class Lagrange(CiarletElement):
@@ -107,8 +107,15 @@ class Lagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Lagrange", "P"]
-    references = ["interval", "triangle", "tetrahedron"]
+    names = (
+        "Lagrange",
+        "P",
+    )
+    references = (
+        "interval",
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 0
     continuity = "C0"
     value_type = "scalar"
@@ -184,8 +191,15 @@ class VectorLagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["vector Lagrange", "vP"]
-    references = ["interval", "triangle", "tetrahedron"]
+    names = (
+        "vector Lagrange",
+        "vP",
+    )
+    references = (
+        "interval",
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 0
     continuity = "C0"
     value_type = "vector"
@@ -254,8 +268,11 @@ class MatrixLagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["matrix Lagrange"]
-    references = ["triangle", "tetrahedron"]
+    names = ("matrix Lagrange",)
+    references = (
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 0
     continuity = "L2"
     value_type = "matrix"
@@ -347,8 +364,11 @@ class SymmetricMatrixLagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["symmetric matrix Lagrange"]
-    references = ["triangle", "tetrahedron"]
+    names = ("symmetric matrix Lagrange",)
+    references = (
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 0
     continuity = "L2"
     value_type = "symmetric matrix"

@@ -35,8 +35,8 @@ class CustomElement(CiarletElement):
 
         super().__init__(reference, order, poly_set, dofs, reference.tdim, 1)
 
-    names = ["custom quad element"]
-    references = ["quadrilateral"]
+    names = ("custom quad element",)
+    references = ("quadrilateral",)
     min_order = 1
     max_order = 1
     continuity = "L2"

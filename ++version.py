@@ -5,7 +5,7 @@ automatically create a new version tag on GitHub.
 """
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Check that CHANGELOG_SINCE_LAST_VERSION.md is not empty
 with open("CHANGELOG_SINCE_LAST_VERSION.md") as f:
@@ -18,7 +18,7 @@ if changes == "":
 with open("VERSION") as f:
     version = tuple(int(i) for i in f.read().split("."))
 
-now = datetime.now()
+now = datetime.now(tz=timezone.utc)
 if now.year == version[0] and now.month == version[1]:
     if len(version) == 2:
         new_version = (now.year, now.month, 1)

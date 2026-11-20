@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Callable
+from collections.abc import Callable
 
 import sympy
 
@@ -12,25 +12,25 @@ from symfem.symbols import x
 
 __all__ = [
     "MappingNotImplemented",
+    "co_contravariant",
+    "co_contravariant_inverse",
+    "contravariant",
+    "contravariant_inverse",
+    "contravariant_inverse_transpose",
+    "covariant",
+    "covariant_inverse",
+    "covariant_inverse_transpose",
+    "double_contravariant",
+    "double_contravariant_inverse",
+    "double_covariant",
+    "double_covariant_inverse",
+    "get_mapping",
     "identity",
     "identity_inverse",
     "identity_inverse_transpose",
     "l2",
-    "l2_inverse_transpose",
     "l2_inverse",
-    "covariant",
-    "covariant_inverse",
-    "covariant_inverse_transpose",
-    "contravariant",
-    "contravariant_inverse",
-    "contravariant_inverse_transpose",
-    "double_covariant",
-    "double_covariant_inverse",
-    "double_contravariant",
-    "double_contravariant_inverse",
-    "co_contravariant",
-    "co_contravariant_inverse",
-    "get_mapping",
+    "l2_inverse_transpose",
 ]
 
 

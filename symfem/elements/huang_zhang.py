@@ -106,8 +106,11 @@ class HuangZhang(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * 2 + 1
 
-    names = ["Huang-Zhang", "HZ"]
-    references = ["quadrilateral"]
+    names = (
+        "Huang-Zhang",
+        "HZ",
+    )
+    references = ("quadrilateral",)
     min_order = 1
     continuity = "H(div)"
     value_type = "vector"

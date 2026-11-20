@@ -16,18 +16,18 @@ from symfem.geometry import (
 )
 
 __all__ = [
+    "Arrow",
+    "Bezier",
+    "Colors",
+    "Fill",
+    "Line",
+    "Math",
+    "NCircle",
+    "Picture",
+    "PictureElement",
     "PointOrFunction",
     "SetOfPointsOrFunctions",
     "tex_font_size",
-    "Colors",
-    "PictureElement",
-    "Line",
-    "Bezier",
-    "Arrow",
-    "NCircle",
-    "Fill",
-    "Math",
-    "Picture",
 ]
 
 PointOrFunction = PointTypeInput | Function
@@ -145,7 +145,6 @@ class PictureElement(ABC):
         Returns:
             An SVG string
         """
-        pass
 
     @abstractmethod
     def as_tikz(self, map_pt: typing.Callable[[PointType], tuple[float, float]]) -> str:
@@ -157,7 +156,6 @@ class PictureElement(ABC):
         Returns:
             A Tikz string
         """
-        pass
 
     @property
     @abstractmethod
@@ -167,7 +165,6 @@ class PictureElement(ABC):
         Returns:
             A set of points
         """
-        pass
 
     def minx(self) -> sympy.core.expr.Expr:
         """Get the minimum x-coordinate.
@@ -678,7 +675,7 @@ class Picture:
 
     def __init__(
         self,
-        padding: sympy.core.expr.Expr = sympy.Integer(25),
+        padding: sympy.core.expr.Expr | None = None,
         scale: int | None = None,
         width: int | None = None,
         height: int | None = None,
@@ -703,6 +700,8 @@ class Picture:
             svg_metadata: Metadata to put at the start of the SVG file
             tex_comment: Comment to put at the start of the TeX file
         """
+        if padding is None:
+            padding = sympy.Integer(25)
         self._default_axes: SetOfPoints = (
             (sympy.Integer(1), -sympy.Rational(2, 25)),
             (sympy.Rational(1, 2), sympy.Rational(1, 5)),
@@ -1093,7 +1092,7 @@ class Picture:
         Returns:
             The image as an SVG string
         """
-        scale, height, width, map_pt = self.compute_scale("px")
+        _scale, height, width, map_pt = self.compute_scale("px")
 
         assert filename is None or filename.endswith(".svg")
         img = (
@@ -1164,7 +1163,7 @@ class Picture:
         Returns:
             The image as a Tikz string
         """
-        scale, height, width, map_pt = self.compute_scale("cm", False)
+        _scale, _height, _width, map_pt = self.compute_scale("cm", False)
         tikz = self.tex_comment
         tikz += "\\begin{tikzpicture}[x=1cm,y=1cm]\n"
 
@@ -1185,7 +1184,7 @@ class Picture:
     def save(
         self,
         filename: str | list[str],
-        plot_options: dict[str, typing.Any] = {},
+        plot_options: dict[str, typing.Any] | None = None,
     ):
         """Save the picture as a file.
 
@@ -1193,6 +1192,8 @@ class Picture:
             filename: The file name
             plot_options: The plotting options
         """
+        if plot_options is None:
+            plot_options = {}
         if isinstance(filename, list):
             for fn in filename:
                 self.save(fn, plot_options)

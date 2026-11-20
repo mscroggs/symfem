@@ -78,8 +78,8 @@ class Argyris(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Argyris"]
-    references = ["triangle"]
+    names = ("Argyris",)
+    references = ("triangle",)
     min_order = 5
     max_order = 5
     continuity = "C1"

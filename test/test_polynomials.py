@@ -1,21 +1,21 @@
 """Test polynomials."""
 
-from random import shuffle, randrange
+from random import randrange, shuffle
 
 import pytest
 import sympy
 
 from symfem import create_element, create_reference
-from symfem.functions import VectorFunction, ScalarFunction
+from symfem.functions import ScalarFunction, VectorFunction
 from symfem.polynomials import (
     Hcurl_polynomials,
     Hdiv_polynomials,
+    degree,
     jacobi_polynomial,
-    monic_jacobi_polynomial,
     l2_dual,
+    monic_jacobi_polynomial,
     orthogonal_basis,
     orthonormal_basis,
-    degree,
 )
 from symfem.symbols import t, x
 from symfem.utils import allequal

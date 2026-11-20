@@ -13,7 +13,7 @@ from symfem.geometry import SetOfPoints
 from symfem.piecewise_functions import PiecewiseFunction
 from symfem.references import Reference
 
-__all__ = ["P1IsoP2Interval", "P1IsoP2Tri", "P1IsoP2Quad"]
+__all__ = ["P1IsoP2Interval", "P1IsoP2Quad", "P1IsoP2Tri"]
 
 
 class P1IsoP2Interval(CiarletElement):
@@ -61,8 +61,12 @@ class P1IsoP2Interval(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
-    references = ["interval"]
+    names = (
+        "P1-iso-P2",
+        "P2-iso-P1",
+        "iso-P2 P1",
+    )
+    references = ("interval",)
     min_order = 1
     max_order = 1
     continuity = "C0"
@@ -105,7 +109,7 @@ class P1IsoP2Tri(CiarletElement):
             poly.append(
                 PiecewiseFunction(
                     {
-                        tuple(reference.get_point(pt) for pt in q): pieces[i] if i in pieces else 0
+                        tuple(reference.get_point(pt) for pt in q): pieces.get(i, 0)
                         for i, q in enumerate(tris)
                     },
                     2,
@@ -137,8 +141,12 @@ class P1IsoP2Tri(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
-    references = ["triangle"]
+    names = (
+        "P1-iso-P2",
+        "P2-iso-P1",
+        "iso-P2 P1",
+    )
+    references = ("triangle",)
     min_order = 1
     max_order = 1
     continuity = "C0"
@@ -183,7 +191,7 @@ class P1IsoP2Quad(CiarletElement):
             poly.append(
                 PiecewiseFunction(
                     {
-                        tuple(reference.get_point(pt) for pt in q): pieces[i] if i in pieces else 0
+                        tuple(reference.get_point(pt) for pt in q): pieces.get(i, 0)
                         for i, q in enumerate(quads)
                     },
                     2,
@@ -216,8 +224,12 @@ class P1IsoP2Quad(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["P1-iso-P2", "P2-iso-P1", "iso-P2 P1"]
-    references = ["quadrilateral"]
+    names = (
+        "P1-iso-P2",
+        "P2-iso-P1",
+        "iso-P2 P1",
+    )
+    references = ("quadrilateral",)
     min_order = 1
     max_order = 1
     continuity = "C0"

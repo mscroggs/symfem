@@ -28,7 +28,7 @@ from symfem.polynomials import (
 from symfem.quadrature import get_quadrature
 from symfem.references import NonDefaultReferenceError, Reference
 
-__all__ = ["Q", "VectorQ", "Nedelec", "RaviartThomas"]
+__all__ = ["Nedelec", "Q", "RaviartThomas", "VectorQ"]
 
 
 class Q(CiarletElement):
@@ -162,8 +162,15 @@ class Q(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim
 
-    names = ["Q", "Lagrange", "P"]
-    references = ["quadrilateral", "hexahedron"]
+    names = (
+        "Q",
+        "Lagrange",
+        "P",
+    )
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 0
     continuity = "C0"
     value_type = "scalar"
@@ -230,8 +237,14 @@ class VectorQ(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim
 
-    names = ["vector Q", "vQ"]
-    references = ["quadrilateral", "hexahedron"]
+    names = (
+        "vector Q",
+        "vQ",
+    )
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 0
     continuity = "C0"
     value_type = "vector"
@@ -290,8 +303,17 @@ class Nedelec(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return (self.order + 1) * self.reference.tdim - 1
 
-    names = ["NCE", "RTCE", "Qcurl", "Nedelec", "Ncurl"]
-    references = ["quadrilateral", "hexahedron"]
+    names = (
+        "NCE",
+        "RTCE",
+        "Qcurl",
+        "Nedelec",
+        "Ncurl",
+    )
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 0
     continuity = "H(curl)"
     value_type = "vector"
@@ -349,8 +371,15 @@ class RaviartThomas(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim + 1
 
-    names = ["NCF", "RTCF", "Qdiv"]
-    references = ["quadrilateral", "hexahedron"]
+    names = (
+        "NCF",
+        "RTCF",
+        "Qdiv",
+    )
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 0
     continuity = "H(div)"
     value_type = "vector"

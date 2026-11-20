@@ -29,19 +29,18 @@ if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../
             elif code and line.strip() == "::":
                 output = True
                 code = False
-            elif code or output:
-                if line.strip() != "":
-                    if line.startswith("    "):
-                        if code:
-                            assert not output
-                            codelines.append(line.strip("\n")[4:])
-                        else:
-                            assert output
-                            outputlines.append(line.strip("\n")[4:])
+            elif (code or output) and line.strip() != "":
+                if line.startswith("    "):
+                    if code:
+                        assert not output
+                        codelines.append(line.strip("\n")[4:])
                     else:
-                        output = False
-                        code = False
-                        doc_data.append(("\n".join(codelines), "\n".join(outputlines)))
+                        assert output
+                        outputlines.append(line.strip("\n")[4:])
+                else:
+                    output = False
+                    code = False
+                    doc_data.append(("\n".join(codelines), "\n".join(outputlines)))
 if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../README.md")):
     with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../README.md")) as f:
         for line in f:
@@ -81,13 +80,13 @@ def test_available_references():
     r_supported = r_supported.split("cell_type: ")[1]
     r_supported = r_supported.split("vertices: ")[0]
     r_supported = r_supported.split("Supported values:")[1]
-    r_supported = set([i.strip() for i in r_supported.split(",")])
+    r_supported = {i.strip() for i in r_supported.split(",")}
 
     e_supported = symfem.create_element.__doc__
     e_supported = e_supported.split("cell_type: ")[1]
     e_supported = e_supported.split("element_type: ")[0]
     e_supported = e_supported.split("Supported values:")[1]
-    e_supported = set([i.strip() for i in e_supported.split(",")])
+    e_supported = {i.strip() for i in e_supported.split(",")}
 
     assert r_supported == e_supported
 
@@ -97,7 +96,7 @@ def test_available_elements():
     supported = supported.split("element_type: ")[1]
     supported = supported.split("order: ")[0]
     supported = supported.split("Supported values:")[1]
-    supported = set([i.strip() for i in supported.split(",")])
+    supported = {i.strip() for i in supported.split(",")}
 
     assert set(symfem.create._elementmap.keys()) == supported
 
@@ -150,7 +149,7 @@ def test_snippets(script, output):
 
     old_stdout = sys.stdout
     redirected_output = sys.stdout = StringIO()
-    exec(script)
+    exec(script)  # noqa: S102
     sys.stdout = old_stdout
 
     actual_output = redirected_output.getvalue().strip()

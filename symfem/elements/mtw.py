@@ -113,8 +113,14 @@ class MardalTaiWinther(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.lagrange_superdegree
 
-    names = ["Mardal-Tai-Winther", "MTW"]
-    references = ["triangle", "tetrahedron"]
+    names = (
+        "Mardal-Tai-Winther",
+        "MTW",
+    )
+    references = (
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 1
     max_order = 1
     continuity = "H(div)"

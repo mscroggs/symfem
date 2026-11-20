@@ -12,9 +12,7 @@ def test_polyset(cell):
     e = symfem.create_element(cell, "P1-iso-P2", 1)
 
     half = sympy.Rational(1, 2)
-    if cell == "triangle":
-        points = [(0, 0), (1, 0), (0, 1), (half, 0), (0, half), (half, half)]
-    elif cell == "quadrilateral":
+    if cell == "triangle" or cell == "quadrilateral":
         points = [(0, 0), (1, 0), (0, 1), (half, 0), (0, half), (half, half)]
     else:
         raise ValueError(f"Unsupported cell: {cell}")

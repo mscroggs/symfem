@@ -13,6 +13,7 @@ from symfem.functions import FunctionInput
 from symfem.polynomials import polynomial_set_1d
 from symfem.quadrature import get_quadrature
 from symfem.references import Reference
+from symfem.utils import ConstDict
 
 __all__ = ["CrouzeixRaviart"]
 
@@ -96,10 +97,18 @@ class CrouzeixRaviart(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Crouzeix-Raviart", "CR", "Crouzeix-Falk", "CF"]
-    references = ["triangle", "tetrahedron"]
+    names = (
+        "Crouzeix-Raviart",
+        "CR",
+        "Crouzeix-Falk",
+        "CF",
+    )
+    references = (
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 1
-    max_order = {"tetrahedron": 1}
+    max_order = ConstDict({"tetrahedron": 1})
     continuity = "L2"
     value_type = "scalar"
     last_updated = "2025.12"

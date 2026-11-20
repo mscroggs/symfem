@@ -14,6 +14,7 @@ A clear and concise description of what the bug is.
 Minimal code to reproduce the behavior:
 ```python
 import symfem
+
 assert 1 == 2
 ```
 **Expected behavior**

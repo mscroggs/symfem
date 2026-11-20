@@ -53,8 +53,13 @@ class Enrichment(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return 1
 
-    names: list[str] = []
-    references = ["triangle", "quadrilateral", "tetrahedron", "hexahedron"]
+    names = ()
+    references = (
+        "triangle",
+        "quadrilateral",
+        "tetrahedron",
+        "hexahedron",
+    )
     min_order = 1
     max_order = 1
     continuity = "C0"
@@ -95,8 +100,17 @@ class VectorEnrichedGalerkin(EnrichedElement):
             return self.order * self.reference.tdim
         return self.order
 
-    names = ["enriched vector Galerkin", "locking-free enriched Galerkin", "LFEG"]
-    references = ["triangle", "quadrilateral", "tetrahedron", "hexahedron"]
+    names = (
+        "enriched vector Galerkin",
+        "locking-free enriched Galerkin",
+        "LFEG",
+    )
+    references = (
+        "triangle",
+        "quadrilateral",
+        "tetrahedron",
+        "hexahedron",
+    )
     min_order = 1
     continuity = "C0"
     value_type = "vector"

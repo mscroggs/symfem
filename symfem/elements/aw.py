@@ -147,8 +147,8 @@ class ArnoldWinther(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
-    names = ["Arnold-Winther", "AW", "conforming Arnold-Winther"]
-    references = ["triangle"]
+    names = ("Arnold-Winther", "AW", "conforming Arnold-Winther")
+    references = ("triangle",)
     min_order = 2
     continuity = "integral inner H(div)"
     value_type = "symmetric matrix"
@@ -248,8 +248,8 @@ class NonConformingArnoldWinther(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
-    names = ["nonconforming Arnold-Winther", "nonconforming AW"]
-    references = ["triangle"]
+    names = ("nonconforming Arnold-Winther", "nonconforming AW")
+    references = ("triangle",)
     min_order = 1
     max_order = 1
     continuity = "integral inner H(div)"

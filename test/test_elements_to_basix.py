@@ -65,4 +65,4 @@ def test_element(
         assert basix_element.value_shape == list(element.range_shape)
 
     code_string = generate_basix_element_code(element)
-    exec(code_string)
+    exec(code_string)  # noqa: S102

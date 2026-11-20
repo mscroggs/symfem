@@ -131,8 +131,11 @@ class Lagrange(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return None
 
-    names = ["Lagrange", "P"]
-    references = ["pyramid"]
+    names = (
+        "Lagrange",
+        "P",
+    )
+    references = ("pyramid",)
     min_order = 0
     continuity = "C0"
     value_type = "scalar"

@@ -13,7 +13,7 @@ from symfem.polynomials import polynomial_set_1d
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import x
 
-__all__ = ["kmv_tri_polyset", "kmv_tet_polyset", "KongMulderVeldhuizen"]
+__all__ = ["KongMulderVeldhuizen", "kmv_tet_polyset", "kmv_tri_polyset"]
 
 
 def kmv_tri_polyset(m: int, mf: int) -> list[FunctionInput]:
@@ -243,8 +243,14 @@ class KongMulderVeldhuizen(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.lagrange_superdegree
 
-    names = ["Kong-Mulder-Veldhuizen", "KMV"]
-    references = ["triangle", "tetrahedron"]
+    names = (
+        "Kong-Mulder-Veldhuizen",
+        "KMV",
+    )
+    references = (
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 1
     continuity = "C0"
     value_type = "scalar"

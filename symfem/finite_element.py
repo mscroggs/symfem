@@ -29,13 +29,13 @@ from symfem.utils import allequal
 from symfem.version import version
 
 __all__ = [
-    "TabulatedBasis",
-    "NoTensorProduct",
-    "FiniteElement",
     "CiarletElement",
     "DirectElement",
-    "EnrichedElement",
     "ElementBasisFunction",
+    "EnrichedElement",
+    "FiniteElement",
+    "NoTensorProduct",
+    "TabulatedBasis",
 ]
 
 TabulatedBasis = (
@@ -154,7 +154,7 @@ class FiniteElement(ABC):
     def plot_dof_diagram(
         self,
         filename: str | list[str],
-        plot_options: dict[str, typing.Any] = {},
+        plot_options: dict[str, typing.Any] | None = None,
         **kwargs: typing.Any,
     ):
         """Plot a diagram showing the DOFs of the element.
@@ -164,6 +164,8 @@ class FiniteElement(ABC):
             plot_options: Options for the plot
             kwargs: Keyword arguments
         """
+        if plot_options is None:
+            plot_options = {}
         img = Picture(**kwargs)
         colors = img.colors
 
@@ -588,8 +590,8 @@ class FiniteElement(ABC):
         """
         return self.names[0]
 
-    names: list[str] = []
-    references: list[str] = []
+    names: tuple[str, ...] = ()
+    references: tuple[str, ...] = ()
     last_updated = version
     cache = True
     value_type = "unknown"
@@ -809,7 +811,7 @@ class CiarletElement(FiniteElement):
             for dim in range(self.reference.tdim + 1):
                 for e in range(self.reference.sub_entity_count(dim)):
                     entity_dofs = self.entity_dofs(dim, e)
-                    dofs_by_type: dict[tuple[typing.Type, str | None], list[int]] = {}
+                    dofs_by_type: dict[tuple[type, str | None], list[int]] = {}
                     for d in entity_dofs:
                         dof = self.dofs[d]
                         t = (type(dof), dof.mapping)

@@ -139,8 +139,8 @@ class AlfeldSorokina(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["Alfeld-Sorokina", "AS"]
-    references = ["triangle"]
+    names = ("Alfeld-Sorokina", "AS")
+    references = ("triangle",)
     min_order = 2
     max_order = 2
     continuity = "C0"

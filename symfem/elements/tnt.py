@@ -25,7 +25,7 @@ from symfem.polynomials import orthogonal_basis, quolynomial_set_1d, quolynomial
 from symfem.references import NonDefaultReferenceError, Reference
 from symfem.symbols import t, x
 
-__all__ = ["p", "b", "TNT", "TNTcurl", "TNTdiv"]
+__all__ = ["TNT", "TNTcurl", "TNTdiv", "b", "p"]
 
 
 def p(k: int, v: sympy.core.symbol.Symbol) -> ScalarFunction:
@@ -146,8 +146,14 @@ class TNT(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return max((self.order - 1) * self.reference.tdim, (self.order - 1) + self.reference.tdim)
 
-    names = ["tiniest tensor", "TNT"]
-    references = ["quadrilateral", "hexahedron"]
+    names = (
+        "tiniest tensor",
+        "TNT",
+    )
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 2
     continuity = "C0"
     value_type = "scalar"
@@ -322,8 +328,14 @@ class TNTcurl(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim + 1
 
-    names = ["tiniest tensor Hcurl", "TNTcurl"]
-    references = ["quadrilateral", "hexahedron"]
+    names = (
+        "tiniest tensor Hcurl",
+        "TNTcurl",
+    )
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 1
     continuity = "H(curl)"
     value_type = "vector"
@@ -496,8 +508,14 @@ class TNTdiv(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order * self.reference.tdim + 1
 
-    names = ["tiniest tensor Hdiv", "TNTdiv"]
-    references = ["quadrilateral", "hexahedron"]
+    names = (
+        "tiniest tensor Hdiv",
+        "TNTdiv",
+    )
+    references = (
+        "quadrilateral",
+        "hexahedron",
+    )
     min_order = 1
     continuity = "H(div)"
     value_type = "vector"

@@ -7,8 +7,9 @@ This demo shows how Symfem can be used to create Basix custom elements, and so
 allows for almost any Symfem element to be used with FEniCSx.
 """
 
-import symfem
 import numpy as np
+
+import symfem
 
 # As Basix is an optional dependency of Symfem, the basix interface must be
 # imported separately

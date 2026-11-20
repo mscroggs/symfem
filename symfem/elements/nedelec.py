@@ -66,8 +66,15 @@ class NedelecFirstKind(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order + 1
 
-    names = ["Nedelec", "Nedelec1", "N1curl"]
-    references = ["triangle", "tetrahedron"]
+    names = (
+        "Nedelec",
+        "Nedelec1",
+        "N1curl",
+    )
+    references = (
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 0
     continuity = "H(curl)"
     value_type = "vector"
@@ -122,8 +129,14 @@ class NedelecSecondKind(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Nedelec2", "N2curl"]
-    references = ["triangle", "tetrahedron"]
+    names = (
+        "Nedelec2",
+        "N2curl",
+    )
+    references = (
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 1
     continuity = "H(curl)"
     value_type = "vector"

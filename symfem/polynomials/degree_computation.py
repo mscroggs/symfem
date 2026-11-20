@@ -1,9 +1,10 @@
 """Functions to compute the degree of polynomials."""
 
 import sympy
-from symfem.references import Reference
-from symfem.functions import ScalarFunction, Function
+
 from symfem.basis_functions import SubbedBasisFunction
+from symfem.functions import Function, ScalarFunction
+from symfem.references import Reference
 from symfem.symbols import x
 
 

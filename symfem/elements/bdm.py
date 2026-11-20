@@ -74,8 +74,15 @@ class BDM(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Brezzi-Douglas-Marini", "BDM", "N2div"]
-    references = ["triangle", "tetrahedron"]
+    names = (
+        "Brezzi-Douglas-Marini",
+        "BDM",
+        "N2div",
+    )
+    references = (
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 1
     continuity = "H(div)"
     value_type = "vector"

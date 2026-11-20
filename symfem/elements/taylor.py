@@ -56,8 +56,15 @@ class Taylor(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         return self.order
 
-    names = ["Taylor", "discontinuous Taylor"]
-    references = ["interval", "triangle", "tetrahedron"]
+    names = (
+        "Taylor",
+        "discontinuous Taylor",
+    )
+    references = (
+        "interval",
+        "triangle",
+        "tetrahedron",
+    )
     min_order = 0
     continuity = "L2"
     value_type = "scalar"

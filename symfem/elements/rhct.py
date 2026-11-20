@@ -114,8 +114,11 @@ class ReducedHsiehCloughTocher(CiarletElement):
     def polynomial_superdegree(self) -> int | None:
         raise NotImplementedError()
 
-    names = ["reduced Hsieh-Clough-Tocher", "rHCT"]
-    references = ["triangle"]
+    names = (
+        "reduced Hsieh-Clough-Tocher",
+        "rHCT",
+    )
+    references = ("triangle",)
     min_order = 3
     max_order = 3
     # continuity = "C1"
