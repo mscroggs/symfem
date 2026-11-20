@@ -29,19 +29,18 @@ if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../
             elif code and line.strip() == "::":
                 output = True
                 code = False
-            elif code or output:
-                if line.strip() != "":
-                    if line.startswith("    "):
-                        if code:
-                            assert not output
-                            codelines.append(line.strip("\n")[4:])
-                        else:
-                            assert output
-                            outputlines.append(line.strip("\n")[4:])
+            elif (code or output) and line.strip() != "":
+                if line.startswith("    "):
+                    if code:
+                        assert not output
+                        codelines.append(line.strip("\n")[4:])
                     else:
-                        output = False
-                        code = False
-                        doc_data.append(("\n".join(codelines), "\n".join(outputlines)))
+                        assert output
+                        outputlines.append(line.strip("\n")[4:])
+                else:
+                    output = False
+                    code = False
+                    doc_data.append(("\n".join(codelines), "\n".join(outputlines)))
 if os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../README.md")):
     with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../README.md")) as f:
         for line in f:

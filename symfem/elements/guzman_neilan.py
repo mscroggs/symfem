@@ -368,9 +368,8 @@ def make_piecewise_lagrange(
                         continue
                     if zero_at_centre and (2 in tri_e):
                         continue
-                elif dim == 1:
-                    if zero_on_boundary and (0 in tri_e):
-                        continue
+                elif dim == 1 and zero_on_boundary and (0 in tri_e):
+                    continue
                 doflist = [nones if i == -1 else lagrange_space.entity_dofs(dim, i) for i in tri_e]
                 for dofs in zip(*doflist):
                     basis_dofs.append(tuple(dofs))
@@ -418,9 +417,8 @@ def make_piecewise_lagrange(
                 elif dim == 1:
                     if zero_on_boundary and (3 in tet_e or 1 in tet_e or 0 in tet_e):
                         continue
-                elif dim == 2:
-                    if zero_on_boundary and (0 in tet_e):
-                        continue
+                elif dim == 2 and zero_on_boundary and (0 in tet_e):
+                    continue
                 doflist = [nones if i == -1 else lagrange_space.entity_dofs(dim, i) for i in tet_e]
                 for dofs in zip(*doflist):
                     basis_dofs.append(tuple(dofs))
