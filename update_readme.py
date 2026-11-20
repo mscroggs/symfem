@@ -19,6 +19,7 @@ for e in symfem.create._elementlist:
     name = e.names[0]
     if len(e.names) > 1:
         name += " (alternative names: " + ", ".join(e.names[1:]) + ")"
+    assert hasattr(e, "references")
     for r in e.references:
         elementlist[r].append(name)
 
